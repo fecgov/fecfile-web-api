@@ -1,3 +1,4 @@
 # requirements.txt
 
 Django==1.9.4
+psycopg2

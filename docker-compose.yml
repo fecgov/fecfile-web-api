@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+  web:
+    build: .
+    image: fecnxg
+    command: python manage.py runserver 0.0.0.0:8080
+    volumes:
+      - ./django-backend:/opt/nxg_fec
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - migration
+  migration:
+    image: fecnxg
+    command: python manage.py migrate --noinput
+    volumes:
+      - ./django-backend:/opt/nxg_fec
+    depends_on:
+      - db
