@@ -20,3 +20,5 @@ Then FEC file login page is launched
 #And user enters invalid committee ID or invalid password
 #When user clicks on login button
 #Then application should display invalid login message
+
+#test
