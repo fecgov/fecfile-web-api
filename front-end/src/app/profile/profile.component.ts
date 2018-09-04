@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HeaderComponent } from '../shared/partials/header/header.component';
+import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-profile',

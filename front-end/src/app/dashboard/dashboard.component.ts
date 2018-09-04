@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SessionService } from '../shared/services/SessionService/session.service';
+import { HeaderComponent } from '../shared/partials/header/header.component';
+import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-dashboard',

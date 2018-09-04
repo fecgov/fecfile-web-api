@@ -2,47 +2,11 @@
 
 .dashboard {
   background-color: $white;
-
+  color: $black;
   .grid-row {
     margin: 0;
     .grid-row__col {
       padding: 0;
-    }
-  }
-  .dashboard__sidebar {
-    background-color: $primaryBlue;
-    min-height: 100vh;
-  }
-  .dashboard__header {
-    background-color: $dustyGray;
-    color: $black;
-    height: 60px;
-    .dashboard__header--nav {
-      float: left;
-      a {
-        color: $black;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-      .bars-icon {
-        padding-left: 20px;
-        padding-top: 15px;
-      }
-      .nav-links {
-        list-style-type: none;
-        li {
-          display: inline-block;
-          padding-right: 25px;
-        }
-      }
-      .dashboard-search {
-        padding-top: 10px;
-        .search-input {
-          @include make-text-input(400px, 1.5em, 1em, 1em);
-        }
-      }
     }
   }
 }
