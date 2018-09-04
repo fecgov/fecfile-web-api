@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>Fec</groupId>
@@ -14,23 +14,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencies>
-   
-    	<dependency>
+<dependencies>
+  
+  		<dependency>
 			<groupId>net.sourceforge.jexcelapi</groupId>
 			<artifactId>jxl</artifactId>
 			<version>2.6.12</version>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/com.sun/tools -->
-		<dependency>
-    		<groupId>com.sun</groupId>
-    		<artifactId>tools</artifactId>
-    		<version>1.8.0</version>
-    		<scope>system</scope>
-    		<systemPath>${JAVA_HOME}/../lib/tools.jar</systemPath>
-		</dependency>
-		
 		
 		 <dependency>
       <groupId>com.google.guava</groupId>
@@ -51,7 +41,20 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 			<artifactId>selenium-java</artifactId>
 			<version>2.53.1</version>
 		</dependency>
-    
+		<!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-server -->
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-server</artifactId>
+    <version>3.5.3</version>
+</dependency>
+		
+    <dependency>
+   		<groupId>com.sun</groupId>
+   		<artifactId>tools</artifactId>
+   		<version>1.8.0</version>
+   		<scope>system</scope>
+   		<systemPath>C:\Program Files\Java\jdk1.8.0_181\lib\tools.jar</systemPath>
+ 	</dependency>
  	
   	<dependency>
   		<groupId>info.cukes</groupId>
@@ -99,6 +102,14 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   		<artifactId>cucumber-junit</artifactId>
   		<version>1.2.4</version>
   	</dependency>
+		<!-- https://mvnrepository.com/artifact/info.cukes/gherkin -->
+		<dependency>
+		    <groupId>info.cukes</groupId>
+		    <artifactId>gherkin</artifactId>
+		    <version>2.12.2</version>
+		    <scope>provided</scope>
+		</dependency>
+
   	<dependency>
   		<groupId>org.hamcrest</groupId>
   		<artifactId>hamcrest-all</artifactId>
@@ -109,13 +120,5 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   		<artifactId>junit</artifactId>
   		<version>4.12</version>
   	</dependency>
-  	
-  	<!-- https://mvnrepository.com/artifact/info.cukes/gherkin -->
-<dependency>
-    <groupId>info.cukes</groupId>
-    <artifactId>gherkin</artifactId>
-    <version>2.12.2</version>
-    <scope>provided</scope>
-</dependency>
   </dependencies>
 </project>
