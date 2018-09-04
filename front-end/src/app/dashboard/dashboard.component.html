@@ -1,0 +1,60 @@
+<div class="dashboard">
+  <div class="grid-row">
+    <div class="grid-row__col grid-row__col--2 dashboard__sidebar">
+      <aside>
+        <div class="logo">
+          <img src="assets/img/logo.svg" alt="FEC logo" role="logo"/>
+        </div>
+      </aside>
+    </div>
+    <div class="grid-row__col grid-row__col--10">
+      <main>
+        <header>
+          <div class="dashboard__header">
+            <div class="dashboard__header--nav">
+              <a href="#" role="button">
+                <i class="bars-icon"></i>
+              </a>
+            </div>
+            <div class="dashboard__header--nav">
+              <ul class="nav-links">
+                <li>
+                  Reports
+                </li>
+                <li>
+                  Contributors
+                </li>
+                <li>
+                  Tools
+                </li>
+                <li>
+                  Help
+                </li>
+              </ul>
+            </div>
+            <div class="dashboard__header--nav">
+              <div class="dashboard-search">
+                <input type="text" name="search" class="search-input" placeholder="Search for..." />
+              </div>
+            </div>
+            <div class="dashboard__header--nav">
+              <ul class="nav-links">
+                <li>Notifications</li>
+                <li>
+                  <a [routerLink]="['/profile']">
+                    Profile
+                  </a>
+                </li>
+                <li>
+                  <a [routerLink]="['/']" (click)="logout()">
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </header>
+      </main>
+    </div>
+  </div>
+</div>

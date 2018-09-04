@@ -1,0 +1,7 @@
+.grid-row {
+  @include make-row();
+}
+
+.grid-row__col {
+  @include make-col-ready();
+}

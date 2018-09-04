@@ -1,0 +1,120 @@
+<div class="login">
+
+  <header>
+    <div class="logo">
+      <img src="assets/img/logo.svg" alt="FEC Logo" />
+    </div>
+  </header>
+
+  <div class="login-box">
+    <form [formGroup]="frm" (ngSubmit)="doSignIn()">
+
+      <header>
+        <div class="title">
+          <h1>FEC eFile</h1>
+        </div>
+      </header>
+
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="error" *ngIf="hasFailed">
+            Invalid commitee id or password.
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row form-field__info">
+        <div class="grid-row__col grid-row__col--6 text-left">
+          <label class="left-text" for="login-committee-id">
+            Committee ID
+          </label>
+        </div>
+        <div class="grid-row__col grid-row__col--6 text-right">
+          <div class="right-text">
+            <a class="link" href="#">
+              Forgot Committee ID
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row form-field">
+        <div class="grid-row__col grid-row__col--12">
+          <input
+            type="text"
+            class="login-committee-id login-input"
+            id="login-committee-id"
+            placeholder="987654320"
+            formControlName="commiteeId"
+            (keyup)="updateStatus()"
+            [ngClass]="{'': (!frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || !committeeIdInputError,
+              'login-input-error':  (frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError}"
+          />
+          <div
+            class="error"
+            *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError "
+          >
+            <div *ngIf="frm.get('commiteeId').hasError('required')">
+              Please enter your committee id.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row form-field__info">
+        <div class="grid-row__col grid-row__col--6 text-left">
+          <label class="left-text" for="login-password">
+            Password
+          </label>
+        </div>
+        <div class="grid-row__col grid-row__col--6 text-right">
+          <div class="right-text">
+            <a class="link" href="#">
+              Forgot Password
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row form-field">
+        <div class="grid-row__col grid-row__col--12">
+          <input
+            type="password"
+            class="login-password login-input"
+            id="login-password"
+            placeholder="**********"
+            formControlName="loginPassword"
+            (keyup)="updateStatus()"
+            [ngClass]="{'': (!frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || !passwordInputError,
+              'login-input-error':  (frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || passwordInputError}"
+          />
+          <div
+            class="error"
+            *ngIf="(frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || passwordInputError "
+          >
+            <div *ngIf="frm.get('loginPassword').hasError('required')">
+              Please enter your password.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <button type="submit" class="login__btn" [disabled]="isBusy">
+            <ng-template [ngIf]="!isBusy">Log In</ng-template>
+            <ng-template [ngIf]="isBusy">Logging in, please wait...</ng-template>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <a class="link" href="#">
+            Do you need to register your committee?
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
