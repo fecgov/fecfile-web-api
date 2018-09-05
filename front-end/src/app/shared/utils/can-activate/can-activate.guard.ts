@@ -15,6 +15,7 @@ export class CanActivateGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
+    console.log('state: ', state);
     if (!this.auth.isSignedIn()) {
       this.router.navigate(['']);
       return false;

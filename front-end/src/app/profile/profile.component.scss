@@ -1,1 +1,12 @@
 @import '../shared/scss/global';
+
+.profile {
+  background-color: $white;
+  color: $black;
+  .grid-row {
+    margin: 0;
+    .grid-row__col {
+      padding: 0;
+    }
+  }
+}

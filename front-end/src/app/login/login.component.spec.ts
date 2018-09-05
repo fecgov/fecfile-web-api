@@ -23,7 +23,6 @@ class MockApiService extends ApiService {
     const password: string = 'test';
 
     if ((usr === username) && (pass === password)) {
-      console.log('user logged in');
       return of([{authenticated: true}]);
     }
 
@@ -31,7 +30,7 @@ class MockApiService extends ApiService {
   }
 }
 
-fdescribe('LoginComponent', () => {
+describe('LoginComponent', () => {
   let component:  LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let authService: MockAuthService;
@@ -97,7 +96,7 @@ fdescribe('LoginComponent', () => {
     expect(component.frm.valid).toBeFalsy();
   });
 
-  it('logging in with a invalid user returns false, but form is', () => {
+  it('logging in with a invalid user returns false, but form is valid', () => {
     const userValue: string = '1073935132';
     const passwordValue: string = 'testpassword';
 
