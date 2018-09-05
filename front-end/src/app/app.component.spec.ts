@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
@@ -9,6 +10,8 @@ import { AppRoutingModule, routes } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { HeaderComponent } from './shared/partials/header/header.component';
+import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
 import { ProfileComponent } from './profile/profile.component';
 
 describe('AppRoutingModule', () => {
@@ -29,9 +32,14 @@ describe('AppRoutingModule', () => {
         AppComponent,
         LoginComponent,
         DashboardComponent,
-        ProfileComponent
+        ProfileComponent,
+        HeaderComponent,
+        SidebarComponent
       ],
-      providers: [CookieService]
+      providers: [CookieService],
+      schemas: [
+        CUSTOM_ELEMENTS_SCHEMA
+      ],
     })
     .compileComponents();
 
@@ -47,20 +55,4 @@ describe('AppRoutingModule', () => {
   it('should create an instance', () => {
     expect(appRoutingModule).toBeTruthy();
   });
-
-  /*it('should show login component wheb url is ``', fakeAsync(() => {
-    router.navigate(['']);
-    tick();
-    expect(location.path()).toBe('');
-  }));
-
-  it('should show dashboard component wheb url is `/dashboard`', fakeAsync(() => {
-    router.navigate(['/dashboard']);
-
-
-     // Place auth service in here and mark as isLoggedIn
-
-    tick();
-    expect(location.path()).toBe('/posts');
-  }));*/
 });

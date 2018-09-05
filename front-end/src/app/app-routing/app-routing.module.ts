@@ -1,10 +1,12 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { CanActivateGuard } from '../shared/utils/can-activate/can-activate.guard';
 import { LoginComponent } from '../login/login.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { ProfileComponent } from '../profile/profile.component';
+import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
+import { HeaderComponent } from '../shared/partials/header/header.component';
 
 export const routes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
@@ -14,11 +16,20 @@ export const routes: Routes = [
 ];
 
 @NgModule({
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
   imports: [
     CommonModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    SidebarComponent,
+    HeaderComponent
   ],
-  declarations: [],
+  declarations: [
+    LoginComponent,
+    DashboardComponent,
+    ProfileComponent,
+    SidebarComponent,
+    HeaderComponent
+  ],
   exports: [ RouterModule ]
 })
 export class AppRoutingModule { }
