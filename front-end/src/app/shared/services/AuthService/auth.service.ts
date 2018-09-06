@@ -19,7 +19,7 @@ export class AuthService {
     if (this._session.getSession()) {
       return true;
     }
-    return !!this._session.accessToken;
+    return false;
   }
 
   /**
