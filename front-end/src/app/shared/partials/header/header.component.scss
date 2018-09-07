@@ -1,5 +1,6 @@
 @import '../../scss/global';
 
+
 .header {
   background-color: $dustyGray;
   color: $black;
@@ -31,4 +32,8 @@
       }
     }
   }
+}
+
+.modal-dialog {
+  color: $black;
 }

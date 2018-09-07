@@ -3,6 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { AppRoutingModule } from './app-routing/app-routing.module';
@@ -27,7 +28,8 @@ import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbModule
   ],
   providers: [CookieService, CanActivateGuard],
   bootstrap: [AppComponent],

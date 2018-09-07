@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 import { SessionService } from '../SessionService/session.service';
 
 @Injectable({
@@ -7,7 +8,8 @@ import { SessionService } from '../SessionService/session.service';
 export class AuthService {
 
   constructor(
-    private _session: SessionService
+    private _session: SessionService,
+    private _cookieService: CookieService
   ) { }
 
   /**
@@ -36,9 +38,12 @@ export class AuthService {
    * @param      {String}  accessToken  The access token
    */
   public doSignIn(accessToken: string) {
+    console.log('doSignIn: ');
     if ((!accessToken)) {
       return;
     }
     this._session.accessToken = accessToken;
+
+    this._cookieService.set('user', JSON.stringify(accessToken));
   }
 }

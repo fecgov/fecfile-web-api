@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { SessionService } from '../SessionService/session.service';
+import { AuthService } from '../AuthService/auth.service';
 import { Posts, Post, Auth } from '../../interfaces/APIService/APIService';
 
 @Injectable({
@@ -13,8 +13,8 @@ export class ApiService {
 
   constructor(
     private _http: HttpClient,
-    private _cookieService: CookieService,
-    private _session: SessionService
+    private _session: SessionService,
+    private _authService: AuthService
   ) { }
 
   /**
@@ -33,7 +33,7 @@ export class ApiService {
       .pipe(map(res => {
           // login successful if there's a jwt token in the response
           if (res && res.access_token) {
-              this._cookieService.set('user', JSON.stringify(res));
+             this._authService.doSignIn(res.access_token);
           }
 
           return res;
