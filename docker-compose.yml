@@ -3,6 +3,10 @@ version: '3'
 services:
   db:
     image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_NAME: postgres
   web:
     build: .
     image: fecnxg
