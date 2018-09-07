@@ -1,0 +1,375 @@
+    1  clear
+    2  adduser rdasa
+    3  sudo su 
+    4  byobu
+    5  clear
+    6  ls
+    7  grep -rin test calorie-tracker/src/test
+    8  cd calorie-tracker/src/test
+    9  ls
+   10  cd java/calories/tracker/app/
+   11  ls
+   12  emacs -nw MealServiceTest.java 
+   13  cp  MealServiceTest.java MealTypeServiceTest.java
+   14  emacs -nw MealTypeServiceTest.java 
+   15  ls
+   16  byobu
+   17  mkdir jsci
+   18  ls
+   19  cd jsci
+   20  ls
+   21  clear
+   22  git clone https://github.com/brwr/fecfiler-django-angular-boilerplate.git
+   23  clear
+   24  ls
+   25  mv fecfiler-django-angular-boilerplate fec-efile
+   26  cd fec-efile/
+   27  ls
+   28  virtualenv venv
+   29  sudo apt-get install virtualenv
+   30  clear
+   31  ls
+   32  less fecfiler_django_angular_boilerplate/views.py 
+   33  less fecfiler_django_angular_boilerplate/urls.py 
+   34  clear
+   35  ls
+   36  clear
+   37  ls
+   38  who
+   39  passwd
+   40  ls ..
+   41  sudo apt-get install byobu
+   42  byobu
+   43  clear
+   44  ls
+   45  clear
+   46  ls
+   47  emacs -nw start.txt
+   48  ls
+   49  cd jsci
+   50  ls
+   51  cd fec-efile/
+   52  ls
+   53  virtualenv ../venv
+   54  virtualenv ../venv -p /usr/bin/python3
+   55  clear
+   56  pip3 install -r requirements.txt 
+   57  sudo apt-get install python3-pip
+   58  pip3 install -r requirements.txt 
+   59  pip install -r requirements.txt 
+   60  less README.md 
+   61  sudo apt-get install python-pip
+   62  pip --version
+   63  pip3 --version
+   64  source ../venv/bin/activate
+   65  pip3 install -r requirements.txt 
+   66  sudo apt-get install emacs 
+   67  emacs -nw requirements.txt 
+   68  pip3 install -r requirements.txt 
+   69  pip3 install wsgiref
+   70  pip3 install ox
+   71  pip3 install wsgiref
+   72  clear
+   73  cat requirements.txt 
+   74  cat README.md 
+   75  pip3 install nodeenv
+   76  nodeenv ../nenv
+   77  source ../nenv/bin/activate
+   78  npm install -g bower
+   79  npm install 
+   80  bower\ install 
+   81  bower install 
+   82  cat README.md 
+   83  python manage.py migrate
+   84  django-admin --version
+   85  pip-freeze 
+   86  pip3  freeze 
+   87  pip3 install Django==1.8
+   88  emacs -nw notes.org
+   89  django-admin --version
+   90  python manage.py migrate
+   91  python manage.py runserver
+   92  python -m SimpleHTTPServer
+   93  python3 -m SimpleHTTPServer
+   94  python2.7 -m SimpleHTTPServer
+   95  python manage.py runserver
+   96  python manage.py runserver 0.0.0.0:8000
+   97  ls
+   98  emacs -nw templates/index.html 
+   99  python manage.py runserver 0.0.0.0:8000
+  100  python manage.py startapp authentication
+  101  emacs authentication/models.py 
+  102  vi authentication/models.py
+  103  emacs authentication/models.py 
+  104  vi authentication/models.py
+  105  emacs authentication/models.py 
+  106  emacs fecfiler_django_angular_boilerplate/settings.py 
+  107  python manage.py makemigrations 
+  108  python manage.py migrate
+  109  python manage.py migrate auth
+  110  python manage.py migrate
+  111  python manage.py createsuperuser
+  112  fg
+  113  emacs authentication/models.py 
+  114  python manage.py createsuperuser
+  115  fg
+  116  emacs authentication/models.py 
+  117  python manage.py createsuperuser
+  118  grep -rin committee .
+  119  emacs authentication/models.py 
+  120  python manage.py makemigrations 
+  121  python manage.py migrate
+  122  fg
+  123  emacs authentication/models.py 
+  124  python manage.py createsuperuser
+  125  emacs authentication/models.py 
+  126  python manage.py createsuperuser
+  127  emacs authentication/models.py 
+  128  python manage.py createsuperuser
+  129  python manage.py runserver 0.0.0.0:8000
+  130  ls
+  131  cd authentication/
+  132  touch authentication/serializers.py
+  133  touch serializers.py
+  134  cd ..
+  135  emacs -nw authentication/serializers.py 
+  136  vi authentication/serializers.py 
+  137  emacs -nw authentication/serializers.py 
+  138  vi authentication/views.py
+  139  fg
+  140  vi authentication/permissions.py
+  141  vi fecfiler_django_angular_boilerplate/urls.py 
+  142  emacs -nw fecfiler_django_angular_boilerplate/urls.py 
+  143  ls
+  144  touch static/javascripts/authentication/services/authentication.service.js
+  145  mkdir -p static/javascripts/authentication/services
+  146  touch static/javascripts/authentication/services/authentication.service.js
+  147  vi static/javascripts/authentication/services/authentication.service.js
+  148  emacs static/javascripts/authentication/services/authentication.service.js
+  149  vi static/templates/authentication/register.html
+  150  mkdir -p static/templates/authentication
+  151  fg
+  152  emacs -nw static/templates/authentication/register.html
+  153  mkdir -p static/javascripts/authentication/controllers
+  154  vi static/javascripts/authentication/controllers/register.controller.js
+  155  vi static/javascripts/fecfiler.routes.js
+  156  vi static/javascripts/authentication/authentication.module.js
+  157  vi static/javascripts/fecfiler.js 
+  158  byobu
+  159  ls
+  160  cd jsci/
+  161  ls
+  162  cd de
+  163  cd fec-efile/
+  164  source ../venv/bin/activate
+  165  source ../nenv/bin/activate
+  166  ls
+  167  clear
+  168  ls
+  169  vi static/javascripts/fecfiler.config.js
+  170  vi static/javascripts/fecfiler.js
+  171  git status
+  172  git stash
+  173  cd ..
+  174  cp -rf fec-efile fec-efile-bkup
+  175  cd fec-efile
+  176  ls
+  177  git checkout release 
+  178  git branch
+  179  git checkout master
+  180  ls
+  181  git diff master release 
+  182  git checkout release 
+  183  git diff origin/master 
+  184  git stash pop
+  185  emacs -nw templates/javascripts.html 
+  186  emacs static/javascripts/fecfiler.js
+  187  emacs authentication/views.py
+  188  vi authentication/views.py
+  189  emacs fecfiler_django_angular_boilerplate/urls.py 
+  190  python manage.py runserver 0.0.0.0:8000
+  191  ls
+  192  emacs fecfiler_django_angular_boilerplate/urls.py 
+  193  python manage.py runserver 0.0.0.0:8000
+  194  fg
+  195  cd ..
+  196  ls
+  197  git clone https://github.com/Benfrnz/FECeFiling.git
+  198  cd FECeFiling/
+  199  ls
+  200  less requirements.txt 
+  201  pip3 install -r requirements.txt 
+  202  clear
+  203  ls
+  204  npm install 
+  205  bower install
+  206  python manage.py migrate
+  207  python manage.py makemigrations
+  208  python manage.py migrate
+  209  python manage.py runserver 0.0.0.0:8000
+  210  clear
+  211  cd ..
+  212  ls
+  213  find . -name "*fecfiler*" 
+  214  mkdir oldcode
+  215  mv fec-efile oldcode
+  216  mv fec-efile-bkup oldcode
+  217  ls
+  218  mv FECeFiling FECeFiling
+  219  cd FECeFiling/
+  220  ls
+  221  cd ..
+  222  cp -rf FECeFiling FECeFiling-bkup
+  223  cd FECeFiling
+  224  ls
+  225  grep -rin fecfiler_django_angular_boilerplate .
+  226  grep -rl fecfiler_django_angular_boilerplate .
+  227  find . -name "*pyc"
+  228  rm `find . -name "*pyc"`
+  229  find . -name "*pyc"
+  230  grep -rl fecfiler_django_angular_boilerplate .
+  231  grep -rl fecfiler_django_angular_boilerplate .
+  232  grep -rl fecfiler
+  233  cp -rf . ../FECeFiling-bkup2
+  234  clear
+  235  ls
+  236  man rename
+  237  ls
+  238  touch reqs.txt
+  239  touch reqssss,txt
+  240  touch reqssss.txt
+  241  find . -name "reqs*"
+  242  man rename
+  243  rename -v 's/reqs/funnnny/g' find . -name "reqs*"
+  244  rename -v 's/reqs/funnnny/g' `find . -name "reqs*"`
+  245  ls
+  246  mv fecfiler_django_angular_boilerplate fecfiler
+  247  clear
+  248  ls
+  249  find . -name "*funn*"
+  250  rm `find . -name "*funn*"`
+  251  clear
+  252  ls
+  253  find . -name "*fecfiler*"
+  254  rename -v 's/fecfiler/fecfiler/g'  `find . -name "*fecfiler*"`
+  255  emacs -nw notes.org
+  256  fg
+  257  emacs -nw notes.org
+  258  clear
+  259  ls
+  260  \\
+  261  clear
+  262  grep -rl fecfiler_django_angular_boilerplate . | less
+  263  grep -rl fecfiler . | less
+  264  grep -rin fecfiler . | less
+  265  ls
+  266  cat notes.org
+  267  sed -i 's/fecfiler/fecfiler/g' `grep -rl fecfiler`
+  268  cat notes.org
+  269  echo "sed -i 's/fecfiler/fecfiler/g' `grep -rl fecfiler`" >> notes.org
+  270  cat notes.org
+  271  echo "sed -i 's/fecfiler/fecfiler/g' grep -rl fecfiler" >> notes.org
+  272  cat notes.org
+  273  clear
+  274  ls
+  275  grep -rin tutorial .
+  276  grep -rl tutorial .
+  277  grep -rl tutorial . | less
+  278  npm install
+  279  grep -rl tutorial . | less
+  280  grep -rin tutorial . | less
+  281  grep -rin tutorial . | tail
+  282  echo "sed -i 's/FECeFiling/FECeFiling/g' `grep -rl tutorial`
+  283  .
+  284  echo "sed -i 's/FECeFiling/FECeFiling/g' `grep -rl tutorial .`
+  285  grep -rin tutorial . | less
+  286  mv ./node_modules ./node_modules-bkup
+  287  npm install
+  288  grep -rl tutorial . 
+  289  grep -rin tutorial . | less
+  290  grep -rin tutorial . |tail 
+  291  sed -i 's/FECeFiling/FECeFiling/g' `grep -rl tutorial .`
+  292  grep -rin tutorial . |tail 
+  293  clear
+  294  lks
+  295  ls
+  296  clear
+  297  grep -rin fecfiler .
+  298  grep -rin tutorial .
+  299  clear
+  300  ls
+  301  python manage.py makemigrations
+  302  python manage.py migrate
+  303  npm install 
+  304  bower install 
+  305  clear
+  306  ls
+  307  python manage.py runserver 0.0.0.0:8000
+  308  emacs -nw  templates/navbar.html 
+  309  grep -rin username
+  310  man grep
+  311  grep -rin username *py
+  312  grep --help
+  313  grep --help | less
+  314  grep -rin username --include=[*.py|*.html]
+  315  grep -rin username --include=[py|html]
+  316  grep -rin username --include="[py|html]
+  317  grep -rin username --include="[py|html]"
+  318  grep -rin username --include="*.py"
+  319  emacs fecfiler/authentication/views.py 
+  320  emacs fecfiler/authentication/models.py 
+  321  emacs -nw templates/index.html 
+  322  find . -name "*navbar*"
+  323  emacs -nw templates/navbar.html 
+  324  grep -rin not-google-plus .
+  325  grep -rin googleplus .
+  326  emacs -nw static/templates/profiles/settings.html 
+  327  emacs -nw static/templates/authentication/login.html 
+  328  npm install 
+  329  bower install 
+  330  python manage.py runserver 0.0.0.0:8000
+  331  clear
+  332  python manage.py createsuperuser
+  333  python manage.py runserver 0.0.0.0:8000
+  334  fg
+  335  emacs -nw fecfiler/authentication/views.py
+  336  bower install
+  337  python manage.py runserver 0.0.0.0:8000
+  338  fg
+  339  emacs -nw fecfiler/authentication/views.py
+  340  clear
+  341  ls
+  342  python manage.py shell
+  343  ls
+  344  cd fecfiler/
+  345  ls
+  346  emacs -nw settings.py 
+  347  fg
+  348  python manage.py runserver 0.0.0.0:8000
+  349  cd ..
+  350  python manage.py runserver 0.0.0.0:8000
+  351  pip install ipdb
+  352  python3 manage.py runserver 0.0.0.0:8000
+  353  ls
+  354  cd ..
+  355  ls
+  356  ls -la FECeFiling-bkup2 | wc -l 
+  357  ls -la FECeFiling | wc -l 
+  358  cd FECeFiling
+  359  ls
+  360  ls fecfiler/
+  361  ls fecfiler/authentication/
+  362  ls static/
+  363  ls static/templates/
+  364  ls static/templates/authentication/
+  365  cd ..
+  366  clear
+  367  ls
+  368  cd FECeFiling-bkup2
+  369  clear
+  370  ls
+  371  source ../venv/bin/activate
+  372  source ../nenv/bin/activate
+  373  python3 manage.py runserver 0.0.0.0:8000
+  374  ls
+  375  history > hist.txt
