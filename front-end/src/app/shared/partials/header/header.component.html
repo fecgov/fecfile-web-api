@@ -1,0 +1,45 @@
+<header>
+  <div class="header">
+    <div class="header--nav">
+      <a href="#" role="button">
+        <i class="bars-icon"></i>
+      </a>
+    </div>
+    <div class="header--nav">
+      <ul class="nav-links">
+        <li>
+          Reports
+        </li>
+        <li>
+          Contributors
+        </li>
+        <li>
+          Tools
+        </li>
+        <li>
+          Help
+        </li>
+      </ul>
+    </div>
+    <div class="header--nav">
+      <div class="header-search">
+        <input type="text" name="search" class="search-input" placeholder="Search for..." />
+      </div>
+    </div>
+    <div class="header--nav">
+      <ul class="nav-links">
+        <li>Notifications</li>
+        <li>
+          <a [routerLink]="['/profile']">
+            Profile
+          </a>
+        </li>
+        <li>
+          <a [routerLink]="['/']" (click)="logout()">
+            Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>

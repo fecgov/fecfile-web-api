@@ -1,0 +1,19 @@
+/* You can add global styles to this file, and also import other style files */
+$fa-font-path: '../node_modules/font-awesome/fonts';
+@import '../node_modules/font-awesome/scss/font-awesome.scss';
+
+@import './app/shared/scss/global';
+
+body {
+  color: $white;
+  font-family: arial, helvetica, sans-serif;
+  font-size: 1em;
+  height: 100vh;
+  margin: 0;
+  overflow-y: scroll;
+}
+
+.bars-icon {
+  @extend .fa;
+  @extend .fa-bars;
+}

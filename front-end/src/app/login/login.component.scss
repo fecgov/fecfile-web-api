@@ -1,0 +1,54 @@
+@import '../shared/scss/global';
+
+.login {
+    background-color: $primaryBlue;
+    color: $black;
+    height: 100vh;
+    padding-top: 15px;
+    header {
+      .logo {
+        margin-bottom: 10px;
+        text-align: center;
+      }
+    }
+  .login-box {
+    background-color: $alto;
+    min-height: 375px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 500px;
+    .grid-row {
+      margin: 0;
+      &.form-field__info {
+        margin-bottom: 10px;
+      }
+      &.form-field {
+        margin-bottom: 25px;
+      }
+      .grid-row__col {
+        padding: 0;
+        .login-input {
+          @include make-text-input(450px, 1.5em, 1em, 1em);
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .left-text {
+          padding-left: 15px;
+        }
+        .right-text {
+          padding-right: 15px;
+        }
+        .login__btn {
+          @include button-variant($primaryBlue, $primaryBlue);
+          @include button-size($input-btn-padding-y, $input-btn-padding-x, 1.5em, $input-btn-line-height, $btn-border-radius);
+          cursor: pointer;
+          margin-bottom: 15px;
+          margin-top: 30px;
+          width: 460px;
+        }
+      }
+    }
+  }
+}
+
