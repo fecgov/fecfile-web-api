@@ -9,6 +9,7 @@ import { ProfileComponent } from '../profile/profile.component';
 export const routes: Routes = [
   {path: '', redirectTo: '/', pathMatch: 'full'},
   {path: '', component: LoginComponent},
+  {path: 'logout', component: LoginComponent},
   {path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [CanActivateGuard]},
   {path: 'profile', component: ProfileComponent, pathMatch: 'full', canActivate: [CanActivateGuard]}
 ];
