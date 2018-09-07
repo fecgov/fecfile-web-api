@@ -7,9 +7,9 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_NAME: postgres
-	  POSTGRES_PASSWORD: postgres 
-	ports:
-	- "5234:5234"
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5234:5234"
   web:
     build: .
     image: fecnxg
