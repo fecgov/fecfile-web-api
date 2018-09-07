@@ -3,6 +3,13 @@ version: '3'
 services:
   db:
     image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_NAME: postgres
+	  POSTGRES_PASSWORD: postgres 
+	ports:
+	- "5234:5234"
   web:
     build: .
     image: fecnxg

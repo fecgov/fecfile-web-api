@@ -1,4 +1,17 @@
-# requirements.txt
-
-Django==1.9.4
-psycopg2
+Django==1.8.8
+dj-database-url==0.3.0
+dj-static==0.0.6
+django-appconf==1.0.1
+django-compressor==1.6
+djangorestframework==3.2.4
+django-rest-swagger==0.3.4
+drf-nested-routers==0.11.1
+gunicorn==19.4.1
+six==1.10.0
+static3==0.6.1
+#wsgiref==0.1.2
+djangocms-admin-style==1.0.7
+django-admin-shortcuts==1.2.6
+django-cors-headers
+# Optional, recommended packages
+psycopg2>=2.6.1	# To work with PostgreSQL
