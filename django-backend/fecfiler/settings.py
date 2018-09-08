@@ -5,7 +5,7 @@ import os
 _ = lambda s: s
 
 
-DEBUG = os.environ.get('DEBUG', True)
+DEBUG = os.environ.get('DEBUG', False)
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -195,3 +195,10 @@ LOGGING = {
         }
     }
 }
+
+
+try:
+    from .local_settings import *
+except:
+    print("Local settings not found")
+    pass
