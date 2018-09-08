@@ -25,5 +25,5 @@ urlpatterns = patterns(
     url(r'^api/v1/auth/login/$', csrf_exempt(LoginView.as_view()), name='login'),
     url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
     url(r'^api/docs/', include('rest_framework_swagger.urls')),
-    #url('^.*$', IndexView.as_view(), name='index'),
+    url('^.*$', IndexView.as_view(), name='index'),
 )
