@@ -67,10 +67,10 @@ DATABASES = {
 #
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_fecfiler',
-        'USER': 'django',
+        'NAME': 'postgres',
+        'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
