@@ -15,3 +15,4 @@ django-admin-shortcuts==1.2.6
 django-cors-headers
 # Optional, recommended packages
 psycopg2>=2.6.1	# To work with PostgreSQL
+bcrypt
