@@ -11,8 +11,8 @@ phases:
       - node --version
   pre_build:
     commands:
-      - pip install -r djanjo-backend/requirements.txt
-      - npm install -g gulp bower @angular cli
+      - pip install -r django-backend/requirements.txt
+      - npm install -g gulp bower @angular/cli
 #      - cd front-end && bower install --allow-root && cd ..
       - cd front-end && npm install && cd ..
       - cd front-end && ng build && cd ..
