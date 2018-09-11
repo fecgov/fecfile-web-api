@@ -28,7 +28,7 @@
     .header-search {
       padding-top: 10px;
       .search-input {
-        @include make-text-input(400px, 1.5em, 1em, 1em);
+        @include make-text-input(250px, 1.5em, 1em, 1em);
       }
     }
   }
