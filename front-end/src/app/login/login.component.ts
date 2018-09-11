@@ -69,9 +69,9 @@ export class LoginComponent implements OnInit {
     this._apiService
       .signIn(username, password)
       .subscribe(res => {
-        if (res.access_token) {
+        if (res.id) {
           this._authService
-              .doSignIn(res.access_token);
+              .doSignIn(res.id);
 
           this._router.navigate(['dashboard']);
         }
