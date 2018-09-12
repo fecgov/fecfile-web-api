@@ -9,7 +9,7 @@ services:
       POSTGRES_NAME: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5234:5432"
+      - "5432:5432"
   web:
     build: .
     image: fecnxg
