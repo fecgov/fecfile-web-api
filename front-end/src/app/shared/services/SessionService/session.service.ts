@@ -30,6 +30,8 @@ export class SessionService {
   public destroy(): void {
     this.accessToken = null;
 
-    this._cookieService.delete('user');
+    // this._cookieService.delete('user');
+
+    this._cookieService.deleteAll();
   }
 }
