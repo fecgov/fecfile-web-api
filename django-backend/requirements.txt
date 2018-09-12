@@ -14,5 +14,5 @@ djangocms-admin-style==1.0.7
 django-admin-shortcuts==1.2.6
 django-cors-headers
 # Optional, recommended packages
-psycopg2>=2.6.1	# To work with PostgreSQL
 bcrypt
+psycopg2-binary
