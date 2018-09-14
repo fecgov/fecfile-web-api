@@ -5,9 +5,10 @@ import os
 _ = lambda s: s
 
 
-DEBUG = os.environ.get('DEBUG', True)
+#DEBUG = os.environ.get('DEBUG', False)
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+CSRF_TRUSTED_ORIGINS = ['localhost','127.0.0.1']
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '$6(x*g_2g9l_*g8peb-@anl5^*8q!1w)k&e&2!i)t6$s8kia94'
 
@@ -67,10 +68,10 @@ DATABASES = {
 #
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_fecfiler',
-        'USER': 'django',
+        'NAME': 'postgres',
+        'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -195,3 +196,10 @@ LOGGING = {
         }
     }
 }
+
+
+try:
+    from .local_settings import *
+except:
+    print("Local settings not found")
+    pass
