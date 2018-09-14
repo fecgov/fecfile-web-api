@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../shared/services/APIService/api.service';
 import { AuthService } from '../shared/services/AuthService/auth.service';
@@ -17,13 +18,15 @@ export class LoginComponent implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
+  public loggedOutMsg: string = '';
 
   constructor(
     private _fb: FormBuilder,
     private _apiService: ApiService,
     private _authService: AuthService,
     private _router: Router,
-    private _cookieService: CookieService
+    private _route: ActivatedRoute,
+    private _cookieService: CookieService,
   ) {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
@@ -32,6 +35,14 @@ export class LoginComponent implements OnInit {
  }
 
   ngOnInit() {
+    this._route
+      .data
+      .subscribe(res => {
+        this.loggedOutMsg = res.msg;
+      });
+  }
+
+  ngOnDestroy() {
   }
 
   /**
