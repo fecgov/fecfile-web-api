@@ -20,7 +20,6 @@ services:
       - "8080:8080"
     depends_on:
       - db
-      - migration
   migration:
     image: fecnxg
     command: python manage.py migrate --noinput
@@ -33,8 +32,9 @@ services:
     build: './front-end'
     restart: always
     volumes:
-      - ./front-end/app/dist/out/:/usr/share/nginx/html
+       - ./front-end/dist/fec-eFilling:/usr/share/nginx/html
     ports:
       - "80:80"
     depends_on:
       - api
+      - migration
