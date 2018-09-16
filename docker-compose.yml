@@ -20,14 +20,6 @@ services:
       - "8080:8080"
     depends_on:
       - db
-  migration:
-    image: fecnxg
-    command: python manage.py migrate --noinput
-    command: python manage.py loaddata fixtures/base_data.json
-    volumes:
-      - ./django-backend:/opt/nxg_fec
-    depends_on:
-      - db
   web:
     build: './front-end'
     restart: always
@@ -37,4 +29,3 @@ services:
       - "80:80"
     depends_on:
       - api
-      - migration
