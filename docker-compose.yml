@@ -26,6 +26,8 @@ services:
     command: python manage.py migrate --noinput
     command: python manage.py loaddata fixtures/base_data.json
     volumes:
-      - ./django-backend:/opt/nxg_fec
+       - ./front-end/dist/fec-eFiling:/usr/share/nginx/html
+    ports:
+      - "80:80"
     depends_on:
       - db
