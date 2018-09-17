@@ -9,24 +9,24 @@ echo -e "installing npm dependecies \n"
 npm install
 # build the angular app
 echo -e "building Angular app \n"
-ng build
+$(npm bin)/ng build
 # change directory to the root of the project
 cd ..
 # shutdown running instances
-docker-compose down
+sudo docker-compose down
 #  echo -e "Removing old images"
-docker rmi -f $( docker images -qa )
+sudo sh -c "docker rmi -f $( docker images -qa )"
 #else
 #  echo -e "Nothing to delete \n"s
 #fi
 # build the application
-docker-compose build
-docker-compose up --build -d
+sudo docker-compose build
+sudo docker-compose up --build -d
 # rerun the migrations just in case
 sleep 2
-docker-compose exec api python manage.py migrate --noinput
-docker-compose exec api python manage.py loaddata fixtures/base_data.json
+sudo docker-compose exec api python manage.py migrate --noinput
+sudo docker-compose exec api python manage.py loaddata fixtures/base_data.json
 
 sleep 2
 echo -e "Running applications \n"
-docker-compose ps
+sudo docker-compose ps
