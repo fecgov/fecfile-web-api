@@ -36,16 +36,16 @@ def get_delete_update_comm_info(request, pk):
 
 #GET POST calls for form99
 
-@api_view(['GET', 'POST'])
-def get_post_comm_info(request):
-    # get all comm info
-    if request.method == 'GET':
-        comm_info = CommitteeInfo.objects.all()
-        serializer = CommitteeInfoSerializer(comm_info, many=True)
-        return Response(serializer.data)
+@api_view(['POST'])
+def create_comm_info(request):
+    # # get all comm info
+    # if request.method == 'GET':
+    #     comm_info = CommitteeInfo.objects.all()
+    #     serializer = CommitteeInfoSerializer(comm_info, many=True)
+    #     return Response(serializer.data)
         
     # insert a new record for a comm_info
-    elif request.method == 'POST':
+    if request.method == 'POST':
         data = {
             'committeeid': request.data.get('committeeid'),
             'committeename': request.data.get('committeename'),
