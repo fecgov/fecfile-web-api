@@ -184,5 +184,4 @@ ADMIN_SHORTCUTS = [
 try:
     from .local_settings import *
 except:
-    print("Local settings not found")
     pass
