@@ -6,6 +6,9 @@ from . import views
 urlpatterns = [
     url(r'^f99/comm_info/(?P<pk>[0-9]+)$', views.get_delete_update_comm_info, name='get_delete_update_comm_info' ),
     url(r'^f99/comm_infos/$', views.get_post_comm_info, name='get_post_comm_info'),
-    url(r'^f99/get_default_reasons$', views.get_f99_reasons, name='get_f99_reasons')
-    
+    url(r'^f99/get_default_reasons$', views.get_f99_reasons, name='get_f99_reasons'),
+
+    url(r'^core/get_comm_details/(?P<cid>[0-9,a-z,A-Z]+)$', views.get_committee, name='get_committee' ),
+    url(r'^core/update_comm_details/(?P<cid>[0-9,a-z,A-Z]+)$', views.update_committee, name='update_committee' ),    
+    url(r'^core/create_committee$', views.create_committee, name='create_committee')
 ]

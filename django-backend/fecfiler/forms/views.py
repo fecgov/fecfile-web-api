@@ -35,6 +35,7 @@ def get_delete_update_comm_info(request, pk):
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #GET POST calls for form99
+
 @api_view(['GET', 'POST'])
 def get_post_comm_info(request):
     # get all comm info
@@ -78,3 +79,56 @@ def get_f99_reasons(request):
             return Response(reason_data, status=status.HTTP_200_OK)
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['GET'])
+def get_committee(request, cid):
+    try:
+        comm = Committee.objects.get(committeeid=cid)
+    except Committee.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # get details of a single comm
+    if request.method == 'GET':
+        serializer = CommitteeSerializer(comm)
+        return Response(serializer.data)    
+
+@api_view(['POST'])
+def update_committee(request, cid):   
+    # # update details of a single comm
+    if request.method == 'POST':
+         serializer = CommitteeSerializer(comm, data=request.data)
+         if serializer.is_valid():
+             serializer.save()
+             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['POST'])
+def create_committee(request):       
+    # insert a new record for a comm
+    if request.method == 'POST':
+        data = {
+            'committeeid': request.data.get('committeeid'),
+            'committeename': request.data.get('committeename'),
+            'street1': request.data.get('street1'),
+            'street2': request.data.get('street2'),
+            'city': request.data.get('city'),
+            'state': request.data.get('state'),
+            'zipcode': int(request.data.get('zipcode')),
+            'treasurerlastname': request.data.get('treasurerlastname'),
+            'treasurerfirstname': request.data.get('treasurerfirstname'),
+            'treasurermiddlename': request.data.get('treasurermiddlename'),
+            'treasurerprefix': request.data.get('treasurerprefix'),
+            'treasurersuffix': request.data.get('treasurersuffix')
+        }
+
+
+        serializer = CommitteeSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
