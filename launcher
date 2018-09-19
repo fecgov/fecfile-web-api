@@ -13,20 +13,20 @@ $(npm bin)/ng build
 # change directory to the root of the project
 cd ..
 # shutdown running instances
-sudo docker-compose down
+docker-compose down
 #  echo -e "Removing old images"
-sudo sh -c "docker rmi -f $( docker images -qa )"
+sh -c "docker rmi -f $( docker images -qa )"
 #else
 #  echo -e "Nothing to delete \n"s
 #fi
 # build the application
-sudo docker-compose build
-sudo docker-compose up --build -d
+docker-compose build
+docker-compose up --build -d
 # rerun the migrations just in case
 sleep 2
-sudo docker-compose exec api python manage.py migrate --noinput
-sudo docker-compose exec api python manage.py loaddata fixtures/base_data.json
+docker-compose exec api python manage.py migrate --noinput
+docker-compose exec api python manage.py loaddata fixtures/base_data.json
 
 sleep 2
 echo -e "Running applications \n"
-sudo docker-compose ps
+docker-compose ps
