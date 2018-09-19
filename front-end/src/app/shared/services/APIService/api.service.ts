@@ -31,7 +31,6 @@ export class ApiService {
         password
       })
       .pipe(map(res => {
-        console.log('res: ', res);
           // login successful if there's a jwt token in the response
           if (res.id) {// && res.access_token) {
              this._authService.doSignIn(res.id);

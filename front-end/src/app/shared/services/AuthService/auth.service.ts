@@ -39,7 +39,6 @@ export class AuthService {
    * @param      {String}  accessToken  The access token
    */
   public doSignIn(accessToken: string) {
-    console.log('doSignIn: ');
     if ((!accessToken)) {
       return;
     }

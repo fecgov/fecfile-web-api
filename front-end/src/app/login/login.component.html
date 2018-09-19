@@ -4,6 +4,9 @@
     <div class="logo">
       <img src="assets/img/logo.svg" alt="FEC Logo" />
     </div>
+    <div>
+      <img src="https://www.fec.gov/static/img/wordmark.svg"/>
+    </div>
   </header>
 
   <div class="login-box">
@@ -19,6 +22,9 @@
         <div class="grid-row__col grid-row__col--12">
           <div class="error" *ngIf="hasFailed">
             Invalid commitee id or password.
+          </div>
+          <div class="logged-out-msg">
+            {{ loggedOutMsg }}
           </div>
         </div>
       </div>
@@ -117,4 +123,4 @@
       </div>
     </form>
   </div>
-</div>
+</div> 
