@@ -17,8 +17,17 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+
+#DEBUG = os.environ.get('DEBUG', False)
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+CSRF_TRUSTED_ORIGINS = ['localhost','api']
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+SECRET_KEY = '$6(x*g_2g9l_*g8peb-@anl5^*8q!1w)k&e&2!i)t6$s8kia94'
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
