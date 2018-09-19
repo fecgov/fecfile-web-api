@@ -4,8 +4,8 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CommitteeInfo
-from .serializers import CommitteeInfoSerializer
+from .models import CommitteeInfo, Committee
+from .serializers import CommitteeInfoSerializer, CommitteeSerializer
 import json
 import os
 # API view functionality for GET DELETE and PUT
