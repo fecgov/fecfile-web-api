@@ -76,7 +76,7 @@ def get_f99_reasons(request):
     if request.method == 'GET':        
         try:
             from django.conf import settings
-            reason_data = json.load(open(os.path.join(settings.BASE_DIR,'sys_data', "f99_default_reasons.json"),'r'))
+            reason_data = json.load(open(os.path.join(settings.BASE_DIR,'sys_data', 'f99_default_reasons.json'),'r'))
             return Response(reason_data, status=status.HTTP_200_OK)
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
