@@ -54,6 +54,7 @@ def create_comm_info(request):
             'city': request.data.get('city'),
             'state': request.data.get('state'),
             'text': request.data.get('text'),
+            'reason' :request.data.get('text'),
             'zipcode': int(request.data.get('zipcode')),
             'treasurerlastname': request.data.get('treasurerlastname'),
             'treasurerfirstname': request.data.get('treasurerfirstname'),

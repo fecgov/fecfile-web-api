@@ -1,0 +1,1000 @@
+ 1000  kls
+ 1001  ls
+ 1002  cd rdash/FECeFileProject/nxg_fec/
+ 1003  ls
+ 1004  cd django-backend/
+ 1005  ls
+ 1006  cd rdash/FECeFileProject/nxg_fec/
+ 1007  ls
+ 1008  cd django-backend/
+ 1009  ls
+ 1010  vim fecfiler/authentication/u
+ 1011  vim fecfiler/urls.py 
+ 1012  ls
+ 1013  vim fecfiler/settings.py 
+ 1014  vim fecfiler/authentication/views.py 
+ 1015  vim fecfiler/urls.py 
+ 1016  grep -rin "csrf"
+ 1017  ls
+ 1018  vim fecfiler/views.py 
+ 1019  vim fecfiler/urls.py 
+ 1020  vim fecfiler/views.py 
+ 1021  vim fecfiler/urls.py 
+ 1022  byobu
+ 1023  clear
+ 1024  cd rdash/FECeFileProject/
+ 1025  ls
+ 1026  cd nxg_fec/
+ 1027  ls
+ 1028  vim django-backend/fecfiler/views.py 
+ 1029  cd ../..
+ 1030  mkdir hello
+ 1031  cd hello/
+ 1032  source ../FECeFileProject/venv/bin/activate
+ 1033  django-admin startproject mysite
+ 1034  ls
+ 1035  cd mysite/
+ 1036  ls
+ 1037  cd mysite/
+ 1038  ls
+ 1039  cd ../..
+ 1040  mv mysite/ /home/ubuntu/rdash/
+ 1041  ls
+ 1042  cd ..
+ 1043  rmdir hello/
+ 1044  ls
+ 1045  cd mysite/
+ 1046  ls
+ 1047  cd mysite/
+ 1048  ls
+ 1049  clare
+ 1050  clear
+ 1051  ls
+ 1052  vim __init__.py 
+ 1053  vim settings.py 
+ 1054  ls
+ 1055  cd ..
+ 1056  ls
+ 1057  python3 manage.py startapp polls
+ 1058  ls
+ 1059  cd polls/
+ 1060  ls
+ 1061  vim views.py 
+ 1062  ls
+ 1063  cd ..
+ 1064  ls
+ 1065  cd polls/
+ 1066  ls
+ 1067  touch urls.py
+ 1068  vim urls.py 
+ 1069  cd ..
+ 1070  ls
+ 1071  cd mysite/
+ 1072  vim urls.py 
+ 1073  ls
+ 1074  cd ..
+ 1075  python3 manage.py  runserver
+ 1076  vim mysite/urls.py 
+ 1077  python3 manage.py  runserver
+ 1078  vim mysite/urls.py 
+ 1079  python3 manage.py  runserver
+ 1080  vim mysite/urls.py 
+ 1081  python3 manage.py  runserver
+ 1082  ls
+ 1083  vim mysite/urls.py 
+ 1084  ls
+ 1085  python3 manage.py  runserver
+ 1086  vim mysite/urls.py 
+ 1087  python3 manage.py  runserver
+ 1088  python3 manage.py runserver
+ 1089  python manage.py runserver
+ 1090  vim mysite/urls.py 
+ 1091  python manage.py runserver
+ 1092  vim mysite/urls.py 
+ 1093  python manage.py runserver
+ 1094  vim mysite/urls.py 
+ 1095  python manage.py runserver
+ 1096  vim mysite/urls.py 
+ 1097  python manage.py runserver
+ 1098  vim mysite/urls.py 
+ 1099  python manage.py runserver
+ 1100  vim mysite/urls.py 
+ 1101  python manage.py runserver
+ 1102  vim mysite/urls.py 
+ 1103  python manage.py runserver
+ 1104  vim mysite/urls.py 
+ 1105  python manage.py runserver
+ 1106  vim mysite/urls.py 
+ 1107  python manage.py runserver
+ 1108  clear
+ 1109  byobu
+ 1110  byobu
+ 1111  ls
+ 1112  cd rdash/
+ 1113  ls
+ 1114  byobu
+ 1115  clear
+ 1116  ls -la
+ 1117  byobu
+ 1118  ls
+ 1119  cd rdash/
+ 1120  ls
+ 1121  cd FECeFileProject/
+ 1122  ls
+ 1123  source venv/bin/activate
+ 1124  source nenv/bin/activate
+ 1125  ls
+ 1126  clear
+ 1127  cd rdash/
+ 1128  ls
+ 1129  clear
+ 1130  ls
+ 1131  cd FECeFileProject/
+ 1132  ls
+ 1133  cd nenv/
+ 1134  ls
+ 1135  cd ..
+ 1136  source venv/bin/activate
+ 1137  ls
+ 1138  cd nxg_fec/
+ 1139  source ../nenv/bin/activate
+ 1140  ls
+ 1141  cd ..
+ 1142  ls
+ 1143  cd nxg_fec/
+ 1144  ls
+ 1145  cd django-backend/
+ 1146  ls
+ 1147  python3 manage.py runserver 0.0.0.0:8000
+ 1148  ls
+ 1149  vim fecfiler/urls.py 
+ 1150  ls
+ 1151  vim fecfiler/settings.py 
+ 1152  clear
+ 1153  cd rdash/
+ 1154  ls
+ 1155  cd FECeFileProject/
+ 1156  ls
+ 1157  cd nxg_fec/
+ 1158  ls
+ 1159  vim django-backend/fecfiler/views.py 
+ 1160  vim django-backend/fecfiler/settings.py 
+ 1161  ls
+ 1162  cd rdash/
+ 1163  ls
+ 1164  cd mysite/
+ 1165  ls
+ 1166  cd mysite/
+ 1167  ls
+ 1168  vim settings.py 
+ 1169  cd /rdash/FECeFileProject/nxg_fec/django-backend$
+ 1170  cd rdash/FECeFileProject/nxg_fec/django-backend$
+ 1171  ls
+ 1172  cd rdash/FECeFileProject/nxg_fec/django-backend/
+ 1173  ls
+ 1174  source ../../venv/bin/activate
+ 1175  source ../../nenv/bin/activate
+ 1176  python3 manage.py runserver 0.0.0.0:8000
+ 1177  python3 manage.py migrate
+ 1178  python3 manage.py runserver 0.0.0.0:8000
+ 1179  netstal -lpunt
+ 1180  netstat -lpu
+ 1181  kill -9 8000
+ 1182  kill -9 22484
+ 1183  clear
+ 1184  python3 manage.py runserver 0.0.0.0:8000
+ 1185  byobu
+ 1186  clear
+ 1187  ls
+ 1188  cd rdash/
+ 1189  ls
+ 1190  cd ..
+ 1191  cd jsci/
+ 1192  ls
+ 1193  cd 
+ 1194  clear
+ 1195  byobu
+ 1196  cd rdash/
+ 1197  ls
+ 1198  cd FECeFileProject/
+ 1199  ls
+ 1200  cd tempt2/
+ 1201  ls
+ 1202  cd tempt2/
+ 1203  ls
+ 1204  cd ../..
+ 1205  ls
+ 1206  cd nxg_fec/
+ 1207  ls
+ 1208  cd django-backend/
+ 1209  ls
+ 1210  cd fecfiler/
+ 1211  ls
+ 1212  cd forms/
+ 1213  ls
+ 1214  vim models.py
+ 1215  vim tests.py 
+ 1216  ls
+ 1217  vim apps.py 
+ 1218  clear
+ 1219  ls
+ 1220  byobu
+ 1221  tail -f /var/log/sys
+ 1222  sudo tail -f /var/log/syslog
+ 1223  df -h
+ 1224  cd rdash/FECeFileProject/
+ 1225  ls
+ 1226  cd nxg_fec
+ 1227  ls
+ 1228  cd ..
+ 1229  ls
+ 1230  cd nxg_fec_copy/
+ 1231  ls
+ 1232  cd nxg_fec/
+ 1233  ls
+ 1234  less launcher 
+ 1235  sudo sh -c "docker rmi -f $( docker images -qa )"
+ 1236  docker images
+ 1237  df
+ 1238  du -hs ~/
+ 1239  du -hs ~/*
+ 1240  cd ..
+ 1241  ls
+ 1242  cd ..
+ 1243  ls
+ 1244  rm -rf sample_app_ver_1_11/
+ 1245  rm -rf tempt2/
+ 1246  ls
+ 1247  cd FECeFiling/
+ 1248  ls
+ 1249  cd ..
+ 1250  ls
+ 1251  rm -rf tempt/
+ 1252  rm -rf mysite/
+ 1253  ls
+ 1254  cd FECeFileProject/
+ 1255  ls
+ 1256  ls ..
+ 1257  ls
+ 1258  cd ..
+ 1259  ls
+ 1260  cd ..
+ 1261  ls
+ 1262  cd rdash/
+ 1263  ls
+ 1264  cd FECeFileProject/
+ 1265  ls
+ 1266  du -hs ./*
+ 1267  cd FECeFiling/
+ 1268  ls
+ 1269  cd ../..
+ 1270  sudo shutdown now
+ 1271  byobu
+ 1272  sudo service postgresql stop
+ 1273  ls
+ 1274  sudo ./launcher 
+ 1275  sudo apt-get install node
+ 1276  sudo apt-get install nodejs
+ 1277  sudo ./launcher 
+ 1278  sudo apt-get install npm
+ 1279  sudo ./launcher 
+ 1280  ls
+ 1281  cd rdash/
+ 1282  ls
+ 1283  cd FECeFileProject/
+ 1284  ls
+ 1285  cd nxg_fec
+ 1286  ls
+ 1287  git status
+ 1288  git stash pop
+ 1289  clear
+ 1290  ls
+ 1291  cd django-backend/
+ 1292  ls
+ 1293  git stats
+ 1294  git status
+ 1295  git diff fecfiler/authentication/models.py
+ 1296  git add fecfiler/authentication/models.py
+ 1297  git commit -m "Committee ID restricted to 9 chars"
+ 1298  git bracnh
+ 1299  git branch
+ 1300  git push origin ranjith
+ 1301  clear
+ 1302  ls
+ 1303  git status
+ 1304  git diff fecfiler/urls.py
+ 1305  git status
+ 1306  git diff fecfiler/settings.py
+ 1307  emacs -nw fecfiler/settings.py
+ 1308  git stash 
+ 1309  ls
+ 1310  less launcher 
+ 1311  emacs -nw launcher 
+ 1312  docker-compose up
+ 1313  cd rdash/
+ 1314  ls
+ 1315  cd FECeFileProject/
+ 1316  ls
+ 1317  cd nxg_fec_copy/
+ 1318  ls
+ 1319  cd nxg_fec/
+ 1320  ls
+ 1321  sudo ./launcher 
+ 1322  emacs ./launcher 
+ 1323  sudo ./launcher 
+ 1324  fg
+ 1325  ls
+ 1326  emacs docker-compose.yml 
+ 1327  ls
+ 1328  git diff
+ 1329  emacs docker-compose.yml 
+ 1330  source ../../venv/bin/activate
+ 1331  source ../../nenv/bin/activate
+ 1332  ./launcher 
+ 1333  sudo chown -R ubuntu.ubuntu ../
+ 1334  sudo chown -R ubuntu.ubuntu ../..
+ 1335  ./launcher 
+ 1336  fg
+ 1337  ./launcher 
+ 1338  sudo ./launcher 
+ 1339  fg
+ 1340  sudo ./launcher 
+ 1341  fg
+ 1342  sudo ./launcher 
+ 1343  ls 
+ 1344  ls front-end/
+ 1345  ls
+ 1346  ls front-end/dist/
+ 1347  ls
+ 1348  ls front-end/dist/
+ 1349  fg
+ 1350  emacs -nw front-end/Dockerfile 
+ 1351  emacs -nw docker-compose.yml 
+ 1352  emacs launcher 
+ 1353  pwd
+ 1354  fg
+ 1355  echo -e "PWD::" pwd " \n"
+ 1356  echo -e "PWD::" `pwd` " \n"
+ 1357  fg
+ 1358  ./launcher 
+ 1359  fg
+ 1360  ./launcher 
+ 1361  emacs ./launcher 
+ 1362  emacs front-end/package.json 
+ 1363  npm install -g @angular/cli
+ 1364  emacs -nw docker-compose.yml 
+ 1365  ./launcher 
+ 1366  fg
+ 1367  ./launcher
+ 1368  sudo ./launcher
+ 1369  sudo chown -R ubuntu.ubuntu ../..
+ 1370  emacs -nw ./launcher 
+ 1371  docker-compose up
+ 1372  ls
+ 1373  cd front-end/
+ 1374  docker-compose up
+ 1375  ls
+ 1376  k
+ 1377  sudo service postgresql stop
+ 1378  cd rdash
+ 1379  ls
+ 1380  cd FECeFileProject/
+ 1381  ls
+ 1382  cd nxg_fec
+ 1383  ls
+ 1384  cd django-backend/
+ 1385  ls
+ 1386  git stash pop
+ 1387  python3 manage.py runserver 0.0.0.0:8000
+ 1388  source ../../venv/bin/activate
+ 1389  source ../../nenv/bin/activate
+ 1390  clear
+ 1391  ls
+ 1392  python3 manage.py runserver 0.0.0.0:8000
+ 1393  emacs -nw fecfiler/local_settings.py
+ 1394  python3 manage.py runserver 0.0.0.0:8000
+ 1395  ls
+ 1396  mv bower_components static/
+ 1397  cp -rf  bower_components/* static/bower_components/
+ 1398  python3 manage.py runserver 0.0.0.0:8000
+ 1399  ls
+ 1400  python manage.py  collectstatic
+ 1401  clear
+ 1402  ls
+ 1403  cd static
+ 1404  ls
+ 1405  ls bower_components/
+ 1406  ls
+ 1407  cp -rf bower_components/* ../staticfiles/bower_components/
+ 1408  cd ..
+ 1409  ls
+ 1410  mv static static.old
+ 1411  emacs -nw fecfiler/local_settings.py
+ 1412  mv staticfiles static
+ 1413  python3 manage.py runserver 0.0.0.0:8000
+ 1414  python manage.py  collectstatic
+ 1415  bower install 
+ 1416  python3 manage.py runserver 0.0.0.0:8000
+ 1417  ls
+ 1418  cp -rf bower_components/* ../staticfiles/bower_components/
+ 1419  cp -rf bower_components/* staticfiles/bower_components/
+ 1420  mkdir staticfiles/bower_components/
+ 1421  cp -rf bower_components/* staticfiles/bower_components/
+ 1422  python3 manage.py runserver 0.0.0.0:8000
+ 1423  ls
+ 1424  cd static
+ 1425  ls
+ 1426  cd ..
+ 1427  ls
+ 1428  cd staticfiles
+ 1429  ls
+ 1430  cd ..
+ 1431  find . -name "javascripts"
+ 1432  ls static/javascripts/
+ 1433  python3 manage.py runserver 0.0.0.0:8000
+ 1434  emacs bower
+ 1435  emacs bower.json 
+ 1436  ls
+ 1437  emacs gulpfile.js 
+ 1438  emacs -nw fecfiler/local_settings.py
+ 1439  python manage.py  collectstatic
+ 1440  python3 manage.py runserver 0.0.0.0:8000
+ 1441  emacs -nw fecfiler/urls.py 
+ 1442  python3 manage.py runserver 0.0.0.0:8000
+ 1443  fg
+ 1444  python3 manage.py runserver 0.0.0.0:8000
+ 1445  fg
+ 1446  python3 manage.py runserver 0.0.0.0:8000
+ 1447  fg
+ 1448  python3 manage.py runserver 0.0.0.0:8000
+ 1449  fg
+ 1450  python3 manage.py runserver 0.0.0.0:8000
+ 1451  python manage.py shell
+ 1452  python manage.py loaddata base_data.json 
+ 1453  emacs base_data.json 
+ 1454  fg
+ 1455  python manage.py dumpdata > base_data.json 
+ 1456  emacs base_data.json 
+ 1457  python3 manage.py runserver 0.0.0.0:8000
+ 1458  python manage.py shell
+ 1459  python3 manage.py runserver 0.0.0.0:8000
+ 1460  fg
+ 1461  python3 manage.py runserver 0.0.0.0:8000
+ 1462  fg
+ 1463  clear
+ 1464  ls
+ 1465  fg
+ 1466  python manage.py loaddata base_data.json 
+ 1467  clear
+ 1468  ls
+ 1469  fg
+ 1470  python manage.py loaddata base_data.json 
+ 1471  fg
+ 1472  cd /tmp/
+ 1473  django-admin startproject temmp
+ 1474  less temmp/temmp/settings.py 
+ 1475  cd -
+ 1476  fg
+ 1477  python manage.py loaddata base_data.json 
+ 1478  clear
+ 1479  ls
+ 1480  ls fecfiler/local_settings.py
+ 1481  less fecfiler/local_settings.py
+ 1482  ls fecfiler/
+ 1483  fg
+ 1484  sudo groupadd docker
+ 1485  sudo usermod -aG docker ubuntu
+ 1486  t
+ 1487  byobu
+ 1488  ky
+ 1489  cd rdash/
+ 1490  ls
+ 1491  cd FECeFileProject/
+ 1492  ls
+ 1493  cd nxg_fec
+ 1494  ls
+ 1495  cd ../nxg_fec_copy/
+ 1496  ls
+ 1497  cd ng
+ 1498  ls
+ 1499  cd nxg_fec/
+ 1500  ls
+ 1501  clear
+ 1502  ls
+ 1503  cd front-end/on
+ 1504  docker-compose up
+ 1505  byobu
+ 1506  byobu
+ 1507  ls
+ 1508  cd rdash/
+ 1509  ls
+ 1510  cd FECeFileProject/
+ 1511  ls
+ 1512  cd nxg_fec
+ 1513  ls
+ 1514  cd django-backend/
+ 1515  ls
+ 1516  cd fecfiler/
+ 1517  ls
+ 1518  cd forms/
+ 1519  ls
+ 1520  vim views.py 
+ 1521  vim tests.py 
+ 1522  cd ../..
+ 1523  ls
+ 1524  cd ..
+ 1525  ls
+ 1526  cd ..
+ 1527  ls
+ 1528  cd nxg_fec_copy/
+ 1529  ls
+ 1530  cd nxg_fec/
+ 1531  ls
+ 1532  cd django-backend/
+ 1533  ls
+ 1534  cd fecfiler/
+ 1535  ls
+ 1536  cd ../../..
+ 1537  ls
+ 1538  cd ..
+ 1539  ls
+ 1540  clear
+ 1541  ls
+ 1542  cd rdash/FECeFileProject/
+ 1543  git status
+ 1544  ls
+ 1545  cd nxg_fec_copy/
+ 1546  ls
+ 1547  cd nxg_fec/
+ 1548  ls
+ 1549  vim README.md 
+ 1550  ls
+ 1551  cd django-backend/
+ 1552  ls
+ 1553  vim README.md 
+ 1554  vim hist.txt 
+ 1555  ls
+ 1556  git log
+ 1557  byobu
+ 1558  byobu
+ 1559  ls
+ 1560  cd rdash/
+ 1561  ls
+ 1562  cd FECeFileProject/
+ 1563  clear
+ 1564  ls -la
+ 1565  cd nxg_fec
+ 1566  ls
+ 1567  cd django-backend/
+ 1568  ls
+ 1569  cd fecfiler/
+ 1570  ls
+ 1571  cd forms/
+ 1572  ls
+ 1573  vim serializers.py
+ 1574  vim views.py
+ 1575  vim models.py
+ 1576  source ../../../../cd
+ 1577  cd ../..
+ 1578  cd nxg_fec_copy/
+ 1579  ls
+ 1580  cd nxg_fec/
+ 1581  ls
+ 1582  ls -la
+ 1583  source  ../../nenv/bin/activate
+ 1584  source  ../../venv/bin/activate
+ 1585  docker-compose build
+ 1586  docker-compose up
+ 1587  deactivate
+ 1588  exit
+ 1589  sudo su postgres 
+ 1590  sudo su postgresql
+ 1591  sudo su postgres
+ 1592  cd rdash/FECeFileProject/nxg_fec
+ 1593  ls
+ 1594  cd django-backend/
+ 1595  ls
+ 1596  sudo su postgres 
+ 1597  sudo -u postgres 
+ 1598  sudo -i -u postgres 
+ 1599  byobu
+ 1600  cd rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/authentication/
+ 1601  vim serializers.py 
+ 1602  vim ../forms/models.py
+ 1603  ls
+ 1604  cd rdash/FECeFileProject/nxg_fec
+ 1605  ls
+ 1606  cd django-backend/
+ 1607  cd fecfiler/authentication/
+ 1608  vim serializers.py 
+ 1609  ls
+ 1610  vim models.py 
+ 1611  vim serializers.py 
+ 1612  ls
+ 1613  cd rdash/FECeFileProject/nxg_fec_copy/nxg_fec/
+ 1614  docker-compose build
+ 1615  docker-compose up
+ 1616  git log
+ 1617  ls
+ 1618  vim docker-compose.yml 
+ 1619  ls
+ 1620  cd launcher
+ 1621  vim launcher 
+ 1622  ls
+ 1623  cd django-backend/
+ 1624  ls
+ 1625  cd fecfiler/
+ 1626  ls
+ 1627  cd
+ 1628  cd rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/
+ 1629  clear
+ 1630  vim views.py
+ 1631  vim serializers.py
+ 1632  vim test
+ 1633  vim tests.py
+ 1634  vim urls.py
+ 1635  clear
+ 1636  ls
+ 1637  vim serializers.py
+ 1638  cd ../../..
+ 1639  docker-compose build
+ 1640  docker-compose up
+ 1641  sudo sh -c "docker rmi -f $( docker images -qa )"
+ 1642  docker-compose up
+ 1643  sudo docker-compose up
+ 1644  docker-compose build
+ 1645  docker-compose up
+ 1646  clear
+ 1647  ls
+ 1648  vim  django-backend/fecfiler/authentication/serializers.py 
+ 1649  ls
+ 1650  source ../venv/bin/activate
+ 1651  source ../nenv/bin/activate
+ 1652  ls
+ 1653  cd django-backend/
+ 1654  python3 manage.py runserver 0.0.0.0:8000
+ 1655  netsat -lpunt
+ 1656  netstat -lpunt
+ 1657  kill -9 1410
+ 1658  python3 manage.py runserver 0.0.0.0:8000
+ 1659  ls
+ 1660  vim fecfiler/forms/
+ 1661  vim fecfiler/forms/admin.py 
+ 1662  vim fecfiler/forms/models.py
+ 1663  sudo -u postgres psql
+ 1664  cd ..
+ 1665  sudo -u postgres psql
+ 1666  cd django-backend/fecfiler/forms/
+ 1667  ls
+ 1668  cd ../..
+ 1669  python3 manage.py runserver 0.0.0.0:8000
+ 1670  ls
+ 1671  cd fecfiler/
+ 1672  ls
+ 1673  vim forms/serializers.py
+ 1674  clear
+ 1675  cd rdash/FECeFileProject/nxg_fec/django-backend/fecfiler
+ 1676  ls
+ 1677  vim settings.py
+ 1678  vim  forms/serializers.py
+ 1679  clear
+ 1680  ls
+ 1681  vim forms/serializers.py
+ 1682  ls -la
+ 1683  clear
+ 1684  clear
+ 1685  cd rdash/FECeFileProject/
+ 1686  ls
+ 1687  cd FECeFiling/
+ 1688  ls
+ 1689  cd fecfiler/
+ 1690  ls
+ 1691  cd ..
+ 1692  ld
+ 1693  cd 
+ 1694  cd -
+ 1695  cd ..
+ 1696  ls
+ 1697  cd nxg_fec
+ 1698  ls
+ 1699  cd django-backend/
+ 1700  ls
+ 1701  clear
+ 1702  ls
+ 1703  cd rdash/FECeFileProject/nxg_fec/django-backend
+ 1704  vim fecfiler/forms/models.py
+ 1705  vim fecfiler/authentication/serializers.py 
+ 1706  cd fecfiler/authentication/
+ 1707  cd ..
+ 1708  cd forms/
+ 1709  ls
+ 1710  cd migrations/
+ 1711  ls
+ 1712  cd ..
+ 1713  clear
+ 1714  cd rdash/FECeFileProject/nxg_fec/django-backend$
+ 1715  cd rdash/FECeFileProject/nxg_fec/django-backend
+ 1716  vim fecfiler/forms/serializers.py
+ 1717  vim fecfiler/forms/models.py
+ 1718  vim fecfiler/forms/views.py
+ 1719  vim fecfiler/forms/tests.py
+ 1720  clear
+ 1721  vim fecfiler/forms/views.py
+ 1722  byobu
+ 1723  ls
+ 1724  cd rdash/FECeFileProject/nxg_fec
+ 1725  ls
+ 1726  cd django-backend/
+ 1727  ls
+ 1728  cd fecfiler/
+ 1729  ls
+ 1730  cd forms/
+ 1731  cd ..
+ 1732  cd authentication/
+ 1733  ls
+ 1734  clear
+ 1735  ls
+ 1736  vim serializers.py 
+ 1737  ls
+ 1738  cd nxg_fec/
+ 1739  cd ../rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/
+ 1740  clear
+ 1741  ls
+ 1742  vim serializers.py
+ 1743  ls
+ 1744  vim views.py
+ 1745  ls
+ 1746  cd rdash/
+ 1747  ls
+ 1748  cd FECeFileProject/
+ 1749  ls
+ 1750  emacs -nw nxg_fec/django-backend/fecfiler/forms/urls.py
+ 1751  cd nxg_fec
+ 1752  ls
+ 1753  source ../venv/bin/activate
+ 1754  source ../nenv/bin/activate
+ 1755  ls
+ 1756  cd django-backend/
+ 1757  ls
+ 1758  python3 manage.py makemigrations
+ 1759  cd rdash/FECeFileProject/
+ 1760  ls
+ 1761  cd nxg_fec
+ 1762  ls
+ 1763  cd django-backend/fecfiler/
+ 1764  cd forms/
+ 1765  clear
+ 1766  ls
+ 1767  vim serializers.py
+ 1768  cd ../../..
+ 1769  ls
+ 1770  cd ..
+ 1771  ls
+ 1772  cd nxg_fec_copy/
+ 1773  ls
+ 1774  cd nxg_fec/
+ 1775  git branch
+ 1776  git status
+ 1777  git log
+ 1778  git branch
+ 1779  git pull origin ranjith
+ 1780  emacs -nw front-end/src/environments/environment.ts 
+ 1781  git pull origin ranjith
+ 1782  git status
+ 1783  git add front-end/src/environments/environment.ts
+ 1784  git status
+ 1785  git pull origin ranjith
+ 1786  git commit 
+ 1787  [
+ 1788  git push origin ranjitht
+ 1789  git status 
+ 1790  ls
+ 1791  source ../../venv/bin/activate
+ 1792  source ../../nenv/bin/activate
+ 1793  pip freeze > new-reqs.txt
+ 1794  emacs new-reqs.txt 
+ 1795  cp -f new-reqs.txt django-backend/requirements.txt 
+ 1796  git status
+ 1797  git diff
+ 1798  clear
+ 1799  git add django-backend/requirements.txt 
+ 1800  git status
+ 1801  git commit -m "updated django version in requirements.txt"
+ 1802  git log
+ 1803  clear
+ 1804  git push origin ranjith
+ 1805  cd ../..
+ 1806  ls
+ 1807  byobu
+ 1808  cd rdash/FECeFileProject/
+ 1809  ls
+ 1810  cd nxg_fec
+ 1811  ls
+ 1812  cd django-backend/
+ 1813  ls
+ 1814  git log
+ 1815  ls
+ 1816  cd fecfiler/
+ 1817  ls
+ 1818  vim forms/urls.py
+ 1819  vim forms/models.py
+ 1820  vim forms/urls.py
+ 1821  vim forms/views.py
+ 1822  vim forms/urls.py
+ 1823  vim forms/views.py
+ 1824  vim forms/urls.py
+ 1825  cd rdash/
+ 1826  ls
+ 1827  cd FECeFileProject/
+ 1828  ls
+ 1829  cd nxg_fec
+ 1830  ls
+ 1831  cd django-backend/
+ 1832  ls
+ 1833  cd fecfiler/
+ 1834  ls
+ 1835  cd ..
+ 1836  ls
+ 1837  source ../../venv/bin/activate
+ 1838  source ../../nenv/bin/activate
+ 1839  ls
+ 1840  python3 manage.py runserver 0.0.0.0:8000
+ 1841  ls
+ 1842  cd fecfiler/
+ 1843  ls
+ 1844  cd forms/
+ 1845  ls
+ 1846  vim urls.py
+ 1847  lscd ..
+ 1848  cd ../..
+ 1849  python3 manage.py runserver 0.0.0.0:8000
+ 1850  ls
+ 1851  cd ../..
+ 1852  ls
+ 1853  cd nxg_fec
+ 1854  ls
+ 1855  cd django-backend/
+ 1856  ls
+ 1857  clear
+ 1858  ls
+ 1859  cd ../..
+ 1860  ls
+ 1861  cd nxg_fec
+ 1862  ls
+ 1863  cd django-backend/
+ 1864  ls
+ 1865  cd fecfiler/
+ 1866  ls
+ 1867  cd forms/
+ 1868  ls
+ 1869  vim serializers.py
+ 1870  vim models.py
+ 1871  cd ../..
+ 1872  python3 manage.py runserver 0.0.0.0:8000
+ 1873  netstat -lpunt
+ 1874  kill -9 24030
+ 1875  python3 manage.py runserver 0.0.0.0:8000
+ 1876  vim fecfiler/forms/serializers.py
+ 1877  vim fecfiler/forms/urls.py
+ 1878  vim fecfiler/forms/views.py
+ 1879  vim fecfiler/forms/urls.py
+ 1880  python3 manage.py runserver 0.0.0.0:8000
+ 1881  ls
+ 1882  cd fecfiler/
+ 1883  ls
+ 1884  cd ..
+ 1885  ls
+ 1886  cd ..
+ 1887  git log
+ 1888  cd django-backend/
+ 1889  git log
+ 1890  cd fecfiler/forms/
+ 1891  git log
+ 1892  cd ../..
+ 1893  cd ..
+ 1894  ls
+ 1895  cd django-backend/
+ 1896  ls
+ 1897  git push origin ranjith
+ 1898  git pull origin ranjith
+ 1899  git status
+ 1900  git add .
+ 1901  git commit -m "form99 with Committe info and f99 reasons"
+ 1902  git push origin ranjith
+ 1903  git branch
+ 1904  git pull origin ranjith
+ 1905  git status
+ 1906  git push origin ranjith
+ 1907  cd ..
+ 1908  git push origin ranjith
+ 1909  git branch
+ 1910  git pull
+ 1911  vim django-backend/fecfiler/settings.py
+ 1912  git pull
+ 1913  clear
+ 1914  git pull origin master
+ 1915  git pull origin ranjith
+ 1916  vim django-backend/fecfiler/settings.py
+ 1917  git add django-backend/fecfiler/settings.py 
+ 1918  git status
+ 1919  git pull origin ranjith
+ 1920  git commit -m "modified settings"
+ 1921  git pull origin ranjith
+ 1922  git push origin ranjith
+ 1923  clear
+ 1924  cd rdash/FECeFileProject/
+ 1925  ls
+ 1926  cd nxg_fec
+ 1927  ls
+ 1928  cd django-backend/
+ 1929  ls
+ 1930  vim fecfiler/settings.py
+ 1931  ls
+ 1932  cd fecfiler/
+ 1933  ls
+ 1934  cd forms/
+ 1935  ls
+ 1936  vim models.py
+ 1937  byobu
+ 1938  clear
+ 1939  cd rdash/FECeFileProject/
+ 1940  ls
+ 1941  cd nxg_fec
+ 1942  ls
+ 1943  cd django-backend/
+ 1944  ls
+ 1945  cd fecfiler/
+ 1946  ls
+ 1947  cd forms/
+ 1948  vim models.py
+ 1949  vim serializers.py
+ 1950  vim views.py
+ 1951  vim tests.py
+ 1952  vim views.py
+ 1953  vim urls.py
+ 1954  cd ../../..
+ 1955  cd ..
+ 1956  zip -r nxg_fec.zip nxg_fec
+ 1957  sudo apt install zip
+ 1958  zip -r nxg_fec.zip nxg_fec
+ 1959  ls
+ 1960  clear
+ 1961  ls
+ 1962  source venv/bin/activate
+ 1963  source nenv/bin/activate
+ 1964  ls
+ 1965  cd nxg_fec/django-backend/
+ 1966  ls
+ 1967  python3 manage.py runserver 0.0.0.0:8000
+ 1968  python3 manage.py test
+ 1969  clear
+ 1970  vim fecfiler/forms/models.py
+ 1971  vim fecfiler/forms/urls.py
+ 1972  cd rdash/
+ 1973  cd FECeFileProject/nxg_fec/django-backend/
+ 1974  vim fecfiler/forms/models.py
+ 1975  source ../../venv/bin/activate
+ 1976  source ../../nenv/bin/activate
+ 1977  python3 manage.py runserver 0.0.0.0:8000
+ 1978  clear
+ 1979  vim fecfiler/forms/views.py
+ 1980  vim fecfiler/forms/serializers.py
+ 1981  cd rdash/FECeFileProject/nxg_fec/django-backend/
+ 1982  ls
+ 1983  cd fecfiler/
+ 1984  ls
+ 1985  cd forms/
+ 1986  vim urls.py
+ 1987  clear
+ 1988  vim ../urls.py 
+ 1989  vim ../views.py 
+ 1990  vim ../authentication/views.py 
+ 1991  vim urls.py
+ 1992  ls
+ 1993  vim urls.py
+ 1994  clear
+ 1995  cd rdash/FECeFileProject/nxg_fec/django-backend/
+ 1996  python dbshell
+ 1997  psql dbshell
+ 1998  postgresql dbshell
+ 1999  history >> hist1.txt

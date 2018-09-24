@@ -25,6 +25,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             instance.city = validated_data.get('city', instance.city)
             instance.state = validated_data.get('state', instance.state)
             instance.text = validated_data.get('text', instance.text)            
+            instance.reason = validated_data.get('text', instance.text)
             instance.zipcode = validated_data.get('zipcode', instance.zipcode)
             instance.treasurerlastname = validated_data.get('treasurerlastname', instance.treasurerlastname)
             instance.treasurerfirstname = validated_data.get('treasurerfirstname', instance.treasurerfirstname)

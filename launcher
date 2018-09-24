@@ -50,7 +50,8 @@ sudo docker-compose up --build -d
 # rerun the migrations just in case
 sleep 2
 sudo docker-compose exec api python manage.py migrate --noinput
-sudo docker-compose exec api python manage.py loaddata fixtures/base_data.json
+
+#sudo docker-compose exec api python manage.py loaddata sys_data/committee_base_data.json
 
 sleep 2
 echo -e "Running applications \n"

@@ -11,6 +11,7 @@ class CommitteeInfo(models.Model):
     street1 = models.CharField(max_length=34, null=False)
     street2 = models.CharField(max_length=34)
     text = models.TextField(max_length=20000, null=False, default="-")
+    reason = models.TextField(max_length=3, null=False, default="-")
     city = models.CharField(max_length=30, null=False)
     state = models.CharField(max_length=2, null=False)
     zipcode = models.IntegerField(null=False)
