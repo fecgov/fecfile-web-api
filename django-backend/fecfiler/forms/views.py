@@ -55,7 +55,7 @@ def create_comm_info(request):
             'state': request.data.get('state'),
             'text': request.data.get('text'),
             'reason' :request.data.get('text'),
-            'zipcode': int(request.data.get('zipcode')),
+            'zipcode': request.data.get('zipcode'),
             'treasurerlastname': request.data.get('treasurerlastname'),
             'treasurerfirstname': request.data.get('treasurerfirstname'),
             'treasurermiddlename': request.data.get('treasurermiddlename'),

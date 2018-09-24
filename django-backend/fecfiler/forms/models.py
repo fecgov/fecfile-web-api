@@ -14,7 +14,7 @@ class CommitteeInfo(models.Model):
     reason = models.TextField(max_length=3, null=False, default="-")
     city = models.CharField(max_length=30, null=False)
     state = models.CharField(max_length=2, null=False)
-    zipcode = models.IntegerField(null=False)
+    zipcode = models.TextField(null=False, max_length=5)
     treasurerlastname = models.CharField(max_length=30, null=False)
     treasurerfirstname = models.CharField(max_length=20, null=False)
     treasurermiddlename = models.CharField(max_length=20)
