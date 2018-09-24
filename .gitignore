@@ -9,7 +9,10 @@ build/
 dist/
 helloworld.db
 local_settings.py
+*.swp
+*/hist.txt
 */CACHE
+*/package-lock.json
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
@@ -45,7 +48,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-.env
+*.env
+*/target
 
 ### Bower ###
 */bower_components
