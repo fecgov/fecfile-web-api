@@ -13,9 +13,9 @@ import os
 
 
 @api_view(['GET'])
-def get_comm_info(request):
+def get_comm_info(request, pk):
     try:
-        comm_info = CommitteeInfo.objects.get(pk=request.user.id)
+        comm_info = CommitteeInfo.objects.get(pk= pk)
     except CommitteeInfo.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
