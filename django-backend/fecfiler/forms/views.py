@@ -12,10 +12,10 @@ import os
 # Exception handling is taken care to validate the committeinfo
 
 
-@api_view(['GET', 'DELETE', 'PUT'])
-def get_delete_update_comm_info(request, pk):
+@api_view(['GET'])
+def get_comm_info(request):
     try:
-        comm_info = CommitteeInfo.objects.get(pk=pk)
+        comm_info = CommitteeInfo.objects.get(pk=request.user.id)
     except CommitteeInfo.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -85,9 +85,10 @@ def get_f99_reasons(request):
 
 
 @api_view(['GET'])
-def get_committee(request, cid):
+def get_committee(request):
     try:
-        comm = Committee.objects.get(committeeid=cid)
+        #import pdb; pdb.set_trace()
+        comm = Committee.objects.get(committeeid=request.user.username)
     except Committee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
