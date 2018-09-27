@@ -1,0 +1,26 @@
+from django.test import TestCase
+#from django.urls import resolve
+from django.core.urlresolvers import reverse
+from .views import *
+
+# Create your tests here
+from fecfiler.authentication.models import Account
+
+class SimpleTest(TestCase):
+    def setUp(self):
+        self.credentials = {
+            'username': 'C012345678',
+            'password': 'test',
+            'email':'test1@test.com'
+        }
+        self.user = Account.objects.create_user(**self.credentials)
+        
+
+    def test_login_success(self):
+        #login = self.client.login(username='c012345678', password='test')
+        # login
+        #import ipdb; ipdb.set_trace()
+        response = self.client.post('/api/v1/auth/login/', **self.credentials)
+        # should be logged in now, fails however
+        
+        self.assertEqual(response.context['user']==self.user)

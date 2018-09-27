@@ -1,0 +1,10 @@
+@import '../../scss/global';
+
+.sidebar {
+  background-color: $primaryBlue;
+  min-height: 100vh;
+  .sidebar__logo {
+    padding-top: 15px;
+    text-align: center;
+  }
+}

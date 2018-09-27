@@ -1,0 +1,25 @@
+version: 0.1
+
+phases:
+  install:
+    commands:
+      - apt-get update -y
+      - apt-get install -y maven curl wget
+      - apt-get purge nodejs npm
+      - curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+      - apt-get install -y nodejs
+      - node --version
+  pre_build:
+    commands:
+      - pip install -r django-backend/requirements.txt
+      - npm install -g gulp bower @angular/cli
+#      - cd front-end && bower install --allow-root && cd ..
+      - cd front-end && npm install && cd ..
+      - cd front-end && ng build && cd ..
+      - cd front-end && gulp && cd ..
+      - cd django-backend && python manage.py collectstatic --noinput && cd ..
+  build:
+    commands:
+  post_build:
+    commands:
+      - echo Build completed on `date`
