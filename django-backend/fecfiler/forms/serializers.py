@@ -8,7 +8,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                     'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text',
                     'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
-                    'created_at' )
+                    'created_at','is_submitted' )
             read_only_fields = ('created_at', 'updated_at')
 
         # Methods to save the model objects to the database
@@ -31,7 +31,8 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             instance.treasurerfirstname = validated_data.get('treasurerfirstname', instance.treasurerfirstname)
             instance.treasurermiddlename = validated_data.get('treasurermiddlename', instance.treasurermiddletname)
             instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
-            instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix) 
+            instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
+            is_submitted.text = validated_data.get('is_submitted', instance.is_submitted)            
             instance.save()
             return instance
 

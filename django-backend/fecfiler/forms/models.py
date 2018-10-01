@@ -25,7 +25,7 @@ class CommitteeInfo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)
     isdeleted = models.BooleanField(default=False)
-
+    is_submitted = models.BooleanField(default=False)
 
     # class constructor
     def __unicode__(self):
