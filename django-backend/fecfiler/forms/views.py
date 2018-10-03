@@ -33,14 +33,13 @@ def get_comm_info(request):
     # elif request.method == 'DELETE':
     #     return Response({})
 
-#GET POST calls for form99
+
 #@csrf_exempt
 @api_view(['POST'])
 def create_comm_info(request):
     """
     Creates a new CommitteeInfo Object, or updates the last created CommitteeInfo object created for that committee.
     """
-    #import pdb; pdb.set_trace();
     # insert a new record for a comm_info
     if request.method == 'POST':
         data = {
@@ -86,7 +85,7 @@ def update_comm_info(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-"""
+    
 @api_view(['POST'])
 def submit_comm_info(request):
     if request.method == 'POST':
@@ -101,7 +100,6 @@ def submit_comm_info(request):
         except CommitteeInfo.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)'''
 
-"""
 
 @api_view(['GET'])
 def get_f99_reasons(request):
@@ -121,9 +119,8 @@ def get_f99_reasons(request):
 
 @api_view(['GET'])
 def get_committee(request):
-
     """
-    fields for auto pouplating the data for creating the comm_info object 
+    fields for auto populating the data for creating the comm_info object 
     """
     try:
         #import pdb; pdb.set_trace()
