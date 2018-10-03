@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 @api_view(['GET'])
-def get_comm_info(request):
+def fetch_f99_info(request):
 
     """"
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
@@ -36,7 +36,7 @@ def get_comm_info(request):
 
 #@csrf_exempt
 @api_view(['POST'])
-def create_comm_info(request):
+def create_f99_info(request):
     """
     Creates a new CommitteeInfo Object, or updates the last created CommitteeInfo object created for that committee.
     """
@@ -68,7 +68,7 @@ def create_comm_info(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-def update_comm_info(request):
+def update_f99_info(request):
     """
     Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
     """
