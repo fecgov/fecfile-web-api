@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^f99/update_f99_info$', views.update_f99_info, name='update_f99_info'),
     url(r'^f99/get_default_reasons$', views.get_f99_reasons, name='get_f99_reasons'),
 #    url(r'^f99/submit_comm_info$', views.submit_comm_info, name='submit_comm_info'),
+	url(r'^f99/validate_f99$', views.validate_f99, name='validate_f99'),
 
 
     url(r'^core/get_committee_details$', views.get_committee, name='get_committee' ),

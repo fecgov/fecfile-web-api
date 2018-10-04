@@ -9,9 +9,10 @@ from .serializers import CommitteeInfoSerializer, CommitteeSerializer
 import json
 import os
 from django.views.decorators.csrf import csrf_exempt
+import logging
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
-
+logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 def fetch_f99_info(request):
@@ -171,3 +172,96 @@ def create_committee(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# validate api for Form 99
+@api_view(['POST'])
+def validate_f99(request):
+    # # get all comm info
+    # if request.method == 'GET':
+    #     comm_info = CommitteeInfo.objects.all()
+    #     serializer = CommitteeInfoSerializer(comm_info, many=True)
+    #     return Response(serializer.data)
+        
+    # insert a new record for a comm_info
+    if request.method == 'POST':
+        data = {
+            'committeeid': request.data.get('committeeid'),
+            'committeename': request.data.get('committeename'),
+            'street1': request.data.get('street1'),
+            'street2': request.data.get('street2'),
+            'city': request.data.get('city'),
+            'state': request.data.get('state'),
+            'text': request.data.get('text'),
+            'reason' :request.data.get('reason'),
+            'zipcode': request.data.get('zipcode'),
+            'treasurerlastname': request.data.get('treasurerlastname'),
+            'treasurerfirstname': request.data.get('treasurerfirstname'),
+            'treasurermiddlename': request.data.get('treasurermiddlename'),
+            'treasurerprefix': request.data.get('treasurerprefix'),
+            'treasurersuffix': request.data.get('treasurersuffix')
+        }
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        #   import pdb; pdb.set_trace()
+        comm = Committee.objects.get(committeeid=request.data.get('committeeid'))
+
+    except Committee.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    count = 0
+
+    if comm.committeename!=request.data.get('committeename'):
+        logger.error('Committee Name')
+        count = count +1
+
+    if comm.street1!=request.data.get('street1'):
+        logger.error('Street1')
+        count = count +1
+    
+    if comm.street2!=request.data.get('street2'):
+        logger.error('Street2')
+        count = count +1
+
+    if comm.city!=request.data.get('city'):
+        logger.error('City')
+        count = count +1
+    
+    if comm.state!=request.data.get('state'):
+        logger.error('State')
+        count = count +1
+
+    if comm.treasurerlastname!=request.data.get('treasurerlastname'):
+        logger.error('treasurer last name')
+        count = count +1
+    
+    if comm.treasurerfirstname!=request.data.get('treasurerfirstname'):
+        logger.error('treasurer first name')
+        count = count +1
+
+    if comm.treasurermiddlename!=request.data.get('treasurermiddlename'):
+        logger.error('treasurer middle name')
+        count = count +1
+
+    if comm.treasurerprefix!=request.data.get('treasurerprefix'):
+        logger.error('Treasurer Prefix')
+        count = count +1
+
+    if comm.treasurersuffix!=request.data.get('treasurersuffix'):
+        logger.error('Treassurer Suffix')
+        count = count +1
+
+    if len(request.data.get('text'))>20000:
+        logger.error('Text greater than 20000')
+        count = count +1
+
+    conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
+    if not any(conditions):
+        logger.error('Invalid Reason')
+        count = count +1
+
+    if count==0:
+        return Response(status=status.HTTP_201_CREATED)
+    else:
+        return Response(status=status.HTTP_204_NO_CONTENT)
