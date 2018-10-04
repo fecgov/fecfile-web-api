@@ -6,7 +6,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         class Meta:
             model = CommitteeInfo
             fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
-                    'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text',
+                    'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                     'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
                     'created_at','is_submitted' )
             read_only_fields = ('created_at', 'updated_at')
@@ -25,14 +25,14 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             instance.city = validated_data.get('city', instance.city)
             instance.state = validated_data.get('state', instance.state)
             instance.text = validated_data.get('text', instance.text)            
-            instance.reason = validated_data.get('text', instance.text)
+            instance.reason = validated_data.get('reason', instance.reason)
             instance.zipcode = validated_data.get('zipcode', instance.zipcode)
             instance.treasurerlastname = validated_data.get('treasurerlastname', instance.treasurerlastname)
             instance.treasurerfirstname = validated_data.get('treasurerfirstname', instance.treasurerfirstname)
-            instance.treasurermiddlename = validated_data.get('treasurermiddlename', instance.treasurermiddletname)
+            instance.treasurermiddlename = validated_data.get('treasurermiddlename', instance.treasurermiddlename)
             instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
             instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
-            is_submitted.text = validated_data.get('is_submitted', instance.is_submitted)            
+            is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
             instance.save()
             return instance
 
