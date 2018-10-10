@@ -27,7 +27,7 @@ urlpatterns = (
     url(r'^api/v1/', include('fecfiler.forms.urls')),
     
     #url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
-    url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
+    #url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
     url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
     #url(r'^api/docs/', include('rest_framework_swagger.urls')),
     url(r'^api/docs$', schema_view),
