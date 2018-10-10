@@ -90,8 +90,16 @@ def update_f99_info(request):
     
 @api_view(['POST'])
 def submit_comm_info(request):
+    """
+    Submits the last unsubmitted but saved comm_info object only.
+    """
     if request.method == 'POST':
-        serializer = CommitteeInfoSerializer(data=data)
+        try:
+            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+        except:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = CommitteeInfoSerializer(comm_info, data={"is_submitted":True})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -204,8 +212,7 @@ def validate_f99(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        #   import pdb; pdb.set_trace()
+    try:        
         comm = Committee.objects.get(committeeid=request.data.get('committeeid'))
 
     except Committee.DoesNotExist:
