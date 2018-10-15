@@ -8,7 +8,7 @@
 
 * Fork this repository.
 * `$ git clone git@github.com:/SalientCRGT-FEC/nxg-fec-back.git`
-* `$ mkvirtualenv nxg-fec-back-venv`
+* `$ virtualenv nxg-fec-back-venv`
 * `$ cd nxg-fec-back`
 * `$ pip install -r requirements.txt`
 * `$ npm install -g bower`

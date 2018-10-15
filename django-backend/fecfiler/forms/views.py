@@ -10,6 +10,8 @@ import json
 import os
 from django.views.decorators.csrf import csrf_exempt
 import logging
+import datetime
+
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
 logger = logging.getLogger(__name__)
@@ -28,12 +30,11 @@ def fetch_f99_info(request):
 
     # get details of a single comm_info
     if request.method == 'GET':
-        serializer = CommitteeInfoSerializer(comm_info)
-        return Response(serializer.data)    
-    # delete a single comm_info
-    # elif request.method == 'DELETE':
-    #     return Response({})
-
+        if comm_info:
+            serializer = CommitteeInfoSerializer(comm_info)
+            return Response(serializer.data)    
+        else:
+            return Response({})    
 
 #@csrf_exempt
 @api_view(['POST'])
@@ -91,25 +92,27 @@ def update_f99_info(request):
 @api_view(['POST'])
 def submit_comm_info(request):
     """
-    Submits the last unsubmitted but saved comm_info object only.
+    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     """
+    #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+            if comm_info:
+                new_data = comm_info.__dict__
+                new_data["is_submitted"]=True
+                new_data["updated_at"]=datetime.datetime.now()
+                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
         except:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = CommitteeInfoSerializer(comm_info, data={"is_submitted":True})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
-        '''try:
-	    submit_comm_info = CommitteeInfo.objects.all
-        except CommitteeInfo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)'''
-
+    else:
+        return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_f99_reasons(request):
