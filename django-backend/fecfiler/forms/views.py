@@ -224,43 +224,43 @@ def validate_f99(request):
     count = 0
 
     if comm.committeename!=request.data.get('committeename'):
-        logger.error('Committee Name')
+        logger.error('Committee Name does not match with Form 1 data.')
         count = count +1
 
     if comm.street1!=request.data.get('street1'):
-        logger.error('Street1')
+        logger.error('Street1 does not match with Form 1 data.')
         count = count +1
     
     if comm.street2!=request.data.get('street2'):
-        logger.error('Street2')
+        logger.error('Street2 does not match with Form 1 data.')
         count = count +1
 
     if comm.city!=request.data.get('city'):
-        logger.error('City')
+        logger.error('City does not match with Form 1 data.')
         count = count +1
     
     if comm.state!=request.data.get('state'):
-        logger.error('State')
+        logger.error('State does not match with Form 1 data.')
         count = count +1
 
     if comm.treasurerlastname!=request.data.get('treasurerlastname'):
-        logger.error('treasurer last name')
-        count = count +1
+        logger.error('Treasurer Last Name does not match with Form 1 data.')
+        count = count +1 
     
     if comm.treasurerfirstname!=request.data.get('treasurerfirstname'):
-        logger.error('treasurer first name')
+        logger.error('Treasurer First Name does not match with Form 1 data.')
         count = count +1
 
     if comm.treasurermiddlename!=request.data.get('treasurermiddlename'):
-        logger.error('treasurer middle name')
+        logger.error('Treasurer Middle Name does not match with Form 1 data.')
         count = count +1
 
     if comm.treasurerprefix!=request.data.get('treasurerprefix'):
-        logger.error('Treasurer Prefix')
+        logger.error('Treasurer Prefix does not match with Form 1 data.')
         count = count +1
 
     if comm.treasurersuffix!=request.data.get('treasurersuffix'):
-        logger.error('Treassurer Suffix')
+        logger.error('Treassurer Suffix does not match with Form 1 data.')
         count = count +1
 
     if len(request.data.get('text'))>20000:
@@ -269,7 +269,7 @@ def validate_f99(request):
 
     conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
     if not any(conditions):
-        logger.error('Invalid Reason')
+        logger.error('Reason does not match the exisiting data')
         count = count +1
 
     if count==0:

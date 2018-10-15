@@ -2,6 +2,7 @@ from django.test import TestCase
 
 # Create your tests here.
 from django.test import TestCase
+from django.test import Client
 from .models import CommitteeInfo, Committee
 
 
@@ -72,3 +73,19 @@ class CommitteeTest(TestCase):
         
         self.assertEqual(comm.committeename, "Test Committee 1")
 
+class Validate_F99(TestCase):
+    """docstring for Validate_F99"TestCase def __init__(self, arg):
+        super(Validate_F99,TestCase.__init__()
+        self.arg = arg
+    """
+
+    def validate_f99_post_json1(self):
+        json_data = { "committeeid": "C01234567", "committeename": "Test Committee 1", "street1": "Street1 ", "street2": "Street 2", "city": "Washington DC", "state": "DC", "zipcode": 912853, "treasurerprefix": "Mr", "treasurerfirstname": "John", "treasurermiddlename": "", "treasurerlastname": "Smith", "treasurersuffix": "", "text": "abcde", "reason": "MST"}
+        resp = self.client.post('/f99/validate_f99', json.dumps(json_data), content_type="application/json")
+        self.assertEqual(resp.status_code, 201)
+
+
+    def validate_f99_post_json2(self):
+        json_data = { "committeeid": "C01234567", "committeename": "Test Committee 1", "street1": "Street1 ", "street2": "Street 2", "city": "Washington DC", "state": "DC", "zipcode": 912853, "treasurerprefix": "Mr", "treasurerfirstname": "John", "treasurermiddlename": "", "treasurerlastname": "Smith", "treasurersuffix": "", "text": "abcde", "reason": "MS"}
+        resp = self.client.post('/f99/validate_f99', json.dumps(json_data), content_type="application/json")
+        self.assertEqual(resp.status_code, 204)

@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
-  api:
+   api:
     build: './django-backend'
     image: fecnxg
     command: python manage.py runserver 0.0.0.0:8080
@@ -29,3 +29,4 @@ services:
       - "80:80"
     depends_on:
       - api
+  
