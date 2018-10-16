@@ -36,6 +36,7 @@ def fetch_f99_info(request):
         else:
             return Response({})    
 
+   
 #@csrf_exempt
 @api_view(['POST'])
 def create_f99_info(request):
@@ -136,8 +137,6 @@ def get_committee(request):
     fields for auto populating the data for creating the comm_info object 
     """
     try:
-        #import pdb; pdb.set_trace()
-        #comm = Committee.objects.get(committeeid=request.user.username)
         comm = Committee.objects.filter(committeeid=request.user.username).last() 
     except Committee.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
@@ -147,6 +146,27 @@ def get_committee(request):
         serializer = CommitteeSerializer(comm)
         return Response(serializer.data)    
 
+
+@api_view(['GET'])
+def get_signee(request):
+    """
+    Gets the signee for the commitee .
+    """
+    try:
+        comm = Committee.objects.filter(committeeid=request.user.username).last()
+    except Committee.DoesNotExist:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    # get details of a single comm
+    if request.method == 'GET':
+        serializer = CommitteeSerializer(comm)
+        filtered_d = {key: val for key, val in serializer.data.items() if key not in ['street1', 'street2', 'created_at','state','city','zipcode']}
+        # FIXME: This is to be redone after there is a discussion on how to model data for the signatories of each committee.
+        filtered_d['email'] = request.user.email
+        #import ipdb; ipdb.set_trace();
+        return Response(filtered_d)    
+    
+    
 @api_view(['POST'])
 def update_committee(request, cid):   
     # # update details of a single comm
