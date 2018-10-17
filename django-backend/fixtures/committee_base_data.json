@@ -1,1 +1,43 @@
-[{"model": "forms.committee", "pk": 1, "fields": {"committeeid": "C01234567", "committeename": "Test Committee 1", "street1": "Street1 ", "street2": "Street 2", "city": "Washington DC", "state": "DC", "zipcode": 912853, "treasurerlastname": "Smith", "treasurerfirstname": "John", "treasurermiddlename": "", "treasurerprefix": "Mr", "treasurersuffix": "", "created_at": "2018-09-19T17:34:00.477Z", "updated_at": "2018-09-19T17:34:00.477Z", "deleted_at": null, "isdeleted": false}}, {"model": "forms.committee", "pk": 2, "fields": {"committeeid": "C11234567", "committeename": "Test Committee 2", "street1": "Street 1", "street2": "Street 2", "city": "Washington", "state": "DC", "zipcode": 20001, "treasurerlastname": "Smith", "treasurerfirstname": "John", "treasurermiddlename": "Doe", "treasurerprefix": "Mr", "treasurersuffix": "IV", "created_at": "2018-09-19T17:34:00.479Z", "updated_at": "2018-09-19T17:34:00.479Z", "deleted_at": null, "isdeleted": false}}]
+[{
+	"model": "forms.committee",
+	"pk": 1,
+	"fields": {
+		"committeeid": "C01234567",
+		"committeename": "Test Committee 1",
+		"street1": "Street1 ",
+		"street2": "Street 2",
+		"city": "Washington DC",
+		"state": "DC",
+		"zipcode": 912853,
+		"treasurerlastname": "Smith",
+		"treasurerfirstname": "John",
+		"treasurermiddlename": "",
+		"treasurerprefix": "Mr",
+		"treasurersuffix": "",
+		"created_at": "2018-09-19T17:34:00.477Z",
+		"updated_at": "2018-09-19T17:34:00.477Z",
+		"deleted_at": null,
+		"isdeleted": false
+	}
+}, {
+	"model": "forms.committee",
+	"pk": 2,
+	"fields": {
+		"committeeid": "C11234567",
+		"committeename": "Test Committee 2",
+		"street1": "Street 1",
+		"street2": "Street 2",
+		"city": "Washington",
+		"state": "DC",
+		"zipcode": 20001,
+		"treasurerlastname": "Smith",
+		"treasurerfirstname": "John",
+		"treasurermiddlename": "Doe",
+		"treasurerprefix": "Mr",
+		"treasurersuffix": "IV",
+		"created_at": "2018-09-19T17:34:00.479Z",
+		"updated_at": "2018-09-19T17:34:00.479Z",
+		"deleted_at": null,
+		"isdeleted": false
+	}
+}]
