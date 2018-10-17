@@ -11,6 +11,7 @@ import os
 from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
+from django.http import JsonResponse
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
