@@ -11,6 +11,7 @@ import os
 from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
+from django.http import JsonResponse
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -247,58 +248,55 @@ def validate_f99(request):
     except Committee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    count = 0
+    errormess = []
 
     if comm.committeename!=request.data.get('committeename'):
-        logger.error('Committee Name does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Committee Name does not match with Form 1 data.')
+        
     if comm.street1!=request.data.get('street1'):
-        logger.error('Street1 does not match with Form 1 data.')
-        count = count +1
-    
+        errormess.append('Street1 does not match with Form 1 data.')
+            
     if comm.street2!=request.data.get('street2'):
-        logger.error('Street2 does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Street2 does not match with Form 1 data.')
+        
     if comm.city!=request.data.get('city'):
-        logger.error('City does not match with Form 1 data.')
-        count = count +1
-    
+        errormess.append('City does not match with Form 1 data.')
+            
     if comm.state!=request.data.get('state'):
-        logger.error('State does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('State does not match with Form 1 data.')
+        
     if comm.treasurerlastname!=request.data.get('treasurerlastname'):
-        logger.error('Treasurer Last Name does not match with Form 1 data.')
-        count = count +1 
-    
+        errormess.append('Treasurer Last Name does not match with Form 1 data.')
+            
     if comm.treasurerfirstname!=request.data.get('treasurerfirstname'):
-        logger.error('Treasurer First Name does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Treasurer First Name does not match with Form 1 data.')
+        
     if comm.treasurermiddlename!=request.data.get('treasurermiddlename'):
-        logger.error('Treasurer Middle Name does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Treasurer Middle Name does not match with Form 1 data.')
+        
     if comm.treasurerprefix!=request.data.get('treasurerprefix'):
-        logger.error('Treasurer Prefix does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Treasurer Prefix does not match with Form 1 data.')
+        
     if comm.treasurersuffix!=request.data.get('treasurersuffix'):
-        logger.error('Treassurer Suffix does not match with Form 1 data.')
-        count = count +1
-
+        errormess.append('Treassurer Suffix does not match with Form 1 data.')
+        
     if len(request.data.get('text'))>20000:
-        logger.error('Text greater than 20000')
-        count = count +1
-
+        errormess.append('Text greater than 20000')
+        
     conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
     if not any(conditions):
-        logger.error('Reason does not match the exisiting data')
-        count = count +1
-
-    if count==0:
-        return Response(status=status.HTTP_201_CREATED)
+        errormess.append('Reason does not match the exisiting data')
+        
+    #if not request.FILES['file'].name.endswith('.pdf'):
+    #    errormess.append('Supports only pdf file extensions')
+        
+    #if request.FILES['file']._size > 33554432:
+    #    errormess.append('File size is more than 32 MB')
+        
+    if len(errormess)==0:
+        errormess.append('Validation successful!')
+        json_object = {'error'}
+        return JsonResponse(errormess, status=200, safe=False)
     else:
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse(errormess, status=400, safe=False)
+
