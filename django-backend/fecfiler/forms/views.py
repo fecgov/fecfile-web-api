@@ -22,6 +22,7 @@ def fetch_f99_info(request):
     """"
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
+    #import ipdb; ipdb.set_trace()
     try: 
         # fetch last comm_info object created that is not submitted, else return None
         comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
@@ -62,6 +63,11 @@ def create_f99_info(request):
             'treasurerprefix': request.data.get('treasurerprefix'),
             'treasurersuffix': request.data.get('treasurersuffix'),
             'is_submitted': request.data.get('is_submitted'),
+            'signee': request.data.get('signee'),
+            'email_on_file' : request.data.get('email_on_file'),
+            'email_on_file_1' : request.data.get('email_on_file_1'),
+            'email_onf_file_2': request.data.get('email_on_file_2'),
+
         }
 
 

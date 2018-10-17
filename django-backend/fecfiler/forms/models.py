@@ -26,6 +26,10 @@ class CommitteeInfo(models.Model):
     deleted_at = models.DateTimeField(null=True)
     isdeleted = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
+    signee = models.CharField(max_length=30, null= False, default = "-")
+    email_on_file = models.TextField(max_length=100, null= False, default = "-")
+    additional_email_1 = models.TextField(max_length=100, null= False, default = "-")
+    additional_email_2 = models.TextField(max_length=100, null= False, default = "-")
 
     # class constructor
     def __unicode__(self):
