@@ -92,7 +92,7 @@ TEMPLATES = [
     },
 ]
 
-if DEBUG == True
+if DEBUG == True:
     CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
