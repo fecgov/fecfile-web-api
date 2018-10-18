@@ -202,7 +202,8 @@ def create_committee(request):
             'treasurerfirstname': request.data.get('treasurerfirstname'),
             'treasurermiddlename': request.data.get('treasurermiddlename'),
             'treasurerprefix': request.data.get('treasurerprefix'),
-            'treasurersuffix': request.data.get('treasurersuffix')
+            'treasurersuffix': request.data.get('treasurersuffix'),
+            'email_on_file' : request.data.get('email_on_file'),
         }
 
 
@@ -237,7 +238,8 @@ def validate_f99(request):
             'treasurerfirstname': request.data.get('treasurerfirstname'),
             'treasurermiddlename': request.data.get('treasurermiddlename'),
             'treasurerprefix': request.data.get('treasurerprefix'),
-            'treasurersuffix': request.data.get('treasurersuffix')
+            'treasurersuffix': request.data.get('treasurersuffix'),
+            'email_on_file' : request.data.get('email_on_file'),
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
