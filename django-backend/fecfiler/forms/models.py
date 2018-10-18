@@ -1,6 +1,7 @@
 
 # Create your models here.
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from django.utils.translation import ugettext_lazy as _
 
 class CommitteeInfo(models.Model):
@@ -30,6 +31,7 @@ class CommitteeInfo(models.Model):
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
     additional_email_1 = models.TextField(max_length=100, null= False, default = "-")
     additional_email_2 = models.TextField(max_length=100, null= False, default = "-")
+    file = models.FileField(upload_to='f99/', null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
 
     # class constructor
     def __unicode__(self):
