@@ -4,6 +4,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 from .models import CommitteeInfo, Committee
 from .serializers import CommitteeInfoSerializer, CommitteeSerializer
 import json
@@ -38,7 +39,7 @@ def fetch_f99_info(request):
         else:
             return Response({})    
 
-   
+parser_classes = (MultiPartParser, FormParser)   
 #@csrf_exempt
 @api_view(['POST'])
 def create_f99_info(request):
@@ -68,6 +69,7 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_onf_file_2': request.data.get('email_on_file_2'),
+            'file': request.data['file'],
 
         }
 
@@ -297,7 +299,6 @@ def validate_f99(request):
         
     if len(errormess)==0:
         errormess.append('Validation successful!')
-        json_object = {'error'}
         return JsonResponse(errormess, status=200, safe=False)
     else:
         return JsonResponse(errormess, status=400, safe=False)
