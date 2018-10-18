@@ -35,3 +35,6 @@ urlpatterns = (
     url(r'^api/v1/token/refresh$', refresh_jwt_token),
     #url('^.*$', IndexView.as_view(), name='index'),
 )
+
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
