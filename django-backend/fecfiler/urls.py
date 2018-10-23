@@ -1,6 +1,8 @@
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 from rest_framework_nested import routers
 from .authentication.views import AccountViewSet, LoginView, LogoutView
 from .posts.views import AccountPostsViewSet, PostViewSet
@@ -18,7 +20,7 @@ accounts_router = routers.NestedSimpleRouter(
 )
 accounts_router.register(r'posts', AccountPostsViewSet)
 
-urlpatterns = (
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     #url(r'^admin$', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -34,4 +36,7 @@ urlpatterns = (
     url(r'^api/v1/token/obtain$', obtain_jwt_token),
     url(r'^api/v1/token/refresh$', refresh_jwt_token),
     #url('^.*$', IndexView.as_view(), name='index'),
-)
+]
+
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
