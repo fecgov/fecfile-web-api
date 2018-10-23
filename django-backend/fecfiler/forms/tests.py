@@ -89,3 +89,44 @@ class Validate_F99(TestCase):
         json_data = { "committeeid": "C01234567", "committeename": "Test Committee 1", "street1": "Street1 ", "street2": "Street 2", "city": "Washington DC", "state": "DC", "zipcode": 912853, "treasurerprefix": "Mr", "treasurerfirstname": "John", "treasurermiddlename": "", "treasurerlastname": "Smith", "treasurersuffix": "", "text": "abcde", "reason": "MS"}
         resp = self.client.post('/f99/validate_f99', json.dumps(json_data), content_type="application/json")
         self.assertEqual(resp.status_code, 204)
+
+
+class Setup_submit_comm_info(TestCase):
+    """Test Module for Submit_comm_info"""
+
+    def setup(self):
+        CommitteeInfo.objects.create(
+            committeeid='C01234567', committeename = 'Test Committee 1', street1='Street1 ',
+            street2 = 'Street 2', city='Washington DC', state='DC', zipcode='912853', text="-",
+            treasurerfirstname='John', treasurerlastname='Smith', treasurerprefix='Mr')
+        
+        submit_data = {
+                "committeeid": "C11234567",
+                "committeename": "Test Committee 2",
+                "street1": "Street 1",
+                "street2": "Street 2",
+                "city": "Washington",
+                "state": "DC",
+                "text" : "--",
+                "zipcode": 20001,
+                "treasurerprefix": "Mr",
+                "treasurerfirstname": "John",
+                "treasurermiddlename": "Doe",
+                "treasurerlastname": "Smith",
+                "treasurersuffix": "IV"
+           }
+
+        CommitteeInfo.objects.create(**submit_data)
+
+class submit_comm_info_Test(TestCase):
+    
+
+    def valid_submit_data_test():
+        data == submit_data
+        self.assertEqual(resp.status_code, 200)
+
+
+    def invalid_submit_data_test():
+        data != submit_data
+        self.assertEqual(resp.status_code,400)
+        
