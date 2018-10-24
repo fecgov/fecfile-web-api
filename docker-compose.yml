@@ -18,6 +18,7 @@ services:
       - ./django-backend:/opt/nxg_fec
     ports:
       - "8080:8080"
+	  - "25:25" 
     depends_on:
       - db
   web:
