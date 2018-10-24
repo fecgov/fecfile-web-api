@@ -65,7 +65,7 @@ Alternatively if you have made changes to the application and need to push the c
 ` docker-compose down `
 # see all running containers
 `docker ps`
-# running commands in a a running container
+# running commands in a running container
 `docker compose exec <container name> <command>`
 
 Container structure
