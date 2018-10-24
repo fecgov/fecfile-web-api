@@ -1,0 +1,57 @@
+@import '../../scss/global';
+
+.steps {
+  list-style-type: none;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0 auto;
+  padding: 24px 0 10px;
+  width: 100%;
+  li {
+    &:not(:last-child) {
+      &:before {
+        background-color: $mercury;
+        content: '';
+        position: absolute;
+        height: 1px;
+        width: calc(100% - 14px);
+        top: -7px;
+        left: calc(50% + 7px);
+      }
+    }
+    &:after {
+      background-color: $alto;
+      position: absolute;
+      top: -14px;
+      left: calc(50% - 7px);
+      width: 14px;
+      height: 14px;
+      content: '';
+      text-align: center;
+      vertical-align: middle;
+      line-height: 14px;
+      -webkit-transition: .25s;
+      transition: .25s;
+      border-radius: 100%;
+      background-color: $mercury;
+    }
+    &.current {
+      &:after {
+        background-color: $dustyGray;
+      }
+    }
+    display: inline-block;
+    position: relative;
+    padding: 10px 0 0;
+    width: 20%;
+    div {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: arial, helvetica, sans-serif;
+    }
+  }
+}

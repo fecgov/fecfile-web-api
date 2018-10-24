@@ -3,7 +3,7 @@
 .login {
     background-color: $primaryBlue;
     color: $black;
-    height: 100vh;
+    height: 100%;
     padding-top: 15px;
     header {
       .logo {
@@ -16,8 +16,19 @@
     min-height: 375px;
     margin-left: auto;
     margin-right: auto;
+    padding-bottom: 15px;
+    padding-top: 15px;
     text-align: center;
-    width: 500px;
+    width: 300px;
+    @include media(tablet) {
+      width: 500px;
+    }
+    @include media(mediumDesktop) {
+      width: 500px;
+    }
+    @include media(largeDesktop) {
+      width: 700px;
+    }
     .grid-row {
       margin: 0;
       &.form-field__info {
@@ -29,7 +40,16 @@
       .grid-row__col {
         padding: 0;
         .login-input {
-          @include make-text-input(450px, 1.5em, 1em, 1em);
+          @include make-text-input(265px, 1.5em, 1em, 1em);
+          @include media(tablet) {
+            @include make-text-input(450px, 1.5em, 1em, 1em);
+          }
+          @include media(mediumDesktop) {
+            @include make-text-input(450px, 1.5em, 1em, 1em);
+          }
+          @include media(largeDesktop) {
+            @include make-text-input(650px, 1.5em, 1em, 1em);
+          }
           margin-left: auto;
           margin-right: auto;
         }
@@ -45,7 +65,23 @@
           cursor: pointer;
           margin-bottom: 15px;
           margin-top: 30px;
-          width: 460px;
+          width: 275px;
+          @include media(tablet) {
+            width: 460px;
+          }
+          @include media(mediumDesktop) {
+            width: 460px;
+          }
+          @include media(largeDesktop) {
+            width: 460px;
+          }
+        }
+        .logged-out-msg {
+          color: $blue;
+          font-size: 1em;
+          font-weight: bold;
+          margin-bottom: 20px;
+          margin-top: 10px;
         }
       }
     }

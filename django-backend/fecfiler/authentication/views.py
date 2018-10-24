@@ -11,7 +11,7 @@ class AccountViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-
+    
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS:
             return permissions.AllowAny(),

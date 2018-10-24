@@ -1,0 +1,115 @@
+@import '../../scss/global';
+
+$btnRowHeight: 45px;
+
+.signee-container {
+  header {
+    .header-container {
+      display: block;
+      width: 100%;
+      .header__text {
+        float: left;
+        width: 72%
+      }
+      .header__btns {
+        float: right;
+        padding-top: 15px;
+        width: 25%;
+        .btn-print-preview {
+          @extend .btn-secondary-gray;
+          margin-right: 5px;
+        }
+        .btn-validate {
+          @extend .btn-primary;
+        }
+        .btn {
+          padding-top: 10px;
+        }
+      }
+      @include clearfix();
+    }
+  }
+  section {
+    .content {
+      display: block;
+      position: relative;
+      width: 100%;
+      form {
+        .form1-link {
+          color: $dodgerBlue;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+        .additional-email__field {
+          margin-bottom: 10px;
+          &:last-child {
+            margin-bottom: 0;
+          }
+          input[type='email'] {
+            @include make-text-input(175px, 1.5em, 1em, 1em);
+          }
+          .error {
+            margin-top: 5px;
+          }
+        }
+        .forms__btn-container {
+          .forms__btn-row {
+            display: block;
+            height: $btnRowHeight;
+            margin-bottom: 15px;
+            position: relative;
+            width: 100%;
+            @include clearfix();
+          }
+          .forms__btn-right {
+            float: right;
+          }
+          .forms__btn-previous {
+            float: left;
+            width: 55%;
+            @include webkitBrowser() {
+              width: 56%;
+            }
+            @include safariOnly() {
+              width: 55%;
+            }
+          }
+          .forms__agreement-text {
+            float: left;
+            width: 38%;
+            @include webkitBrowser() {
+              width: 36%;
+            }
+            @include safariOnly() {
+              width: 36%;
+            }
+            .agreement__text {
+              display: inline-block;
+              float: left;
+              font-size: 0.85em;
+              margin-left: 5px;
+              width: 290px;
+            }
+            input[type='checkbox'] {
+              float: left;
+            }
+          }
+          .forms__btn-submit {
+            float: left;
+            width: 5%;
+            @include webkitBrowser() {
+              width: 8%;
+            }
+            @include safariOnly() {
+              width: 5%;
+            }
+          }
+        }
+      }
+
+      // @include form-btns();
+    }
+  }
+} // .signee-container

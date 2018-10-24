@@ -29,7 +29,6 @@ export class AuthService {
    *
    */
   public doSignOut() {
-    console.log('doSignOut: ');
     this._session.destroy();
   }
 
@@ -39,7 +38,6 @@ export class AuthService {
    * @param      {String}  accessToken  The access token
    */
   public doSignIn(accessToken: string) {
-    console.log('doSignIn: ');
     if ((!accessToken)) {
       return;
     }

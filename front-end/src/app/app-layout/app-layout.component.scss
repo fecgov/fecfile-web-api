@@ -1,0 +1,60 @@
+ @import '../shared/scss/global';
+
+.app-container {
+  color: $black;
+  height: 100%;
+  padding-left: $sideBarWidth;
+  transition: all 0.4s ease 0s;
+  &.active {
+    padding-left: 0;
+    .app__side-nav {
+      left: 0;
+    }
+  }
+  .app__top {
+    left: 0;
+    position: fixed;
+    right: 0;
+    vertical-align: middle;
+    width: 100%;
+    z-index: 1;
+    .app__top-logo {
+      float: left;
+      margin-right: 25px;
+      width: auto;
+      img {
+        padding-top: 5px;
+        width: 350px;
+      }
+    } // .app__top-logo
+    .app__side-nav-toggle {
+      float: left;
+      padding-top: 20px;
+      .side-nav-toggle {
+        color: $black;
+        cursor: pointer;
+        text-decoration: none;
+      }
+    }// .app__side-nav-toggle
+    @include clearfix();
+  } // .app__top
+  .app__side-nav {
+    height: 100%;
+    left: $sideBarWidth;
+    margin-left: -$sideBarWidth;
+    position: fixed;
+    top: 25px;
+    transition: all 0.4s ease 0s;
+    width: $sideBarWidth;
+    z-index: 1000;
+  } // .app__side-nav
+  main {
+    height: 98%;
+    .app__content-wrapper {
+      //height: 95%;
+      padding-top: 60px;
+      transition: all 0.4s ease 0s;
+      width: 100%;
+    }
+  }
+}

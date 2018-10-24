@@ -1,0 +1,105 @@
+<div class="reason-container">
+  <form
+    [formGroup]="frmReason"
+    (ngSubmit)="doValidateReason()"
+  >
+    <header>
+      <div class="header-container">
+        <div class="header__text">
+          <h1 class="text-left" *ngIf="!typeSelected">Form 99</h1>
+          <h1 class="text-left" *ngIf="typeSelected">Form 99 / {{ typeSelected }}</h1>
+        </div>
+        <div class="header__btns">
+          <button
+            type="button"
+            class="btn btn-print-preview"
+            (click)="printPreview()"
+          >
+            Print Preview
+          </button>
+          <button
+            type="button"
+            class="btn btn-validate"
+            (click)="validateForm()"
+          >
+              Validate
+            </button>
+        </div>
+      </div>
+    </header>
+    <section>
+      <div class="content">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <b>Enter your text*</b>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+              You must enter a reason.
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="rich-text-editor">
+              <angular-editor
+                ngDefaultControl
+                formControlName="reasonText"
+                #editor
+                [config]="editorConfig"
+              ></angular-editor>
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="editor-character-count">
+              {{ characterCount }}
+              characters
+            </div>
+            <div class="error-text"
+              *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
+              <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+                You can only enter up to 20,000 characters.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <div class="btn-container-row">
+                <div>
+                  <hr/>
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-right"
+                    (click)="saveForm()"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-previous btn-left"
+                (click)="previousStep()"
+              >
+                Previous
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary btn-right"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> <!-- ./content -->
+    </section>
+  </form>
+</div> <!-- ./reason-container -->
