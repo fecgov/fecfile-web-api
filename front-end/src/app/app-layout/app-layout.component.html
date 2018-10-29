@@ -1,0 +1,31 @@
+<div class="app-container"
+  [ngClass]="showSideBar === false ? 'active' : ''">
+  <div class="app__top">
+    <div class="app__top-logo">
+      <a [routerLink]="['/dashboard']">
+        <img src="assets/img/logo-transparent.png" />
+      </a>
+    </div>
+    <div class="app__side-nav-toggle">
+      <a class="side-nav-toggle"
+        role="button"
+        (click)="toggleSideNav()"
+      >
+        <i class="bars-icon">
+          <span class="sr-only">Toggle Sidebar</span>
+        </i>
+      </a>
+    </div>
+    <div class="app__top-nav">
+      <app-header></app-header>
+    </div>
+  </div>
+  <div class="app__side-nav">
+    <app-sidebar></app-sidebar>
+  </div>
+  <main>
+    <div class="app__content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

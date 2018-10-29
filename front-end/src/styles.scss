@@ -8,17 +8,85 @@ $fa-font-path: '../node_modules/font-awesome/fonts';
 @import '../node_modules/bootstrap/scss/buttons';
 @import '../node_modules/bootstrap/scss/transitions';
 @import '../node_modules/bootstrap/scss/modal';
+@import '../node_modules/bootstrap/scss/close';
+
+html,body {
+  height: 100%;
+}
 
 body {
   color: $white;
   font-family: arial, helvetica, sans-serif;
   font-size: 1em;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
   overflow-y: scroll;
+}
+
+ul {
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 0;
+  -webkit-padding-start: 0;
+  li {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+    -webkit-margin-start: 0;
+    -webkit-margin-end: 0;
+    -webkit-padding-start: 0;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
 }
 
 .bars-icon {
   @extend .fa;
   @extend .fa-bars;
+}
+
+.folder-icon {
+	@extend .fa;
+	@extend .fa-folder;
+	color: $white;
+}
+
+.plus-icon {
+	@extend .fa;
+	@extend .fa-plus-circle;
+}
+
+.notifications-icon {
+  @extend .fa;
+  @extend .fa-bell;
+}
+
+.profile-icon {
+  @extend .fa;
+  @extend .fa-user-circle;
+}
+
+.settings-icon {
+  @extend .fa;
+  @extend .fa-cog;
+}
+
+.dropdown-icon {
+  @extend .fa;
+  @extend .fa-caret-down;
+}
+
+.info-icon {
+  @extend .fa;
+  @extend .fa-info-circle;
 }

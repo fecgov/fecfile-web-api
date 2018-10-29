@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { MessageService } from '../shared/services/MessageService/message.service';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../shared/services/APIService/api.service';
 import { AuthService } from '../shared/services/AuthService/auth.service';
@@ -17,21 +19,40 @@ export class LoginComponent implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
+  public loggedOut: any = '';
+  private _subscription: Subscription;
 
   constructor(
     private _fb: FormBuilder,
+    private _ngZone: NgZone,
     private _apiService: ApiService,
     private _authService: AuthService,
     private _router: Router,
-    private _cookieService: CookieService
+    private _route: ActivatedRoute,
+    private _cookieService: CookieService,
+    private _messageService: MessageService
   ) {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
       loginPassword: ['', Validators.required]
     });
+    this._subscription =
+      this._messageService
+        .getMessage()
+        .subscribe(res => {
+          this.loggedOut = res;
+        });
  }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    this._subscription.unsubscribe();
+  }
+
+  public getLoggedOut() {
+    return this.loggedOut;
   }
 
   /**
@@ -69,9 +90,9 @@ export class LoginComponent implements OnInit {
     this._apiService
       .signIn(username, password)
       .subscribe(res => {
-        if (res.id) {
+        if (res.token) {
           this._authService
-              .doSignIn(res.id);
+              .doSignIn(res.token);
 
           this._router.navigate(['dashboard']);
         }

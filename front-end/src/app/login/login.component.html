@@ -4,6 +4,9 @@
     <div class="logo">
       <img src="assets/img/logo.svg" alt="FEC Logo" />
     </div>
+    <div>
+      <img src="https://www.fec.gov/static/img/wordmark.svg"/>
+    </div>
   </header>
 
   <div class="login-box">
@@ -20,6 +23,9 @@
           <div class="error" *ngIf="hasFailed">
             Invalid commitee id or password.
           </div>
+          <div class="logged-out-msg" *ngIf="loggedOut.loggedOut">
+            {{ loggedOut?.msg }}
+          </div>
         </div>
       </div>
 
@@ -31,7 +37,7 @@
         </div>
         <div class="grid-row__col grid-row__col--6 text-right">
           <div class="right-text">
-            <a class="link" href="https://www.fec.gov/data/" target="_blank">
+            <a class="forgot-committee-id-link link" href="https://www.fec.gov/data/" target="_blank">
               Forgot Committee ID
             </a>
           </div>
@@ -54,7 +60,7 @@
             class="error"
             *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError "
           >
-            <div *ngIf="frm.get('commiteeId').hasError('required')">
+            <div class="error__committee-id" *ngIf="frm.get('commiteeId').hasError('required')">
               Please enter your committee id.
             </div>
           </div>
@@ -69,7 +75,7 @@
         </div>
         <div class="grid-row__col grid-row__col--6 text-right">
           <div class="right-text">
-            <a class="link" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
+            <a class="forgot-password-link link" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
               Forgot Password
             </a>
           </div>
@@ -92,7 +98,7 @@
             class="error"
             *ngIf="(frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || passwordInputError "
           >
-            <div *ngIf="frm.get('loginPassword').hasError('required')">
+            <div class="error__password-error" *ngIf="frm.get('loginPassword').hasError('required')">
               Please enter your password.
             </div>
           </div>
@@ -110,7 +116,7 @@
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
-          <a class="link" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
+          <a class="need-to-register-link link" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
             Do you need to register your committee?
           </a>
         </div>

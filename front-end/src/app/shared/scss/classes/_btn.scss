@@ -1,0 +1,41 @@
+.btn-primary {
+  background-color: $blueZodiac;
+  border-color: $blueZodiac;
+  color: $white;
+  &:hover {
+    background-color: darken($blueZodiac, 10%);
+    border-color: darken($blueZodiac, 10%);
+  }
+}
+
+.btn-secondary {
+  background-color: $pelorous;
+  border-color: $pelorous;
+  color: $white;
+  &:hover {
+    background-color: darken($pelorous, 10%);
+    border-color: darken($pelorous, 10%);
+  }
+}
+
+.btn-secondary-gray {
+  background-color: $mercury;
+  border-color: $mercury;
+  color: $shuttleGray;
+  &:hover {
+    background-color: darken($mercury, 10%);
+    border-color: darken($mercury, 10%);
+  }
+}
+
+.btn-previous {
+  @extend .btn-secondary-gray;
+}
+
+.btn-submit {
+  @extend .btn-secondary;
+}
+
+.btn-edit {
+  @extend .btn-secondary-gray;
+}

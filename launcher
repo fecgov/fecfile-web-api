@@ -1,31 +1,43 @@
 #!/bin/bash
 
-# change working directory to build the Angular application
+# Change working directory to build the Angular application
 cd front-end
+
 # remove old artifact
 rm -fr dist/* node_modules
+
 # install dependencies
 echo -e "installing npm dependecies \n"
 npm install
+
+# Fix any module vulnerabilities tht happen during installation 
+npm audit fix
 # build the angular app
 echo -e "building Angular app \n"
-$(npm bin)/ng build
+$(npm bin)/ng build 
+
 # change directory to the root of the project
 cd ..
+
 # shutdown running instances
 docker-compose down
+
+# removing all containers 
+docker rm $( docker ps -qa )
+
 #  echo -e "Removing old images"
 sh -c "docker rmi -f $( docker images -qa )"
-#else
-#  echo -e "Nothing to delete \n"s
-#fi
+
 # build the application
 docker-compose build
 docker-compose up --build -d
+
 # rerun the migrations just in case
 sleep 2
 docker-compose exec api python manage.py migrate --noinput
-docker-compose exec api python manage.py loaddata fixtures/base_data.json
+for i in $( ls django-backend/fixtures/ ); do 
+  docker-compose exec api python manage.py loaddata fixtures/$i
+done
 
 sleep 2
 echo -e "Running applications \n"

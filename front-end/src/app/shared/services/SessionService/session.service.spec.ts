@@ -1,5 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { CookieService } from 'ngx-cookie-service';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SessionService } from './session.service';
 
 describe('SessionService', () => {
@@ -9,6 +10,9 @@ describe('SessionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       providers: [
         SessionService,
         CookieService

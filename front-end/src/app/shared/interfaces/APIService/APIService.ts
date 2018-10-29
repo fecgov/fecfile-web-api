@@ -19,5 +19,6 @@ export interface Posts {
  }
 
  export interface Auth {
-   id?: string
+   token?: string
  }
+

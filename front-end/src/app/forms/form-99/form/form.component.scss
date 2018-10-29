@@ -1,0 +1,23 @@
+@import '../../../shared/scss/global';
+
+.forms__wizard {
+  height: 100%;
+  margin: 0 auto;
+  width: 96%;
+  @include clearfix();
+  .form__steps {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    @include clearfix();
+  }
+  .form__container {
+    display: block;
+    height: 100%;
+    width: 100%;
+    .form__content {
+      float: left;
+      width: 100%;
+    }
+  } // .form__container
+}
