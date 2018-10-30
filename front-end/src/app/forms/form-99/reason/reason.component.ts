@@ -33,7 +33,7 @@ export class ReasonComponent implements OnInit {
   public characterCount: number = 0;
   public formSaved: boolean = false;
 
-  private _form_99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
+  private _form_99_details: any = {}
   private _editorMax: number = 20000;
   private _form_type: string = '';
 
@@ -77,9 +77,14 @@ export class ReasonComponent implements OnInit {
   ngOnInit(): void {
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+
     if(this._form_99_details) {
       if(this._form_99_details.text) {
-        this.typeSelected = this._form_99_details.reason;
+
+        if(this._form_99_details.reason) {
+          this.typeSelected = this._form_99_details.reason;
+        }
 
         this.frmReason = this._fb.group({
           reasonText: [this._form_99_details.text, [
@@ -123,6 +128,12 @@ export class ReasonComponent implements OnInit {
 
       this.characterCount = text.length;
     }
+
+    if(this.frmReason.get('reasonText').value.length === 4) {
+      if(this.frmReason.get('reasonText').value === '<br>') {
+        this.frmReason.controls['reasonText'].setValue('');
+      }
+    }    
   }
 
   /**
@@ -139,7 +150,10 @@ export class ReasonComponent implements OnInit {
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
-        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+        setTimeout(() => {
+          localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+        }, 100);
+        
 
         this.status.emit({
           form: this.frmReason,
@@ -184,7 +198,7 @@ export class ReasonComponent implements OnInit {
         this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
 
         this.reasonText = this.frmReason.get('reasonText').value;
-        this._form_99_details.text = this.frmReason.get('reasonText').value;
+        this._form_99_details.text = this.reasonText;
 
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 

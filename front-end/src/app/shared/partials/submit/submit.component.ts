@@ -28,8 +28,6 @@ export class SubmitComponent implements OnInit {
           this._router
             .events
             .subscribe(e => {
-              console.log('submit component: ');
-              console.log('e: ', e);
               if(e instanceof NavigationEnd) {
                 if(!e.url.indexOf('/forms/')) {
                   localStorage.removeItem(`form_${this.form_type}_details`);

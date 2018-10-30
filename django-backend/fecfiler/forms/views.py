@@ -69,8 +69,8 @@ def create_f99_info(request):
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
-            'email_onf_file_2': request.data.get('email_on_file_2'),
-            'file': request.data['file'],
+            'email_onf_file_2': request.data.get('email_on_file_2')
+            #'file': request.data['file'],
 
         }
 
@@ -242,8 +242,8 @@ def validate_f99(request):
             'treasurermiddlename': request.data.get('treasurermiddlename'),
             'treasurerprefix': request.data.get('treasurerprefix'),
             'treasurersuffix': request.data.get('treasurersuffix'),
-            'email_on_file' : request.data.get('email_on_file'),
-            'file': request.data.get('file'),
+            'email_on_file' : request.data.get('email_on_file')
+            #'file': request.data.get('file'),
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -300,18 +300,18 @@ def validate_f99(request):
         errormess.append('Reason does not match the pre-defined codes.')
     
     #pdf validation for type, extension and size
-    if 'file' in request.data:
-        valid_mime_types = ['application/pdf']
-        file = request.data.get('file')
-        file_mime_type = magic.from_buffer(file.read(1024), mime=True)
-        if file_mime_type not in valid_mime_types:
-            errormess.append('This is not a pdf file type. Kindly open your document using a pdf reader before uploading it.')
-        valid_file_extensions = ['.pdf']
-        ext = os.path.splitext(file.name)[1]
-        if ext.lower() not in valid_file_extensions:
-            errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
-        if file._size > 33554432:
-            errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')    
+    # if 'file' in request.data:
+    #     valid_mime_types = ['application/pdf']
+    #     file = request.data.get('file')
+    #     file_mime_type = magic.from_buffer(file.read(1024), mime=True)
+    #     if file_mime_type not in valid_mime_types:
+    #         errormess.append('This is not a pdf file type. Kindly open your document using a pdf reader before uploading it.')
+    #     valid_file_extensions = ['.pdf']
+    #     ext = os.path.splitext(file.name)[1]
+    #     if ext.lower() not in valid_file_extensions:
+    #         errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
+    #     if file._size > 33554432:
+    #         errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')    
             
     if len(errormess)==0:
         errormess.append('Validation successful!')

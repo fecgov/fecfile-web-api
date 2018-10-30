@@ -9,3 +9,5 @@ build/
 dist/
 helloworld.db
 local_settings.py
+/env/
+.python-version

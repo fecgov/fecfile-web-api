@@ -18,7 +18,6 @@ export class TypeComponent implements OnInit {
 
   public frmType: FormGroup;
   public typeSelected: string = '';
-  // public reasonFailed: boolean = false;
   public isValidType: boolean = false;
   public typeFailed: boolean = false;
 
@@ -70,13 +69,17 @@ export class TypeComponent implements OnInit {
    */
   public doValidateType() {
     if (this.frmType.get('reasonTypeRadio').value) {
+      console.log('doValidateReason: ');
         this.typeFailed = false;
         this.isValidType = true;
         this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
 
         this._form_99_details.reason = this.frmType.get('reasonTypeRadio').value;
 
-        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+        setTimeout(() => {
+          localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+        }, 100);
+        
 
         this.status.emit({
           form: this.frmType,

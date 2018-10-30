@@ -52,63 +52,40 @@ export class FormComponent implements OnInit {
 
     if(this._committee_details) {
       if(this._committee_details.committeeid) {
-        if(!this._committee_details.is_submitted) {
-          this._formService
-            .getForm(
-                this._committee_details.committeeid,
-                false,
-                this._form_type
-            )
-            .subscribe(res => {
-              if(Object.keys(res).length>=1) {
-                  this._form99_details = res;
+        this._form99_details = this.committee_details;
 
-                  Object.keys(this._form99_details).forEach((key) => {
-                    if(this._form99_details[key] !== null) { // For file code in backend
-                      if(!this._form99_details[key].length) {
-                        this._form99_details[key] = this.committee_details[key];
-                      }
-                    }
-                  });
+        this._form99_details.reason = '';
+        this._form99_details.text = '';
+        this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99_details.additional_email_1 = '';
+        this._form99_details.additional_email_2 = '';
+        this._form99_details.created_at = '';
+        this._form99_details.is_submitted = false;  
+        
+        this._formService
+          .getForm(
+              this._committee_details.committeeid,
+              false,
+              this._form_type
+          )
+          .subscribe(res => {
+            if(Object.keys(res).length>=1) {
+              this._form99_details.reason = res.reason;
+              this._form99_details.text = res.text;
 
-                  if(!this._form99_details.is_submitted || this._form99_details.is_submitted) {
-                    this._form99_details.is_submitted = false;
-                  }
+              if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+                localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+              }
 
-                  this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+              this.isLoading = false;
+            } else {
+              if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+                localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+              }
 
-                  if(!localStorage.hasOwnProperty('form_99_details')) {
-                    localStorage.setItem('form_99_details', JSON.stringify(this._form99_details));
-                  }
-                  this.isLoading = false;
-                  if(this._activatedRoute.snapshot.queryParams.step) {
-                    this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-                    this.step = this.currentStep;
-                  }
-                } else {
-                  this._form99_details = this.committee_details;
-
-                  this._form99_details.reason = '';
-                  this._form99_details.text = '';
-                  this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
-                  this._form99_details.additional_email_1 = '';
-                  this._form99_details.additional_email_2 = '';
-                  this._form99_details.created_at = '';
-                  this._form99_details.is_submitted = false;
-
-                  if(!localStorage.hasOwnProperty('form_99_details')) {
-                    localStorage.setItem('form_99_details', JSON.stringify(this._form99_details));
-                  }
-                  this.isLoading = false;
-                  if(this._activatedRoute.snapshot.queryParams.step) {
-                    this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-                    this.step = this.currentStep;
-                  }
-                }
-              });
-        } else {
-          this.isLoading = false;
-        }
+              this.isLoading = false;
+            }
+          });              
       }
     }
 
@@ -120,6 +97,7 @@ export class FormComponent implements OnInit {
             this.currentStep = this._activatedRoute.snapshot.queryParams.step;
             this.step = this._activatedRoute.snapshot.queryParams.step;
           }
+          window.scrollTo(0, 0);
         }
       });
   }
@@ -145,7 +123,6 @@ export class FormComponent implements OnInit {
   }
 
   public onNotify(e) {
-    console.log('notify: ', e);
     this.frm = e.form;
 
     this.direction = e.direction;
