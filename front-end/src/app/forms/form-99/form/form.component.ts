@@ -102,7 +102,11 @@ export class FormComponent implements OnInit {
       });
   }
 
-  public canContinue() {
+  /**
+   * Determines ability to continue.
+   *
+   */
+  public canContinue(): void {
     if(this.frm && this.direction) {
       if(this.direction === 'next') {
         if(this.frm.valid) {
@@ -122,7 +126,12 @@ export class FormComponent implements OnInit {
     }
   }
 
-  public onNotify(e) {
+  /**
+   * Get's message from child components.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public onNotify(e): void {
     this.frm = e.form;
 
     this.direction = e.direction;

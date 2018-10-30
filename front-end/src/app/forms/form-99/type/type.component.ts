@@ -69,7 +69,6 @@ export class TypeComponent implements OnInit {
    */
   public doValidateType() {
     if (this.frmType.get('reasonTypeRadio').value) {
-      console.log('doValidateReason: ');
         this.typeFailed = false;
         this.isValidType = true;
         this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
