@@ -69,11 +69,10 @@ def create_f99_info(request):
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
-            'email_onf_file_2': request.data.get('email_on_file_2'),
-            'file': request.data['file'],
-
+            'email_on_file_2': request.data.get('email_on_file_2'),
+            'file': request.data.get('file'),
+            
         }
-
 
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():

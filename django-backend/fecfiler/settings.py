@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'fecfiler.authentication',
     'fecfiler.posts',
-    'fecfiler.forms',    
+    'fecfiler.forms',
+    'db_file_storage',    
 ]
 
 MIDDLEWARE = [
@@ -163,6 +164,7 @@ STATIC_ROOT = 'static'
 
 COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', not DEBUG)
 
+DEFAULT_FILE_STORAGE = 'db_file_storage.storage.DatabaseFileStorage'
  
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
