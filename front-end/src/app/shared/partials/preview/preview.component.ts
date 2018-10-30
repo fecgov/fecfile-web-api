@@ -37,12 +37,16 @@ export class PreviewComponent implements OnInit {
         .subscribe(res => {
           this._step = res.step;
 
-          this.form_details = JSON.parse(localStorage.getItem('form_99_details'));
+          this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
           this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
           if(this.form_type === '99') {
-            this.type_selected = this.form_details.reason;
+            if(this.form_details !== null) {
+              if(this.form_details.reason !== null) {
+                this.type_selected = this.form_details.reason;
+              }              
+            }
           }
         });
 
@@ -50,6 +54,10 @@ export class PreviewComponent implements OnInit {
   }
 
   public goToPreviousStep(): void {
+      setTimeout(() => {
+        localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
+      }, 100);
+          
       this.status.emit({
         form: {},
         direction: 'previous',
@@ -59,6 +67,10 @@ export class PreviewComponent implements OnInit {
   }
 
   public goToNextStep(): void {
+      setTimeout(() => {
+        localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
+      }, 100);
+
       this.status.emit({
         form: 'preview',
         direction: 'next',
