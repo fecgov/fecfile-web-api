@@ -70,13 +70,18 @@ export class FormComponent implements OnInit {
           )
           .subscribe(res => {
             if(Object.keys(res).length>=1) {
-              this._form99_details.reason = res.reason;
-              this._form99_details.text = res.text;
+              if(!res.is_submitted) {
+                this._form99_details.reason = res.reason;
+                this._form99_details.text = res.text;
 
-              if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
-                localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+                if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+                  localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+                }                
+              } else {
+                if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+                  localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+                }                 
               }
-
               this.isLoading = false;
             } else {
               if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
