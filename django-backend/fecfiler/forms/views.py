@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -9,6 +10,7 @@ from .models import CommitteeInfo, Committee
 from .serializers import CommitteeInfoSerializer, CommitteeSerializer
 import json
 import os
+import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
@@ -41,7 +43,7 @@ def fetch_f99_info(request):
             return Response({})    
 
 parser_classes = (MultiPartParser, FormParser)   
-#@csrf_exempt
+
 @api_view(['POST'])
 def create_f99_info(request):
     """
@@ -70,7 +72,7 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_onf_file_2': request.data.get('email_on_file_2'),
-            'file': request.data['file'],
+            #'file': request.data['file'],
 
         }
 
@@ -138,9 +140,6 @@ def get_f99_reasons(request):
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
 @api_view(['GET'])
 def get_committee(request):
     """
@@ -173,7 +172,6 @@ def get_signee(request):
         filtered_d = {key: val for key, val in serializer.data.items() if key not in ['street1', 'street2', 'created_at','state','city','zipcode']}
         # FIXME: This is to be redone after there is a discussion on how to model data for the signatories of each committee.
         filtered_d['email'] = request.user.email
-        #import ipdb; ipdb.set_trace();
         return Response(filtered_d)    
     
     
@@ -219,11 +217,11 @@ def create_committee(request):
 # validate api for Form 99
 @api_view(['POST'])
 def validate_f99(request):
-    # # get all comm info
-    # if request.method == 'GET':
-    #     comm_info = CommitteeInfo.objects.all()
-    #     serializer = CommitteeInfoSerializer(comm_info, many=True)
-    #     return Response(serializer.data)
+    """ get all comm info
+     if request.method == 'GET':
+         comm_info = CommitteeInfo.objects.all()
+         serializer = CommitteeInfoSerializer(comm_info, many=True)
+         return Response(serializer.data)"""
         
     # insert a new record for a comm_info
     if request.method == 'POST':
@@ -319,3 +317,18 @@ def validate_f99(request):
     else:
         return JsonResponse(errormess, status=400, safe=False)
 
+@api_view(['GET'])
+def get_rad_analyst_info(request):
+    if request.method == 'GET':
+        try:
+            #import ipdb; ipdb.set_trace();
+            if request.user.username: 
+                ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + request.user.username + '&sort_hide_null=false&sort_null_only=false')
+                return JsonResponse({"response":ab.json()['results']})
+            else:
+                return JsonResponse({"ERROR":"You must be logged in  for this operation."})
+        except:
+            return JsonResponse({"ERROR":"ERR_f99_03: Unexpected Error. Please contact administrator."})
+            
+            
+    #https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=DEMO_KEY&sort_hide_null=false&sort_null_only=false

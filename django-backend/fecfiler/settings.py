@@ -36,11 +36,9 @@ SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
-
 
 ALLOWED_HOSTS = ['*']
 
