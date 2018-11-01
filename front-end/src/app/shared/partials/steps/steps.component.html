@@ -1,0 +1,10 @@
+<ul class="steps">
+  <li
+    *ngFor="let step of steps"
+    [ngClass]="(step.step === current_step)? 'current ' + step.step : step.step"
+  >
+    <div>
+      {{ step.text }}
+    </div>
+  </li>
+</ul>

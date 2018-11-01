@@ -29,7 +29,6 @@ export class AuthService {
    *
    */
   public doSignOut() {
-    console.log('doSignOut: ');
     this._session.destroy();
   }
 

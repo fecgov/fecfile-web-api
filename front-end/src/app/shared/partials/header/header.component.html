@@ -1,34 +1,6 @@
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Legal Disclaimer</h4>
-    <button
-      type="button"
-      class="close"
-      aria-label="Close"
-      (click)="modal.dismiss('Cross click')"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>
-      Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-      government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-      apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
-    </p>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="modal.close('Save click')"
-    >
-      Agree
-    </button>
-  </div>
-</ng-template>
 <header>
   <div class="header">
+<<<<<<< HEAD
     <div class="header--nav">
       <a [routerLink]="" role="button">
         <i class="bars-icon"></i>
@@ -63,22 +35,65 @@
     <div class="header--nav">
       <div class="header-search">
         <input type="text" name="search" class="search-input" placeholder="Search for..." />
+=======
+    <div class="header__nav">
+      <div class="header__search">
+        <input
+          type="text"
+          name="search"
+          class="search-input"
+          placeholder="Search for..."
+        />
+>>>>>>> develop
       </div>
-    </div>
-    <div class="header--nav">
-      <ul class="nav-links">
-        <li>Notifications</li>
-        <li>
-          <a [routerLink]="['/profile']">
-            Profile
-          </a>
-        </li>
-        <li>
-          <a [routerLink]="['/logout']" (click)="logout()">
-            Logout
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
+      <div class="header__links">
+        <ul class="nav-links">
+          <li>
+            <a [routerLink]="['/reports']">
+              Reports
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/contributors']">
+              Contributors
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/tools']">
+              Tools
+            </a>
+          </li>
+          <li>
+            Help
+          </li>
+          <li>
+            <a class="icon-link" role="button">
+              <i class="notifications-icon icon" aria-hidden="true"></i>
+              <span class="ico n-link-text">Notifications</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="['/profile']" class="icon-link">
+              <i class="profile-icon icon" aria-hidden="true"></i>
+              <span class="icon-link-text">Profile</span>
+            </a>
+          </li>
+          <li>
+            <div ngbDropdown placement="bottom-left" class="d-inline-block">
+              <div class="dropdown-toggle" role="button" id="dropdownMenu" ngbDropdownToggle>
+                <i class="settings-icon icon" aria-hidden="true"></i>
+              </div>
+              <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+                <div>
+                  <a [routerLink]="['/logout']" (click)="logout()">
+                    Logout
+                  </a>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul> <!-- ./nav-links -->
+      </div> <!-- ./header__links -->
+    </div> <!-- ./header__nav -->
+  </div> <!-- ./header -->
 </header>

@@ -59,3 +59,62 @@
   @include button-variant($primaryBlue, $primaryBlue);
   @include button-size($input-btn-padding-y, $input-btn-padding-x, 1.5em, $input-btn-line-height, $btn-border-radius);
 } */
+
+//Media query mixin
+
+@mixin media($type) {
+  @if $type == tablet {/* Small devices (tablets, >= 768px and <= 991px) */
+    @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+      @content;
+    }
+  }
+  @else if $type == mediumDesktop {/* Medium devices (desktops, >= 992px and <= 1100px) */
+    @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+      @content;
+    }
+  }
+  @else if $type == largeDesktop {/* Large devices (large desktops, 1200px and up) */
+    @media (min-width: $screen-lg-min) {
+      @content;
+    }
+  }
+}
+
+/**
+ * Targets Webkit based browsers. (e.g. Chrome, Safari)
+ *
+ */
+@mixin webkitBrowser() {
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+     @content;
+  }
+}
+
+@mixin safariOnly() {
+  @media not all and (min-resolution:.001dpcm) {
+    @content;
+  }
+}
+
+@mixin form-btns() {
+  .forms__btn-container {
+    margin: 0 auto;
+    .btn-container-row {
+      @include clearfix();
+      border-bottom: 1px solid $dustyGray;
+      height: 55px;
+      margin-bottom: 10px;
+      width: 100%;
+      .btn {
+        margin-right: 0;
+      }
+    }
+    .btn-left {
+      float: left;
+    }
+    .btn-right {
+      float: right;
+    }
+    @include clearfix();
+  }
+}

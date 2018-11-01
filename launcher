@@ -1,58 +1,44 @@
 #!/bin/bash
 
-# change working directory to build the Angular application
+# Change working directory to build the Angular application
 cd front-end
-echo -e "PWD::" `pwd` " \n"
-virtualenv venv
-source venv/bin/activate
-pip install nodeenv
-nodeenv nenv
-source nenv/bin/activate
+
 # remove old artifact
 rm -fr dist/* node_modules
 
 # install dependencies
-
 echo -e "installing npm dependecies \n"
 npm install
-npm install @angular/cli
 
-echo -e "Updating any rxjs(6.3.2) dependencies to 6.2.2 due to bug with angular!! ref: https://github.com/ReactiveX/rxjs/issues/4070#issuecomment-419041214 \n"
-ng update
-ng update @angular/core
-ng update --all
-npm update --save
-npm list rxjs
-npm un --save rxjs
-npm un --save rxjs-compat
-npm list --depth=0
-npm i --save rxjs@6.2.2
-npm i --save rxjs-compat@6.2.2
-npm list rxjs
-
+# Fix any module vulnerabilities tht happen during installation 
+npm audit fix
 # build the angular app
 echo -e "building Angular app \n"
-#$(npm bin)/ng build
-ng build
+$(npm bin)/ng build 
+
 # change directory to the root of the project
-deactivate
 cd ..
+
 # shutdown running instances
-sudo docker-compose down
+docker-compose down
+
+# removing all containers 
+docker rm $( docker ps -qa )
+
 #  echo -e "Removing old images"
-sudo sh -c "docker rmi -f $( docker images -qa )"
-#else
-#  echo -e "Nothing to delete \n"s
-#fi
+sh -c "docker rmi -f $( docker images -qa )"
+
 # build the application
-sudo docker-compose build
-sudo docker-compose up --build -d
+docker-compose build
+docker-compose up --build -d
+
 # rerun the migrations just in case
 sleep 2
-sudo docker-compose exec api python manage.py migrate --noinput
-
-#sudo docker-compose exec api python manage.py loaddata sys_data/committee_base_data.json
+docker-compose exec api python manage.py migrate --noinput
+for i in $( ls django-backend/fixtures/ ); do 
+  docker-compose exec api python manage.py loaddata fixtures/$i
+done
 
 sleep 2
 echo -e "Running applications \n"
-sudo docker-compose ps
+docker-compose ps

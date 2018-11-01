@@ -1,4 +1,3 @@
-
 from django.shortcuts import render
 
 # Create your views here.
@@ -71,11 +70,10 @@ def create_f99_info(request):
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
-            'email_onf_file_2': request.data.get('email_on_file_2'),
-            #'file': request.data['file'],
-
+            'email_on_file_2': request.data.get('email_on_file_2'),
+            'file': request.data.get('file'),
+            
         }
-
 
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
@@ -140,6 +138,7 @@ def get_f99_reasons(request):
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        
 @api_view(['GET'])
 def get_committee(request):
     """
@@ -217,11 +216,11 @@ def create_committee(request):
 # validate api for Form 99
 @api_view(['POST'])
 def validate_f99(request):
-    """ get all comm info
-     if request.method == 'GET':
-         comm_info = CommitteeInfo.objects.all()
-         serializer = CommitteeInfoSerializer(comm_info, many=True)
-         return Response(serializer.data)"""
+    # # get all comm info
+    # if request.method == 'GET':
+    #     comm_info = CommitteeInfo.objects.all()
+    #     serializer = CommitteeInfoSerializer(comm_info, many=True)
+    #     return Response(serializer.data)
         
     # insert a new record for a comm_info
     if request.method == 'POST':

@@ -1,5 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { CookieService } from 'ngx-cookie-service';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SessionService } from '../SessionService/session.service';
 import { AuthService } from './auth.service';
 
@@ -10,6 +11,9 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       providers: [
         AuthService,
         SessionService,

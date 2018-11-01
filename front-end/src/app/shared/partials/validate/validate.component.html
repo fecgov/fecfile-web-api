@@ -1,0 +1,14 @@
+<div class="validate-results" *ngIf="validate_results">
+  <div class="validate-results__title">
+    <h3 class="text-center">System Validation</h3>
+    <hr />
+  </div>
+  <div class="validate-results__errors" *ngIf="isArray(validate_results)">
+    <div class="validate-results__error" *ngFor="let result of validate_results">
+      {{ result }}
+    </div>
+  </div>
+  <div class="validate-results__success" *ngIf="!isArray(validate_results)">
+    {{ validate_results }}
+  </div>
+</div>

@@ -13,7 +13,7 @@ class CommitteeInfoTest(TestCase):
         CommitteeInfo.objects.create(
             committeeid='C01234567', committeename = 'Test Committee 1', street1='Street1 ',
             street2 = 'Street 2', city='Washington DC', state='DC', zipcode='912853', text="-",
-            treasurermiddlename = 'Doe', treasurerfirstname='John', treasurerlastname='Smith', treasurerprefix='Mr')
+            treasurerfirstname='John', treasurerlastname='Smith', treasurerprefix='Mr')
             
         save_data = {
                 "committeeid": "C11234567",
@@ -60,7 +60,7 @@ class CommitteeTest(TestCase):
                 "zipcode": 20001,
                 "treasurerprefix": "Mr",
                 "treasurerfirstname": "John",
-                #"treasurermiddlename": "Doe",
+                "treasurermiddlename": "Doe",
                 "treasurerlastname": "Smith",
                 "treasurersuffix": "IV"
             }

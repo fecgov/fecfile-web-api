@@ -14,52 +14,53 @@ local_settings.py
 */CACHE
 */package-lock.json
 *.editorconfig
- See http://help.github.com/ignore-files/ for more about ignoring files.
 
- # compiled output
- /dist
- /tmp
- /out-tsc
+# See http://help.github.com/ignore-files/ for more about ignoring files.
 
- # dependencies
- */node_modules
+# compiled output
+/dist
+/tmp
+/out-tsc
 
- # IDEs and editors
- *.idea
- *.project
- *.classpath
- *.c9/
- *.launch
- *.settings/
- *.sublime-workspace
+# dependencies
+*/node_modules
 
- # IDE - VSCode
- .vscode/*
- !.vscode/settings.json
- !.vscode/tasks.json
- !.vscode/launch.json
- !.vscode/extensions.json
+# IDEs and editors
+*.idea
+*.project
+*.classpath
+*.c9/
+*.launch
+*.settings/
+*.sublime-workspace
 
- # misc
- /.sass-cache
- /connect.lock
- /coverage
- /libpeerconnection.log
- npm-debug.log
- yarn-error.log
- testem.log
- /typings
- *.env
- */target
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
- ### Bower ###
- */bower_components
- *.bower-cache
- *.bower-registry
- *.bower-tmp
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+*.env
+*/target
+
+### Bower ###
+*/bower_components
+*.bower-cache
+*.bower-registry
+*.bower-tmp
 
 
 
- # System Files
- .DS_Store
- Thumbs.db
+# System Files
+.DS_Store
+Thumbs.db

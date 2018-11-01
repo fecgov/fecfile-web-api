@@ -5,3 +5,12 @@
 .grid-row__col {
   @include make-col-ready();
 }
+
+$gridStart: 1;
+$gridEnd: 12;
+
+@for $i from $gridStart through $gridEnd {
+  .grid-row__col--#{$i} {
+    @include make-col($i);
+  }
+}

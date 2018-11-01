@@ -7,7 +7,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             model = CommitteeInfo
             fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                     'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
-                    'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
+                    'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'file',
                     'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2' )
             read_only_fields = ('created_at', 'updated_at')
 
@@ -37,8 +37,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
             instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
             instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
-            #instance.file = validated_data.get('file', instance.file)
-
+            instance.file = validated_data.get('file', instance.file)
 
             instance.save()
             return instance

@@ -6,16 +6,19 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { Router } from '@angular/router';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-import { AppRoutingModule, routes } from './app-routing/app-routing.module';
+import { AppRoutes, routing } from './app.routes';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
+import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { HeaderComponent } from './shared/partials/header/header.component';
 import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ToolsComponent } from './tools/tools.component';
+import { ReportsComponent } from './reports/reports.component';
+import { ContributorsComponent } from './contributors/contributors.component';
+import { FormsComponent } from './forms/forms.component';
 
 describe('AppRoutingModule', () => {
-  let appRoutingModule: AppRoutingModule;
   let location: Location;
   let router: Router;
   let fixture;
@@ -23,7 +26,7 @@ describe('AppRoutingModule', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule.withRoutes(routes),
+        RouterTestingModule.withRoutes(AppRoutes),
         FormsModule,
         ReactiveFormsModule,
         HttpClientTestingModule
@@ -31,10 +34,14 @@ describe('AppRoutingModule', () => {
       declarations: [
         AppComponent,
         LoginComponent,
+        AppLayoutComponent,
         DashboardComponent,
+        SidebarComponent,
         ProfileComponent,
-        HeaderComponent,
-        SidebarComponent
+        ToolsComponent,
+        ReportsComponent,
+        ContributorsComponent,
+        FormsComponent
       ],
       providers: [CookieService],
       schemas: [
@@ -43,8 +50,6 @@ describe('AppRoutingModule', () => {
     })
     .compileComponents();
 
-    appRoutingModule = new AppRoutingModule();
-
     router = TestBed.get(Router);
     location = TestBed.get(Location);
 
@@ -52,7 +57,9 @@ describe('AppRoutingModule', () => {
     router.initialNavigation();
   });
 
-  it('should create an instance', () => {
-    expect(appRoutingModule).toBeTruthy();
-  });
+  it('should create an instance', fakeAsync(() => {
+    router.navigate(['']);
+    tick();
+    expect(location.path()).toBe('');
+  }));
 });

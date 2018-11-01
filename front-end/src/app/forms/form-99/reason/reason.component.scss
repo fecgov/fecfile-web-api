@@ -1,0 +1,66 @@
+@import '../../../shared/scss/global';
+
+.reason-container {
+  header {
+    .header-container {
+      display: block;
+      width: 100%;
+      .header__text {
+        float: left;
+        width: 72%
+      }
+      .header__btns {
+        float: right;
+        padding-top: 15px;
+        width: 25%;
+        .btn-print-preview {
+          @extend .btn-secondary-gray;
+          margin-right: 5px;
+        }
+        .btn-validate {
+          @extend .btn-primary;
+        }
+        .btn {
+          padding-top: 10px;
+        }
+      }
+      @include clearfix();
+    }
+  }
+  section {
+    .content {
+      display: block;
+      width: 100%;
+      .rich-text-editor {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        z-index: 0;
+        .angular-editor {
+          z-index: 0;
+          .angular-editor-toolbar {
+            .angular-editor-toolbar-set {
+              select[title='Custom Style'],
+              .angular-editor-button[title='Insert Image'],
+              .angular-editor-button[title='Insert Link'],
+              .angular-editor-button[title='Unlink'],
+              .angular-editor-button[title='HTML Code'] {
+                display: none;
+              }
+
+            }
+          }
+        }
+        @include clearfix();
+      } // .rich-text-editor
+      .editor-character-count,
+      .error-text {
+        float: left;
+      }
+      .error-text {
+        padding-left: 20px;
+      }
+      @include form-btns();
+    } // .content
+  }
+}

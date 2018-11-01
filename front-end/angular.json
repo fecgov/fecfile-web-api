@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "fec-eFiling": {
+    "fec-eFilling": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/fec-eFiling",
+            "outputPath": "dist/fec-eFilling",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -23,10 +23,11 @@
               "src/assets"
             ],
             "styles": [
-              //"./node_modules/bootstrap/dist/css/bootstrap.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/font-awesome/css/font-awesome.css"
             ],
-            "scripts": []
+            "scripts": [
+            ]
           },
           "configurations": {
             "production": {
@@ -45,24 +46,35 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true
+            },
+            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ]
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "fec-eFiling:build"
+            "browserTarget": "fec-eFilling:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "fec-eFiling:build:production"
+              "browserTarget": "fec-eFilling:build:production"
+            },
+            "local": {
+              "browserTarget": "fec-eFilling:build:local"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "fec-eFiling:build"
+            "browserTarget": "fec-eFilling:build"
           }
         },
         "test": {
@@ -96,7 +108,7 @@
         }
       }
     },
-    "fec-eFiling-e2e": {
+    "fec-eFilling-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -104,11 +116,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "fec-eFiling:serve"
+            "devServerTarget": "fec-eFilling:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "fec-eFiling:serve:production"
+              "devServerTarget": "fec-eFilling:serve:production"
             }
           }
         },
@@ -124,7 +136,7 @@
       }
     }
   },
-  "defaultProject": "fec-eFiling",
+  "defaultProject": "fec-eFilling",
   "schematics": {
     "@schematics/angular:component": {
       "styleext": "scss"

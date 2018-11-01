@@ -1,18 +1,42 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { NgxEditorModule } from 'ngx-editor';
+import { AngularFileUploaderModule } from "angular-file-uploader";
 import { CookieService } from 'ngx-cookie-service';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ArchwizardModule } from 'angular-archwizard';
+import { QuillModule } from 'ngx-quill';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-import { AppRoutingModule } from './app-routing/app-routing.module';
+
+// import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
+
+import { routing } from './app.routes';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProfileComponent } from './profile/profile.component';
 import { HeaderComponent } from './shared/partials/header/header.component';
 import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
+import { FormsComponent } from './forms/forms.component';
+import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { ReportsComponent } from './reports/reports.component';
+import { ContributorsComponent } from './contributors/contributors.component';
+import { ToolsComponent } from './tools/tools.component';
+import { FormComponent } from './forms/form-99/form/form.component';
+import { TypeComponent } from './forms/form-99/type/type.component';
+import { ReasonComponent } from './forms/form-99/reason/reason.component';
+import { StepsComponent } from './shared/partials/steps/steps.component';
+import { PreviewComponent } from './shared/partials/preview/preview.component';
+import { ValidateComponent } from './shared/partials/validate/validate.component';
+import { SignComponent } from './shared/partials/sign/sign.component';
+import { SubmitComponent } from './shared/partials/submit/submit.component';
 
 @NgModule({
   declarations: [
@@ -21,15 +45,35 @@ import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
     DashboardComponent,
     ProfileComponent,
     HeaderComponent,
-    SidebarComponent
+    SidebarComponent,
+    FormsComponent,
+    AppLayoutComponent,
+    ReportsComponent,
+    ContributorsComponent,
+    ToolsComponent,
+    FormComponent,
+    TypeComponent,
+    ReasonComponent,
+    StepsComponent,
+    PreviewComponent,
+    ValidateComponent,
+    SignComponent,
+    SubmitComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgbModule
+    routing,
+    AngularFileUploaderModule,
+    ArchwizardModule,
+    NgxEditorModule,
+    TooltipModule.forRoot(),
+    CollapseModule.forRoot(),
+    QuillModule,
+    AngularEditorModule,
+    NgbModule.forRoot()
   ],
   providers: [CookieService, CanActivateGuard],
   bootstrap: [AppComponent],

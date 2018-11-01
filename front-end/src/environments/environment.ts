@@ -4,8 +4,14 @@
 
 export const environment = {
   production: false,
+<<<<<<< HEAD
   apiUrl: 'http://localhost:8080/api/v1'
   //apiUrl: 'http://35.172.199.97/api/v1'
+=======
+  name: 'development',
+  apiUrl: 'http://35.172.199.97/api/v1',
+  validateSuccess: 'All required fields have been validated.'
+>>>>>>> develop
 };
 
 /*

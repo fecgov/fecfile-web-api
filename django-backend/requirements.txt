@@ -14,6 +14,7 @@ django-appconf==1.0.1
 django-bootstrap3==11.0.0
 django-compressor==1.6
 django-cors-headers==2.4.0
+django-db-file-storage==0.5.3
 django-rest-swagger==2.2.0
 djangocms-admin-style==1.0.7
 djangorestframework==3.8.2

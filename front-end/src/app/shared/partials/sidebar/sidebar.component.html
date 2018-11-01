@@ -1,7 +1,41 @@
 <aside>
   <div class="sidebar">
-    <div class="sidebar__logo">
-      <img src="assets/img/logo.svg" alt="FEC logo" role="logo"/>
-    </div>
+    <nav>
+      <div class="sidebar__nav">
+        <div class="sidebar__nav--header">
+          <i class="folder-icon" aria-hidden="true"></i>
+          My Forms
+        </div>
+        <div class="sidebar__nav--links">
+          <ul class="links-list">
+            <li>
+              Form...
+            </li>
+            <li>
+              Test
+            </li>
+            <li>
+              Test
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar__nav--header">
+          <i class="plus-icon" aria-hidden="true"></i>
+          Other Forms
+        </div>
+        <div class="sidebar__nav--links">
+          <ul class="links-list">
+            <li>
+              <a
+                [routerLink]="['/forms/form/', '99']"
+                [queryParams]="{ step: 'step_1' }"
+              >
+                Form 99
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
   </div>
 </aside>
