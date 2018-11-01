@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import datetime
+from corsheaders.defaults import default_headers
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -96,12 +98,8 @@ TEMPLATES = [
 if DEBUG == True:
     CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'localhost:4200',
-)
-CORS_ORIGIN_REGEX_WHITELIST = (
-    'localhost:4200',
+CORS_ALLOW_HEADERS = default_headers + (
+    'enctype',
 )
 
 # Database
