@@ -35,12 +35,6 @@ export class SessionService {
     this.accessToken = null;
     this._cookieService.deleteAll();
 
-<<<<<<< HEAD
-    // this._cookieService.delete('user');
-
-    this._cookieService.deleteAll();
-=======
     localStorage.clear();
->>>>>>> develop
   }
 }

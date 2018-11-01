@@ -1,12 +1,8 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-<<<<<<< HEAD
-import { Subject } from 'rxjs';
-=======
 import { Subject, Subscription } from 'rxjs';
 import { MessageService } from '../shared/services/MessageService/message.service';
->>>>>>> develop
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../shared/services/APIService/api.service';
 import { AuthService } from '../shared/services/AuthService/auth.service';
@@ -23,12 +19,8 @@ export class LoginComponent implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
-<<<<<<< HEAD
-  public loggedOutMsg: string = '';
-=======
   public loggedOut: any = '';
   private _subscription: Subscription;
->>>>>>> develop
 
   constructor(
     private _fb: FormBuilder,
@@ -38,10 +30,7 @@ export class LoginComponent implements OnInit {
     private _router: Router,
     private _route: ActivatedRoute,
     private _cookieService: CookieService,
-<<<<<<< HEAD
-=======
     private _messageService: MessageService
->>>>>>> develop
   ) {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
@@ -56,14 +45,6 @@ export class LoginComponent implements OnInit {
  }
 
   ngOnInit() {
-    this._route
-      .data
-      .subscribe(res => {
-        this.loggedOutMsg = res.msg;
-      });
-  }
-
-  ngOnDestroy() {
   }
 
   ngOnDestroy() {

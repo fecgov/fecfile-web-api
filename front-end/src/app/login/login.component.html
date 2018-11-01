@@ -23,13 +23,8 @@
           <div class="error" *ngIf="hasFailed">
             Invalid commitee id or password.
           </div>
-<<<<<<< HEAD
-          <div class="logged-out-msg">
-            {{ loggedOutMsg }}
-=======
           <div class="logged-out-msg" *ngIf="loggedOut.loggedOut">
             {{ loggedOut?.msg }}
->>>>>>> develop
           </div>
         </div>
       </div>
@@ -128,4 +123,4 @@
       </div>
     </form>
   </div>
-</div> 
+</div>
