@@ -62,7 +62,8 @@
             </div>
             <div class="error-text"
               *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
-              <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+              <div class="text-error text-center" 
+                *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
                 You can only enter up to 20,000 characters.
               </div>
             </div>
@@ -84,7 +85,7 @@
                     type="button"
                     class="btn btn-secondary btn-right"
                     (click)="saveForm()"
-                    [disabled]="!frmReason.valid"
+                    [disabled]="frmReason.controls.reasonText.errors?.requiredLengt"
                   >
                     Save
                   </button>
@@ -100,7 +101,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-right"
-                [disabled]="!frmReason.valid"
+                [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
               >
                 Next
               </button>
