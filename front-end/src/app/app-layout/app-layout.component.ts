@@ -12,6 +12,8 @@ import { FormsComponent } from '../forms/forms.component';
 })
 export class AppLayoutComponent implements OnInit {
 
+  @Input() status: any;
+
 	public showSideBar: boolean = true;
 
 	constructor(
@@ -58,4 +60,13 @@ export class AppLayoutComponent implements OnInit {
   public logout(): void {
     this._sessionService.destroy();
   }
+
+  /**
+   * Get's message from child components.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public onNotify(e): void {
+    this.showSideBar = e.showSidebar;
+  }  
 }

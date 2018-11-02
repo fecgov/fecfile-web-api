@@ -3,14 +3,24 @@
 .sidebar {
   background-color: $primaryBlue;
   min-height: 100vh;
+  .sidebar__toggle {
+    color: $white;
+    display: block;
+    height: 50px;
+    width: 100%;
+    .toggle-sidebar {
+      cursor: pointer;
+      float: right;
+      margin-right: 10px;
+    }
+    @include clearfix();
+  }  
   .sidebar__logo {
     padding-top: 15px;
     text-align: center;
   }
   .sidebar__nav {
   	color: $white;
-  	margin-top: 35px;
-    padding-top: 40px;
     text-align: center;
     .sidebar__nav--header {
       font-weight: bold;
@@ -29,4 +39,12 @@
       }
     }
   }
+  main {
+    height: 98%;
+    .app__content-wrapper {
+      padding-top: 60px;
+      transition: all 0.4s ease 0s;
+      width: 100%;
+    }
+  }  
 }

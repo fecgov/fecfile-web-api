@@ -90,3 +90,8 @@ h6 {
   @extend .fa;
   @extend .fa-info-circle;
 }
+
+.close-icon {
+  @extend .fa;
+  @extend .fa-times;
+}

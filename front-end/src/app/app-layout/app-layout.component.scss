@@ -8,10 +8,10 @@
   &.active {
     padding-left: 0;
     .app__side-nav {
-      left: 0;
+      left: 35px;
     }
   }
-  .app__top {
+ .app__top {
     left: 0;
     position: fixed;
     right: 0;
@@ -27,27 +27,18 @@
         width: 350px;
       }
     } // .app__top-logo
-    .app__side-nav-toggle {
-      float: left;
-      padding-top: 20px;
-      .side-nav-toggle {
-        color: $black;
-        cursor: pointer;
-        text-decoration: none;
-      }
-    }// .app__side-nav-toggle
     @include clearfix();
-  } // .app__top
+  } // .app__top  
   .app__side-nav {
     height: 100%;
     left: $sideBarWidth;
     margin-left: -$sideBarWidth;
     position: fixed;
-    top: 25px;
+    top: 58px;
     transition: all 0.4s ease 0s;
     width: $sideBarWidth;
     z-index: 1000;
-  } // .app__side-nav
+  } // .app__side-nav  
   main {
     height: 98%;
     .app__content-wrapper {
@@ -55,6 +46,7 @@
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       width: 100%;
+      z-index: 0;
     }
-  }
+  }      
 }
