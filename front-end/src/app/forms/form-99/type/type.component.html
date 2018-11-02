@@ -1,6 +1,6 @@
 <div class="form__type-container">
   <div class="form__type">
-    <form [formGroup]="frmType" (ngSubmit)="doValidateType()">
+    <form [formGroup]="frmType" (ngSubmit)="doValidateType()" (blur)="doValidateType()">
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
             <h1 class="text-left" *ngIf="!typeSelected">
@@ -10,7 +10,8 @@
               Form 99 / {{ typeSelected }}
             </h1>
             <hr/>
-            <div class="error text-center" *ngIf="typeFailed">
+            <div class="text-error text-center" 
+              *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
               You must select a type for filing.
             </div>
             <ul class="reasons-list">
@@ -209,6 +210,7 @@
               <button
                 class="btn btn-primary btn-right"
                 type="submit"
+                [disabled]="!frmType.valid"
               >
                 Next
               </button>

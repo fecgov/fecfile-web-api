@@ -1,8 +1,14 @@
 // error classes
-.error {
-  color: $red;
+.text-error {
+  color: $red !important;
   font-weight: bold;
   margin-bottom: 10px;
+}
+
+.text-info {
+  color: $blue !important;
+  font-weight: bold;
+  margin-bottom: 10px;  
 }
 
 .text-left {

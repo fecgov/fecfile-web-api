@@ -37,7 +37,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12"
             *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-            <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
               You must enter a reason.
             </div>
           </div>
@@ -62,8 +62,14 @@
             </div>
             <div class="error-text"
               *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
-              <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+              <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
                 You can only enter up to 20,000 characters.
+              </div>
+            </div>
+            <div class="error-text">
+              <div class="text-info text-center"
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved">
+                Form 99 has been successfully saved.
               </div>
             </div>
           </div>
@@ -78,6 +84,7 @@
                     type="button"
                     class="btn btn-secondary btn-right"
                     (click)="saveForm()"
+                    [disabled]="!frmReason.valid"
                   >
                     Save
                   </button>
@@ -93,6 +100,7 @@
               <button
                 type="submit"
                 class="btn btn-primary btn-right"
+                [disabled]="!frmReason.valid"
               >
                 Next
               </button>

@@ -161,7 +161,6 @@ export class FormsService {
       url = '/f99/submit_comm_info';
       data = form99_details;
     }
-
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -175,6 +174,6 @@ export class FormsService {
             return true;
           }
           return false;
-      }));
+      }));      
   }
 }

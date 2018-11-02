@@ -77,7 +77,7 @@ export class ReasonComponent implements OnInit {
   ngOnInit(): void {
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+    this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
     if(this._form_99_details) {
       if(this._form_99_details.text) {
@@ -142,16 +142,23 @@ export class ReasonComponent implements OnInit {
    */
   public doValidateReason() {
     if (this.frmReason.get('reasonText').value.length >= 1) {
+        console.log('doValidateReason: ');
+        let formSaved: any = {
+          'form_saved': this.formSaved
+        };
         this.reasonFailed = false;
         this.isValidReason = true;
 
-        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+        this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
         setTimeout(() => {
-          localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+          console.log('this._form_99_details: ', this._form_99_details);
+          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
+
+          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
 
@@ -163,7 +170,7 @@ export class ReasonComponent implements OnInit {
         });
 
         this._messageService.sendMessage({
-          data: this.frmReason.get('reasonText').value,
+          data: this._form_99_details,
           previousStep: 'step_3'
         });
     } else {
