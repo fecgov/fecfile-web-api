@@ -1,13 +1,3 @@
-#FROM nginx:latest
-#
-##RUN npm install -g gulp bower @angular/cli
-#RUN npm install
-#RUN ng build
-#RUN gulp
-#COPY ./dist/fec-eFilling/ /usr/share/nginx/html
-#COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
-# base image
 FROM node:9.6.1
 
 RUN mkdir /usr/src/app
@@ -23,6 +13,8 @@ RUN npm install -g @angular/cli
 
 # add app
 COPY . /usr/src/app
+
+RUN ng build
 
 # start app
 CMD ng serve --host 0.0.0.0

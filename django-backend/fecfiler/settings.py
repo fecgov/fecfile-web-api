@@ -27,7 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #DEBUG = os.environ.get('DEBUG', False)
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-CSRF_TRUSTED_ORIGINS = ['localhost','api']
+CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('API_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '$6(x*g_2g9l_*g8peb-@anl5^*8q!1w)k&e&2!i)t6$s8kia94'
 
