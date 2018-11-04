@@ -22,6 +22,6 @@ CMD ng serve --host 0.0.0.0
 
 FROM nginx:latest
 
-COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist/fec-eFilling /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
