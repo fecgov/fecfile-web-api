@@ -15,7 +15,7 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
-  public isNavbarCollapsed: boolean = false;
+  public toggleMenu: boolean = false;
 
 	constructor(
 		private _sessionService: SessionService,
@@ -48,11 +48,11 @@ export class AppLayoutComponent implements OnInit {
    * Show's or hides the sidebar navigation.
    */
   public toggleSideNav(): void {
-    if (this.showSideBar) {
-      this.showSideBar = false;
-    } else if (!this.showSideBar) {
-      this.showSideBar = true;
-    }
+    this.showSideBar = !this.showSideBar;
+  }
+
+  public toggleTopNav(): void {
+    this.toggleMenu = !this.toggleMenu;
   }
 
   /**
