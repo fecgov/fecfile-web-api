@@ -12,21 +12,56 @@
     }
   }
  .app__top {
+    background-color: $dustyGray;
     left: 0;
     position: fixed;
     right: 0;
     vertical-align: middle;
     width: 100%;
     z-index: 1;
-    .app__top-logo {
-      float: left;
-      margin-right: 25px;
-      width: auto;
-      img {
-        padding-top: 5px;
-        width: 350px;
+    .navbar {
+      padding-left: 0 !important;
+      .app__top-logo {
+        float: left;
+        margin-right: 25px;
+        width: 10%;
+        @include media(tablet) {
+          width: 20%;
+        }
+        @include media(mediumDesktop) {
+          width: 25%;
+        }         
+        @include media(largeDesktop) {
+          width: 25%;
+        }         
+        img {
+          padding-top: 5px;
+          width: 250px;
+          @include media(tablet) {
+            width: 270px;
+          }
+          @include media(mediumDesktop) {
+            width: 280px;
+          }         
+          @include media(largeDesktop) {
+            width: 350px;
+          }           
+        }
+      } // .app__top-logo
+      .app__top-nav {
+        float: left;
+        width: auto;
+        @include media(tablet) {
+        
+        }
+        @include media(mediumDesktop) {
+          width: 65%;
+        }         
+        @include media(largeDesktop) {
+          width: 73%;
+        }         
       }
-    } // .app__top-logo
+    } 
     @include clearfix();
   } // .app__top  
   .app__side-nav {
@@ -34,10 +69,19 @@
     left: $sideBarWidth;
     margin-left: -$sideBarWidth;
     position: fixed;
-    top: 58px;
+    top: 54px;
     transition: all 0.4s ease 0s;
     width: $sideBarWidth;
     z-index: 1000;
+    @include media(tablet) {
+      top: 60px;
+    }
+    @include media(mediumDesktop) {
+      top: 70px;
+    }         
+    @include media(largeDesktop) {
+      top: 70px;
+    }     
   } // .app__side-nav  
   main {
     height: 98%;

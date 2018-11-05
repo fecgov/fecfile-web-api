@@ -15,6 +15,7 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
+  public isNavbarCollapsed: boolean = false;
 
 	constructor(
 		private _sessionService: SessionService,

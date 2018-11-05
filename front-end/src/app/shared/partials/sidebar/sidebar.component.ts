@@ -10,7 +10,7 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public showSidebar: boolean = true;
+  public showCloseIcon: boolean = true;
 
   constructor(
     private _router: Router,
@@ -18,21 +18,29 @@ export class SidebarComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if(this._router.url.indexOf('/forms/form/') === 0) {
+      this.showCloseIcon = false;
+
+      this.status.emit({
+        showSidebar: this.showCloseIcon
+      });        
+    }     
+    
     this._router
       .events
       .subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
-              this.showSidebar = false;
+              this.showCloseIcon = false;
 
               this.status.emit({
-                showSidebar: this.showSidebar
+                showSidebar: this.showCloseIcon
               });             
             }
           }
         }
-      });    
+      });  
   }
 
   /**
@@ -40,14 +48,14 @@ export class SidebarComponent implements OnInit {
    *
    */
   public toggleSideNav(): void {
-    if(this.showSidebar) {
-      this.showSidebar = false;
+    if(this.showCloseIcon) {
+      this.showCloseIcon = false;
     } else {
-      this.showSidebar = true;
+      this.showCloseIcon = true;
     }
 
     this.status.emit({
-      showSidebar: this.showSidebar
+      showSidebar: this.showCloseIcon
     });  	
   }
 }

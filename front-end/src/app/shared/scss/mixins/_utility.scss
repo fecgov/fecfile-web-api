@@ -10,7 +10,7 @@
       @content;
     }
   }
-  @else if $type == mediumDesktop {/* Medium devices (desktops, >= 992px and <= 1100px) */
+  @else if $type == mediumDesktop {/* Medium devices (desktops, >= 992px and <= 1199px) */
     @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
       @content;
     }
