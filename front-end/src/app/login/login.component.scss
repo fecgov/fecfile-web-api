@@ -59,6 +59,10 @@
         .right-text {
           padding-right: 15px;
         }
+        .error__committee-id,
+        .error__password-error {
+          @extend .text-error;
+        }
         .login__btn {
           @include button-variant($primaryBlue, $primaryBlue);
           @include button-size($input-btn-padding-y, $input-btn-padding-x, 1.5em, $input-btn-line-height, $btn-border-radius);

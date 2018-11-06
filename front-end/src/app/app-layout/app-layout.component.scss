@@ -13,14 +13,53 @@
   }
  .app__top {
     background-color: $dustyGray;
+    height: 60px;
     left: 0;
     position: fixed;
     right: 0;
     vertical-align: middle;
     width: 100%;
-    z-index: 1001;
+    z-index: 1001;    
     .navbar {
-      padding-left: 0 !important;
+      background-color: $dustyGray;
+      height: 60px;
+      margin: 0 !important;
+      padding: 0 !important;   
+      @include media(tablet) {
+        height: 60px;
+      }
+      @include media(mediumDesktop) {
+        height: 60px;
+      }         
+      @include media(largeDesktop) {
+        height: 60px;
+      }       
+      &.toggleMenuStyle {
+        height: 335px;
+        @include media(tablet) {
+          height: 335px;
+        }
+        @include media(mediumDesktop) {
+          height: 60px !important;
+        }         
+        @include media(largeDesktop) {
+          height: 60px !important;
+        }   
+        .app__top-nav {
+          display: block;
+          height: 335px;
+          @include media(tablet) {
+            display: block;
+            height: 345px;
+          }
+          @include media(mediumDesktop) {
+            height: 60px;
+          }         
+          @include media(largeDesktop) {
+            height: 60px;
+          }           
+        }      
+      }
       .app__top-logo {
         float: left;
         margin-right: 25px;
@@ -51,20 +90,9 @@
       .app__top-nav {
         float: left;
         width: auto;
-        &.toggleMenuStyle {
-          display: block;
-          float: none;
-          height: 200px;
-          @include media(tablet) {
-            height: 200px;
-          }
-          @include media(mediumDesktop) {
-            height: 60px; 
-          }         
-          @include media(largeDesktop) {
-            height: 60px;
-          }           
-        }
+        @include media(mediumDesktop) {
+          width: auto;
+        }           
         @include media(mediumDesktop) {
           width: 65%;
         }         
@@ -80,19 +108,10 @@
     left: $sideBarWidth;
     margin-left: -$sideBarWidth;
     position: fixed;
-    top: 54px;
+    top: 60px;
     transition: all 0.4s ease 0s;
     width: $sideBarWidth;
     z-index: 1000;
-    @include media(tablet) {
-      top: 60px;
-    }
-    @include media(mediumDesktop) {
-      top: 70px;
-    }         
-    @include media(largeDesktop) {
-      top: 70px;
-    }     
   } // .app__side-nav  
   main {
     height: 98%;
