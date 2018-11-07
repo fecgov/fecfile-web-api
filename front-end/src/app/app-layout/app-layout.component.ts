@@ -45,12 +45,8 @@ export class AppLayoutComponent implements OnInit {
 	}
 
   /**
-   * Show's or hides the sidebar navigation.
+   * Shows the top nav in tablet and mobile phone view when clicked.
    */
-  public toggleSideNav(): void {
-    this.showSideBar = !this.showSideBar;
-  }
-
   public toggleTopNav(): void {
     this.toggleMenu = !this.toggleMenu;
   }

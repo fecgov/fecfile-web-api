@@ -33,10 +33,15 @@ export class SidebarComponent implements OnInit {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
               this.showCloseIcon = false;
-
               this.status.emit({
                 showSidebar: this.showCloseIcon
               });             
+            } else if (this._router.url.indexOf('/dashboard') === 0) {
+              this.showCloseIcon = true;
+
+              this.status.emit({
+                showSidebar: this.showCloseIcon
+              });               
             }
           }
         }
@@ -50,12 +55,16 @@ export class SidebarComponent implements OnInit {
   public toggleSideNav(): void {
     if(this.showCloseIcon) {
       this.showCloseIcon = false;
+
+      this.status.emit({
+        showSidebar: false
+      });       
     } else {
       this.showCloseIcon = true;
-    }
 
-    this.status.emit({
-      showSidebar: this.showCloseIcon
-    });  	
+      this.status.emit({
+        showSidebar: true
+      });       
+    } 	
   }
 }

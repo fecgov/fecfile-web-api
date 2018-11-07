@@ -1,7 +1,7 @@
 <div class="app-container"
   [ngClass]="showSideBar === false ? 'active' : ''">
   <div class="app__top">
-    <nav class="navbar py-0 navbar-expand-lg" [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }">
+    <nav class="navbar py-0 navbar-expand-lg">
       <div class="navbar-brand app__top-logo">
         <a [routerLink]="['/dashboard']">
           <img src="assets/img/logo-transparent.png" />
@@ -23,6 +23,7 @@
       <div 
         class="collapse navbar-collapse app__top-nav" 
         id="navbarSupportedContent"
+        [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }"
       >       
         <app-header></app-header>
       </div>

@@ -24,57 +24,11 @@
       background-color: $dustyGray;
       height: 60px;
       margin: 0 !important;
-      padding: 0 !important;   
-      @include media(tablet) {
-        height: 60px;
-      }
-      @include media(mediumDesktop) {
-        height: 60px;
-      }         
-      @include media(largeDesktop) {
-        height: 60px;
-      }       
-      &.toggleMenuStyle {
-        height: 335px;
-        @include media(tablet) {
-          height: 335px;
-        }
-        @include media(mediumDesktop) {
-          height: 60px !important;
-        }         
-        @include media(largeDesktop) {
-          height: 60px !important;
-        }   
-        .app__top-nav {
-          display: block;
-          height: 335px;
-          @include media(tablet) {
-            display: block;
-            height: 345px;
-          }
-          @include media(mediumDesktop) {
-            height: 60px;
-          }         
-          @include media(largeDesktop) {
-            height: 60px;
-          }           
-        }      
-      }
-      .app__top-logo {
-        float: left;
-        margin-right: 25px;
-        width: 10%;
-        @include media(tablet) {
-          width: 20%;
-        }
-        @include media(mediumDesktop) {
-          width: 25%;
-        }         
-        @include media(largeDesktop) {
-          width: 25%;
-        }         
+      padding: 0 !important;          
+      .app__top-logo { 
+        margin: 0 !important;
+        padding: 0 !important;
         img {
-          padding-top: 5px;
           width: 250px;
           @include media(tablet) {
             width: 270px;
@@ -90,6 +44,33 @@
       .app__top-nav {
         float: left;
         width: auto;
+        &.toggleMenuStyle {  
+          background: $dustyGray;
+          display: block;
+          float: none;
+          height: 335px;
+          position: absolute;
+          top: 60px;
+          width: 100%;
+          @include media(tablet) {
+            display: block;
+            float: none;
+            height: 335px;
+            position: absolute;
+            top: 60px;
+            width: 100%;
+          }
+          @include media(mediumDesktop) {
+            height: 60px;
+            position: relative;
+            top: 0;
+          }         
+          @include media(largeDesktop) {
+            height: 60px;
+            position: relative;
+            top: 0;
+          }                 
+        }        
         @include media(mediumDesktop) {
           width: auto;
         }           

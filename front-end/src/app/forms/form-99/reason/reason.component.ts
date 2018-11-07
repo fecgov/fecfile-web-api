@@ -111,7 +111,11 @@ export class ReasonComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    let form_99_details: any = JSON.parse(localStorage.getItem('form_99_details'));
+    let form_99_details: any = {};
+
+    if(localStorage.getItem('form_99_details') !== null) {
+      JSON.parse(localStorage.getItem('form_99_details'));
+    }
 
     if(form_99_details) {
       this.typeSelected = form_99_details.reason;
@@ -142,7 +146,6 @@ export class ReasonComponent implements OnInit {
    */
   public doValidateReason() {
     if (this.frmReason.get('reasonText').value.length >= 1) {
-        console.log('doValidateReason: ');
         let formSaved: any = {
           'form_saved': this.formSaved
         };
