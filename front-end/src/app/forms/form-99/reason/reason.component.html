@@ -6,8 +6,12 @@
     <header>
       <div class="header-container">
         <div class="header__text">
-          <h1 class="text-left" *ngIf="!typeSelected">Form 99</h1>
-          <h1 class="text-left" *ngIf="typeSelected">Form 99 / {{ typeSelected }}</h1>
+          <h1 class="text-left" *ngIf="!typeSelected">
+            Form 99
+          </h1>
+          <h1 class="text-left" *ngIf="typeSelected">
+            Form 99 / {{ typeSelected }}
+          </h1>
         </div>
         <div class="header__btns">
           <button

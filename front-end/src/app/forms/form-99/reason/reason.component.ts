@@ -23,9 +23,9 @@ export class ReasonComponent implements OnInit {
   @Input('editor') editor: any;
 
   public frmReason: FormGroup;
-  public reasonType: string = '';
+  public reasonType: string = null;
   public reasonFailed: boolean = false;
-  public typeSelected: string = '';
+  public typeSelected: string = null;
   public lengthError: boolean = false;
   public isValidReason: boolean = false;
   public reasonText: string = '';
@@ -75,17 +75,18 @@ export class ReasonComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('reason ngOnInit: ');
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
     if(this._form_99_details) {
+/*      if(this._form_99_details.reason) {
+        this.typeSelected = this._form_99_details.reason;
+       
+        console.log('this.typeSelected: ', this.typeSelected);
+      } */     
       if(this._form_99_details.text) {
-
-        if(this._form_99_details.reason) {
-          this.typeSelected = this._form_99_details.reason;
-        }
-
         this.frmReason = this._fb.group({
           reasonText: [this._form_99_details.text, [
             Validators.required,
@@ -114,7 +115,7 @@ export class ReasonComponent implements OnInit {
     let form_99_details: any = {};
 
     if(localStorage.getItem('form_99_details') !== null) {
-      JSON.parse(localStorage.getItem('form_99_details'));
+      form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
     }
 
     if(form_99_details) {
