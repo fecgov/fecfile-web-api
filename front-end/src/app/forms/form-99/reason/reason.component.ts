@@ -153,7 +153,6 @@ export class ReasonComponent implements OnInit {
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
         setTimeout(() => {
-          console.log('this._form_99_details: ', this._form_99_details);
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
 
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
