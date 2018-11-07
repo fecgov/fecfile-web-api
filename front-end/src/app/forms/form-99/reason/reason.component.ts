@@ -75,17 +75,11 @@ export class ReasonComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('reason ngOnInit: ');
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
-    if(this._form_99_details) {
-/*      if(this._form_99_details.reason) {
-        this.typeSelected = this._form_99_details.reason;
-       
-        console.log('this.typeSelected: ', this.typeSelected);
-      } */     
+    if(this._form_99_details) {  
       if(this._form_99_details.text) {
         this.frmReason = this._fb.group({
           reasonText: [this._form_99_details.text, [
