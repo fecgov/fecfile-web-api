@@ -1,6 +1,9 @@
 <div class="forms-container">
   <div class="main-content">
-    <div class="form__alerts">
+    <div 
+      class="form__alerts" 
+      [ngClass]="showValidateBar === true ? 'show-alerts' : ''"
+    >
       <app-validate></app-validate>
     </div>
     <div class="form__content">

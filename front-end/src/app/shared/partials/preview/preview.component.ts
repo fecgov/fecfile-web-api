@@ -50,7 +50,11 @@ export class PreviewComponent implements OnInit {
           }
         });
 
-
+    if(!this.form_details) {
+      if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
+        this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+      }
+    }
   }
 
   public goToPreviousStep(): void {

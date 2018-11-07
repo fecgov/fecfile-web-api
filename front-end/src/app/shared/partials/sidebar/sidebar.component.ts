@@ -10,22 +10,14 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public showCloseIcon: boolean = true;
+  public showCloseIcon: boolean = false;
 
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute 
   ) { }
 
-  ngOnInit(): void {
-    if(this._router.url.indexOf('/forms/form/') === 0) {
-      this.showCloseIcon = false;
-
-      this.status.emit({
-        showSidebar: this.showCloseIcon
-      });        
-    }     
-    
+  ngOnInit(): void {    
     this._router
       .events
       .subscribe(val => {
@@ -34,18 +26,30 @@ export class SidebarComponent implements OnInit {
             if(val.url.indexOf('/forms/form/') === 0) {
               this.showCloseIcon = false;
               this.status.emit({
-                showSidebar: this.showCloseIcon
+                showSidebar: false
               });             
-            } else if (this._router.url.indexOf('/dashboard') === 0) {
+            } 
+
+            if (val.url.indexOf('/dashboard') === 0) {
               this.showCloseIcon = true;
 
               this.status.emit({
-                showSidebar: this.showCloseIcon
+                showSidebar: true
               });               
             }
           }
         }
       });  
+  }
+
+  ngDoCheck(): void {
+    if(this._router.url.indexOf('/forms/form/') === 0) {
+      this.showCloseIcon = false;
+
+      this.status.emit({
+        showSidebar: false
+      });        
+    }
   }
 
   /**
@@ -66,5 +70,7 @@ export class SidebarComponent implements OnInit {
         showSidebar: true
       });       
     } 	
+
+    console.log('this.showCloseIcon: ', this.showCloseIcon);
   }
 }

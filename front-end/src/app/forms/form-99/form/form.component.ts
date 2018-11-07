@@ -74,6 +74,8 @@ export class FormComponent implements OnInit {
                 this._form99_details.reason = res.reason;
                 this._form99_details.text = res.text;
 
+                console.log('res: ', res);
+
                 if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
                   localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
                 }                

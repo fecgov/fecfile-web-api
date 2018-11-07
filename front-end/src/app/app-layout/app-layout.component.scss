@@ -3,18 +3,16 @@
 .app-container {
   color: $black;
   height: 100%;
-  padding-left: $sideBarWidth;
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
     .app__side-nav {
-      left: 35px;
+      left: 0;
     }
   }
  .app__top {
     background-color: $dustyGray;
     height: 60px;
-    left: 0;
     position: fixed;
     right: 0;
     vertical-align: middle;
@@ -86,8 +84,9 @@
   } // .app__top  
   .app__side-nav {
     height: 100%;
-    left: $sideBarWidth;
-    margin-left: -$sideBarWidth;
+    left: -210px;
+    // left: $sideBarWidth;
+    // margin-left: $sideBarWidth;
     position: fixed;
     top: 60px;
     transition: all 0.4s ease 0s;

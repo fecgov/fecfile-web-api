@@ -22,11 +22,11 @@ export class AppLayoutComponent implements OnInit {
     private _router: Router
 	) { }
 
-	ngOnInit() {
+	ngOnInit(): void {
     let route: string = this._router.url;
 
     if(route) {
-      if(route.indexOf('forms/form/') >= 1) {
+      if(route.indexOf('forms/form/') === 0) {
         this.showSideBar = false;
       }
     }
@@ -35,7 +35,7 @@ export class AppLayoutComponent implements OnInit {
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
-          if(val.url.indexOf('forms/form/') >= 1) {
+          if(val.url.indexOf('forms/form/') === 0) {
             this.showSideBar = false;
           } else {
             this.showSideBar = true;

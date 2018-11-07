@@ -236,14 +236,20 @@ export class ReasonComponent implements OnInit {
         if(res) {
             this._messageService
               .sendMessage({
-                'validate': environment.validateSuccess
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true                  
+                }
               });
         }
       },
       (error) => {
         this._messageService
           .sendMessage({
-            'validate': error.error
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true                  
+            }            
           });
       });
   }
