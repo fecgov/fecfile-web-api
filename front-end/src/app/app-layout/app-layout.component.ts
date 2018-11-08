@@ -28,11 +28,13 @@ export class AppLayoutComponent implements OnInit {
 	ngOnInit(): void {
     let route: string = this._router.url;
 
-    /*if(route) {
-      if(route.indexOf('forms/form/') === 0) {
-        this.sideBarClass = '';
+    if(route) {
+      if(route.indexOf('/dashboard') === 0) {
+        if(this.sideBarClass !== 'active') {
+          this.sideBarClass = 'active';             
+        }
       }
-    }*/
+    }  
 
     this._router
       .events

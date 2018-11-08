@@ -17,7 +17,21 @@ export class SidebarComponent implements OnInit {
     private _activatedRoute: ActivatedRoute 
   ) { }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {   
+    let route: string = this._router.url;
+
+    if(route) {
+      if(route.indexOf('/dashboard') === 0) {
+        if(this.iconClass !== 'close-icon') {
+          this.iconClass = 'close-icon';
+
+          this.status.emit({
+            showSidebar: true
+          });               
+        }
+      }
+    }       
+    
     this._router
       .events
       .subscribe(val => {
@@ -29,9 +43,7 @@ export class SidebarComponent implements OnInit {
               this.status.emit({
                 showSidebar: false
               });             
-            } 
-
-            if (val.url.indexOf('/dashboard') === 0) {
+            } else if (val.url.indexOf('/dashboard') === 0) {
               this.iconClass = 'close-icon';
 
               this.status.emit({
@@ -41,6 +53,10 @@ export class SidebarComponent implements OnInit {
           }
         }
       });  
+  }
+
+  ngDoCheck(): void {
+
   }
 
   /**
