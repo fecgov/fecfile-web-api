@@ -11,10 +11,10 @@
   .main-content {
     display: flex;
     flex: 1;
-    padding-left: 20%;
+    padding-left: 10px;
     width: 100%;
     @include media(tablet) {
-      padding-left: 20%;
+      padding-left: 0;
     }
     @include media(mediumDesktop) {
       padding-left: 0;
@@ -26,8 +26,9 @@
       background-color: $bombay;
       display: none;
       &.show-alerts {
+        padding-left: 0;
         @include media(tablet) {
-        
+          padding-left: 0;
         }
         @include media(mediumDesktop) {
           padding-left: 60px;

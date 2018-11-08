@@ -14,11 +14,11 @@
               *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
               You must select a type for filing.
             </div>
-            <ul class="reasons-list">
-              <li class="reasons-item"
+            <ul class="type-list">
+              <li class="type-item"
                 [ngClass]="typeSelected === 'mst'? 'selected' : ''">
-                <div class="reasons-item__box">
-                  <div class="reasons-item__box--top">
+                <div class="type-item__box">
+                  <div class="type-item__box--top">
                     <input
                       type="radio"
                       id="mst-radio"
@@ -27,17 +27,17 @@
                     />
                     <label
                       for="mst-radio"
-                      class="reason-text"
+                      class="type-text"
                       (click)="updateTypeSelected('MST')"
                     >
                       MST – Miscellaneous Report to FEC
                     </label>
                     <div
-                      class="reason-radio"
+                      class="type-radio"
                       data-value="MST"
                       (click)="updateTypeSelected('MST')"
                     ></div>
-                    <div class="reason__info">
+                    <div class="type__info">
                       <button
                         type="button"
                         class="btn btn-link"
@@ -51,7 +51,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="reasons-item__box--botom">
+                  <div class="type-item__box--botom">
                     <div id="mst_collapse" #mstCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
                       <div class="well well-lg">
                         A Miscellaneous Text Submission (Form 99) may be used for narrative responses that do not affect actual entries within a report (for example, when outlining the committee’s procedures for making “best efforts” to obtain contributor information.)
@@ -60,9 +60,9 @@
                   </div>
                 </div>
               </li>
-              <li class="reasons-item" [ngClass]="typeSelected === 'msm'? 'selected' : ''">
-                <div class="reasons-item__box">
-                  <div class="reasons-item__box--top">
+              <li class="type-item" [ngClass]="typeSelected === 'msm'? 'selected' : ''">
+                <div class="type-item__box">
+                  <div class="type-item__box--top">
                     <input
                       type="radio"
                       id="msm-radio"
@@ -71,17 +71,17 @@
                     />
                     <label
                       for="msm-radio"
-                      class="reason-text"
+                      class="type-text"
                       (click)="updateTypeSelected('MSM')"
                     >
                       MSM – Filing Frequency Chance Notice
                     </label>
                     <div
-                      class="reason-radio"
+                      class="type-radio"
                       data-value="msm"
                       (click)="updateTypeSelected('MSM')"
                     ></div>
-                    <div class="reason__info">
+                    <div class="type__info">
                       <button
                         type="button"
                         class="btn btn-link"
@@ -95,7 +95,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="reasons-item__box--botom">
+                  <div class="type-item__box--botom">
                     <div id="msm_collapse" #msmCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
                       <div class="well well-lg">
                         Notification to the FEC in writing where committees may change their filing schedule from quarterly to monthly (or vice versa) only once per calendar year.
@@ -104,10 +104,10 @@
                   </div>
                 </div>
               </li>
-              <li class="reasons-item"
+              <li class="type-item"
                 [ngClass]="typeSelected === 'msi'? 'selected' : ''">
-                <div class="reasons-item__box">
-                  <div class="reasons-item__box--top">
+                <div class="type-item__box">
+                  <div class="type-item__box--top">
                     <input
                       type="radio"
                       id="msi-radio"
@@ -116,17 +116,17 @@
                     />
                     <label
                       for="msi-radio"
-                      class="reason-text"
+                      class="type-text"
                       (click)="updateTypeSelected('MSI')"
                     >
                       MSI – Disavowal Response
                     </label>
                     <div
-                      class="reason-radio"
+                      class="type-radio"
                       data-value="MSI"
                       (click)="updateTypeSelected('MSI')"
                     ></div>
-                    <div class="reason__info">
+                    <div class="type__info">
                       <button
                         type="button"
                         class="btn btn-link"
@@ -140,7 +140,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="reasons-item__box--botom">
+                  <div class="type-item__box--botom">
                     <div id="msi_collapse" #msiCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
                       <div class="well well-lg">
                         A letter to the FEC where a candidate disavows unauthorized campaign activity within 30 days after being notified by the agency that another person or group has received contributions or made expenditures of more than $5,000 on the individual’s behalf. 100.3(a)(3) and 102.13(a)(2).
@@ -149,9 +149,9 @@
                   </div>
                 </div>
               </li>
-              <li class="reasons-item"  [ngClass]="typeSelected === 'msw'? 'selected' : ''">
-                <div class="reasons-item__box">
-                  <div class="reasons-item__box--top">
+              <li class="type-item"  [ngClass]="typeSelected === 'msw'? 'selected' : ''">
+                <div class="type-item__box">
+                  <div class="type-item__box--top">
                     <input
                       type="radio"
                       id="msw-radio"
@@ -160,18 +160,18 @@
                     />
                     <label
                       for="msw-radio"
-                      class="reason-text"
+                      class="type-text"
                       (click)="updateTypeSelected('MSW')"
                     >
                       MSW - C1 Loan Agreement
                     </label>
                     <div
-                      class="reason-radio"
+                      class="type-radio"
                       data-value="MSW"
                       (click)="updateTypeSelected('MSW')"
                     >
                     </div>
-                    <div class="reason__info">
+                    <div class="type__info">
                       <button
                         type="button"
                         class="btn btn-link"
@@ -185,7 +185,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="reasons-item__box--botom">
+                  <div class="type-item__box--botom">
                     <div id="msw_collapse" #mswCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
                       <div class="well well-lg">
                         Loans and Line of Credit from Lending Institutions, including copies of loan agreements.
