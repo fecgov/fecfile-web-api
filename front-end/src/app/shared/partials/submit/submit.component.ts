@@ -25,15 +25,8 @@ export class SubmitComponent implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(res.form_submitted) {
-          this._router
-            .events
-            .subscribe(e => {
-              if(e instanceof NavigationEnd) {
-                if(!e.url.indexOf('/forms/')) {
-                  localStorage.removeItem(`form_${this.form_type}_details`);
-                }
-              }
-            });
+          localStorage.removeItem(`form_${this.form_type}_details`);
+          localStorage.removeItem(`form_${this.form_type}_saved`);
         }
       });
   }
