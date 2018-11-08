@@ -10,7 +10,7 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public showCloseIcon: boolean = false;
+  public iconClass: string = 'bars-icon';
 
   constructor(
     private _router: Router,
@@ -24,14 +24,15 @@ export class SidebarComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
-              this.showCloseIcon = false;
+              this.iconClass = 'bars-icon';
+              
               this.status.emit({
                 showSidebar: false
               });             
             } 
 
             if (val.url.indexOf('/dashboard') === 0) {
-              this.showCloseIcon = true;
+              this.iconClass = 'close-icon';
 
               this.status.emit({
                 showSidebar: true
@@ -42,35 +43,23 @@ export class SidebarComponent implements OnInit {
       });  
   }
 
-  ngDoCheck(): void {
-    if(this._router.url.indexOf('/forms/form/') === 0) {
-      this.showCloseIcon = false;
-
-      this.status.emit({
-        showSidebar: false
-      });        
-    }
-  }
-
   /**
    * Toggles the sidebar.
    *
    */
   public toggleSideNav(): void {
-    if(this.showCloseIcon) {
-      this.showCloseIcon = false;
+    if(this.iconClass === 'close-icon') {
+      this.iconClass = 'bars-icon';
 
       this.status.emit({
         showSidebar: false
       });       
     } else {
-      this.showCloseIcon = true;
+      this.iconClass = 'close-icon';
 
       this.status.emit({
         showSidebar: true
       });       
     } 	
-
-    console.log('this.showCloseIcon: ', this.showCloseIcon);
   }
 }

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { SessionService } from '../shared/services/SessionService/session.service';
+import { MessageService } from '../shared/services/MessageService/message.service';
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
@@ -15,30 +16,32 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
+  public sideBarClass: string = '';
   public toggleMenu: boolean = false;
 
 	constructor(
 		private _sessionService: SessionService,
+    private _messageService: MessageService,
     private _router: Router
 	) { }
 
 	ngOnInit(): void {
     let route: string = this._router.url;
 
-    if(route) {
+    /*if(route) {
       if(route.indexOf('forms/form/') === 0) {
-        this.showSideBar = false;
+        this.sideBarClass = '';
       }
-    }
+    }*/
 
     this._router
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf('forms/form/') === 0) {
-            this.showSideBar = false;
+            this.sideBarClass = '';
           } else {
-            this.showSideBar = true;
+            this.sideBarClass = 'active';
           }
         }
       })
@@ -65,5 +68,11 @@ export class AppLayoutComponent implements OnInit {
    */
   public onNotify(e): void {
     this.showSideBar = e.showSidebar;
+
+    if(this.showSideBar) {
+      this.sideBarClass = 'active';
+    } else {
+      this.sideBarClass = '';
+    }
   }  
 }
