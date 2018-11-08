@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../environments/environment';
+import { MessageService } from '../shared/services/MessageService/message.service';
 import { ValidateComponent } from '../shared/partials/validate/validate.component';
 
 @Component({
@@ -16,11 +17,13 @@ export class FormsComponent implements OnInit {
 	public form_type: string = '';
   public closeResult: string = '';
   public canContinue: boolean = false;
+  public showValidateBar: boolean = false;
 
   constructor(
   	private _activeRoute: ActivatedRoute,
     private _modalService: NgbModal,
-    private _ngZone: NgZone
+    private _ngZone: NgZone,
+    private _messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -29,6 +32,14 @@ export class FormsComponent implements OnInit {
       .subscribe( params => {
   		  this.form_type = params.form_id;
   	});
+
+    this._messageService
+      .getMessage()
+      .subscribe(res => {
+        if(res.validateMessage) {
+          this.showValidateBar = res.validateMessage.showValidateBar;
+        }
+      });
   }
 
   /**

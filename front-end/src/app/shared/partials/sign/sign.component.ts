@@ -21,6 +21,7 @@ export class SignComponent implements OnInit {
   public form_type: string = '';
   public type_selected: string = '';
   public signFailed: boolean = false;
+  public frmSaved: boolean = false;
   public frmSignee: FormGroup;
   public date_stamp: Date = new Date();
 
@@ -97,14 +98,20 @@ export class SignComponent implements OnInit {
         if(res) {
             this._messageService
               .sendMessage({
-                'validate': environment.validateSuccess
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true                  
+                }
               });
         }
       },
       (error) => {
         this._messageService
           .sendMessage({
-            'validate': error.error
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true                  
+            }            
           });
       });
   }
@@ -126,18 +133,21 @@ export class SignComponent implements OnInit {
         .subscribe(res => {
           if(res) {
             console.log('res: ', res);
+            this.frmSaved = true;
           }
         },
         (error) => {
           console.log('error: ', error);
-        })
+        });
     }
   }
 
+  /**
+   * Submits a form.
+   *
+   */
   public doSubmitForm(): void {
-    console.log('doSubmitForm: ');
-    console.log('this.frmSignee: ', this.frmSignee);
-
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
     this._form_details.file = '';
 
@@ -146,6 +156,35 @@ export class SignComponent implements OnInit {
       this.signFailed = true;
     } else if(this.frmSignee.valid) {
       this.signFailed = false;
+
+      if(!formSaved.form_saved) {
+        this._formsService
+          .saveForm({}, this.form_type)
+          .subscribe(res => {
+            if(res) {
+              this._formsService
+                .submitForm({}, this.form_type)
+                .subscribe(res => {
+                  if(res) {
+                    this.status.emit({
+                      form: this.frmSignee,
+                      direction: 'next',
+                      step: 'step_5',
+                      previousStep: this._step
+                    });
+
+                    this._messageService
+                      .sendMessage({
+                        'form_submitted': true
+                      });
+                  }
+                });              
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+      }
 
       this._formsService
         .submitForm({}, this.form_type)

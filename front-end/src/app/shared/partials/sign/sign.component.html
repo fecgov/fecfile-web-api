@@ -24,13 +24,22 @@
   </header>
   <section>
     <div class="content">
-      <div class="grid-row" *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched)) || (signFailed)">
+      <div class="grid-row" 
+        *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched)) || (signFailed)">
         <div class="grid-row__col grid-row__col--12">
-          <div class="error text-center">
+          <div class="text-error text-center">
             You must certify this form.
           </div>
         </div>
       </div>
+      <div class="grid-row"
+        *ngIf="(frmSignee.controls.signee.valid) && frmSaved">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="text-info text-center">
+              Form {{ form_type }} has been successfully saved.
+            </div>
+          </div>
+        </div>
       <form [formGroup]="frmSignee" (ngSubmit)="doSubmitForm()">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--6">

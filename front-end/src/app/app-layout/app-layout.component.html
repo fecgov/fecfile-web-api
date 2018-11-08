@@ -1,27 +1,38 @@
-<div class="app-container"
-  [ngClass]="showSideBar === false ? 'active' : ''">
+<div 
+  class="app-container"
+  [ngClass]="sideBarClass"
+>
   <div class="app__top">
-    <div class="app__top-logo">
-      <a [routerLink]="['/dashboard']">
-        <img src="assets/img/logo-transparent.png" />
-      </a>
-    </div>
-    <div class="app__side-nav-toggle">
-      <a class="side-nav-toggle"
-        role="button"
-        (click)="toggleSideNav()"
+    <nav class="navbar py-0 navbar-expand-lg">
+      <div class="navbar-brand app__top-logo">
+        <a [routerLink]="['/dashboard']">
+          <img src="assets/img/logo-transparent.png" />
+        </a>
+      </div>
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-toggle="collapse" 
+        data-target="#navbarSupportedContent" 
+        aria-controls="navbarSupportedContent" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation"
+        (click)="toggleTopNav()"
       >
-        <i class="bars-icon">
-          <span class="sr-only">Toggle Sidebar</span>
-        </i>
-      </a>
-    </div>
-    <div class="app__top-nav">
-      <app-header></app-header>
-    </div>
+        <span class="sr-only">Toggle navigation</span>
+        <span class="bars-icon"></span>
+      </button>             
+      <div 
+        class="collapse navbar-collapse app__top-nav" 
+        id="navbarSupportedContent"
+        [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }"
+      >       
+        <app-header></app-header>
+      </div>
+    </nav>
   </div>
   <div class="app__side-nav">
-    <app-sidebar></app-sidebar>
+    <app-sidebar (status)='onNotify($event)'></app-sidebar>
   </div>
   <main>
     <div class="app__content-wrapper">

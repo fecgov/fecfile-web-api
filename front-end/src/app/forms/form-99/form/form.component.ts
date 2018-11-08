@@ -71,8 +71,11 @@ export class FormComponent implements OnInit {
           .subscribe(res => {
             if(Object.keys(res).length>=1) {
               if(!res.is_submitted) {
+                console.log('isSubmitted: ', res.is_submitted);
                 this._form99_details.reason = res.reason;
                 this._form99_details.text = res.text;
+
+                console.log('this._form99_details: ', this._form99_details);
 
                 if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
                   localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
@@ -105,6 +108,13 @@ export class FormComponent implements OnInit {
           window.scrollTo(0, 0);
         }
       });
+  }
+
+  ngDoCheck(): void {
+    if(this.currentStep !== this._activatedRoute.snapshot.queryParams.step) {
+      this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+      this.step = this._activatedRoute.snapshot.queryParams.step;      
+    }
   }
 
   /**

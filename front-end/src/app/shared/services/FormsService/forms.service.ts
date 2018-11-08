@@ -60,7 +60,6 @@ export class FormsService {
    * @return     {Observable}  The validation results of the form.
    */
   public validateForm(formObj: any, form_type: string): Observable<any> {
-    console.log('validateForm: ');
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '';
@@ -76,8 +75,6 @@ export class FormsService {
       data.text = data.text.replace(/<[^>]*>/g, '');
 
       data.text = data.text.replace(/(&nbsp;)/g, ' ');
-
-      console.log('data.text: ', data.text);
     }
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -119,8 +116,6 @@ export class FormsService {
 
     if(form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
-
-      console.log('form99_details: ', form99_details);
 
       url = '/f99/create_f99_info';
       data = form99_details;
@@ -166,7 +161,6 @@ export class FormsService {
       url = '/f99/submit_comm_info';
       data = form99_details;
     }
-
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -180,6 +174,6 @@ export class FormsService {
             return true;
           }
           return false;
-      }));
+      }));      
   }
 }

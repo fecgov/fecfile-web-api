@@ -11,18 +11,55 @@
   .main-content {
     display: flex;
     flex: 1;
+    padding-left: 20%;
     width: 100%;
+    @include media(tablet) {
+      padding-left: 20%;
+    }
+    @include media(mediumDesktop) {
+      padding-left: 0;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 0;
+    }     
     .form__alerts {
       background-color: $bombay;
-      float: left;
-      min-height: 100%;
-      position: relative;
-      width: 20%;
+      display: none;
+      &.show-alerts {
+        @include media(tablet) {
+        
+        }
+        @include media(mediumDesktop) {
+          padding-left: 60px;
+          width: 300px;         
+        }         
+        @include media(largeDesktop) {
+          padding-left: 60px;
+          width: 300px; 
+        }         
+      }
+      @include media(tablet) {
+        display: none;
+      }
+      @include media(mediumDesktop) {
+        display: inline-block;
+        float: left;
+        min-height: 100%;
+        position: relative;
+        width: 100px;      
+      }         
+      @include media(largeDesktop) {
+        display: inline-block;
+        float: left;
+        min-height: 100%;
+        position: relative;
+        width: 100px;      
+      }       
     }
     .form__content {
       float: left;
       min-height: 100%;
-      width: 75%;
+      width: 100%;
       .grid-row {
         margin: 0;
         .grid-row__col {
