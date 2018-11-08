@@ -22,7 +22,19 @@
       background-color: $dustyGray;
       height: 60px;
       margin: 0 !important;
-      padding: 0 !important;          
+      padding: 0 !important;      
+      .navbar-toggler {
+        padding-right: 20px;
+        @include media(tablet) {
+          padding-right: 10px;
+        }
+        @include media(mediumDesktop) {
+          padding-right: 0;
+        }         
+        @include media(largeDesktop) {
+          padding-right: 0;
+        }         
+      } 
       .app__top-logo { 
         margin: 0 !important;
         padding: 0 !important;
