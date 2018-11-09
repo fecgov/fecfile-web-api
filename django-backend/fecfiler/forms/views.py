@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import CommitteeInfo, Committee
-from .serializers import CommitteeInfoSerializer, CommitteeSerializer
+from .serializers import CommitteeInfoSerializer, CommitteeSerializer, CommitteeInfoListSerializer
 import json
 import os
 from django.views.decorators.csrf import csrf_exempt
@@ -318,3 +318,42 @@ def validate_f99(request):
     else:
         return JsonResponse(errormess, status=400, safe=False)
 
+
+@api_view(['GET'])
+def get_form99list(request):
+    """
+    fields for auto populating the form 99 reports data 
+    """
+    try:
+        
+        comm = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True)
+        
+    except CommitteeInfo.DoesNotExist:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    # get details of a form 99 records
+    if request.method == 'GET':
+        
+        serializer = CommitteeInfoListSerializer(comm)
+        return Response(serializer.data)    
+
+"""
+    if request.method == 'POST':
+        try:
+            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+            if comm_info:
+                new_data = comm_info.__dict__
+                new_data["is_submitted"]=True
+                new_data["updated_at"]=datetime.datetime.now()
+                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+        except:
+            return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
+"""
