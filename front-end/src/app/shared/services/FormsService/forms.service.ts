@@ -109,6 +109,7 @@ export class FormsService {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let data: any = {};
     let httpOptions =  new HttpHeaders();
+    let formSaved: boolean = false;
     let url: string = '';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -117,7 +118,18 @@ export class FormsService {
     if(form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
-      url = '/f99/create_f99_info';
+      if(localStorage.getItem('form_99_saved') !== null) {
+        let formSavedObj = JSON.parse(localStorage.getItem('form_99_saved'));
+
+        formSaved = formSavedObj.saved;
+      }
+
+      if(formSaved) {
+        url = '/f99/update_f99_info'
+      } else {
+        url = '/f99/create_f99_info';  
+      }
+      
       data = form99_details;
     }
 

@@ -78,9 +78,7 @@ export class PreviewComponent implements OnInit {
   }
 
   public goToNextStep(): void {
-      console.log('Preview goToNextStep: ');
       setTimeout(() => {
-        console.log('this.form_details: ', this.form_details);
         localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
       }, 100);
 

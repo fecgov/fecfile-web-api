@@ -211,11 +211,17 @@ export class ReasonComponent implements OnInit {
           .subscribe(res => {
             if(res) {
               this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
             }
           },
           (error) => {
             console.log('error: ', error);
-          })
+          });          
       }
     }
   }

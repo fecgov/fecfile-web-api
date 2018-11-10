@@ -121,6 +121,8 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
       this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
@@ -132,8 +134,13 @@ export class SignComponent implements OnInit {
         .saveForm({}, this.form_type)
         .subscribe(res => {
           if(res) {
-            console.log('res: ', res);
             this.frmSaved = true;
+
+            let formSavedObj: any = {
+              'saved': this.frmSaved
+            };
+
+            localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify(formSavedObj));            
           }
         },
         (error) => {

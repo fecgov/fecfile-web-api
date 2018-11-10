@@ -36,7 +36,17 @@
   </div>
   <main>
     <div class="app__content-wrapper">
-      <router-outlet></router-outlet>
+      <div class="app__committee-info">
+        <div class="committee-name">
+          {{ committeeName }}
+        </div>
+        <div class="committee-id">
+          {{ committeeId }}
+        </div>
+      </div>
+      <div class="app__content">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </main>
 </div>

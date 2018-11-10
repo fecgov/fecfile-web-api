@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
+import { ApiService } from '../shared/services/APIService/api.service';
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
@@ -18,8 +19,11 @@ export class AppLayoutComponent implements OnInit {
 	public showSideBar: boolean = true;
   public sideBarClass: string = '';
   public toggleMenu: boolean = false;
+  public committeeName: string = '';
+  public committeeId: string = '';
 
 	constructor(
+    private _apiService: ApiService,
 		private _sessionService: SessionService,
     private _messageService: MessageService,
     private _router: Router
@@ -47,7 +51,20 @@ export class AppLayoutComponent implements OnInit {
           }
         }
       })
-	}
+
+    this._apiService
+      .getCommiteeDetails()
+      .subscribe(res => {
+        if(res) {
+          localStorage.setItem('committee_details', JSON.stringify(res));
+
+          this.committeeName = res.committeename;
+          this.committeeId = res.committeeid;
+          this._messageService
+            .sendMessage({'committee_details_loaded': true});
+        }
+      });      
+  }
 
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.

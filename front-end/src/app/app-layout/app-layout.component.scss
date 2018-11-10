@@ -106,10 +106,33 @@
   main {
     height: 98%;
     .app__content-wrapper {
+      background-color: $mercury;
+      margin: 0 auto;
+      padding-left: 50px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
-      width: 100%;
       z-index: 0;
+      .app__committee-info {
+        background-color: $mercury;
+        font-size: 1.5em;
+        height: 60px;
+        line-height: 60px;
+        padding-left: 60px;
+        padding-right: 60px;
+        position: relative;
+        .committee-name,
+        .committee-id {
+          display: inline-block;
+          height: 100%;
+          position: relative;
+        }
+        @include clearfix();
+      }
+      .app__content {
+        background-color: $white;
+        margin: 0 auto;
+        width: 90%;
+      }
     }
   }      
 }
