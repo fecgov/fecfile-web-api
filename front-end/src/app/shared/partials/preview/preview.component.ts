@@ -49,10 +49,17 @@ export class PreviewComponent implements OnInit {
             }
           }
         });
+  }
 
+  ngDoCheck(): void {
     if(!this.form_details) {
       if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
         this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+        if(this.form_type === '99') {
+          if(!this.type_selected) {
+            this.type_selected = this.form_details.reason;
+          } 
+        }
       }
     }
   }

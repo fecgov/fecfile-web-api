@@ -206,6 +206,14 @@ export class SignComponent implements OnInit {
     }
   }
 
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }      
+  }
+
   /**
    * Goes to the previous step.
    *
