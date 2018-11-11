@@ -21,10 +21,10 @@
           width: 60%;
         }
         @include media(mediumDesktop) {
-          width: 72%;
+          width: 60%;
         }         
         @include media(largeDesktop) {
-          width: 72%;
+          width: 60%;
         }         
       }
       .header__btns {
@@ -35,10 +35,10 @@
           width: 30%;
         }
         @include media(mediumDesktop) {
-          width: 25%;
+          width: 30%;
         }         
         @include media(largeDesktop) {
-          width: 25%;
+          width: 30%;
         }         
         .btn-print-preview {
           @extend .btn-secondary-gray;

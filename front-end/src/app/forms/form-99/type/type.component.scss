@@ -76,10 +76,19 @@
             height: 25px;
             width: 25px;
             top: 60px;
-            left: 20px;
+            left: 5px;
             z-index: 5;
             transition: border .25s linear;
             -webkit-transition: border .25s linear;
+            @include media(tablet) {
+              left: 20px;
+            }
+            @include media(mediumDesktop) {
+              left: 20px;
+            }         
+            @include media(largeDesktop) {
+              left: 20px;
+            }             
             &:before {
               display: block;
               position: absolute;
@@ -103,11 +112,23 @@
             margin: 10px auto;
             position: relative;
             padding-bottom: 25px;
-            padding-left: 65px;
+            padding-left: 45px;
             padding-top: 40px;
-            width: auto;
+            width: 190px;
             z-index: 0;
             -webkit-transition: all 0.25s linear;
+            @include media(tablet) {
+              padding-left: 65px;
+              width: auto;
+            }
+            @include media(mediumDesktop) {
+              padding-left: 65px;
+              width: auto;
+            }         
+            @include media(largeDesktop) {
+              padding-left: 65px;
+              width: auto;
+            }             
           }
         } // .type-item__box
         .type__info {

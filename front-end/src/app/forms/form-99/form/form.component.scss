@@ -26,17 +26,7 @@
     width: 100%;
     .form__content {
       float: left;
-      padding-left: 4%;
-      width: 100%;
-      @include media(tablet) {
-        padding-left: 2%;
-      }
-      @include media(mediumDesktop) {
-        padding-left: 0;
-      }         
-      @include media(largeDesktop) {
-        padding-left: 0;
-      }       
+      width: 100%;      
     }
   } // .form__container
 }

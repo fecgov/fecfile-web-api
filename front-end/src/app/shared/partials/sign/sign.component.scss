@@ -9,12 +9,36 @@ $btnRowHeight: 45px;
       width: 100%;
       .header__text {
         float: left;
-        width: 72%
+        width: 55%;
+        @include media(tablet) {
+          width: 50%;
+        }
+        @include media(mediumDesktop) {
+          width: 60%;
+        }         
+        @include media(largeDesktop) {
+          width: 60%;
+        }         
       }
       .header__btns {
-        float: right;
-        padding-top: 15px;
-        width: 25%;
+        float: left;
+        padding-top: 0;
+        width: 30%;
+        @include media(tablet) {
+          float: right;
+          padding-top: 0;
+          width: 40%;
+        }
+        @include media(mediumDesktop) {
+          float: right;
+          padding-top: 15px;
+          width: 30%;
+        }         
+        @include media(largeDesktop) {
+          float: right;
+          padding-top: 15px;
+          width: 30%;
+        }         
         .btn-print-preview {
           @extend .btn-secondary-gray;
           margin-right: 5px;
@@ -68,29 +92,72 @@ $btnRowHeight: 45px;
           }
           .forms__btn-previous {
             float: left;
-            width: 55%;
-            @include webkitBrowser() {
-              width: 56%;
+            width: 30%;
+            @include media(tablet) {
+              width: 40%;
             }
-            @include safariOnly() {
+            @include media(mediumDesktop) {
               width: 55%;
-            }
+              @include webkitBrowser() {
+                width: 56%;
+              }
+              @include safariOnly() {
+                width: 55%;
+              }            
+            }         
+            @include media(largeDesktop) {
+              width: 55%;
+              @include webkitBrowser() {
+                width: 56%;
+              }
+              @include safariOnly() {
+                width: 55%;
+              }            
+            }             
           }
           .forms__agreement-text {
             float: left;
-            width: 38%;
-            @include webkitBrowser() {
-              width: 36%;
+            width: 40%;
+            @include media(tablet) {
+              width: 50%;
             }
-            @include safariOnly() {
-              width: 36%;
-            }
+            @include media(mediumDesktop) {
+              width: 38%;
+              @include webkitBrowser() {
+                width: 36%;
+              }
+              @include safariOnly() {
+                width: 36%;
+              }            
+            }         
+            @include media(largeDesktop) {
+              width: 38%;
+              @include webkitBrowser() {
+                width: 36%;
+              }
+              @include safariOnly() {
+                width: 36%;
+              }            
+            }             
             .agreement__text {
               display: inline-block;
               float: left;
               font-size: 0.85em;
-              margin-left: 5px;
-              width: 290px;
+              margin-left: 0;
+              //overflow-y: scroll;
+              width: 130px;
+              @include media(tablet) {
+                margin-left: 5px;
+                width: 290px;
+              }
+              @include media(mediumDesktop) {
+                margin-left: 5px;
+                width: 290px;
+              }         
+              @include media(largeDesktop) {
+                margin-left: 5px;
+                width: 290px;
+              }               
             }
             input[type='checkbox'] {
               float: left;

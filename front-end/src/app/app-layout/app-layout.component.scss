@@ -114,17 +114,39 @@
       z-index: 0;
       .app__committee-info {
         background-color: $mercury;
-        font-size: 1.5em;
-        height: 60px;
-        line-height: 60px;
+        height: 90px;
         padding-left: 60px;
         padding-right: 60px;
+        padding-top: 35px;
         position: relative;
+        vertical-align: bottom;
+        @include media(tablet) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }
+        @include media(mediumDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
+        @include media(largeDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
         .committee-name,
         .committee-id {
           display: inline-block;
-          height: 100%;
+          //height: 100%;
           position: relative;
+        }
+        .committee-id {
+          font-size: 1.5em;
+          margin-right: 25px;
+        }
+        .committee-name {
+          font-size: 1em;
         }
         @include clearfix();
       }

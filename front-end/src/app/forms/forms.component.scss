@@ -31,11 +31,9 @@
           padding-left: 0;
         }
         @include media(mediumDesktop) {
-          padding-left: 60px;
           width: 300px;         
         }         
         @include media(largeDesktop) {
-          padding-left: 60px;
           width: 300px; 
         }         
       }
