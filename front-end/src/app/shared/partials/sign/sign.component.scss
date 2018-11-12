@@ -11,33 +11,31 @@ $btnRowHeight: 45px;
         float: left;
         width: 55%;
         @include media(tablet) {
-          width: 50%;
+          width: 40%;
         }
         @include media(mediumDesktop) {
-          width: 60%;
+          width: 40%;
         }         
         @include media(largeDesktop) {
-          width: 60%;
+          width: 40%;
         }         
       }
       .header__btns {
         float: left;
         padding-top: 0;
+        text-align: right;
         width: 30%;
         @include media(tablet) {
-          float: right;
           padding-top: 0;
-          width: 40%;
+          width: 50%;
         }
         @include media(mediumDesktop) {
-          float: right;
-          padding-top: 15px;
-          width: 30%;
+          padding-top: 0;
+          width: 50%;
         }         
         @include media(largeDesktop) {
-          float: right;
-          padding-top: 15px;
-          width: 30%;
+          padding-top: 0;
+          width: 50%;
         }         
         .btn-print-preview {
           @extend .btn-secondary-gray;
@@ -99,7 +97,7 @@ $btnRowHeight: 45px;
             @include media(mediumDesktop) {
               width: 55%;
               @include webkitBrowser() {
-                width: 56%;
+                width: 40%;
               }
               @include safariOnly() {
                 width: 55%;
@@ -108,7 +106,7 @@ $btnRowHeight: 45px;
             @include media(largeDesktop) {
               width: 55%;
               @include webkitBrowser() {
-                width: 56%;
+                width: 50%;
               }
               @include safariOnly() {
                 width: 55%;
@@ -124,7 +122,7 @@ $btnRowHeight: 45px;
             @include media(mediumDesktop) {
               width: 38%;
               @include webkitBrowser() {
-                width: 36%;
+                width: 50%;
               }
               @include safariOnly() {
                 width: 36%;
@@ -133,7 +131,7 @@ $btnRowHeight: 45px;
             @include media(largeDesktop) {
               width: 38%;
               @include webkitBrowser() {
-                width: 36%;
+                width: 42%;
               }
               @include safariOnly() {
                 width: 36%;

@@ -8,7 +8,12 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                     'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                     'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
-                    'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2' )
+                    'created_at','is_submitted', 'signee', 'email_on_file' )
+
+            # fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
+            #         'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
+            #         'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
+            #         'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2' )
 
             # fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
             #         'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
@@ -40,8 +45,8 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
             instance.signee = validated_data.get('signee', instance.signee)
             instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
-            instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
-            instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
+            #instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
+            #instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
             # instance.file = validated_data.get('file', instance.file)
 
 

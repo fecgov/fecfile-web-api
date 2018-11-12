@@ -18,27 +18,28 @@
         float: left;
         width: 70%;
         @include media(tablet) {
-          width: 60%;
+          width: 50%;
         }
         @include media(mediumDesktop) {
-          width: 60%;
+          width: 50%;
         }         
         @include media(largeDesktop) {
-          width: 60%;
+          width: 50%;
         }         
       }
       .header__btns {
-        float: right;
+        float: left;
         padding-top: 15px;
+        text-align: right;
         width: 30%;
         @include media(tablet) {
-          width: 30%;
+          width: 50%;
         }
         @include media(mediumDesktop) {
-          width: 30%;
+          width: 50%;
         }         
         @include media(largeDesktop) {
-          width: 30%;
+          width: 50%;
         }         
         .btn-print-preview {
           @extend .btn-secondary-gray;

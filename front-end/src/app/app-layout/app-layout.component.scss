@@ -6,6 +6,15 @@
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
+      padding-left: 200px;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 200px;
+    }     
     .app__side-nav {
       left: 0;
     }
