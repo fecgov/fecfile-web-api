@@ -15,9 +15,13 @@
         padding-left: 0;
       }
       @include media(mediumDesktop) {
+        display: inline-block;
+        float: left;
         width: 250px;         
       }         
       @include media(largeDesktop) {
+        display: inline-block;
+        float: left;
         width: 250px; 
       }         
     }    
