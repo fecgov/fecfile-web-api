@@ -17,10 +17,11 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
-  public sideBarClass: string = '';
+  public sideBarClass: string = null;
   public toggleMenu: boolean = false;
   public committeeName: string = '';
   public committeeId: string = '';
+  public dashboardClass: string = '';
 
 	constructor(
     private _apiService: ApiService,
@@ -31,26 +32,6 @@ export class AppLayoutComponent implements OnInit {
 
 	ngOnInit(): void {
     let route: string = this._router.url;
-
-    if(route) {
-      if(route.indexOf('/dashboard') === 0) {
-        if(this.sideBarClass !== 'active') {
-          this.sideBarClass = 'active';             
-        }
-      }
-    }  
-
-    this._router
-      .events
-      .subscribe(val => {
-        if(val instanceof NavigationEnd) {
-          if(val.url.indexOf('forms/form/') === 0) {
-            this.sideBarClass = '';
-          } else {
-            this.sideBarClass = 'active';
-          }
-        }
-      })
 
     this._apiService
       .getCommiteeDetails()
@@ -64,6 +45,22 @@ export class AppLayoutComponent implements OnInit {
             .sendMessage({'committee_details_loaded': true});
         }
       });      
+  }
+
+  ngDoCheck(): void {
+    let route: string = this._router.url;
+
+    if(route) {
+      if(route.indexOf('/dashboard') === 0) {
+        if(this.showSideBar) {
+          if(this.sideBarClass !== 'dashboard active') {
+            this.sideBarClass = 'dashboard active';             
+          }          
+        }  else {
+          this.sideBarClass = '';   
+        }
+      }
+    }    
   }
 
   /**
@@ -86,10 +83,17 @@ export class AppLayoutComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
+    let route: string = this._router.url;
     this.showSideBar = e.showSidebar;
 
     if(this.showSideBar) {
-      this.sideBarClass = 'active';
+      if(route) {
+        if(route.indexOf('/dashboard') === 0) {
+          this.sideBarClass = 'dashboard active';
+        } else {
+          this.sideBarClass = 'active';
+        }
+      }
     } else {
       this.sideBarClass = '';
     }

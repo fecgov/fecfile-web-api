@@ -124,11 +124,7 @@ export class FormsService {
         formSaved = formSavedObj.saved;
       }
 
-      if(formSaved) {
-        url = '/f99/update_f99_info'
-      } else {
-        url = '/f99/create_f99_info';  
-      }
+      url = '/f99/create_f99_info';  
       
       data = form99_details;
     }

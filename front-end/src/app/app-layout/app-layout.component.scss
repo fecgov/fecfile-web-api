@@ -10,6 +10,21 @@
       padding-left: 0
     }
     @include media(mediumDesktop) {
+      padding-left: 0;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 0;
+    }     
+    .app__side-nav {
+      left: 0;
+    }
+  }
+  &.dashboard.active {
+    padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
       padding-left: 200px;
     }         
     @include media(largeDesktop) {
@@ -17,7 +32,7 @@
     }     
     .app__side-nav {
       left: 0;
-    }
+    }    
   }
  .app__top {
     background-color: $dustyGray;

@@ -56,6 +56,7 @@ $btnRowHeight: 45px;
       display: block;
       position: relative;
       width: 100%;
+      .grid-r
       form {
         .form1-link {
           color: $dodgerBlue;
@@ -76,105 +77,9 @@ $btnRowHeight: 45px;
             margin-top: 5px;
           }
         }
-        .forms__btn-container {
-          .forms__btn-row {
-            display: block;
-            height: $btnRowHeight;
-            margin-bottom: 15px;
-            position: relative;
-            width: 100%;
-            @include clearfix();
-          }
-          .forms__btn-right {
-            float: right;
-          }
-          .forms__btn-previous {
-            float: left;
-            width: 30%;
-            @include media(tablet) {
-              width: 40%;
-            }
-            @include media(mediumDesktop) {
-              width: 55%;
-              @include webkitBrowser() {
-                width: 40%;
-              }
-              @include safariOnly() {
-                width: 55%;
-              }            
-            }         
-            @include media(largeDesktop) {
-              width: 55%;
-              @include webkitBrowser() {
-                width: 50%;
-              }
-              @include safariOnly() {
-                width: 55%;
-              }            
-            }             
-          }
-          .forms__agreement-text {
-            float: left;
-            width: 40%;
-            @include media(tablet) {
-              width: 50%;
-            }
-            @include media(mediumDesktop) {
-              width: 38%;
-              @include webkitBrowser() {
-                width: 50%;
-              }
-              @include safariOnly() {
-                width: 36%;
-              }            
-            }         
-            @include media(largeDesktop) {
-              width: 38%;
-              @include webkitBrowser() {
-                width: 42%;
-              }
-              @include safariOnly() {
-                width: 36%;
-              }            
-            }             
-            .agreement__text {
-              display: inline-block;
-              float: left;
-              font-size: 0.85em;
-              margin-left: 0;
-              //overflow-y: scroll;
-              width: 130px;
-              @include media(tablet) {
-                margin-left: 5px;
-                width: 290px;
-              }
-              @include media(mediumDesktop) {
-                margin-left: 5px;
-                width: 290px;
-              }         
-              @include media(largeDesktop) {
-                margin-left: 5px;
-                width: 290px;
-              }               
-            }
-            input[type='checkbox'] {
-              float: left;
-            }
-          }
-          .forms__btn-submit {
-            float: left;
-            width: 5%;
-            @include webkitBrowser() {
-              width: 8%;
-            }
-            @include safariOnly() {
-              width: 5%;
-            }
-          }
+        footer {
         }
       }
-
-      // @include form-btns();
     }
   }
 } // .signee-container
