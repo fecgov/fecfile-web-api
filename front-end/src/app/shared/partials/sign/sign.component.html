@@ -33,8 +33,9 @@
         </div>
       </div>
       <div class="grid-row"
-        *ngIf="(frmSignee.controls.signee.valid) && frmSaved">
-          <div class="grid-row__col grid-row__col--12">
+        *ngIf="(frmSignee.controls.signee.valid) && frmSaved"
+      >
+          <div class="grid-row__col grid-row__col--12" [hidden]="hideText">
             <div class="text-info text-center">
               Form {{ form_type }} has been successfully saved.
             </div>
@@ -43,7 +44,25 @@
       <form [formGroup]="frmSignee" (ngSubmit)="doSubmitForm()">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--6">
-            <h4>Signee*</h4>
+            <ng-template #tipContent>
+              FEC Form 9 must be signed by the person making the electioneering communication, who is making a verified certification under penalty of perjury that the statement is correct.             
+            </ng-template>            
+            <h4>
+              Signee*
+              <button 
+                type="button" 
+                class="btn btn-info"
+                [ngbTooltip]="tipContent"
+                #t2="ngbTooltip"
+                (click)="toggleToolTip(t2)"
+                triggers="manual"
+                tooltipClass="custom-tooltip-class"
+                placement="right"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>              
+            </h4>
             <div>
               <label>
                 <input
@@ -106,59 +125,65 @@
                 </div>
               </div>
             </div>
+            <hr />
           </div>
         </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <div class="forms__btn-row">
-                <div class="forms__btn-right">
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-right"
-                    (click)="saveForm()"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-              <hr />
-              <div class="forms__btn-row">
-                <div class="forms__btn-previous">
-                  <button
-                    type="button"
-                    class="btn btn-previous btn-left"
-                    (click)="goToPreviousStep()"
-                  >
-                    Previous
-                  </button>
-                </div>
-                <div class="forms__agreement-text">
-                  <input
-                    type="checkbox"
-                    id="agreement"
-                    name="agree"
-                    value="yes"
-                    formControlName="agreement"
-                  />
-                  <label class="agreement__text" for="agreement">
-                    I certify that I have examined this statement
-                    and to the best of my knowledge and belief it
-                    is true, correct, and complete.
-                  </label>
-                </div>
-                <div class="forms__btn-submit">
-                  <button
-                    type="submit"
-                    class="btn btn-submit btn-right"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
+        <footer>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <button
+                type="button"
+                class="btn btn-secondary btn-right"
+                (click)="saveForm()"
+              >
+                Save
+              </button>             
             </div>
-          </div> <!-- ./grid-row__col -->
-        </div> <!-- ./grid-row -->
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <hr />
+              <div class="forms__agreement-text">
+                <input
+                  type="checkbox"
+                  id="agreement"
+                  name="agree"
+                  value="yes"
+                  formControlName="agreement"
+                />
+                <label class="agreement__text" for="agreement">
+                  I certify that I have examined this statement
+                  and to the best of my knowledge and belief it
+                  is true, correct, and complete.
+                </label>
+              </div>              
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <hr />
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--6">
+              <button
+                type="button"
+                class="btn btn-previous btn-left"
+                (click)="goToPreviousStep()"
+              >
+                Previous
+              </button>              
+            </div>
+            <div class="grid-row__col grid-row__col--6">
+              <button
+                type="submit"
+                class="btn btn-submit btn-right"
+              >
+                Submit
+              </button>              
+            </div>
+          </div>
+        </footer>
       </form>
     </div> <!-- ./content -->
   </section>

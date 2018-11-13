@@ -6,9 +6,33 @@
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
+      padding-left: 0;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 0;
+    }     
     .app__side-nav {
       left: 0;
     }
+  }
+  &.dashboard.active {
+    padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
+      padding-left: 200px;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 200px;
+    }     
+    .app__side-nav {
+      left: 0;
+    }    
   }
  .app__top {
     background-color: $dustyGray;
@@ -22,7 +46,19 @@
       background-color: $dustyGray;
       height: 60px;
       margin: 0 !important;
-      padding: 0 !important;          
+      padding: 0 !important;      
+      .navbar-toggler {
+        padding-right: 20px;
+        @include media(tablet) {
+          padding-right: 10px;
+        }
+        @include media(mediumDesktop) {
+          padding-right: 0;
+        }         
+        @include media(largeDesktop) {
+          padding-right: 0;
+        }         
+      } 
       .app__top-logo { 
         margin: 0 !important;
         padding: 0 !important;
@@ -94,10 +130,55 @@
   main {
     height: 98%;
     .app__content-wrapper {
+      background-color: $mercury;
+      margin: 0 auto;
+      padding-left: 50px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
-      width: 100%;
       z-index: 0;
+      .app__committee-info {
+        background-color: $mercury;
+        height: 90px;
+        padding-left: 60px;
+        padding-right: 60px;
+        padding-top: 35px;
+        position: relative;
+        vertical-align: bottom;
+        @include media(tablet) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }
+        @include media(mediumDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
+        @include media(largeDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
+        .committee-name,
+        .committee-id {
+          display: inline-block;
+          //height: 100%;
+          position: relative;
+        }
+        .committee-id {
+          font-size: 1.5em;
+          margin-right: 25px;
+        }
+        .committee-name {
+          font-size: 1em;
+        }
+        @include clearfix();
+      }
+      .app__content {
+        background-color: $white;
+        margin: 0 auto;
+        width: 90%;
+      }
     }
   }      
 }

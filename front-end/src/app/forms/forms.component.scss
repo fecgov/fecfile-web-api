@@ -2,61 +2,28 @@
 
 .forms-container {
   bottom: 0;
-	color: $black;
+  color: $black;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   position: relative;
   width: 100%;
-  .main-content {
+  .forms-container__main {
     display: flex;
-    flex: 1;
-    padding-left: 20%;
+    padding-left: 10px;
     width: 100%;
     @include media(tablet) {
-      padding-left: 20%;
+      padding-left: 0;
     }
     @include media(mediumDesktop) {
+      flex: 1;
       padding-left: 0;
     }         
     @include media(largeDesktop) {
+      flex: 1;
       padding-left: 0;
     }     
-    .form__alerts {
-      background-color: $bombay;
-      display: none;
-      &.show-alerts {
-        @include media(tablet) {
-        
-        }
-        @include media(mediumDesktop) {
-          padding-left: 60px;
-          width: 300px;         
-        }         
-        @include media(largeDesktop) {
-          padding-left: 60px;
-          width: 300px; 
-        }         
-      }
-      @include media(tablet) {
-        display: none;
-      }
-      @include media(mediumDesktop) {
-        display: inline-block;
-        float: left;
-        min-height: 100%;
-        position: relative;
-        width: 100px;      
-      }         
-      @include media(largeDesktop) {
-        display: inline-block;
-        float: left;
-        min-height: 100%;
-        position: relative;
-        width: 100px;      
-      }       
-    }
-    .form__content {
+    .form__main-content {
       float: left;
       min-height: 100%;
       width: 100%;

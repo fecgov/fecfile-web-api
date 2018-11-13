@@ -4,15 +4,43 @@
   header {
     .header-container {
       display: block;
-      width: 100%;
+      width: 80%;
+      @include media(tablet) {
+        width: 100%;
+      }
+      @include media(mediumDesktop) {
+        width: 100%;
+      }         
+      @include media(largeDesktop) {
+        width: 100%;
+      }       
       .header__text {
         float: left;
-        width: 72%
+        width: 70%;
+        @include media(tablet) {
+          width: 50%;
+        }
+        @include media(mediumDesktop) {
+          width: 50%;
+        }         
+        @include media(largeDesktop) {
+          width: 50%;
+        }         
       }
       .header__btns {
-        float: right;
+        float: left;
         padding-top: 15px;
-        width: 25%;
+        text-align: right;
+        width: 30%;
+        @include media(tablet) {
+          width: 50%;
+        }
+        @include media(mediumDesktop) {
+          width: 50%;
+        }         
+        @include media(largeDesktop) {
+          width: 50%;
+        }         
         .btn-print-preview {
           @extend .btn-secondary-gray;
           margin-right: 5px;
