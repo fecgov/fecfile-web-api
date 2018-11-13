@@ -33,8 +33,9 @@
         </div>
       </div>
       <div class="grid-row"
-        *ngIf="(frmSignee.controls.signee.valid) && frmSaved">
-          <div class="grid-row__col grid-row__col--12">
+        *ngIf="(frmSignee.controls.signee.valid) && frmSaved"
+      >
+          <div class="grid-row__col grid-row__col--12" [hidden]="hideText">
             <div class="text-info text-center">
               Form {{ form_type }} has been successfully saved.
             </div>

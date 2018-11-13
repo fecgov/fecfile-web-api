@@ -24,6 +24,7 @@ export class SignComponent implements OnInit {
   public frmSaved: boolean = false;
   public frmSignee: FormGroup;
   public date_stamp: Date = new Date();
+  public hideText: boolean = false;
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -129,7 +130,7 @@ export class SignComponent implements OnInit {
       this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-
+      
       this._formsService
         .saveForm({}, this.form_type)
         .subscribe(res => {
@@ -226,12 +227,14 @@ export class SignComponent implements OnInit {
    *
    */
   public goToPreviousStep(): void {
-      this.status.emit({
-        form: {},
-        direction: 'previous',
-        step: 'step_3',
-        previousStep: this._step
-      });
+    this.frmSaved = false;
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_3',
+      previousStep: this._step
+    });
   }
 
 }

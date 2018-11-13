@@ -29,6 +29,7 @@ export class FormComponent implements OnInit {
   public previousStep: string = '';
   public isLoading: boolean = true;
   public committee_details: any = {};
+  public showValidateBar: boolean = false;
 
   private _committee_details: any = {};
   private _form99_details: any = {};
@@ -110,6 +111,14 @@ export class FormComponent implements OnInit {
             this.step = this._activatedRoute.snapshot.queryParams.step;
           }
           window.scrollTo(0, 0);
+        }
+      });
+  
+    this._messageService
+      .getMessage()
+      .subscribe(res => {
+        if(res.validateMessage) {
+          this.showValidateBar = res.validateMessage.showValidateBar;
         }
       });
   }

@@ -32,6 +32,7 @@ export class ReasonComponent implements OnInit {
   public isFiled: boolean = false;
   public characterCount: number = 0;
   public formSaved: boolean = false;
+  public hideText: boolean = false;
 
   private _form_99_details: any = {}
   private _editorMax: number = 20000;
@@ -158,6 +159,7 @@ export class ReasonComponent implements OnInit {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
+        this.hideText = true; 
 
         this.status.emit({
           form: this.frmReason,
@@ -185,6 +187,9 @@ export class ReasonComponent implements OnInit {
   }
 
   public previousStep(): void {
+    this.hideText = true;
+    this.formSaved = false;
+    
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -205,6 +210,8 @@ export class ReasonComponent implements OnInit {
         this._form_99_details.text = this.reasonText;
 
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+
+        this.hideText = true;
 
         this._formsService
           .saveForm({}, this._form_type)
