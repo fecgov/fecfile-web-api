@@ -8,8 +8,10 @@
   .form__alerts {
     background-color: $bombay;
     &.show-alerts {
+      display: none;
       padding-left: 0;
       @include media(tablet) {
+        display: none;
         padding-left: 0;
       }
       @include media(mediumDesktop) {
