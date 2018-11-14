@@ -2,27 +2,31 @@
 
 .forms-container {
   bottom: 0;
-	color: $black;
+  color: $black;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   position: relative;
   width: 100%;
-  .main-content {
+  .forms-container__main {
     display: flex;
-    flex: 1;
+    padding-left: 10px;
     width: 100%;
-    .form__alerts {
-      background-color: $bombay;
-      float: left;
-      min-height: 100%;
-      position: relative;
-      width: 20%;
+    @include media(tablet) {
+      padding-left: 0;
     }
-    .form__content {
+    @include media(mediumDesktop) {
+      flex: 1;
+      padding-left: 0;
+    }         
+    @include media(largeDesktop) {
+      flex: 1;
+      padding-left: 0;
+    }     
+    .form__main-content {
       float: left;
       min-height: 100%;
-      width: 75%;
+      width: 100%;
       .grid-row {
         margin: 0;
         .grid-row__col {

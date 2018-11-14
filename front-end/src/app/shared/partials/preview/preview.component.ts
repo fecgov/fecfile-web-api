@@ -37,20 +37,31 @@ export class PreviewComponent implements OnInit {
         .subscribe(res => {
           this._step = res.step;
 
-          this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+          this.form_details = res.data;
 
           this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
           if(this.form_type === '99') {
-            if(this.form_details !== null) {
-              if(this.form_details.reason !== null) {
+            if(typeof this.form_details !== 'undefined') {
+              if(typeof this.form_details.reason !== 'undefined') {
                 this.type_selected = this.form_details.reason;
               }              
             }
           }
         });
+  }
 
-
+  ngDoCheck(): void {
+    if(!this.form_details) {
+      if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
+        this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+        if(this.form_type === '99') {
+          if(!this.type_selected) {
+            this.type_selected = this.form_details.reason;
+          } 
+        }
+      }
+    }
   }
 
   public goToPreviousStep(): void {

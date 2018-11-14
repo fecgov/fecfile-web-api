@@ -1,5 +1,15 @@
 <aside>
   <div class="sidebar">
+    <div class="sidebar__toggle">
+      <a class="toggle-sidebar"
+        role="button"
+        (click)="toggleSideNav()"
+      >
+        <i [ngClass]="iconClass">
+          <span class="sr-only">Toggle Sidebar</span>
+        </i>
+      </a>           
+    </div>    
     <nav>
       <div class="sidebar__nav">
         <div class="sidebar__nav--header">

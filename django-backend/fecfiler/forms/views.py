@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import CommitteeInfo, Committee
-from .serializers import CommitteeInfoSerializer, CommitteeSerializer
+from .serializers import CommitteeInfoSerializer, CommitteeSerializer, CommitteeInfoListSerializer
 import json
 import os
 import requests
@@ -350,8 +350,12 @@ def validate_f99(request):
     else:
         return JsonResponse(errormess, status=400, safe=False)
 
+
 @api_view(['GET'])
 def get_rad_analyst_info(request):
+    """
+    ref: #https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=DEMO_KEY&sort_hide_null=false&sort_null_only=false
+    """
     if request.method == 'GET':
         try:
             #import ipdb; ipdb.set_trace();
@@ -364,4 +368,24 @@ def get_rad_analyst_info(request):
             return JsonResponse({"ERROR":"ERR_f99_03: Unexpected Error. Please contact administrator."})
             
             
-    #https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=DEMO_KEY&sort_hide_null=false&sort_null_only=false
+
+
+
+@api_view(['GET'])
+def get_form99list(request):
+    """
+    fields for auto populating the form 99 reports data 
+    """
+    try:
+        
+        comm = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True)
+        
+    except CommitteeInfo.DoesNotExist:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    # get details of a form 99 records
+    if request.method == 'GET':
+        
+        serializer = CommitteeInfoListSerializer(comm)
+        return Response(serializer.data)    
+

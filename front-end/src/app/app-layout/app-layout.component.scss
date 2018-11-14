@@ -3,58 +3,182 @@
 .app-container {
   color: $black;
   height: 100%;
-  padding-left: $sideBarWidth;
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
+      padding-left: 0;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 0;
+    }     
     .app__side-nav {
       left: 0;
     }
   }
-  .app__top {
-    left: 0;
+  &.dashboard.active {
+    padding-left: 0;
+    @include media(tablet) {
+      padding-left: 0
+    }
+    @include media(mediumDesktop) {
+      padding-left: 200px;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 200px;
+    }     
+    .app__side-nav {
+      left: 0;
+    }    
+  }
+ .app__top {
+    background-color: $dustyGray;
+    height: 60px;
     position: fixed;
     right: 0;
     vertical-align: middle;
     width: 100%;
-    z-index: 1;
-    .app__top-logo {
-      float: left;
-      margin-right: 25px;
-      width: auto;
-      img {
-        padding-top: 5px;
-        width: 350px;
+    z-index: 1001;    
+    .navbar {
+      background-color: $dustyGray;
+      height: 60px;
+      margin: 0 !important;
+      padding: 0 !important;      
+      .navbar-toggler {
+        padding-right: 20px;
+        @include media(tablet) {
+          padding-right: 10px;
+        }
+        @include media(mediumDesktop) {
+          padding-right: 0;
+        }         
+        @include media(largeDesktop) {
+          padding-right: 0;
+        }         
+      } 
+      .app__top-logo { 
+        margin: 0 !important;
+        padding: 0 !important;
+        img {
+          width: 250px;
+          @include media(tablet) {
+            width: 270px;
+          }
+          @include media(mediumDesktop) {
+            width: 280px;
+          }         
+          @include media(largeDesktop) {
+            width: 350px;
+          }           
+        }
+      } // .app__top-logo
+      .app__top-nav {
+        float: left;
+        width: auto;
+        &.toggleMenuStyle {  
+          background: $dustyGray;
+          display: block;
+          float: none;
+          height: 335px;
+          position: absolute;
+          top: 60px;
+          width: 100%;
+          @include media(tablet) {
+            display: block;
+            float: none;
+            height: 335px;
+            position: absolute;
+            top: 60px;
+            width: 100%;
+          }
+          @include media(mediumDesktop) {
+            height: 60px;
+            position: relative;
+            top: 0;
+          }         
+          @include media(largeDesktop) {
+            height: 60px;
+            position: relative;
+            top: 0;
+          }                 
+        }        
+        @include media(mediumDesktop) {
+          width: auto;
+        }           
+        @include media(mediumDesktop) {
+          width: 65%;
+        }         
+        @include media(largeDesktop) {
+          width: 73%;
+        }         
       }
-    } // .app__top-logo
-    .app__side-nav-toggle {
-      float: left;
-      padding-top: 20px;
-      .side-nav-toggle {
-        color: $black;
-        cursor: pointer;
-        text-decoration: none;
-      }
-    }// .app__side-nav-toggle
+    } 
     @include clearfix();
-  } // .app__top
+  } // .app__top  
   .app__side-nav {
     height: 100%;
-    left: $sideBarWidth;
-    margin-left: -$sideBarWidth;
+    left: -245px;
     position: fixed;
-    top: 25px;
+    top: 60px;
     transition: all 0.4s ease 0s;
     width: $sideBarWidth;
     z-index: 1000;
-  } // .app__side-nav
+  } // .app__side-nav  
   main {
     height: 98%;
     .app__content-wrapper {
-      //height: 95%;
+      background-color: $mercury;
+      margin: 0 auto;
+      padding-left: 50px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
-      width: 100%;
+      z-index: 0;
+      .app__committee-info {
+        background-color: $mercury;
+        height: 90px;
+        padding-left: 60px;
+        padding-right: 60px;
+        padding-top: 35px;
+        position: relative;
+        vertical-align: bottom;
+        @include media(tablet) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }
+        @include media(mediumDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
+        @include media(largeDesktop) {
+          height: 60px;
+          line-height: 60px;
+          padding-top: 0;
+        }         
+        .committee-name,
+        .committee-id {
+          display: inline-block;
+          //height: 100%;
+          position: relative;
+        }
+        .committee-id {
+          font-size: 1.5em;
+          margin-right: 25px;
+        }
+        .committee-name {
+          font-size: 1em;
+        }
+        @include clearfix();
+      }
+      .app__content {
+        background-color: $white;
+        margin: 0 auto;
+        width: 90%;
+      }
     }
-  }
+  }      
 }

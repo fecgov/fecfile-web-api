@@ -16,7 +16,10 @@
     padding-right: 5px;
   }
   .icon-link-text {
-    display: none;
+    display: inline;
+    &:hover {
+      text-decoration: underline;
+    }    
     @include media(tablet) {
       display: inline;
       &:hover {

@@ -9,7 +9,9 @@ import { MessageService } from '../../services/MessageService/message.service';
 })
 export class ValidateComponent implements OnInit {
 
-  public validate_results: any = {};
+  public validateResults: any = {};
+  public showValidateBar: boolean = false;
+  public showValidateResults: boolean = false;
 
   constructor(
     private _messageService: MessageService
@@ -19,7 +21,11 @@ export class ValidateComponent implements OnInit {
     this._messageService
       .getMessage()
       .subscribe(res => {
-        this.validate_results = res.validate;
+        if(typeof res.validateMessage === 'object') {
+          this.showValidateResults = true;
+          this.validateResults = res.validateMessage.validate;
+          this.showValidateBar = res.validateMessage.showValidateBar;          
+        }
       });
   }
 
