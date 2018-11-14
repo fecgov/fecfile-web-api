@@ -103,7 +103,7 @@ def update_f99_info(request):
 @api_view(['POST'])
 def submit_comm_info(request):
     """
-    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
+    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details.Call the data_receive API and fetch the response
     """
     #import ipdb; ipdb.set_trace()
     #if request.method == 'POST':
