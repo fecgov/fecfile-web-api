@@ -1,6 +1,8 @@
 @import '../../../shared/scss/global';
 
 .reason-container {
+  display: block;
+  height: 100%;
   header {
     .header-container {
       display: block;
@@ -15,30 +17,47 @@
         width: 100%;
       }       
       .header__text {
-        float: left;
-        width: 70%;
+        float: none;
+        display: block;
+        font-size: 0.85em;
+        width: 100%;
         @include media(tablet) {
-          width: 50%;
+          float: none;
+          font-size: 0.85em;
+          display: block;
+          width: 100%;
         }
         @include media(mediumDesktop) {
+          float: left;
+          font-size: 1em;
           width: 50%;
         }         
         @include media(largeDesktop) {
+          float: left;
+          font-size: 1em;
           width: 50%;
         }         
       }
       .header__btns {
-        float: left;
+        display: block;
+        float: none;
         padding-top: 15px;
-        text-align: right;
-        width: 30%;
+        text-align: left;
+        width: 100%;
         @include media(tablet) {
-          width: 50%;
+          display: block;
+          float: none;
+          text-align: left;
+          width: 100%;
         }
         @include media(mediumDesktop) {
+          float: left;
+          text-align: right;
           width: 50%;
         }         
         @include media(largeDesktop) {
+          float: left;
+          text-align: right;
           width: 50%;
         }         
         .btn-print-preview {
@@ -59,6 +78,38 @@
     .content {
       display: block;
       width: 100%;
+      .validate__form {
+        &.show-alerts {
+          display: block;
+          @include media(tablet) {
+            display: block;
+          }
+          @include media(mediumDesktop) {
+            display: none;
+          }         
+          @include media(largeDesktop) {
+            display: none;
+          }           
+        }
+        background-color: $bombay;
+        display: none;
+        height: 80px;
+        margin-top: 10px;
+        width: 100%;
+        @include media(tablet) {
+          background-color: $bombay;
+          display: none;
+          height: 80px;
+          margin-top: 10px;
+          width: 100%;        
+        }
+        @include media(mediumDesktop) {
+          display: none;
+        }         
+        @include media(largeDesktop) {
+          display: none;
+        }         
+      }      
       .rich-text-editor {
         margin-left: auto;
         margin-right: auto;

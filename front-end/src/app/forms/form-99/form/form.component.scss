@@ -12,7 +12,6 @@
       padding-left: 0;
       @include media(tablet) {
         display: none;
-        padding-left: 0;
       }
       @include media(mediumDesktop) {
         display: inline-block;
@@ -26,9 +25,7 @@
       }         
     }    
     @include media(tablet) {
-      display: block;
-      height: 40px;
-      width: 100%;
+      display: none;
     }
     @include media(mediumDesktop) {
       display: inline-block;
@@ -54,8 +51,16 @@
   .form__container {
     height: 100vh;
     float: left;
-    margin-left: 5px;
-    width: 90%;
+    width: 99%;
+    @include media(tablet) {
+      width: 99%;
+    }
+    @include media(mediumDesktop) {
+      width: 85%;
+    }         
+    @include media(largeDesktop) {
+      width: 90%;
+    }     
     &.show-alerts {
       padding-left: 0;
       @include media(tablet) {
@@ -63,7 +68,7 @@
       }
       @include media(mediumDesktop) {
         margin-left: 5px;
-        width: 76%;         
+        width: 70%;         
       }         
       @include media(largeDesktop) {
         margin-left: 5px;
@@ -71,7 +76,12 @@
       }         
     }      
     .form__content {
-      width: 100%;    
+      height: 100%;
+      width: 100%; 
+      .form__step {
+        height: 100%;
+        width: 100%;         
+      }   
     }
   } // .form__container
   @include clearfix();
