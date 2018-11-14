@@ -2,7 +2,7 @@
 
 .app-container {
   color: $black;
-  height: 100%;
+  min-height: 100vh;
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
