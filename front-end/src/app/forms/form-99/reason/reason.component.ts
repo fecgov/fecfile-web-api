@@ -33,6 +33,7 @@ export class ReasonComponent implements OnInit {
   public characterCount: number = 0;
   public formSaved: boolean = false;
   public hideText: boolean = false;
+  public showValidateBar: boolean = false;
 
   private _form_99_details: any = {}
   private _editorMax: number = 20000;
@@ -159,7 +160,17 @@ export class ReasonComponent implements OnInit {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
-        this.hideText = true; 
+        this.hideText = true;
+
+        this.showValidateBar = false; 
+
+        this._messageService
+          .sendMessage({
+            'validateMessage': {
+              'validate': '',
+              'showValidateBar': false                  
+            }            
+          });          
 
         this.status.emit({
           form: this.frmReason,
@@ -189,6 +200,16 @@ export class ReasonComponent implements OnInit {
   public previousStep(): void {
     this.hideText = true;
     this.formSaved = false;
+
+    this.showValidateBar = false;
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false                  
+        }            
+      });    
     
     this.status.emit({
       form: {},
@@ -212,6 +233,8 @@ export class ReasonComponent implements OnInit {
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 
         this.hideText = true;
+
+        this.showValidateBar = false;
 
         this._formsService
           .saveForm({}, this._form_type)
@@ -242,6 +265,8 @@ export class ReasonComponent implements OnInit {
     this._form_99_details.text = this.frmReason.get('reasonText').value;
 
     localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+
+    this.showValidateBar = true;
 
     this._formsService
       .validateForm({}, this._form_type)

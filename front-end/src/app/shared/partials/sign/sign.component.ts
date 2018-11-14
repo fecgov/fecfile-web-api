@@ -25,6 +25,7 @@ export class SignComponent implements OnInit {
   public frmSignee: FormGroup;
   public date_stamp: Date = new Date();
   public hideText: boolean = false;
+  public showValidateBar: boolean = false;
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -93,6 +94,7 @@ export class SignComponent implements OnInit {
    *
    */
   public validateForm(): void {
+    this.showValidateBar = true;
     this._formsService
       .validateForm({}, this.form_type)
       .subscribe(res => {
@@ -194,6 +196,14 @@ export class SignComponent implements OnInit {
           });
       }
 
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': '',
+            'showValidateBar': false                  
+          }            
+        });            
+
       this._formsService
         .submitForm({}, this.form_type)
         .subscribe(res => {
@@ -235,6 +245,14 @@ export class SignComponent implements OnInit {
       step: 'step_3',
       previousStep: this._step
     });
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': '',
+          'showValidateBar': false                  
+        }            
+      });          
   }
 
 }

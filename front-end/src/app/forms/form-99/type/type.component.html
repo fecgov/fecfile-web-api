@@ -1,221 +1,236 @@
 <div class="form__type-container">
   <div class="form__type">
     <form [formGroup]="frmType" (ngSubmit)="doValidateType()" (blur)="doValidateType()">
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+      <header>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
             <h1 class="text-left" *ngIf="!typeSelected">
               Type
             </h1>
             <h1 class="text-left" *ngIf="typeSelected">
               Form 99 / {{ typeSelected }}
-            </h1>
-            <hr/>
-            <div class="text-error text-center" 
-              *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
-              You must select a type for filing.
-            </div>
-            <ul class="type-list">
-              <li class="type-item"
-                [ngClass]="typeSelected === 'mst'? 'selected' : ''">
-                <div class="type-item__box">
-                  <div class="type-item__box--top">
-                    <input
-                      type="radio"
-                      id="mst-radio"
-                      value="MST"
-                      formControlName="reasonTypeRadio"
-                    />
-                    <label
-                      for="mst-radio"
-                      class="type-text"
-                      (click)="updateTypeSelected('MST')"
-                    >
-                      MST – Miscellaneous Report to FEC
-                    </label>
-                    <div
-                      class="type-radio"
-                      data-value="MST"
-                      (click)="updateTypeSelected('MST')"
-                    ></div>
-                    <div class="type__info">
-                      <button
-                        type="button"
-                        class="btn btn-link"
-                        aria-controls="mst_collapse"
-                        (click)="(mstCollapse.isExpanded)? mstCollapse.hide() : mstCollapse.show()"
-                      >
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="type-item__box--botom">
-                    <div id="mst_collapse" #mstCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
-                      <div class="well well-lg">
-                        A Miscellaneous Text Submission (Form 99) may be used for narrative responses that do not affect actual entries within a report (for example, when outlining the committee’s procedures for making “best efforts” to obtain contributor information.)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li class="type-item" [ngClass]="typeSelected === 'msm'? 'selected' : ''">
-                <div class="type-item__box">
-                  <div class="type-item__box--top">
-                    <input
-                      type="radio"
-                      id="msm-radio"
-                      value="MSM"
-                      formControlName="reasonTypeRadio"
-                    />
-                    <label
-                      for="msm-radio"
-                      class="type-text"
-                      (click)="updateTypeSelected('MSM')"
-                    >
-                      MSM – Filing Frequency Chance Notice
-                    </label>
-                    <div
-                      class="type-radio"
-                      data-value="msm"
-                      (click)="updateTypeSelected('MSM')"
-                    ></div>
-                    <div class="type__info">
-                      <button
-                        type="button"
-                        class="btn btn-link"
-                        aria-controls="msm_collapse"
-                        (click)="(msmCollapse.isExpanded)? msmCollapse.hide() : msmCollapse.show()"
-                      >
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="type-item__box--botom">
-                    <div id="msm_collapse" #msmCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
-                      <div class="well well-lg">
-                        Notification to the FEC in writing where committees may change their filing schedule from quarterly to monthly (or vice versa) only once per calendar year.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li class="type-item"
-                [ngClass]="typeSelected === 'msi'? 'selected' : ''">
-                <div class="type-item__box">
-                  <div class="type-item__box--top">
-                    <input
-                      type="radio"
-                      id="msi-radio"
-                      value="MSI"
-                      formControlName="reasonTypeRadio"
-                    />
-                    <label
-                      for="msi-radio"
-                      class="type-text"
-                      (click)="updateTypeSelected('MSI')"
-                    >
-                      MSI – Disavowal Response
-                    </label>
-                    <div
-                      class="type-radio"
-                      data-value="MSI"
-                      (click)="updateTypeSelected('MSI')"
-                    ></div>
-                    <div class="type__info">
-                      <button
-                        type="button"
-                        class="btn btn-link"
-                        aria-controls="msi_collapse"
-                        (click)="(msiCollapse.isExpanded)? msiCollapse.hide(): msiCollapse.show()"
-                      >
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="type-item__box--botom">
-                    <div id="msi_collapse" #msiCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
-                      <div class="well well-lg">
-                        A letter to the FEC where a candidate disavows unauthorized campaign activity within 30 days after being notified by the agency that another person or group has received contributions or made expenditures of more than $5,000 on the individual’s behalf. 100.3(a)(3) and 102.13(a)(2).
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li class="type-item"  [ngClass]="typeSelected === 'msw'? 'selected' : ''">
-                <div class="type-item__box">
-                  <div class="type-item__box--top">
-                    <input
-                      type="radio"
-                      id="msw-radio"
-                      value="MSW"
-                      formControlName="reasonTypeRadio"
-                    />
-                    <label
-                      for="msw-radio"
-                      class="type-text"
-                      (click)="updateTypeSelected('MSW')"
-                    >
-                      MSW - C1 Loan Agreement
-                    </label>
-                    <div
-                      class="type-radio"
-                      data-value="MSW"
-                      (click)="updateTypeSelected('MSW')"
-                    >
-                    </div>
-                    <div class="type__info">
-                      <button
-                        type="button"
-                        class="btn btn-link"
-                        aria-controls="msw_collapse"
-                        (click)="(mswCollapse.isExpanded)? mswCollapse.hide(): mswCollapse.show()"
-                      >
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="type-item__box--botom">
-                    <div id="msw_collapse" #mswCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
-                      <div class="well well-lg">
-                        Loans and Line of Credit from Lending Institutions, including copies of loan agreements.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            </h1>            
+          </div>
         </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12 text-center">
-            <div class="forms__btn-container">
-              <button
-                class="btn btn-default btn-left"
-                type="button"
-                (click)="cancel()"
-              >
-                Cancel
-              </button>
-              <button
-                class="btn btn-primary btn-right"
-                type="submit"
-              >
-                Next
-              </button>
+      </header>
+      <section>
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="text-error text-center" 
+                *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
+                You must select a type for filing.
+              </div>
             </div>
+          </div>  
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <ul class="type-list">
+                <li class="type-item"
+                  [ngClass]="typeSelected === 'mst'? 'selected' : ''">
+                  <div class="type-item__box">
+                    <div class="type-item__box--top">
+                      <input
+                        type="radio"
+                        id="mst-radio"
+                        value="MST"
+                        formControlName="reasonTypeRadio"
+                      />
+                      <label
+                        for="mst-radio"
+                        class="type-text"
+                        (click)="updateTypeSelected('MST')"
+                      >
+                        MST – Miscellaneous Report to FEC
+                      </label>
+                      <div
+                        class="type-radio"
+                        data-value="MST"
+                        (click)="updateTypeSelected('MST')"
+                      ></div>
+                      <div class="type__info">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          aria-controls="mst_collapse"
+                          (click)="(mstCollapse.isExpanded)? mstCollapse.hide() : mstCollapse.show()"
+                        >
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="type-item__box--botom">
+                      <div id="mst_collapse" #mstCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
+                        <div class="well well-lg">
+                          A Miscellaneous Text Submission (Form 99) may be used for narrative responses that do not affect actual entries within a report (for example, when outlining the committee’s procedures for making “best efforts” to obtain contributor information.)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="type-item" [ngClass]="typeSelected === 'msm'? 'selected' : ''">
+                  <div class="type-item__box">
+                    <div class="type-item__box--top">
+                      <input
+                        type="radio"
+                        id="msm-radio"
+                        value="MSM"
+                        formControlName="reasonTypeRadio"
+                      />
+                      <label
+                        for="msm-radio"
+                        class="type-text"
+                        (click)="updateTypeSelected('MSM')"
+                      >
+                        MSM – Filing Frequency Chance Notice
+                      </label>
+                      <div
+                        class="type-radio"
+                        data-value="msm"
+                        (click)="updateTypeSelected('MSM')"
+                      ></div>
+                      <div class="type__info">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          aria-controls="msm_collapse"
+                          (click)="(msmCollapse.isExpanded)? msmCollapse.hide() : msmCollapse.show()"
+                        >
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="type-item__box--botom">
+                      <div id="msm_collapse" #msmCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
+                        <div class="well well-lg">
+                          Notification to the FEC in writing where committees may change their filing schedule from quarterly to monthly (or vice versa) only once per calendar year.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="type-item"
+                  [ngClass]="typeSelected === 'msi'? 'selected' : ''">
+                  <div class="type-item__box">
+                    <div class="type-item__box--top">
+                      <input
+                        type="radio"
+                        id="msi-radio"
+                        value="MSI"
+                        formControlName="reasonTypeRadio"
+                      />
+                      <label
+                        for="msi-radio"
+                        class="type-text"
+                        (click)="updateTypeSelected('MSI')"
+                      >
+                        MSI – Disavowal Response
+                      </label>
+                      <div
+                        class="type-radio"
+                        data-value="MSI"
+                        (click)="updateTypeSelected('MSI')"
+                      ></div>
+                      <div class="type__info">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          aria-controls="msi_collapse"
+                          (click)="(msiCollapse.isExpanded)? msiCollapse.hide(): msiCollapse.show()"
+                        >
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="type-item__box--botom">
+                      <div id="msi_collapse" #msiCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
+                        <div class="well well-lg">
+                          A letter to the FEC where a candidate disavows unauthorized campaign activity within 30 days after being notified by the agency that another person or group has received contributions or made expenditures of more than $5,000 on the individual’s behalf. 100.3(a)(3) and 102.13(a)(2).
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="type-item"  [ngClass]="typeSelected === 'msw'? 'selected' : ''">
+                  <div class="type-item__box">
+                    <div class="type-item__box--top">
+                      <input
+                        type="radio"
+                        id="msw-radio"
+                        value="MSW"
+                        formControlName="reasonTypeRadio"
+                      />
+                      <label
+                        for="msw-radio"
+                        class="type-text"
+                        (click)="updateTypeSelected('MSW')"
+                      >
+                        MSW - C1 Loan Agreement
+                      </label>
+                      <div
+                        class="type-radio"
+                        data-value="MSW"
+                        (click)="updateTypeSelected('MSW')"
+                      >
+                      </div>
+                      <div class="type__info">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          aria-controls="msw_collapse"
+                          (click)="(mswCollapse.isExpanded)? mswCollapse.hide(): mswCollapse.show()"
+                        >
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="type-item__box--botom">
+                      <div id="msw_collapse" #mswCollapse="bs-collapse" class="collapse-text" [collapse]="!isOpen">
+                        <div class="well well-lg">
+                          Loans and Line of Credit from Lending Institutions, including copies of loan agreements.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>                  
         </div>
-      </div>
+      </section>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12 text-center">
+              <div class="forms__btn-container">
+                <button
+                  class="btn btn-default btn-left"
+                  type="button"
+                  (click)="cancel()"
+                >
+                  Cancel
+                </button>
+                <button
+                  class="btn btn-primary btn-right"
+                  type="submit"
+                >
+                  Next
+                </button>
+              </div>
+          </div>
+        </div>        
+      </footer>
     </form>
   </div> <!-- ./form__type -->
 </div> <!-- ./form__type-container -->

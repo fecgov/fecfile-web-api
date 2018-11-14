@@ -22,9 +22,13 @@ export class ValidateComponent implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(typeof res.validateMessage === 'object') {
-          this.showValidateResults = true;
-          this.validateResults = res.validateMessage.validate;
-          this.showValidateBar = res.validateMessage.showValidateBar;          
+          if(res.validateMessage.showValidateBar) {
+            this.showValidateResults = true;
+            this.validateResults = res.validateMessage.validate;
+            this.showValidateBar = res.validateMessage.showValidateBar;              
+          } else {
+            this.showValidateResults = false;
+          }
         }
       });
   }
