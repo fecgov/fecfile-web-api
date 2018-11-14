@@ -89,39 +89,39 @@
       </div> <!-- ./content -->
     </section>
     <footer>
+      <div class="grid-row btn-row">
+        <div class="grid-row__col--12">
+          <hr />
+          <button 
+            class="btn btn-secondary btn-right" 
+            type="button"
+            (click)="saveForm()"
+            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+          >
+            Save 
+          </button>     
+        </div>
+      </div> 
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <div class="forms__btn-container">
-            <div class="btn-container-row">
-              <div>
-                <hr/>
-                <button
-                  type="button"
-                  class="btn btn-secondary btn-right"
-                  (click)="saveForm()"
-                  [disabled]="frmReason.controls.reasonText.errors?.requiredLengt"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-            <button
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-previous btn-left" 
               type="button"
-              class="btn btn-previous btn-left"
               (click)="previousStep()"
             >
-              Previous
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary btn-right"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
-            >
-              Next
-            </button>
-          </div>
+              Previous 
+            </button>          
         </div>
-      </div>      
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-primary btn-right" 
+              type="submit"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            > 
+              Next
+            </button>          
+        </div>
+      </div> 
     </footer>
   </form>
 </div> <!-- ./reason-container -->

@@ -80,7 +80,17 @@
       width: 100%; 
       .form__step {
         height: 100%;
-        width: 100%;         
+        padding-left: 0;
+        width: 100%;     
+        @include media(tablet) {
+          padding-left: 0;
+        }
+        @include media(mediumDesktop) {
+          padding-left: 5px;
+        }         
+        @include media(largeDesktop) {
+          padding-left: 5px;
+        }             
       }   
     }
   } // .form__container

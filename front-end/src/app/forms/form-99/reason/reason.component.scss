@@ -139,7 +139,11 @@
       .error-text {
         padding-left: 20px;
       }
-      @include form-btns();
-    } // .content
+    } // .content  
+  } // section
+  footer {
+    .grid-row {
+      margin-bottom: 15px !important;
+    }
   }
 }

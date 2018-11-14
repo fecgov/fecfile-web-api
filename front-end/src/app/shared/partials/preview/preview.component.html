@@ -1,144 +1,177 @@
 <div class="preview-container">
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--12">
-      <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
-      <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
-      <hr/>
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--4">
-      <p>
-        <b>Name of Committee in Full</b>
-      </p>
-      <p>
-        {{ committee_details?.committeename }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--4">
-      <p><b>Address</b></p>
-      <p>
-        {{ committee_details?.street1 }}<br/>
-        {{ committee_details?.street2 }}
-      </p>
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--3">
-    <p>
-      <b>City</b>
-    </p>
-    <p>
-      {{ committee_details?.city }}
-    </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>State</b>
-      </p>
-      <p>
-        {{ committee_details?.state }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Zip Code</b>
-      </p>
-      <p>
-        {{ committee_details?.zipcode }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Treasurer Last Name</b>
-      </p>
-      <p>
-        {{ committee_details?.treasurerlastname }}
-      </p>
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Treasurer First Name</b>
-      </p>
-      <p>
-       {{ committee_details?.treasurerfirstname }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Treasurer Middle Name</b>
-      </p>
-      <p>
-       {{ committee_details?.treasurermiddlename }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Treasurer Prefix</b>
-      </p>
-      <p>
-       {{ committee_details?.treasurerprefix }}
-      </p>
-    </div>
-    <div class="grid-row__col grid-row__col--3">
-      <p>
-        <b>Treasurer Sufix</b>
-      </p>
-      <p>
-       {{ committee_details?.treasurersuffix }}
-      </p>
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--12">
-      <hr />
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--6 text-left">
-      <h4>Text</h4>
-    </div>
-    <div class="grid-row__col grid-row__col--6 text-right">
-      <button
-        type="button"
-        class="btn btn-edit"
-        (click)="goToPreviousStep()"
-      >
-          Edit
-        </button>
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--12" [innerHtml]="form_details?.text"></div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row-col grid-row__col--12">
-      <hr />
-      <h4>Attachments</h4>
-      <hr />
-      <br />
-    </div>
-  </div>
-  <div class="grid-row">
-    <div class="grid-row__col grid-row__col--12 text-center">
-      <div class="forms__btn-container">
-        <button
-          type="button"
-          class="btn btn-previous btn-left"
-          (click)="goToPreviousStep()"
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary btn-right"
-          (click)="goToNextStep()"
-        >
-          Next
-        </button>
+  <header>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
+        <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
+        <hr/>
       </div>
-    </div>
-  </div>
+    </div>  
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <button
+          type="button"
+          class="btn btn-validate btn-right"
+          (click)="validateForm()"
+        >
+            Validate
+        </button>
+        <button
+          type="button"
+          class="btn btn-print-preview btn-right"
+          (click)="printPreview()"
+        >
+          Print Preview
+        </button>        
+      </div>
+    </div>         
+  </header>
+  <section>
+    <div class="content">
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+          <app-validate></app-validate>
+        </div>            
+      </div>
+    </div>      
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--4">
+          <p>
+            <b>Name of Committee in Full</b>
+          </p>
+          <p>
+            {{ committee_details?.committeename }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--4">
+          <p><b>Address</b></p>
+          <p>
+            {{ committee_details?.street1 }}<br/>
+            {{ committee_details?.street2 }}
+          </p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--3">
+        <p>
+          <b>City</b>
+        </p>
+        <p>
+          {{ committee_details?.city }}
+        </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>State</b>
+          </p>
+          <p>
+            {{ committee_details?.state }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Zip Code</b>
+          </p>
+          <p>
+            {{ committee_details?.zipcode }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Treasurer Last Name</b>
+          </p>
+          <p>
+            {{ committee_details?.treasurerlastname }}
+          </p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Treasurer First Name</b>
+          </p>
+          <p>
+           {{ committee_details?.treasurerfirstname }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Treasurer Middle Name</b>
+          </p>
+          <p>
+           {{ committee_details?.treasurermiddlename }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Treasurer Prefix</b>
+          </p>
+          <p>
+           {{ committee_details?.treasurerprefix }}
+          </p>
+        </div>
+        <div class="grid-row__col grid-row__col--3">
+          <p>
+            <b>Treasurer Sufix</b>
+          </p>
+          <p>
+           {{ committee_details?.treasurersuffix }}
+          </p>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <hr />
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--6 text-left">
+          <h4>Text</h4>
+        </div>
+        <div class="grid-row__col grid-row__col--6 text-right">
+          <button
+            type="button"
+            class="btn btn-edit"
+            (click)="goToPreviousStep()"
+          >
+              Edit
+            </button>
+        </div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12" [innerHtml]="form_details?.text"></div>
+      </div>
+      <div class="grid-row">
+        <div class="grid-row-col grid-row__col--12">
+          <hr />
+          <h4>Attachments</h4>
+          <hr />
+          <br />
+        </div>
+      </div>      
+    </div> <!-- ./content -->
+  </section>
+  <footer>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12 text-center">
+        <div class="forms__btn-container">
+          <button
+            type="button"
+            class="btn btn-previous btn-left"
+            (click)="goToPreviousStep()"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary btn-right"
+            (click)="goToNextStep()"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>    
+  </footer>
 </div>
