@@ -15,6 +15,7 @@ import logging
 import datetime
 import magic
 from django.http import JsonResponse
+import fecfiler
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -22,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 @api_view(['GET'])
 def fetch_f99_info(request):
-
     """"
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
@@ -71,10 +71,9 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_on_file_2': request.data.get('email_on_file_2'),
-            'file': request.data.get('file'),
-            
+            'file': request.data.get('file'),            
         }
-
+        
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -99,6 +98,7 @@ def update_f99_info(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 @api_view(['POST'])
 def submit_comm_info(request):
@@ -106,19 +106,53 @@ def submit_comm_info(request):
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     """
     #import ipdb; ipdb.set_trace()
+    #if request.method == 'POST':
     if request.method == 'POST':
         try:
+            #import ipdb; ipdb.set_trace()
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
             if comm_info:
+
+                comm_info.is_submitted=True
+                comm_info.updated_at=datetime.datetime.now()
+                comm_info.save()
                 new_data = comm_info.__dict__
-                new_data["is_submitted"]=True
-                new_data["updated_at"]=datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
+                serializer = CommitteeInfoSerializer(comm_info) #, data=new_data)
+                if True: #serializer.is_valid():
+                    #serializer.save()
+                    
+                    # make temp file, stream it , and close
+                    try:
+                        tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+                        json.dump(serializer.data, open(tmp_filename, 'w'))
+                        
+                        f99_obj_to_s3 = {
+                            'committeeid': new_data['committeeid'],                                                    
+                            #'upload':open(tmp_filename, 'r')
+                        }
+                        resp = requests.post("http://" + fecfiler.settings.DATA_RECEIVE_API_URL + fecfiler.settings.DATA_RECEIVE_API_VERSION + "f99_data_receive", data=f99_obj_to_s3, files={'upload':open(tmp_filename,'r')})
+
+                        if not resp.ok:
+                            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+                        
+                        # delete tmp file if exists
+                        try:
+                            os.remove(tmp_filename)
+                        except:
+                            pass
+
+                    except:
+                        try:
+                            os.remove(tmp_filename)
+                        except:
+                            pass
+                    
+                    return Response({'uploaded_file': resp.json(), 'obj_data':serializer.data}, status=status.HTTP_200_OK)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -26,6 +26,10 @@ TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost','api']
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+DATA_RECEIVE_API_URL="127.0.0.1:8002"
+DATA_RECEIVE_API_VERSION = "/api/v1/"
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 
