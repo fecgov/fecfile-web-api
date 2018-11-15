@@ -1,32 +1,3 @@
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Legal Disclaimer</h4>
-    <button
-      type="button"
-      class="close"
-      aria-label="Close"
-      (click)="modal.dismiss('Cross click')"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>
-      Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-      government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-      apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
-    </p>
-  </div>
-  <div class="modal-footer">
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="modal.close('Save click')"
-    >
-      Close
-    </button>
-  </div>
-</ng-template>
 <section>
 	<div class="dashboard">
 	    <div class="grid-row">
@@ -40,11 +11,18 @@
             <button
               type="button"
               class="btn btn-link"
-              (click)="open(content)"
+              (click)="open()"
             >
               Legal Disclaimer
             </button>
           </div>
+          <div class="legal-text" [hidden]="!showLegalDisclaimer">
+            <p>
+              Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
+              government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
+              apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
+            </p>          
+          </div>          
         </div>
       </footer>
 	</div>

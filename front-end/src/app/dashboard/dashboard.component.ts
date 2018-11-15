@@ -16,6 +16,7 @@ import { FormsComponent } from '../forms/forms.component';
 export class DashboardComponent implements OnInit {
 
   public showSideBar: boolean = true;
+  public showLegalDisclaimer: boolean = false;
 
   constructor(
     private _sessionService: SessionService,
@@ -24,8 +25,7 @@ export class DashboardComponent implements OnInit {
     private _messageService: MessageService
   ) { }
 
-  ngOnInit() {
-
+  ngOnInit(): void {
   }
 
   public closeResult: string;
@@ -53,12 +53,13 @@ export class DashboardComponent implements OnInit {
    *
    * @param      {Object}  content  The content
    */
-  public open(content): void {
-    this._modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+  public open(): void {
+    this.showLegalDisclaimer = !this.showLegalDisclaimer;
+    /*this._modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
-    });
+    });*/
   }
 
   /**
