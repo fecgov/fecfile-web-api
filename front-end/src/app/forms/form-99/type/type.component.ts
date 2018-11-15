@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -20,8 +20,11 @@ export class TypeComponent implements OnInit {
   public typeSelected: string = '';
   public isValidType: boolean = false;
   public typeFailed: boolean = false;
+  public screenWidth: number = 0;
+  public infoHeight: string = '140px';
 
   private _form_99_details: form99;
+  private _infoHeight: string = '250px';
 
   constructor(
     private _fb: FormBuilder,
@@ -33,6 +36,12 @@ export class TypeComponent implements OnInit {
 
   ngOnInit(): void {
     this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+
+    this.screenWidth = window.innerWidth;
+
+    if(this.screenWidth <= 780) {
+      this.infoHeight = this._infoHeight;
+    }
 
     if(this._form_99_details) {
       if(this._form_99_details.reason) {
@@ -51,6 +60,21 @@ export class TypeComponent implements OnInit {
           });
     }
   }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    console.log('event: ', event);
+    //event.target.innerWidth;
+    console.log('width: ', event.target.innerWidth);
+
+    this.screenWidth = event.target.innerWidth;
+
+    if(this.screenWidth <= 780) {
+      this.infoHeight = this._infoHeight;
+    } else {
+      this.infoHeight = '140px';
+    }
+  }  
 
   /**
    * Updates the type selected.
