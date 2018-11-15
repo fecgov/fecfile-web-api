@@ -197,6 +197,9 @@ export class ReasonComponent implements OnInit {
     }
   }
 
+  /**
+   * Goes to the previous step.
+   */
   public previousStep(): void {
     this.hideText = true;
     this.formSaved = false;
@@ -256,6 +259,9 @@ export class ReasonComponent implements OnInit {
     }
   }
 
+  /**
+   * Validates the entire form.
+   */
   public validateForm(): void {
     let type: string = localStorage.getItem('form99-type');
 
@@ -291,6 +297,24 @@ export class ReasonComponent implements OnInit {
           });
       });
   }
+
+  /**
+   * Hides the validate bar if the textarea changed.
+   */
+  public updateValidation(): void {
+    console.log('updateValidation: ');
+    this.showValidateBar = false;
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false                  
+        }            
+      });       
+  }
+
+
 
   public printPreview(): void {
     this.status.emit({

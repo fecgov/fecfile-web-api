@@ -58,6 +58,7 @@
             <div class="text-editor">
               <textarea 
                 placeholder="Enter text here..."
+                (keyup)="updateValidation()"
                 formControlName="reasonText"
               ></textarea>
             </div>

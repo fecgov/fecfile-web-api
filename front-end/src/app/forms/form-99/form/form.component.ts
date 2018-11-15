@@ -124,7 +124,6 @@ export class FormComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    console.log('step: ', this.step);
     if(this.currentStep !== this._activatedRoute.snapshot.queryParams.step) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;      
