@@ -5,12 +5,12 @@
   width: 100%;
   .form__type {
     float: left;
-    height: 100%;
+    height: 600px;
     width: 100%;
     .type-list {
       list-style-type: none;
+      height: 530px;
       position: relative;
-      margin-bottom: 20px;
       margin-left: auto;
       margin-right: auto;
       z-index: 0;
@@ -24,6 +24,9 @@
         position: relative;
         float: left;
         width: 94%;
+        &:nth-child(even) {
+          background-color: $white;
+        }
         &:hover {
           background-color: $dustyGray;
         }

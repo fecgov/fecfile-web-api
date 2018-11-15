@@ -32,7 +32,13 @@ section {
     }
   }
 }
-.modal {
+.modal-dialog {
   color: $black;
+  margin: 0 auto;
+  width: 400px;
+  z-index: 1051;
+  .modal-content {
+    width: 100%;
+  }
 }
 
