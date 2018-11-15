@@ -41,8 +41,6 @@ class CommitteeInfoTest(TestCase):
         comm = CommitteeInfo.objects.get(committeeid='C11234567')            
         self.assertEqual(comm.committeename, "Test Committee 2")
 
-
-
 class CommitteeTest(TestCase):
     """ Test module for Committee model """
 
