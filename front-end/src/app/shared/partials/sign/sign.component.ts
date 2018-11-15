@@ -21,8 +21,11 @@ export class SignComponent implements OnInit {
   public form_type: string = '';
   public type_selected: string = '';
   public signFailed: boolean = false;
+  public frmSaved: boolean = false;
   public frmSignee: FormGroup;
   public date_stamp: Date = new Date();
+  public hideText: boolean = false;
+  public showValidateBar: boolean = false;
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -91,20 +94,27 @@ export class SignComponent implements OnInit {
    *
    */
   public validateForm(): void {
+    this.showValidateBar = true;
     this._formsService
       .validateForm({}, this.form_type)
       .subscribe(res => {
         if(res) {
             this._messageService
               .sendMessage({
-                'validate': environment.validateSuccess
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true                  
+                }
               });
         }
       },
       (error) => {
         this._messageService
           .sendMessage({
-            'validate': error.error
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true                  
+            }            
           });
       });
   }
@@ -114,30 +124,40 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
       this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
       this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-
+      
       this._formsService
         .saveForm({}, this.form_type)
         .subscribe(res => {
           if(res) {
-            console.log('res: ', res);
+            this.frmSaved = true;
+
+            let formSavedObj: any = {
+              'saved': this.frmSaved
+            };
+
+            localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify(formSavedObj));            
           }
         },
         (error) => {
           console.log('error: ', error);
-        })
+        });
     }
   }
 
+  /**
+   * Submits a form.
+   *
+   */
   public doSubmitForm(): void {
-    console.log('doSubmitForm: ');
-    console.log('this.frmSignee: ', this.frmSignee);
-
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
     this._form_details.file = '';
 
@@ -146,6 +166,43 @@ export class SignComponent implements OnInit {
       this.signFailed = true;
     } else if(this.frmSignee.valid) {
       this.signFailed = false;
+
+      if(!formSaved.form_saved) {
+        this._formsService
+          .saveForm({}, this.form_type)
+          .subscribe(res => {
+            if(res) {
+              this._formsService
+                .submitForm({}, this.form_type)
+                .subscribe(res => {
+                  if(res) {
+                    this.status.emit({
+                      form: this.frmSignee,
+                      direction: 'next',
+                      step: 'step_5',
+                      previousStep: this._step
+                    });
+
+                    this._messageService
+                      .sendMessage({
+                        'form_submitted': true
+                      });
+                  }
+                });              
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+      }
+
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': '',
+            'showValidateBar': false                  
+          }            
+        });            
 
       this._formsService
         .submitForm({}, this.form_type)
@@ -167,17 +224,35 @@ export class SignComponent implements OnInit {
     }
   }
 
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }      
+  }
+
   /**
    * Goes to the previous step.
    *
    */
   public goToPreviousStep(): void {
-      this.status.emit({
-        form: {},
-        direction: 'previous',
-        step: 'step_3',
-        previousStep: this._step
-      });
+    this.frmSaved = false;
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_3',
+      previousStep: this._step
+    });
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': '',
+          'showValidateBar': false                  
+        }            
+      });          
   }
 
 }

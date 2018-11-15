@@ -1,11 +1,23 @@
 @import '../../scss/global';
 .header {
-  background-color: $dustyGray;
   color: $black;
+  display: block;
   height: 60px;
+  width: 100%;
   .header__nav {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    @include media(tablet) {
+      display: flex;
+      flex-direction: colummn;
+    }
+    @include media(mediumDesktop) {
+      display: block;
+    }         
+    @include media(largeDesktop) {
+      display: block;
+    }    
     a {
       color: $black;
       text-decoration: none;
@@ -14,51 +26,96 @@
       }
     }
     .header__search {
-      display: inline-block;
-      padding-left: 10px;
+      display: block;
+      order: 2;
+      padding-left: 0;
       padding-top: 10px;
-      width: 200px;
+      width: 100%;
+      input[type='text'] {
+        @include make-text-input(300px, 1.5em, 1em, 1em);
+        margin-left: auto;
+        margin-right: auto;
+      }       
       @include media(tablet) {
-        width: 10%;
+        display: block;  
+        order: 2;     
+        padding-left: 5px;
+        width: 100%;
+        input[type='text'] {
+          @include make-text-input(400px, 1.5em, 1em, 1em);       
+          margin-left: auto;
+          margin-right: auto;            
+        }         
       }
       @include media(mediumDesktop) {
-        width: 10%;
+        display: inline-block;
+        padding-left: 5px;
+        width: 15%;
+        input[type='text'] {
+          @include make-text-input(85%, 1.5em, 1em, 1em);
+          position: relative;
+          transition: all .5s;
+          z-index: 1002;
+          -webkit-transition: all .5s;
+          -moz-transition: all .5s;             
+          &:focus {
+            @include make-text-input(300px, 1.5em, 1em, 1em);
+          }
+        }          
       }
       @include media(largeDesktop) {
-        width: 10%;
-      }
-      input[type='text'] {
-        @include make-text-input(100%, 1.5em, 1em, 1em);
+        display: inline-block;
+        padding-left: 15px;
+        width: 20%;
+        input[type='text'] {
+          @include make-text-input(100%, 1.5em, 1em, 1em);
+        }        
       }
     }
     .header__links {
-      display: inline-block;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      order: 1;
+      width: 100%;
       @include media(tablet) {
-        width: 55%;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        order: 1;
+        width: 100%;
       }
       @include media(mediumDesktop) {
-        width: 55%;
-      }
+        display: inline-block;
+        padding-left: 15px;
+        width: 80%;
+      } 
       @include media(largeDesktop) {
-        padding-left: 20px;
-        width: 55%;
+        display: inline-block;
+        padding-left: 30px;
+        width: 74%;
       }
       .nav-links {
         list-style-type: none;
         width: 100%;
         li {
-          display: inline-block;
+          display: block;
+          margin-bottom: 10px;
           text-align: center;
           vertical-align: middle;
           @include media(tablet) {
-            width: 70px;
+            display: block;
+            margin-bottom: 10px;
+            width: 100%;
           }
           @include media(mediumDesktop) {
-            padding-left: 15px;
-            padding-right: 15px;
+            display: inline-block;
+            padding-left: 10px;
+            padding-right: 10px;
             width: auto;
           }
           @include media(largeDesktop) {
+            display: inline-block;
             padding-left: 15px;
             padding-right: 15px;
             width: auto;
@@ -66,7 +123,7 @@
           .dropdown-toggle {
             cursor: pointer;
           }
-          .dropdown {
+          .dropdown {                    
             .dropdown-menu {
               left: -45px !important;
               text-align: center;

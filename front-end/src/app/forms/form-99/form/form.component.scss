@@ -1,10 +1,47 @@
 @import '../../../shared/scss/global';
 
 .forms__wizard {
-  height: 100%;
-  margin: 0 auto;
-  width: 96%;
-  @include clearfix();
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100%;  
+  .form__alerts {
+    background-color: $bombay;
+    &.show-alerts {
+      display: none;
+      padding-left: 0;
+      @include media(tablet) {
+        display: none;
+      }
+      @include media(mediumDesktop) {
+        display: inline-block;
+        float: left;
+        width: 250px;         
+      }         
+      @include media(largeDesktop) {
+        display: inline-block;
+        float: left;
+        width: 250px; 
+      }         
+    }    
+    @include media(tablet) {
+      display: none;
+    }
+    @include media(mediumDesktop) {
+      display: inline-block;
+      float: left;
+      min-height: 100vh;
+      position: relative;
+      width: 100px;      
+    }         
+    @include media(largeDesktop) {
+      display: inline-block;
+      float: left;
+      min-height: 100vh;
+      position: relative;
+      width: 100px;      
+    }             
+  }  
   .form__steps {
     display: block;
     margin: 0 auto;
@@ -12,12 +49,53 @@
     @include clearfix();
   }
   .form__container {
-    display: block;
-    height: 100%;
-    width: 100%;
+    min-height: 100vh;
+    float: left;
+    width: 99%;
+    @include media(tablet) {
+      min-height: 100vh;
+      width: 99%;
+    }
+    @include media(mediumDesktop) {
+      min-height: 100vh;
+      width: 85%;
+    }         
+    @include media(largeDesktop) {
+      min-height: 100vh;
+      width: 90%;
+    }     
+    &.show-alerts {
+      padding-left: 0;
+      @include media(tablet) {
+        padding-left: 0;
+      }
+      @include media(mediumDesktop) {
+        margin-left: 5px;
+        width: 70%;         
+      }         
+      @include media(largeDesktop) {
+        margin-left: 5px;
+        width: 76%; 
+      }         
+    }      
     .form__content {
-      float: left;
-      width: 100%;
+      min-height: 100vh;
+      width: 100%; 
+      .form__step {
+        min-height: 100vh;
+        padding-left: 0;
+        width: 100%;     
+        @include media(tablet) {
+          padding-left: 0;
+        }
+        @include media(mediumDesktop) {
+          padding-left: 5px;
+        }         
+        @include media(largeDesktop) {
+          padding-left: 5px;
+        }             
+      }   
     }
   } // .form__container
+  @include clearfix();
 }

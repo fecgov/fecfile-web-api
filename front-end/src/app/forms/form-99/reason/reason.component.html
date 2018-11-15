@@ -6,8 +6,12 @@
     <header>
       <div class="header-container">
         <div class="header__text">
-          <h1 class="text-left" *ngIf="!typeSelected">Form 99</h1>
-          <h1 class="text-left" *ngIf="typeSelected">Form 99 / {{ typeSelected }}</h1>
+          <h1 class="text-left" *ngIf="!typeSelected">
+            Form 99
+          </h1>
+          <h1 class="text-left" *ngIf="typeSelected">
+            Form 99 / {{ typeSelected }}
+          </h1>
         </div>
         <div class="header__btns">
           <button
@@ -31,13 +35,20 @@
       <div class="content">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
+            <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+              <app-validate></app-validate>
+            </div>            
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
             <b>Enter your text*</b>
           </div>
         </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12"
             *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-            <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
               You must enter a reason.
             </div>
           </div>
@@ -62,44 +73,55 @@
             </div>
             <div class="error-text"
               *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
-              <div class="error text-center" *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+              <div class="text-error text-center" 
+                *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
                 You can only enter up to 20,000 characters.
               </div>
             </div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <div class="btn-container-row">
-                <div>
-                  <hr/>
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-right"
-                    (click)="saveForm()"
-                  >
-                    Save
-                  </button>
-                </div>
+            <div class="error-text">
+              <div class="text-info text-center"
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved">
+                Form 99 has been successfully saved.
               </div>
-              <button
-                type="button"
-                class="btn btn-previous btn-left"
-                (click)="previousStep()"
-              >
-                Previous
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary btn-right"
-              >
-                Next
-              </button>
             </div>
           </div>
-        </div>
+        </div>        
       </div> <!-- ./content -->
     </section>
+    <footer>
+      <div class="grid-row btn-row">
+        <div class="grid-row__col--12">
+          <hr />
+          <button 
+            class="btn btn-secondary btn-right" 
+            type="button"
+            (click)="saveForm()"
+            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+          >
+            Save 
+          </button>     
+        </div>
+      </div> 
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-previous btn-left" 
+              type="button"
+              (click)="previousStep()"
+            >
+              Previous 
+            </button>          
+        </div>
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-primary btn-right" 
+              type="submit"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            > 
+              Next
+            </button>          
+        </div>
+      </div> 
+    </footer>
   </form>
 </div> <!-- ./reason-container -->

@@ -23,15 +23,17 @@ export class ReasonComponent implements OnInit {
   @Input('editor') editor: any;
 
   public frmReason: FormGroup;
-  public reasonType: string = '';
+  public reasonType: string = null;
   public reasonFailed: boolean = false;
-  public typeSelected: string = '';
+  public typeSelected: string = null;
   public lengthError: boolean = false;
   public isValidReason: boolean = false;
   public reasonText: string = '';
   public isFiled: boolean = false;
   public characterCount: number = 0;
   public formSaved: boolean = false;
+  public hideText: boolean = false;
+  public showValidateBar: boolean = false;
 
   private _form_99_details: any = {}
   private _editorMax: number = 20000;
@@ -77,15 +79,10 @@ export class ReasonComponent implements OnInit {
   ngOnInit(): void {
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+    this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
-    if(this._form_99_details) {
+    if(this._form_99_details) {  
       if(this._form_99_details.text) {
-
-        if(this._form_99_details.reason) {
-          this.typeSelected = this._form_99_details.reason;
-        }
-
         this.frmReason = this._fb.group({
           reasonText: [this._form_99_details.text, [
             Validators.required,
@@ -111,7 +108,11 @@ export class ReasonComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    let form_99_details: any = JSON.parse(localStorage.getItem('form_99_details'));
+    let form_99_details: any = {};
+
+    if(localStorage.getItem('form_99_details') !== null) {
+      form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+    }
 
     if(form_99_details) {
       this.typeSelected = form_99_details.reason;
@@ -142,18 +143,34 @@ export class ReasonComponent implements OnInit {
    */
   public doValidateReason() {
     if (this.frmReason.get('reasonText').value.length >= 1) {
+        let formSaved: any = {
+          'form_saved': this.formSaved
+        };
         this.reasonFailed = false;
         this.isValidReason = true;
 
-        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+        this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
         setTimeout(() => {
-          localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
+
+          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
+        this.hideText = true;
+
+        this.showValidateBar = false; 
+
+        this._messageService
+          .sendMessage({
+            'validateMessage': {
+              'validate': '',
+              'showValidateBar': false                  
+            }            
+          });          
 
         this.status.emit({
           form: this.frmReason,
@@ -163,7 +180,7 @@ export class ReasonComponent implements OnInit {
         });
 
         this._messageService.sendMessage({
-          data: this.frmReason.get('reasonText').value,
+          data: this._form_99_details,
           previousStep: 'step_3'
         });
     } else {
@@ -181,6 +198,19 @@ export class ReasonComponent implements OnInit {
   }
 
   public previousStep(): void {
+    this.hideText = true;
+    this.formSaved = false;
+
+    this.showValidateBar = false;
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false                  
+        }            
+      });    
+    
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -202,16 +232,26 @@ export class ReasonComponent implements OnInit {
 
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 
+        this.hideText = true;
+
+        this.showValidateBar = false;
+
         this._formsService
           .saveForm({}, this._form_type)
           .subscribe(res => {
             if(res) {
               this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
             }
           },
           (error) => {
             console.log('error: ', error);
-          })
+          });          
       }
     }
   }
@@ -226,20 +266,28 @@ export class ReasonComponent implements OnInit {
 
     localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 
+    this.showValidateBar = true;
+
     this._formsService
       .validateForm({}, this._form_type)
       .subscribe(res => {
         if(res) {
             this._messageService
               .sendMessage({
-                'validate': environment.validateSuccess
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true                  
+                }
               });
         }
       },
       (error) => {
         this._messageService
           .sendMessage({
-            'validate': error.error
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true                  
+            }            
           });
       });
   }

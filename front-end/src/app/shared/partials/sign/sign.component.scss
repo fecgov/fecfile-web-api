@@ -8,13 +8,48 @@ $btnRowHeight: 45px;
       display: block;
       width: 100%;
       .header__text {
-        float: left;
-        width: 72%
+        display: block;
+        float: none;
+        width: 100%;
+        @include media(tablet) {
+          display: block;
+          float: none;
+          width: 100%;
+        }
+        @include media(mediumDesktop) {
+          float: left;
+          width: 40%;
+        }         
+        @include media(largeDesktop) {
+          float: left;
+          width: 40%;
+        }         
       }
       .header__btns {
-        float: right;
-        padding-top: 15px;
-        width: 25%;
+        display: block;
+        float: none;
+        padding-top: 0;
+        text-align: left;
+        width: 100%;
+        @include media(tablet) {
+          display: block;
+          float: none;
+          padding-top: 0;
+          text-align: left;
+          width: 100%;
+        }
+        @include media(mediumDesktop) {
+          float: left;
+          padding-top: 0;
+          text-align: right;
+          width: 50%;
+        }         
+        @include media(largeDesktop) {
+          float: left;
+          padding-top: 0;
+          text-align: right;
+          width: 50%;
+        }         
         .btn-print-preview {
           @extend .btn-secondary-gray;
           margin-right: 5px;
@@ -34,6 +69,38 @@ $btnRowHeight: 45px;
       display: block;
       position: relative;
       width: 100%;
+      .validate__form {
+        &.show-alerts {
+          display: block;
+          @include media(tablet) {
+            display: block;
+          }
+          @include media(mediumDesktop) {
+            display: none;
+          }         
+          @include media(largeDesktop) {
+            display: none;
+          }           
+        }
+        background-color: $bombay;
+        display: none;
+        height: 80px;
+        margin-top: 10px;
+        width: 100%;
+        @include media(tablet) {
+          background-color: $bombay;
+          display: none;
+          height: 80px;
+          margin-top: 10px;
+          width: 100%;        
+        }
+        @include media(mediumDesktop) {
+          display: none;
+        }         
+        @include media(largeDesktop) {
+          display: none;
+        }         
+      }      
       form {
         .form1-link {
           color: $dodgerBlue;
@@ -54,62 +121,9 @@ $btnRowHeight: 45px;
             margin-top: 5px;
           }
         }
-        .forms__btn-container {
-          .forms__btn-row {
-            display: block;
-            height: $btnRowHeight;
-            margin-bottom: 15px;
-            position: relative;
-            width: 100%;
-            @include clearfix();
-          }
-          .forms__btn-right {
-            float: right;
-          }
-          .forms__btn-previous {
-            float: left;
-            width: 55%;
-            @include webkitBrowser() {
-              width: 56%;
-            }
-            @include safariOnly() {
-              width: 55%;
-            }
-          }
-          .forms__agreement-text {
-            float: left;
-            width: 38%;
-            @include webkitBrowser() {
-              width: 36%;
-            }
-            @include safariOnly() {
-              width: 36%;
-            }
-            .agreement__text {
-              display: inline-block;
-              float: left;
-              font-size: 0.85em;
-              margin-left: 5px;
-              width: 290px;
-            }
-            input[type='checkbox'] {
-              float: left;
-            }
-          }
-          .forms__btn-submit {
-            float: left;
-            width: 5%;
-            @include webkitBrowser() {
-              width: 8%;
-            }
-            @include safariOnly() {
-              width: 5%;
-            }
-          }
+        footer {
         }
       }
-
-      // @include form-btns();
     }
   }
 } // .signee-container

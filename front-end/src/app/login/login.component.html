@@ -20,10 +20,10 @@
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
-          <div class="error" *ngIf="hasFailed">
+          <div class="text-error" *ngIf="hasFailed">
             Invalid commitee id or password.
           </div>
-          <div class="logged-out-msg" *ngIf="loggedOut.loggedOut">
+          <div class="logged-out-msg text-info" *ngIf="loggedOut.loggedOut">
             {{ loggedOut?.msg }}
           </div>
         </div>
