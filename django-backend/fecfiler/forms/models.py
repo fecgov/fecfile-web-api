@@ -38,7 +38,7 @@ class CommitteeInfo(models.Model):
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
     additional_email_1 = models.TextField(max_length=100, null= False, default = "-")
     additional_email_2 = models.TextField(max_length=100, null= False, default = "-")
-    file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
+    #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
     # implememted file upload using the following module: https://django-db-file-storage.readthedocs.io/en/master/
     
     # class constructor
