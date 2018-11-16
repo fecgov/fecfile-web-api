@@ -93,7 +93,9 @@ TEMPLATES = [
 
 if DEBUG == True:
     CORS_ORIGIN_ALLOW_ALL = True
-
+else:
+    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
+    
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
 )
