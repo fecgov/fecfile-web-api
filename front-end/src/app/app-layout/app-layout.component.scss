@@ -132,6 +132,7 @@
     .app__content-wrapper {
       background-color: $mercury;
       margin: 0 auto;
+      min-height: 100vh;
       padding-left: 50px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
@@ -177,6 +178,7 @@
       .app__content {
         background-color: $white;
         margin: 0 auto;
+        min-height: 85vh;
         width: 90%;
       }
     }

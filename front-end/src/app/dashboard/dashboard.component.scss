@@ -1,8 +1,7 @@
  @import '../shared/scss/global';
 section {
-  height: 92vh;
   .dashboard {
-    height: 98%;
+    min-height: 85vh;
     position: relative;
     .grid-row {
       margin: 0;

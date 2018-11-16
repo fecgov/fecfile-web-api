@@ -27,7 +27,8 @@
             <div class="grid-row__col grid-row__col--12">
               <ul class="type-list">
                 <li class="type-item"
-                  [ngClass]="typeSelected === 'mst'? 'selected' : ''">
+                  [ngClass]="{'selected': typeSelected === 'mst'}"
+                  [style.height]="mstCollapse.isExpanded ? infoHeight : '100px'">
                   <div class="type-item__box">
                     <div class="type-item__box--top">
                       <input
@@ -53,7 +54,7 @@
                           type="button"
                           class="btn btn-link"
                           aria-controls="mst_collapse"
-                          (click)="(mstCollapse.isExpanded)? mstCollapse.hide() : mstCollapse.show()"
+                          (click)="(mstCollapse.isExpanded)? mstCollapse.hide(): mstCollapse.show()"
                         >
                           <i class="info-icon" aria-hidden="true"></i>
                           <span class="sr-only">
@@ -71,7 +72,9 @@
                     </div>
                   </div>
                 </li>
-                <li class="type-item" [ngClass]="typeSelected === 'msm'? 'selected' : ''">
+                <li class="type-item" 
+                  [ngClass]="{'selected': typeSelected === 'msm'}"
+                  [style.height]="msmCollapse.isExpanded ? infoHeight : '100px'">
                   <div class="type-item__box">
                     <div class="type-item__box--top">
                       <input
@@ -97,7 +100,7 @@
                           type="button"
                           class="btn btn-link"
                           aria-controls="msm_collapse"
-                          (click)="(msmCollapse.isExpanded)? msmCollapse.hide() : msmCollapse.show()"
+                          (click)="(msmCollapse.isExpanded)? msmCollapse.hide(): msmCollapse.show()"
                         >
                           <i class="info-icon" aria-hidden="true"></i>
                           <span class="sr-only">
@@ -116,7 +119,8 @@
                   </div>
                 </li>
                 <li class="type-item"
-                  [ngClass]="typeSelected === 'msi'? 'selected' : ''">
+                  [ngClass]="typeSelected === 'msi'? 'selected' : ''"
+                  [style.height]="msiCollapse.isExpanded ? infoHeight : '100px'">
                   <div class="type-item__box">
                     <div class="type-item__box--top">
                       <input
@@ -160,7 +164,10 @@
                     </div>
                   </div>
                 </li>
-                <li class="type-item"  [ngClass]="typeSelected === 'msw'? 'selected' : ''">
+                <li class="type-item"  
+                  [ngClass]="typeSelected === 'msw'? 'selected' : ''"
+                  [style.height]="mswCollapse.isExpanded ? infoHeight : '100px'"
+                >
                   <div class="type-item__box">
                     <div class="type-item__box--top">
                       <input
