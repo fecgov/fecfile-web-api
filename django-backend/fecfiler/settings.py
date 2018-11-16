@@ -22,29 +22,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-#DEBUG = os.environ.get('DEBUG', False)
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False)
+
 TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-DATA_RECEIVE_API_URL="127.0.0.1:8002"
+DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', 'http://127.0.0.1:8002')
 DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
-
-ALLOWED_HOSTS = ['*']
-
-# Application definition
 
 ALLOWED_HOSTS = ['*']
 
@@ -99,7 +93,9 @@ TEMPLATES = [
 
 if DEBUG == True:
     CORS_ORIGIN_ALLOW_ALL = True
-
+else:
+    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
+    
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
 )
@@ -121,7 +117,7 @@ DATABASES = {
          'USER': os.environ.get('DB_USERNAME', 'postgres'),
          'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
          'HOST': os.environ.get('DB_HOST', 'db'),
-         'PORT': os.environ.get('DB_PORT', '5432'),
+         'PORT': os.environ.get('DB_PORT', '5432')
      }
 }
 

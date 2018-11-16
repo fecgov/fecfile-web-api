@@ -150,7 +150,7 @@ def fetch_f99_info(request):
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     #import ipdb; ipdb.set_trace()
-    try: 
+    try:
         # fetch last comm_info object created that is not submitted, else return None
         comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
     except CommitteeInfo.DoesNotExist:
@@ -160,11 +160,11 @@ def fetch_f99_info(request):
     if request.method == 'GET':
         if comm_info:
             serializer = CommitteeInfoSerializer(comm_info)
-            return Response(serializer.data)    
+            return Response(serializer.data)
         else:
-            return Response({})    
+            return Response({})
 
-parser_classes = (MultiPartParser, FormParser)   
+parser_classes = (MultiPartParser, FormParser)
 
 @api_view(['POST'])
 def create_f99_info(request):
@@ -194,9 +194,9 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_on_file_2': request.data.get('email_on_file_2'),
-            'file': request.data.get('file'),            
+            'file': request.data.get('file'),
         }
-        
+
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -211,7 +211,7 @@ def update_f99_info(request):
     # update details of a single comm_info
     if request.method == 'POST':
         try:
-            # fetch last comm_info object created, else return 404  
+            # fetch last comm_info object created, else return 404
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
         except CommitteeInfo.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -222,72 +222,98 @@ def update_f99_info(request):
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
 @api_view(['POST'])
 def submit_comm_info(request):
     """
-    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details.Call the data_receive API and fetch the response
+    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
+    validate_api/s3 not being called currently
     """
     #import ipdb; ipdb.set_trace()
-    #if request.method == 'POST':
     if request.method == 'POST':
         try:
-            #import ipdb; ipdb.set_trace()
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
             if comm_info:
-
-                comm_info.is_submitted=True
-                comm_info.updated_at=datetime.datetime.now()
-                comm_info.save()
                 new_data = comm_info.__dict__
-                serializer = CommitteeInfoSerializer(comm_info) #, data=new_data)
-                if True: #serializer.is_valid():
-                    #serializer.save()
-                    
-                    # make temp file, stream it , and close
-                    try:
-                        tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
-                        json.dump(serializer.data, open(tmp_filename, 'w'))
-                        
-                        f99_obj_to_s3 = {
-                            'committeeid': new_data['committeeid'],                                                    
-                            #'upload':open(tmp_filename, 'r')
-                        }
-                        resp = requests.post("http://" + fecfiler.settings.DATA_RECEIVE_API_URL + fecfiler.settings.DATA_RECEIVE_API_VERSION + "f99_data_receive", data=f99_obj_to_s3, files={'upload':open(tmp_filename,'r')})
-
-                        if not resp.ok:
-                            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
-                        
-                        # delete tmp file if exists
-                        try:
-                            os.remove(tmp_filename)
-                        except:
-                            pass
-
-                    except:
-                        try:
-                            os.remove(tmp_filename)
-                        except:
-                            pass
-                    
-                    return Response({'uploaded_file': resp.json(), 'obj_data':serializer.data}, status=status.HTTP_200_OK)
+                new_data["is_submitted"]=True
+                new_data["updated_at"]=datetime.datetime.now()
+                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            else:
-                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
 
+    
+# @api_view(['POST'])
+# def submit_comm_info(request):
+#     """
+#     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details.Call the data_receive API and fetch the response
+#     """
+#     #import ipdb; ipdb.set_trace()
+#     #if request.method == 'POST':
+#     if request.method == 'POST':
+#         try:
+#             #import ipdb; ipdb.set_trace()
+#             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+#             if comm_info:
+
+#                 comm_info.is_submitted=True
+#                 comm_info.updated_at=datetime.datetime.now()
+#                 comm_info.save()
+#                 new_data = comm_info.__dict__
+#                 serializer = CommitteeInfoSerializer(comm_info) #, data=new_data)
+#                 if True: #serializer.is_valid():
+#                     #serializer.save()
+
+#                     # make temp file, stream it , and close
+#                     try:
+#                         tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+#                         json.dump(serializer.data, open(tmp_filename, 'w'))
+
+#                         f99_obj_to_s3 = {
+#                             'committeeid': new_data['committeeid'],
+#                             #'upload':open(tmp_filename, 'r')
+#                         }
+#                         resp = requests.post(fecfiler.settings.DATA_RECEIVE_API_URL + fecfiler.settings.DATA_RECEIVE_API_VERSION + "f99_data_receive", data=f99_obj_to_s3, files={'upload':open(tmp_filename,'r')})
+
+#                         if not resp.ok:
+#                             return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+
+#                         # delete tmp file if exists
+#                         try:
+#                             os.remove(tmp_filename)
+#                         except:
+#                             pass
+
+#                     except:
+#                         try:
+#                             os.remove(tmp_filename)
+#                         except:
+#                             pass
+
+#                     return Response({'uploaded_file': resp.json(), 'obj_data':serializer.data}, status=status.HTTP_200_OK)
+#                 else:
+#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#             else:
+#                 return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+#         except:
+#             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+
+#     else:
+#         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 def get_f99_reasons(request):
     """
     Json object the resons for filing
     """
-    if request.method == 'GET':        
+    if request.method == 'GET':
         try:
             from django.conf import settings
             reason_data = json.load(open(os.path.join(settings.BASE_DIR,'sys_data', 'f99_default_reasons.json'),'r'))
@@ -295,21 +321,21 @@ def get_f99_reasons(request):
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        
+
 @api_view(['GET'])
 def get_committee(request):
     """
-    fields for auto populating the data for creating the comm_info object 
+    fields for auto populating the data for creating the comm_info object
     """
     try:
-        comm = Committee.objects.filter(committeeid=request.user.username).last() 
+        comm = Committee.objects.filter(committeeid=request.user.username).last()
     except Committee.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     # get details of a single comm
     if request.method == 'GET':
         serializer = CommitteeSerializer(comm)
-        return Response(serializer.data)    
+        return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -328,11 +354,11 @@ def get_signee(request):
         filtered_d = {key: val for key, val in serializer.data.items() if key not in ['street1', 'street2', 'created_at','state','city','zipcode']}
         # FIXME: This is to be redone after there is a discussion on how to model data for the signatories of each committee.
         filtered_d['email'] = request.user.email
-        return Response(filtered_d)    
-    
-    
+        return Response(filtered_d)
+
+
 @api_view(['POST'])
-def update_committee(request, cid):   
+def update_committee(request, cid):
     # # update details of a single comm
     if request.method == 'POST':
          serializer = CommitteeSerializer(comm, data=request.data)
@@ -344,7 +370,7 @@ def update_committee(request, cid):
 
 
 @api_view(['POST'])
-def create_committee(request):       
+def create_committee(request):
     # insert a new record for a committee
     if request.method == 'POST':
         data = {
@@ -378,7 +404,7 @@ def validate_f99(request):
     #     comm_info = CommitteeInfo.objects.all()
     #     serializer = CommitteeInfoSerializer(comm_info, many=True)
     #     return Response(serializer.data)
-        
+
     # insert a new record for a comm_info
     if request.method == 'POST':
         data = {
@@ -402,7 +428,7 @@ def validate_f99(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    try:        
+    try:
         comm = Committee.objects.get(committeeid=request.data.get('committeeid'))
 
     except Committee.DoesNotExist:
@@ -412,47 +438,47 @@ def validate_f99(request):
 
     if comm.committeename!=request.data.get('committeename'):
         errormess.append('Committee Name does not match the Form 1 data.')
-        
+
     if comm.street1!=request.data.get('street1'):
         errormess.append('Street1 does not match the Form 1 data.')
-            
+
     if 'street2' in request.data and comm.street2!=request.data.get('street2'):
         errormess.append('Street2 does not match the Form 1 data.')
-        
+
     if comm.city!=request.data.get('city'):
         errormess.append('City does not match the Form 1 data.')
-            
+
     if comm.state!=request.data.get('state'):
         errormess.append('State does not match the Form 1 data.')
-    
+
     if comm.zipcode!=int(request.data.get('zipcode')):
         errormess.append('Zipcode does not match the Form 1 data.')
 
     if comm.treasurerlastname!=request.data.get('treasurerlastname'):
         errormess.append('Treasurer Last Name does not match the Form 1 data.')
-            
+
     if comm.treasurerfirstname!=request.data.get('treasurerfirstname'):
         errormess.append('Treasurer First Name does not match the Form 1 data.')
-        
+
     if 'treasurermiddlename' in request.data and comm.treasurermiddlename!=request.data.get('treasurermiddlename'):
         errormess.append('Treasurer Middle Name does not match the Form 1 data.')
-        
+
     if 'treasurerprefix' in request.data and comm.treasurerprefix!=request.data.get('treasurerprefix'):
         errormess.append('Treasurer Prefix does not match the Form 1 data.')
-        
+
     if 'treasurersuffix' in request.data and comm.treasurersuffix!=request.data.get('treasurersuffix'):
         errormess.append('Treasurer Suffix does not match the Form 1 data.')
-        
+
     if len(request.data.get('text'))>20000:
         errormess.append('Text greater than 20000.')
 
     if len(request.data.get('text'))==0:
         errormess.append('Text field is empty.')
-        
+
     conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
     if not any(conditions):
         errormess.append('Reason does not match the pre-defined codes.')
-    
+
     #pdf validation for type, extension and size
     if 'file' in request.data:
         valid_mime_types = ['application/pdf']
@@ -465,8 +491,8 @@ def validate_f99(request):
         if ext.lower() not in valid_file_extensions:
             errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
         if file._size > 33554432:
-            errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')    
-            
+            errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
+
     if len(errormess)==0:
         errormess.append('Validation successful!')
         return JsonResponse(errormess, status=200, safe=False)
@@ -481,30 +507,29 @@ def get_rad_analyst_info(request):
     if request.method == 'GET':
         try:
             #import ipdb; ipdb.set_trace();
-            if request.user.username: 
+            if request.user.username:
                 ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + request.user.username + '&sort_hide_null=false&sort_null_only=false')
                 return JsonResponse({"response":ab.json()['results']})
             else:
                 return JsonResponse({"ERROR":"You must be logged in  for this operation."})
         except:
             return JsonResponse({"ERROR":"ERR_f99_03: Unexpected Error. Please contact administrator."})
-            
-            
+
+
 @api_view(['GET'])
 def get_form99list(request):
     """
-    fields for auto populating the form 99 reports data 
+    fields for auto populating the form 99 reports data
     """
     try:
-        
+
         comm = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True)
-        
+
     except CommitteeInfo.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
     # get details of a form 99 records
     if request.method == 'GET':
-        
-        serializer = CommitteeInfoListSerializer(comm)
-        return Response(serializer.data)    
 
+        serializer = CommitteeInfoListSerializer(comm)
+        return Response(serializer.data)

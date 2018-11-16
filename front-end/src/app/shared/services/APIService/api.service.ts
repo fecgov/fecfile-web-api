@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { SessionService } from '../SessionService/session.service';
 import { AuthService } from '../AuthService/auth.service';
+import { AppConfigService } from '../../../app-config.service';
 import { Posts, Post, Auth } from '../../interfaces/APIService/APIService';
 
 @Injectable({
@@ -17,7 +18,8 @@ export class ApiService {
     private _http: HttpClient,
     private _session: SessionService,
     private _authService: AuthService,
-    private _cookieService: CookieService
+    private _cookieService: CookieService,
+    private _appConfigService: AppConfigService
   ) { }
 
   /**
@@ -30,7 +32,7 @@ export class ApiService {
    */
   public signIn(username: string, password: string): Observable<any> {
     return this._http
-      .post<Auth>(`${environment.apiUrl}/token/obtain`, {
+      .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/token/obtain`, {
         username,
         password
       })
@@ -58,7 +60,7 @@ export class ApiService {
 
     return this._http
      .get(
-        `${environment.apiUrl}/core/get_committee_details`,
+        `${this._appConfigService.getConfig().apiUrl}/core/get_committee_details`,
         {
           headers: httpOptions
         }
