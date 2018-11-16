@@ -104,9 +104,9 @@ def print_pdf_info(request):
 """@api_view(['GET'])
 def print_f99_info(request):
 
-    """
+    
     #Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
-    """
+    
     try: 
         # fetch last comm_info object created that is not submitted, else return None
         comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
