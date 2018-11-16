@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  name: 'awsdev',
-  apiUrl: 'https://dev-fecfile-api.efdev.fec.gov/api/v1',
+  name: 'awsuat',
+  apiUrl: 'https://uat-fecfile-api.efdev.fec.gov/api/v1',
   validateSuccess: 'All required fields have been validated.'
 };
