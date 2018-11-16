@@ -14,7 +14,8 @@ export class FormsService {
 
   constructor(
     private _http: HttpClient,
-    private _cookieService: CookieService
+    private _cookieService: CookieService,
+    private _appConfigService: AppConfigService
   ) { }
 
   /**
