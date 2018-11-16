@@ -55,13 +55,12 @@
         </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-            <div class="rich-text-editor">
-              <angular-editor
-                ngDefaultControl
+            <div class="text-editor">
+              <textarea 
+                placeholder="Enter text here..."
+                (keyup)="updateValidation()"
                 formControlName="reasonText"
-                #editor
-                [config]="editorConfig"
-              ></angular-editor>
+              ></textarea>
             </div>
           </div>
         </div>
