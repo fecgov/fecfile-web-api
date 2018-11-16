@@ -40,6 +40,9 @@ class CommitteeInfo(models.Model):
     additional_email_2 = models.TextField(max_length=100, null= False, default = "-")
     #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
     # implememted file upload using the following module: https://django-db-file-storage.readthedocs.io/en/master/
+    form_type = models.CharField(max_length=3, default="F99")
+    coverage_start_date = models.DateField(null=True)
+    coverage_end_date = models.DateField(null=True)
     
     # class constructor
     def __unicode__(self):
