@@ -63,10 +63,6 @@ export class TypeComponent implements OnInit {
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    console.log('event: ', event);
-    //event.target.innerWidth;
-    console.log('width: ', event.target.innerWidth);
-
     this.screenWidth = event.target.innerWidth;
 
     if(this.screenWidth <= 780) {

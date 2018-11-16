@@ -39,7 +39,7 @@ export class ReasonComponent implements OnInit {
   private _editorMax: number = 20000;
   private _form_type: string = '';
 
-  public editorConfig: AngularEditorConfig = {
+  /*public editorConfig: AngularEditorConfig = {
     editable: true,
     spellcheck: true,
     height: '25rem',
@@ -62,7 +62,7 @@ export class ReasonComponent implements OnInit {
         tag: "h1",
       },
     ]
-  };
+  };*/
 
 
   constructor(
@@ -302,7 +302,6 @@ export class ReasonComponent implements OnInit {
    * Hides the validate bar if the textarea changed.
    */
   public updateValidation(): void {
-    console.log('updateValidation: ');
     this.showValidateBar = false;
 
     this._messageService
