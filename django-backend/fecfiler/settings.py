@@ -91,10 +91,10 @@ TEMPLATES = [
     },
 ]
 
-if DEBUG == True:
-    CORS_ORIGIN_ALLOW_ALL = True
-else:
-    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
+#if DEBUG == True:
+CORS_ORIGIN_ALLOW_ALL = True
+#else:
+#    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
     
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
@@ -110,23 +110,23 @@ DATABASES = {
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
 
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-         'NAME': 'postgres',
-         'USER': 'postgres',
-         'PASSWORD': 'postgres',
-         'HOST': 'localhost',
-         'PORT': '5432',
-     }
-     
      #'default': {
      #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-     #    'NAME': os.environ.get('DB_NAME', 'postgres'),
-     #    'USER': os.environ.get('DB_USERNAME', 'postgres'),
-     #    'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-     #    'HOST': os.environ.get('DB_HOST', 'db'),
-     #    'PORT': os.environ.get('DB_PORT', '5432')
+     #    'NAME': 'postgres',
+     #    'USER': 'postgres',
+     #    'PASSWORD': 'postgres',
+     #    'HOST': 'localhost',
+     #    'PORT': '5432',
      #}
+     
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+         'NAME': os.environ.get('DB_NAME', 'postgres'),
+         'USER': os.environ.get('DB_USERNAME', 'postgres'),
+         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+         'HOST': os.environ.get('DB_HOST', 'db'),
+         'PORT': os.environ.get('DB_PORT', '5432')
+     }
 }
 
 
