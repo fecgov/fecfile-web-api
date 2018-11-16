@@ -121,7 +121,16 @@
           height: 400px;
           overflow: scroll;
           padding: 10px;
-          width: 96%;
+          width: 90%;
+          @include media(tablet) {
+            width: 96%;
+          }
+          @include media(mediumDesktop) {
+            width: 96%;
+          }         
+          @include media(largeDesktop) {
+            width: 96%;
+          }           
         }
         /* .angular-editor {
           z-index: 0;
