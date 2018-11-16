@@ -21,6 +21,48 @@ import fecfiler
 # Exception handling is taken care to validate the committeinfo
 logger = logging.getLogger(__name__)
 
+# API to create a .fec which can be used on webprint module to print pdf. The data being used is the data that was last saved in the database for f99.
+@api_view(['GET'])
+def print_f99_info(request):
+
+    """"
+    Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
+    """
+    try: 
+        # fetch last comm_info object created that is not submitted, else return None
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
+
+    except CommitteeInfo.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND) #status=status.HTTP_404_NOT_FOUND)
+
+    file_name = "%s.fec" %comm_info.id
+    with open(file_name, "w") as text_file:
+        text_file.write("HDRFEC8.3FECfile8.3.0.0(f32)F99")
+        text_file.write("%s" %comm_info.committeeid)
+        text_file.write("%s" %comm_info.committeename)
+        text_file.write("%s" %comm_info.street1)
+        text_file.write("%s" %comm_info.street2)
+        text_file.write("%s" %comm_info.city)
+        text_file.write("%s" %comm_info.state)
+        text_file.write("%s" %comm_info.zipcode)
+        text_file.write("%s" %comm_info.treasurerlastname)
+        text_file.write("%s" %comm_info.treasurerfirstname)
+        text_file.write("%s" %comm_info.zipcode)
+        date = comm_info.created_at.strftime('%Y%m%d')
+        text_file.write("%s" %date)
+        text_file.write("%s" %comm_info.reason)
+        text_file.write("[BEGINTEXT]")
+        text_file.write("%s" %comm_info.zipcode)
+        text_file.write("[ENDTEXT]")
+
+    # get details of a single comm_info
+    if request.method == 'GET':
+        if comm_info:
+            serializer = CommitteeInfoSerializer(comm_info)
+            return Response(status=status.HTTP_201_CREATED)    
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)    
+
 @api_view(['GET'])
 def fetch_f99_info(request):
     """"
