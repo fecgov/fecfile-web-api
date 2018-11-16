@@ -1,30 +1,27 @@
 <div class="preview-container">
   <header>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
+    <div class="header-container">
+      <div class="header__text">
         <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
         <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
-        <hr/>
       </div>
-    </div>  
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
+      <div class="header__btns">
         <button
           type="button"
-          class="btn btn-validate btn-right"
-          (click)="validateForm()"
+          class="btn btn-print-preview"
         >
-            Validate
+          Print Preview
         </button>
         <button
           type="button"
-          class="btn btn-print-preview btn-right"
-          (click)="printPreview()"
+          class="btn btn-validate"
+          (click)="validateForm()"
         >
-          Print Preview
-        </button>        
+            Validate
+          </button>
       </div>
-    </div>         
+    </div>   
+    <hr />          
   </header>
   <section>
     <div class="content">
