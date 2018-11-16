@@ -523,7 +523,7 @@ def get_form99list(request):
     """
     try:
 
-        comm = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True)
+        comm = CommitteeInfo.objects.filter(committeeid=request.user.username)
 
     except CommitteeInfo.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
