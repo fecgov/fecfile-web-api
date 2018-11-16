@@ -28,7 +28,7 @@ TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-DATA_RECEIVE_API_URL=os.environ.get('DATARECEIVER_URL', 'http://127.0.0.1:8002')]
+DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', 'http://127.0.0.1:8002')
 DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 
