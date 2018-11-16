@@ -15,7 +15,7 @@ import logging
 import datetime
 import magic
 import pdfrw
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 import fecfiler
 
 # API view functionality for GET DELETE and PUT
@@ -93,11 +93,13 @@ def print_pdf_info(request):
                     )
     pdfrw.PdfWriter().write(output_pdf_path, template_pdf)
 
-    #download_link = 'http://{}/{}'.format(request.get_host(),output_pdf_path)
-    #return Response(download_link)
-
-    response = HttpResponse('f99_preview', content_type='application/pdf')
-    response['content-Disposition'] = 'attachment; filename = {}.pdf'.format(request.data.get('id'))
+    response = FileResponse(open(output_pdf_path, 'rb'), content_type='application/pdf')
+    response['content-Disposition'] = 'inline; filename = {}_Form99_Preview.pdf'.format(request.data.get('committeeid'))
+    """f = open(output_pdf_path, 'rb')
+    pdf_contents = f.read()
+    f.close()
+    response = HttpResponse(pdf_contents, content_type='application/pdf')
+    response['content-Disposition'] = 'inline; filename = {}.pdf'.format(request.data.get('id'))"""
     return response
 
 # API to create a .fec which can be used on webprint module to print pdf. The data being used is the data that was last saved in the database for f99.
