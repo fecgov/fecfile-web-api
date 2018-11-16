@@ -14,19 +14,98 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
 import magic
-from django.http import JsonResponse
+import pdfrw
+from django.http import JsonResponse, HttpResponse
 import fecfiler
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
 logger = logging.getLogger(__name__)
 
+# API which prints Form 99 data
+@api_view(['POST'])
+def print_pdf_info(request):
+    """
+    Creates a new CommitteeInfo Object, or updates the last created CommitteeInfo object created for that committee.
+    """
+    # Configuration values
+    ANNOT_KEY = '/Annots'
+    ANNOT_FIELD_KEY = '/T'
+    ANNOT_VAL_KEY = '/V'
+    ANNOT_RECT_KEY = '/Rect'
+    SUBTYPE_KEY = '/Subtype'
+    WIDGET_SUBTYPE_KEY = '/Widget'
+
+    input_pdf_path = 'templates/forms/F99.pdf'
+    output_pdf_path = 'templates/forms/media/%s.pdf' %request.data.get('id')
+
+    #code to generate form 99 using form99 template
+    template_pdf = pdfrw.PdfReader(input_pdf_path)
+    annotations = template_pdf.pages[0][ANNOT_KEY]
+    for annotation in annotations:
+        if annotation[SUBTYPE_KEY] == WIDGET_SUBTYPE_KEY:
+            if annotation[ANNOT_FIELD_KEY]:
+                key = annotation[ANNOT_FIELD_KEY][1:-1]
+                if key == "IMGNO":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('id')))
+                    )
+                if key == "FILING_TIMESTAMP":
+                    date = datetime.datetime.now().strftime('%Y%m%d')
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(date))
+                    )
+                if key == "PAGESTR":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format("1 of 1"))
+                    )
+                if key == "COMMITTEE_NAME":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('committeename')))
+                    )
+                if key == "FILER_FEC_ID_NUMBER":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('committeeid')))
+                    )
+                if key == "STREET_1":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('street1')))
+                    )
+                if key == "STREET_2":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('street2')))
+                    )
+                if key == "CITY":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('city')))
+                    )
+                if key == "STATE":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('state')))
+                    )
+                if key == "ZIP":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('zipcode')))
+                    )
+                if key == "FREE_FORMAT_TEXT":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('text')))
+                    )
+    pdfrw.PdfWriter().write(output_pdf_path, template_pdf)
+
+    #download_link = 'http://{}/{}'.format(request.get_host(),output_pdf_path)
+    #return Response(download_link)
+
+    response = HttpResponse('f99_preview', content_type='application/pdf')
+    response['content-Disposition'] = 'attachment; filename = {}.pdf'.format(request.data.get('id'))
+    return response
+
 # API to create a .fec which can be used on webprint module to print pdf. The data being used is the data that was last saved in the database for f99.
-@api_view(['GET'])
+"""@api_view(['GET'])
 def print_f99_info(request):
 
-    """"
-    Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
+    """
+    #Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
     """
     try: 
         # fetch last comm_info object created that is not submitted, else return None
@@ -62,7 +141,7 @@ def print_f99_info(request):
             return Response(status=status.HTTP_201_CREATED)    
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)    
-
+"""
 @api_view(['GET'])
 def fetch_f99_info(request):
     """"
