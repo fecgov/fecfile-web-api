@@ -53,6 +53,14 @@
         width: 15%;
         input[type='text'] {
           @include make-text-input(85%, 1.5em, 1em, 1em);
+          position: relative;
+          transition: all .5s;
+          z-index: 1002;
+          -webkit-transition: all .5s;
+          -moz-transition: all .5s;             
+          &:focus {
+            @include make-text-input(300px, 1.5em, 1em, 1em);
+          }
         }          
       }
       @include media(largeDesktop) {

@@ -24,6 +24,8 @@ export class SignComponent implements OnInit {
   public frmSaved: boolean = false;
   public frmSignee: FormGroup;
   public date_stamp: Date = new Date();
+  public hideText: boolean = false;
+  public showValidateBar: boolean = false;
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -92,6 +94,7 @@ export class SignComponent implements OnInit {
    *
    */
   public validateForm(): void {
+    this.showValidateBar = true;
     this._formsService
       .validateForm({}, this.form_type)
       .subscribe(res => {
@@ -121,19 +124,26 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
       this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
       this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-
+      
       this._formsService
         .saveForm({}, this.form_type)
         .subscribe(res => {
           if(res) {
-            console.log('res: ', res);
             this.frmSaved = true;
+
+            let formSavedObj: any = {
+              'saved': this.frmSaved
+            };
+
+            localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify(formSavedObj));            
           }
         },
         (error) => {
@@ -186,6 +196,14 @@ export class SignComponent implements OnInit {
           });
       }
 
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': '',
+            'showValidateBar': false                  
+          }            
+        });            
+
       this._formsService
         .submitForm({}, this.form_type)
         .subscribe(res => {
@@ -206,17 +224,35 @@ export class SignComponent implements OnInit {
     }
   }
 
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }      
+  }
+
   /**
    * Goes to the previous step.
    *
    */
   public goToPreviousStep(): void {
-      this.status.emit({
-        form: {},
-        direction: 'previous',
-        step: 'step_3',
-        previousStep: this._step
-      });
+    this.frmSaved = false;
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_3',
+      previousStep: this._step
+    });
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': '',
+          'showValidateBar': false                  
+        }            
+      });          
   }
 
 }

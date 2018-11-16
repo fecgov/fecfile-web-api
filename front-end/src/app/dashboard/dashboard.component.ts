@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { ApiService } from '../shared/services/APIService/api.service';
+import { MessageService } from '../shared/services/MessageService/message.service';
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
@@ -15,21 +16,16 @@ import { FormsComponent } from '../forms/forms.component';
 export class DashboardComponent implements OnInit {
 
   public showSideBar: boolean = true;
+  public showLegalDisclaimer: boolean = false;
 
   constructor(
     private _sessionService: SessionService,
     private _apiService: ApiService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _messageService: MessageService
   ) { }
 
-  ngOnInit() {
-    this._apiService
-      .getCommiteeDetails()
-      .subscribe(res => {
-        if(res) {
-          localStorage.setItem('committee_details', JSON.stringify(res));
-        }
-      });
+  ngOnInit(): void {
   }
 
   public closeResult: string;
@@ -57,12 +53,13 @@ export class DashboardComponent implements OnInit {
    *
    * @param      {Object}  content  The content
    */
-  public open(content): void {
-    this._modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+  public open(): void {
+    this.showLegalDisclaimer = !this.showLegalDisclaimer;
+    /*this._modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
-    });
+    });*/
   }
 
   /**

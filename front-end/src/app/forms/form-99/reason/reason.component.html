@@ -35,6 +35,13 @@
       <div class="content">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
+            <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+              <app-validate></app-validate>
+            </div>            
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
             <b>Enter your text*</b>
           </div>
         </div>
@@ -48,13 +55,11 @@
         </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-            <div class="rich-text-editor">
-              <angular-editor
-                ngDefaultControl
+            <div class="text-editor">
+              <textarea 
+                placeholder="Enter text here..."
                 formControlName="reasonText"
-                #editor
-                [config]="editorConfig"
-              ></angular-editor>
+              ></textarea>
             </div>
           </div>
         </div>
@@ -78,41 +83,43 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <div class="btn-container-row">
-                <div>
-                  <hr/>
-                  <button
-                    type="button"
-                    class="btn btn-secondary btn-right"
-                    (click)="saveForm()"
-                    [disabled]="frmReason.controls.reasonText.errors?.requiredLengt"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-              <button
-                type="button"
-                class="btn btn-previous btn-left"
-                (click)="previousStep()"
-              >
-                Previous
-              </button>
-              <button
-                type="submit"
-                class="btn btn-primary btn-right"
-                [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        </div>
+        </div>        
       </div> <!-- ./content -->
     </section>
+    <footer>
+      <div class="grid-row btn-row">
+        <div class="grid-row__col--12">
+          <hr />
+          <button 
+            class="btn btn-secondary btn-right" 
+            type="button"
+            (click)="saveForm()"
+            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+          >
+            Save 
+          </button>     
+        </div>
+      </div> 
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-previous btn-left" 
+              type="button"
+              (click)="previousStep()"
+            >
+              Previous 
+            </button>          
+        </div>
+        <div class="grid-row__col grid-row__col--6">
+            <button 
+              class="btn btn-primary btn-right" 
+              type="submit"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            > 
+              Next
+            </button>          
+        </div>
+      </div> 
+    </footer>
   </form>
 </div> <!-- ./reason-container -->

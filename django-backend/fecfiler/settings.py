@@ -19,30 +19,32 @@ from corsheaders.defaults import default_headers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 #DEBUG = os.environ.get('DEBUG', False)
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-CSRF_TRUSTED_ORIGINS = ['localhost','api']
+CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-SECRET_KEY = '$6(x*g_2g9l_*g8peb-@anl5^*8q!1w)k&e&2!i)t6$s8kia94'
+
+DATA_RECEIVE_API_URL="127.0.0.1:8002"
+DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = False
 
 ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
 
+ALLOWED_HOSTS = ['*']
+
+# Application definition
 
 ALLOWED_HOSTS = ['*']
 
@@ -64,7 +66,7 @@ INSTALLED_APPS = [
     'fecfiler.authentication',
     'fecfiler.posts',
     'fecfiler.forms',
-    'db_file_storage',    
+    'db_file_storage',
 ]
 
 MIDDLEWARE = [
@@ -112,14 +114,14 @@ DATABASES = {
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
 
-    
+
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
-         'NAME': 'postgres',
-         'USER': 'postgres',
-         'PASSWORD': 'postgres',
-         'HOST': 'db',
-         'PORT': '5432',
+         'NAME': os.environ.get('DB_NAME', 'postgres'),
+         'USER': os.environ.get('DB_USERNAME', 'postgres'),
+         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+         'HOST': os.environ.get('DB_HOST', 'db'),
+         'PORT': os.environ.get('DB_PORT', '5432'),
      }
 }
 
@@ -171,7 +173,7 @@ STATIC_ROOT = 'static'
 COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', not DEBUG)
 
 DEFAULT_FILE_STORAGE = 'db_file_storage.storage.DatabaseFileStorage'
- 
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -187,7 +189,7 @@ JWT_AUTH = {
         'JWT_ALLOW_REFRESH': True,
         'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
     }
-                          
+
 ADMIN_SHORTCUTS = [
     {
         'shortcuts': [

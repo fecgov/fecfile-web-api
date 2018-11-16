@@ -1,19 +1,41 @@
 <div class="forms__wizard">
-  <div class="form__steps">
-    <app-steps
-      [steps]="[
-        {text: 'Type', step: 'step_1'},
-        {text: 'Form', step: 'step_2'},
-        {text: 'Preview', step: 'step_3'},
-        {text: 'Sign', step: 'step_4'},
-        {text: 'Submit', step: 'step_5'}
-      ]"
-      [current_step]="currentStep"
+  <div 
+    class="form__alerts"
+    [ngClass]="{
+      'show-alerts': showValidateBar === true,
+      'hide-alerts': step==='step_5'
+    }"
+  >
+    <app-validate></app-validate>
+  </div>    
+  <div 
+    class="form__container"
+    [ngClass]="{
+      'show-alerts': showValidateBar === true,
+      'hide-alerts': step==='step_5'
+    }"
+  >
+    <div class="form__steps">
+      <app-steps
+        [steps]="[
+          {text: 'Type', step: 'step_1'},
+          {text: 'Form', step: 'step_2'},
+          {text: 'Preview', step: 'step_3'},
+          {text: 'Sign', step: 'step_4'},
+          {text: 'Submit', step: 'step_5'}
+        ]"
+        [current_step]="currentStep"
+      >
+      </app-steps>
+    </div>    
+    <div 
+      class="form__content" 
+      *ngIf="!isLoading"
+      [ngClass]="{
+        'show-alerts': showValidateBar === true,
+        'hide-alerts': step==='step_5'
+      }"      
     >
-    </app-steps>
-  </div>
-  <div class="form__container">
-    <div class="form__content" *ngIf="!isLoading">
       <div
         class="form__step"
         [hidden]="step!=='step_1'"
@@ -50,5 +72,5 @@
         ></app-submit>
       </div>
     </div>
-  </div>
-</div>
+  </div> <!-- ./form__container -->
+</div> <!-- ./forms__wizard -->

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { MessageService } from '../../services/MessageService/message.service';
+import { FormsService } from '../../services/FormsService/forms.service';
 
 @Component({
   selector: 'app-preview',
@@ -19,13 +20,15 @@ export class PreviewComponent implements OnInit {
   public form_type: string = '';
   public date_stamp: Date = new Date();
   public form_details: form99;
-  private _subscription: Subscription;
+  public showValidateBar: boolean = false;
 
+  private _subscription: Subscription;
   private _step: string = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _formsService: FormsService
   ) {}
 
   ngOnInit(): void {
@@ -49,40 +52,92 @@ export class PreviewComponent implements OnInit {
             }
           }
         });
+  }
 
+  ngDoCheck(): void {
     if(!this.form_details) {
       if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
         this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+        if(this.form_type === '99') {
+          if(!this.type_selected) {
+            this.type_selected = this.form_details.reason;
+          } 
+        }
       }
     }
   }
 
   public goToPreviousStep(): void {
-      setTimeout(() => {
-        localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
-      }, 100);
-          
-      this.status.emit({
-        form: {},
-        direction: 'previous',
-        step: 'step_2',
-        previousStep: this._step
-      });
+    setTimeout(() => {
+      localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
+    }, 100);
+        
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2',
+      previousStep: this._step
+    });
+
+    this.showValidateBar = false;
+
+    this._messageService
+    .sendMessage({
+      'validateMessage': {
+        'validate': {},
+        'showValidateBar': false                  
+      }            
+    });          
   }
 
   public goToNextStep(): void {
-      console.log('Preview goToNextStep: ');
-      setTimeout(() => {
-        console.log('this.form_details: ', this.form_details);
-        localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
-      }, 100);
+    setTimeout(() => {
+      localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
+    }, 100);
 
-      this.status.emit({
-        form: 'preview',
-        direction: 'next',
-        step: 'step_4',
-        previousStep: this._step
-      });
+    this.status.emit({
+      form: 'preview',
+      direction: 'next',
+      step: 'step_4',
+      previousStep: this._step
+    });
+
+    this.showValidateBar = false;
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false                  
+        }            
+      });          
+  }
+
+  public validateForm(): void {
+    this.showValidateBar = true;
+
+    this._formsService
+      .validateForm({}, this.form_type)
+      .subscribe(res => {
+        if(res) {
+            this._messageService
+              .sendMessage({
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true                  
+                }
+              });
+        }
+      },
+      (error) => {
+        this._messageService
+          .sendMessage({
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true                  
+            }            
+          });
+      });    
   }
 
 }

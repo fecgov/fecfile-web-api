@@ -9,19 +9,141 @@ from .models import CommitteeInfo, Committee
 from .serializers import CommitteeInfoSerializer, CommitteeSerializer, CommitteeInfoListSerializer
 import json
 import os
+import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
 import datetime
 import magic
-from django.http import JsonResponse
+import pdfrw
+from django.http import JsonResponse, HttpResponse
+import fecfiler
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
 logger = logging.getLogger(__name__)
 
+# API which prints Form 99 data
+@api_view(['POST'])
+def print_pdf_info(request):
+    """
+    Creates a new CommitteeInfo Object, or updates the last created CommitteeInfo object created for that committee.
+    """
+    # Configuration values
+    ANNOT_KEY = '/Annots'
+    ANNOT_FIELD_KEY = '/T'
+    ANNOT_VAL_KEY = '/V'
+    ANNOT_RECT_KEY = '/Rect'
+    SUBTYPE_KEY = '/Subtype'
+    WIDGET_SUBTYPE_KEY = '/Widget'
+
+    input_pdf_path = 'templates/forms/F99.pdf'
+    output_pdf_path = 'templates/forms/media/%s.pdf' %request.data.get('id')
+
+    #code to generate form 99 using form99 template
+    template_pdf = pdfrw.PdfReader(input_pdf_path)
+    annotations = template_pdf.pages[0][ANNOT_KEY]
+    for annotation in annotations:
+        if annotation[SUBTYPE_KEY] == WIDGET_SUBTYPE_KEY:
+            if annotation[ANNOT_FIELD_KEY]:
+                key = annotation[ANNOT_FIELD_KEY][1:-1]
+                if key == "IMGNO":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('id')))
+                    )
+                if key == "FILING_TIMESTAMP":
+                    date = datetime.datetime.now().strftime('%Y%m%d')
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(date))
+                    )
+                if key == "PAGESTR":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format("1 of 1"))
+                    )
+                if key == "COMMITTEE_NAME":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('committeename')))
+                    )
+                if key == "FILER_FEC_ID_NUMBER":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('committeeid')))
+                    )
+                if key == "STREET_1":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('street1')))
+                    )
+                if key == "STREET_2":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('street2')))
+                    )
+                if key == "CITY":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('city')))
+                    )
+                if key == "STATE":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('state')))
+                    )
+                if key == "ZIP":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('zipcode')))
+                    )
+                if key == "FREE_FORMAT_TEXT":
+                    annotation.update(
+                        pdfrw.PdfDict(V='{}'.format(request.data.get('text')))
+                    )
+    pdfrw.PdfWriter().write(output_pdf_path, template_pdf)
+
+    #download_link = 'http://{}/{}'.format(request.get_host(),output_pdf_path)
+    #return Response(download_link)
+
+    response = HttpResponse('f99_preview', content_type='application/pdf')
+    response['content-Disposition'] = 'attachment; filename = {}.pdf'.format(request.data.get('id'))
+    return response
+
+# API to create a .fec which can be used on webprint module to print pdf. The data being used is the data that was last saved in the database for f99.
+"""@api_view(['GET'])
+def print_f99_info(request):
+
+    """
+    #Fetches the last unsubmitted comm_info object saved in db and creates a .fec file which is used as input to print form99 in webprint module.
+    """
+    try: 
+        # fetch last comm_info object created that is not submitted, else return None
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
+
+    except CommitteeInfo.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND) #status=status.HTTP_404_NOT_FOUND)
+
+    file_name = "%s.fec" %comm_info.id
+    with open(file_name, "w") as text_file:
+        text_file.write("HDRFEC8.3FECfile8.3.0.0(f32)F99")
+        text_file.write("%s" %comm_info.committeeid)
+        text_file.write("%s" %comm_info.committeename)
+        text_file.write("%s" %comm_info.street1)
+        text_file.write("%s" %comm_info.street2)
+        text_file.write("%s" %comm_info.city)
+        text_file.write("%s" %comm_info.state)
+        text_file.write("%s" %comm_info.zipcode)
+        text_file.write("%s" %comm_info.treasurerlastname)
+        text_file.write("%s" %comm_info.treasurerfirstname)
+        text_file.write("%s" %comm_info.zipcode)
+        date = comm_info.created_at.strftime('%Y%m%d')
+        text_file.write("%s" %date)
+        text_file.write("%s" %comm_info.reason)
+        text_file.write("[BEGINTEXT]")
+        text_file.write("%s" %comm_info.zipcode)
+        text_file.write("[ENDTEXT]")
+
+    # get details of a single comm_info
+    if request.method == 'GET':
+        if comm_info:
+            serializer = CommitteeInfoSerializer(comm_info)
+            return Response(status=status.HTTP_201_CREATED)    
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)    
+"""
 @api_view(['GET'])
 def fetch_f99_info(request):
-
     """"
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
@@ -41,7 +163,7 @@ def fetch_f99_info(request):
             return Response({})    
 
 parser_classes = (MultiPartParser, FormParser)   
-#@csrf_exempt
+
 @api_view(['POST'])
 def create_f99_info(request):
     """
@@ -70,10 +192,9 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_on_file_2': request.data.get('email_on_file_2'),
-            'file': request.data.get('file'),
-            
+            'file': request.data.get('file'),            
         }
-
+        
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -98,26 +219,61 @@ def update_f99_info(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 @api_view(['POST'])
 def submit_comm_info(request):
     """
-    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
+    Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details.Call the data_receive API and fetch the response
     """
     #import ipdb; ipdb.set_trace()
+    #if request.method == 'POST':
     if request.method == 'POST':
         try:
+            #import ipdb; ipdb.set_trace()
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
             if comm_info:
+
+                comm_info.is_submitted=True
+                comm_info.updated_at=datetime.datetime.now()
+                comm_info.save()
                 new_data = comm_info.__dict__
-                new_data["is_submitted"]=True
-                new_data["updated_at"]=datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
+                serializer = CommitteeInfoSerializer(comm_info) #, data=new_data)
+                if True: #serializer.is_valid():
+                    #serializer.save()
+                    
+                    # make temp file, stream it , and close
+                    try:
+                        tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+                        json.dump(serializer.data, open(tmp_filename, 'w'))
+                        
+                        f99_obj_to_s3 = {
+                            'committeeid': new_data['committeeid'],                                                    
+                            #'upload':open(tmp_filename, 'r')
+                        }
+                        resp = requests.post("http://" + fecfiler.settings.DATA_RECEIVE_API_URL + fecfiler.settings.DATA_RECEIVE_API_VERSION + "f99_data_receive", data=f99_obj_to_s3, files={'upload':open(tmp_filename,'r')})
+
+                        if not resp.ok:
+                            return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+                        
+                        # delete tmp file if exists
+                        try:
+                            os.remove(tmp_filename)
+                        except:
+                            pass
+
+                    except:
+                        try:
+                            os.remove(tmp_filename)
+                        except:
+                            pass
+                    
+                    return Response({'uploaded_file': resp.json(), 'obj_data':serializer.data}, status=status.HTTP_200_OK)
                 else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -137,9 +293,7 @@ def get_f99_reasons(request):
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
+        
 @api_view(['GET'])
 def get_committee(request):
     """
@@ -172,7 +326,6 @@ def get_signee(request):
         filtered_d = {key: val for key, val in serializer.data.items() if key not in ['street1', 'street2', 'created_at','state','city','zipcode']}
         # FIXME: This is to be redone after there is a discussion on how to model data for the signatories of each committee.
         filtered_d['email'] = request.user.email
-        #import ipdb; ipdb.set_trace();
         return Response(filtered_d)    
     
     
@@ -318,7 +471,23 @@ def validate_f99(request):
     else:
         return JsonResponse(errormess, status=400, safe=False)
 
-
+@api_view(['GET'])
+def get_rad_analyst_info(request):
+    """
+    ref: #https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=DEMO_KEY&sort_hide_null=false&sort_null_only=false
+    """
+    if request.method == 'GET':
+        try:
+            #import ipdb; ipdb.set_trace();
+            if request.user.username: 
+                ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + request.user.username + '&sort_hide_null=false&sort_null_only=false')
+                return JsonResponse({"response":ab.json()['results']})
+            else:
+                return JsonResponse({"ERROR":"You must be logged in  for this operation."})
+        except:
+            return JsonResponse({"ERROR":"ERR_f99_03: Unexpected Error. Please contact administrator."})
+            
+            
 @api_view(['GET'])
 def get_form99list(request):
     """
@@ -337,23 +506,3 @@ def get_form99list(request):
         serializer = CommitteeInfoListSerializer(comm)
         return Response(serializer.data)    
 
-"""
-    if request.method == 'POST':
-        try:
-            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
-            if comm_info:
-                new_data = comm_info.__dict__
-                new_data["is_submitted"]=True
-                new_data["updated_at"]=datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
-        except:
-            return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-
-    else:
-        return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
-"""

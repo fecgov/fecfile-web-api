@@ -39,3 +39,36 @@
 .btn-edit {
   @extend .btn-secondary-gray;
 }
+
+.btn-info {
+  background-color: Transparent;
+  background-repeat: no-repeat;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  &:hover,
+  &:active,
+  &:focus {
+    background-color: Transparent !important;
+    background-repeat: no-repeat;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;    
+  }
+  .info-icon {
+    color: $blueZodiac; 
+    outline: none;
+  }
+}
+
+.btn-right {
+  float: right;
+}
+
+.btn-left {
+  float: left;
+}

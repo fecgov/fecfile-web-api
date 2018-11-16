@@ -60,6 +60,16 @@
 @mixin form-btns() {
   .forms__btn-container {
     margin: 0 auto;
+    width: 80%;
+    @include media(tablet) {
+      width: 100%;    
+    }
+    @include media(mediumDesktop) {
+      width: 100%;
+    }         
+    @include media(largeDesktop) {
+      width: 100%;
+    }     
     .btn-container-row {
       @include clearfix();
       border-bottom: 1px solid $dustyGray;

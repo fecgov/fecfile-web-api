@@ -1,3 +1,54 @@
 @import '../../scss/global';
 
+.preview-container {
+	header {    
+	    .btn-print-preview {
+	      @extend .btn-secondary-gray;
+	      margin-right: 10px;
+	    }
+	    .btn-validate {
+	      @extend .btn-primary;
+	    }
+	    .btn {
+	      padding-top: 10px;
+	    }
+      	@include clearfix();		
+	}
+	section {
+		.content {
+	      .validate__form {
+	        &.show-alerts {
+	          display: block;
+	          @include media(tablet) {
+	            display: block;
+	          }
+	          @include media(mediumDesktop) {
+	            display: none;
+	          }         
+	          @include media(largeDesktop) {
+	            display: none;
+	          }           
+	        }
+	        background-color: $bombay;
+	        display: none;
+	        height: 80px;
+	        margin-top: 10px;
+	        width: 100%;
+	        @include media(tablet) {
+	          background-color: $bombay;
+	          display: none;
+	          height: 80px;
+	          margin-top: 10px;
+	          width: 100%;        
+	        }
+	        @include media(mediumDesktop) {
+	          display: none;
+	        }         
+	        @include media(largeDesktop) {
+	          display: none;
+	        }         
+	      }			
+		}
+	}
+}
 @include form-btns();

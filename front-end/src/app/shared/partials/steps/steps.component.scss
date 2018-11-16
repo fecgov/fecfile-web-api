@@ -6,8 +6,20 @@
   bottom: 0;
   left: 0;
   margin: 0 auto;
-  padding: 24px 0 10px;
-  width: 100%;
+  padding: 24px 0;
+  width: 80%;
+  @include media(tablet) {
+    padding: 24px 0 10px;
+    width: 80%;
+  }
+  @include media(mediumDesktop) {
+    padding: 24px 0 10px;
+    width: 100%;
+  }         
+  @include media(largeDesktop) {
+    padding: 24px 0 10px;
+    width: 100%;
+  }   
   li {
     &:not(:last-child) {
       &:before {
