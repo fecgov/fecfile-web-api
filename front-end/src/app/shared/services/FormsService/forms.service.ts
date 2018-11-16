@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
+import { AppConfigService } from '../../../app-config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class FormsService {
 
   constructor(
     private _http: HttpClient,
-    private _cookieService: CookieService
+    private _cookieService: CookieService,
+    private _appConfigService: AppConfigService
   ) { }
 
   /**
@@ -43,7 +45,7 @@ export class FormsService {
 
     return this._http
      .get(
-        `${environment.apiUrl}${url}`,
+        `${this._appConfigService.getConfig().apiUrl}${url}`,
         {
           headers: httpOptions,
           params
@@ -82,7 +84,7 @@ export class FormsService {
 
     return this._http
       .post<form99>(
-        `${environment.apiUrl}${url}`,
+        `${this._appConfigService.getConfig().apiUrl}${url}`,
         data,
         {
           headers: httpOptions
@@ -124,14 +126,14 @@ export class FormsService {
         formSaved = formSavedObj.saved;
       }
 
-      url = '/f99/create_f99_info';  
-      
+      url = '/f99/create_f99_info';
+
       data = form99_details;
     }
 
     return this._http
       .post(
-        `${environment.apiUrl}${url}`,
+        `${this._appConfigService.getConfig().apiUrl}${url}`,
         data,
         {
           headers: httpOptions
@@ -171,7 +173,7 @@ export class FormsService {
     }
     return this._http
       .post(
-        `${environment.apiUrl}${url}`,
+        `${this._appConfigService.getConfig().apiUrl}${url}`,
         data,
         {
           headers: httpOptions
@@ -182,6 +184,6 @@ export class FormsService {
             return true;
           }
           return false;
-      }));      
+      }));
   }
 }
