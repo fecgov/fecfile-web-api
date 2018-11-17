@@ -543,7 +543,7 @@ def get_form99list(request):
 
 #email through AWS SES
 def email(boolean, data):
-    SENDER = "pjinka.ctr@fec.gov"
+    SENDER = "donotreply@fec.gov"
     RECIPIENT = "%s" % data.get('email_on_file')
     
     SUBJECT = "Test - Form 99 submitted successfully"
