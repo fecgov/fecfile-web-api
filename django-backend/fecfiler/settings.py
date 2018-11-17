@@ -124,7 +124,7 @@ DATABASES = {
          'NAME': os.environ.get('DB_NAME', 'postgres'),
          'USER': os.environ.get('DB_USERNAME', 'postgres'),
          'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-         'HOST': os.environ.get('DB_HOST', 'db'),
+         'HOST': os.environ.get('DB_HOST', 'localhost'),
          'PORT': os.environ.get('DB_PORT', '5432')
      }
 }
@@ -234,3 +234,13 @@ LOGGING = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# AWS SES Configuration Settings
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+AWS_ACCESS_KEY_ID = 'AKIAIH4XBCHDF3EWFC7Q'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_HOST_NAME = 'us-east-1'
+AWS_REGION = 'us-east-1'
+
+AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
