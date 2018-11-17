@@ -17,6 +17,11 @@ import magic
 import pdfrw
 from django.http import JsonResponse, HttpResponse, FileResponse
 import fecfiler
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.template import Context, Template
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -239,6 +244,7 @@ def submit_comm_info(request):
                 serializer = CommitteeInfoSerializer(comm_info, data=new_data)
                 if serializer.is_valid():
                     serializer.save()
+                    email(True, serializer.data)
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
@@ -533,3 +539,68 @@ def get_form99list(request):
 
         serializer = CommitteeInfoListSerializer(comm)
         return Response(serializer.data)
+
+
+#email through AWS SES
+def email(boolean, data):
+    SENDER = "pjinka.ctr@fec.gov"
+    RECIPIENT = "%s" % data.get('email_on_file')
+    
+    SUBJECT = "Test - Form 99 submitted successfully"
+
+    # The email body for recipients with non-HTML email clients.
+    BODY_TEXT = ("Form 99 that we received has been validated and submitted\r\n"
+                 "This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."
+                )
+                
+    # The HTML body of the email.
+    #final_html = email_ack1.html.replace('{{@REPID}}',1234567).replace('{{@REPLACE_CMTE_ID}}',C0123456)
+    #t = Template(email_ack1)
+    #c= Context({'@REPID':123458},)
+    BODY_HTML = render_to_string('email_ack.html',{'data':data})
+    #data.get('committeeid')
+    """<html>
+    <head></head>
+    <body>
+      <h1>Form 99 that we received has been validated and submitted</h1>
+      <p>This email was sent by FEC.gov. If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307."</p>
+    </body>
+    </html>"""
+
+    # The character encoding for the email.
+    CHARSET = "UTF-8"
+
+    # Create a new SES resource and specify a region.
+    client = boto3.client('ses', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,region_name=settings.AWS_REGION)
+
+    # Try to send the email.
+    try:
+        #Provide the contents of the email.
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+           
+        )
+    # Display an error if something goes wrong. 
+    except ClientError as e:
+        print(e.response['Error']['Message'])
