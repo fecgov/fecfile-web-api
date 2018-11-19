@@ -2,7 +2,33 @@
 	<div class="reports-container">
 	    <div class="grid-row">
 	      <div class="grid-row__col grid-row__col--12">
-	        <h1 class="text-center">Reports Content</h1>
+					<h1 class="text-center">Reports Details</h1>
+					<table class="datatable" style="width:100%">
+					<thead>
+						<tr align="left">
+							<th>Form</th>
+							<th>Status</th>
+							<th>FEC ID</th>
+							<th>Coverage Start Date</th>
+							<th>Coverage End Date</th>
+							<th>Report</th>
+							<th>Filed Date</th>
+							<th>Actions</th>
+						</tr>
+					</thead>	
+					<tbody>
+						<tr *ngFor="let report of reports || async">
+							<td>{{report.form_type}}</td>
+							<td>submitted</td>
+							<td>{{report.committeeid}}</td>
+							<td>{{report.coverage_start_date}}</td>
+							<td>{{report.coverage_end_date}}</td>
+							<td>{{report.ReportType}}</td>
+							<td>{{report.created_dt}}</td>
+							<td></td>
+						</tr>
+					</tbody>
+					</table>
 	      </div>
 	    </div>		
 	</div>
