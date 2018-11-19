@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
+#from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -207,7 +208,22 @@ def create_f99_info(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+"""
+@api_view(['POST'])
+#class f99_file_upload(APIView):
+    #parser_class = (FileUploadParser,)
 
+def f99_file_upload(self, request, format=None):
+    import ipdb; ipdb.set_trace()
+    if 'file' not in request.data:
+        raise ParseError("Empty content")
+
+    f = request.data['file']
+    #import ipdb; ipdb.set_trace()
+    
+    mymodel.my_file_field.save(f.name, f, save=True)
+    return Response(status=status.HTTP_201_CREATED)
+"""
 @api_view(['POST'])
 def update_f99_info(request):
     """
@@ -371,10 +387,6 @@ def update_committee(request, cid):
          if serializer.is_valid():
              serializer.save()
              return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 @api_view(['POST'])
 def create_committee(request):
     # insert a new record for a committee
