@@ -42,10 +42,10 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.form_type = validated_data.get('form_type', instance.form_type)
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)
-        #try:
-        #    instance.file = validated_data.get('file', instance.file)
-        #except:
-        #    pass
+        try:
+            instance.file = validated_data.get('file', instance.file)
+        except:
+            pass
         
         instance.save()
         return instance
