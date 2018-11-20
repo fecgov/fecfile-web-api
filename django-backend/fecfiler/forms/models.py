@@ -32,6 +32,7 @@ class CommitteeInfo(models.Model):
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
     additional_email_1 = models.TextField(max_length=100, null= False, default = "-")
     additional_email_2 = models.TextField(max_length=100, null= False, default = "-")
+    form_type = models.TextField(max_length=3, null= False, default = "F99")
     # file = models.FileField(upload_to='f99/', null=True, validators=(validate_is_pdf,))
 
     # class constructor

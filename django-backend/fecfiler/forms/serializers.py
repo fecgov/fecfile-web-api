@@ -8,7 +8,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
             fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                     'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                     'treasurermiddlename', 'treasurerlastname', 'treasurersuffix',
-                    'created_at','is_submitted', 'signee', 'email_on_file' )
+                    'created_at','is_submitted', 'signee', 'email_on_file', 'form_type')
 
             # fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
             #         'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
