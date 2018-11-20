@@ -120,12 +120,25 @@
             padding-right: 15px;
             width: auto;
           }
+          .btn-link {
+            color: $black;
+            line-height: inherit;
+            padding: 0;
+          }
+          .profile-icon {
+            padding-right: 5px;
+          }
           .dropdown-toggle {
             cursor: pointer;
+            display: inline-block;
+            &:hover {
+              text-decoration: underline;
+            }
           }
           .dropdown {                    
             .dropdown-menu {
               left: -45px !important;
+              top: 20px;
               text-align: center;
             }
           }

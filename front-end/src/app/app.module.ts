@@ -37,6 +37,9 @@ import { PreviewComponent } from './shared/partials/preview/preview.component';
 import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
+import { AccountComponent } from './account/account.component';
+import { UsersComponent } from './users/users.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +61,10 @@ import { SubmitComponent } from './shared/partials/submit/submit.component';
     PreviewComponent,
     ValidateComponent,
     SignComponent,
-    SubmitComponent
+    SubmitComponent,
+    AccountComponent,
+    UsersComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

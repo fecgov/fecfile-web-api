@@ -35,23 +35,42 @@
           </a>
         </li>
         <li class="nav-item">
-          <a [routerLink]="['/profile']" class="icon-link">
-            <i class="profile-icon icon" aria-hidden="true"></i>
-            <span class="icon-link-text">Profile</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <div ngbDropdown placement="bottom-left" class="d-inline-block">
-            <div class="dropdown-toggle" role="button" id="dropdownMenu" ngbDropdownToggle>
-              <i class="settings-icon icon" aria-hidden="true"></i>
-            </div>
+          <div 
+            ngbDropdown 
+            placement="bottom-left" 
+            class="d-inline-block"
+          >
+            <i class="profile-icon icon" aria-hidden="true"></i>          
+            <div 
+              class="dropdown-toggle" 
+              role="button" 
+              id="dropdownMenu" 
+              ngbDropdownToggle
+            >
+              Profile
+            </div>            
             <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+              <div>
+                <a [routerLink]="['/account']">
+                  Account
+                </a>                
+              </div>
+              <div>
+                <a [routerLink]="['/users']">
+                  Users
+                </a>                
+              </div>  
+              <div>
+                <a [routerLink]="['/settings']">
+                  Settings
+                </a>                
+              </div>                            
               <div>
                 <a [routerLink]="['/logout']" (click)="logout()">
                   Logout
                 </a>
               </div>
-            </div>
+            </div>            
           </div>
         </li>
       </ul> <!-- ./nav-links -->
