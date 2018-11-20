@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, APP_INITIALIZER, ModuleWithProviders } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -37,13 +37,9 @@ import { PreviewComponent } from './shared/partials/preview/preview.component';
 import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
-import { AppConfigService } from './app-config.service';
-
-const appInitializerFn = (appConfig: AppConfigService) => {
-  return () => {
-    return appConfig.loadAppConfig();
-  };
-};
+import { AccountComponent } from './account/account.component';
+import { UsersComponent } from './users/users.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +61,10 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     PreviewComponent,
     ValidateComponent,
     SignComponent,
-    SubmitComponent
+    SubmitComponent,
+    AccountComponent,
+    UsersComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -82,17 +81,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     AngularEditorModule,
     NgbModule.forRoot()
   ],
-  providers: [
-    CookieService,
-    CanActivateGuard,
-    AppConfigService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFn,
-      multi: true,
-      deps: [AppConfigService]
-    }
-  ],
+  providers: [CookieService, CanActivateGuard],
   bootstrap: [AppComponent],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
