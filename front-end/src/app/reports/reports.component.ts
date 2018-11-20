@@ -22,7 +22,7 @@ export class ReportsComponent implements OnInit {
  
   
   ngOnInit() {
-    console.log("accessing service call...")
+    console.log("accessing service call...");
     this._reportService.getReports()
       .subscribe(res => this.reports = <IReport[]> res);
     console.log(this.reports)

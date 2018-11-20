@@ -3,7 +3,7 @@
 	    <div class="grid-row">
 	      <div class="grid-row__col grid-row__col--12">
 					<h1 class="text-center">Reports Details</h1>
-					<table class="datatable" style="width:100%">
+					<table class="table-striped" style="width:100%">
 					<thead>
 						<tr align="left">
 							<th>Form</th>
@@ -19,12 +19,12 @@
 					<tbody>
 						<tr *ngFor="let report of reports || async">
 							<td>{{report.form_type}}</td>
-							<td>submitted</td>
+							<td>{{report.is_submitted ? 'submitted' :'save'}}</td>
 							<td>{{report.committeeid}}</td>
 							<td>{{report.coverage_start_date}}</td>
 							<td>{{report.coverage_end_date}}</td>
 							<td>{{report.ReportType}}</td>
-							<td>{{report.created_dt}}</td>
+							<td>{{report.created_at | date: 'mm/dd/yyyy'}}</td>
 							<td></td>
 						</tr>
 					</tbody>
