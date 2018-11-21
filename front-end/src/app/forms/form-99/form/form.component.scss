@@ -33,14 +33,14 @@
     @include media(mediumDesktop) {
       display: inline-block;
       float: left;
-      min-height: 100vh;
+      min-height: 120vh;
       position: relative;
       width: 100px;      
     }         
     @include media(largeDesktop) {
       display: inline-block;
       float: left;
-      min-height: 100vh;
+      min-height: 120vh;
       position: relative;
       width: 100px;      
     }             

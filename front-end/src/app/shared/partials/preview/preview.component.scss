@@ -64,38 +64,66 @@
 	}
 	section {
 		.content {
-	      .validate__form {
-	        &.show-alerts {
-	          display: block;
-	          @include media(tablet) {
-	            display: block;
-	          }
-	          @include media(mediumDesktop) {
-	            display: none;
-	          }         
-	          @include media(largeDesktop) {
-	            display: none;
-	          }           
-	        }
-	        background-color: $bombay;
-	        display: none;
-	        height: 80px;
-	        margin-top: 10px;
-	        width: 100%;
-	        @include media(tablet) {
-	          background-color: $bombay;
-	          display: none;
-	          height: 80px;
-	          margin-top: 10px;
-	          width: 100%;        
-	        }
-	        @include media(mediumDesktop) {
-	          display: none;
-	        }         
-	        @include media(largeDesktop) {
-	          display: none;
-	        }         
-	      }			
+			.grid-col {
+				display: block;
+				max-width: 100%;
+				padding-left: 10px;
+				width: 100%;				
+				@include media(tablet) {
+					display: block;
+					padding-left: 10px;
+					max-width: 100%;
+					width: 100%;
+				}
+				@include media(mediumDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;					
+				}         
+				@include media(largeDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;				    				
+				} 				
+			}	
+			.validate__form {
+			&.show-alerts {
+			  display: block;
+			  @include media(tablet) {
+			    display: block;
+			  }
+			  @include media(mediumDesktop) {
+			    display: none;
+			  }         
+			  @include media(largeDesktop) {
+			    display: none;
+			  }           
+			}
+			background-color: $bombay;
+			display: none;
+			height: 80px;
+			margin-top: 10px;
+			width: 100%;
+			@include media(tablet) {
+			  background-color: $bombay;
+			  display: none;
+			  height: 80px;
+			  margin-top: 10px;
+			  width: 100%;        
+			}
+			@include media(mediumDesktop) {
+			  display: none;
+			}         
+			@include media(largeDesktop) {
+			  display: none;
+			}         
+			}			
 		}
 	}
 }

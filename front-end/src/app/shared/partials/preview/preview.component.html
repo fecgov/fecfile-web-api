@@ -33,7 +33,7 @@
       </div>
     </div>      
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--4">
+        <div class="grid-col">
           <p>
             <b>Name of Committee in Full</b>
           </p>
@@ -41,24 +41,29 @@
             {{ committee_details?.committeename }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--4">
-          <p><b>Address</b></p>
+        <div class="grid-col">
+          <p><b>Address Line 1</b></p>
           <p>
-            {{ committee_details?.street1 }}<br/>
-            {{ committee_details?.street2 }}
+            {{ committee_details?.street1 }}
           </p>
         </div>
+        <div class="grid-col">
+          <p><b>Address Line 2</b></p>
+          <p>
+            {{ committee_details?.street2 }}
+          </p>
+        </div>        
       </div>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--3">
-        <p>
-          <b>City</b>
-        </p>
-        <p>
-          {{ committee_details?.city }}
-        </p>
+        <div class="grid-col">
+          <p>
+            <b>City</b>
+          </p>
+          <p>
+            {{ committee_details?.city }}
+          </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-col">
           <p>
             <b>State</b>
           </p>
@@ -66,7 +71,7 @@
             {{ committee_details?.state }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-col">
           <p>
             <b>Zip Code</b>
           </p>
@@ -74,17 +79,17 @@
             {{ committee_details?.zipcode }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+      </div>
+      <div class="grid-row">
+        <div class="grid-col">
           <p>
             <b>Treasurer Last Name</b>
           </p>
           <p>
             {{ committee_details?.treasurerlastname }}
           </p>
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--3">
+        </div>        
+        <div class="grid-col">
           <p>
             <b>Treasurer First Name</b>
           </p>
@@ -92,7 +97,7 @@
            {{ committee_details?.treasurerfirstname }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-col">
           <p>
             <b>Treasurer Middle Name</b>
           </p>
@@ -100,7 +105,9 @@
            {{ committee_details?.treasurermiddlename }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+      </div>
+      <div class="grid-row">
+        <div class="grid-col">
           <p>
             <b>Treasurer Prefix</b>
           </p>
@@ -108,14 +115,14 @@
            {{ committee_details?.treasurerprefix }}
           </p>
         </div>
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-col">
           <p>
             <b>Treasurer Sufix</b>
           </p>
           <p>
            {{ committee_details?.treasurersuffix }}
           </p>
-        </div>
+        </div>        
       </div>
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
