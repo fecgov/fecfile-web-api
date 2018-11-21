@@ -224,6 +224,12 @@ export class SignComponent implements OnInit {
     }
   }
 
+  public updateValidation(e): void {
+    if(e.target.checked) {
+      this.signFailed = false;
+    }
+  }
+
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();

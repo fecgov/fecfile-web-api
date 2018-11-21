@@ -88,7 +88,7 @@
             type="password"
             class="login-password login-input"
             id="login-password"
-            placeholder="**********"
+            placeholder="e.g. 123456!ABC"
             formControlName="loginPassword"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || !passwordInputError,

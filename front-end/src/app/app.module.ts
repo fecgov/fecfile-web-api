@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NgxEditorModule } from 'ngx-editor';
@@ -41,6 +42,14 @@ import { AccountComponent } from './account/account.component';
 import { UsersComponent } from './users/users.component';
 import { SettingsComponent } from './settings/settings.component';
 
+import { AppConfigService } from './app-config.service';
+
+ const appInitializerFn = (appConfig: AppConfigService) => {
+  return () => {
+    return appConfig.loadAppConfig();
+  };
+};
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -71,6 +80,7 @@ import { SettingsComponent } from './settings/settings.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    HttpModule,
     routing,
     AngularFileUploaderModule,
     ArchwizardModule,
