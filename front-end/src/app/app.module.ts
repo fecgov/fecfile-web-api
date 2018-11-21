@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, APP_INITIALIZER, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
@@ -91,7 +91,17 @@ import { AppConfigService } from './app-config.service';
     AngularEditorModule,
     NgbModule.forRoot()
   ],
-  providers: [CookieService, CanActivateGuard],
+  providers: [
+    CookieService, 
+    CanActivateGuard,
+    AppConfigService,
+      {
+        provide: APP_INITIALIZER,
+        useFactory: appInitializerFn,
+        multi: true,
+        deps: [AppConfigService
+      }
+    ],
   bootstrap: [AppComponent],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
