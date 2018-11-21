@@ -99,7 +99,7 @@ import { AppConfigService } from './app-config.service';
         provide: APP_INITIALIZER,
         useFactory: appInitializerFn,
         multi: true,
-        deps: [AppConfigService
+        deps: [AppConfigService]
       }
     ],
   bootstrap: [AppComponent],
