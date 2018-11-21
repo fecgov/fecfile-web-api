@@ -42,6 +42,14 @@ import { AccountComponent } from './account/account.component';
 import { UsersComponent } from './users/users.component';
 import { SettingsComponent } from './settings/settings.component';
 
+import { AppConfigService } from './app-config.service';
+
+ const appInitializerFn = (appConfig: AppConfigService) => {
+  return () => {
+    return appConfig.loadAppConfig();
+  };
+};
+
 @NgModule({
   declarations: [
     AppComponent,

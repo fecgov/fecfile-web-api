@@ -118,7 +118,7 @@
                   formControlName="additional_email_1"
                 >
                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
+                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
                     Additional email must be valid email address.
                   </div>
                 </div>
@@ -131,7 +131,7 @@
                   formControlName="additional_email_2"
                 >
                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
+                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
                     Additional email must be valid email address.
                   </div>
                 </div>
@@ -163,6 +163,7 @@
               id="agreement"
               name="agree"
               value="yes"
+              (change)="updateValidation($event)"
               formControlName="agreement"
             />
             <label class="agreement__text" for="agreement">
