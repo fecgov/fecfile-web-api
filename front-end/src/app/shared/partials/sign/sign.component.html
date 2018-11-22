@@ -36,9 +36,9 @@
           </div>
         </div>      
         <div class="grid-row" 
-          *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched)) || (signFailed)">
+          *ngIf="(frmSignee.invalid || (frmSignee.dirty || frmSignee.touched))">
           <div class="grid-row__col grid-row__col--12">
-            <div class="text-error text-center">
+            <div class="text-error text-center" *ngIf="signFailed">
               You must certify this form.
             </div>
           </div>

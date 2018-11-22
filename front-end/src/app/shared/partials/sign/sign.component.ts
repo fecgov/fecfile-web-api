@@ -157,11 +157,13 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
+    console.log('doSubmitForm: ');
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
     this._form_details.file = '';
 
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+
     if(this.frmSignee.invalid) {
       this.signFailed = true;
     } else if(this.frmSignee.valid) {

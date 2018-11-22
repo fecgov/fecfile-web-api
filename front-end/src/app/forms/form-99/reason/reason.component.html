@@ -103,22 +103,22 @@
       </div> 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--6">
-            <button 
-              class="btn btn-previous btn-left" 
-              type="button"
-              (click)="previousStep()"
-            >
-              Previous 
-            </button>          
+          <button 
+            class="btn btn-previous btn-left" 
+            type="button"
+            (click)="previousStep()"
+          >
+            Previous 
+          </button>          
         </div>
         <div class="grid-row__col grid-row__col--6">
-            <button 
-              class="btn btn-primary btn-right" 
-              type="submit"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
-            > 
-              Next
-            </button>          
+          <button 
+            class="btn btn-primary btn-right" 
+            type="submit"
+            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+          > 
+            Next
+          </button>          
         </div>
       </div> 
     </footer>

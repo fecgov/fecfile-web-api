@@ -27,7 +27,7 @@ export class HeaderComponent implements OnInit {
     this._messageService.sendMessage(
       {
         loggedOut: true,
-        msg: 'You have successfully logged out of the FEC eFile application.'
+        msg: `You have successfully logged out of the ${environment.appTitle} application.`
       }
     );
 
