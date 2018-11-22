@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { CookieService } from 'ngx-cookie-service';
 import { ApiService } from '../shared/services/APIService/api.service';
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
+  public appTitle: string = null;
   public loggedOut: any = '';
   private _subscription: Subscription;
 
@@ -45,6 +47,9 @@ export class LoginComponent implements OnInit {
  }
 
   ngOnInit() {
+    this.appTitle = environment.appTitle;
+
+    console.log('this.appTitle: ', this.appTitle);
   }
 
   ngOnDestroy() {
