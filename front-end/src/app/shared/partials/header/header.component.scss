@@ -145,6 +145,36 @@
               left: -45px !important;
               top: 20px;
               text-align: center;
+              div {
+                display: inline-block;
+                  height: 30px;
+                  margin-bottom: 0;
+                  margin-top: 0;
+                  padding-bottom: 0;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  padding-top: 0;              
+                @include media(tablet) {
+                  display: inline-block;
+                  height: 30px;
+                  margin-bottom: 0;
+                  margin-top: 0;
+                  padding-bottom: 0;
+                  padding-left: 10px;
+                  padding-right: 10px;
+                  padding-top: 0;
+                }
+                @include media(mediumDesktop) {
+                  display: block;
+                  padding-left: 0;
+                  padding-right: 0;                  
+                }         
+                @include media(largeDesktop) {
+                  display: block;
+                  padding-left: 0;
+                  padding-right: 0;                    
+                }                 
+              }              
             }
           }
         }
