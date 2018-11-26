@@ -1,12 +1,19 @@
 @import '../../../shared/scss/global';
 
 .forms__wizard {
-  min-height: 85vh;
+  display: table;
+  table-layout: fixed;
+  // height: 100vh;
+  min-height: 120vh;
   margin: 0;
   padding: 0;
   width: 100%;  
+  @include firefoxOnly() {
+    height: 100vh;
+  }
   .form__alerts {
     background-color: $bombay;
+    flex-grow: 1;
     &.show-alerts {
       display: none;
       padding-left: 0;
@@ -14,13 +21,11 @@
         display: none;
       }
       @include media(mediumDesktop) {
-        display: inline-block;
-        float: left;
+        display: table-cell;
         width: 250px;         
       }         
       @include media(largeDesktop) {
-        display: inline-block;
-        float: left;
+        display: table-cell;
         width: 250px; 
       }         
     }
@@ -31,19 +36,20 @@
       display: none;
     }
     @include media(mediumDesktop) {
-      display: inline-block;
-      float: left;
+      display: table-cell;
+      //height: 120vh;
       min-height: 120vh;
       position: relative;
       width: 100px;      
     }         
     @include media(largeDesktop) {
-      display: inline-block;
-      float: left;
+      display: table-cell;
+      //height: 120vh;
       min-height: 120vh;
       position: relative;
       width: 100px;      
-    }             
+    }    
+    @include clearfix();         
   }  
   .form__steps {
     display: block;
@@ -52,8 +58,9 @@
     @include clearfix();
   }
   .form__container {
+    display: table-cell;
+    //height: 100vh;
     min-height: 100vh;
-    float: left;
     width: 99%;
     &.show-alerts {
       padding-left: 0;
@@ -82,14 +89,17 @@
       }       
     }    
     @include media(tablet) {
+      //height: 100vh;
       min-height: 100vh;
       width: 99%;
     }
     @include media(mediumDesktop) {
+      //height: 100vh;
       min-height: 100vh;
       width: 85%;
     }         
     @include media(largeDesktop) {
+      //height: 100vh;
       min-height: 100vh;
       width: 90%;
     }          
@@ -97,6 +107,14 @@
       height: 100%;
       width: 100%;
       padding-left: 2px;
+/*       &.preview {
+        display: table-cell;
+      } */
+      &.preview {
+        @include firefoxOnly() {
+          display: table-cell;
+        }        
+      }
       @include media(tablet) {
         padding-left: 2px;
       }
@@ -127,6 +145,7 @@
         }             
       }   
     }
+    @include clearfix();
   } // .form__container
   @include clearfix();
 }
