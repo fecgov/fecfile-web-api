@@ -50,7 +50,9 @@ export class AppLayoutComponent implements OnInit {
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
-          this.toggleMenu = !this.toggleMenu;
+          if(this.toggleMenu) {
+            this.toggleMenu = false;
+          }
         }
       });
   }
