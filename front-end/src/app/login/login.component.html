@@ -14,7 +14,7 @@
 
       <header>
         <div class="title">
-          <h1>FEC eFile</h1>
+          <h1>{{ appTitle }}</h1>
         </div>
       </header>
 
@@ -50,7 +50,7 @@
             type="text"
             class="login-committee-id login-input"
             id="login-committee-id"
-            placeholder="C987654320"
+            placeholder="C00012345"
             formControlName="commiteeId"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || !committeeIdInputError,
@@ -88,7 +88,7 @@
             type="password"
             class="login-password login-input"
             id="login-password"
-            placeholder="**********"
+            placeholder="e.g. 123456!ABC"
             formControlName="loginPassword"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || !passwordInputError,

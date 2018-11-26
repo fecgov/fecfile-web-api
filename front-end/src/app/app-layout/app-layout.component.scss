@@ -60,18 +60,19 @@
         }         
       } 
       .app__top-logo { 
+        float: left;
         margin: 0 !important;
         padding: 0 !important;
         img {
-          width: 250px;
+          width: 200px;
           @include media(tablet) {
-            width: 270px;
+            width: 200px;
           }
           @include media(mediumDesktop) {
-            width: 280px;
+            width: 200px;
           }         
           @include media(largeDesktop) {
-            width: 350px;
+            width: 275px;
           }           
         }
       } // .app__top-logo
@@ -82,14 +83,14 @@
           background: $dustyGray;
           display: block;
           float: none;
-          height: 335px;
+          height: 620px;
           position: absolute;
           top: 60px;
           width: 100%;
           @include media(tablet) {
             display: block;
             float: none;
-            height: 335px;
+            height: 620px;
             position: absolute;
             top: 60px;
             width: 100%;
@@ -109,12 +110,13 @@
           width: auto;
         }           
         @include media(mediumDesktop) {
-          width: 65%;
+          width: 80%;
         }         
         @include media(largeDesktop) {
-          width: 73%;
+          width: 90%;
         }         
       }
+      @include clearfix();
     } 
     @include clearfix();
   } // .app__top  

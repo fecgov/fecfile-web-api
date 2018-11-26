@@ -39,32 +39,6 @@ export class ReasonComponent implements OnInit {
   private _editorMax: number = 20000;
   private _form_type: string = '';
 
-  /*public editorConfig: AngularEditorConfig = {
-    editable: true,
-    spellcheck: true,
-    height: '25rem',
-    minHeight: '5rem',
-    placeholder: 'Enter text here...',
-    translate: 'no',
-    uploadUrl: 'v1/images', // if needed
-    customClasses: [ // optional
-      {
-        name: "quote",
-        class: "quote",
-      },
-      {
-        name: 'redText',
-        class: 'redText'
-      },
-      {
-        name: "titleText",
-        class: "titleText",
-        tag: "h1",
-      },
-    ]
-  };*/
-
-
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -119,22 +93,14 @@ export class ReasonComponent implements OnInit {
     }
 
     if (this.frmReason.get('reasonText').value.length >= 1) {
-      let text: string = this.frmReason.get('reasonText').value.replace(/<[^>]*>/g, '');
-      text = text.replace(/(&nbsp;)/g, ' ');
+      let text: string = this.frmReason.get('reasonText').value;
 
       this.characterCount = text.length;
     } else if(this.frmReason.get('reasonText').value.length === 0) {
-      let text: string = this.frmReason.get('reasonText').value.replace(/<[^>]*>/g, '');
-      text = text.replace(/(&nbsp;)/g, ' ');
+      let text: string = this.frmReason.get('reasonText').value;
 
       this.characterCount = text.length;
     }
-
-    if(this.frmReason.get('reasonText').value.length === 4) {
-      if(this.frmReason.get('reasonText').value === '<br>') {
-        this.frmReason.controls['reasonText'].setValue('');
-      }
-    }    
   }
 
   /**
@@ -163,6 +129,9 @@ export class ReasonComponent implements OnInit {
         this.hideText = true;
 
         this.showValidateBar = false; 
+
+        this.hideText = true;
+        this.formSaved = false;        
 
         this._messageService
           .sendMessage({
@@ -303,6 +272,9 @@ export class ReasonComponent implements OnInit {
    */
   public updateValidation(): void {
     this.showValidateBar = false;
+
+    this.hideText = true;
+    this.formSaved = false;      
 
     this._messageService
       .sendMessage({

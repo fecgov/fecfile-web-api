@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule, APP_INITIALIZER, ModuleWithProviders } from '@angular/core';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NgxEditorModule } from 'ngx-editor';
@@ -37,9 +38,13 @@ import { PreviewComponent } from './shared/partials/preview/preview.component';
 import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
+import { AccountComponent } from './account/account.component';
+import { UsersComponent } from './users/users.component';
+import { SettingsComponent } from './settings/settings.component';
+
 import { AppConfigService } from './app-config.service';
 
-const appInitializerFn = (appConfig: AppConfigService) => {
+ const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();
   };
@@ -65,13 +70,17 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     PreviewComponent,
     ValidateComponent,
     SignComponent,
-    SubmitComponent
+    SubmitComponent,
+    AccountComponent,
+    UsersComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    HttpModule,
     routing,
     AngularFileUploaderModule,
     ArchwizardModule,
@@ -83,7 +92,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     NgbModule.forRoot()
   ],
   providers: [
-    CookieService,
+    CookieService, 
     CanActivateGuard,
     AppConfigService,
     {
@@ -91,7 +100,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
       useFactory: appInitializerFn,
       multi: true,
       deps: [AppConfigService]
-    }
+    }    
   ],
   bootstrap: [AppComponent],
   schemas: [

@@ -4,4 +4,5 @@ export const environment = {
   'appTitle': 'fecfile',
   apiUrl: 'https://dev-fecfile-api.efdev.fec.gov/api/v1',
   validateSuccess: 'All required fields have passed validation..'
+  appTitle: 'FECFile',
 };
