@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
   apiUrl: '',
-  validateSuccess: 'All required fields have been validated.'
+  appTitle: 'FECFile',
+  validateSuccess: 'All required fields have passed validation..'
 };

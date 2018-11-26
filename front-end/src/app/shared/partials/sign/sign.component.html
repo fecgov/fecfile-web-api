@@ -36,9 +36,9 @@
           </div>
         </div>      
         <div class="grid-row" 
-          *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched)) || (signFailed)">
+          *ngIf="(frmSignee.invalid || (frmSignee.dirty || frmSignee.touched))">
           <div class="grid-row__col grid-row__col--12">
-            <div class="text-error text-center">
+            <div class="text-error text-center" *ngIf="signFailed">
               You must certify this form.
             </div>
           </div>
@@ -109,7 +109,7 @@
           </div>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <h4>Additional Emails</h4>
+              <h4>Additional emails for your confirmation receipt</h4>
               <div class="additional-email__field">
                 <input
                   type="email"
@@ -118,7 +118,7 @@
                   formControlName="additional_email_1"
                 >
                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
+                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
                     Additional email must be valid email address.
                   </div>
                 </div>
@@ -131,7 +131,7 @@
                   formControlName="additional_email_2"
                 >
                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
+                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
                     Additional email must be valid email address.
                   </div>
                 </div>
@@ -163,6 +163,7 @@
               id="agreement"
               name="agree"
               value="yes"
+              (change)="updateValidation($event)"
               formControlName="agreement"
             />
             <label class="agreement__text" for="agreement">

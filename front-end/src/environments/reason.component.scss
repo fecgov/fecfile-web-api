@@ -1,0 +1,167 @@
+@import '../../../shared/scss/global';
+
+.reason-container {
+  display: block;
+  height: 100%;
+  header {
+    .header-container {
+      display: block;
+      width: 80%;
+      @include media(tablet) {
+        width: 100%;
+      }
+      @include media(mediumDesktop) {
+        width: 100%;
+      }         
+      @include media(largeDesktop) {
+        width: 100%;
+      }       
+      .header__text {
+        float: none;
+        display: block;
+        font-size: 0.85em;
+        width: 100%;
+        @include media(tablet) {
+          float: none;
+          font-size: 0.85em;
+          display: block;
+          width: 100%;
+        }
+        @include media(mediumDesktop) {
+          float: left;
+          font-size: 1em;
+          width: 50%;
+        }         
+        @include media(largeDesktop) {
+          float: left;
+          font-size: 1em;
+          width: 50%;
+        }         
+      }
+      .header__btns {
+        display: block;
+        float: none;
+        padding-top: 15px;
+        text-align: left;
+        width: 100%;
+        @include media(tablet) {
+          display: block;
+          float: none;
+          text-align: left;
+          width: 100%;
+        }
+        @include media(mediumDesktop) {
+          float: left;
+          text-align: right;
+          width: 50%;
+        }         
+        @include media(largeDesktop) {
+          float: left;
+          text-align: right;
+          width: 50%;
+        }         
+        .btn-print-preview {
+          @extend .btn-secondary-gray;
+          margin-right: 5px;
+        }
+        .btn-validate {
+          @extend .btn-primary;
+        }
+        .btn {
+          padding-top: 10px;
+        }
+      }
+      @include clearfix();
+    }
+  }
+  section {
+    .content {
+      display: block;
+      width: 100%;
+      .validate__form {
+        &.show-alerts {
+          display: block;
+          @include media(tablet) {
+            display: block;
+          }
+          @include media(mediumDesktop) {
+            display: none;
+          }         
+          @include media(largeDesktop) {
+            display: none;
+          }           
+        }
+        background-color: $bombay;
+        display: none;
+        height: 80px;
+        margin-top: 10px;
+        width: 100%;
+        @include media(tablet) {
+          background-color: $bombay;
+          display: none;
+          height: 80px;
+          margin-top: 10px;
+          width: 100%;        
+        }
+        @include media(mediumDesktop) {
+          display: none;
+        }         
+        @include media(largeDesktop) {
+          display: none;
+        }         
+      }      
+      .text-editor {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        z-index: 0;
+        height: 250px !important;
+        textarea {
+          border-radius: 3px;
+          font-size: 1em;
+          height: 200px !important; /* Mahendra 11262018 */
+          overflow: scroll;
+          padding: 10px;
+          width: 90%;
+          @include media(tablet) {
+            width: 96%;
+          }
+          @include media(mediumDesktop) {
+            width: 96%;
+          }         
+          @include media(largeDesktop) {
+            width: 96%;
+          }           
+        }
+        /* .angular-editor {
+          z-index: 0;
+          .angular-editor-toolbar {
+            .angular-editor-toolbar-set {
+              select[title='Custom Style'],
+              .angular-editor-button[title='Insert Image'],
+              .angular-editor-button[title='Insert Link'],
+              .angular-editor-button[title='Unlink'],
+              .angular-editor-button[title='HTML Code'] {
+                display: none;
+              }
+
+            }
+          }
+        } */
+        @include clearfix();
+      } // .rich-text-editor
+      .editor-character-count,
+      .error-text {
+        float: left;
+      }
+      .error-text {
+        padding-left: 20px;
+      }
+    } // .content  
+  } // section
+  footer {
+    .grid-row {
+      margin-bottom: 15px !important;
+    }
+  }
+}
