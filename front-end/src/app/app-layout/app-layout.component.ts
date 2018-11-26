@@ -45,6 +45,16 @@ export class AppLayoutComponent implements OnInit {
             .sendMessage({'committee_details_loaded': true});
         }
       });      
+  
+    this._router
+      .events
+      .subscribe(val => {
+        if(val instanceof NavigationEnd) {
+          if(this.toggleMenu) {
+            this.toggleMenu = false;
+          }
+        }
+      });
   }
 
   ngDoCheck(): void {

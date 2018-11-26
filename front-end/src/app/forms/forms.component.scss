@@ -10,7 +10,7 @@
   width: 100%;
   .forms-container__main {
     display: flex;
-    padding-left: 2px;
+    padding-left: 0;
     width: 100%;
     @include media(tablet) {
       padding-left: 0;
