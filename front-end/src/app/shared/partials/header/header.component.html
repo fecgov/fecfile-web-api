@@ -25,11 +25,55 @@
             Contributors
           </a>
         </li>
-        <li class="nav-item">
+        <!--<li class="nav-item">
           <a [routerLink]="['/tools']">
             Tools
           </a>
-        </li>
+        </li>-->
+       <li class="nav-item">
+          <div 
+            ngbDropdown 
+            placement="bottom-left" 
+            class="d-inline-block"
+          >
+            <!--<i class="profile-icon icon" aria-hidden="true"></i>   -->       
+            <div 
+              class="dropdown-toggle" 
+              role="button" 
+              id="dropdownMenu" 
+              ngbDropdownToggle
+            >
+              Tools
+            </div>            
+            <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+              <div>
+                <a [routerLink]="['/tools_import_transactions']">
+                  Import Transactions
+                </a>                
+              </div>
+              <div>
+                <a [routerLink]="['/tools_import_names']">
+                  Import Names
+                </a>                
+              </div>  
+              <div>
+                <a [routerLink]="['/tools_export_names']">
+                  Export Names
+                </a>                
+              </div>                            
+              <div>
+                  <a [routerLink]="['/tools_merge_names']">
+                  Merge Names
+                </a>
+              </div>
+              <div>
+                  <a [routerLink]="['/tools_create_backup']">
+                  Create Backup
+                  </a>
+              </div>              
+            </div>            
+          </div>
+        </li>       
         <li class="nav-item">
           Help
         </li>
