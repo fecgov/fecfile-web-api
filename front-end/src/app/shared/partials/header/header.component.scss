@@ -101,7 +101,7 @@
       .nav-links {
         list-style-type: none;
         width: 100%;
-        li {
+        .nav-item {
           display: block;
           margin-bottom: 10px;
           padding-left: 10px;
@@ -182,8 +182,14 @@
               }              
             }
           }
-        }
-      }
-    }
-  }
-}
+          .secondary-dropdown-menu {
+            top: 40px !important;
+            div {
+              height: auto !important;
+            }
+          }
+        } // .nav-item
+      } // .nav-links
+    } // .header__links
+  } // .header__nav
+} // .header

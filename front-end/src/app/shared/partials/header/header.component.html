@@ -40,10 +40,10 @@
           </a>
         </li>
         <li class="nav-item">
-          <div 
-            ngbDropdown 
-            placement="bottom-left" 
+          <div  
             class="d-inline-block"
+            ngbDropdown 
+            placement="bottom-left"            
           >
             <i class="profile-icon icon" aria-hidden="true"></i>          
             <div 
@@ -54,26 +54,30 @@
             >
               Profile
             </div>            
-            <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+            <div 
+              class="secondary-dropdown-menu"
+              aria-labelledby="dropdownMenu"
+              ngbDropdownMenu
+            >
               <div>
                 <a [routerLink]="['/account']">
                   Account
-                </a>                
+                </a>                 
               </div>
               <div>
                 <a [routerLink]="['/users']">
                   Users
-                </a>                
-              </div>  
+                </a>                    
+              </div>
               <div>
                 <a [routerLink]="['/settings']">
                   Settings
-                </a>                
-              </div>                            
+                </a>                  
+              </div>
               <div>
                 <a [routerLink]="['/logout']" (click)="logout()">
                   Logout
-                </a>
+                </a>                
               </div>
             </div>            
           </div>
