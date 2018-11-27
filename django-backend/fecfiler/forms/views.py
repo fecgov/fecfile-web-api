@@ -445,10 +445,11 @@ def validate_f99(request):
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
+    
     try:
-        comm = Committee.objects.get(committeeid=request.data.get('committeeid')).last()
-
+        #import ipdb; ipdb.set_trace()
+        comm = Committee.objects.filter(committeeid=request.data.get).last() 
+        
     except Committee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -469,7 +470,7 @@ def validate_f99(request):
     if comm.state!=request.data.get('state'):
         errormess.append('State does not match the Form 1 data.')
 
-    if comm.zipcode!=int(request.data.get('zipcode')):
+    if comm.zipcode!= int(request.data.get('zipcode')) if request.data.get('zipcode') else '':
         errormess.append('Zipcode does not match the Form 1 data.')
 
     if comm.treasurerlastname!=request.data.get('treasurerlastname'):
