@@ -91,12 +91,10 @@
         width: 100%;
       }
       @include media(mediumDesktop) {
-        //display: inline-block;
         float: left;
         width: 78%;
       } 
       @include media(largeDesktop) {
-        // display: inline-block;
         float: left;
         width: 78%;
       }
@@ -106,23 +104,30 @@
         li {
           display: block;
           margin-bottom: 10px;
-          text-align: center;
+          padding-left: 10px;
+          padding-right: 0;          
+          text-align: left;
           vertical-align: middle;
           @include media(tablet) {
             display: block;
             margin-bottom: 10px;
+            padding-left: 10px;
+            padding-right: 0;
+            text-align: left;
             width: 100%;
           }
           @include media(mediumDesktop) {
             display: inline-block;
             padding-left: 10px;
             padding-right: 10px;
+            text-align: center;
             width: auto;
           }
           @include media(largeDesktop) {
             display: inline-block;
             padding-left: 15px;
             padding-right: 15px;
+            text-align: center;
             width: auto;
           }
           .btn-link {

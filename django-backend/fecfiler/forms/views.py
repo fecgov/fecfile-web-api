@@ -447,9 +447,9 @@ def validate_f99(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        #import ipdb; ipdb.set_trace()
-        comm = Committee.objects.filter(committeeid=request.data.get).last() 
         
+        comm = Committee.objects.filter(committeeid=request.data.get('committeeid')).last()
+
     except Committee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

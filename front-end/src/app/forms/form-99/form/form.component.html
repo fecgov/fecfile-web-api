@@ -33,7 +33,8 @@
       *ngIf="!isLoading"
       [ngClass]="{
         'show-alerts': showValidateBar === true,
-        'hide-alerts': step==='step_5'
+        'hide-alerts': step==='step_5',
+        'preview': step==='step_3'
       }"      
     >
       <div
