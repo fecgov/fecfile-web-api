@@ -51,7 +51,6 @@
         }         
       }
       @include media(mediumDesktop) {
-        //display: inline-block;
         float: left;
         padding-left: 5px;
         width: 15%;
@@ -68,7 +67,6 @@
         }          
       }
       @include media(largeDesktop) {
-        // display: inline-block;
         float: left;
         padding-left: 15px;
         width: 20%;
@@ -101,7 +99,7 @@
       .nav-links {
         list-style-type: none;
         width: 100%;
-        li {
+        .nav-item {
           display: block;
           margin-bottom: 10px;
           padding-left: 10px;
@@ -141,8 +139,12 @@
           .dropdown-toggle {
             cursor: pointer;
             display: inline-block;
-            &:hover {
+            &:hover
+            &:active {
               text-decoration: underline;
+            }
+            &[aria-expanded='true'] {
+              background-color: $iron;
             }
           }
           .dropdown {                    
@@ -182,28 +184,38 @@
               }              
             }
           }
-        }
-      }
-    }
-  }
-}
-.vertical-menu {
-  width: 200px; /* Set a width if you like */
-}
-
-.vertical-menu a {
-  background-color: #eee; /* Grey background color */
-  color: black; /* Black text color */
-  display: block; /* Make the links appear below each other */
-  padding: 12px; /* Add some padding */
-  text-decoration: none; /* Remove underline from links */
-}
-
-.vertical-menu a:hover {
-  background-color: #ccc; /* Dark grey background on mouse-over */
-}
-
-.vertical-menu a.active {
-  background-color: #4CAF50; /* Add a green color to the "active/current" link */
-  color: white;
-}
+          .secondary-dropdown-menu {
+            background-color: $dustyGray;
+            margin: 0;
+            padding: 0;
+            height: 40px;
+            @include media(mediumDesktop) {
+              border-top: 0;
+              margin: 0;
+              padding: 0; 
+              top: 60px;    
+              height: auto;         
+            }         
+            @include media(largeDesktop) {
+              border-top: 0;
+              margin: 0;
+              padding: 0;
+              top: 60px;  
+              height: auto;                
+            }             
+            div {
+              @include media(mediumDesktop) {
+                height: 40px !important;
+                line-height: 40px;
+              }         
+              @include media(largeDesktop) {
+                height: 40px !important;
+                line-height: 40px;
+              }               
+            }
+          }
+        } // .nav-item
+      } // .nav-links
+    } // .header__links
+  } // .header__nav
+} // .header

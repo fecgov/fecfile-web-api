@@ -13,6 +13,8 @@ import { AuthService } from '../../services/AuthService/auth.service';
 })
 export class HeaderComponent implements OnInit {
 
+  public menuActive: boolean = false;
+
   constructor(
     private _messageService: MessageService,
     private _authService: AuthService
@@ -33,5 +35,13 @@ export class HeaderComponent implements OnInit {
     );
 
     this._authService.doSignOut();
+  }
+
+  public toggleMenu(): void {
+    if(this.menuActive) {
+      this.menuActive = false;
+    } else {
+      this.menuActive = true;
+    }
   }
 }

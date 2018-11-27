@@ -229,6 +229,8 @@ export class SignComponent implements OnInit {
   public updateValidation(e): void {
     if(e.target.checked) {
       this.signFailed = false;
+    } else if (!e.target.checked) {
+      this.signFailed = true;
     }
   }
 
