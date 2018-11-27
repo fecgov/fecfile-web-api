@@ -21,10 +21,10 @@
 							<td>{{report.form_type}}</td>
 							<td>{{report.is_submitted ? 'submitted' :'save'}}</td>
 							<td>{{report.committeeid}}</td>
-							<td>{{report.coverage_start_date}}</td>
-							<td>{{report.coverage_end_date}}</td>
+							<td>{{report.coverage_start_date | date: 'MM/dd/yyyy'}}</td>
+							<td>{{report.coverage_end_date | date: 'MM/dd/yyyy'}}</td>
 							<td>{{report.ReportType}}</td>
-							<td>{{report.created_at | date: 'mm/dd/yyyy'}}</td>
+							<td>{{report.created_at | date: 'MM/dd/yyyy'}}</td>
 							<td></td>
 						</tr>
 					</tbody>
