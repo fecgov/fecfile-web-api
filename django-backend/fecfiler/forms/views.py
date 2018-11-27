@@ -447,7 +447,7 @@ def validate_f99(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        comm = Committee.objects.get(committeeid=request.data.get('committeeid')).last()
+        comm = Committee.objects.filter(committeeid=request.user.username).last()
 
     except Committee.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
