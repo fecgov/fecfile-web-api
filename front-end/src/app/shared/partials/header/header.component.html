@@ -40,40 +40,46 @@
           </a>
         </li>
         <li class="nav-item">
-          <div 
-            ngbDropdown 
-            placement="bottom-left" 
+          <div  
             class="d-inline-block"
-          >
-            <i class="profile-icon icon" aria-hidden="true"></i>          
-            <div 
-              class="dropdown-toggle" 
-              role="button" 
+            ngbDropdown 
+            placement="bottom-left"            
+          >      
+            <button 
+              type="button"
+              class="btn btn-link dropdown-toggle" 
               id="dropdownMenu" 
+              [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
+              (click)="toggleMenu()"
               ngbDropdownToggle
             >
+              <i class="profile-icon icon" aria-hidden="true"></i>    
               Profile
-            </div>            
-            <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+            </button>            
+            <div 
+              class="secondary-dropdown-menu"
+              aria-labelledby="dropdownMenu"
+              ngbDropdownMenu
+            >
               <div>
                 <a [routerLink]="['/account']">
                   Account
-                </a>                
+                </a>                 
               </div>
               <div>
                 <a [routerLink]="['/users']">
                   Users
-                </a>                
-              </div>  
+                </a>                    
+              </div>
               <div>
                 <a [routerLink]="['/settings']">
                   Settings
-                </a>                
-              </div>                            
+                </a>                  
+              </div>
               <div>
                 <a [routerLink]="['/logout']" (click)="logout()">
                   Logout
-                </a>
+                </a>                
               </div>
             </div>            
           </div>
