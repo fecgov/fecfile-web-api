@@ -44,16 +44,18 @@
             class="d-inline-block"
             ngbDropdown 
             placement="bottom-left"            
-          >
-            <i class="profile-icon icon" aria-hidden="true"></i>          
-            <div 
-              class="dropdown-toggle" 
-              role="button" 
+          >      
+            <button 
+              type="button"
+              class="btn btn-link dropdown-toggle" 
               id="dropdownMenu" 
+              [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
+              (click)="toggleMenu()"
               ngbDropdownToggle
             >
+              <i class="profile-icon icon" aria-hidden="true"></i>    
               Profile
-            </div>            
+            </button>            
             <div 
               class="secondary-dropdown-menu"
               aria-labelledby="dropdownMenu"

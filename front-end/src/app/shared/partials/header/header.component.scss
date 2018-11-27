@@ -139,8 +139,12 @@
           .dropdown-toggle {
             cursor: pointer;
             display: inline-block;
-            &:hover {
+            &:hover
+            &:active {
               text-decoration: underline;
+            }
+            &[aria-expanded='true'] {
+              background-color: $iron;
             }
           }
           .dropdown {                    
@@ -181,9 +185,33 @@
             }
           }
           .secondary-dropdown-menu {
-            top: 40px !important;
+            background-color: $dustyGray;
+            margin: 0;
+            padding: 0;
+            height: 40px;
+            @include media(mediumDesktop) {
+              border-top: 0;
+              margin: 0;
+              padding: 0; 
+              top: 60px;    
+              height: auto;         
+            }         
+            @include media(largeDesktop) {
+              border-top: 0;
+              margin: 0;
+              padding: 0;
+              top: 60px;  
+              height: auto;                
+            }             
             div {
-              height: 40px !important;
+              @include media(mediumDesktop) {
+                height: 40px !important;
+                line-height: 40px;
+              }         
+              @include media(largeDesktop) {
+                height: 40px !important;
+                line-height: 40px;
+              }               
             }
           }
         } // .nav-item
