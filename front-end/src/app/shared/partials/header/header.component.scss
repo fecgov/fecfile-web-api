@@ -51,7 +51,6 @@
         }         
       }
       @include media(mediumDesktop) {
-        //display: inline-block;
         float: left;
         padding-left: 5px;
         width: 15%;
@@ -68,7 +67,6 @@
         }          
       }
       @include media(largeDesktop) {
-        // display: inline-block;
         float: left;
         padding-left: 15px;
         width: 20%;
@@ -185,7 +183,7 @@
           .secondary-dropdown-menu {
             top: 40px !important;
             div {
-              height: auto !important;
+              height: 40px !important;
             }
           }
         } // .nav-item
