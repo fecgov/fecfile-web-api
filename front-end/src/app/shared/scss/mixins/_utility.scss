@@ -23,7 +23,7 @@
 }
 
 /**
- * Targets Webkit based browsers. (e.g. Chrome, Safari)
+ * Targets Webkit based browsers.
  *
  */
 @mixin webkitBrowser() {
@@ -40,4 +40,14 @@
   @media not all and (min-resolution:.001dpcm) {
     @content;
   }
+}
+
+/**
+ * Targets FireFox only.
+ *
+ */
+@mixin firefoxOnly() {
+  @-moz-document url-prefix() {
+    @content;
+  }  
 }
