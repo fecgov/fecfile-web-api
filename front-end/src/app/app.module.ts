@@ -44,6 +44,15 @@ import { SettingsComponent } from './settings/settings.component';
 
 import { AppConfigService } from './app-config.service';
 
+/*import { MatMenuModule, MatButtonModule} from '@angular/material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';*/
+
+import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
+import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
+import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
+import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
+import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
+
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();
@@ -73,7 +82,12 @@ import { AppConfigService } from './app-config.service';
     SubmitComponent,
     AccountComponent,
     UsersComponent,
-    SettingsComponent
+    SettingsComponent,
+    ToolsImportTransactionsComponent,
+    ToolsImportNamesComponent,
+    ToolsExportNamesComponent,
+    ToolsMergeNamesComponent,
+    ToolsCreateBackupComponent
   ],
   imports: [
     BrowserModule,
@@ -89,7 +103,10 @@ import { AppConfigService } from './app-config.service';
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    /*MatMenuModule,
+    MatButtonModule,
+    BrowserAnimationsModule*/
   ],
   providers: [
     CookieService, 

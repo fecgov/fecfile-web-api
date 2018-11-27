@@ -2,7 +2,7 @@
 	<div class="reports-container">
 	    <div class="grid-row">
 	      <div class="grid-row__col grid-row__col--12">
-					<h1 class="text-center">Reports Details</h1>
+					<h1 class="text-center">Reports</h1>
 					<table class="table-striped" style="width:100%">
 					<thead>
 						<tr align="left">
@@ -20,7 +20,7 @@
 						<tr *ngFor="let report of reports || async">
 							<td>{{report.form_type}}</td>
 							<td>{{report.is_submitted ? 'submitted' :'save'}}</td>
-							<td>{{report.committeeid}}</td>
+							<td>{{report.id}}</td>
 							<td>{{report.coverage_start_date | date: 'MM/dd/yyyy'}}</td>
 							<td>{{report.coverage_end_date | date: 'MM/dd/yyyy'}}</td>
 							<td>{{report.ReportType}}</td>
