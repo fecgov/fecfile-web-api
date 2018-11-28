@@ -36,7 +36,7 @@
   }
  .app__top {
     background-color: $dustyGray;
-    height: 60px;
+    height: $topNavHeight;
     position: fixed;
     right: 0;
     vertical-align: middle;
@@ -44,7 +44,7 @@
     z-index: 1001;    
     .navbar {
       background-color: $dustyGray;
-      height: 60px;
+      height: $topNavHeight;
       margin: 0 !important;
       padding: 0 !important;      
       .navbar-toggler {
