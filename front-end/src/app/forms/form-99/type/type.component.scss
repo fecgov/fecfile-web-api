@@ -14,7 +14,7 @@
       margin-right: auto;
       z-index: 0;
       .type-item {
-        background-color: $alto;
+        background-color: $white;
         color: $black;
         display: block;
         font-size: 0.85em;
@@ -22,25 +22,20 @@
         position: relative;
         float: left;
         width: 94%;
-        &:nth-child(even) {
-          background-color: $white;
-        }
-        &:hover {
-          background-color: $dustyGray;
-        }
-        &.selected {
-          background-color: $dustyGray;
-        }
         @include media(tablet) {
           font-size: 1em;
           width: 97%;
         }
         @include media(mediumDesktop) {
           font-size: 1em;
+          height: 50px;
+          padding-top: 10px;
           width: 100%;
         }         
         @include media(largeDesktop) {
-          font-style: 1em;
+          font-size: 1em;
+          height: 50px;
+          padding-top: 10px;
           width: 100%;
         }         
         .type-item__box {
@@ -55,18 +50,6 @@
             color: $black;
             display: none;
             padding-left: 20px;
-          }
-          input[type='radio'] {
-            position: absolute;
-            visibility: hidden;
-            &:checked ~.type-radio {
-            &:before {
-              background: $black;
-            }
-            }
-            &:checked ~ label {
-              color: $black;
-            }
           }
           .type-radio {
             display: block;
@@ -112,22 +95,22 @@
             display: inline-block;
             margin: 10px auto;
             position: relative;
-            padding-bottom: 25px;
-            padding-left: 45px;
-            padding-top: 40px;
+            // padding-bottom: 25px;
+            // padding-left: 45px;
+            // padding-top: 40px;
             width: 190px;
             z-index: 0;
             -webkit-transition: all 0.25s linear;
             @include media(tablet) {
-              padding-left: 65px;
+              padding-left: 10px;
               width: auto;
             }
             @include media(mediumDesktop) {
-              padding-left: 65px;
+              padding-left: 10px;
               width: auto;
             }         
             @include media(largeDesktop) {
-              padding-left: 65px;
+              padding-left: 10px;
               width: auto;
             }             
           }
@@ -147,8 +130,41 @@
             }
           }
           .tooltip {
+            /* left: 0 !important;
+            @include media(tablet) {
+              left: 310px !important;
+            }
+            @include media(mediumDesktop) {
+              left: 310px !important;
+            }         
+            @include media(largeDesktop) {
+              // left: 310px !important;
+              left: auto !important;
+            }  */   
+            .arrow {
+              /* left: 218px;
+              @include media(tablet) {
+                left: 0;
+              }
+              @include media(mediumDesktop) {
+                left: 0;
+              }         
+              @include media(largeDesktop) {
+                left: 0;
+              }   */             
+            }          
             .tooltip-inner {
-              max-width: 200px;
+              max-width: 300px;
+              text-align: left;
+              @include media(tablet) {
+                max-width: 300px;
+              }
+              @include media(mediumDesktop) {
+                max-width: 500px;
+              }         
+              @include media(largeDesktop) {
+                max-width: 600px;
+              }               
             }
           }
         }

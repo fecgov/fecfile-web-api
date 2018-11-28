@@ -26,9 +26,53 @@
           </a>
         </li>
         <li class="nav-item">
-          <a [routerLink]="['/tools']">
+          <div  
+            class="d-inline-block"
+            ngbDropdown 
+            placement="bottom-left"            
+          >
+            <button 
+              type="button"
+              class="btn btn-link dropdown-toggle" 
+              id="dropdownMenu" 
+              [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
+              (click)="toggleMenu()"
+              ngbDropdownToggle
+            >
             Tools
-          </a>
+            </button>
+            <div 
+              class="secondary-dropdown-menu tools"
+              aria-labelledby="dropdownMenu"
+              ngbDropdownMenu
+            >
+              <div>
+                <a [routerLink]="['/tools_import_transactions']">
+                  Import Transactions
+                </a>                
+              </div>
+              <div>
+                <a [routerLink]="['/tools_import_names']">
+                  Import Names
+                </a>                
+              </div>  
+              <div>
+                <a [routerLink]="['/tools_export_names']">
+                  Export Names
+                </a>                
+              </div>                            
+              <div>
+                  <a [routerLink]="['/tools_merge_names']">
+                  Merge Names
+                </a>
+              </div>
+              <div>
+                  <a [routerLink]="['/tools_create_backup']">
+                  Create Backup
+                  </a>
+              </div> 
+            </div>                       
+          </div>
         </li>
         <li class="nav-item">
           Help
@@ -57,7 +101,7 @@
               Profile
             </button>            
             <div 
-              class="secondary-dropdown-menu"
+              class="secondary-dropdown-menu profile"
               aria-labelledby="dropdownMenu"
               ngbDropdownMenu
             >

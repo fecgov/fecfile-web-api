@@ -36,7 +36,7 @@
   }
  .app__top {
     background-color: $dustyGray;
-    height: 60px;
+    height: $topNavHeight;
     position: fixed;
     right: 0;
     vertical-align: middle;
@@ -44,7 +44,7 @@
     z-index: 1001;    
     .navbar {
       background-color: $dustyGray;
-      height: 60px;
+      height: $topNavHeight;
       margin: 0 !important;
       padding: 0 !important;      
       .navbar-toggler {
@@ -83,14 +83,14 @@
           background: $dustyGray;
           display: block;
           float: none;
-          height: 620px;
+          height: 675px;
           position: absolute;
           top: 60px;
           width: 100%;
           @include media(tablet) {
             display: block;
             float: none;
-            height: 620px;
+            height: 675px;
             position: absolute;
             top: 60px;
             width: 100%;
@@ -106,7 +106,7 @@
             top: 0;
           }                 
         }        
-        @include media(mediumDesktop) {
+        @include media(tablet) {
           width: auto;
         }           
         @include media(mediumDesktop) {
