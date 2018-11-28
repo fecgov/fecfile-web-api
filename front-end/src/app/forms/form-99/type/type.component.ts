@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -9,7 +9,8 @@ import { ValidateComponent } from '../../../shared/partials/validate/validate.co
 @Component({
   selector: 'app-type',
   templateUrl: './type.component.html',
-  styleUrls: ['./type.component.scss']
+  styleUrls: ['./type.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TypeComponent implements OnInit {
 
@@ -21,10 +22,10 @@ export class TypeComponent implements OnInit {
   public isValidType: boolean = false;
   public typeFailed: boolean = false;
   public screenWidth: number = 0;
-  public infoHeight: string = '140px';
+  public tooltipPosition: string = 'right';
+  public tooltipLeft: string = 'auto';
 
   private _form_99_details: form99;
-  private _infoHeight: string = '250px';
 
   constructor(
     private _fb: FormBuilder,
@@ -39,8 +40,12 @@ export class TypeComponent implements OnInit {
 
     this.screenWidth = window.innerWidth;
 
-    if(this.screenWidth <= 780) {
-      this.infoHeight = this._infoHeight;
+    if(this.screenWidth < 768) {
+      this.tooltipPosition = 'bottom';
+      this.tooltipLeft = '0';
+    } else if (this.screenWidth >= 768) {
+      this.tooltipPosition = 'right';
+      this.tooltipLeft = 'auto';
     }
 
     if(this._form_99_details) {
@@ -65,10 +70,12 @@ export class TypeComponent implements OnInit {
   onResize(event) {
     this.screenWidth = event.target.innerWidth;
 
-    if(this.screenWidth <= 780) {
-      this.infoHeight = this._infoHeight;
-    } else {
-      this.infoHeight = '140px';
+    if(this.screenWidth < 768) {
+      this.tooltipPosition = 'bottom';
+      this.tooltipLeft = '0';
+    } else if (this.screenWidth >= 768) {
+      this.tooltipPosition = 'right';
+      this.tooltipLeft = 'auto';
     }
   }  
 
@@ -122,6 +129,14 @@ export class TypeComponent implements OnInit {
       return 0;
     }
   }
+
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }      
+  }  
 
   public frmTypeValid() {
     return this.isValidType;
