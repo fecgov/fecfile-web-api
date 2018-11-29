@@ -634,7 +634,7 @@ def email(boolean, data):
             Destination={
                 'ToAddresses': 
                     RECIPIENT,
-                ,
+                
             },
             Message={
                 'Body': {
