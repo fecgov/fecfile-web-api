@@ -6,6 +6,15 @@
   line-height: $topNavHeight;
   vertical-align: middle;
   width: 100%;
+  @include media(tablet) {
+    width: 100%;
+  }
+  @include media(mediumDesktop) {
+    width: 958px;
+  }         
+  @include media(largeDesktop) {
+    width: 990px;
+  }   
   .header__nav {
     display: flex;
     flex-direction: column;
@@ -52,8 +61,8 @@
       }
       @include media(mediumDesktop) {
         float: left;
-        padding-left: 5px;
-        width: 15%;
+        padding-left: 0;
+        width: 180px;
         input[type='text'] {
           @include make-text-input(80%, 1.5em, 1em, 1em);
           position: relative;
@@ -69,7 +78,7 @@
       @include media(largeDesktop) {
         float: left;
         padding-left: 5px;
-        width: 18%;
+        width: 180px;
         input[type='text'] {
           @include make-text-input(80%, 1.5em, 1em, 1em);
         }        
@@ -90,11 +99,11 @@
       }
       @include media(mediumDesktop) {
         float: left;
-        width: 80%;
+        width: 773px;
       } 
       @include media(largeDesktop) {
         float: left;
-        width: 80%;
+        width: 805px;
       }
       .nav-links {
         list-style-type: none;
@@ -236,5 +245,6 @@
         } // .nav-item
       } // .nav-links
     } // .header__links
+    @include clearfix();
   } // .header__nav
 } // .header
