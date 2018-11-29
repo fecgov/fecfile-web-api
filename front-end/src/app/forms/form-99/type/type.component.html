@@ -35,7 +35,7 @@
                         type="radio"
                         id="mst-radio"
                         value="MST"
-                        (change)="updateTypeSelected('MST')"
+                        (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
                       />
                       <label
@@ -76,7 +76,7 @@
                         type="radio"
                         id="msm-radio"
                         value="MSM"
-                        (change)="updateTypeSelected('MSM')"
+                        (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
                       />
                       <label
@@ -117,13 +117,13 @@
                         type="radio"
                         id="msi-radio"
                         value="MSI"
-                        (change)="updateTypeSelected('MSI')"
+                        (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
                       />
                       <label
                         for="msi-radio"
                         class="type-text"
-                        (click)="updateTypeSelected('MSI')"
+                        (click)="updateTypeSelected($event)"
                       >
                         Disavowal Response (MSI)
                       </label>
@@ -159,6 +159,7 @@
                         type="radio"
                         id="msw-radio"
                         value="MSW"
+                        (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
                       />
                       <label
