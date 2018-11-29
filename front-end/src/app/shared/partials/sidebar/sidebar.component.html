@@ -1,4 +1,4 @@
- <aside>
+<aside>
   <div class="sidebar">
     <div class="sidebar__toggle">
       <a class="toggle-sidebar"
@@ -8,8 +8,8 @@
         <i [ngClass]="iconClass">
           <span class="sr-only">Toggle Sidebar</span>
         </i>
-      </a>
-    </div>
+      </a>           
+    </div>    
     <nav>
       <div class="sidebar__nav">
         <div class="sidebar__nav--header">
@@ -19,16 +19,17 @@
         <div class="sidebar__nav--links">
           <ul class="links-list">
             <li>
-              PAC & Party Report of Receipts & Disbursements (F3X)
+              &nbsp;PAC & Party Report of Receipts & Disbursements (F3X)
             </li>
             <li>
-              Report of Contributors Bundled (F3L)
+               &nbsp;Report of Contributors Bundled (F3L)
             </li>
           </ul>
         </div>
-        <div class="sidebar__nav--header">
+         <div class="sidebar__nav--header">
+          <br />
           <i class="plus-icon" aria-hidden="true"></i>
-          Other Forms
+                  Other Forms
         </div>
         <div class="sidebar__nav--links">
           <ul class="links-list">
@@ -37,7 +38,7 @@
                 [routerLink]="['/forms/form/', '99']"
                 [queryParams]="{ step: 'step_1' }"
               >
-              Miscellaneous Report to the FEC (F99)
+              &nbsp;Miscellaneous Report to the FEC (F99)
               </a>
             </li>
           </ul>
@@ -45,4 +46,4 @@
       </div>
     </nav>
   </div>
-</aside> 
+</aside>

@@ -1,203 +1,203 @@
 <div class="signee-container">
-   <form
-    [formGroup]="frmSignee"
-    (ngSubmit)="doSubmitForm()"
-  >  
-    <header>
-      <div class="header-container">
-        <div class="header__text">
-          <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
-          <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
-        </div>
-        <div class="header__btns">
-          <button
-            type="button"
-            class="btn btn-print-preview"
-          >
-            Print Preview
-          </button>
-          <button
-            type="button"
-            class="btn btn-validate"
-            (click)="validateForm()"
-          >
-              Validate
-            </button>
-        </div>
-      </div>
-    </header>
-    <section>
-      <div class="content">
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
-              <app-validate></app-validate>
-            </div>            
-          </div>
-        </div>      
-        <div class="grid-row" 
-          *ngIf="(frmSignee.invalid || (frmSignee.dirty || frmSignee.touched))">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="text-error text-center" *ngIf="signFailed">
-              You must certify this form.
-            </div>
-          </div>
-        </div>
-        <div class="grid-row"
-          *ngIf="(frmSignee.controls.signee.valid) && frmSaved"
-        >
-            <div class="grid-row__col grid-row__col--12" [hidden]="hideText">
-              <div class="text-info text-center">
-                Form {{ form_type }} has been successfully saved.
-              </div>
-            </div>
-          </div>
-        <form [formGroup]="frmSignee" (ngSubmit)="doSubmitForm()">
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--6">
-              <ng-template #tipContent>
-                Only a treasurer or assistant treasurer designated on a Form 1 (Statement of Organization) may sign the report. 104.14(a)            
-              </ng-template>            
-              <h4>
-                Signee*
-                <button 
-                  type="button" 
-                  class="btn btn-info"
-                  [ngbTooltip]="tipContent"
-                  #t2="ngbTooltip"
-                  (click)="toggleToolTip(t2)"
-                  triggers="manual"
-                  tooltipClass="custom-tooltip-class"
-                  placement="right"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>              
-              </h4>
-              <div>
-                <label>
-                  <input
-                    type="radio"
-                    name="signee"
-                    [value]="committee_details?.treasurerfirstname + ' ' + committee_details?.treasurerlastname"
-                    [checked]="true"
-                    formControlName="signee"
-                  />
-                  {{ committee_details?.treasurerfirstname }} {{ committee_details?.treasurerlastname }}
-              </label>
-              </div>
-            </div>
-            <div class="grid-row__col grid-row__col--6">
-              <h4>Date*</h4>
-              <div>
-                {{ date_stamp.getMonth() + 1 }}/{{ date_stamp.getDate() }}/{{ date_stamp.getFullYear() }}
-              </div>
-            </div>
-          </div>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              If your name is not listed, please
-              <a class="form1-link" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">click here</a> to amend Form 1.
-            </div>
-          </div>
-          <hr />
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <h4>Email On File</h4>
-              {{ committee_details?.email_on_file }}
-            </div>
-          </div>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <h4>Additional Emails</h4>
-              <div class="additional-email__field">
-                <input
-                  type="email"
-                  name="additional_email_1"
-                  value=""
-                  formControlName="additional_email_1"
-                >
-                <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
-                    Additional email must be valid email address.
-                  </div>
-                </div>
-              </div>
-              <div class="additional-email__field">
-                <input
-                  type="email"
-                  name="additional_email_2"
-                  value=""
-                  formControlName="additional_email_2"
-                >
-                <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                  <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
-                    Additional email must be valid email address.
-                  </div>
-                </div>
-              </div>
-              <hr />
-            </div>
-          </div>
-        </form>
-      </div> <!-- ./content -->
-    </section>
-    <footer>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <button
-            type="button"
-            class="btn btn-secondary btn-right"
-            (click)="saveForm()"
-          >
-            Save
-          </button>             
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <hr />
-          <div class="forms__agreement-text">
-            <input
-              type="checkbox"
-              id="agreement"
-              name="agree"
-              value="yes"
-              (change)="updateValidation($event)"
-              formControlName="agreement"
-            />
-            <label class="agreement__text" for="agreement">
-              I certify that I have examined this statement
-              and to the best of my knowledge and belief it
-              is true, correct, and complete.
-            </label>
-          </div>              
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <hr />
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--6">
-          <button
-            type="button"
-            class="btn btn-previous btn-left"
-            (click)="goToPreviousStep()"
-          >
-            Previous
-          </button>              
-        </div>
-        <div class="grid-row__col grid-row__col--6">
-          <button
-            type="submit"
-            class="btn btn-submit btn-right"
-          >
-            Submit
-          </button>              
-        </div>
-      </div>    
-    </footer>
-  </form>
-</div> <!-- ./signee-container -->
+    <form
+     [formGroup]="frmSignee"
+     (ngSubmit)="doSubmitForm()"
+   >  
+     <header>
+       <div class="header-container">
+         <div class="header__text">
+           <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
+           <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
+         </div>
+         <div class="header__btns">
+           <button
+             type="button"
+             class="btn btn-print-preview"
+           >
+             Print Preview
+           </button>
+           <button
+             type="button"
+             class="btn btn-validate"
+             (click)="validateForm()"
+           >
+               Validate
+             </button>
+         </div>
+       </div>
+     </header>
+     <section>
+       <div class="content">
+         <div class="grid-row">
+           <div class="grid-row__col grid-row__col--12">
+             <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+               <app-validate></app-validate>
+             </div>            
+           </div>
+         </div>      
+         <div class="grid-row" 
+           *ngIf="(frmSignee.invalid || (frmSignee.dirty || frmSignee.touched))">
+           <div class="grid-row__col grid-row__col--12">
+             <div class="text-error text-center" *ngIf="signFailed">
+               You must certify this form.
+             </div>
+           </div>
+         </div>
+         <div class="grid-row"
+           *ngIf="(frmSignee.controls.signee.valid) && frmSaved"
+         >
+             <div class="grid-row__col grid-row__col--12" [hidden]="hideText">
+               <div class="text-info text-center">
+                 Form {{ form_type }} has been successfully saved.
+               </div>
+             </div>
+           </div>
+         <form [formGroup]="frmSignee" (ngSubmit)="doSubmitForm()">
+           <div class="grid-row">
+             <div class="grid-row__col grid-row__col--6">
+               <ng-template #tipContent>
+                 Only a treasurer or assistant treasurer designated on a Form 1 (Statement of Organization) may sign the report. 104.14(a)            
+               </ng-template>            
+               <h4>
+                 Signee*
+                 <button 
+                   type="button" 
+                   class="btn btn-info"
+                   [ngbTooltip]="tipContent"
+                   #t2="ngbTooltip"
+                   (click)="toggleToolTip(t2)"
+                   triggers="manual"
+                   tooltipClass="custom-tooltip-class"
+                   placement="right"
+                 >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                 </button>              
+               </h4>
+               <div>
+                 <label>
+                   <input
+                     type="radio"
+                     name="signee"
+                     [value]="committee_details?.treasurerfirstname + ' ' + committee_details?.treasurerlastname"
+                     [checked]="true"
+                     formControlName="signee"
+                   />
+                   {{ committee_details?.treasurerfirstname }} {{ committee_details?.treasurerlastname }}
+               </label>
+               </div>
+             </div>
+             <div class="grid-row__col grid-row__col--6">
+               <h4>Date*</h4>
+               <div>
+                 {{ date_stamp.getMonth() + 1 }}/{{ date_stamp.getDate() }}/{{ date_stamp.getFullYear() }}
+               </div>
+             </div>
+           </div>
+           <div class="grid-row">
+             <div class="grid-row__col grid-row__col--12">
+               If your name is not listed, please
+               <a class="form1-link" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">click here</a> to amend Form 1.
+             </div>
+           </div>
+           <hr />
+           <div class="grid-row">
+             <div class="grid-row__col grid-row__col--12">
+               <h4>Emails On File</h4>
+               {{ committee_details?.email_on_file }}
+             </div>
+           </div>
+           <div class="grid-row">
+             <div class="grid-row__col grid-row__col--12">
+               <h4>Additional Emails for your confirmation receipt</h4>
+               <div class="additional-email__field">
+                 <input
+                   type="email"
+                   name="additional_email_1"
+                   value=""
+                   formControlName="additional_email_1"
+                 >
+                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
+                   <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
+                     Additional email must be valid email address.
+                   </div>
+                 </div>
+               </div>
+               <div class="additional-email__field">
+                 <input
+                   type="email"
+                   name="additional_email_2"
+                   value=""
+                   formControlName="additional_email_2"
+                 >
+                 <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
+                   <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
+                     Additional email must be valid email address.
+                   </div>
+                 </div>
+               </div>
+               <hr />
+             </div>
+           </div>
+         </form>
+       </div> <!-- ./content -->
+     </section>
+     <footer>
+       <div class="grid-row">
+         <div class="grid-row__col grid-row__col--12">
+           <button
+             type="button"
+             class="btn btn-secondary btn-right"
+             (click)="saveForm()"
+           >
+             Save
+           </button>             
+         </div>
+       </div>
+       <div class="grid-row">
+         <div class="grid-row__col grid-row__col--12">
+           <hr />
+           <div class="forms__agreement-text">
+             <input
+               type="checkbox"
+               id="agreement"
+               name="agree"
+               value="yes"
+               (change)="updateValidation($event)"
+               formControlName="agreement"
+             />
+             <label class="agreement__text" for="agreement">
+               I certify that I have examined this statement
+               and to the best of my knowledge and belief it
+               is true, correct, and complete.
+             </label>
+           </div>              
+         </div>
+       </div>
+       <div class="grid-row">
+         <div class="grid-row__col grid-row__col--12">
+           <hr />
+         </div>
+       </div>
+       <div class="grid-row">
+         <div class="grid-row__col grid-row__col--6">
+           <button
+             type="button"
+             class="btn btn-previous btn-left"
+             (click)="goToPreviousStep()"
+           >
+             Previous
+           </button>              
+         </div>
+         <div class="grid-row__col grid-row__col--6">
+           <button
+             type="submit"
+             class="btn btn-submit btn-right"
+           >
+             Submit
+           </button>              
+         </div>
+       </div>    
+     </footer>
+   </form>
+ </div> <!-- ./signee-container -->
