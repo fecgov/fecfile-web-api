@@ -557,7 +557,15 @@ def get_form99list(request):
 #email through AWS SES
 def email(boolean, data):
     SENDER = "donotreply@fec.gov"
-    RECIPIENT = "%s" % data.get('email_on_file')
+    RECIPIENT = []
+
+    RECIPIENT.append("%s" % data.get('email_on_file'))
+
+    if 'additional_email_1' in data and (not data.get('additional_email_1')=='-'):
+        RECIPIENT.append("%s" % data.get('additional_email_1')) 
+
+    if 'additional_email_2' in data and (not data.get('additional_email_2')=='-'):
+        RECIPIENT.append("%s" % data.get('additional_email_2'))
     
     SUBJECT = "Test - Form 99 submitted successfully"
 
@@ -591,9 +599,9 @@ def email(boolean, data):
         #Provide the contents of the email.
         response = client.send_email(
             Destination={
-                'ToAddresses': [
+                'ToAddresses': 
                     RECIPIENT,
-                ],
+                ,
             },
             Message={
                 'Body': {
