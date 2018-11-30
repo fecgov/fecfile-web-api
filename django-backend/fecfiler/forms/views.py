@@ -232,15 +232,27 @@ def update_f99_info(request):
     # update details of a single comm_info
     if request.method == 'POST':
         try:
+            #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
-            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
-        except CommitteeInfo.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = CommitteeInfoSerializer(comm_info, data=request.data)
+            try:
+                comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, is_submitted=False) #.last()
+            except CommitteeInfo.DoesNotExist:
+                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
+        except:
+            #logger.
+            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST) 
+        
+        incoming_data = request.data
+        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
+        incoming_data.is_submitted = False
+        # just making sure that committeeid is not updated by mistake
+        incoming_data.committeeid=request.user.username
+        
+        serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -253,6 +265,7 @@ def submit_comm_info(request):
     if request.method == 'POST':
         try:
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+            #print(comm_info.pk)
             if comm_info:
                 new_data = comm_info.__dict__
                 new_data["is_submitted"]=True
