@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^f99/get_form99list$', views.get_form99list, name='get_form99list' ),
     #url(r'^f99/print_f99_info$', views.print_f99_info, name='print_f99_info' ),
     #url(r'^f99/f99_file_upload$', views.f99_file_upload, name='f99_file_upload'),
+    url(r'^f99/delete_forms$', views.delete_forms, name='delete_forms'),
     url(r'^f99/print_pdf_info$', views.print_pdf_info, name='print_pdf_info'),
     url(r'^core/get_committee_details$', views.get_committee, name='get_committee' ),
     url(r'^core/update_committee_details/(?P<cid>[0-9,a-z,A-Z]+)$', views.update_committee, name='update_committee' ),    

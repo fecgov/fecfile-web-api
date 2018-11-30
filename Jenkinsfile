@@ -1,9 +1,6 @@
 pipeline {
-
   agent any
-
   stages {
-
     stage('Prepare Build') {
       steps {
                 script
@@ -48,5 +45,15 @@ pipeline {
       }
 
     }
+//    stage('Deploy backend-api to DEV environment'){
+//      steps {
+        //sh "kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=dev set image deployment/fecfile-backend-api fecfile-backend-api=813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-django-backend:${VERSION}"
+//      }
+//    }
+//    stage('Deploy front-end to DEV environment'){
+//      steps{
+       // sh "kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=dev set image deployment/fecfile-frontend fecfile-frontend=813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend:${VERSION}"
+//      }
+//    }
   }
 }
