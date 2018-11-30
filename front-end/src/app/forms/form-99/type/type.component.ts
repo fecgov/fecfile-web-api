@@ -84,10 +84,15 @@ export class TypeComponent implements OnInit {
    *
    * @param      {<type>}  val     The value
    */
-  public updateTypeSelected(val: string): void {
-    this.typeSelected = val;
-
-    this.frmType.controls['reasonTypeRadio'].setValue(val);
+  public updateTypeSelected(e): void {
+    if(e.target.checked) {
+      this.typeSelected = e.target.value;
+      this.typeFailed = false;
+    } else {
+      this.typeSelected = '';
+      this.typeFailed = true;
+    }
+    // this.frmType.controls['reasonTypeRadio'].setValue(val);
   }
 
   /**

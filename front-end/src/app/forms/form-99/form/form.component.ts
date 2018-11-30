@@ -62,43 +62,20 @@ export class FormComponent implements OnInit {
         this._form99_details.additional_email_2 = '';
         this._form99_details.created_at = '';
         this._form99_details.is_submitted = false;  
-        
-        this._formService
-          .getForm(
-              this._committee_details.committeeid,
-              false,
-              this._form_type
-          )
-          .subscribe(res => {
-            if(Object.keys(res).length>=1) {
-              if(!res.is_submitted) {
-                this._form99_details.reason = res.reason;
-                this._form99_details.text = res.text;
-                let formSavedObj: any = {
-                  'saved': true
-                };          
+           
+        let formSavedObj: any = {
+          'saved': true
+        };          
 
-                if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
-                  localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
-                }        
+        if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+        }        
 
-                if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
-                  localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
-                }        
-              } else {
-                if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
-                  localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
-                }                 
-              }
-              this.isLoading = false;
-            } else {
-              if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
-                localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
-              }
+        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
+          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
+        }  
 
-              this.isLoading = false;
-            }
-          });              
+        this.isLoading = false;
       }
     }
 
