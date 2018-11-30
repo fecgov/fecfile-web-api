@@ -566,11 +566,52 @@ def get_form99list(request):
         serializer = CommitteeInfoListSerializer(comm)
         return Response(serializer.data)
 
-
+#API to delete saved forms
+@api_view(['POST'])
+def delete_forms(request):
+    """
+    deletes the multiple saved reports based on report/form id. Returns success or fail message
+    """
+    if request.method == 'POST':
+        for obj in request.data:
+            try:
+                if obj.get('form_type') == 'F99':
+                    comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=obj.get('id')).first()
+                    # or can be written like comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=request.data.get('id'))[0]
+                    # way to access single object out of multiple objects -> for object in objects:
+                
+                    if comm_info:
+                        #print('%s') %new_data.get('committeename')
+                        new_data = vars(comm_info)
+                        new_data["isdeleted"]=True
+                        new_data["deleted_at"]=datetime.datetime.now()
+                        serializer = CommitteeInfoSerializer(comm_info, data=new_data)
+                        if serializer.is_valid():
+                            serializer.save()
+                            #print(serializer.data)
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        #print(comm_info.id)
+                        return Response({"error":"ERRCODE: FEC03. Form with id %d is already deleted or has been submitted beforehand." %obj.get('id')}, status=status.HTTP_400_BAD_REQUEST)                    
+            except:
+                return Response({"error":"There is an error while deleting forms."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"Forms deleted successfully"}, status=status.HTTP_200_OK)
+    else:
+        return Response({"error":"ERRCODE: FEC02. POST method is expected."}, status=status.HTTP_400_BAD_REQUEST)
+    
 #email through AWS SES
 def email(boolean, data):
     SENDER = "donotreply@fec.gov"
-    RECIPIENT = "%s" % data.get('email_on_file')
+    RECIPIENT = []
+
+    RECIPIENT.append("%s" % data.get('email_on_file'))
+
+    if 'additional_email_1' in data and (not data.get('additional_email_1')=='-'):
+        RECIPIENT.append("%s" % data.get('additional_email_1')) 
+
+    if 'additional_email_2' in data and (not data.get('additional_email_2')=='-'):
+        RECIPIENT.append("%s" % data.get('additional_email_2'))
     
     SUBJECT = "Test - Form 99 submitted successfully"
 
@@ -604,9 +645,9 @@ def email(boolean, data):
         #Provide the contents of the email.
         response = client.send_email(
             Destination={
-                'ToAddresses': [
+                'ToAddresses': 
                     RECIPIENT,
-                ],
+                
             },
             Message={
                 'Body': {
