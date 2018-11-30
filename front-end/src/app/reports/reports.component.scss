@@ -53,7 +53,7 @@
  }
 
  .datatable th, td{
-  text-align: left;
+  /*text-align: left;*/
   padding:8px;
 }
 
@@ -66,8 +66,12 @@
   width: 100%;
 }
 
-th, td {
+th {
   text-align: left;
+  padding: 8px;
+}
+
+td {
   padding: 8px;
 }
 
