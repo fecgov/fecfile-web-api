@@ -85,8 +85,6 @@ export class TypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
-    console.log('typeSelected: ');
-    console.log('e: ', e);
     if(e.target.checked) {
       this.typeSelected = e.target.value;
       this.typeFailed = false;
