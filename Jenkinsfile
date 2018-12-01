@@ -56,7 +56,7 @@ pipeline {
             frontendImage.push()
           }
 
-          def frontendNginxImage = docker.build("fecnxg-frontend-nginx:${VERSION}uat", 'front-end/ -f front-end/Dockerfile-nginxuat')
+          def frontendNginxImage = docker.build("fecnxg-frontend-nginx:${VERSION}uat", 'front-end/ -f front-end/Dockerfile-nginx')
 
           docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend-nginx') {
             frontendNginxImage.push()
