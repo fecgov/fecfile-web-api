@@ -106,28 +106,29 @@ export class FormsService {
    * @return     {Observable} The result of the form being saved.
    */
   public saveForm(formObj: any, form_type: string): Observable<any> {
-    console.log('saveForm: ');
     let token: string = JSON.parse(this._cookieService.get('user'));
     let data: any = {};
     let httpOptions =  new HttpHeaders();
-    let formSaved: boolean = false;
     let url: string = '';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     if(form_type === '99') {
-      let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
+      let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
 
-      console.log('form99 details: ', form99_details);
+      if(localStorage.getItem(`form_${form_type}_saved`) !== null) {
+        let formSavedObj = JSON.parse(localStorage.getItem(`form_${form_type}_saved`));
+        let formStatus: boolean = formSavedObj.saved;
 
-      if(localStorage.getItem('form_99_saved') !== null) {
-        let formSavedObj = JSON.parse(localStorage.getItem('form_99_saved'));
-
-        formSaved = formSavedObj.saved;
+        if(formStatus) {
+          url = '/f99/update_f99_info'; 
+        } else {
+          url = '/f99/create_f99_info';
+        } 
+      } else {
+        url = '/f99/create_f99_info';  
       }
-
-      url = '/f99/create_f99_info';  
       
       data = form99_details;
 
@@ -144,6 +145,7 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
+           
             return true;
           }
           return false;

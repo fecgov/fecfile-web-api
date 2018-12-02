@@ -58,13 +58,13 @@ export class FormComponent implements OnInit {
         this._form99_details.reason = '';
         this._form99_details.text = '';
         this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
-        this._form99_details.additional_email_1 = '';
-        this._form99_details.additional_email_2 = '';
+        this._form99_details.additional_email_1 = '-';
+        this._form99_details.additional_email_2 = '-';
         this._form99_details.created_at = '';
         this._form99_details.is_submitted = false;  
            
         let formSavedObj: any = {
-          'saved': true
+          'saved': false
         };          
 
         if(localStorage.getItem(`form_${this._form_type}_details`) === null) {

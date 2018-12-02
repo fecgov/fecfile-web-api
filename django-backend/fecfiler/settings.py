@@ -13,34 +13,32 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import datetime
+from corsheaders.defaults import default_headers
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-#DEBUG = os.environ.get('DEBUG', False)
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', False)
+
 TEMPLATE_DEBUG = DEBUG
-CSRF_TRUSTED_ORIGINS = ['localhost','api']
+CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-SECRET_KEY = '$6(x*g_2g9l_*g8peb-@anl5^*8q!1w)k&e&2!i)t6$s8kia94'
+
+#DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', 'http://127.0.0.1:8002')
+#DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 
 ROOT_URLCONF = 'fecfiler.urls'
 WSGI_APPLICATION = 'fecfiler.wsgi.application'
 AUTH_USER_MODEL = 'authentication.Account'
-
 
 ALLOWED_HOSTS = ['*']
 
@@ -61,7 +59,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'fecfiler.authentication',
     'fecfiler.posts',
-    'fecfiler.forms',    
+    'fecfiler.forms',
+    'db_file_storage',
 ]
 
 MIDDLEWARE = [
@@ -92,8 +91,14 @@ TEMPLATES = [
     },
 ]
 
-if DEBUG == True:
-    CORS_ORIGIN_ALLOW_ALL = True
+#if DEBUG == True:
+CORS_ORIGIN_ALLOW_ALL = True
+#else:
+#    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
+    
+CORS_ALLOW_HEADERS = default_headers + (
+    'enctype',
+)
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -105,14 +110,22 @@ DATABASES = {
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
 
-    
+     #'default': {
+     #    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+     #    'NAME': 'postgres',
+     #    'USER': 'postgres',
+     #    'PASSWORD': 'postgres',
+     #    'HOST': 'localhost',
+     #    'PORT': '5432',
+     #}
+     
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
-         'NAME': 'postgres',
-         'USER': 'postgres',
-         'PASSWORD': 'postgres',
-         'HOST': '127.0.0.1',
-         'PORT': '5432',
+         'NAME': os.environ.get('DB_NAME', 'postgres'),
+         'USER': os.environ.get('DB_USERNAME', 'postgres'),
+         'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+         'HOST': os.environ.get('DB_HOST', 'localhost'),
+         'PORT': os.environ.get('DB_PORT', '5432')
      }
 }
 
@@ -163,7 +176,8 @@ STATIC_ROOT = 'static'
 
 COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', not DEBUG)
 
- 
+DEFAULT_FILE_STORAGE = 'db_file_storage.storage.DatabaseFileStorage'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -179,7 +193,7 @@ JWT_AUTH = {
         'JWT_ALLOW_REFRESH': True,
         'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
     }
-                          
+
 ADMIN_SHORTCUTS = [
     {
         'shortcuts': [
@@ -220,3 +234,13 @@ LOGGING = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# AWS SES Configuration Settings
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+AWS_ACCESS_KEY_ID = 'AKIAIH4XBCHDF3EWFC7Q'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_HOST_NAME = 'us-east-1'
+AWS_REGION = 'us-east-1'
+
+AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)

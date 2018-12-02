@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^api/docs$', schema_view),
     url(r'^api/v1/token/obtain$', obtain_jwt_token),
     url(r'^api/v1/token/refresh$', refresh_jwt_token),
+    url(r'^files/', include('db_file_storage.urls')),
     #url('^.*$', IndexView.as_view(), name='index'),
 ]
 
