@@ -244,7 +244,7 @@ def update_f99_info(request):
         
         incoming_data = request.data
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-        incoming_data.is_submitted = False
+        incoming_data['is_submitted'] = False
         # just making sure that committeeid is not updated by mistake
         incoming_data.committeeid=request.user.username
         
