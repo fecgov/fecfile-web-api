@@ -38,6 +38,7 @@ export class ReasonComponent implements OnInit {
   private _form_99_details: any = {}
   private _editorMax: number = 20000;
   private _form_type: string = '';
+  private _form_saved: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -195,8 +196,10 @@ export class ReasonComponent implements OnInit {
    *
    */
   public saveForm() {
+    console.log('saveForm: ');
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
+        let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
 
         this.reasonText = this.frmReason.get('reasonText').value;
@@ -212,6 +215,13 @@ export class ReasonComponent implements OnInit {
           .saveForm({}, this._form_type)
           .subscribe(res => {
             if(res) {
+              console.log('res: ', res);
+
+              this._form_99_details.id = res.id;
+
+              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+              
+              // success
               this.formSaved = true;
 
               let formSavedObj: any = {

@@ -15,8 +15,7 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-
-// import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
+import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
 
 import { routing } from './app.routes';
 import { AppComponent } from './app.component';
@@ -43,15 +42,6 @@ import { UsersComponent } from './users/users.component';
 import { SettingsComponent } from './settings/settings.component';
 
 import { AppConfigService } from './app-config.service';
-
-/*import { MatMenuModule, MatButtonModule} from '@angular/material';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';*/
-
-import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
-import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
-import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
-import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
-import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -82,12 +72,7 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
     SubmitComponent,
     AccountComponent,
     UsersComponent,
-    SettingsComponent,
-    ToolsImportTransactionsComponent,
-    ToolsImportNamesComponent,
-    ToolsExportNamesComponent,
-    ToolsMergeNamesComponent,
-    ToolsCreateBackupComponent
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -103,14 +88,12 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot(),
-    /*MatMenuModule,
-    MatButtonModule,
-    BrowserAnimationsModule*/
+    NgbModule.forRoot()
   ],
   providers: [
     CookieService, 
     CanActivateGuard,
+    CanDeactivateGuard,
     AppConfigService,
     {
       provide: APP_INITIALIZER,

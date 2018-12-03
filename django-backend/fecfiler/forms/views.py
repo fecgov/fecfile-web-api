@@ -243,10 +243,13 @@ def update_f99_info(request):
             return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST) 
         
         incoming_data = request.data
+        #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-        incoming_data.is_submitted = False
+        
+        if not(incoming_data['is_submitted'] == 'False' and incoming_data['committeeid'] == request.user.username):
+            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
         # just making sure that committeeid is not updated by mistake
-        incoming_data.committeeid=request.user.username
+
         
         serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
         if serializer.is_valid():
@@ -267,12 +270,12 @@ def submit_comm_info(request):
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
             #print(comm_info.pk)
             if comm_info:
-                new_data = comm_info.__dict__
-                new_data["is_submitted"]=True
-                new_data["updated_at"]=datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                if serializer.is_valid():
+                comm_info.is_submitted = True
+                comm_info.updated_at = datetime.datetime.now()                
+                serializer = CommitteeInfoSerializer(comm_info)                
+                if serializer.is_valid():                    
                     serializer.save()
+                    
                     email(True, serializer.data)
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
