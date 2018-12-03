@@ -56,10 +56,13 @@ export class FormsComponent implements OnInit {
    */
   public hasUnsavedData(): boolean {
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
-    let formStatus: boolean = formSaved.saved;
 
-    if(!formStatus) {
-      return true;
+    if(formSaved !== null) {
+      let formStatus: boolean = formSaved.saved;
+
+      if(!formStatus) {
+        return true;
+      }      
     }
 
     return false;

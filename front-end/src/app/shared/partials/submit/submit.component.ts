@@ -26,6 +26,7 @@ export class SubmitComponent implements OnInit {
       .subscribe(res => {
         if(res.form_submitted) {
           localStorage.removeItem(`form_${this.form_type}_details`);
+          localStorage.removeItem(`form_${this.form_type}_saved`);
         }
       });
   }

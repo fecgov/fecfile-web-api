@@ -176,7 +176,7 @@ export class SignComponent implements OnInit {
           .subscribe(res => {
             if(res) {
 
-              localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify({'saved': true}));
+              //localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify({'saved': true}));
               this._formsService
                 .submitForm({}, this.form_type)
                 .subscribe(res => {
