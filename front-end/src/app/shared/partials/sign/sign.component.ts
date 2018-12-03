@@ -230,10 +230,20 @@ export class SignComponent implements OnInit {
   }
 
   public updateAdditionalEmail(e): void {
-    console.log('updateAdditionalEmail: ');
-    console.log('e: ', e);
     if(e.target.value.length) {
-      // add update email here.
+     if(e.target.name === 'additional_email_1') {
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
+       this._form_details.additional_email_1 = e.target.value;
+
+       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     } else if(e.target.name === 'additional_email_2') {
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
+       this._form_details.additional_email_2 = e.target.value;
+
+       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     }
     }
   }
 
