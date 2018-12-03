@@ -115,6 +115,7 @@
                    type="email"
                    name="additional_email_1"
                    value=""
+                   (blur)="updateAdditionalEmail($event)"
                    formControlName="additional_email_1"
                  >
                  <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
@@ -128,6 +129,7 @@
                    type="email"
                    name="additional_email_2"
                    value=""
+                   (blur)="updateAdditionalEmail($event)"
                    formControlName="additional_email_2"
                  >
                  <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">

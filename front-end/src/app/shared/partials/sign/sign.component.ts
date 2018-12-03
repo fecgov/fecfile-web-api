@@ -124,6 +124,8 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
+    let formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
+    let formStatus: boolean = true;
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
@@ -157,7 +159,6 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
-    console.log('doSubmitForm: ');
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
     this._form_details.file = '';
@@ -174,6 +175,8 @@ export class SignComponent implements OnInit {
           .saveForm({}, this.form_type)
           .subscribe(res => {
             if(res) {
+
+              //localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify({'saved': true}));
               this._formsService
                 .submitForm({}, this.form_type)
                 .subscribe(res => {
@@ -223,6 +226,24 @@ export class SignComponent implements OnInit {
             }
           });
       }
+    }
+  }
+
+  public updateAdditionalEmail(e): void {
+    if(e.target.value.length) {
+     if(e.target.name === 'additional_email_1') {
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
+       this._form_details.additional_email_1 = e.target.value;
+
+       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     } else if(e.target.name === 'additional_email_2') {
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
+       this._form_details.additional_email_2 = e.target.value;
+
+       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     }
     }
   }
 
