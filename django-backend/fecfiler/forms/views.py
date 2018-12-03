@@ -512,7 +512,7 @@ def validate_f99(request):
         errormess.append('Reason does not match the pre-defined codes.')
 
     #pdf validation for type, extension and size
-    if 'file' in request.data:
+    if 'file' in request.data or request.data.get('file')=='':
         valid_mime_types = ['application/pdf']
         file = request.data.get('file')
         file_mime_type = magic.from_buffer(file.read(1024), mime=True)
