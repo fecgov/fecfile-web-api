@@ -1,6 +1,6 @@
 import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
@@ -83,11 +83,18 @@ export class FormComponent implements OnInit {
       .events
       .subscribe(val => {
         if(val) {
-          if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
-            this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-            this.step = this._activatedRoute.snapshot.queryParams.step;
+          if(val instanceof NavigationEnd) {
+            if(val.url.indexOf('/forms/form/99') === -1) {
+              localStorage.removeItem(`form_${this._form_type}_details`);
+              localStorage.removeItem(`form_${this._form_type}_saved`);
+            }
+          } else {
+            if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+              this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+              this.step = this._activatedRoute.snapshot.queryParams.step;
+            }
+            window.scrollTo(0, 0);            
           }
-          window.scrollTo(0, 0);
         }
       });
   
