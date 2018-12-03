@@ -196,6 +196,7 @@ export class ReasonComponent implements OnInit {
    *
    */
   public saveForm() {
+    console.log('saveForm: ');
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
@@ -214,6 +215,12 @@ export class ReasonComponent implements OnInit {
           .saveForm({}, this._form_type)
           .subscribe(res => {
             if(res) {
+              console.log('res: ', res);
+
+              this._form_99_details.id = res.id;
+
+              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+              
               // success
               this.formSaved = true;
 

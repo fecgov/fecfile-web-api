@@ -175,6 +175,8 @@ export class SignComponent implements OnInit {
           .saveForm({}, this.form_type)
           .subscribe(res => {
             if(res) {
+
+              localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify({'saved': true}));
               this._formsService
                 .submitForm({}, this.form_type)
                 .subscribe(res => {
@@ -224,6 +226,14 @@ export class SignComponent implements OnInit {
             }
           });
       }
+    }
+  }
+
+  public updateAdditionalEmail(e): void {
+    console.log('updateAdditionalEmail: ');
+    console.log('e: ', e);
+    if(e.target.value.length) {
+      // add update email here.
     }
   }
 

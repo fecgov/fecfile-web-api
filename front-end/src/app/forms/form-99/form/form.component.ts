@@ -61,7 +61,8 @@ export class FormComponent implements OnInit {
         this._form99_details.additional_email_1 = '-';
         this._form99_details.additional_email_2 = '-';
         this._form99_details.created_at = '';
-        this._form99_details.is_submitted = false;  
+        this._form99_details.is_submitted = false; 
+        this._form99_details.id = ''; 
            
         let formSavedObj: any = {
           'saved': false

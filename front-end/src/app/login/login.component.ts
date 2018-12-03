@@ -48,8 +48,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.appTitle = environment.appTitle;
-
-    console.log('this.appTitle: ', this.appTitle);
   }
 
   ngOnDestroy() {
