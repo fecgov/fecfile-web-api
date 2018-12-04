@@ -263,7 +263,7 @@ def submit_comm_info(request):
     """
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     validate_api/s3 not being called currently
-    """
+    #"""
     #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
@@ -273,13 +273,14 @@ def submit_comm_info(request):
                 comm_info.is_submitted = True
                 comm_info.updated_at = datetime.datetime.now()                
                 serializer = CommitteeInfoSerializer(comm_info)                
-                if serializer.is_valid():                    
-                    serializer.save()
+                #if serializer.is_valid():
+                #if True:
+                comm_info.save()
                     
-                    email(True, serializer.data)
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                email(True, serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+                #else:
+                #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
