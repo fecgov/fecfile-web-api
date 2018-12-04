@@ -11,6 +11,7 @@ services:
     ports:
       - "5432:5432"
   api:
+    env_file: ../local.env
     build: './django-backend'
     image: fecnxg
     command: python manage.py runserver 0.0.0.0:8080
