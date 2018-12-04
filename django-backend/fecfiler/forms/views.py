@@ -202,7 +202,7 @@ def create_f99_info(request):
             'email_on_file_2': request.data.get('email_on_file_2'),
             'file': request.data.get('file'),
         }
-
+        import ipdb; ipdb.set_trace()
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -232,7 +232,7 @@ def update_f99_info(request):
     # update details of a single comm_info
     if request.method == 'POST':
         try:
-            #import ipdb; ipdb.set_trace()
+            import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
                 comm_info = CommitteeInfo.objects.get(committeeid=request.user.username,id=request.data.get('id'), is_submitted=False) #.last()
@@ -246,7 +246,7 @@ def update_f99_info(request):
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
         
-        if not(incoming_data['is_submitted'] == 'False' and incoming_data['committeeid'] == request.user.username):
+        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
             return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
         # just making sure that committeeid is not updated by mistake
 
