@@ -232,10 +232,10 @@ def update_f99_info(request):
     # update details of a single comm_info
     if request.method == 'POST':
         try:
-            import ipdb; ipdb.set_trace()
+            #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
-                comm_info = CommitteeInfo.objects.get(committeeid=request.user.username,id=request.data.get('id'), is_submitted=False) #.last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=False).last()
             except CommitteeInfo.DoesNotExist:
                 return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
         except:
