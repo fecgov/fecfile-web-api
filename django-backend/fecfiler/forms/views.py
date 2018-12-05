@@ -202,7 +202,7 @@ def create_f99_info(request):
             'email_on_file_2': request.data.get('email_on_file_2'),
             'file': request.data.get('file'),
         }
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
