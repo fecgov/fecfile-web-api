@@ -1,6 +1,14 @@
 @import '../shared/scss/global';
 
 .account-container {
+	.grid-row {
+		margin-left: 0;
+		margin-right: 0;
+		.grid-row__col {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
 	header {    
 	    .header-container {
 	      display: block;
@@ -8,56 +16,7 @@
 	      .header__text {
 	        display: block;
 	        float: none;
-	        width: 100%;
-	        @include media(tablet) {
-	          display: block;
-	          float: none;
-	          width: 100%;
-	        }
-	        @include media(mediumDesktop) {
-	          float: left;
-	          width: 40%;
-	        }         
-	        @include media(largeDesktop) {
-	          float: left;
-	          width: 40%;
-	        }         
-	      }
-	      .header__btns {
-	        display: block;
-	        float: none;
-	        padding-top: 0;
-	        text-align: left;
-	        width: 100%;
-	        @include media(tablet) {
-	          display: block;
-	          float: none;
-	          padding-top: 0;
-	          text-align: left;
-	          width: 100%;
-	        }
-	        @include media(mediumDesktop) {
-	          float: left;
-	          padding-top: 0;
-	          text-align: right;
-	          width: 50%;
-	        }         
-	        @include media(largeDesktop) {
-	          float: left;
-	          padding-top: 0;
-	          text-align: right;
-	          width: 50%;
-	        }         
-	        /*.btn-print-preview {
-	          @extend .btn-secondary-gray;
-	          margin-right: 5px;
-	        }
-	        .btn-validate {
-	          @extend .btn-primary;
-	        }
-	        .btn {
-	          padding-top: 10px;
-	        }*/
+	        width: 100%;       
 	      }
 	      @include clearfix();	
 		}
