@@ -41,6 +41,12 @@ import { AccountComponent } from './account/account.component';
 import { UsersComponent } from './users/users.component';
 import { SettingsComponent } from './settings/settings.component';
 
+import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
+import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
+import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
+import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
+import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
+
 import { AppConfigService } from './app-config.service';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -72,7 +78,12 @@ import { AppConfigService } from './app-config.service';
     SubmitComponent,
     AccountComponent,
     UsersComponent,
-    SettingsComponent
+    SettingsComponent,
+    ToolsImportTransactionsComponent,
+    ToolsImportNamesComponent,
+    ToolsExportNamesComponent,
+    ToolsMergeNamesComponent,
+    ToolsCreateBackupComponent
   ],
   imports: [
     BrowserModule,
