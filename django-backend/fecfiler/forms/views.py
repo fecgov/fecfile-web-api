@@ -200,9 +200,9 @@ def create_f99_info(request):
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
             'email_on_file_2': request.data.get('email_on_file_2'),
-            #'file': request.data.get('file'),
+            'file': request.data.get('file'),
         }
-
+        #import ipdb; ipdb.set_trace()
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -263,23 +263,24 @@ def submit_comm_info(request):
     """
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     validate_api/s3 not being called currently
-    """
+    #"""
     #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
             #print(comm_info.pk)
             if comm_info:
-                new_data = comm_info.__dict__
-                new_data["is_submitted"]=True
-                new_data["updated_at"]=datetime.datetime.now()
-                serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                if serializer.is_valid():
-                    serializer.save()
-                    email(True, serializer.data)
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                comm_info.is_submitted = True
+                comm_info.updated_at = datetime.datetime.now()                
+                serializer = CommitteeInfoSerializer(comm_info)                
+                #if serializer.is_valid():
+                #if True:
+                comm_info.save()
+                    
+                email(True, serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+                #else:
+                #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -514,25 +515,27 @@ def validate_f99(request):
     if not any(conditions):
         errormess.append('Reason does not match the pre-defined codes.')
 
-    #pdf validation for type, extension and size
-    # if 'file' in request.data:
-    #     valid_mime_types = ['application/pdf']
-    #     file = request.data.get('file')
-    #     file_mime_type = magic.from_buffer(file.read(1024), mime=True)
-    #     if file_mime_type not in valid_mime_types:
-    #         errormess.append('This is not a pdf file type. Kindly open your document using a pdf reader before uploading it.')
-    #     valid_file_extensions = ['.pdf']
-    #     ext = os.path.splitext(file.name)[1]
-    #     if ext.lower() not in valid_file_extensions:
-    #         errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
-    #     if file._size > 33554432:
-    #         errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
-
     if len(errormess)==0:
         errormess.append('Validation successful!')
         return JsonResponse(errormess, status=200, safe=False)
     else:
         return JsonResponse(errormess, status=400, safe=False)
+"""
+    #pdf validation for type, extension and size
+    if 'file' in request.data:
+        valid_mime_types = ['application/pdf']
+        file = request.data.get('file')
+        file_mime_type = magic.from_buffer(file.read(1024), mime=True)
+        if file_mime_type not in valid_mime_types:
+            errormess.append('This is not a pdf file type. Kindly open your document using a pdf reader before uploading it.')
+        valid_file_extensions = ['.pdf']
+        ext = os.path.splitext(file.name)[1]
+        if ext.lower() not in valid_file_extensions:
+            errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
+        if file._size > 33554432:
+            errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
+"""
+
 
 @api_view(['GET'])
 def get_rad_analyst_info(request):

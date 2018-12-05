@@ -34,7 +34,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.treasurermiddlename = validated_data.get('treasurermiddlename', instance.treasurermiddlename)
         instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
         instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
-        instance.is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
+        is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
         instance.signee = validated_data.get('signee', instance.signee)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
         instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
@@ -42,10 +42,10 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.form_type = validated_data.get('form_type', instance.form_type)
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)
-        #try:
-            #instance.file = validated_data.get('file', instance.file)
-        #except:
-            #pass
+        try:
+            instance.file = validated_data.get('file', instance.file)
+        except:
+            pass
         
         instance.save()
         return instance
