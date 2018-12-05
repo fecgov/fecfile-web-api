@@ -51,6 +51,8 @@ export class FormComponent implements OnInit {
 
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    this.step = this._activatedRoute.snapshot.queryParams.step;
+
     if(this._committee_details) {
       if(this._committee_details.committeeid) {
         this._form99_details = this.committee_details;
@@ -68,11 +70,11 @@ export class FormComponent implements OnInit {
           'saved': false
         };          
 
-        if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+        if(localStorage.getItem(`form_${this._form_type}_details`) === null && this.step !== 'step_5') {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
         }        
 
-        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
+        if(localStorage.getItem(`form_${this._form_type}_saved`) === null && this.step !== 'step_5') {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
         }  
 
