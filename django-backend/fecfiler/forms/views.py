@@ -514,13 +514,7 @@ def validate_f99(request):
     conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
     if not any(conditions):
         errormess.append('Reason does not match the pre-defined codes.')
-
-    if len(errormess)==0:
-        errormess.append('Validation successful!')
-        return JsonResponse(errormess, status=200, safe=False)
-    else:
-        return JsonResponse(errormess, status=400, safe=False)
-"""
+    """
     #pdf validation for type, extension and size
     if 'file' in request.data:
         valid_mime_types = ['application/pdf']
@@ -534,8 +528,12 @@ def validate_f99(request):
             errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
         if file._size > 33554432:
             errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
-"""
-
+    """
+    if len(errormess)==0:
+        errormess.append('Validation successful!')
+        return JsonResponse(errormess, status=200, safe=False)
+    else:
+        return JsonResponse(errormess, status=400, safe=False)
 
 @api_view(['GET'])
 def get_rad_analyst_info(request):
