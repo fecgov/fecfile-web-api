@@ -235,7 +235,7 @@ def update_f99_info(request):
             #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
-                comm_info = CommitteeInfo.objects.get(committeeid=request.user.username,id=request.data.get('id'), is_submitted=False) #.last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=False).last()
             except CommitteeInfo.DoesNotExist:
                 return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
         except:
@@ -243,11 +243,14 @@ def update_f99_info(request):
             return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST) 
         
         incoming_data = request.data
+        #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-        incoming_data['is_submitted'] = False
+        
+        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
+            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
         # just making sure that committeeid is not updated by mistake
-        #incoming_data.committeeid=request.user.username
-        incoming_data['committeeid'] = request.user.username
+
+        
         serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
         if serializer.is_valid():
             serializer.save()
