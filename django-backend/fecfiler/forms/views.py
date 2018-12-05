@@ -202,7 +202,7 @@ def create_f99_info(request):
             'email_on_file_2': request.data.get('email_on_file_2'),
             'file': request.data.get('file'),
         }
-
+        #import ipdb; ipdb.set_trace()
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -235,7 +235,7 @@ def update_f99_info(request):
             #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
-                comm_info = CommitteeInfo.objects.get(committeeid=request.user.username,id=request.data.get('id'), is_submitted=False) #.last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=False).last()
             except CommitteeInfo.DoesNotExist:
                 return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
         except:
@@ -246,7 +246,7 @@ def update_f99_info(request):
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
         
-        if not(incoming_data['is_submitted'] == 'False' and incoming_data['committeeid'] == request.user.username):
+        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
             return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
         # just making sure that committeeid is not updated by mistake
 
@@ -263,7 +263,7 @@ def submit_comm_info(request):
     """
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     validate_api/s3 not being called currently
-    """
+    #"""
     #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
@@ -273,13 +273,14 @@ def submit_comm_info(request):
                 comm_info.is_submitted = True
                 comm_info.updated_at = datetime.datetime.now()                
                 serializer = CommitteeInfoSerializer(comm_info)                
-                if serializer.is_valid():                    
-                    serializer.save()
+                #if serializer.is_valid():
+                #if True:
+                comm_info.save()
                     
-                    email(True, serializer.data)
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
+                email(True, serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+                #else:
+                #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                    
         except:
             return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 

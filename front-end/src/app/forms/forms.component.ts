@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, NgZone, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -40,6 +40,32 @@ export class FormsComponent implements OnInit {
           this.showValidateBar = res.validateMessage.showValidateBar;
         }
       });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+      if (this.hasUnsavedData()) {
+          $event.returnValue =true;
+      }
+  }  
+
+  /**
+   * Determines if form has unsaved data.
+   *
+   * @return     {boolean}  True if has unsaved data, False otherwise.
+   */
+  public hasUnsavedData(): boolean {
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
+
+    if(formSaved !== null) {
+      let formStatus: boolean = formSaved.saved;
+
+      if(!formStatus) {
+        return true;
+      }      
+    }
+
+    return false;
   }
 
   /**
