@@ -3,5 +3,5 @@ export const environment = {
   name: 'local',
   apiUrl: 'http://localhost:8000/api/v1',
   appTitle: 'FECFile',
-  validateSuccess: 'All required fields have been validated.'
+  validateSuccess: 'All required fields have passed validation.'
 };

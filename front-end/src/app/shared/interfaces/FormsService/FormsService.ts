@@ -15,8 +15,8 @@
   treasurersuffix: string,
   signee: string,
   email_on_file: string,
-  additional_email_1: string,
-  additional_email_2: string,
+  email_on_file_1: string,
+  email_on_file_2: string,
   created_at: string,
   is_submitted: boolean
  }

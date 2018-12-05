@@ -7,7 +7,7 @@ export const environment = {
   name: 'development',
   apiUrl: 'http://35.172.199.97/api/v1',
   appTitle: 'FECFile',
-  validateSuccess: 'All required fields have been validated.'
+  validateSuccess: 'All required fields have passed validation.'
 };
 
 /*

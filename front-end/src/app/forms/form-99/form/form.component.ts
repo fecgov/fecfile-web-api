@@ -46,15 +46,10 @@ export class FormComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    localStorage.removeItem(`form_${this._form_type}_details`);
-    localStorage.removeItem(`form_${this._form_type}_saved`);
-
     this._committee_details = JSON.parse(localStorage.getItem('committee_details'));
     this.committee_details = this._committee_details;
 
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-
-    this.step = this._activatedRoute.snapshot.queryParams.step;
 
     if(this._committee_details) {
       if(this._committee_details.committeeid) {
@@ -71,13 +66,13 @@ export class FormComponent implements OnInit {
            
         let formSavedObj: any = {
           'saved': false
-        };         
+        };          
 
-        if(localStorage.getItem(`form_${this._form_type}_details`) === null && this.step !== 'step_5') {
+        if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
         }        
 
-        if(localStorage.getItem(`form_${this._form_type}_saved`) === null && this.step !== 'step_5') {
+        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
         }  
 
