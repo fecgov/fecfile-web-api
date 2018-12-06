@@ -198,8 +198,8 @@ def create_f99_info(request):
             'is_submitted': request.data.get('is_submitted'),
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
-            'email_on_file_1' : request.data.get('email_on_file_1'),
-            'email_on_file_2': request.data.get('email_on_file_2'),
+            'additional_email_1' : request.data.get('additional_email_1'),
+            'additional_email_2': request.data.get('additional_email_2'),
             'file': request.data.get('file'),
         }
         #import ipdb; ipdb.set_trace()
