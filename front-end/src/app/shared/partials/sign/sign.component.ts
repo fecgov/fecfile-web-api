@@ -47,6 +47,29 @@ export class SignComponent implements OnInit {
 
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
+    this._setForm();
+
+    this._messageService
+      .getMessage()
+      .subscribe(res => {
+        if(res.message) {
+          if(res.message === 'New form99') {
+            this._setForm();
+          }
+        }
+      });  
+  }
+
+  ngDoCheck(): void {
+    if(this.form_type === '99') {
+      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+      if(form_99_details) {
+        this.type_selected = form_99_details.reason;
+      }
+    }
+  }
+
+  private _setForm(): void {
     if(this._form_details) {
       if(this.form_type === '99') {
         this.type_selected = this._form_details.reason;
@@ -77,15 +100,9 @@ export class SignComponent implements OnInit {
         agreement: [false, Validators.requiredTrue]
       });
     }
-  }
 
-  ngDoCheck(): void {
-    if(this.form_type === '99') {
-      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
-      if(form_99_details) {
-        this.type_selected = form_99_details.reason;
-      }
-    }
+    this._messageService
+      .clearMessage();
   }
 
   /**

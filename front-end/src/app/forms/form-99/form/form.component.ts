@@ -35,6 +35,7 @@ export class FormComponent implements OnInit {
   private _form99_details: any = {};
   private _step: string = '';
   private _form_type: string = '';
+  private _form_submitted: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -106,6 +107,10 @@ export class FormComponent implements OnInit {
       .subscribe(res => {
         if(res.validateMessage) {
           this.showValidateBar = res.validateMessage.showValidateBar;
+        } else if (res.form_submitted) {
+          this._form_submitted = true;
+
+          this._form99_details = this.committee_details;      
         }
       });
   }
@@ -114,6 +119,36 @@ export class FormComponent implements OnInit {
     if(this.currentStep !== this._activatedRoute.snapshot.queryParams.step) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;      
+    }
+
+    if(this._form_submitted) {
+      if(this.step === 'step_1') {
+        this._form99_details.reason = '';
+        this._form99_details.text = '';
+        this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99_details.additional_email_1 = '-';
+        this._form99_details.additional_email_2 = '-';
+        this._form99_details.created_at = '';
+        this._form99_details.is_submitted = false; 
+        this._form99_details.id = '';     
+
+        let formSavedObj: any = {
+          'saved': false
+        };          
+
+        if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
+          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+        }        
+
+        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
+          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
+        }
+
+        this._messageService
+          .sendMessage({
+            'message': 'New form99'
+          });                  
+      }
     }
   }
 

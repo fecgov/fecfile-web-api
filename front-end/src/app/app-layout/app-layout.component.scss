@@ -10,10 +10,10 @@
       padding-left: 0
     }
     @include media(mediumDesktop) {
-      padding-left: 0;
+      padding-left: 200px;
     }         
     @include media(largeDesktop) {
-      padding-left: 0;
+      padding-left: 200px;
     }     
     .app__side-nav {
       left: 0;
@@ -72,7 +72,7 @@
             width: 200px;
           }         
           @include media(largeDesktop) {
-            width: 275px;
+            width: 260px;
           }           
         }
       } // .app__top-logo

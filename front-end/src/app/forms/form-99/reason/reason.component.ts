@@ -39,6 +39,7 @@ export class ReasonComponent implements OnInit {
   private _editorMax: number = 20000;
   private _form_type: string = '';
   private _form_saved: boolean = false;
+  private _form_submitted: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -56,6 +57,45 @@ export class ReasonComponent implements OnInit {
 
     this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
+
+    this._setForm();
+
+    this._messageService    
+      .getMessage()
+      .subscribe(res => {
+        if(res.message) {
+          if(res.message === 'New form99') {
+            this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+            
+            this._setForm();
+          }
+        }
+      });     
+  }
+
+  ngDoCheck(): void {
+    let form_99_details: any = {};
+
+    if(localStorage.getItem('form_99_details') !== null) {
+      form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+    }
+
+    if(form_99_details) {
+      this.typeSelected = form_99_details.reason;
+    }
+
+    if (this.frmReason.get('reasonText').value.length >= 1) {
+      let text: string = this.frmReason.get('reasonText').value;
+
+      this.characterCount = text.length;
+    } else if(this.frmReason.get('reasonText').value.length === 0) {
+      let text: string = this.frmReason.get('reasonText').value;
+
+      this.characterCount = text.length;
+    }
+  }
+
+  private _setForm(): void {
     if(this._form_99_details) {  
       if(this._form_99_details.text) {
         this.frmReason = this._fb.group({
@@ -79,29 +119,7 @@ export class ReasonComponent implements OnInit {
           htmlLength(this._editorMax)
         ]]
       });
-    }
-  }
-
-  ngDoCheck(): void {
-    let form_99_details: any = {};
-
-    if(localStorage.getItem('form_99_details') !== null) {
-      form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
-    }
-
-    if(form_99_details) {
-      this.typeSelected = form_99_details.reason;
-    }
-
-    if (this.frmReason.get('reasonText').value.length >= 1) {
-      let text: string = this.frmReason.get('reasonText').value;
-
-      this.characterCount = text.length;
-    } else if(this.frmReason.get('reasonText').value.length === 0) {
-      let text: string = this.frmReason.get('reasonText').value;
-
-      this.characterCount = text.length;
-    }
+    }    
   }
 
   /**
