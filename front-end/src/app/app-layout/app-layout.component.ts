@@ -72,11 +72,11 @@ export class AppLayoutComponent implements OnInit {
       }
     }    
   }
-
+  
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     localStorage.clear();
-  }    
+  }   
 
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.

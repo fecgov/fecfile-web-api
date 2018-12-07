@@ -11,6 +11,7 @@ services:
     ports:
       - "5432:5432"
   api:
+    env_file: ../local.env
     build: './django-backend'
     image: fecnxg
     command: python manage.py runserver 0.0.0.0:8080
@@ -18,11 +19,12 @@ services:
       - ./django-backend:/opt/nxg_fec
     ports:
       - "8080:8080"
-	  - "25:25" 
     depends_on:
       - db
   web:
-    build: './front-end'
+    build:
+      context: './front-end'
+      dockerfile: Dockerfile-nginx
     restart: always
     volumes:
        - ./front-end/dist/fec-eFilling:/usr/share/nginx/html

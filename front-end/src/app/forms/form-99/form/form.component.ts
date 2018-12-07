@@ -76,7 +76,7 @@ export class FormComponent implements OnInit {
 
         if(localStorage.getItem(`form_${this._form_type}_saved`) === null && this.step !== 'step_5') {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
-        }  
+        } 
 
         this.isLoading = false;
       }
