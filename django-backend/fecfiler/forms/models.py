@@ -53,6 +53,10 @@ class CommitteeInfo(models.Model):
     def save(self, *args, **kwargs):
         delete_file_if_needed(self, 'file')
         super(CommitteeInfo, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        super(CommitteeInfo, self).delete(*args, **kwargs)
+        delete_file(self, 'file')
     
 
     class Meta():
