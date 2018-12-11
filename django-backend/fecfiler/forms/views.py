@@ -198,6 +198,8 @@ def create_f99_info(request):
             'is_submitted': request.data.get('is_submitted'),
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
+            'email_on_file_1': request.data.get('email_on_file_1'),
+
             'additional_email_1' : request.data.get('additional_email_1'),
             'additional_email_2': request.data.get('additional_email_2'),
             'file': request.data.get('file'),
@@ -422,6 +424,7 @@ def create_committee(request):
             'treasurerprefix': request.data.get('treasurerprefix'),
             'treasurersuffix': request.data.get('treasurersuffix'),
             'email_on_file' : request.data.get('email_on_file'),
+            'email_on_file_1' : request.data.get('email_on_file_1'),
         }
 
 
@@ -458,7 +461,9 @@ def validate_f99(request):
             'treasurerprefix': request.data.get('treasurerprefix'),
             'treasurersuffix': request.data.get('treasurersuffix'),
             'email_on_file' : request.data.get('email_on_file'),
-            #'file': request.data.get('file'),
+            'email_on_file_1' : request.data.get('email_on_file_1'),
+            'file': request.data.get('file'),
+
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -504,6 +509,12 @@ def validate_f99(request):
 
     if 'treasurersuffix' in request.data and comm.treasurersuffix!=request.data.get('treasurersuffix'):
         errormess.append('Treasurer Suffix does not match the Form 1 data.')
+
+    if 'email_on_file_1' in request.data and comm.email_on_file_1!=request.data.get('email_on_file_1'):
+        errormess.append('email_on_file_1 does not match the Form 1 data.')
+
+    if 'email_on_file' in request.data and comm.email_on_file!=request.data.get('email_on_file'):
+        errormess.append('email_on_file does not match the Form 1 data.')
 
     if len(request.data.get('text'))>20000:
         errormess.append('Text greater than 20000.')
@@ -613,9 +624,12 @@ def email(boolean, data):
 
     if 'additional_email_1' in data and (not data.get('additional_email_1')=='-'):
         RECIPIENT.append("%s" % data.get('additional_email_1')) 
-
+ 
     if 'additional_email_2' in data and (not data.get('additional_email_2')=='-'):
         RECIPIENT.append("%s" % data.get('additional_email_2'))
+
+    if 'email_on_file_1' in data and (not data.get('email_on_file_1')=='-'):
+        RECIPIENT.append("%s" % data.get('email_on_file_1'))
     
     SUBJECT = "Test - Form 99 submitted successfully"
 
