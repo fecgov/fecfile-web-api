@@ -15,6 +15,9 @@
               .form-name {
                 display: block;
               }
+              .btn-info {
+                display: none;
+              }
             }
           }
         }
@@ -64,8 +67,16 @@
           .list-item__info {
             float: left;
             .form-name {
+              //background-color: $mercury;
               display: none;
               padding-left: 10px;
+              padding-right: 6px;
+            }
+            .btn-info {
+              display: block;
+              .info-icon {
+                color: $white;
+              }
             }
           }
           @include clearfix();

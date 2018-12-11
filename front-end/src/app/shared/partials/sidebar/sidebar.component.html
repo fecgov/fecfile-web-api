@@ -27,6 +27,22 @@
                 <div class="form-name">
                   F3X
                 </div>
+                 <button 
+                   type="button" 
+                   class="btn btn-info"
+                   [ngbTooltip]="f3xContent"
+                   #f3xtoolTip="ngbTooltip"
+                   (click)="toggleToolTip(f99toolTip)"
+                   triggers="manual"
+                   tooltipClass="custom-tooltip-class"
+                   placement="right"
+                 >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                 </button>
+                <ng-template #f3xContent>
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae metus mollis, interdum erat ac, placerat turpis. Duis tincidunt diam vel sapien semper, sed mattis nibh facilisis.    
+                </ng-template>                
               </div>
             </li>
             <li class="links-list__item">
@@ -37,6 +53,22 @@
                 <div class="form-name">
                   F3L
                 </div>
+                 <button 
+                   type="button" 
+                   class="btn btn-info"
+                   [ngbTooltip]="f3lContent"
+                   #f3LtoolTip="ngbTooltip"
+                   (click)="toggleToolTip(f99toolTip)"
+                   triggers="manual"
+                   tooltipClass="custom-tooltip-class"
+                   placement="right"
+                 >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                 </button>
+                <ng-template #f3lContent>
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae metus mollis, interdum erat ac, placerat turpis. Duis tincidunt diam vel sapien semper, sed mattis nibh facilisis.    
+                </ng-template>                  
               </div>
             </li>
           </ul>
@@ -62,6 +94,22 @@
                 <div class="form-name">
                   F99
                 </div>
+                 <button 
+                   type="button" 
+                   class="btn btn-info"
+                   [ngbTooltip]="f99Content"
+                   #f99toolTip="ngbTooltip"
+                   (click)="toggleToolTip(f99toolTip)"
+                   triggers="manual"
+                   tooltipClass="custom-tooltip-class"
+                   placement="right"
+                 >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                 </button>
+                <ng-template #f99Content>
+                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae metus mollis, interdum erat ac, placerat turpis. Duis tincidunt diam vel sapien semper, sed mattis nibh facilisis.    
+                </ng-template>                                    
               </div>
             </li>
           </ul>
