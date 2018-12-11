@@ -11,6 +11,7 @@ export class SidebarComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public iconClass: string = 'bars-icon';
+  public sidebarVisibleClass: string = 'sidebar-visible';
 
   constructor(
     private _router: Router,
@@ -38,25 +39,13 @@ export class SidebarComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
-              this.iconClass = 'bars-icon';
-              
-              this.status.emit({
-                showSidebar: false
-              });             
+              this._closeNavBar();           
             } else if (val.url.indexOf('/dashboard') === 0) {
-              this.iconClass = 'close-icon';
-
-              this.status.emit({
-                showSidebar: true
-              });               
+              this._openNavBar();        
             }
           }
         }
       });  
-  }
-
-  ngDoCheck(): void {
-
   }
 
   /**
@@ -65,17 +54,39 @@ export class SidebarComponent implements OnInit {
    */
   public toggleSideNav(): void {
     if(this.iconClass === 'close-icon') {
-      this.iconClass = 'bars-icon';
-
-      this.status.emit({
-        showSidebar: false
-      });       
+      this._closeNavBar();     
     } else {
-      this.iconClass = 'close-icon';
-
-      this.status.emit({
-        showSidebar: true
-      });       
+      this._openNavBar();      
     } 	
+  }
+
+  /**
+   * Closes the navbar.
+   */
+  private _closeNavBar(): void {
+    this.iconClass = 'bars-icon';
+
+    setTimeout(() => {
+      this.sidebarVisibleClass = 'sidebar-hidden';
+    }, 10);
+
+    this.status.emit({
+      showSidebar: false
+    });               
+  }
+
+  /**
+   * Opens the navbar.
+   */
+  private _openNavBar(): void {
+    this.iconClass = 'close-icon';
+
+    setTimeout(() => {
+      this.sidebarVisibleClass = 'sidebar-visible';
+    }, 10);    
+
+    this.status.emit({
+      showSidebar: true
+    });   
   }
 }

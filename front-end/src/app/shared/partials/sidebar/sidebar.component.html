@@ -1,5 +1,5 @@
 <aside>
-  <div class="sidebar">
+  <div class="sidebar" [ngClass]="sidebarVisibleClass">
     <div class="sidebar__toggle">
       <a class="toggle-sidebar"
         role="button"
@@ -19,30 +19,50 @@
         </div>
         <div class="sidebar__nav--links">
           <ul class="links-list">
-            <li>
-                <p class="tab">PAC & Party Report of Receipts & Disbursements (F3X)</p>
+            <li class="links-list__item">
+              <div class="list-item__link">
+                PAC & Party Report of Receipts & Disbursements (F3X)
+              </div>
+              <div class="list-item__info">
+                <div class="form-name">
+                  F3X
+                </div>
+              </div>
             </li>
-            <li>
-                <p class="tab">Report of Contributors Bundled (F3L)</p>
+            <li class="links-list__item">
+              <div class="list-item__link">
+                Report of Contributors Bundled (F3L)
+              </div>
+              <div class="list-item__info">
+                <div class="form-name">
+                  F3L
+                </div>
+              </div>
             </li>
           </ul>
         </div>
          <div class="sidebar__nav--header">
           <br />
           <i class="plus-icon" aria-hidden="true"></i>
-                  Other Forms
-                  <br />
+            Other Forms
+            <br />
         </div>
         <div class="sidebar__nav--links">
           <ul class="links-list">
-            <li>
-              <a
-                [routerLink]="['/forms/form/', '99']"
-                [queryParams]="{ step: 'step_1' }"
-              >
-              
-              <p class="tab">Miscellaneous Report to the FEC (F99)</p>
-              </a>
+            <li class="links-list__item">
+              <div class="list-item__link">
+                <a
+                  [routerLink]="['/forms/form/', '99']"
+                  [queryParams]="{ step: 'step_1' }"
+                >
+                  Miscellaneous Report to the FEC (F99)
+                </a>                
+              </div>
+              <div class="list-item__info">
+                <div class="form-name">
+                  F99
+                </div>
+              </div>
             </li>
           </ul>
         </div>

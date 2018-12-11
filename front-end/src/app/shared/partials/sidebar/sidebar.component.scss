@@ -3,6 +3,24 @@
 .sidebar {
   background-color: $primaryBlue;
   min-height: 100vh;
+  &.sidebar-hidden {
+    .sidebar__nav {
+      .sidebar__nav--links {
+        .links-list {
+          .links-list__item {
+            .list-item__link {
+              width: 200px;
+            }
+            .list-item__info {
+              .form-name {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   .sidebar__toggle {
     color: $white;
     display: block;
@@ -24,28 +42,35 @@
     text-align: left;
     .sidebar__nav--header {
       font-weight: bold;
+      margin-left: 10px;
     }
     .sidebar__nav--links {
       margin-bottom: 50px;
-      li {
-        margin-bottom: 15px;
-        a {
-          color: $white;
-          text-decoration: none;
-          &:hover {
-            text-decoration: underline;
+      .links-list {
+        .links-list__item {
+          margin-bottom: 15px;
+          margin-left: 30px;
+          .list-item__link {
+            float: left;
+            width: 190px;
+            a {
+              color: $white;
+              text-decoration: none;
+              &:hover {
+                text-decoration: underline;
+              }
+            }            
           }
+          .list-item__info {
+            float: left;
+            .form-name {
+              display: none;
+              padding-left: 10px;
+            }
+          }
+          @include clearfix();
         }
       }
     }
   }
-  main {
-    height: 98%;
-    .app__content-wrapper {
-      padding-top: 60px;
-      transition: all 0.4s ease 0s;
-      width: 100%;
-    }
-  }  
 }
-.tab { margin-left: 30px; }

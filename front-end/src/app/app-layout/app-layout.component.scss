@@ -122,7 +122,7 @@
   } // .app__top  
   .app__side-nav {
     height: 100%;
-    left: -245px;
+    left: -235px;
     position: fixed;
     top: 60px;
     transition: all 0.4s ease 0s;
@@ -165,7 +165,6 @@
         .committee-name,
         .committee-id {
           display: inline-block;
-          //height: 100%;
           position: relative;
         }
         .committee-id {
