@@ -69,6 +69,7 @@ pipeline {
 
     }
 	stage ('Deployments'){
+	  when { branch "develop" }	
 	  parallel {
          stage('Deploy backend-api to DEV environment'){
            steps {

@@ -50,18 +50,17 @@ export class SignComponent implements OnInit {
     if(this._form_details) {
       if(this.form_type === '99') {
         this.type_selected = this._form_details.reason;
-      }
-
-      if(this._form_details.additional_email_1.length >= 1) {
-        if(this._form_details.additional_email_1 === '-') {
-          this._form_details.additional_email_1 = '';
+        if(this._form_details.additional_email_1.length >= 1) {
+          if(this._form_details.additional_email_1 === '-') {
+            this._form_details.additional_email_1 = '';
+          }
         }
-      }
 
-      if(this._form_details.additional_email_2.length >= 1) {
-        if(this._form_details.additional_email_2 === '-') {
-          this._form_details.additional_email_2 = '';
-        }
+        if(this._form_details.additional_email_2.length >= 1) {
+          if(this._form_details.additional_email_2 === '-') {
+            this._form_details.additional_email_2 = '';
+          }
+        }        
       }
 
       this.frmSignee = this._fb.group({
@@ -161,7 +160,19 @@ export class SignComponent implements OnInit {
   public doSubmitForm(): void {
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
-    this._form_details.file = '';
+
+    if(this.form_type === '99') {
+
+      this._form_details.file = '';
+
+      if(this._form_details.additional_email_1 === '') {
+        this._form_details.additional_email_1 = '-';
+      }
+
+      if(this._form_details.additional_email_2 === '') {
+        this._form_details.additional_email_2 = '-';
+      }    
+    }    
 
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
 
