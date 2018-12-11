@@ -8,4 +8,5 @@ RUN pip3 install -r requirements.txt
 #ADD . /opt/nxg_fec/
 
 EXPOSE 8080
-CMD python manage.py runserver 0.0.0.0:8080
+CMD gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi
+#CMD python manage.py runserver 0.0.0.0:8080
