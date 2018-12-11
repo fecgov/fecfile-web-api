@@ -203,6 +203,9 @@ def create_f99_info(request):
             'file': request.data.get('file'),
         }
         #import ipdb; ipdb.set_trace()
+        if 'file' in request.data:
+            data['filename'] = request.data.get('file').name
+
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -231,27 +234,34 @@ def update_f99_info(request):
     """
     # update details of a single comm_info
     if request.method == 'POST':
+
         try:
             #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
                 comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=False).last()
+                id_comm = CommitteeInfo()
+                id_comm.id = comm_info.id
+                comm_info.delete()
             except CommitteeInfo.DoesNotExist:
-                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
+                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except:
             #logger.
-            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST) 
-        
+            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+
         incoming_data = request.data
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-        
+
         if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
-            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
+            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
 
-        
-        serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
+        if 'file' in request.data:
+            incoming_data['filename'] = request.data.get('file').name
+
+                
+        serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
