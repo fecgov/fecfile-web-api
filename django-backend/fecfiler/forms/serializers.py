@@ -7,7 +7,8 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         model = CommitteeInfo
         fields=('id','committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
-                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'filename', 'file', 
+                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 
+                #'filename', 'file', 
                 'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2',
                 'form_type', 'coverage_start_date', 'coverage_end_date')
         read_only_fields = ('created_at', 'updated_at')
