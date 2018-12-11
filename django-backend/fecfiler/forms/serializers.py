@@ -8,7 +8,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         fields=('id','committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                 'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 
-                'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2',
+                'created_at','is_submitted', 'signee', 'email_on_file','email_on_file_1', 'additional_email_1', 'additional_email_2',
                 'form_type', 'coverage_start_date', 'coverage_end_date')
         read_only_fields = ('created_at', 'updated_at')
         
@@ -37,6 +37,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
         instance.signee = validated_data.get('signee', instance.signee)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
+        instance.email_on_file_1 = validated_data.get('email_on_file_1', instance.email_on_file_1)
         instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
         instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
         instance.form_type = validated_data.get('form_type', instance.form_type)
@@ -61,7 +62,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
         model = Committee
         fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname',
-                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file',
+                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file','email_on_file_1',
                 'created_at' )
         read_only_fields = ('created_at', 'updated_at')
         
@@ -85,6 +86,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
         instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
         instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file) 
+        instance.email_on_file_1 = validated_data.get('email_on_file_1', instance.email_on_file_1)
         instance.save()
         return instance
 
