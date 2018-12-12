@@ -1,5 +1,5 @@
 # base image
-FROM node:9.6.1 as builder
+FROM node:latest as builder
 
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
@@ -22,7 +22,7 @@ RUN ng build --configuration=awsdev
 
 FROM nginx:latest
 
-# Copy local nginx config file 
+# Copy local nginx config file
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy artifact to nginx default html dir
