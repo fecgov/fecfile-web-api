@@ -29,12 +29,12 @@
                 </div>
                  <button 
                    type="button" 
-                   class="btn btn-info"
+                   class="btn btn-link"
                    [ngbTooltip]="f3xContent"
                    #f3xtoolTip="ngbTooltip"
-                   (click)="toggleToolTip(f99toolTip)"
+                   (click)="toggleToolTip(f3xtoolTip)"
                    triggers="manual"
-                   tooltipClass="custom-tooltip-class"
+                   tooltipClass="sidebar-tooltip"
                    placement="right"
                  >
                    <i class="info-icon" aria-hidden="true"></i>
@@ -53,14 +53,14 @@
                 <div class="form-name">
                   F3L
                 </div>
-                 <button 
+                 <button                 
                    type="button" 
-                   class="btn btn-info"
+                   class="btn btn-link"
                    [ngbTooltip]="f3lContent"
                    #f3LtoolTip="ngbTooltip"
-                   (click)="toggleToolTip(f99toolTip)"
+                   (click)="toggleToolTip(f3LtoolTip)"
                    triggers="manual"
-                   tooltipClass="custom-tooltip-class"
+                   tooltipClass="sidebar-tooltip"
                    placement="right"
                  >
                    <i class="info-icon" aria-hidden="true"></i>
@@ -81,11 +81,12 @@
         </div>
         <div class="sidebar__nav--links">
           <ul class="links-list">
-            <li class="links-list__item">
+            <li class="links-list__item" [ngClass]="formType === 99 ? 'links-list__item--selected' : ''">
               <div class="list-item__link">
                 <a
                   [routerLink]="['/forms/form/', '99']"
                   [queryParams]="{ step: 'step_1' }"
+                  (click)="formSelected(99)"
                 >
                   Miscellaneous Report to the FEC (F99)
                 </a>                
@@ -96,12 +97,12 @@
                 </div>
                  <button 
                    type="button" 
-                   class="btn btn-info"
+                   class="btn btn-link"
                    [ngbTooltip]="f99Content"
                    #f99toolTip="ngbTooltip"
                    (click)="toggleToolTip(f99toolTip)"
                    triggers="manual"
-                   tooltipClass="custom-tooltip-class"
+                   tooltipClass="sidebar-tooltip"
                    placement="right"
                  >
                    <i class="info-icon" aria-hidden="true"></i>

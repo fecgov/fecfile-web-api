@@ -1,74 +1,55 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public iconClass: string = 'bars-icon';
-  public sidebarVisibleClass: string = 'sidebar-hidden';
-  public formType: string = null;
+  public iconClass: string = 'close-icon';
+  public sidebarVisibleClass: string = 'sidebar-visible';
+  public formType: number = null;
 
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute 
   ) { }
 
-  ngOnInit(): void {   
+  ngOnInit(): void {  
     let route: string = this._router.url;
 
-    /*if(route) {
-      if(route.indexOf('/dashboard') === 0) {
-        if(this.iconClass !== 'close-icon') {
-          this.iconClass = 'close-icon';
-
-          this.status.emit({
-            showSidebar: true
-          });               
-        }
-      }
-    }   */    
+   
     
     this._router
       .events
       .subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
-            console.log('val: ', val);
-            if(val.url.indexOf('/forms/form/') === 0) {
-              console.log('form');
-              this._closeNavBar();           
-            } else if (val.url.indexOf('/dashboard') === 0) {
-              console.log('dashboard: ');
-              this._openNavBar();        
+            if(val.url.indexOf('/forms/form/') === 0) {        
+              this._closeNavBar();     
+            } else if(val.url.indexOf('/dashboard') === 0) {
+              this._openNavBar();   
+            } else if(val.url.indexOf('/forms/form/') !== 0) {
+              this.formType = null;
             }
           }
         }
       });  
+  
 
-      /*this._activatedRoute
-        .params
-        .subscribe(params => {
-          console.log('params: ', params);
-        });*/
-
-      /*this._activatedRoute
-        .params
-        .subscribe(params => {
-          console.log('params: ', params);
-          this.formType = params['form_id'];
-
-          console.log('formType:', this.formType);
-        });*/
   }
 
-  ngDoCheck(): void {
-    console.log('sidebar component: ');
+  ngDoCheck() {
+
+  }
+
+  public formSelected(form: string) {
+    this.formType = parseInt(form);
   }
 
   /**
@@ -99,7 +80,7 @@ export class SidebarComponent implements OnInit {
 
     setTimeout(() => {
       this.sidebarVisibleClass = 'sidebar-hidden';
-    }, 10);
+    }, 100);
 
     this.status.emit({
       showSidebar: false
@@ -110,15 +91,11 @@ export class SidebarComponent implements OnInit {
    * Opens the navbar.
    */
   private _openNavBar(): void {
-    console.log('_openNavBar:');
     this.iconClass = 'close-icon';
 
     setTimeout(() => {
-      console.log('update visibile class: ');
       this.sidebarVisibleClass = 'sidebar-visible';
-
-      console.log('this.sidebarVisibleClass:', this.sidebarVisibleClass);
-    }, 10);    
+    }, 100);    
 
     this.status.emit({
       showSidebar: true

@@ -30,6 +30,8 @@ export class FormsComponent implements OnInit {
   	this._activeRoute
       .params
       .subscribe( params => {
+        console.log('forms: ');
+        console.log('params: ', params);
   		  this.form_type = params.form_id;
   	});
 
