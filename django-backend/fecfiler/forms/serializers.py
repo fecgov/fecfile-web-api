@@ -8,6 +8,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         fields=('id','committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                 'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 
+                #'filename', 'file', 
                 'created_at','is_submitted', 'signee', 'email_on_file','email_on_file_1', 'additional_email_1', 'additional_email_2',
                 'form_type', 'coverage_start_date', 'coverage_end_date')
         read_only_fields = ('created_at', 'updated_at')
@@ -44,6 +45,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)
         try:
+            instance.filename = validated_data.get('filename', instance.filename)
             instance.file = validated_data.get('file', instance.file)
         except:
             pass
