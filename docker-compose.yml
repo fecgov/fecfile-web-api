@@ -20,10 +20,11 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - flyway
   web:
     build:
       context: './front-end'
-      dockerfile: Dockerfile-nginx
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "80:80"
