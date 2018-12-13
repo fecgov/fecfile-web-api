@@ -14,6 +14,9 @@ export class SidebarComponent implements OnInit {
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public formType: number = null;
+  public screenWidth: number = 0;
+  public tooltipPosition: string = 'right';
+  public tooltipLeft: string = 'auto';
 
   constructor(
     private _router: Router,
@@ -23,8 +26,6 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {  
     let route: string = this._router.url;
 
-   
-    
     this._router
       .events
       .subscribe(val => {
@@ -40,13 +41,31 @@ export class SidebarComponent implements OnInit {
           }
         }
       });  
-  
+ 
 
+    this.screenWidth = window.innerWidth;
+
+    if(this.screenWidth < 768) {
+      this.tooltipPosition = 'bottom';
+      this.tooltipLeft = '0';
+    } else if (this.screenWidth >= 768) {
+      this.tooltipPosition = 'right';
+      this.tooltipLeft = 'auto';
+    } 
   }
 
-  ngDoCheck() {
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.screenWidth = event.target.innerWidth;
 
-  }
+    if(this.screenWidth < 768) {
+      this.tooltipPosition = 'bottom';
+      this.tooltipLeft = '0';
+    } else if (this.screenWidth >= 768) {
+      this.tooltipPosition = 'right';
+      this.tooltipLeft = 'auto';
+    }
+  }    
 
   public formSelected(form: string) {
     this.formType = parseInt(form);
