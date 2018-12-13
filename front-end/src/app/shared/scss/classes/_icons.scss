@@ -1,56 +1,61 @@
 
 .bars-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-bars;
 }
 
 .folder-icon {
-	@extend .fa;
+	@extend .fas;
 	@extend .fa-folder;
 	//color: $white;
 }
 
 .plus-icon {
-	@extend .fa;
+	@extend .fas;
 	@extend .fa-plus-circle;
 }
 
 .notifications-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-bell;
 }
 
 .profile-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-user-circle;
 }
 
 .settings-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-cog;
 }
 
 .dropdown-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-caret-down;
 }
 
 .info-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-info-circle;
 }
 
 .close-icon {
-  @extend .fa;
+  @extend .fas;
   @extend .fa-times;
 }
 
 .external-link-icon {
-  @extend .fa;
-  @extend .fa-external-link;
+  @extend .fas;
+  @extend .fa-external-link-alt;
 }
 
-.file-icon {
-  @extend .fa;
-  @extend .fa-file;  
+.file-alt-icon {
+  @extend .fas;
+  @extend .fa-file-alt;  
+}
+
+.file-copy-icon {
+  @extend .fas;
+  @extend .fa-copy;   
 }
