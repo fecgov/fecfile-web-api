@@ -179,6 +179,7 @@ def create_f99_info(request):
     """
     # insert a new record for a comm_info
     if request.method == 'POST':
+        
         data = {
             'committeeid': request.data.get('committeeid'),
             'committeename': request.data.get('committeename'),
@@ -202,12 +203,72 @@ def create_f99_info(request):
             'additional_email_1' : request.data.get('additional_email_1'),
             'additional_email_2': request.data.get('additional_email_2'),
             'file': request.data.get('file'),
+            'form_type': request.data.get('form_type'),
+            'coverage_start_date': request.data.get('coverage_start_date'),
+            'coverage_end_date': request.data.get('coverage_end_date'),
         }
         #import ipdb; ipdb.set_trace()
+        """
+        if 'file' in request.data:
+            data['filename'] = request.data.get('file').name
+
         serializer = CommitteeInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        """
+        
+        incoming_data = data
+        #import ipdb; ipdb.set_trace()
+        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
+
+        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
+            return Response({"FEC Error 001":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
+        # just making sure that committeeid is not updated by mistake
+        
+        if 'file' in request.data:
+            incoming_data['filename'] = request.data.get('file').name
+
+        #try:
+            #import ipdb; ipdb.set_trace()
+            # fetch last comm_info object created, else return 404
+        try:
+            if 'id' in request.data and (not request.data['id']==''):
+                if int(request.data['id'])>=1:
+                    id_comm = CommitteeInfo()
+                    id_comm.id = request.data['id']
+                    comm_info = CommitteeInfo.objects.filter(id=id_comm.id).last()
+                    if comm_info:
+                        if comm_info.is_submitted==False:
+                            print(comm_info.created_at)
+                            id_comm.created_at = comm_info.created_at
+                            comm_info.delete()
+                        else:
+                            return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                    id_comm.updated_at = datetime.datetime.now()
+                    print(id_comm.created_at)
+                    serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
+                else:
+                    incoming_data['created_at'] = datetime.datetime.now()
+                    serializer = CommitteeInfoSerializer(data=incoming_data)
+            else:
+                incoming_data['created_at'] = datetime.datetime.now()
+                serializer = CommitteeInfoSerializer(data=incoming_data)
+        except CommitteeInfo.DoesNotExist:
+            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+                    return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+        #except:
+            #logger.
+            #return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+    
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 """
 @api_view(['POST'])
@@ -224,47 +285,117 @@ def f99_file_upload(self, request, format=None):
     
     mymodel.my_file_field.save(f.name, f, save=True)
     return Response(status=status.HTTP_201_CREATED)
-"""
+
 @api_view(['POST'])
 def update_f99_info(request):
-    """
-    Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
-    """
+    
+    #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
+    
     # update details of a single comm_info
     if request.method == 'POST':
+
         try:
             #import ipdb; ipdb.set_trace()
             # fetch last comm_info object created, else return 404
             try:
-                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=False).last()
+                id_comm = CommitteeInfo()
+                id_comm.id = request.data['id']
+                comm_info = CommitteeInfo.objects.filter(id=id_comm.id, is_submitted=False).last()
+                comm_info.delete()
             except CommitteeInfo.DoesNotExist:
-                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)            
+                return Response({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except:
             #logger.
-            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST) 
-        
+            return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+
         incoming_data = request.data
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-        
+
         if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
-            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)            
+            return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
 
-        
-        serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
+        if 'file' in request.data:
+            incoming_data['filename'] = request.data.get('file').name
+
+                
+        serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+"""
 @api_view(['POST'])
 def submit_comm_info(request):
+
+    if request.method == 'POST':
+        
+        data = {
+            'committeeid': request.data.get('committeeid'),
+            'committeename': request.data.get('committeename'),
+            'street1': request.data.get('street1'),
+            'street2': request.data.get('street2'),
+            'city': request.data.get('city'),
+            'state': request.data.get('state'),
+            'text': request.data.get('text'),
+            #'reason' :request.data.get('text'),
+            'reason' :request.data.get('reason'),
+            'zipcode': request.data.get('zipcode'),
+            'treasurerlastname': request.data.get('treasurerlastname'),
+            'treasurerfirstname': request.data.get('treasurerfirstname'),
+            'treasurermiddlename': request.data.get('treasurermiddlename'),
+            'treasurerprefix': request.data.get('treasurerprefix'),
+            'treasurersuffix': request.data.get('treasurersuffix'),
+            
+            'signee': request.data.get('signee'),
+            'email_on_file' : request.data.get('email_on_file'),
+            'email_on_file_1': request.data.get('email_on_file_1'),
+
+            'additional_email_1' : request.data.get('additional_email_1'),
+            'additional_email_2': request.data.get('additional_email_2'),
+            'form_type': request.data.get('form_type'),
+            'coverage_start_date': request.data.get('coverage_start_date'),
+            'coverage_end_date': request.data.get('coverage_end_date'),
+
+        }
+                
+        incoming_data = data
+        #import ipdb; ipdb.set_trace()
+        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
+
+        if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+            return Response({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+        # just making sure that committeeid is not updated by mistake
+        try:
+            comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+            if comm_info:
+                if comm_info.is_submitted==False:
+                    incoming_data['updated_at'] = datetime.datetime.now()
+                    comm_info.is_submitted=True
+                    serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
+                else:
+                    return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        except CommitteeInfo.DoesNotExist:
+            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+                    return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if serializer.is_valid():
+            serializer.save()
+            email(True, serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+         
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     """
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
     validate_api/s3 not being called currently
-    #"""
+    #
     #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
@@ -287,7 +418,7 @@ def submit_comm_info(request):
 
     else:
         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
-
+    """
     
 # @api_view(['POST'])
 # def submit_comm_info(request):
@@ -461,7 +592,8 @@ def validate_f99(request):
             'treasurersuffix': request.data.get('treasurersuffix'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
-            'file': request.data.get('file'),
+            #'file': request.data.get('file'),
+
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -523,9 +655,9 @@ def validate_f99(request):
     conditions = [request.data.get('reason')=='MST', request.data.get('reason')=='MSM', request.data.get('reason')=='MSI', request.data.get('reason')=='MSW']
     if not any(conditions):
         errormess.append('Reason does not match the pre-defined codes.')
-
+    """
     #pdf validation for type, extension and size
-    if 'file' in request.data:
+    if 'file' in request.data or request.data.get('file')=='':
         valid_mime_types = ['application/pdf']
         file = request.data.get('file')
         file_mime_type = magic.from_buffer(file.read(1024), mime=True)
@@ -537,7 +669,7 @@ def validate_f99(request):
             errormess.append('Unacceptable file extension. Only files with .pdf extensions are accepted.')
         if file._size > 33554432:
             errormess.append('The File size is more than 32 MB. Kindly reduce the size of the file before you upload it.')
-
+    """
     if len(errormess)==0:
         errormess.append('Validation successful!')
         return JsonResponse(errormess, status=200, safe=False)
@@ -622,7 +754,7 @@ def email(boolean, data):
 
     if 'additional_email_1' in data and (not data.get('additional_email_1')=='-'):
         RECIPIENT.append("%s" % data.get('additional_email_1')) 
- 
+
     if 'additional_email_2' in data and (not data.get('additional_email_2')=='-'):
         RECIPIENT.append("%s" % data.get('additional_email_2'))
 

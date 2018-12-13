@@ -8,9 +8,10 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         fields=('id','committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
                 'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 
-                'created_at','is_submitted', 'signee', 'email_on_file','email_on_file_1', 'additional_email_1', 'additional_email_2',
-                'form_type', 'coverage_start_date', 'coverage_end_date')
-        read_only_fields = ('created_at', 'updated_at')
+                'filename', 'file', 
+                'created_at','is_submitted', 'signee', 'email_on_file', 'email_on_file_1', 'additional_email_1', 'additional_email_2',
+                'form_type', 'coverage_start_date', 'coverage_end_date', 'updated_at')
+        #read_only_fields = ('created_at', 'updated_at')
         
         # Methods to save the model objects to the database
         
@@ -44,6 +45,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)
         try:
+            instance.filename = validated_data.get('filename', instance.filename)
             instance.file = validated_data.get('file', instance.file)
         except:
             pass
@@ -62,7 +64,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
         model = Committee
         fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname',
-                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file','email_on_file_1',
+                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file', 'email_on_file_1',
                 'created_at' )
         read_only_fields = ('created_at', 'updated_at')
         
