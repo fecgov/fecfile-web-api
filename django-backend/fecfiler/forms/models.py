@@ -81,7 +81,7 @@ class Committee(models.Model):
     treasurermiddlename = models.CharField(max_length=20)
     treasurerprefix = models.CharField(max_length=10)
     treasurersuffix = models.CharField(max_length=10)
-    email_on_file = models.TextField(max_length=100, null=False, default = "-")
+    email_on_file = models.TextField(max_length=100, null= False, default = "-")
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
