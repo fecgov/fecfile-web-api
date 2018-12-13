@@ -11,9 +11,9 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
+  public formType: number = null;
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
-  public formType: number = null;
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
@@ -54,6 +54,12 @@ export class SidebarComponent implements OnInit {
     } 
   }
 
+  /**
+   * Determines placement of tooltips based on screen size.
+   *
+   * @class      HostListener (name)
+   * @param      {Object}  event   The event
+   */
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.screenWidth = event.target.innerWidth;
@@ -67,8 +73,15 @@ export class SidebarComponent implements OnInit {
     }
   }    
 
-  public formSelected(form: string) {
-    this.formType = parseInt(form);
+  /**
+   * Determines which form has been selected.
+   *
+   * @param      {String}  form    The form
+   */
+  public formSelected(form: string): void {
+    setTimeout(() => {
+      this.formType = parseInt(form);
+    }, 225);    
   }
 
   /**
@@ -83,6 +96,11 @@ export class SidebarComponent implements OnInit {
     } 	
   }
 
+  /**
+   * Toggles the tooltips.
+   *
+   * @param      {Object}  tooltip  The tooltip.
+   */
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
