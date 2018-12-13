@@ -235,8 +235,14 @@ def create_f99_info(request):
             if 'id' in request.data and int(request.data['id'])>=1:
                 id_comm = CommitteeInfo()
                 id_comm.id = request.data['id']
-                comm_info = CommitteeInfo.objects.filter(id=id_comm.id, is_submitted=False).last()
-                comm_info.delete()
+                comm_info = CommitteeInfo.objects.filter(id=id_comm.id).last()
+                if comm_info:
+                    if comm_info.is_submitted==False:
+                        comm_info.delete()
+                    else:
+                        return Response({"error":"This form is already submitted"})
+                else:
+                    return Response({"error":"This form Id number does not exist"})
                 serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
             else:
                 serializer = CommitteeInfoSerializer(data=incoming_data)
