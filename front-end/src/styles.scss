@@ -7,6 +7,10 @@ $fa-font-path: '../node_modules/@fortawesome/fontawesome-free/webfonts';
 @import './app/shared/scss/global';
 @import './app/shared/scss/custom-reset';
 
+/**
+ * Included here to enable use of Bootstrap classes within HTML markup.
+ * If the component your using isn't included, then include it here.
+ */
 @import '../node_modules/bootstrap/scss/functions';
 @import '../node_modules/bootstrap/scss/variables';
 @import '../node_modules/bootstrap/scss/mixins';
