@@ -3,6 +3,10 @@
 .reason-container {
   display: block;
   height: 100%;
+  hr {
+    margin: 0 auto 5px auto;
+    width: 99%;
+  }
   header {
     .header-container {
       display: block;
@@ -30,12 +34,12 @@
         @include media(mediumDesktop) {
           float: left;
           font-size: 1em;
-          width: 50%;
+          width: 45%;
         }         
         @include media(largeDesktop) {
           float: left;
           font-size: 1em;
-          width: 50%;
+          width: 45%;
         }         
       }
       .header__btns {
@@ -161,6 +165,40 @@
   footer {
     .grid-row {
       margin-bottom: 15px !important;
+      .grid-row__col--12 {
+        .forms__btn-container {
+          margin: 0 auto;
+          padding: 0;
+          width: 80%;
+          @include media(tablet) {
+            margin: 0;
+            padding: 0;
+            width: 95%;
+          }
+          @include media(mediumDesktop) {
+            width: 98%;
+          }         
+          @include media(largeDesktop) {
+            width: 98%;
+          }  
+          .btn-container-row {
+            @include clearfix();
+            border-bottom: 1px solid $dustyGray;
+            height: 55px;
+            margin-bottom: 10px;
+            width: 100%;
+            .btn {
+              margin-right: 0;
+            }
+          }
+          .btn-left {
+            float: left;
+          }
+          .btn-right {
+            float: right;
+          }          
+        }       
+      }
     }
   }
 }

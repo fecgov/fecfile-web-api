@@ -91,34 +91,36 @@
       <div class="grid-row btn-row">
         <div class="grid-row__col--12">
           <hr />
-          <button 
-            class="btn btn-secondary btn-right" 
-            type="button"
-            (click)="saveForm()"
-            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
-          >
-            Save 
-          </button>     
+          <div class="forms__btn-container">
+            <button 
+              class="btn btn-secondary btn-right" 
+              type="button"
+              (click)="saveForm()"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            >
+              Save 
+            </button>     
+          </div>
         </div>
       </div> 
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--6">
-          <button 
-            class="btn btn-previous btn-left" 
-            type="button"
-            (click)="previousStep()"
-          >
-            Previous 
-          </button>          
-        </div>
-        <div class="grid-row__col grid-row__col--6">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="forms__btn-container">
+            <button 
+              class="btn btn-previous btn-left" 
+              type="button"
+              (click)="previousStep()"
+            >
+              Previous 
+            </button>     
           <button 
             class="btn btn-primary btn-right" 
             type="submit"
             [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
           > 
             Next
-          </button>          
+          </button>                   
+          </div>
         </div>
       </div> 
     </footer>

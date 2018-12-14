@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 $fa-font-path: '../node_modules/font-awesome/fonts';
 @import '../node_modules/font-awesome/scss/font-awesome.scss';
-
+@import './app/shared/scss/classes/icons';
 @import './app/shared/scss/global';
 
 @import '../node_modules/bootstrap/scss/functions';
@@ -61,48 +61,3 @@ h6 {
     -webkit-margin-end: 0px;
 }
 
-.bars-icon {
-  @extend .fa;
-  @extend .fa-bars;
-}
-
-.folder-icon {
-	@extend .fa;
-	@extend .fa-folder;
-	color: $white;
-}
-
-.plus-icon {
-	@extend .fa;
-	@extend .fa-plus-circle;
-}
-
-.notifications-icon {
-  @extend .fa;
-  @extend .fa-bell;
-}
-
-.profile-icon {
-  @extend .fa;
-  @extend .fa-user-circle;
-}
-
-.settings-icon {
-  @extend .fa;
-  @extend .fa-cog;
-}
-
-.dropdown-icon {
-  @extend .fa;
-  @extend .fa-caret-down;
-}
-
-.info-icon {
-  @extend .fa;
-  @extend .fa-info-circle;
-}
-
-.close-icon {
-  @extend .fa;
-  @extend .fa-times;
-}

@@ -3,6 +3,10 @@
   display: block;
   height: 100%;
   width: 100%;
+  hr {
+    margin: 0 auto 5px auto;
+    width: 99%;
+  }
   .form__type {
     float: left;
     height: 400px;
@@ -30,13 +34,13 @@
           font-size: 1em;
           height: 50px;
           padding-top: 10px;
-          width: 100%;
+          width: 95%;
         }         
         @include media(largeDesktop) {
           font-size: 1em;
           height: 50px;
           padding-top: 10px;
-          width: 100%;
+          width: 95%;
         }         
         .type-item__box {
           display: inline-block;
@@ -180,10 +184,10 @@
         width: 95%;
       }
       @include media(mediumDesktop) {
-        width: 100%;
+        width: 95%;
       }         
       @include media(largeDesktop) {
-        width: 100%;
+        width: 95%;
       }       
       .btn-container-row {
         @include clearfix();
@@ -194,12 +198,6 @@
         .btn {
           margin-right: 0;
         }
-      }
-      .btn-left {
-        float: left;
-      }
-      .btn-right {
-        float: right;
       }
       @include clearfix();
     }

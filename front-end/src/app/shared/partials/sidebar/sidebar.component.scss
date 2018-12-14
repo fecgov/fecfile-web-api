@@ -3,6 +3,37 @@
 .sidebar {
   background-color: $primaryBlue;
   min-height: 100vh;
+  &.sidebar-hidden {
+    .sidebar__nav {
+      .sidebar__nav--links {
+        .links-list {
+          .links-list__item {
+            &.links-list__item--selected {
+              background-color: $mercury;
+              padding-left: 2px;
+              .list-item__info {
+                padding-top: 10px;
+                .form-name {
+                  color: $black;
+                } 
+              }            
+            }            
+            .list-item__link {
+              width: 197px;
+            }
+            .list-item__info {
+              .form-name {
+                display: block;
+              }
+              .btn-link {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   .sidebar__toggle {
     color: $white;
     display: block;
@@ -24,28 +55,66 @@
     text-align: left;
     .sidebar__nav--header {
       font-weight: bold;
+      margin-left: 10px;
     }
     .sidebar__nav--links {
-      margin-bottom: 50px;
-      li {
-        margin-bottom: 15px;
-        a {
-          color: $white;
-          text-decoration: none;
-          &:hover {
-            text-decoration: underline;
+      margin-bottom: 50spx;
+      .links-list {
+        .links-list__item {
+          background-color: none;
+          margin-bottom: 15px;
+          margin-left: 30px;
+          &.links-list__item--selected {
+            background-color: none;            
           }
+          .list-item__link {
+            float: left;
+            width: 185px;
+            a {
+              color: $white;
+              text-decoration: none;
+              &:hover {
+                text-decoration: underline;
+              }
+            }            
+          }
+          .list-item__info {
+            float: left;
+            .form-name {
+              display: none;
+              padding-left: 10px;
+              padding-right: 6px;
+            }
+            .btn-link {
+              color: $white;
+              &:hover,
+              &:active,
+              &:visited {
+                color: $white;
+              }
+            }
+            .sidebar-tooltip {
+              top: 0;
+              width: 300px;
+              .tooltip-inner {
+                max-width: 300px;
+                text-align: left;
+                a {
+                  color: $white;
+                  text-decoration: underline;
+                  &:hover {
+                    text-decoration: none;
+                  }
+                }
+                .external-link-icon {
+                  margin-left: 5px;
+                }
+              }
+            }
+          }
+          @include clearfix();
         }
       }
     }
   }
-  main {
-    height: 98%;
-    .app__content-wrapper {
-      padding-top: 60px;
-      transition: all 0.4s ease 0s;
-      width: 100%;
-    }
-  }  
 }
-.tab { margin-left: 30px; }

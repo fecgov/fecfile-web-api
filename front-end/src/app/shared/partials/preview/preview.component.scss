@@ -1,6 +1,10 @@
 @import '../../scss/global';
 
 .preview-container {
+	hr {
+		margin: 0 auto 5px auto;
+		width: 99%;
+	}	
 	header {    
 	    .header-container {
 	      display: block;
@@ -127,4 +131,25 @@
 		}
 	}
 }
-@include form-btns();
+footer {
+	.grid-row {
+		.grid-row__col--12 {
+		    .forms__btn-container {
+		      margin: 0 auto;
+		      padding: 0;
+		      width: 80%;
+		      @include media(tablet) {
+		        margin: 0;
+		        padding: 0;
+		        width: 95%;
+		      }
+		      @include media(mediumDesktop) {
+		        width: 95%;
+		      }         
+		      @include media(largeDesktop) {
+		        width: 95%;
+		      }	
+		    }		
+		}
+	}
+}

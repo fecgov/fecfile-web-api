@@ -101,10 +101,12 @@
       }
       @include media(mediumDesktop) {
         float: left;
+        padding-top: 10px;
         width: 773px;
       } 
       @include media(largeDesktop) {
         float: left;
+        padding-top: 10px;
         width: 805px;
       }
       .nav-links {

@@ -38,8 +38,8 @@ class Migration(migrations.Migration):
                 ('isdeleted', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name': 'Committee',
                 'verbose_name_plural': 'Committee',
+                'verbose_name': 'Committee',
             },
         ),
         migrations.CreateModel(
@@ -77,8 +77,8 @@ class Migration(migrations.Migration):
                 ('coverage_end_date', models.DateField(null=True)),
             ],
             options={
-                'verbose_name': 'CommitteeInfo',
                 'verbose_name_plural': 'CommitteeInfo',
+                'verbose_name': 'CommitteeInfo',
             },
         ),
         migrations.CreateModel(
