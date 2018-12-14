@@ -59,3 +59,13 @@
   @extend .fas;
   @extend .fa-copy;   
 }
+
+.down-arrow-icon {
+  @extend .fas;
+  @extend .fa-angle-down;
+}
+
+.up-arrow-icon {
+  @extend .fas;
+  @extend .fa-angle-up;  
+}

@@ -17,6 +17,8 @@ export class SidebarComponent implements OnInit {
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
+  public otherFormsHidden: boolean = false;
+  public myFormsHidden: boolean = false;
 
   constructor(
     private _router: Router,
@@ -110,6 +112,17 @@ export class SidebarComponent implements OnInit {
   }    
 
   /**
+   * Toggles weather or not the form navigation is visible.
+   *
+   * @param      {String}  navType  The navigation type
+   */
+  public toggleFormNav(navType: string): void {
+    if(navType === 'other-forms') {
+      this.otherFormsHidden = (this.otherFormsHidden) ? false : true;
+    }
+  }
+
+  /**
    * Closes the navbar.
    */
   private _closeNavBar(): void {
@@ -117,6 +130,7 @@ export class SidebarComponent implements OnInit {
 
     setTimeout(() => {
       this.sidebarVisibleClass = 'sidebar-hidden';
+      this.otherFormsHidden = false;
     }, 100);
 
     this.status.emit({

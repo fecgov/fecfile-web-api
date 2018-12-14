@@ -14,8 +14,15 @@
       <div class="sidebar__nav">
         <div class="sidebar__nav--header">
           <i class="file-alt-icon" aria-hidden="true"></i>
-          My Forms
-        <br />
+          <div class="header-text">
+            My Forms
+          </div>
+          <div class="btn-hide-form-nav">
+            <i
+              class="down-arrow-icon"
+              aria-hidden="true"
+            ></i>            
+          </div>
         </div>
         <div class="sidebar__nav--links">
           <ul class="links-list">
@@ -82,12 +89,23 @@
           </ul>
         </div>
          <div class="sidebar__nav--header">
-          <br />
           <i class="file-copy-icon" aria-hidden="true"></i>
-            Other Forms
-            <br />
+          <div class="header-text">
+           Other Forms 
+          </div>
+          <button 
+            type="button"
+            class="btn btn-link btn-hide-form-nav"
+            (click)="toggleFormNav('other-forms')"
+          >
+            <i
+              aria-hidden="true"
+              [ngClass]="{'down-arrow-icon': otherFormsHidden === false, 'up-arrow-icon': otherFormsHidden === true}"
+            ></i>
+            <span class="sr-only">Click to hide Other Forms</span>
+          </button>
         </div>
-        <div class="sidebar__nav--links">
+        <div class="sidebar__nav--links" [ngClass]="{'d-none': otherFormsHidden === true}">
           <ul class="links-list">
             <li class="links-list__item" [ngClass]="formType === 99 ? 'links-list__item--selected' : ''">
               <div class="list-item__link">

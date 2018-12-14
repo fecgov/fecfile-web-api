@@ -5,6 +5,11 @@
   min-height: 100vh;
   &.sidebar-hidden {
     .sidebar__nav {
+      .sidebar__nav--header {
+        .btn-hide-form-nav {
+          display: none;
+        }
+      }
       .sidebar__nav--links {
         .links-list {
           .links-list__item {
@@ -55,10 +60,28 @@
     text-align: left;
     .sidebar__nav--header {
       font-weight: bold;
+      margin-bottom: 5px;
       margin-left: 10px;
+      .header-text {
+        display: inline-block;
+        margin-left: 5px;
+        width: 200px;
+      }
+      .btn-hide-form-nav {
+        color: $white;
+        display: inline-block;
+        padding: 0;
+        line-height: inherit;
+        margin: 0;
+        &:hover,
+        &:active,
+        &:visited {
+          color: $white;
+        }
+      }
     }
     .sidebar__nav--links {
-      margin-bottom: 50spx;
+      margin-bottom: 50px;
       .links-list {
         .links-list__item {
           background-color: none;
