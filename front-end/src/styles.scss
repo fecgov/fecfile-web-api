@@ -3,7 +3,9 @@ $fa-font-path: '../node_modules/@fortawesome/fontawesome-free/webfonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
 @import './app/shared/scss/classes/icons';
+
 @import './app/shared/scss/global';
+@import './app/shared/scss/custom-reset';
 
 @import '../node_modules/bootstrap/scss/functions';
 @import '../node_modules/bootstrap/scss/variables';
@@ -16,6 +18,8 @@ $fa-font-path: '../node_modules/@fortawesome/fontawesome-free/webfonts';
 @import '../node_modules/bootstrap/scss/navbar';
 @import '../node_modules/bootstrap/scss/buttons';
 @import '../node_modules/bootstrap/scss/transitions';
+
+
 
 html,body {
   height: 100%;
@@ -30,35 +34,5 @@ body {
   overflow-y: scroll;
 }
 
-ul {
-  -webkit-margin-before: 0;
-  -webkit-margin-after: 0;
-  -webkit-margin-start: 0;
-  -webkit-margin-end: 0;
-  -webkit-padding-start: 0;
-  margin-block-start: 0;
-  margin-block-end: 0;
-  margin-inline-start: 0;
-  margin-inline-end: 0;
-  padding-inline-start: 0;  
-  li {
-    -webkit-margin-before: 0;
-    -webkit-margin-after: 0;
-    -webkit-margin-start: 0;
-    -webkit-margin-end: 0;
-    -webkit-padding-start: 0;
-  }
-}
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    -webkit-margin-before: 0.67em;
-    -webkit-margin-after: 0.67em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
-}
 

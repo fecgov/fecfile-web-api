@@ -6,9 +6,16 @@
   &.sidebar-hidden {
     .sidebar__nav {
       .sidebar__nav--header {
-        .btn-hide-form-nav {
-          display: none;
+        position: relative;
+        .sidebar-form-icon {
+          display: block;
+          position: absolute;
+          right: 20px;
+          top: -20px;
         }
+        .header-text {
+          width: 230px;
+        }        
       }
       .sidebar__nav--links {
         .links-list {
@@ -20,6 +27,18 @@
                 padding-top: 10px;
                 .form-name {
                   color: $black;
+                  a {
+                    color: $black;
+                    &:hover,
+                    &:active,
+                    &:visited {
+                      color: $black;
+                    }
+                    /* &:active,
+                    &:visited {
+                      text-decoration: none;
+                    }       */              
+                  }                  
                 } 
               }            
             }            
@@ -29,6 +48,14 @@
             .list-item__info {
               .form-name {
                 display: block;
+                a {
+                  color: $white;
+                  &:hover,
+                  &:active,
+                  &:visited {
+                    color: $white;
+                  }
+                }
               }
               .btn-link {
                 display: none;
@@ -62,6 +89,10 @@
       font-weight: bold;
       margin-bottom: 5px;
       margin-left: 10px;
+      .sidebar-form-icon {
+        display: inline-block;
+        position: relative;
+      }
       .header-text {
         display: inline-block;
         margin-left: 5px;

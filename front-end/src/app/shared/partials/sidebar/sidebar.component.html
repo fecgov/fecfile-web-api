@@ -13,7 +13,9 @@
     <nav>
       <div class="sidebar__nav">
         <div class="sidebar__nav--header">
-          <i class="file-alt-icon" aria-hidden="true"></i>
+          <div class="sidebar-form-icon">
+            <i class="file-alt-icon" aria-hidden="true"></i>
+          </div>
           <div class="header-text">
             My Forms
           </div>
@@ -28,7 +30,7 @@
           <ul class="links-list">
             <li class="links-list__item">
               <div class="list-item__link">
-                PAC & Party Report of Receipts & Disbursements (F3X)
+                PAC &amp; Party Report of Receipts &amp; Disbursements (F3X)
               </div>
               <div class="list-item__info">
                 <div class="form-name">
@@ -89,7 +91,9 @@
           </ul>
         </div>
          <div class="sidebar__nav--header">
-          <i class="file-copy-icon" aria-hidden="true"></i>
+          <div class="sidebar-form-icon">
+            <i class="file-copy-icon" aria-hidden="true"></i>
+          </div>
           <div class="header-text">
            Other Forms 
           </div>
@@ -119,7 +123,13 @@
               </div>
               <div class="list-item__info">
                 <div class="form-name">
-                  F99
+                  <a
+                    [routerLink]="['/forms/form/', '99']"
+                    [queryParams]="{ step: 'step_1' }"
+                    (click)="formSelected(99)"
+                  >                  
+                    F99
+                  </a>
                 </div>
                  <button 
                    type="button" 
