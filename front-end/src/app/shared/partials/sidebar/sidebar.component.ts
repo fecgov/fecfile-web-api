@@ -130,7 +130,6 @@ export class SidebarComponent implements OnInit {
 
     setTimeout(() => {
       this.sidebarVisibleClass = 'sidebar-hidden';
-      this.otherFormsHidden = false;
     }, 100);
 
     this.status.emit({
