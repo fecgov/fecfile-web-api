@@ -4,6 +4,10 @@
   background-color: $primaryBlue;
   min-height: 100vh;
   &.sidebar-hidden {
+    .sidebar__toggle {
+      padding-right: 10px;
+      @include clearfix();
+    }      
     .sidebar__nav {
       .sidebar__nav--header {
         position: relative;
@@ -66,6 +70,9 @@
     color: $white;
     display: block;
     height: 50px;
+    margin-bottom: 10px;
+    padding-right: 25px;
+    padding-top: 10px;
     width: 100%;
     .toggle-sidebar {
       cursor: pointer;
