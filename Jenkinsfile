@@ -83,13 +83,13 @@ pipeline {
         }
       }
     }
-    post {
-        success {
-            slackSend color: 'good', message: "Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/"   
-        }
-        failure {
-            slackSend color: 'danger', message: " Deployement of ${VERSION} failed!"
-        }    
+  }
+  post {
+    success {
+        slackSend color: 'good', message: "Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/"   
     }
+    failure {
+        slackSend color: 'danger', message: " Deployement of ${VERSION} failed!"
+    }    
   }
 }
