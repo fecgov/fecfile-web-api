@@ -14,7 +14,7 @@ describe('login page', () => {
 
     it('should display welcome message', () => {
       page.navigateTo();
-      expect(page.getParagraphText()).toEqual('FEC eFile');
+      expect(page.getParagraphText()).toEqual('FEC File Online');
     });
 
     describe('login page links', () => {

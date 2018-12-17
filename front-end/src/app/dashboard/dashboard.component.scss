@@ -1,42 +1,59 @@
 @import '../shared/scss/global';
-section {
-  .dashboard {
-    min-height: 85vh;
-    position: relative;
-    .grid-row {
-      margin: 0;
-      .grid-row__col {
-        padding: 0;
+.dashboard {
+  background-color: $mercury;
+  min-height: 85vh;
+  position: relative;  
+  .grid-row {
+    margin-bottom: 10px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    .grid-row__col {
+      padding: 0;
+    }
+    .grid-col {
+      background-color: $white;
+      flex: 0 0 48%;
+      max-width: 48%;      
+      &:first-child {
+        margin-right: 5px;
       }
     }
-    footer {
-      .footer {
-        bottom: 0;
-        position: absolute;
-        width: 100%;
-        .legal-disclaimer {
-          text-align: center;
-          .btn {
-            color: $black;
-          }
-        }
-      }
-    }
-  }
+  }  
   a {
     color: $black;
     text-decoration: none;
     &:hover {
       text-decoration: underline;
     }
+  } 
+  section {
+    .content {
+      min-height: 85vh;
+      position: relative;
+      .grid-row {
+        min-height: 350px;
+        position: relative;
+        .grid-row__col {
+          background-color: $white;
+          margin: 0 auto;
+        }
+      }
+    }
   }
-}
-.modal-dialog {
-  color: $black;
-  margin: 0 auto;
-  width: 400px;
-  z-index: 1051;
-  .modal-content {
-    width: 100%;
-  }
-}
+  footer {
+    .footer {
+      bottom: 0;
+      position: absolute;
+      width: 100%;
+      .legal-disclaimer {
+        text-align: center;
+        .btn {
+          color: $black;
+        }
+      }
+    }
+  }  
+} // .dashboard
+
+

@@ -5,7 +5,31 @@ from rest_framework.response import Response
 from .models import Account
 from .permissions import IsAccountOwner
 from .serializers import AccountSerializer
+from fecfiler.forms.models import Committee
 
+from rest_framework_jwt.settings import api_settings
+
+jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+
+def jwt_response_payload_handler(token, user=None, request=None):
+    """
+    JWT TOKEN handler. 
+    Checks if Committee ID exists in forms.models.Committee first before allowing access.
+    """
+    if not Committee.objects.filter(committeeid=user.username).exists():
+        return {
+            'status': 'Unauthorized',
+            'message': 'This account has not been authorized.'
+        }
+    
+    return {
+        'token': token       
+    }
+
+#payload = jwt_response_payload_handler(user)
+#token = jwt_encode_handler(payload)
 
 class AccountViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
@@ -28,7 +52,8 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         return Response({
             'status': 'Bad request',
-            'message': 'Account could not be created with received data.'
+            'message': 'Account could not be created with received data.',
+            'details': str(serializer.errors),
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -38,8 +63,9 @@ class LoginView(views.APIView):
         data = request.data
         username = data.get('username', None)
         password = data.get('password', None)
-        account = authenticate(request=request, username=username, password=password)
         #import ipdb; ipdb.set_trace()
+        account = authenticate(request=request, username=username, password=password)
+
         # fail, bad login info
         if account is None:
             return Response({
@@ -54,6 +80,13 @@ class LoginView(views.APIView):
                 'message': 'This account has been disabled.'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
+
+        if not Committee.objects.filter(committeeid=username).exists():
+            return Response({
+                'status': 'Unauthorized',
+                'message': 'This account has not been authorized.'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
         # success, login and respond
         login(request, account)
         serialized = AccountSerializer(account)

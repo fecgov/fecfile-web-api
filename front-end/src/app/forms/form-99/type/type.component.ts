@@ -1,6 +1,6 @@
 import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
@@ -26,6 +26,8 @@ export class TypeComponent implements OnInit {
   public tooltipLeft: string = 'auto';
 
   private _form_99_details: form99;
+  private _newForm: boolean = false;
+  private _previousUrl: string = null;
 
   constructor(
     private _fb: FormBuilder,
@@ -48,6 +50,38 @@ export class TypeComponent implements OnInit {
       this.tooltipLeft = 'auto';
     }
 
+    this._setForm();
+  
+    this._router
+      .events
+      .subscribe(e => {
+        if(e instanceof NavigationEnd) {
+          this._previousUrl = e.url;        
+          if(this._previousUrl === '/forms/form/99?step=step_5') {
+            this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+
+            this.typeSelected = '';
+
+            this._setForm(); 
+          }
+        }
+      });
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.screenWidth = event.target.innerWidth;
+
+    if(this.screenWidth < 768) {
+      this.tooltipPosition = 'bottom';
+      this.tooltipLeft = '0';
+    } else if (this.screenWidth >= 768) {
+      this.tooltipPosition = 'right';
+      this.tooltipLeft = 'auto';
+    }
+  }  
+
+  private _setForm(): void {
     if(this._form_99_details) {
       if(this._form_99_details.reason) {
         this.typeSelected = this._form_99_details.reason;
@@ -63,21 +97,8 @@ export class TypeComponent implements OnInit {
       this.frmType = this._fb.group({
             reasonTypeRadio: ['', Validators.required]
           });
-    }
+    }    
   }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.screenWidth = event.target.innerWidth;
-
-    if(this.screenWidth < 768) {
-      this.tooltipPosition = 'bottom';
-      this.tooltipLeft = '0';
-    } else if (this.screenWidth >= 768) {
-      this.tooltipPosition = 'right';
-      this.tooltipLeft = 'auto';
-    }
-  }  
 
   /**
    * Updates the type selected.
