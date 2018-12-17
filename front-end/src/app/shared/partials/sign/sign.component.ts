@@ -33,6 +33,8 @@ export class SignComponent implements OnInit {
   private _form_details: any = {};
   private _step: string = '';
 
+  public _need_additional_email_2=false;
+
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _fb: FormBuilder,
@@ -289,6 +291,15 @@ export class SignComponent implements OnInit {
     } else {
       tooltip.open();
     }      
+  }
+
+ public add_additional_email_2(): void {
+    this._need_additional_email_2=true;
+    console.log("2nd email needed");
+  }
+  public remove_additional_email_2(): void {
+    this._need_additional_email_2=false;
+    console.log("2nd email removed");
   }
 
   /**
