@@ -31,7 +31,7 @@
     line-height: $lineHeight;
   } @else {
     line-height: $input-line-height;
-  }
+  } 
   @if ($paddingY) {
     padding-top: $paddingY;
     padding-bottom: $paddingY;

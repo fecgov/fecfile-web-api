@@ -5,7 +5,9 @@
   min-height: 100vh;
   &.sidebar-hidden {
     .sidebar__toggle {
-      padding-right: 10px;
+      .toggle-sidebar {
+        margin-right: 5px;
+      }
       @include clearfix();
     }      
     .sidebar__nav {
@@ -75,9 +77,17 @@
     padding-top: 10px;
     width: 100%;
     .toggle-sidebar {
+      color: $white;
       cursor: pointer;
       float: right;
-      margin-right: 10px;
+      margin-right: 24px;
+      text-decoration: none;
+      &:hover ,
+      &:visited,
+      &:active {
+        color: $white;
+        text-decoration: none;
+      }
     }
     @include clearfix();
   }  
