@@ -250,7 +250,6 @@ def create_f99_info(request):
                     else:
                         return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
                     id_comm.updated_at = datetime.datetime.now()
-                    print(id_comm.created_at)
                     serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
                 else:
                     incoming_data['created_at'] = datetime.datetime.now()
