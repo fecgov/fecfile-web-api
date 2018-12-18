@@ -61,6 +61,7 @@
       }
       @include media(mediumDesktop) {
         float: left;
+        margin-top: 10px;
         padding-left: 0;
         width: 180px;
         input[type='text'] {
@@ -77,6 +78,7 @@
       }
       @include media(largeDesktop) {
         float: left;
+        margin-top: 10px;
         padding-left: 5px;
         width: 180px;
         input[type='text'] {

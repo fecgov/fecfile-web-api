@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
@@ -72,6 +72,11 @@ export class AppLayoutComponent implements OnInit {
       }
     }    
   }
+  
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    localStorage.clear();
+  }   
 
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.

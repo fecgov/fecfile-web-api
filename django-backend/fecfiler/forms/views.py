@@ -200,6 +200,7 @@ def create_f99_info(request):
             'signee': request.data.get('signee'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1': request.data.get('email_on_file_1'),
+
             'additional_email_1' : request.data.get('additional_email_1'),
             'additional_email_2': request.data.get('additional_email_2'),
             'file': request.data.get('file'),
@@ -592,8 +593,7 @@ def validate_f99(request):
             'treasurersuffix': request.data.get('treasurersuffix'),
             'email_on_file' : request.data.get('email_on_file'),
             'email_on_file_1' : request.data.get('email_on_file_1'),
-            #'file': request.data.get('file'),
-
+            'file': request.data.get('file')
         }
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
