@@ -34,12 +34,12 @@
         @include media(mediumDesktop) {
           float: left;
           font-size: 1em;
-          width: 45%;
+          width: 50%;
         }         
         @include media(largeDesktop) {
           float: left;
           font-size: 1em;
-          width: 45%;
+          width: 50%;
         }         
       }
       .header__btns {
@@ -153,6 +153,28 @@
         } */
         @include clearfix();
       } // .rich-text-editor
+
+      .file-attached-container {
+        .close-icon {
+          // @extend .close-icon;          
+          color: $red;
+          vertical-align: top
+        }
+      }
+
+      .tooltip-inner {
+        max-width: 300px;
+        text-align: left;
+        @include media(tablet) {
+          max-width: 300px;
+        }
+        @include media(mediumDesktop) {
+          max-width: 500px;
+        }         
+        @include media(largeDesktop) {
+          max-width: 600px;
+        }               
+      }
       .editor-character-count,
       .error-text {
         float: left;
@@ -200,5 +222,5 @@
         }       
       }
     }
-  }
+}
 }
