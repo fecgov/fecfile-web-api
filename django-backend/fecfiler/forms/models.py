@@ -30,8 +30,8 @@ class CommitteeInfo(models.Model):
     treasurermiddlename = models.CharField(max_length=20, null=True)
     treasurerprefix = models.CharField(max_length=10, null=True)
     treasurersuffix = models.CharField(max_length=10, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(null=False )
+    updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
     isdeleted = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
@@ -50,7 +50,7 @@ class CommitteeInfo(models.Model):
     # class constructor
     def __unicode__(self):
         return self.committeename
-
+    """
     def save(self, *args, **kwargs):
         delete_file_if_needed(self, 'file')
         super(CommitteeInfo, self).save(*args, **kwargs)
@@ -58,7 +58,7 @@ class CommitteeInfo(models.Model):
     def delete(self, *args, **kwargs):
         super(CommitteeInfo, self).delete(*args, **kwargs)
         delete_file(self, 'file')
-    
+    """
 
     class Meta():
         verbose_name = _('CommitteeInfo')
