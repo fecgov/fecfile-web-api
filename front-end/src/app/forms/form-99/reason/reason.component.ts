@@ -39,7 +39,9 @@ export class ReasonComponent implements OnInit {
   private _editorMax: number = 20000;
   private _form_type: string = '';
   private _form_saved: boolean = false;
-
+  public file: any = null;
+  private _form_submitted: boolean = false;
+  
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -58,18 +60,25 @@ export class ReasonComponent implements OnInit {
 
     if(this._form_99_details) {  
       if(this._form_99_details.text) {
+
+        if (this._form_99_details.reason){
+           this.typeSelected=this._form_99_details.reason; 
+        }
+
         this.frmReason = this._fb.group({
           reasonText: [this._form_99_details.text, [
             Validators.required,
             htmlLength(this._editorMax)
-          ]]
+          ]],
+          file: ['']
         });
        } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
             htmlLength(this._editorMax)
-          ]]
+          ]],
+          file: ['']
         });
        }
     } else {
@@ -77,7 +86,8 @@ export class ReasonComponent implements OnInit {
         reasonText: ['', [
           Validators.required,
           htmlLength(this._editorMax)
-        ]]
+        ]],
+        file: ['']
       });
     }
   }
@@ -105,6 +115,22 @@ export class ReasonComponent implements OnInit {
   }
 
   /**
+   * Sets the file.
+   *
+   * @param      {Object}  e The event object.
+   */
+  public setFile(e): void {
+    if(e.target.files.length === 1) {
+      this.file = e.target.files[0];
+
+      localStorage.setItem(`form_${this._form_type}_file`, this.file.name);
+
+    } else {
+      localStorage.setItem(`form_${this._form_type}_file`, '');
+    }
+  }
+
+  /**
    * Validates the reason form.
    *
    */
@@ -120,6 +146,10 @@ export class ReasonComponent implements OnInit {
 
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.frmReason.get('reasonText').value;
+
+        if (this.frmReason.get('file').value){
+          this._form_99_details.file=this.frmReason.get('file').value;  
+        }
 
         setTimeout(() => {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
@@ -167,6 +197,19 @@ export class ReasonComponent implements OnInit {
     }
   }
 
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }      
+  }  
+
+  
+  public removeFile(): void {
+    this.file = null;
+  }
+
   /**
    * Goes to the previous step.
    */
@@ -205,14 +248,23 @@ export class ReasonComponent implements OnInit {
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.reasonText;
 
+        this._form_99_details.file='';
+
+        if (this.file !== null){
+          this._form_99_details.file=this.file;
+          this._form_99_details.filename=this.file.name;
+        }
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 
         this.hideText = true;
 
         this.showValidateBar = false;
-
-        this._formsService
-          .saveForm({}, this._form_type)
+        console.log('this.file: ',this.file);
+        
+        if (this.file !== null){
+          this._form_99_details.file=this.file;
+          this._formsService
+          .saveForm({}, this.file, this._form_type)
           .subscribe(res => {
             if(res) {
               console.log('res: ', res);
@@ -227,7 +279,6 @@ export class ReasonComponent implements OnInit {
               let formSavedObj: any = {
                 'saved': this.formSaved
               };
-
               localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
             }
           },
@@ -235,9 +286,33 @@ export class ReasonComponent implements OnInit {
             console.log('error: ', error);
           });          
       }
+      else {
+        this._formsService
+        .saveForm({}, {}, this._form_type)
+        .subscribe(res => {
+          if(res) {
+            console.log('res: ', res);
+
+            this._form_99_details.id = res.id;
+
+            localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+            
+            // success
+            this.formSaved = true;
+
+            let formSavedObj: any = {
+              'saved': this.formSaved
+            };
+            localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });         
+      }
     }
   }
-
+  }
   /**
    * Validates the entire form.
    */

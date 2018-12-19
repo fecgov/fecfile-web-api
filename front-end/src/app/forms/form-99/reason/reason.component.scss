@@ -3,6 +3,10 @@
 .reason-container {
   display: block;
   height: 100%;
+  hr {
+    margin: 0 auto 5px auto;
+    width: 99%;
+  }
   header {
     .header-container {
       display: block;
@@ -149,6 +153,28 @@
         } */
         @include clearfix();
       } // .rich-text-editor
+
+      .file-attached-container {
+        .close-icon {
+          // @extend .close-icon;          
+          color: $red;
+          vertical-align: top
+        }
+      }
+
+      .tooltip-inner {
+        max-width: 300px;
+        text-align: left;
+        @include media(tablet) {
+          max-width: 300px;
+        }
+        @include media(mediumDesktop) {
+          max-width: 500px;
+        }         
+        @include media(largeDesktop) {
+          max-width: 600px;
+        }               
+      }
       .editor-character-count,
       .error-text {
         float: left;
@@ -161,6 +187,40 @@
   footer {
     .grid-row {
       margin-bottom: 15px !important;
+      .grid-row__col--12 {
+        .forms__btn-container {
+          margin: 0 auto;
+          padding: 0;
+          width: 80%;
+          @include media(tablet) {
+            margin: 0;
+            padding: 0;
+            width: 95%;
+          }
+          @include media(mediumDesktop) {
+            width: 98%;
+          }         
+          @include media(largeDesktop) {
+            width: 98%;
+          }  
+          .btn-container-row {
+            @include clearfix();
+            border-bottom: 1px solid $dustyGray;
+            height: 55px;
+            margin-bottom: 10px;
+            width: 100%;
+            .btn {
+              margin-right: 0;
+            }
+          }
+          .btn-left {
+            float: left;
+          }
+          .btn-right {
+            float: right;
+          }          
+        }       
+      }
     }
-  }
+}
 }

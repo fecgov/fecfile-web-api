@@ -17,7 +17,7 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
-  public sideBarClass: string = null;
+  public sideBarClass: string = 'dashboard active';
   public toggleMenu: boolean = false;
   public committeeName: string = '';
   public committeeId: string = '';
@@ -53,24 +53,15 @@ export class AppLayoutComponent implements OnInit {
           if(this.toggleMenu) {
             this.toggleMenu = false;
           }
+          if(val.url.indexOf('/dashboard') === 0) {
+            this.sideBarClass = 'dashboard active';
+          } else if(val.url.indexOf('/forms') === 0) {
+            this.sideBarClass = ''; 
+          }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
+            this.sideBarClass = 'active';
+          }
         }
       });
-  }
-
-  ngDoCheck(): void {
-    let route: string = this._router.url;
-
-    if(route) {
-      if(route.indexOf('/dashboard') === 0) {
-        if(this.showSideBar) {
-          if(this.sideBarClass !== 'dashboard active') {
-            this.sideBarClass = 'dashboard active';             
-          }          
-        }  else {
-          this.sideBarClass = '';   
-        }
-      }
-    }    
   }
   
   @HostListener('window:beforeunload', ['$event'])
@@ -105,7 +96,7 @@ export class AppLayoutComponent implements OnInit {
       if(route) {
         if(route.indexOf('/dashboard') === 0) {
           this.sideBarClass = 'dashboard active';
-        } else {
+        } else if(!route.indexOf('/forms') && !route.indexOf('/dashboard')) {
           this.sideBarClass = 'active';
         }
       }

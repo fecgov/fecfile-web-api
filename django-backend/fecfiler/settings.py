@@ -1,4 +1,3 @@
-
 """
 Django settings for FEC-EFiler project.
 
@@ -124,7 +123,7 @@ DATABASES = {
          'NAME': os.environ.get('DB_NAME', 'postgres'),
          'USER': os.environ.get('DB_USERNAME', 'postgres'),
          'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-         'HOST': os.environ.get('DB_HOST', 'localhost'),
+         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
          'PORT': os.environ.get('DB_PORT', '5432')
      }
 }
@@ -247,8 +246,7 @@ LOGGING = {
         'default': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/error.log',
-
+            'filename': 'logs/access.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter':'standard',

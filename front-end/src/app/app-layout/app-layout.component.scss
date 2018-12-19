@@ -10,10 +10,10 @@
       padding-left: 0
     }
     @include media(mediumDesktop) {
-      padding-left: 0;
+      padding-left: 200px;
     }         
     @include media(largeDesktop) {
-      padding-left: 0;
+      padding-left: 200px;
     }     
     .app__side-nav {
       left: 0;
@@ -72,7 +72,7 @@
             width: 200px;
           }         
           @include media(largeDesktop) {
-            width: 275px;
+            width: 260px;
           }           
         }
       } // .app__top-logo
@@ -122,7 +122,7 @@
   } // .app__top  
   .app__side-nav {
     height: 100%;
-    left: -245px;
+    left: -235px;
     position: fixed;
     top: 60px;
     transition: all 0.4s ease 0s;
@@ -165,7 +165,6 @@
         .committee-name,
         .committee-id {
           display: inline-block;
-          //height: 100%;
           position: relative;
         }
         .committee-id {

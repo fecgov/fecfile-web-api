@@ -1,4 +1,3 @@
-
 # Create your models here.
 from django.db import models
 from django.core.validators import FileExtensionValidator
@@ -50,7 +49,7 @@ class CommitteeInfo(models.Model):
     # class constructor
     def __unicode__(self):
         return self.committeename
-
+    """
     def save(self, *args, **kwargs):
         delete_file_if_needed(self, 'file')
         super(CommitteeInfo, self).save(*args, **kwargs)
@@ -59,6 +58,7 @@ class CommitteeInfo(models.Model):
         super(CommitteeInfo, self).delete(*args, **kwargs)
         delete_file(self, 'file')
     
+    """
 
     class Meta():
         verbose_name = _('CommitteeInfo')
