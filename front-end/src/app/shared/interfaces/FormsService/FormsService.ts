@@ -22,5 +22,8 @@
   created_at: string,
   is_submitted: boolean,
   filename:string,
-  form_type:string
+  form_type:string,
+  file:any,
+  org_filename:string,
+  org_fileurl:string
  }
