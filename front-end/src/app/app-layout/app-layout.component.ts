@@ -17,7 +17,7 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
-  public sideBarClass: string = null;
+  public sideBarClass: string = 'dashboard active';
   public toggleMenu: boolean = false;
   public committeeName: string = '';
   public committeeId: string = '';
@@ -50,45 +50,18 @@ export class AppLayoutComponent implements OnInit {
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
-          console.log('val: ', val);
           if(this.toggleMenu) {
             this.toggleMenu = false;
           }
           if(val.url.indexOf('/dashboard') === 0) {
-            if(this.showSideBar) {
-              this.sideBarClass = 'dashboard active';
-            } else if(!this.showSideBar) {
-              this.sideBarClass = '';
-            }
-          } else if(!val.url.indexOf('/forms') && !val.url.indexOf('/dashboard')) {
-            if(this.showSideBar) {
-              this.sideBarClass = 'active';
-            } else if(!this.showSideBar) {
-              this.sideBarClass = '';
-            }
+            this.sideBarClass = 'dashboard active';
+          } else if(val.url.indexOf('/forms') === 0) {
+            this.sideBarClass = ''; 
+          }else if(val.url.indexOf('/dashboard') === -1 || val.url.indexOf('/forms') === -1) {
+            this.sideBarClass = 'active';
           }
         }
       });
-  }
-
-  ngDoCheck(): void {
-    let route: string = this._router.url;
-
-    /*if(route) {
-      if(route.indexOf('/dashboard') === 0) {
-        if(this.showSideBar) {
-          if(this.sideBarClass !== 'dashboard active') {
-            this.sideBarClass = 'dashboard active';             
-          }          
-        } else if(!this.showSideBar) {
-          console.log('sidebarClass: ', this.sideBarClass);
-          this.sideBarClass = '';   
-        }
-      } else  if(!route.indexOf('/dashboard') && !route.indexOf('/forms')){
-        console.log('not a dashboard or form:');
-        this.sideBarClass = 'active';
-      }
-    } */   
   }
   
   @HostListener('window:beforeunload', ['$event'])
