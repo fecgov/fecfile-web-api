@@ -39,6 +39,24 @@
           margin: 0 auto;
         }
       }
+      .forms-table {
+        width: 100%;
+        tbody {
+          tr {
+            td {
+              text-align: center;
+              .btn-group {
+                .btn {
+                  margin-right: 5px;
+                  &:last-child {
+                    margin-right: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
   footer {
