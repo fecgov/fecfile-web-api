@@ -192,7 +192,8 @@ export class FormsService {
       console.log ('form99_details: ',form99_details);
 
       if(file && file.name) {
-        
+        console.log ('file uploaded successfully');
+        localStorage.setItem('form_99_details.file', file);
         formData.append('file', file, file.name);         
         formData.append('committeeid', form99_details.committeeid);
         formData.append('committeename', form99_details.committeename);
@@ -211,7 +212,7 @@ export class FormsService {
         formData.append('signee', form99_details.signee);
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
-        formData.append('additional_email_1', form99_details.email_on_file_1);
+        formData.append('additional_email_1', form99_details.additional_email_1);
         formData.append('additional_email_2', form99_details.additional_email_2);        
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
@@ -229,8 +230,9 @@ export class FormsService {
       }
       else
       {
-        /*form99_details.is_submitted=false; 
-        formData.append('file', file, file.name);  */       
+        /*form99_details.is_submitted=false; */
+        formData.append('file', form99_details.file);  
+        formData.append('filename', form99_details.filename);    
         formData.append('committeeid', form99_details.committeeid);
         formData.append('committeename', form99_details.committeename);
         formData.append('street1', form99_details.street1);
@@ -248,7 +250,7 @@ export class FormsService {
         formData.append('signee', form99_details.signee);
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
-        formData.append('additional_email_1', form99_details.email_on_file_1);
+        formData.append('additional_email_1', form99_details.additional_email_1);
         formData.append('additional_email_2', form99_details.additional_email_2);        
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
