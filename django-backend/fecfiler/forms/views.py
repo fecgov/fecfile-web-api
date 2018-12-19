@@ -768,15 +768,15 @@ def email(boolean, data):
 
     RECIPIENT.append("%s" % data.get('email_on_file'))
     
-    print(data.get('additional_email_1'))
+    #print(data.get('additional_email_1'))
     if 'additional_email_1' in data and (not (data.get('additional_email_1')=='-' or data.get('additional_email_1') is None or data.get('additional_email_1') == 'null')):
         RECIPIENT.append("%s" % data.get('additional_email_1')) 
     
-    print(data.get('additional_email_2'))
+    #print(data.get('additional_email_2'))
     if 'additional_email_2' in data and (not (data.get('additional_email_2')=='-' or data.get('additional_email_2') is None or data.get('additional_email_2') == 'null')):
         RECIPIENT.append("%s" % data.get('additional_email_2'))
 
-    print(data.get('email_on_file_1'))
+    #print(data.get('email_on_file_1'))
     if 'email_on_file_1' in data and (not (data.get('email_on_file_1')=='-' or data.get('email_on_file_1') is None or data.get('email_on_file_1') == 'null')):
         RECIPIENT.append("%s" % data.get('email_on_file_1'))
     
