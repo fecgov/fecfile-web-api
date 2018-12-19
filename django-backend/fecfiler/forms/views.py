@@ -390,7 +390,7 @@ def submit_comm_info(request):
                 if comm_info.is_submitted==False:
                     incoming_data['updated_at'] = datetime.datetime.now()
                     incoming_data['created_at'] = comm_info.created_at
-                    #comm_info.is_submitted=True
+                    comm_info.is_submitted=True
                     serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
                 else:
                     return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
