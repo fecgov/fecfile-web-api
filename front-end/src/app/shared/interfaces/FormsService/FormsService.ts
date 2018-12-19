@@ -1,5 +1,5 @@
  export interface form99 {
-  id: number,
+  id: string,
   committeeid: string,
   committeename: string,
   street1: string,
