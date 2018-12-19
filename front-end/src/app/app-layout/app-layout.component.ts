@@ -57,7 +57,7 @@ export class AppLayoutComponent implements OnInit {
             this.sideBarClass = 'dashboard active';
           } else if(val.url.indexOf('/forms') === 0) {
             this.sideBarClass = ''; 
-          }else if(val.url.indexOf('/dashboard') === -1 || val.url.indexOf('/forms') === -1) {
+          }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
             this.sideBarClass = 'active';
           }
         }
