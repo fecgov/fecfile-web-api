@@ -97,7 +97,7 @@
            <div class="grid-row">
              <div class="grid-row__col grid-row__col--12">
                If your name is not listed, please
-               <a class="form1-link" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">click here</a> to amend Form 1.
+               <a class="form1-link" href="https://webforms.fec.gov/webforms/form1/index.htm" target="_blank">click here</a> to amend Form 1.
              </div>
            </div>
            <hr />
@@ -125,9 +125,9 @@
                 </div>
                  <div class="grid-col">
                  <!--<button class="btn btn-primary" type="button" id="button-addon2" (click)="add_additional_email_2()"> -->
-                 <button class="btn btn-primary" type="button" id="button-addon2" (click)="add_additional_email_2()">
+                 <!--<button class="btn btn-primary" type="button" id="button-addon2" (click)="add_additional_email_2()">
                        <i class="fa fa-plus-circle"></i>
-                 </button>
+                 </button>-->
                 </div>
                 </div>
                  <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
@@ -136,7 +136,8 @@
                    </div>
                  </div>
                </div>
-               <div class="additional-email__field"   *ngIf="_need_additional_email_2">
+               <!--<div class="additional-email__field"   *ngIf="_need_additional_email_2">-->
+               <div class="additional-email__field"   >
                 <div class="grid-row">
                 <div class="grid-col">
                  <input
@@ -149,9 +150,9 @@
                  </div>
                  <div class="grid-col">
                  <!--<button class="btn btn-danger" class="btn btn-link" type="button" id="button-addon2" (click)="remove_additional_email_2()>-->
-                    <button class="btn btn-danger" type="button" id="button-addon2" (click)="remove_additional_email_2()">  
+                    <!--<button class="btn btn-danger" type="button" id="button-addon2" (click)="remove_additional_email_2()">  
                           <i class="fa fa-minus-circle"></i>
-                    </button>
+                    </button>-->
                   </div>
                  </div>
                  <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
