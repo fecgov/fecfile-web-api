@@ -252,6 +252,11 @@ def create_f99_info(request):
                                 incoming_data['additional_email_2'] = None
                             if incoming_data['additional_email_1'] in [None, "", " "]:
                                 incoming_data['additional_email_1'] = None
+                            """if not 'file' in request.data:
+                                if not comm_info.file is None:
+                                    del incoming_data['file']
+                                    del incoming_data['filename']
+                            """
                             serializer = CommitteeInfoSerializer(id_comm, data=incoming_data)
                         else:
                             logger.debug("FEC Error 002:This form is already submitted")
@@ -399,7 +404,7 @@ def submit_comm_info(request):
             
         if serializer.is_valid():
             serializer.save()
-            #email(True, serializer.data)
+            email(True, serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -762,14 +767,17 @@ def email(boolean, data):
     RECIPIENT = []
 
     RECIPIENT.append("%s" % data.get('email_on_file'))
-
-    if 'additional_email_1' in data and (not data.get('additional_email_1')=='-'):
+    
+    #print(data.get('additional_email_1'))
+    if 'additional_email_1' in data and (not (data.get('additional_email_1')=='-' or data.get('additional_email_1') is None or data.get('additional_email_1') == 'null')):
         RECIPIENT.append("%s" % data.get('additional_email_1')) 
-
-    if 'additional_email_2' in data and (not data.get('additional_email_2')=='-'):
+    
+    #print(data.get('additional_email_2'))
+    if 'additional_email_2' in data and (not (data.get('additional_email_2')=='-' or data.get('additional_email_2') is None or data.get('additional_email_2') == 'null')):
         RECIPIENT.append("%s" % data.get('additional_email_2'))
 
-    if 'email_on_file_1' in data and (not data.get('email_on_file_1')=='-'):
+    #print(data.get('email_on_file_1'))
+    if 'email_on_file_1' in data and (not (data.get('email_on_file_1')=='-' or data.get('email_on_file_1') is None or data.get('email_on_file_1') == 'null')):
         RECIPIENT.append("%s" % data.get('email_on_file_1'))
     
     SUBJECT = "Test - Form 99 submitted successfully"
