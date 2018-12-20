@@ -96,7 +96,7 @@ TEMPLATES = [
 CORS_ORIGIN_ALLOW_ALL = True
 #else:
 #    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
-    
+
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
 )
@@ -119,7 +119,7 @@ DATABASES = {
      #    'HOST': 'localhost',
      #    'PORT': '5432',
      #}
-     
+
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'NAME': os.environ.get('DB_NAME', 'postgres'),
@@ -253,7 +253,7 @@ LOGGING = {
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter':'standard',
-        },  
+        },
         'request_handler': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
@@ -280,10 +280,9 @@ LOGGING = {
 # AWS SES Configuration Settings
 EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
 
-AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', '')
-AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', '')
+AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
+AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
 AWS_HOST_NAME = 'us-east-1'
 AWS_REGION = 'us-east-1'
 
 AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
-
