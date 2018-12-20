@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
+		'django_ses_boto3',
 ]
 
 MIDDLEWARE = [
@@ -277,7 +278,7 @@ LOGGING = {
 }
 
 # AWS SES Configuration Settings
-EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
 
 AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', '')
 AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', '')
