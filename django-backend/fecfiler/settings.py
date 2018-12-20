@@ -276,3 +276,13 @@ LOGGING = {
     }
 }
 
+# AWS SES Configuration Settings
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', '')
+AWS_HOST_NAME = 'us-east-1'
+AWS_REGION = 'us-east-1'
+
+AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
+
