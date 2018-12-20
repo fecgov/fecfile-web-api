@@ -167,6 +167,8 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let url: string = '';
     let id:string;
+    let org_filename="";
+    let org_fileurl="";
 
     if(file && file.name) {
       console.log('file: ', file);
@@ -218,8 +220,7 @@ export class FormsService {
         formData.append('is_submitted', "False");
         formData.append('filename', form99_details.filename);
         formData.append('form_type', "F99");
-        if (form99_details.id.toString() ==='' || form99_details.id.toString() ==="" || form99_details.id===null){
-        
+        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
           /*data['id']="0";*/
           formData.append('id', "0");
         }
@@ -230,9 +231,9 @@ export class FormsService {
       }
       else
       {
-        /*form99_details.is_submitted=false; */
+        /*form99_details.is_submitted=false; 
         formData.append('file', form99_details.file);  
-        formData.append('filename', form99_details.filename);    
+        formData.append('filename', form99_details.filename);    */
         formData.append('committeeid', form99_details.committeeid);
         formData.append('committeename', form99_details.committeename);
         formData.append('street1', form99_details.street1);
@@ -256,7 +257,7 @@ export class FormsService {
         formData.append('is_submitted', "False");
         /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', "F99");
-        if (form99_details.id.toString() ==='' || form99_details.id.toString() ==="" || form99_details.id===null){
+        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
         
           /*data['id']="0";*/
           formData.append('id', "0");
@@ -329,9 +330,15 @@ export class FormsService {
             localStorage.setItem('form_99_details_res', JSON.stringify(res));
             let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
             id=form99_details_res.id.toString();
+            org_filename=form99_details_res.filename;
+            org_fileurl=form99_details_res.file;
             /*form_99_details_res_tmp.id=form_99_details_res.id; //just to get form 99 id
             localStorage.setItem('id', form_99_details_res_tmp.id);*/
             localStorage.setItem('form_99_details.id', id);
+            localStorage.setItem('form_99_details.org_filename', org_filename);
+            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
+            console.log ('org_filename',org_filename);
+            console.log ('org_fileurl',org_fileurl);
 
             return res;
           }

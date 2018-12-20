@@ -25,6 +25,11 @@ export class PreviewComponent implements OnInit {
   private _subscription: Subscription;
   private _step: string = '';
 
+  private filename: string ='';
+  private fileurl: string ='';
+  public org_filename:string='';
+  public org_fileurl:string='';
+
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
@@ -33,6 +38,14 @@ export class PreviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    /*this.filename = this._activatedRoute.snapshot.paramMap.get(`form_${this.form_type}_file`);*/
+    
+     this.org_filename=JSON.parse(localStorage.getItem('form_99_details.org_filename'));      
+     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));         
+
+    console.log('On Preview Screen org_filename: ', this.org_filename);
+    console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
+
 
     this._subscription =
       this._messageService
