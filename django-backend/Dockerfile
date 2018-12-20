@@ -7,4 +7,5 @@ ADD . /opt/nxg_fec/
 RUN pip3 install -r requirements.txt
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "python wait_for_db.py && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi"]
+ENTRYPOINT ["gunicorn", " --bind 0.0.0.0:8080", "fecfiler.wsgi"]
+# ENTRYPOINT ["sh", "-c", "python wait_for_db.py && gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi"]
