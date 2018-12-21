@@ -30,13 +30,14 @@ class CommitteeInfo(models.Model):
     treasurermiddlename = models.CharField(max_length=20, null=True)
     treasurerprefix = models.CharField(max_length=10, null=True)
     treasurersuffix = models.CharField(max_length=10, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(null=False )
+    updated_at = models.DateTimeField(null=True)
     deleted_at = models.DateTimeField(null=True)
     isdeleted = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
     signee = models.CharField(max_length=30, null= False, default = "-")
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
+    email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
     additional_email_1 = models.TextField(max_length=100, null= True, default = "-")
     additional_email_2 = models.TextField(max_length=100, null= True, default = "-")
     filename = models.CharField(max_length=128, null=True)
@@ -50,10 +51,15 @@ class CommitteeInfo(models.Model):
     def __unicode__(self):
         return self.committeename
 
+    """
     def save(self, *args, **kwargs):
         delete_file_if_needed(self, 'file')
         super(CommitteeInfo, self).save(*args, **kwargs)
-    
+
+    def delete(self, *args, **kwargs):
+        super(CommitteeInfo, self).delete(*args, **kwargs)
+        delete_file(self, 'file')
+    """
 
     class Meta():
         verbose_name = _('CommitteeInfo')
@@ -77,6 +83,7 @@ class Committee(models.Model):
     treasurerprefix = models.CharField(max_length=10)
     treasurersuffix = models.CharField(max_length=10)
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
+    email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True)

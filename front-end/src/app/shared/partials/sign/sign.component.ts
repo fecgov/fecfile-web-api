@@ -33,6 +33,7 @@ export class SignComponent implements OnInit {
   private _form_details: any = {};
   private _step: string = '';
 
+  public _need_additional_email_2=false;
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _fb: FormBuilder,
@@ -129,13 +130,14 @@ export class SignComponent implements OnInit {
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
+        console.log("getting additonal emails");
       this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
       this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
       
       this._formsService
-        .saveForm({}, this.form_type)
+        .saveForm({}, {}, this.form_type)
         .subscribe(res => {
           if(res) {
             this.frmSaved = true;
@@ -162,7 +164,6 @@ export class SignComponent implements OnInit {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
     if(this.form_type === '99') {
-
       this._form_details.file = '';
 
       if(this._form_details.additional_email_1 === '') {
@@ -177,13 +178,17 @@ export class SignComponent implements OnInit {
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
 
     if(this.frmSignee.invalid) {
-      this.signFailed = true;
+      if(this.frmSignee.get('agreement').value) {
+        this.signFailed = false;
+      } else {
+        this.signFailed = true;
+      }
     } else if(this.frmSignee.valid) {
       this.signFailed = false;
 
       if(!formSaved.form_saved) {
         this._formsService
-          .saveForm({}, this.form_type)
+          .saveForm({}, {}, this.form_type)
           .subscribe(res => {
             if(res) {
 
@@ -264,6 +269,8 @@ export class SignComponent implements OnInit {
     } else if (!e.target.checked) {
       this.signFailed = true;
     }
+
+    console.log('this.signFailed: ', this.signFailed);
   }
 
   public toggleToolTip(tooltip): void {
@@ -297,4 +304,13 @@ export class SignComponent implements OnInit {
       });          
   }
 
+  public add_additional_email_2(): void {
+    this._need_additional_email_2=true;
+    console.log("2nd email needed");
+  }
+  public remove_additional_email_2(): void {
+    this._need_additional_email_2=false;
+    console.log("2nd email removed");
+    localStorage.setItem('form_99_details.additional_email_2',"");
+  }
 }

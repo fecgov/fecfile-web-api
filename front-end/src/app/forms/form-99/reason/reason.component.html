@@ -54,6 +54,15 @@
           </div>
         </div>
         <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="_not_valid_pdf">
+            <div class="text-error text-center" *ngIf="_not_valid_pdf">
+              You can upload only pdf file.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="text-editor">
               <textarea 
@@ -79,12 +88,65 @@
             </div>
             <div class="error-text">
               <div class="text-info text-center"
-                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved">
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! _not_valid_pdf)">
                 Form 99 has been successfully saved.
               </div>
             </div>
           </div>
         </div>        
+        <!-- file upload start -->
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <hr />
+            <ng-template #tipContent>
+              The attachment feature can be used to attach documents that may fall outside of a simple letter.  
+              Examples include copies of refund checks sent to contributors, tables for disclosing information, or the ability to submit a C-1 Loan Agreement.  
+              Please note that if you have more than one PDF attachment, you will need to merge them into a single PDF.              
+            </ng-template>
+            <h4>
+              File Attachment
+              <button 
+                type="button" 
+                class="btn btn-info"
+                [ngbTooltip]="tipContent"
+                #t2="ngbTooltip"
+                (click)="toggleToolTip(t2)"
+                triggers="manual"
+                tooltipClass="custom-tooltip-class"
+                placement="right"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </h4>
+            <div class="file-upload-container" *ngIf="file === null">
+              <input 
+                type="file" 
+                name="file"
+                accept="application/pdf"
+                (change)="setFile($event)"
+                formControlName="file" 
+              />              
+            </div>
+            <div class="file-attached-container" *ngIf="file !== null">
+              <div class="grid-row">
+                <div class="grid-row__col--2">
+                  {{ file.name }}
+                </div>
+                <div class="grid-row__col--2 text-left">
+                  <button 
+                    type="button"
+                    class="btn btn-link"
+                    (click)="removeFile()"
+                  >
+                      <span vertical-align="top" class="close-icon"></span>
+                    </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- file upload end -->              
       </div> <!-- ./content -->
     </section>
     <footer>
@@ -95,7 +157,7 @@
             class="btn btn-secondary btn-right" 
             type="button"
             (click)="saveForm()"
-            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            [disabled]="(frmReason.controls.reasonText.errors?.requiredLength) || (! _valid_file)"
           >
             Save 
           </button>     

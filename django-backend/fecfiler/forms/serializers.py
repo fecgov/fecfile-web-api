@@ -7,11 +7,12 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         model = CommitteeInfo
         fields=('id','committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname', 'text','reason',
-                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'filename', 'file', 
-                'created_at','is_submitted', 'signee', 'email_on_file', 'additional_email_1', 'additional_email_2',
-                'form_type', 'coverage_start_date', 'coverage_end_date')
-        read_only_fields = ('created_at', 'updated_at')
-        
+                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 
+                'filename', 'file', 
+                'created_at','is_submitted', 'signee', 'email_on_file', 'email_on_file_1', 'additional_email_1', 'additional_email_2',
+                'form_type', 'coverage_start_date', 'coverage_end_date', 'updated_at')
+        #read_only_fields = ('created_at', 'updated_at')
+  
         # Methods to save the model objects to the database
         
     def create(self, validated_data):
@@ -34,14 +35,17 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.treasurermiddlename = validated_data.get('treasurermiddlename', instance.treasurermiddlename)
         instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
         instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
-        is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
+        instance.is_submitted = validated_data.get('is_submitted', instance.is_submitted)            
         instance.signee = validated_data.get('signee', instance.signee)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
+        instance.email_on_file_1 = validated_data.get('email_on_file_1', instance.email_on_file_1)
         instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
         instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
         instance.form_type = validated_data.get('form_type', instance.form_type)
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)
+        instance.updated_at = validated_data.get('updated_at', instance.updated_at)
+        instance.created_at = validated_data.get('created_at', instance.created_at)
         try:
             instance.filename = validated_data.get('filename', instance.filename)
             instance.file = validated_data.get('file', instance.file)
@@ -62,7 +66,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
         model = Committee
         fields=('committeeid', 'committeename', 'street1', 'street2', 'city',
                 'state','zipcode', 'treasurerprefix', 'treasurerfirstname',
-                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file',
+                'treasurermiddlename', 'treasurerlastname', 'treasurersuffix', 'email_on_file', 'email_on_file_1',
                 'created_at' )
         read_only_fields = ('created_at', 'updated_at')
         
@@ -86,6 +90,7 @@ class CommitteeSerializer(serializers.ModelSerializer):
         instance.treasurerprefix = validated_data.get('treasurerprefix', instance.treasurerprefix)
         instance.treasurersuffix = validated_data.get('treasurersuffix', instance.treasurersuffix)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file) 
+        instance.email_on_file_1 = validated_data.get('email_on_file_1', instance.email_on_file_1)
         instance.save()
         return instance
 

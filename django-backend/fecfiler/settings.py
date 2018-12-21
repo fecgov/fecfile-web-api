@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import datetime
 from corsheaders.defaults import default_headers
-
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,8 +28,8 @@ TEMPLATE_DEBUG = DEBUG
 CSRF_TRUSTED_ORIGINS = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-#DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', 'http://127.0.0.1:8002')
-#DATA_RECEIVE_API_VERSION = "/api/v1/"
+DATA_RECEIVE_API_URL=os.environ.get('DATA_RECEIVER_URL', 'http://127.0.0.1:8002')
+DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
+		'django_ses_boto3',
 ]
 
 MIDDLEWARE = [
@@ -95,7 +96,7 @@ TEMPLATES = [
 CORS_ORIGIN_ALLOW_ALL = True
 #else:
 #    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
-    
+
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
 )
@@ -118,13 +119,13 @@ DATABASES = {
      #    'HOST': 'localhost',
      #    'PORT': '5432',
      #}
-     
+
      'default': {
          'ENGINE': 'django.db.backends.postgresql_psycopg2',
          'NAME': os.environ.get('DB_NAME', 'postgres'),
          'USER': os.environ.get('DB_USERNAME', 'postgres'),
          'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
-         'HOST': os.environ.get('DB_HOST', 'localhost'),
+         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
          'PORT': os.environ.get('DB_PORT', '5432')
      }
 }
@@ -190,9 +191,12 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-        'JWT_ALLOW_REFRESH': True,
-        'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
-    }
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+    'JWT_RESPONSE_PAYLOAD_HANDLER':'fecfiler.authentication.views.jwt_response_payload_handler',
+}
+
+
 
 ADMIN_SHORTCUTS = [
     {
@@ -215,7 +219,7 @@ try:
 except:
     pass
 
-
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -231,15 +235,53 @@ LOGGING = {
         },
     },
 }
+"""
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'default': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/access.log',
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 5,
+            'formatter':'standard',
+        },
+        'request_handler': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/access.log',
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 5,
+            'formatter':'standard',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['default'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'django.request': {
+            'handlers': ['request_handler'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+    }
+}
 
 # AWS SES Configuration Settings
-EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
 
-AWS_ACCESS_KEY_ID = 'AKIAIH4XBCHDF3EWFC7Q'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
+AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
 AWS_HOST_NAME = 'us-east-1'
 AWS_REGION = 'us-east-1'
 

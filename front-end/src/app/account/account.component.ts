@@ -27,7 +27,6 @@ export class AccountComponent implements OnInit {
     private _sessionService: SessionService,
     private _apiService: ApiService,
     private _modalService: NgbModal
-    /*rivate _messageService: MessageService*/
     ){}
 
     public toggleSideNav(): void {
@@ -43,9 +42,9 @@ export class AccountComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log("accessing service call...");
+    // console.log("accessing service call...");
     this._accountService.getAccounts()
       .subscribe(res => this.accounts = <IAccount> res);
-    console.log(this.accounts)
+    // console.log(this.accounts)
   }
 }

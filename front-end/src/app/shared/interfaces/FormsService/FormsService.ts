@@ -1,4 +1,5 @@
  export interface form99 {
+  id: string,
   committeeid: string,
   committeename: string,
   street1: string,
@@ -15,8 +16,14 @@
   treasurersuffix: string,
   signee: string,
   email_on_file: string,
+  email_on_file_1: string,
   additional_email_1: string,
   additional_email_2: string,
   created_at: string,
-  is_submitted: boolean
+  is_submitted: boolean,
+  filename:string,
+  form_type:string,
+  file:any,
+  org_filename:string,
+  org_fileurl:string
  }

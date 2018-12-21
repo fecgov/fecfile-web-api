@@ -64,7 +64,10 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let url: string = '';
     let data: any = {};
-
+   
+    
+    
+    
     if(form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -105,7 +108,7 @@ export class FormsService {
    *
    * @return     {Observable} The result of the form being saved.
    */
-  public saveForm(formObj: any, form_type: string): Observable<any> {
+  /*public saveForm(formObj: any, form_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let data: any = {};
     let httpOptions =  new HttpHeaders();
@@ -150,7 +153,209 @@ export class FormsService {
           return false;
       }));
 
-  }
+  }*/
+
+  public saveForm(formObj: any, file: any, form_type: string): Observable<any> {
+    console.log('saveForm: ');
+    console.log('formObj: ', formObj);
+    let form_99_details_res: any ={};
+    let form_99_details_res_tmp: form99;
+
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let data: any = {};
+    let formData: FormData = new FormData();
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+    let id:string;
+    let org_filename="";
+    let org_fileurl="";
+    let fileuploaded:boolean=false;
+
+    if(file && file.name) {
+      console.log('file: ', file);
+      httpOptions = httpOptions.append('enctype', 'multipart/form-data');
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);    
+    } else {
+      /*httpOptions = httpOptions.append('Content-Type', 'application/json');*/
+      httpOptions = httpOptions.append('enctype', 'multipart/form-data');
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    }
+
+    console.log('form_type',form_type);
+
+    if(form_type === '99') {
+
+      let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
+     
+      /*if (form99_details.id===null || form99_details.id===''){
+        form99_details.id="0";
+        localStorage.setItem('id', "0");
+      }*/
+
+      console.log ('form99_details: ',form99_details);
+
+      if(file && file.name) {
+        fileuploaded=true;
+        console.log ('file uploaded successfully');
+        localStorage.setItem('form_99_details.file', file);
+        formData.append('file', file, file.name);         
+        formData.append('committeeid', form99_details.committeeid);
+        formData.append('committeename', form99_details.committeename);
+        formData.append('street1', form99_details.street1);
+        formData.append('street2', form99_details.street2);
+        formData.append('city', form99_details.city);
+        formData.append('state', form99_details.state);
+        formData.append('zipcode', form99_details.zipcode);
+        formData.append('treasurerprefix', form99_details.treasurerprefix);
+        formData.append('treasurerfirstname', form99_details.treasurerfirstname);
+        formData.append('treasurermiddlename', form99_details.treasurermiddlename);
+        formData.append('treasurerlastname', form99_details.treasurerlastname);
+        formData.append('treasurersuffix', form99_details.treasurersuffix);
+        formData.append('reason', form99_details.reason);
+        formData.append('text', form99_details.text);
+        formData.append('signee', form99_details.signee);
+        formData.append('email_on_file', form99_details.email_on_file);
+        formData.append('email_on_file_1', form99_details.email_on_file_1);
+        formData.append('additional_email_1', form99_details.additional_email_1);
+        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('created_at', form99_details.created_at);
+        formData.append('is_submitted', "False");
+        formData.append('filename', form99_details.filename);
+        formData.append('form_type', "F99");
+        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
+          /*data['id']="0";*/
+          formData.append('id', "0");
+        }
+        else
+        {
+          formData.append('id', form99_details.id.toString());
+        }
+      }
+      else
+      {
+        fileuploaded=false;
+        /*form99_details.is_submitted=false; 
+        formData.append('file', form99_details.file);  */
+
+        if (form99_details.filename!= null || form99_details.filename!= '' || form99_details.filename != "" || form99_details.filename != undefined){
+          formData.append('filename', form99_details.filename);    
+        }
+        formData.append('committeeid', form99_details.committeeid);
+        formData.append('committeename', form99_details.committeename);
+        formData.append('street1', form99_details.street1);
+        formData.append('street2', form99_details.street2);
+        formData.append('city', form99_details.city);
+        formData.append('state', form99_details.state);
+        formData.append('zipcode', form99_details.zipcode);
+        formData.append('treasurerprefix', form99_details.treasurerprefix);
+        formData.append('treasurerfirstname', form99_details.treasurerfirstname);
+        formData.append('treasurermiddlename', form99_details.treasurermiddlename);
+        formData.append('treasurerlastname', form99_details.treasurerlastname);
+        formData.append('treasurersuffix', form99_details.treasurersuffix);
+        formData.append('reason', form99_details.reason);
+        formData.append('text', form99_details.text);
+        formData.append('signee', form99_details.signee);
+        formData.append('email_on_file', form99_details.email_on_file);
+        formData.append('email_on_file_1', form99_details.email_on_file_1);
+        formData.append('additional_email_1', form99_details.additional_email_1);
+        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('created_at', form99_details.created_at);
+        formData.append('is_submitted', "False");
+        /*formData.append('filename', form99_details.filename);*/
+        formData.append('form_type', "F99");
+        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
+        
+          /*data['id']="0";*/
+          formData.append('id', "0");
+        }
+        else
+        {
+          formData.append('id', form99_details.id.toString());
+        }
+
+      }  
+      
+
+      if(localStorage.getItem(`form_${form_type}_saved`) !== null) {
+        let formSavedObj = JSON.parse(localStorage.getItem(`form_${form_type}_saved`));
+        let formStatus: boolean = formSavedObj.saved;
+
+        if(formStatus) {
+          url = '/f99/create_f99_info'; 
+        } else {
+          url = '/f99/create_f99_info';
+        } 
+      } else {
+        url = '/f99/create_f99_info';  
+      }
+      
+      /*data = form99_details;
+      form99_details.form_type="F99";
+      data = (file) ? formData : form99_details;*/
+      data=formData;
+
+      /*if (form99_details.id.toString() ==='' || form99_details.id.toString() ==="" || form99_details.id===null){
+        
+        data['id']="0";
+      }
+      else
+      {
+        data['id']= form99_details.id;
+      }
+
+      data['form_type'] = 'F99';*/
+      /*data['filename'] = '';*/
+    }
+
+    console.log ('Dupdated Data: ',data);
+
+    console.log ('loop through simple form Data: ');
+
+    for (var value of data.values()) {
+      console.log(value); 
+   }
+    console.log ('loop through form Data: ');
+    console.log(data);
+
+    /*for(let pair of data.entries()) {
+      console.log(pair[0] + ": ", pair[1]); 
+   }*/
+
+   new Response(data).text().then(console.log)
+    
+    return this._http
+      .post(
+        `${environment.apiUrl}${url}`,
+        data,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            localStorage.setItem('form_99_details_res', JSON.stringify(res));
+            let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
+            id=form99_details_res.id.toString();
+            localStorage.setItem('form_99_details.id', id);
+
+            if (fileuploaded)
+            {
+              org_filename=form99_details_res.filename;
+              org_fileurl=form99_details_res.file;
+              /*form_99_details_res_tmp.id=form_99_details_res.id; //just to get form 99 id
+              localStorage.setItem('id', form_99_details_res_tmp.id);*/
+              localStorage.setItem('org_filename', org_filename);
+              localStorage.setItem('org_fileurl', org_fileurl);
+              console.log ('org_filename on Reason screen',org_filename);
+              console.log ('org_fileurl on Reason screen',org_fileurl);
+            }
+
+            return res;
+          }
+          return false;
+      }));
+}
+
 
   /**
    * Submits a form.
@@ -176,6 +381,9 @@ export class FormsService {
       data = form99_details;
 
        data['form_type'] = 'F99';
+
+       console.log('F99 Submit form99_details',form99_details);
+       console.log('F99 Submit Data',data);
     }
     return this._http
       .post(
@@ -187,6 +395,8 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_details_res');
             return true;
           }
           return false;
