@@ -110,7 +110,7 @@
 /*       &.preview {
         display: table-cell;
       } */
-      &.preview {
+      //&.preview {
       @include media(tablet) {
         padding-left: 2px;
       }
