@@ -4,12 +4,12 @@
   display: table;
   table-layout: fixed;
   // height: 100vh;
-  min-height: 120vh;
+  min-height: $mainContentHeight;
   margin: 0;
   padding: 0;
   width: 100%;  
   @include firefoxOnly() {
-    height: 100vh;
+    height: $mainContentHeight;
   }
   .form__alerts {
     background-color: $bombay;
