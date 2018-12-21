@@ -1,0 +1,274 @@
+2018-12-21 20:03:31,336 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'created_at': [''], 'street2': ['street1'], 'city': ['WARRENTON'], 'email_on_file_1': ['null'], 'treasurerlastname': ['Marathe'], 'street1': ['332 W LEE HWY'], 'committeename': ['DIGITAL'], 'text': ['test'], 'additional_email_1': ['-'], 'treasurerfirstname': ['Mahendra'], 'form_type': ['F99'], 'id': ['0'], 'state': ['VA'], 'zipcode': ['92630'], 'reason': ['MSI'], 'additional_email_2': ['-'], 'treasurersuffix': ['II'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'signee': ['Mahendra Marathe'], 'treasurerprefix': ['Mr'], 'is_submitted': ['False'], 'treasurermiddlename': ['B'], 'committeeid': ['C01234567']}>
+2018-12-21 20:03:31,364 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+2018-12-21 20:03:31,364 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+2018-12-21 20:03:43,111 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'created_at': [''], 'street2': ['street1'], 'city': ['WARRENTON'], 'email_on_file_1': ['null'], 'treasurerlastname': ['Marathe'], 'street1': ['332 W LEE HWY'], 'committeename': ['DIGITAL'], 'text': ['test'], 'additional_email_1': ['-'], 'treasurerfirstname': ['Mahendra'], 'form_type': ['F99'], 'id': ['0'], 'state': ['VA'], 'zipcode': ['92630'], 'reason': ['MSI'], 'additional_email_2': ['-'], 'treasurersuffix': ['II'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'signee': ['Mahendra Marathe'], 'treasurerprefix': ['Mr'], 'is_submitted': ['False'], 'treasurermiddlename': ['B'], 'committeeid': ['C01234567']}>
+2018-12-21 20:03:43,245 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+2018-12-21 20:03:43,245 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 80, in execute
+    return super(CursorDebugWrapper, self).execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
