@@ -1,7 +1,8 @@
 @import '../shared/scss/global';
+
 .dashboard {
   background-color: $mercury;
-  min-height: 85vh;
+  min-height: $mainContentHeight;
   position: relative;  
   .grid-row {
     margin-bottom: 5px;
@@ -12,12 +13,26 @@
       padding: 0;
     }
     .grid-col {
-      background-color: $white;
-      flex: 0 0 48%;
-      max-width: 48%;      
+      background-color: $white;   
+      display: block;
       &:first-child {
         margin-right: 5px;
       }
+      @include media(tablet) {
+        display: block;
+      }
+      @include media(mediumDesktop) {
+        flex: 0 0 46%;
+        max-width: 46%;  
+        padding-left: 10px;
+        padding-right: 10px;       
+      }         
+      @include media(largeDesktop) {
+        flex: 0 0 46%;
+        max-width: 46%;   
+        padding-left: 10px;
+        padding-right: 10px;              
+      }       
     }
   }  
   a {
@@ -29,7 +44,7 @@
   } 
   section {
     .content {
-      min-height: 85vh;
+      min-height: 70vh;
       position: relative;
       .grid-row {
         min-height: 350px;
