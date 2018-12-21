@@ -41,6 +41,9 @@ export class ReasonComponent implements OnInit {
   private _form_saved: boolean = false;
   public file: any = null;
   private _form_submitted: boolean = false;
+  public _not_valid_pdf: boolean = false;
+  public _valid_file: boolean = true;
+  public _show_file_delete_button: boolean=false;
   
   constructor(
     private _fb: FormBuilder,
@@ -55,7 +58,7 @@ export class ReasonComponent implements OnInit {
 
   ngOnInit(): void {
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    
     this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
     if(this._form_99_details) {  
@@ -121,13 +124,26 @@ export class ReasonComponent implements OnInit {
    */
   public setFile(e): void {
     if(e.target.files.length === 1) {
-      this.file = e.target.files[0];
+       this.file = e.target.files[0];
+       if (this.file.name.includes('.pdf')){
+         console.log("pdf uploaded");
+         localStorage.setItem(`form_${this._form_type}_file`, this.file.name);
+         this._not_valid_pdf=false;
+         this._valid_file=true;
+         this._show_file_delete_button=true;
+      }
+      else {
+        this._not_valid_pdf=true;
+        this._valid_file=false;
+        this.file=null;
+        this._show_file_delete_button=true;
+      }
 
-      localStorage.setItem(`form_${this._form_type}_file`, this.file.name);
 
     } else {
       localStorage.setItem(`form_${this._form_type}_file`, '');
     }
+    console.log ('_valid_file:',this._valid_file);
   }
 
   /**
@@ -208,6 +224,7 @@ export class ReasonComponent implements OnInit {
   
   public removeFile(): void {
     this.file = null;
+    this._not_valid_pdf=false;
   }
 
   /**
@@ -238,7 +255,7 @@ export class ReasonComponent implements OnInit {
    * Saves the form when the save button is clicked.
    *
    */
-  public saveForm() {
+  public saveForm () {
     console.log('saveForm: ');
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
