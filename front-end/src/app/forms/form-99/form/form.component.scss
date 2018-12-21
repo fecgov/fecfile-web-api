@@ -111,10 +111,6 @@
         display: table-cell;
       } */
       &.preview {
-        /* @include firefoxOnly() {
-          display: table-cell;
-        }  */       
-      }
       @include media(tablet) {
         padding-left: 2px;
       }
