@@ -34,10 +34,7 @@ export class SignComponent implements OnInit {
   private _step: string = '';
 
   public _need_additional_email_2=false;
-<<<<<<< HEAD
 
-=======
->>>>>>> 7c108638e1ecac103c4abf013c0156f6ef5e812d
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _fb: FormBuilder,
