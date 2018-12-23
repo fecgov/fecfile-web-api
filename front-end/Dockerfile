@@ -15,7 +15,7 @@ RUN npm install -g @angular/cli
 # add app
 COPY . /usr/src/app
 
-RUN ng build --configuration=awsdev
+RUN ng build --configuration=local
 
 # start app
 #CMD ng serve --host 0.0.0.0
