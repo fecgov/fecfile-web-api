@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'db_file_storage',
 ]
 
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -161,7 +162,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
@@ -175,7 +175,39 @@ STATIC_ROOT = 'static'
 
 COMPRESS_ENABLED = os.environ.get('COMPRESS_ENABLED', not DEBUG)
 
-DEFAULT_FILE_STORAGE = 'db_file_storage.storage.DatabaseFileStorage'
+#DEFAULT_FILE_STORAGE = 'db_file_storage.storage.DatabaseFileStorage'
+#AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
+#AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
+AWS_HOST_NAME = 'us-east-1'
+AWS_REGION = 'us-east-1'
+
+AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
+
+
+
+# add the credentials from IAM and bucket name
+AWS_STORAGE_BUCKET_NAME = 'fecfile-filing' # or None if using service role
+AWS_STORAGE_UPLOAD_BUCKET_NAME = 'fecfile-filing-uploads' # or None if using service role
+#AWS_ACCESS_KEY_ID = '<aws access key >' # or None if using service role
+#AWS_SECRET_ACCESS_KEY = '<aws secret access key>'
+
+
+# if False it will create unique file names for every uploaded file
+AWS_S3_FILE_OVERWRITE = True
+
+# the url, that your media and static files will be available at
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_CUSTOM_UPLOAD_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_UPLOAD_BUCKET_NAME
+
+# the sub-directories of media and static files
+STATICFILES_LOCATION = 'static'
+MEDIAFILES_LOCATION = 'media'
+
+# a custom storage file, so we can easily put static and media in one bucket
+DEFAULT_FILE_STORAGE = 'fecfiler.custom_storages.MediaStorage'
+
+# the regular Django file settings but with the custom S3 URLs
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -213,9 +245,9 @@ ADMIN_SHORTCUTS = [
 
 
 try:
-    from .local_settings import *
+  from .local_settings import *
 except:
-    pass
+   pass
 
 """
 LOGGING = {
