@@ -274,8 +274,8 @@ def create_f99_info(request):
             logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
             return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except ValueError:
-                    logger.debug("FEC Error 006:This form Id number is not an integer")
-                    return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.debug("FEC Error 006:This form Id number is not an integer")
+            return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
         #except:
             #logger.
             #return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
@@ -300,10 +300,47 @@ def f99_file_upload(self, request, format=None):
     
     mymodel.my_file_field.save(f.name, f, save=True)
     return Response(status=status.HTTP_201_CREATED)
-
+"""
 @api_view(['POST'])
 def update_f99_info(request):
-    
+    if request.method == 'POST':
+        try:
+            if 'id' in request.data and (not request.data['id']=='') and int(request.data['id'])>=1:
+                comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                if comm_info:
+                    if comm_info.is_submitted==False:
+                        comm_info.signee = request.data['signee']
+                        comm_info.email_on_file = request.data['email_on_file']
+                        comm_info.email_on_file_1 = request.data['email_on_file_1']
+                        comm_info.additional_email_1 = request.data['additional_email_1']
+                        comm_info.additional_email_2 = request.data['additional_email_2']
+                        comm_info.updated_at = datetime.datetime.now()
+                        comm_info.save()
+                        result = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                        if result:
+                            serializer = CommitteeInfoSerializer(result)
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        else:
+                            return Response({})
+                    else:
+                        logger.debug("FEC Error 002:This form is already submitted")
+                        return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    logger.debug("FEC Error 003:This form Id number does not exist")
+                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                print('new id is created')
+                create_f99_info(request)
+        except CommitteeInfo.DoesNotExist:
+            logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
+            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValueError:
+            logger.debug("FEC Error 006:This form Id number is not an integer")
+            return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""    
     #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
     
     # update details of a single comm_info
@@ -344,7 +381,6 @@ def update_f99_info(request):
 """
 @api_view(['POST'])
 def submit_comm_info(request):
-
     if request.method == 'POST':
         
         data = {
@@ -716,7 +752,7 @@ def get_form99list(request):
     """
     try:
 
-        comm = CommitteeInfo.objects.filter(committeeid=request.user.username)
+        comm = CommitteeInfo.objects.filter(committeeid=request.user.username).order_by('id').reverse()
 
     except CommitteeInfo.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
