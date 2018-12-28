@@ -9,9 +9,15 @@
 @import '../../../../node_modules/bootstrap/scss/navbar';
 @import '../../../../node_modules/bootstrap/scss/modal';
 
+@import url('https://fonts.googleapis.com/css?family=Karla');
+@font-face {
+	font-family: 'Gandhi Serif Regular';
+	src: url('/assets/fonts/Gandhi-Serif-Regular.woff')
+}
+
 @import './custom-variables';
 @import './custom-colors';
 @import './custom-mixins';
 @import './custom-classes';
 
-@import url('https://fonts.googleapis.com/css?family=Karla');
+
