@@ -173,6 +173,8 @@ export class ReasonComponent implements OnInit {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
+        this.saveForm();
+
         this.hideText = true;
 
         this.showValidateBar = false; 

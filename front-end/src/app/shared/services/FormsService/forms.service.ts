@@ -100,64 +100,8 @@ export class FormsService {
 
   }
 
-  /**
-   * Saves a form.
-   *
-   * @param      {Object}  formObj    The form object.
-   * @param      {String}  form_type  The form type.
-   *
-   * @return     {Observable} The result of the form being saved.
-   */
-  /*public saveForm(formObj: any, form_type: string): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
-    let data: any = {};
-    let httpOptions =  new HttpHeaders();
-    let url: string = '';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    if(form_type === '99') {
-      let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
-
-      if(localStorage.getItem(`form_${form_type}_saved`) !== null) {
-        let formSavedObj = JSON.parse(localStorage.getItem(`form_${form_type}_saved`));
-        let formStatus: boolean = formSavedObj.saved;
-
-        if(formStatus) {
-          url = '/f99/update_f99_info'; 
-        } else {
-          url = '/f99/create_f99_info';
-        } 
-      } else {
-        url = '/f99/create_f99_info';  
-      }
-      
-      data = form99_details;
-
-      data['form_type'] = 'F99';
-    }
-
-    return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        data,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if(res) {
-            return res;
-          }
-          return false;
-      }));
-
-  }*/
 
   public saveForm(formObj: any, file: any, form_type: string): Observable<any> {
-    console.log('saveForm: ');
-    console.log('formObj: ', formObj);
     let form_99_details_res: any ={};
     let form_99_details_res_tmp: form99;
 
@@ -165,39 +109,21 @@ export class FormsService {
     let data: any = {};
     let formData: FormData = new FormData();
     let httpOptions =  new HttpHeaders();
-    let url: string = '';
+    let url: string = '/f99/create_f99_info';
     let id:string;
     let org_filename="";
     let org_fileurl="";
     let fileuploaded:boolean=false;
 
-
-    if(file && file.name) {
-      console.log('file: ', file);
-      httpOptions = httpOptions.append('enctype', 'multipart/form-data');
-      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);    
-    } else {
-      /*httpOptions = httpOptions.append('Content-Type', 'application/json');*/
-      httpOptions = httpOptions.append('enctype', 'multipart/form-data');
-      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    }
-
-    console.log('form_type',form_type);
+    httpOptions = httpOptions.append('enctype', 'multipart/form-data');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token); 
 
     if(form_type === '99') {
 
       let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
-     
-      /*if (form99_details.id===null || form99_details.id===''){
-        form99_details.id="0";
-        localStorage.setItem('id', "0");
-      }*/
-
-      console.log ('form99_details: ',form99_details);
 
       if(file && file.name) {
         fileuploaded=true;
-        console.log ('file uploaded successfully');
         localStorage.setItem('form_99_details.file', file);
         formData.append('file', file, file.name);         
         formData.append('committeeid', form99_details.committeeid);
@@ -277,37 +203,10 @@ export class FormsService {
         }
 
       }  
-      
-
-      if(localStorage.getItem(`form_${form_type}_saved`) !== null) {
-        let formSavedObj = JSON.parse(localStorage.getItem(`form_${form_type}_saved`));
-        let formStatus: boolean = formSavedObj.saved;
-
-        if(formStatus) {
-          url = '/f99/create_f99_info'; 
-        } else {
-          url = '/f99/create_f99_info';
-        } 
-      } else {
-        url = '/f99/create_f99_info';  
-      }
-      
-      /*data = form99_details;
-      form99_details.form_type="F99";
-      data = (file) ? formData : form99_details;*/
+     
       data=formData;
 
-      /*if (form99_details.id.toString() ==='' || form99_details.id.toString() ==="" || form99_details.id===null){
-        
-        data['id']="0";
-      }
-      else
-      {
-        data['id']= form99_details.id;
-      }
-
-      data['form_type'] = 'F99';*/
-      /*data['filename'] = '';*/
+  
     }
 
     console.log ('Dupdated Data: ',data);
@@ -319,10 +218,6 @@ export class FormsService {
    }
     console.log ('loop through form Data: ');
     console.log(data);
-
-    /*for(let pair of data.entries()) {
-      console.log(pair[0] + ": ", pair[1]); 
-   }*/
 
    new Response(data).text().then(console.log)
     

@@ -3,6 +3,7 @@
 .app-container {
   background-color: $mercury;
   color: $black;
+  font-family: $mainFontFamily;
   min-height: 100vh;
   transition: all 0.4s ease 0s;
   &.active {
@@ -50,6 +51,7 @@
     }   
     footer {
       .app__footer {
+        font-family: $mainFontFamily;
         padding-left: 80px;
         @include media(tablet) {
           padding-left: 100px;
@@ -65,6 +67,7 @@
   }
  .app__top {
     background-color: $dustyGray;
+    font-family: $mainFontFamily;
     height: $topNavHeight;
     position: fixed;
     right: 0;
@@ -150,6 +153,7 @@
     @include clearfix();
   } // .app__top  
   .app__side-nav {
+    font-family: $mainFontFamily;
     height: 100%;
     left: -235px;
     position: fixed;
@@ -162,6 +166,7 @@
     height: 80%;
     .app__content-wrapper {
       background-color: $mercury;
+      font-family: $mainFontFamily;
       margin: 0 auto;
       min-height: $mainContentHeight;
       padding-left: 50px;
@@ -198,10 +203,12 @@
         }
         .committee-id {
           font-size: 1.5em;
+          font-family: $committeeInfoFontFamily;
           margin-right: 25px;
         }
         .committee-name {
           font-size: 1em;
+          font-family: $committeeInfoFontFamily;
         }
         @include clearfix();
       }

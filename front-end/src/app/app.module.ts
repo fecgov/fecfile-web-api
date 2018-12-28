@@ -15,7 +15,8 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
+import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
+import { DialogService } from './shared/services/DialogService/dialog.service';
 
 import { routing } from './app.routes';
 import { AppComponent } from './app.component';
@@ -104,7 +105,8 @@ import { AppConfigService } from './app-config.service';
   providers: [
     CookieService, 
     CanActivateGuard,
-    CanDeactivateGuard,
+    DialogService,
+    CanDeactivateGuardService,
     AppConfigService,
     {
       provide: APP_INITIALIZER,

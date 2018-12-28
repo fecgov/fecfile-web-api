@@ -1,21 +1,23 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-// import { CanDeactivate, CanComponentDeactivate } from '../../interfaces/can-deactivate';
+import { CanDeactivate, CanComponentDeactivate } from '../../interfaces/CanDeactivate/can-deactivate';
+import { FormsComponent } from '../../../forms/forms.component';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CanDeactivateGuardService /*implements CanDeactivate<CanComponentDeactivate>*/ {
+export class CanDeactivateGuardService implements CanDeactivate<FormsComponent> {
 
   constructor() { }
 
-  /*canDeactivate(component: CanComponentDeactivate,
-           route: ActivatedRouteSnapshot,
-           state: RouterStateSnapshot) {
+  canDeactivate(
+  		component: FormsComponent,
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+  ) {
 
      let url: string = state.url;
-     console.log('Url: '+ url);
 
      return component.canDeactivate ? component.canDeactivate() : true;
-  }*/
+  }
 }
