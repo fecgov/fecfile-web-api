@@ -1,9 +1,10 @@
-import { Component, HostListener, OnInit, NgZone, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../environments/environment';
 import { MessageService } from '../shared/services/MessageService/message.service';
+import { DialogService } from '../shared/services/DialogService/dialog.service';
 import { ValidateComponent } from '../shared/partials/validate/validate.component';
 
 @Component({
@@ -14,16 +15,22 @@ import { ValidateComponent } from '../shared/partials/validate/validate.componen
 })
 export class FormsComponent implements OnInit {
 
+  @ViewChild('content') modalContent;
+
 	public form_type: string = '';
   public closeResult: string = '';
   public canContinue: boolean = false;
   public showValidateBar: boolean = false;
+  public confirmModal: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  private _openModal: any = null;
 
   constructor(
   	private _activeRoute: ActivatedRoute,
     private _modalService: NgbModal,
     private _ngZone: NgZone,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -42,12 +49,32 @@ export class FormsComponent implements OnInit {
       });
   }
 
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any) {
-      if (this.hasUnsavedData()) {
-          $event.returnValue =true;
-      }
-  }  
+  /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    if (this.hasUnsavedData()) {
+      let result: boolean = null;
+
+      result = await this._dialogService
+        .confirm('', this.modalContent)
+        .then(res => {
+          let val: boolean = null;
+
+          if(res === 'okay') {
+            val = true;
+          } else if(res === 'cancel') {
+            val = false;
+          }
+
+          return val;
+        });
+
+      return result;
+    }
+  }
 
   /**
    * Determines if form has unsaved data.
@@ -73,27 +100,28 @@ export class FormsComponent implements OnInit {
    *
    * @param      {Object}  content  The content
    */
-  public openModal(content): void {
-    this._modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this._getModalDismissReason(reason)}`;
-    });
+  /*public openModal(): void {
+    console.log('openModal: ');
+    console.log('this.modalContent: ', this.modalContent);
+    console.log('this._modalService.open(this.modalContent): ', this._modalService.open(this.modalContent));
+    this._openModal = this._modalService.open(this.modalContent);
+
+    this.confirmModal.next(false);
   }
 
-  /**
-   * Gets the dismiss reason.
-   *
-   * @param      {Any}  reason  The reason
-   * @return     {<type>}  The dismiss reason.
-   */
-  private _getModalDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  `with: ${reason}`;
+  public modalResponse(response: string): void {
+    console.log('modalResponse: ');
+    console.log('response: ',  response);
+    let result: boolean = false;
+
+    if(response === 'okay') {
+      this._modalService.dismissAll();
+      result = true;
+    } else if(response === 'cancel') {
+      this._modalService.dismissAll();
+      result = false;
     }
-  }
+
+    this.confirmModal.next(result);
+  }*/
 }
