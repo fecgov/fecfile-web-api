@@ -73,6 +73,8 @@ export class FormsComponent implements OnInit {
         });
 
       return result;
+    } else {
+      return true;
     }
   }
 

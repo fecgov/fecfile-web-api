@@ -42,6 +42,18 @@
 .modal {
   .modal-dialog {
     .modal-content {
+      margin-left: auto;
+      margin-right: auto;
+      width: 300px;
+      @include media(tablet) {
+        width: 100%;
+      }
+      @include media(mediumDesktop) {
+        width: 100%;
+      }         
+      @include media(largeDesktop) {
+        width: 100%;
+      }       
       .modal-header {
         background-color: $crusta;
         color: $white;

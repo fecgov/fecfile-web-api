@@ -14,35 +14,27 @@ export class DialogService {
   ) { }
 
   public confirm(message?: string, modalContent?: any): Promise<any> {
-    // const confirmation = window.confirm(message || 'Are you sure?');
-    let result: boolean = true;
+    let modalOptions: any = {
+    	'backdrop': true,
+    	'keyboard': false,
+    };
     
     return this._modalService
-    	.open(modalContent)
-    	.result;
-   // console.log('this._modalService.open(modalContent).result: ', );
-
-	/*this._modalService.open(modalContent)
-		.result
-		.then(res => {
-			console.log('this.getDismissReason(res): ', this.getDismissReason(res));
-			if(this.getDismissReason(res) === 'okay') {
-				result = true;
-			} else if(this.getDismissReason(res) === 'cancel') {
-				result = false;
-			}			
-		});*/
-
-	//console.log('result: ', result);
+    	.open(modalContent, modalOptions)
+    	.result
+    	.then(res => {
+    		/**
+    		 * Returned if a button on the modal is clicked.
+    		 */
+    		return res;
+    	}, (res) => {
+    		/**
+    		 * Returned if the modal backdrop or escape is clicked.
+    		 * Although in this case I have the keyboard disabled.
+    		 */
+    		if(res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
+    			return 'cancel';
+    		}
+    	});
   }
-
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return  reason;
-    }
-  }  
 }
