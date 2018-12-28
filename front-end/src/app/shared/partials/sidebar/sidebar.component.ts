@@ -36,8 +36,9 @@ export class SidebarComponent implements OnInit {
             if(val.url.indexOf('/forms/form/') === 0) {        
               this._closeNavBar();     
             } else if(val.url.indexOf('/dashboard') === 0) {
+              this.formType = null;
               this._openNavBar();   
-            } else if(val.url.indexOf('/forms/form/') !== 0) {
+            } else if(val.url.indexOf('/forms/form/') === -1) {
               this.formType = null;
             }
           }
@@ -81,9 +82,13 @@ export class SidebarComponent implements OnInit {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
-    setTimeout(() => {
-      this.formType = parseInt(form);
-    }, 225);    
+    if(form) {
+      setTimeout(() => {
+        this.formType = parseInt(form);
+      }, 225);        
+    } else {
+      this.formType = null;
+    }
   }
 
   /**
