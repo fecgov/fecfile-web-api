@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'compressor',
     'corsheaders',
     'fecfiler.authentication',
-    'fecfiler.posts',
+    #'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
 ]
@@ -193,8 +193,7 @@ AWS_STORAGE_UPLOAD_BUCKET_NAME = 'fecfile-filing-uploads' # or None if using ser
 
 
 # if False it will create unique file names for every uploaded file
-AWS_S3_FILE_OVERWRITE = True
-
+AWS_S3_FILE_OVERWRITE = False
 # the url, that your media and static files will be available at
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_CUSTOM_UPLOAD_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_UPLOAD_BUCKET_NAME
