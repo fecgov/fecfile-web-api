@@ -344,8 +344,8 @@ export class FormsService {
               org_fileurl=form99_details_res.file;
               /*form_99_details_res_tmp.id=form_99_details_res.id; //just to get form 99 id
               localStorage.setItem('id', form_99_details_res_tmp.id);*/
-              localStorage.setItem('org_filename', org_filename);
-              localStorage.setItem('org_fileurl', org_fileurl);
+              localStorage.setItem('orm_99_details.org_filename', org_filename);
+              localStorage.setItem('orm_99_details.org_fileurl', org_fileurl);
               console.log ('org_filename on Reason screen',org_filename);
               console.log ('org_fileurl on Reason screen',org_fileurl);
             }
@@ -397,6 +397,42 @@ export class FormsService {
           if (res) {
             localStorage.removeItem('form_99_details');
             localStorage.removeItem('form_99_details_res');
+            return true;
+          }
+          return false;
+      }));      
+  }
+
+  public Signee_SaveForm(formObj: any, form_type): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let data: any = {};
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    if(form_type === '99') {
+      let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
+
+      url = '/f99/update_f99_info';
+      data = form99_details;
+
+       data['form_type'] = 'F99';
+
+       console.log('Signee_SaveForm form99_details',form99_details);
+       console.log('Signee_SaveForm Data',data);
+    }
+    return this._http
+      .post(
+        `${environment.apiUrl}${url}`,
+        data,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
             return true;
           }
           return false;

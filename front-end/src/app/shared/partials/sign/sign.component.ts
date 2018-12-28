@@ -136,8 +136,10 @@ export class SignComponent implements OnInit {
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
       
+      /*.saveForm({}, {}, this.form_type)*/
+      console.log("Accessing Signee_SaveForm ...");
       this._formsService
-        .saveForm({}, {}, this.form_type)
+        .Signee_SaveForm({}, this.form_type)
         .subscribe(res => {
           if(res) {
             this.frmSaved = true;
@@ -164,7 +166,6 @@ export class SignComponent implements OnInit {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
     if(this.form_type === '99') {
-
       this._form_details.file = '';
 
       if(this._form_details.additional_email_1 === '') {
@@ -179,7 +180,11 @@ export class SignComponent implements OnInit {
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
 
     if(this.frmSignee.invalid) {
-      this.signFailed = true;
+      if(this.frmSignee.get('agreement').value) {
+        this.signFailed = false;
+      } else {
+        this.signFailed = true;
+      }
     } else if(this.frmSignee.valid) {
       this.signFailed = false;
 
@@ -266,6 +271,8 @@ export class SignComponent implements OnInit {
     } else if (!e.target.checked) {
       this.signFailed = true;
     }
+
+    console.log('this.signFailed: ', this.signFailed);
   }
 
   public toggleToolTip(tooltip): void {
