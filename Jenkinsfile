@@ -30,6 +30,9 @@ pipeline {
     stage('Build frontend') {
       steps {
         script {
+		  sh "sed -i 's/local/awsdev/g' front-end/Dockerfile"
+		  sh "sed -i 's/local/awsdev/g' front-end/Dockerfile-nginx"
+
           def frontendImage = docker.build("fecnxg-frontend:${VERSION}", 'front-end/')
 
           docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend') {
@@ -60,8 +63,6 @@ pipeline {
 
           docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend-nginx') {
             frontendNginxImage.push()
-			sh " sed -i 's/awsuat/awsdev/g' front-end/Dockerfile "
-			sh " sed -i 's/awsuat/awsdev/g' front-end/Dockerfile-nginx "
 
           }
         }

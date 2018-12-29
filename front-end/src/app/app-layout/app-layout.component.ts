@@ -56,7 +56,11 @@ export class AppLayoutComponent implements OnInit {
           if(val.url.indexOf('/dashboard') === 0) {
             this.sideBarClass = 'dashboard active';
           } else if(val.url.indexOf('/forms') === 0) {
-            this.sideBarClass = ''; 
+            if(this.toggleMenu) {
+              this.sideBarClass = 'visible';
+            } else {
+              this.sideBarClass = ''; 
+            }
           }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
             this.sideBarClass = 'active';
           }
@@ -96,7 +100,7 @@ export class AppLayoutComponent implements OnInit {
       if(route) {
         if(route.indexOf('/dashboard') === 0) {
           this.sideBarClass = 'dashboard active';
-        } else if(!route.indexOf('/forms') && !route.indexOf('/dashboard')) {
+        } else if(route.indexOf('/dashboard') === -1) {
           this.sideBarClass = 'active';
         }
       }

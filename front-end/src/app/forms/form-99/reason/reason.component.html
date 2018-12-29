@@ -54,6 +54,15 @@
           </div>
         </div>
         <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="_not_valid_pdf">
+            <div class="text-error text-center" *ngIf="_not_valid_pdf">
+              You can upload only pdf file.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="text-editor">
               <textarea 
@@ -79,7 +88,7 @@
             </div>
             <div class="error-text">
               <div class="text-info text-center"
-                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved">
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! _not_valid_pdf)">
                 Form 99 has been successfully saved.
               </div>
             </div>
@@ -148,7 +157,7 @@
             class="btn btn-secondary btn-right" 
             type="button"
             (click)="saveForm()"
-            [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
+            [disabled]="(frmReason.controls.reasonText.errors?.requiredLength) || (! _valid_file)"
           >
             Save 
           </button>     
