@@ -24,7 +24,7 @@ export class PreviewComponent implements OnInit {
   public date_stamp: Date = new Date();
   public form_details: form99;
   public showValidateBar: boolean = false;
-
+  
   private _subscription: Subscription;
   private _step: string = '';
 
@@ -32,6 +32,9 @@ export class PreviewComponent implements OnInit {
   private fileurl: string ='';
   public org_filename:string='';
   public org_fileurl:string='';
+  private _form_details: any = {}
+  public printpriview_filename: string="";
+  public printpriview_fileurl: string="";
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -45,11 +48,14 @@ export class PreviewComponent implements OnInit {
     /*this.filename = this._activatedRoute.snapshot.paramMap.get(`form_${this.form_type}_file`);*/
     
      this.org_filename=JSON.parse(localStorage.getItem('form_99_details.org_filename'));      
-     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));         
+     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));       
+     this.printpriview_filename=JSON.parse(localStorage.getItem('form_99_details.printpriview_filename'));      
+     this.printpriview_fileurl = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));     
 
     console.log('On Preview Screen org_filename: ', this.org_filename);
     console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
-
+    console.log('On Preview Screen org_filename: ', this.printpriview_filename);
+    console.log('On Preview Screen org_fileurl: ', this.printpriview_fileurl);
 
     this._subscription =
       this._messageService
@@ -205,5 +211,22 @@ export class PreviewComponent implements OnInit {
           });
       });    
   }
+  public printPriview(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
+    localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     
+     /*.saveForm({}, {}, this.form_type)*/
+     console.log("Accessing Sign printPriview ...");
+     this._formsService
+       .PreviewForm_Preview_sign_Screen({}, this.form_type)
+       .subscribe(res => {
+         if(res) {
+           console.log("Accessing Preview printPriview res ...",res);
+         }
+       },
+       (error) => {
+         console.log('error: ', error);
+       });
+ }
 }
