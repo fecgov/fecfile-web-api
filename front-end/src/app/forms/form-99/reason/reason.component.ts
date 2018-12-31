@@ -434,7 +434,7 @@ export class ReasonComponent implements OnInit {
           .PreviewForm_ReasonScreen({}, this.file, this._form_type)
           .subscribe(res => {
             if(res) {
-              console.log('Reason screen printPreview: res: ', res);
+              console.log('Reason screen printPreview: res:=', res);
 
               this._form_99_details.id = res.id;
 
