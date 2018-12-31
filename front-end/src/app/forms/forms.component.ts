@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { DialogService } from '../shared/services/DialogService/dialog.service';
 import { ValidateComponent } from '../shared/partials/validate/validate.component';
+import { ConfirmModalComponent } from '../shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-forms',
@@ -14,8 +15,6 @@ import { ValidateComponent } from '../shared/partials/validate/validate.componen
   encapsulation: ViewEncapsulation.None
 })
 export class FormsComponent implements OnInit {
-
-  @ViewChild('content') modalContent;
 
 	public form_type: string = '';
   public closeResult: string = '';
@@ -55,11 +54,13 @@ export class FormsComponent implements OnInit {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
+    console.log('canDeactivate: ');
+    console.log('modalContent: ', ConfirmModalComponent);
     if (this.hasUnsavedData()) {
       let result: boolean = null;
 
       result = await this._dialogService
-        .confirm('', this.modalContent)
+        .confirm('', ConfirmModalComponent)
         .then(res => {
           let val: boolean = null;
 

@@ -49,6 +49,7 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
 
 import { AppConfigService } from './app-config.service';
+import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -84,7 +85,11 @@ import { AppConfigService } from './app-config.service';
     ToolsImportNamesComponent,
     ToolsExportNamesComponent,
     ToolsMergeNamesComponent,
-    ToolsCreateBackupComponent
+    ToolsCreateBackupComponent,
+    ConfirmModalComponent
+  ],
+  entryComponents: [
+    ConfirmModalComponent
   ],
   imports: [
     BrowserModule,

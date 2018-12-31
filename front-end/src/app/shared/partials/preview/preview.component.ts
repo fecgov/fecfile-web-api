@@ -1,10 +1,12 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { MessageService } from '../../services/MessageService/message.service';
 import { FormsService } from '../../services/FormsService/forms.service';
+import { DialogService } from '../../services/DialogService/dialog.service';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-preview',
@@ -16,6 +18,7 @@ export class PreviewComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public committee_details: any = {};
+  public confirmModal: BehaviorSubject<boolean> = new BehaviorSubject(false);
   public type_selected: string = '';
   public form_type: string = '';
   public date_stamp: Date = new Date();
@@ -33,7 +36,8 @@ export class PreviewComponent implements OnInit {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
-    private _formsService: FormsService
+    private _formsService: FormsService,
+    private _dialogService: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -79,6 +83,56 @@ export class PreviewComponent implements OnInit {
       }
     }
   }
+
+  /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    console.log('canDeactivate: ');
+    console.log('modalContent: ', ConfirmModalComponent);
+    if (this.hasUnsavedData()) {
+      let result: boolean = null;
+
+      result = await this._dialogService
+        .confirm('', ConfirmModalComponent)
+        .then(res => {
+          let val: boolean = null;
+
+          if(res === 'okay') {
+            val = true;
+          } else if(res === 'cancel') {
+            val = false;
+          }
+
+          return val;
+        });
+
+      return result;
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Determines if form has unsaved data.
+   *
+   * @return     {boolean}  True if has unsaved data, False otherwise.
+   */
+  public hasUnsavedData(): boolean {
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
+
+    if(formSaved !== null) {
+      let formStatus: boolean = formSaved.saved;
+
+      if(!formStatus) {
+        return true;
+      }      
+    }
+
+    return false;
+  }    
 
   public goToPreviousStep(): void {
     setTimeout(() => {
