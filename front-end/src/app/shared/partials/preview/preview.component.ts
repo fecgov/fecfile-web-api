@@ -24,7 +24,7 @@ export class PreviewComponent implements OnInit {
   public date_stamp: Date = new Date();
   public form_details: form99;
   public showValidateBar: boolean = false;
-
+  
   private _subscription: Subscription;
   private _step: string = '';
 
@@ -33,6 +33,8 @@ export class PreviewComponent implements OnInit {
   public org_filename:string='';
   public org_fileurl:string='';
   private _form_details: any = {}
+  public printpriview_filename: string="";
+  public printpriview_fileurl: string="";
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -46,11 +48,14 @@ export class PreviewComponent implements OnInit {
     /*this.filename = this._activatedRoute.snapshot.paramMap.get(`form_${this.form_type}_file`);*/
     
      this.org_filename=JSON.parse(localStorage.getItem('form_99_details.org_filename'));      
-     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));         
+     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));       
+     this.printpriview_filename=JSON.parse(localStorage.getItem('form_99_details.printpriview_filename'));      
+     this.printpriview_fileurl = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));     
 
     console.log('On Preview Screen org_filename: ', this.org_filename);
     console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
-
+    console.log('On Preview Screen org_filename: ', this.printpriview_filename);
+    console.log('On Preview Screen org_fileurl: ', this.printpriview_fileurl);
 
     this._subscription =
       this._messageService
