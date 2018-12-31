@@ -32,6 +32,7 @@ export class PreviewComponent implements OnInit {
   private fileurl: string ='';
   public org_filename:string='';
   public org_fileurl:string='';
+  private _form_details: any = {}
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -205,5 +206,22 @@ export class PreviewComponent implements OnInit {
           });
       });    
   }
+  public printPriview(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
+    localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     
+     /*.saveForm({}, {}, this.form_type)*/
+     console.log("Accessing Sign printPriview ...");
+     this._formsService
+       .PreviewForm_Preview_sign_Screen({}, this.form_type)
+       .subscribe(res => {
+         if(res) {
+           console.log("Accessing Preview printPriview res ...",res);
+         }
+       },
+       (error) => {
+         console.log('error: ', error);
+       });
+ }
 }
