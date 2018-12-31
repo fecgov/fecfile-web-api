@@ -386,4 +386,29 @@ export class SignComponent implements OnInit {
         }            
       });          
   }
+  public printPriview(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+
+   if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
+     this.frmSignee.controls.additional_email_2.valid) {
+     
+     this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+     this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+
+     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     
+     /*.saveForm({}, {}, this.form_type)*/
+     console.log("Accessing Sign printPriview ...");
+     this._formsService
+       .PreviewForm_Preview_sign_Screen({}, this.form_type)
+       .subscribe(res => {
+         if(res) {
+           console.log("Accessing Sign printPriview res ...",res);
+         }
+       },
+       (error) => {
+         console.log('error: ', error);
+       });
+   }
+ }
 }
