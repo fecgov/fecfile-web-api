@@ -104,7 +104,16 @@
 				    padding-left: 0;
 					position: relative;
 					width: 100%;				    				
-				} 				
+				} 
+				.label {
+					font-family: $labelFontFamily;
+					font-weight: bold;
+					margin-bottom: 1em;
+				}				
+				.text {
+					font-family: $mainFontFamily;
+					margin-bottom: 1em;
+				}
 			}	
 			.validate__form {
 			&.show-alerts {

@@ -192,3 +192,256 @@ botocore.exceptions.NoCredentialsError: Unable to locate credentials
 2018-12-31 16:02:12,636 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
 2018-12-31 16:05:07,543 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MST'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
 2018-12-31 16:06:29,059 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:20:51,622 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:42:01,166 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:50:11,404 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MST'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:51:35,706 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:54:47,046 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:58:37,444 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 16:59:12,097 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 17:05:45,875 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['undefined'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'created_at': [''], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'street1': ['332 W LEE HWY'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['0'], 'form_type': ['F99'], 'treasurerlastname': ['Marathe'], 'additional_email_1': ['-'], 'state': ['VA'], 'treasurersuffix': ['II'], 'zipcode': ['92630'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 17:05:59,725 [DEBUG] fecfiler.forms.views: Incoming parameters: create_f99_info<QueryDict: {'text': ['test'], 'street2': ['street1'], 'city': ['WARRENTON'], 'filename': ['WMATA-Subway-2017-System-Map.pdf'], 'is_submitted': ['False'], 'email_on_file_1': ['null'], 'treasurermiddlename': ['B'], 'form_type': ['F99'], 'committeename': ['DIGITAL'], 'signee': ['Mahendra Marathe'], 'zipcode': ['92630'], 'additional_email_2': ['-'], 'committeeid': ['C01234567'], 'reason': ['MSM'], 'additional_email_1': ['-'], 'email_on_file': ['mahendra.marathe@salientcrgt.com'], 'treasurerprefix': ['Mr'], 'id': ['120'], 'street1': ['332 W LEE HWY'], 'treasurerlastname': ['Marathe'], 'file': [<InMemoryUploadedFile: WMATA-Subway-2017-System-Map.pdf (application/pdf)>], 'created_at': [''], 'state': ['VA'], 'treasurersuffix': ['II'], 'treasurerfirstname': ['Mahendra']}>
+2018-12-31 17:05:59,968 [DEBUG] botocore.hooks: Changing event name from creating-client-class.iot-data to creating-client-class.iot-data-plane
+2018-12-31 17:05:59,975 [DEBUG] botocore.hooks: Changing event name from before-call.apigateway to before-call.api-gateway
+2018-12-31 17:05:59,976 [DEBUG] botocore.hooks: Changing event name from request-created.machinelearning.Predict to request-created.machine-learning.Predict
+2018-12-31 17:05:59,981 [DEBUG] botocore.hooks: Changing event name from before-parameter-build.autoscaling.CreateLaunchConfiguration to before-parameter-build.auto-scaling.CreateLaunchConfiguration
+2018-12-31 17:05:59,982 [DEBUG] botocore.hooks: Changing event name from before-parameter-build.route53 to before-parameter-build.route-53
+2018-12-31 17:05:59,983 [DEBUG] botocore.hooks: Changing event name from request-created.cloudsearchdomain.Search to request-created.cloudsearch-domain.Search
+2018-12-31 17:05:59,986 [DEBUG] botocore.hooks: Changing event name from docs.*.autoscaling.CreateLaunchConfiguration.complete-section to docs.*.auto-scaling.CreateLaunchConfiguration.complete-section
+2018-12-31 17:05:59,991 [DEBUG] botocore.hooks: Changing event name from before-parameter-build.logs.CreateExportTask to before-parameter-build.cloudwatch-logs.CreateExportTask
+2018-12-31 17:05:59,991 [DEBUG] botocore.hooks: Changing event name from docs.*.logs.CreateExportTask.complete-section to docs.*.cloudwatch-logs.CreateExportTask.complete-section
+2018-12-31 17:05:59,992 [DEBUG] botocore.hooks: Changing event name from before-parameter-build.cloudsearchdomain.Search to before-parameter-build.cloudsearch-domain.Search
+2018-12-31 17:05:59,992 [DEBUG] botocore.hooks: Changing event name from docs.*.cloudsearchdomain.Search.complete-section to docs.*.cloudsearch-domain.Search.complete-section
+2018-12-31 17:06:00,149 [DEBUG] botocore.loaders: Loading JSON file: /Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/boto3/data/s3/2006-03-01/resources-1.json
+2018-12-31 17:06:00,578 [DEBUG] botocore.credentials: Looking for credentials via: env
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: assume-role
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: shared-credentials-file
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: custom-process
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: config-file
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: ec2-credentials-file
+2018-12-31 17:06:00,579 [DEBUG] botocore.credentials: Looking for credentials via: boto-config
+2018-12-31 17:06:00,587 [DEBUG] botocore.credentials: Looking for credentials via: container-role
+2018-12-31 17:06:00,588 [DEBUG] botocore.credentials: Looking for credentials via: iam-role
+2018-12-31 17:06:00,589 [DEBUG] urllib3.util.retry: Converted retries value: False -> Retry(total=False, connect=None, read=None, redirect=0, status=None)
+2018-12-31 17:06:00,591 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 169.254.169.254:80
+2018-12-31 17:06:01,594 [DEBUG] botocore.utils: Caught retryable HTTP exception while making metadata service request to http://169.254.169.254/latest/meta-data/iam/security-credentials/: Connect timeout on endpoint URL: "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connection.py", line 171, in _new_conn
+    (self._dns_host, self.port), self.timeout, **extra_kw)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/util/connection.py", line 79, in create_connection
+    raise err
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/util/connection.py", line 69, in create_connection
+    sock.connect(sa)
+socket.timeout: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/httpsession.py", line 258, in send
+    decode_content=False,
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 638, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/util/retry.py", line 343, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 600, in urlopen
+    chunked=chunked)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connectionpool.py", line 354, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/Users/cstroman/.pyenv/versions/3.5.0/lib/python3.5/http/client.py", line 1083, in request
+    self._send_request(method, url, body, headers)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/awsrequest.py", line 125, in _send_request
+    method, url, body, headers, *args, **kwargs)
+  File "/Users/cstroman/.pyenv/versions/3.5.0/lib/python3.5/http/client.py", line 1128, in _send_request
+    self.endheaders(body)
+  File "/Users/cstroman/.pyenv/versions/3.5.0/lib/python3.5/http/client.py", line 1079, in endheaders
+    self._send_output(message_body)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/awsrequest.py", line 152, in _send_output
+    self.send(msg)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/awsrequest.py", line 236, in send
+    return super(AWSConnection, self).send(str)
+  File "/Users/cstroman/.pyenv/versions/3.5.0/lib/python3.5/http/client.py", line 854, in send
+    self.connect()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connection.py", line 196, in connect
+    conn = self._new_conn()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/urllib3/connection.py", line 176, in _new_conn
+    (self.host, self.timeout))
+urllib3.exceptions.ConnectTimeoutError: (<botocore.awsrequest.AWSHTTPConnection object at 0x1116a2ac8>, 'Connection to 169.254.169.254 timed out. (connect timeout=1)')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/utils.py", line 292, in _get_request
+    response = self._session.send(request.prepare())
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/httpsession.py", line 282, in send
+    raise ConnectTimeoutError(endpoint_url=request.url, error=e)
+botocore.exceptions.ConnectTimeoutError: Connect timeout on endpoint URL: "http://169.254.169.254/latest/meta-data/iam/security-credentials/"
+2018-12-31 17:06:01,662 [DEBUG] botocore.utils: Max number of attempts exceeded (1) when attempting to retrieve data from metadata service.
+2018-12-31 17:06:01,673 [DEBUG] botocore.loaders: Loading JSON file: /Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/data/endpoints.json
+2018-12-31 17:06:01,690 [DEBUG] botocore.hooks: Event choose-service-name: calling handler <function handle_service_name_alias at 0x110a89ae8>
+2018-12-31 17:06:01,717 [DEBUG] botocore.loaders: Loading JSON file: /Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/data/s3/2006-03-01/service-2.json
+2018-12-31 17:06:01,743 [DEBUG] botocore.hooks: Event creating-client-class.s3: calling handler <function add_generate_presigned_post at 0x110a55488>
+2018-12-31 17:06:01,743 [DEBUG] botocore.hooks: Event creating-client-class.s3: calling handler <function lazy_call.<locals>._handler at 0x111b02840>
+2018-12-31 17:06:02,165 [DEBUG] botocore.hooks: Event creating-client-class.s3: calling handler <function add_generate_presigned_url at 0x110a55268>
+2018-12-31 17:06:02,166 [DEBUG] botocore.args: The s3 config key is not a dictionary type, ignoring its value of: None
+2018-12-31 17:06:02,194 [DEBUG] botocore.endpoint: Setting s3 timeout as (60, 60)
+2018-12-31 17:06:02,204 [DEBUG] botocore.loaders: Loading JSON file: /Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/data/_retry.json
+2018-12-31 17:06:02,206 [DEBUG] botocore.client: Registering retry handlers for service: s3
+2018-12-31 17:06:02,208 [DEBUG] botocore.client: Defaulting to S3 virtual host style addressing with path style addressing fallback.
+2018-12-31 17:06:02,208 [DEBUG] boto3.resources.factory: Loading s3:s3
+2018-12-31 17:06:02,211 [DEBUG] botocore.hooks: Event before-parameter-build.s3.HeadObject: calling handler <function sse_md5 at 0x110a9c268>
+2018-12-31 17:06:02,211 [DEBUG] botocore.hooks: Event before-parameter-build.s3.HeadObject: calling handler <function validate_bucket_name at 0x110a9c1e0>
+2018-12-31 17:06:02,211 [DEBUG] botocore.hooks: Event before-parameter-build.s3.HeadObject: calling handler <bound method S3RegionRedirector.redirect_from_cache of <botocore.utils.S3RegionRedirector object at 0x111a79d68>>
+2018-12-31 17:06:02,211 [DEBUG] botocore.hooks: Event before-parameter-build.s3.HeadObject: calling handler <function generate_idempotent_uuid at 0x110aa3d90>
+2018-12-31 17:06:02,212 [DEBUG] botocore.hooks: Event before-call.s3.HeadObject: calling handler <function add_expect_header at 0x110a9c6a8>
+2018-12-31 17:06:02,213 [DEBUG] botocore.hooks: Event before-call.s3.HeadObject: calling handler <bound method S3RegionRedirector.set_request_url of <botocore.utils.S3RegionRedirector object at 0x111a79d68>>
+2018-12-31 17:06:02,213 [DEBUG] botocore.endpoint: Making request for OperationModel(name=HeadObject) with params: {'context': {'has_streaming_input': False, 'client_config': <botocore.config.Config object at 0x111869b70>, 'signing': {'bucket': 'fecfile-filing'}, 'client_region': 'us-east-1', 'auth_type': None}, 'method': 'HEAD', 'headers': {'User-Agent': 'Boto3/1.9.43 Python/3.5.0 Darwin/17.7.0 Botocore/1.12.43 Resource'}, 'url_path': '/fecfile-filing/media/WMATA-Subway-2017-System-Map.pdf', 'body': b'', 'url': 'https://s3.amazonaws.com/fecfile-filing/media/WMATA-Subway-2017-System-Map.pdf', 'query_string': {}}
+2018-12-31 17:06:02,214 [DEBUG] botocore.hooks: Event request-created.s3.HeadObject: calling handler <bound method RequestSigner.handler of <botocore.signers.RequestSigner object at 0x111869630>>
+2018-12-31 17:06:02,214 [DEBUG] botocore.hooks: Event choose-signer.s3.HeadObject: calling handler <bound method ClientCreator._default_s3_presign_to_sigv2 of <botocore.client.ClientCreator object at 0x1116a2828>>
+2018-12-31 17:06:02,215 [DEBUG] botocore.hooks: Event choose-signer.s3.HeadObject: calling handler <function set_operation_specific_signer at 0x110aa3c80>
+2018-12-31 17:06:02,215 [DEBUG] botocore.hooks: Event before-sign.s3.HeadObject: calling handler <function fix_s3_host at 0x11096e488>
+2018-12-31 17:06:02,215 [DEBUG] botocore.utils: Checking for DNS compatible bucket for: https://s3.amazonaws.com/fecfile-filing/media/WMATA-Subway-2017-System-Map.pdf
+2018-12-31 17:06:02,215 [DEBUG] botocore.utils: URI updated to: https://fecfile-filing.s3.amazonaws.com/media/WMATA-Subway-2017-System-Map.pdf
+2018-12-31 17:06:02,216 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 209, in save
+    self.instance = self.update(self.instance, validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 55, in update
+    instance.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 900, in _save_table
+    for f in non_pks]
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 900, in <listcomp>
+    for f in non_pks]
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/fields/files.py", line 297, in pre_save
+    file.save(file.name, file.file, save=False)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/fields/files.py", line 95, in save
+    self.name = self.storage.save(name, content, max_length=self.field.max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/files/storage.py", line 53, in save
+    name = self.get_available_name(name, max_length=max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/storages/backends/s3boto3.py", line 633, in get_available_name
+    return super(S3Boto3Storage, self).get_available_name(name, max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/files/storage.py", line 77, in get_available_name
+    while self.exists(name) or (max_length and len(name) > max_length):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/storages/backends/s3boto3.py", line 532, in exists
+    self.connection.meta.client.head_object(Bucket=self.bucket_name, Key=name)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/client.py", line 320, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/client.py", line 610, in _make_api_call
+    operation_model, request_dict)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 102, in make_request
+    return self._send_request(request_dict, operation_model)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 132, in _send_request
+    request = self.create_request(request_dict, operation_model)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 116, in create_request
+    operation_name=operation_model.name)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 356, in emit
+    return self._emitter.emit(aliased_event_name, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 228, in emit
+    return self._emit(event_name, kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 211, in _emit
+    response = handler(**kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/signers.py", line 90, in handler
+    return self.sign(operation_name, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/signers.py", line 157, in sign
+    auth.add_auth(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/auth.py", line 425, in add_auth
+    super(S3SigV4Auth, self).add_auth(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/auth.py", line 357, in add_auth
+    raise NoCredentialsError
+botocore.exceptions.NoCredentialsError: Unable to locate credentials
+2018-12-31 17:06:02,216 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/views.py", line 284, in create_f99_info
+    serializer.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/rest_framework/serializers.py", line 209, in save
+    self.instance = self.update(self.instance, validated_data)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 55, in update
+    instance.save()
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 900, in _save_table
+    for f in non_pks]
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/base.py", line 900, in <listcomp>
+    for f in non_pks]
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/fields/files.py", line 297, in pre_save
+    file.save(file.name, file.file, save=False)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/db/models/fields/files.py", line 95, in save
+    self.name = self.storage.save(name, content, max_length=self.field.max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/files/storage.py", line 53, in save
+    name = self.get_available_name(name, max_length=max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/storages/backends/s3boto3.py", line 633, in get_available_name
+    return super(S3Boto3Storage, self).get_available_name(name, max_length)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/django/core/files/storage.py", line 77, in get_available_name
+    while self.exists(name) or (max_length and len(name) > max_length):
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/storages/backends/s3boto3.py", line 532, in exists
+    self.connection.meta.client.head_object(Bucket=self.bucket_name, Key=name)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/client.py", line 320, in _api_call
+    return self._make_api_call(operation_name, kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/client.py", line 610, in _make_api_call
+    operation_model, request_dict)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 102, in make_request
+    return self._send_request(request_dict, operation_model)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 132, in _send_request
+    request = self.create_request(request_dict, operation_model)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/endpoint.py", line 116, in create_request
+    operation_name=operation_model.name)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 356, in emit
+    return self._emitter.emit(aliased_event_name, **kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 228, in emit
+    return self._emit(event_name, kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/hooks.py", line 211, in _emit
+    response = handler(**kwargs)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/signers.py", line 90, in handler
+    return self.sign(operation_name, request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/signers.py", line 157, in sign
+    auth.add_auth(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/auth.py", line 425, in add_auth
+    super(S3SigV4Auth, self).add_auth(request)
+  File "/Users/cstroman/sites/salient-crgt/nxg_fec/django-backend/env/lib/python3.5/site-packages/botocore/auth.py", line 357, in add_auth
+    raise NoCredentialsError
+botocore.exceptions.NoCredentialsError: Unable to locate credentials
