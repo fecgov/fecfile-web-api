@@ -301,7 +301,7 @@ export class SignComponent implements OnInit {
     }      
   }
 
-/* 
+ 
   public add_additional_email_2(): void {
     this._need_additional_email_2=true;
     console.log("2nd email needed");
@@ -310,7 +310,7 @@ export class SignComponent implements OnInit {
     this._need_additional_email_2=false;
     console.log("2nd email removed");
   }
-*/
+
 
   /**
    * Goes to the previous step.

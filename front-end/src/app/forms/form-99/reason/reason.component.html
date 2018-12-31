@@ -25,6 +25,7 @@
             type="button"
             class="btn btn-validate"
             (click)="validateForm()"
+            [disabled]="true"
           >
               Validate
             </button>
@@ -165,7 +166,7 @@
               type="submit"
               [disabled]="frmReason.controls.reasonText.errors?.requiredLength"
             > 
-              Next
+             Save & Continue
             </button>  
           </div>  
         </div> 
