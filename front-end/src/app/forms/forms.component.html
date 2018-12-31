@@ -1,38 +1,8 @@
-  <div class="forms-container__main">
-    <div class="form__main-content">
-      <div *ngIf="form_type === '99'">
-        <!-- begin form 99 -->
-        <app-form-99></app-form-99>
-      </div>
+<div class="forms-container__main">
+  <div class="form__main-content">
+    <div *ngIf="form_type === '99'">
+      <!-- begin form 99 -->
+      <app-form-99></app-form-99>
     </div>
   </div>
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Warning</h4>
-    <button 
-    	type="button" 
-    	class="close btn btn-link" 
-    	aria-label="Close" 
-    	(click)="modal.close('cancel')"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-  	<div>
-  		You have unsaved changes! If you leave, your changes will be lost.
-  	</div>
-  </div>
-  <div class="modal-footer">
-    <button 
-    	type="button" 
-    	(click)="modal.close('cancel')"
-    	class="btn btn-secondary"
-    >Cancel</button>
-    <button 
-    	type="button" 
-    	class="btn btn-primary" 
-    	(click)="modal.close('okay')"
-    >Okay</button>    
-  </div>
-</ng-template>
+</div>
