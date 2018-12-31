@@ -90,8 +90,6 @@ export class PreviewComponent implements OnInit {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-    console.log('canDeactivate: ');
-    console.log('modalContent: ', ConfirmModalComponent);
     if (this.hasUnsavedData()) {
       let result: boolean = null;
 
@@ -117,6 +115,7 @@ export class PreviewComponent implements OnInit {
 
   /**
    * Determines if form has unsaved data.
+   * TODO: Move to service.
    *
    * @return     {boolean}  True if has unsaved data, False otherwise.
    */
