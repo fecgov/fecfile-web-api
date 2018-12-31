@@ -391,13 +391,13 @@ export class ReasonComponent implements OnInit {
 
 
 
-  public printPreview(): void {
+  /*public printPreview(): void {
     this.status.emit({
       form: {},
       direction: 'next',
       step: 'step_3'
     });
-  }
+  }*/
 
   /*public canDeactivate(): Observable<boolean> | boolean {
       if (!this.formSaved && this.frmReason.dirty) {
@@ -406,4 +406,53 @@ export class ReasonComponent implements OnInit {
       }
       return true;
   }*/
+  public printPreview () {
+    console.log('Reason screen printPreview: ');
+    if(this.frmReason.valid) {
+      if (this.frmReason.get('reasonText').value.length >= 1) {
+        let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
+        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+
+        this.reasonText = this.frmReason.get('reasonText').value;
+        this._form_99_details.text = this.reasonText;
+
+        this._form_99_details.file='';
+
+        if (this.file !== null){
+          this._form_99_details.file=this.file;
+          this._form_99_details.filename=this.file.name;
+        }
+        
+        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+
+        this.hideText = true;
+
+        this.showValidateBar = false;
+        console.log('Reason screen printPreview: this.file: ',this.file);
+        
+        this._formsService
+          .PreviewForm_ReasonScreen({}, this.file, this._form_type)
+          .subscribe(res => {
+            if(res) {
+              console.log('Reason screen printPreview: res: ', res);
+
+              this._form_99_details.id = res.id;
+
+              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+              
+              // success
+              this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });          
+      }
+    }
+  }
 }
