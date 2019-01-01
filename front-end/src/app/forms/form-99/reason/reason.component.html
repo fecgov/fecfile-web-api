@@ -1,511 +1,205 @@
-import { Component, EventEmitter, ElementRef, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { QuillEditorComponent } from 'ngx-quill';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
-import { environment } from '../../../../environments/environment';
-import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
-import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-
-@Component({
-  selector: 'app-reason',
-  templateUrl: './reason.component.html',
-  styleUrls: ['./reason.component.scss'],
-  encapsulation: ViewEncapsulation.None
-})
-export class ReasonComponent implements OnInit {
-
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input('editor') editor: any;
-
-  @ViewChild('fileInput') fileInput: ElementRef;
-
-  public frmReason: FormGroup;
-  public reasonType: string = null;
-  public reasonFailed: boolean = false;
-  public typeSelected: string = null;
-  public lengthError: boolean = false;
-  public isValidReason: boolean = false;
-  public reasonText: string = '';
-  public isFiled: boolean = false;
-  public characterCount: number = 0;
-  public formSaved: boolean = false;
-  public hideText: boolean = false;
-  public showValidateBar: boolean = false;
-
-  private _form_99_details: any = {}
-  private _editorMax: number = 20000;
-  private _form_type: string = '';
-  private _form_saved: boolean = false;
-  public file: any = null;
-  private _form_submitted: boolean = false;
-  public _not_valid_pdf: boolean = false;
-  public _valid_file: boolean = true;
-  public _show_file_delete_button: boolean=false;
-  
-  constructor(
-    private _fb: FormBuilder,
-    private _router: Router,
-    private _activatedRoute: ActivatedRoute,
-    private _formsService: FormsService,
-    private _messageService: MessageService,
-    private _dialogService: DialogService
-  ) {
-    this._messageService.clearMessage();
-  }
-
-  ngOnInit(): void {
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-    
-    this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
-
-    if(this._form_99_details) {  
-      if(this._form_99_details.text) {
-
-        if (this._form_99_details.reason){
-           this.typeSelected=this._form_99_details.reason; 
-        }
-
-        this.frmReason = this._fb.group({
-          reasonText: [this._form_99_details.text, [
-            Validators.required,
-            htmlLength(this._editorMax)
-          ]],
-          file: ['']
-        });
-       } else {
-        this.frmReason = this._fb.group({
-          reasonText: ['', [
-            Validators.required,
-            htmlLength(this._editorMax)
-          ]],
-          file: ['']
-        });
-       }
-    } else {
-      this.frmReason = this._fb.group({
-        reasonText: ['', [
-          Validators.required,
-          htmlLength(this._editorMax)
-        ]],
-        file: ['']
-      });
-    }
-  }
-
-  ngDoCheck(): void {
-    let form_99_details: any = {};
-
-    if(localStorage.getItem('form_99_details') !== null) {
-      form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
-    }
-
-    if(form_99_details) {
-      this.typeSelected = form_99_details.reason;
-    }
-
-    if (this.frmReason.get('reasonText').value.length >= 1) {
-      let text: string = this.frmReason.get('reasonText').value;
-
-      this.characterCount = text.length;
-    } else if(this.frmReason.get('reasonText').value.length === 0) {
-      let text: string = this.frmReason.get('reasonText').value;
-
-      this.characterCount = text.length;
-    }
-  }
-
-  /**
-   * Sets the file.
-   *
-   * @param      {Object}  e The event object.
-   */
-  /*public setFile(e): void {
-    if(e.target.files.length === 1) {
-       this.file = e.target.files[0];
-       if (this.file.name.includes('.pdf')){
-         console.log("pdf uploaded");
-         localStorage.setItem(`form_${this._form_type}_file`, this.file.name);
-         this._not_valid_pdf=false;
-         this._valid_file=true;
-         this._show_file_delete_button=true;
-      }
-      else {
-        this._not_valid_pdf=true;
-        this._valid_file=false;
-        this.file=null;
-        this._show_file_delete_button=true;
-      }
-
-
-    } else {
-      localStorage.setItem(`form_${this._form_type}_file`, '');
-    }
-    console.log ('_valid_file:',this._valid_file);
-  }*/
-
-  public setFile(e): void {
-    if(e.target.files.length === 1) {
-       this.file = e.target.files[0];
-
-       console.log('this.file.name: ', this.file.name);
-       this._show_file_delete_button=true;
-
-       if (this.file.name.includes('.pdf')) {
-         let fileNameObj: any = {
-           'fileName': this.file.name
-         };
-         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));
-         this._not_valid_pdf=false;
-         this._valid_file=true;
-         this._show_file_delete_button=true;
-         this._form_99_details.filename = this.file.name;
-      }
-      else
-      {
-        this._not_valid_pdf=true;
-        this._valid_file=false;
-        this.file=null;
-      }
-    } 
-    else 
-    {
-         let fileNameObj: any = {
-           'fileName': ''
-         };
-         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));        
-        this._not_valid_pdf=true;
-        this._valid_file=false;
-        this.file=null;
-        this._show_file_delete_button=false;
-        this.fileInput.nativeElement.value = '';
-        this._form_99_details.filename = '';
-        localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));  
-    }
-
-    console.log('this._not_valid_pdf: ', this._not_valid_pdf);
-    console.log('this._valid_file: ', this._valid_file);
-  }
-
-  /**
-   * Validates the reason form.
-   *
-   */
-  public doValidateReason() {
-    console.log('doValidateReason: ');
-    if (this.frmReason.get('reasonText').value.length >= 1) {
-        let formSaved: any = {
-          'form_saved': this.formSaved
-        };
-        this.reasonFailed = false;
-        this.isValidReason = true;
-
-        this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
-
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form_99_details.text = this.frmReason.get('reasonText').value;
-
-        /*if (this.frmReason.get('file').value){
-          this._form_99_details.file=this.frmReason.get('file').value;  
-        }*/
-
-        console.log('this._form_99_details: ', this._form_99_details);
-
-        setTimeout(() => {
-          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
-
-          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
-        }, 100);
-        
-        this.saveForm();
-
-        this.hideText = true;
-
-        this.showValidateBar = false; 
-
-        this.hideText = true;
-        this.formSaved = false;        
-
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': '',
-              'showValidateBar': false                  
-            }            
-          });          
-
-        this.status.emit({
-          form: this.frmReason,
-          direction: 'next',
-          step: 'step_3',
-          previousStep: 'step_2'
-        });
-
-        this._messageService.sendMessage({
-          data: this._form_99_details,
-          previousStep: 'step_3'
-        });
-    } else {
-      this.reasonFailed = true;
-      this.isValidReason = false;
-
-      this.status.emit({
-        form: this.frmReason,
-        direction: 'next',
-        step: 'step_2',
-        previousStep: ''
-      });
-      return;
-    }
-  }
-
-  public toggleToolTip(tooltip): void {
-    if (tooltip.isOpen()) {
-      tooltip.close();
-    } else {
-      tooltip.open();
-    }      
-  }  
-
-  
-  public removeFile(): void {
-    this.file = null;
-    this._not_valid_pdf=false;
-    this._show_file_delete_button=false;
-    this._form_99_details.filename = '';
-    localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));     
-  }
-
-  /**
-   * Goes to the previous step.
-   */
-  public previousStep(): void {
-    this.hideText = true;
-    this.formSaved = false;
-
-    this.showValidateBar = false;
-
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false                  
-        }            
-      });    
-    
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_1'
-    });
-  }
-
-  /**
-   * Saves the form when the save button is clicked.
-   *
-   */
-  public saveForm () {
-    console.log('saveForm: ');
-    if(this.frmReason.valid) {
-      if (this.frmReason.get('reasonText').value.length >= 1) {
-        let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
-        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
-
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form_99_details.text = this.reasonText;
-
-        this._form_99_details.file='';
-
-        if (this.file !== null){
-          this._form_99_details.file=this.file;
-          this._form_99_details.filename=this.file.name;
-        }
-        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-
-        this.hideText = true;
-
-        this.showValidateBar = false;
-        console.log('this.file: ',this.file);
-        
-        if (this.file !== null){
-          this._form_99_details.file=this.file;
-          this._formsService
-          .saveForm({}, this.file, this._form_type)
-          .subscribe(res => {
-            if(res) {
-              console.log('res: ', res);
-
-              this._form_99_details.id = res.id;
-              this._form_99_details.org_fileurl = res.file;
-              console.log('res.file: ', res.file);
-
-              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-              
-              // success
-              this.formSaved = true;
-
-              let formSavedObj: any = {
-                'saved': this.formSaved
-              };
-              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
-            }
-          },
-          (error) => {
-            console.log('error: ', error);
-          });          
-      }
-      else {
-        this._formsService
-        .saveForm({}, {}, this._form_type)
-        .subscribe(res => {
-          if(res) {
-            console.log('res: ', res);
-
-            this._form_99_details.id = res.id;
-
-            localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-            
-            // success
-            this.formSaved = true;
-
-            let formSavedObj: any = {
-              'saved': this.formSaved
-            };
-            localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });         
-      }
-    }
-  }
-  }
-  /**
-   * Validates the entire form.
-   */
-  public validateForm(): void {
-    let type: string = localStorage.getItem('form99-type');
-
-    this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
-
-    this.reasonText = this.frmReason.get('reasonText').value;
-    this._form_99_details.text = this.frmReason.get('reasonText').value;
-
-    localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-
-    this.showValidateBar = true;
-
-    this._formsService
-      .validateForm({}, this._form_type)
-      .subscribe(res => {
-        if(res) {
-            this._messageService
-              .sendMessage({
-                'validateMessage': {
-                  'validate': environment.validateSuccess,
-                  'showValidateBar': true                  
-                }
-              });
-        }
-      },
-      (error) => {
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': error.error,
-              'showValidateBar': true                  
-            }            
-          });
-      });
-  }
-
-  /**
-   * Hides the validate bar if the textarea changed.
-   */
-  public updateValidation(): void {
-    this.showValidateBar = false;
-
-    this.hideText = true;
-    this.formSaved = false;      
-
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false                  
-        }            
-      });       
-  }
-
-
-
-  /*public printPreview(): void {
-    this.status.emit({
-      form: {},
-      direction: 'next',
-      step: 'step_3'
-    });
-  }*/
-
-  /*public canDeactivate(): Observable<boolean> | boolean {
-      if (!this.formSaved && this.frmReason.dirty) {
-
-          return this._dialogService.confirm('Discard changes for this form?');
-      }
-      return true;
-  }*/
-  public printPreview () {
-    console.log('Reason screen printPreview: ');
-    if(this.frmReason.valid) {
-      if (this.frmReason.get('reasonText').value.length >= 1) {
-        let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
-        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
-
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form_99_details.text = this.reasonText;
-
-        this._form_99_details.file='';
-
-        if (this.file !== null){
-          this._form_99_details.file=this.file;
-          this._form_99_details.filename=this.file.name;
-        }
-        
-        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-
-        this.hideText = true;
-
-        this.showValidateBar = false;
-        console.log('Reason screen printPreview: this.file: ',this.file);
-        
-        this._formsService
-          .PreviewForm_ReasonScreen({}, this.file, this._form_type)
-          .subscribe(res => {
-            if(res) {
-              console.log('Reason screen printPreview: res: ', res);
-
-              this._form_99_details.id = res.id;
-
-              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-              
-              // success
-              this.formSaved = true;
-
-              let formSavedObj: any = {
-                'saved': this.formSaved
-              };
-              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
-            }
-          },
-          (error) => {
-            console.log('error: ', error);
-          });          
-      }
-    }
-  }
-}
+<div class="reason-container">
+  <form
+    [formGroup]="frmReason"
+    (ngSubmit)="doValidateReason()"
+  >
+    <header>
+      <div class="header-container">
+        <div class="header__text">
+          <h1 class="text-left" *ngIf="!typeSelected">
+            Form 99
+          </h1>
+          <h1 class="text-left" *ngIf="typeSelected">
+            Form 99 / {{ typeSelected }}
+          </h1>
+        </div>
+        <div class="header__btns">
+          <button
+            type="button"
+            class="btn btn-validate"
+            (click)="printPreview()"
+          >
+            Print Preview
+          </button> &nbsp;
+          <button
+            type="button"
+            class="btn btn-validate"
+            (click)="validateForm()"
+          >
+              Validate
+            </button>
+        </div>
+      </div>
+    </header>
+    <section>
+      <div class="content">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+              <app-validate></app-validate>
+            </div>            
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <b>Enter your text*</b>
+            <ng-template #tipContent1>
+                Please note that if you copy and paste text into the text box the formatting may be lost. 
+                The text box is only for composing a message or letter. The text box does feature basic formatting. 
+                If you need to include supplemental information, you can use the attachment feature below the text box.             
+             </ng-template>
+               <button 
+                  type="button" 
+                  class="btn btn-info"
+                  [ngbTooltip]="tipContent1"
+                  #t1="ngbTooltip"
+                  (click)="toggleToolTip(t1)"
+                  triggers="manual"
+                  tooltipClass="custom-tooltip-class"
+                  placement="right"
+                >
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+ 
+
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+              You must enter a reason.
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="_not_valid_pdf">
+            <div class="text-error text-center" *ngIf="_not_valid_pdf">
+              You can upload only pdf file.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="text-editor">
+              <textarea 
+                placeholder="Enter text here..."
+                (keyup)="updateValidation()"
+                formControlName="reasonText"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="editor-character-count">
+              {{ characterCount }}
+              characters
+            </div>
+            <div class="error-text"
+              *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
+              <div class="text-error text-center" 
+                *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+                You can only enter up to 20,000 characters.
+              </div>
+            </div>
+            <div class="error-text">
+              <div class="text-info text-center"
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! _not_valid_pdf)">
+                Form 99 has been successfully saved.
+              </div>
+            </div>
+          </div>
+        </div>        
+        <!-- file upload start -->
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <hr />
+            <ng-template #tipContent2>
+              The attachment feature can be used to attach documents that may fall outside of a simple letter.  
+              Examples include copies of refund checks sent to contributors, tables for disclosing information, or the ability to submit a C-1 Loan Agreement.  
+              Please note that if you have more than one PDF attachment, you will need to merge them into a single PDF.              
+            </ng-template>
+            <h4>
+              File Attachment
+              <button 
+                type="button" 
+                class="btn btn-info"
+                [ngbTooltip]="tipContent2"
+                #t2="ngbTooltip"
+                (click)="toggleToolTip(t2)"
+                triggers="manual"
+                tooltipClass="custom-tooltip-class"
+                placement="right"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </h4>
+            <!--<div class="file-upload-container" *ngIf="file === null">
+              <input 
+                type="file" 
+                name="file"
+                accept="application/pdf"
+                (change)="setFile($event)"
+                formControlName="file" 
+              />              
+            </div>-->
+            <div class="file-upload-container" *ngIf="file === null">
+                <input 
+                  #fileInput
+                  type="file" 
+                  name="file"
+                  accept="application/pdf"
+                  (change)="setFile($event)"
+                />              
+            </div>
+            <div class="file-attached-container" *ngIf="file !== null">
+              <div class="grid-row">
+                <div class="grid-row__col--2">
+                  {{ file.name }}
+                </div>
+                <div class="grid-row__col--2 text-left">
+                  <button 
+                    type="button"
+                    class="btn btn-link"
+                    (click)="removeFile()"
+                  >
+                      <span vertical-align="top" class="close-icon"></span>
+                    </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- file upload end -->              
+      </div> <!-- ./content -->
+    </section>
+    <footer>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="forms__btn-container">
+            <button 
+              class="btn btn-previous btn-left" 
+              type="button"
+              (click)="previousStep()"
+            >
+              Previous 
+            </button>
+            <button 
+              class="btn btn-primary btn-right" 
+              type="submit"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! _valid_file) "
+            > 
+             Save & Continue
+            </button>  
+          </div>  
+        </div> 
+      </div> 
+    </footer>
+  </form>
+</div> <!-- ./reason-container -->
