@@ -151,6 +151,10 @@ export class ReasonComponent implements OnInit {
   public setFile(e): void {
     if(e.target.files.length === 1) {
        this.file = e.target.files[0];
+
+       console.log('this.file.name: ', this.file.name);
+       this._show_file_delete_button=true;
+
        if (this.file.name.includes('.pdf')) {
          let fileNameObj: any = {
            'fileName': this.file.name
@@ -161,7 +165,15 @@ export class ReasonComponent implements OnInit {
          this._show_file_delete_button=true;
          this._form_99_details.filename = this.file.name;
       }
-    } else {
+      else
+      {
+        this._not_valid_pdf=true;
+        this._valid_file=false;
+        this.file=null;
+      }
+    } 
+    else 
+    {
          let fileNameObj: any = {
            'fileName': ''
          };
@@ -174,6 +186,9 @@ export class ReasonComponent implements OnInit {
         this._form_99_details.filename = '';
         localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));  
     }
+
+    console.log('this._not_valid_pdf: ', this._not_valid_pdf);
+    console.log('this._valid_file: ', this._valid_file);
   }
 
   /**
@@ -247,7 +262,7 @@ export class ReasonComponent implements OnInit {
       return;
     }
   }
-  
+
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
@@ -260,7 +275,7 @@ export class ReasonComponent implements OnInit {
   public removeFile(): void {
     this.file = null;
     this._not_valid_pdf=false;
-
+    this._show_file_delete_button=false;
     this._form_99_details.filename = '';
     localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));     
   }
