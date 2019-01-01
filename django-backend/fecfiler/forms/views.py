@@ -23,6 +23,9 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import Context, Template
+import PyPDF2
+from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
+from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -842,3 +845,245 @@ def email(boolean, data):
     # Display an error if something goes wrong. 
     except ClientError as e:
         print(e.response['Error']['Message'])
+
+@api_view(['POST'])
+def save_print_f99(request):
+    """"
+    Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
+    """
+    #import ipdb; ipdb.set_trace()
+    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data)
+    if not createresp.ok:
+        return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
+    #try:
+    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+    if comm_info:
+        serializer = CommitteeInfoSerializer(comm_info)
+        imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
+
+        treasurer_name = ''
+        if not comm_info.treasurerprefix is None:
+            treasurer_name = treasurer_name +  comm_info.treasurerprefix
+        if not comm_info.treasurerfirstname is None:
+            treasurer_name = treasurer_name +  " " + comm_info.treasurerfirstname
+        if not comm_info.treasurermiddlename is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurermiddlename
+        if not comm_info.treasurerlastname is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurerlastname
+        if not comm_info.treasurersuffix is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
+
+        data = {
+            'IMGNO': imageno,
+            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            'COMMITTEE_NAME': comm_info.committeename,
+            'FILER_FEC_ID_NUMBER':comm_info.committeeid,
+            'STREET_1': comm_info.street1,
+            'CITY': comm_info.city,
+            'STATE': comm_info.state,
+            'ZIP': comm_info.zipcode,
+            'REASON_TYPE': comm_info.reason,
+            'DATE_SIGNED_MM':comm_info.updated_at.strftime('%m'),
+            'DATE_SIGNED_DD':comm_info.updated_at.strftime('%d'),
+            'DATE_SIGNED_YY':comm_info.updated_at.strftime('%Y'),
+            'TREASURER_FULL_NAME': treasurer_name,
+            'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
+            'EF_STAMP':"[Electronically Filed]",
+            'MISCELLANEOUS_TEXT': comm_info.text,
+
+        }
+
+        if not comm_info.street2 is None:
+            data['STREET_2'] = comm_info.street2    
+
+        print(data)
+
+        with open('data.json', 'w') as outfile:
+            json.dump(data, outfile, ensure_ascii=False)
+        
+        #obj = open('data.json', 'w')
+        #obj.write(serializer.data)
+        #obj.close
+
+        # variables to be sent along the JSON file in form-data
+        filing_type='FEC'
+        vendor_software_name='FECFILE'
+
+        data_obj = {
+                'filing_type':filing_type,
+                'vendor_software_name':vendor_software_name,
+            }
+
+        #print(comm_info.file)
+        
+        if not (comm_info.file in [None, '', 'null', ' ',""]):
+            filename = comm_info.file.name 
+            #print(filename)
+            myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+            #print(myurl)
+            myfile = urllib.request.urlopen(myurl)
+
+            #s3 = boto3.client('s3')
+
+            #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+
+            #attachment = open(file_object['Body'], 'rb')
+
+            file_obj = {
+                'data1': ('data.json', open('data.json', 'r'), 'application/json'),
+                'file': ('attachment.pdf', myfile, 'application/pdf')
+            }
+        else:
+            file_obj = {
+                'data1': ('data.json', open('data.json', 'r'), 'application/json')
+            }
+        #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        if not printresp.ok:
+            return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            dictcreate = createresp.json()
+            dictprint = printresp.json()
+            merged_dict = {**dictcreate, **dictprint}
+            #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+            return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+            #return Response(printresp.json(), status=status.HTTP_201_CREATED)
+    else:
+        return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    """    
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    """
+
+def set_need_appearances_writer(writer):
+
+    try:
+
+        catalog = writer._root_object
+
+        # get the AcroForm tree and add "/NeedAppearances attribute
+
+        if "/AcroForm" not in catalog:
+
+            writer._root_object.update({
+
+                NameObject("/AcroForm"): IndirectObject(len(writer._objects), 0, writer)})
+
+ 
+
+        need_appearances = NameObject("/NeedAppearances")
+
+        writer._root_object["/AcroForm"][need_appearances] = BooleanObject(True)
+
+        return writer
+
+ 
+
+    except Exception as e:
+
+        print('set_need_appearances_writer() catch : ', repr(e))
+
+        return writer
+
+ 
+
+ 
+
+# API which prints Form 99 data
+
+@api_view(['POST'])
+
+def print_pdf(request):
+
+    #try:
+    data1 = request.data.get('data1')
+    #data_file = open('request.data.get('data1')', 'r')
+    #print(data1['IMGNO'])
+    data_decode = json.load(data1)
+    #print(data_decode['IMGNO'])
+    #if data_decode['REASON_TYPE'] = "MST":
+    #    data_decode['']
+
+    infile = "templates/forms/F99.pdf"
+
+    outfile = 'templates/forms/media/{}.pdf'.format(data_decode['IMGNO'])
+
+    if data_decode['REASON_TYPE'] == 'MST':
+        data_decode['REASON_TYPE_1'] = 1
+
+    if data_decode['REASON_TYPE'] == 'MSM':
+        data_decode['REASON_TYPE_2'] = 1
+
+    if data_decode['REASON_TYPE'] == 'MSI':
+        data_decode['REASON_TYPE_3'] = 1
+
+    if data_decode['REASON_TYPE'] == 'MSW':
+        data_decode['REASON_TYPE_4'] = 1
+    # open the input file
+
+    input_stream = open(infile, "rb")
+
+    pdf_reader = PdfFileReader(input_stream, strict=False)
+
+    if "/AcroForm" in pdf_reader.trailer["/Root"]:
+
+        pdf_reader.trailer["/Root"]["/AcroForm"].update(
+
+            {NameObject("/NeedAppearances"): BooleanObject(True)})
+
+
+
+    pdf_writer = PdfFileWriter()
+
+    set_need_appearances_writer(pdf_writer)
+
+
+
+    for page_num in range(pdf_reader.numPages):
+
+        page_obj = pdf_reader.getPage(page_num)
+
+        pdf_writer.addPage(page_obj)
+
+        pdf_writer.updatePageFormFieldValues(page_obj, data_decode)
+
+        print(data_decode)
+
+
+
+    # Add the F99 attachment
+    if 'file' in request.data:
+        #attachment_file = "templates/forms/F99_Attachment.pdf"
+        attachment_stream = request.data.get('file')
+
+        #attachment_stream = open(attachment_file, "rb")
+
+        attachment_reader = PdfFileReader(attachment_stream, strict=False)
+
+        for attachment_page_num in range(attachment_reader.numPages):
+
+            attachment_page_obj = attachment_reader.getPage(attachment_page_num)
+
+            pdf_writer.addPage(attachment_page_obj)
+
+ 
+
+    output_stream = open(outfile, "wb")
+
+    pdf_writer.write(output_stream)
+
+    input_stream.close()
+
+    output_stream.close()
+
+    s3 = boto3.resource('s3')
+    s3.Bucket(settings.AWS_STORAGE_BUCKET_NAME).upload_file(outfile, 'media/{}.pdf'.format(data_decode['IMGNO']))
+
+    resp = {
+        'printpriview_filename' : '{}.pdf'.format(data_decode['IMGNO']),
+        'printpriview_fileurl' : "https://" + "{}".format(settings.AWS_STORAGE_BUCKET_NAME) + ".s3.amazonaws.com/media/" + "{}.pdf".format(data_decode['IMGNO'])
+    }
+
+    return JsonResponse(resp, status=status.HTTP_201_CREATED)
