@@ -154,10 +154,15 @@
       <div class="grid-row">
         <div class="grid-row-col grid-row__col--12">
           <hr />
-          <span class="label">
-            Attachment:
-          </span>
-          <a href="{{ org_fileurl }}">{{ org_filename }}</a>
+            <span class="label">
+              Attachment:
+            </span>
+            <span *ngIf="org_fileurl">
+              <a href="{{ org_fileurl }}" target="_blank">{{ fileName }}</a>
+            </span>
+            <span *ngIf="!org_fileurl">
+              {{ fileName }}
+            </span>
           <hr />
           <br />
         </div>
