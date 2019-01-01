@@ -119,13 +119,22 @@
                 <span class="sr-only">Click here for more information</span>
               </button>
             </h4>
-            <div class="file-upload-container" *ngIf="file === null">
+            <!--<div class="file-upload-container" *ngIf="file === null">
               <input 
                 type="file" 
                 name="file"
                 accept="application/pdf"
                 (change)="setFile($event)"
                 formControlName="file" 
+              />              
+            </div>-->
+            <div class="file-upload-container" *ngIf="file === null">
+              <input 
+                #fileInput
+                type="file" 
+                name="file"
+                accept="application/pdf"
+                (change)="setFile($event)"
               />              
             </div>
             <div class="file-attached-container" *ngIf="file !== null">
