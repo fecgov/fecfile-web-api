@@ -305,10 +305,48 @@ def f99_file_upload(self, request, format=None):
     
     mymodel.my_file_field.save(f.name, f, save=True)
     return Response(status=status.HTTP_201_CREATED)
-
+"""
 @api_view(['POST'])
 def update_f99_info(request):
-    
+
+    if request.method == 'POST':
+        try:
+            if 'id' in request.data and (not request.data['id']=='') and int(request.data['id'])>=1:
+                comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                if comm_info:
+                    if comm_info.is_submitted==False:
+                        comm_info.signee = request.data['signee']
+                        comm_info.email_on_file = request.data['email_on_file']
+                        comm_info.email_on_file_1 = request.data['email_on_file_1']
+                        comm_info.additional_email_1 = request.data['additional_email_1']
+                        comm_info.additional_email_2 = request.data['additional_email_2']
+                        comm_info.updated_at = datetime.datetime.now()
+                        comm_info.save()
+                        result = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                        if result:
+                            serializer = CommitteeInfoSerializer(result)
+                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                        else:
+                            return Response({})
+                    else:
+                        logger.debug("FEC Error 002:This form is already submitted")
+                        return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    logger.debug("FEC Error 003:This form Id number does not exist")
+                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                print('new id is created')
+                create_f99_info(request)
+        except CommitteeInfo.DoesNotExist:
+            logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
+            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValueError:
+            logger.debug("FEC Error 006:This form Id number is not an integer")
+            return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    """   
     #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
     
     # update details of a single comm_info
@@ -348,7 +386,7 @@ def update_f99_info(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-"""
+    """
 @api_view(['POST'])
 def submit_comm_info(request):
 
@@ -848,6 +886,117 @@ def email(boolean, data):
 
 @api_view(['POST'])
 def save_print_f99(request):
+    """"
+    Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
+    """
+    #import ipdb; ipdb.set_trace()
+    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data)
+    if not createresp.ok:
+        return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
+    #try:
+    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+    if comm_info:
+        serializer = CommitteeInfoSerializer(comm_info)
+        imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
+
+        treasurer_name = ''
+        if not comm_info.treasurerprefix is None:
+            treasurer_name = treasurer_name +  comm_info.treasurerprefix
+        if not comm_info.treasurerfirstname is None:
+            treasurer_name = treasurer_name +  " " + comm_info.treasurerfirstname
+        if not comm_info.treasurermiddlename is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurermiddlename
+        if not comm_info.treasurerlastname is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurerlastname
+        if not comm_info.treasurersuffix is None:
+            treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
+
+        data = {
+            'IMGNO': imageno,
+            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            'COMMITTEE_NAME': comm_info.committeename,
+            'FILER_FEC_ID_NUMBER':comm_info.committeeid,
+            'STREET_1': comm_info.street1,
+            'CITY': comm_info.city,
+            'STATE': comm_info.state,
+            'ZIP': comm_info.zipcode,
+            'REASON_TYPE': comm_info.reason,
+            'DATE_SIGNED_MM':comm_info.updated_at.strftime('%m'),
+            'DATE_SIGNED_DD':comm_info.updated_at.strftime('%d'),
+            'DATE_SIGNED_YY':comm_info.updated_at.strftime('%Y'),
+            'TREASURER_FULL_NAME': treasurer_name,
+            'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
+            'EF_STAMP':"[Electronically Filed]",
+            'MISCELLANEOUS_TEXT': comm_info.text,
+
+        }
+
+        if not comm_info.street2 is None:
+            data['STREET_2'] = comm_info.street2    
+
+        print(data)
+
+        with open('data.json', 'w') as outfile:
+            json.dump(data, outfile, ensure_ascii=False)
+        
+        #obj = open('data.json', 'w')
+        #obj.write(serializer.data)
+        #obj.close
+
+        # variables to be sent along the JSON file in form-data
+        filing_type='FEC'
+        vendor_software_name='FECFILE'
+
+        data_obj = {
+                'filing_type':filing_type,
+                'vendor_software_name':vendor_software_name,
+            }
+
+        #print(comm_info.file)
+        
+        if not (comm_info.file in [None, '', 'null', ' ',""]):
+            filename = comm_info.file.name 
+            #print(filename)
+            myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+            #print(myurl)
+            myfile = urllib.request.urlopen(myurl)
+
+            #s3 = boto3.client('s3')
+
+            #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+
+            #attachment = open(file_object['Body'], 'rb')
+
+            file_obj = {
+                'data1': ('data.json', open('data.json', 'r'), 'application/json'),
+                'file': ('attachment.pdf', myfile, 'application/pdf')
+            }
+        else:
+            file_obj = {
+                'data1': ('data.json', open('data.json', 'r'), 'application/json')
+            }
+        #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        if not printresp.ok:
+            return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            dictcreate = createresp.json()
+            dictprint = printresp.json()
+            merged_dict = {**dictcreate, **dictprint}
+            #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+            return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+            #return Response(printresp.json(), status=status.HTTP_201_CREATED)
+    else:
+        return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+    """    
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    """
+
+@api_view(['POST'])
+def update_print_f99(request):
     """"
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
