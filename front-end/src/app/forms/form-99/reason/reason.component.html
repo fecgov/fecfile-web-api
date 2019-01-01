@@ -43,6 +43,26 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <b>Enter your text*</b>
+            <ng-template #tipContent1>
+                Please note that if you copy and paste text into the text box the formatting may be lost. 
+                The text box is only for composing a message or letter. The text box does feature basic formatting. 
+                If you need to include supplemental information, you can use the attachment feature below the text box.             
+             </ng-template>
+               <button 
+                  type="button" 
+                  class="btn btn-info"
+                  [ngbTooltip]="tipContent1"
+                  #t1="ngbTooltip"
+                  (click)="toggleToolTip(t1)"
+                  triggers="manual"
+                  tooltipClass="custom-tooltip-class"
+                  placement="right"
+                >
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+ 
+
           </div>
         </div>
         <div class="grid-row">
@@ -98,7 +118,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <hr />
-            <ng-template #tipContent>
+            <ng-template #tipContent2>
               The attachment feature can be used to attach documents that may fall outside of a simple letter.  
               Examples include copies of refund checks sent to contributors, tables for disclosing information, or the ability to submit a C-1 Loan Agreement.  
               Please note that if you have more than one PDF attachment, you will need to merge them into a single PDF.              
@@ -108,7 +128,7 @@
               <button 
                 type="button" 
                 class="btn btn-info"
-                [ngbTooltip]="tipContent"
+                [ngbTooltip]="tipContent2"
                 #t2="ngbTooltip"
                 (click)="toggleToolTip(t2)"
                 triggers="manual"
