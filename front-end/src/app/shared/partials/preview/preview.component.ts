@@ -28,8 +28,8 @@ export class PreviewComponent implements OnInit {
   private _subscription: Subscription;
   private _step: string = '';
 
-  private filename: string ='';
-  private fileurl: string ='';
+  public fileName: string ='';
+  public fileurl: string ='';
   public org_filename:string='';
   public org_fileurl:string='';
   private _form_details: any = {}
@@ -47,17 +47,14 @@ export class PreviewComponent implements OnInit {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
     /*this.filename = this._activatedRoute.snapshot.paramMap.get(`form_${this.form_type}_file`);*/
     
-     this.org_filename=JSON.parse(localStorage.getItem('form_99_details.org_filename'));      
-     this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));       
-     this.printpriview_filename=JSON.parse(localStorage.getItem('form_99_details.printpriview_filename'));      
-     this.printpriview_fileurl = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));     
+     
+     //this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));         
 
-    console.log('On Preview Screen org_filename: ', this.org_filename);
-    console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
-    console.log('On Preview Screen org_filename: ', this.printpriview_filename);
-    console.log('On Preview Screen org_fileurl: ', this.printpriview_fileurl);
+    
+    // console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
 
-    this._subscription =
+
+    // this._subscription =
       this._messageService
         .getMessage()
         .subscribe(res => {
@@ -68,6 +65,25 @@ export class PreviewComponent implements OnInit {
           this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
           if(this.form_type === '99') {
+            if (this.form_details) {
+              if (typeof this.form_details.filename !== 'undefined') {
+                
+                if (this.form_details.filename !== null) {
+                  this.fileName = this.form_details.filename;
+                } else {
+                  this.fileName = '';
+                }
+              }
+
+              if (typeof this.form_details.org_fileurl !== 'undefined') {
+                console.log('this.form_details.org_fileurl: ', this.form_details.org_fileurl);
+                if (this.form_details.org_fileurl !== null) {
+                  this.org_fileurl = this.form_details.org_fileurl;
+                } else {
+                  this.org_fileurl = '';
+                }                
+              }
+            }
             if(typeof this.form_details !== 'undefined') {
               if(typeof this.form_details.reason !== 'undefined') {
                 this.type_selected = this.form_details.reason;
@@ -78,13 +94,20 @@ export class PreviewComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    if(this.form_details) {
+     console.log('this.form_details.org_fileurl: ', this.form_details.org_fileurl); 
+     if(this.form_details.org_fileurl) {
+       this.org_fileurl = this.form_details.org_fileurl;
+     }
+    }
+    
     if(!this.form_details) {
       if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
         this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
         if(this.form_type === '99') {
           if(!this.type_selected) {
             this.type_selected = this.form_details.reason;
-          } 
+          }
         }
       }
     }
