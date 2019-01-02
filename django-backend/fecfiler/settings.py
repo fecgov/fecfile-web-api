@@ -275,6 +275,11 @@ LOGGING = {
         },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard'
+        },
         'default': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
@@ -305,6 +310,14 @@ LOGGING = {
         },
     }
 }
+
+#if DEBUG:
+    # make all loggers use the console.
+for logger in LOGGING['loggers']:
+    LOGGING['loggers'][logger]['handlers'] = ['console']
+
+
+
 
 # AWS SES Configuration Settings
 EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
