@@ -1,11 +1,12 @@
 <div class="preview-container">
-  <header>
+  <!--<header>
     <div class="header-container">
       <div class="header__text">
         <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
         <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
       </div>
-      <div class="header__btns">
+    <div class="header__btns" >
+        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
         <button
           type="button"
           class="btn btn-validate"
@@ -20,10 +21,39 @@
         >
             Validate
           </button>
-      </div>
+         </div>
     </div>   
     <hr />          
-  </header>
+  </header>-->
+
+  <header>
+      <div class="header-container">
+        <div class="header__text">
+          <h1 class="text-left" *ngIf="!typeSelected">
+            Form 99
+          </h1>
+          <h1 class="text-left" *ngIf="typeSelected">
+            Form 99 / {{ typeSelected }}
+          </h1>
+        </div>
+        <div class="header__btns">
+           <button
+            type="button"
+            class="btn btn-validate"
+            (click)="printPreview()"
+          >
+            Print Preview
+          </button> &nbsp;
+          <button
+            type="button"
+            class="btn btn-validate"
+            (click)="validateForm()"
+          >
+              Validate
+            </button>
+        </div>
+      </div>
+    </header>  
   <section>
     <div class="content">
     <div class="grid-row">
@@ -193,6 +223,11 @@
           </button>
         </div>
       </div>
-    </div>    
+    </div>
+    <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+        <h4>* = Required</h4>    
+        </div> 
+    </div>        
   </footer>
 </div>
