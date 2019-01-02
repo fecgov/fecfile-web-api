@@ -211,12 +211,12 @@ MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        #'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
-        #'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
