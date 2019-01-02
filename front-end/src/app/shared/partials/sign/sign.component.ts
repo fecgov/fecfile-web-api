@@ -263,8 +263,6 @@ export class SignComponent implements OnInit {
           .saveForm({}, {}, this.form_type)
           .subscribe(res => {
             if(res) {
-
-              //localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify({'saved': true}));
               this._formsService
                 .submitForm({}, this.form_type)
                 .subscribe(res => {
@@ -280,6 +278,14 @@ export class SignComponent implements OnInit {
                       .sendMessage({
                         'form_submitted': true
                       });
+
+                      this._messageService
+                        .sendMessage({
+                          'validateMessage': {
+                            'validate': 'All required fields have passed validation.',
+                            'showValidateBar': true,                
+                          }            
+                        });                       
                   }
                 });              
             }
