@@ -6,7 +6,7 @@ from . import views
 urlpatterns = [
     url(r'^f99/fetch_f99_info$', views.fetch_f99_info, name='fetch_f99_info' ),
     url(r'^f99/create_f99_info$', views.create_f99_info, name='create_f99_info'),
-    #url(r'^f99/update_f99_info$', views.update_f99_info, name='update_f99_info'),
+    url(r'^f99/update_f99_info$', views.update_f99_info, name='update_f99_info'),
     url(r'^f99/get_default_reasons$', views.get_f99_reasons, name='get_f99_reasons'),
     url(r'^f99/submit_comm_info$', views.submit_comm_info, name='submit_comm_info'),
     url(r'^f99/validate_f99$', views.validate_f99, name='validate_f99'),
