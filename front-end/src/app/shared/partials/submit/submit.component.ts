@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service'
@@ -6,7 +6,8 @@ import { MessageService } from '../../services/MessageService/message.service'
 @Component({
   selector: 'app-submit',
   templateUrl: './submit.component.html',
-  styleUrls: ['./submit.component.scss']
+  styleUrls: ['./submit.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SubmitComponent implements OnInit {
 
@@ -29,6 +30,24 @@ export class SubmitComponent implements OnInit {
           localStorage.removeItem(`form_${this.form_type}_saved`);
         }
       });
+
+    this._router
+      .events
+      .subscribe(val => {
+        if(val) {
+          if(val instanceof NavigationEnd) {
+            if(val.url.indexOf('/forms/form/99') === -1) {
+              this._messageService
+                .sendMessage({
+                  'validateMessage': {
+                    'validate': {},
+                    'showValidateBar': false,                
+                  }            
+                });                 
+            }
+          }
+        }
+      });           
   }
 
 }
