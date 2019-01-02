@@ -1,10 +1,10 @@
-
 # Create your models here.
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from .validators import validate_is_pdf
 from django.utils.translation import ugettext_lazy as _
 from db_file_storage.model_utils import delete_file, delete_file_if_needed
+from fecfiler.custom_storages import MediaStorage
 
 #Table to store F99 attachment data (Refer this documentation: https://django-db-file-storage.readthedocs.io/en/master/)
 class F99Attachment(models.Model):
@@ -38,10 +38,11 @@ class CommitteeInfo(models.Model):
     signee = models.CharField(max_length=30, null= False, default = "-")
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
-    additional_email_1 = models.TextField(max_length=100, null= True, default = "-")
-    additional_email_2 = models.TextField(max_length=100, null= True, default = "-")
+    additional_email_1 = models.TextField(max_length=100, null= True, blank=True)
+    additional_email_2 = models.TextField(max_length=100, null= True, blank=True)
     filename = models.CharField(max_length=128, null=True)
-    file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
+    #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
+    file = models.FileField(storage=MediaStorage(), null=True, blank=True)
     # implememted file upload using the following module: https://django-db-file-storage.readthedocs.io/en/master/
     form_type = models.CharField(max_length=3, default="F99")
     coverage_start_date = models.DateField(null=True)
@@ -59,6 +60,7 @@ class CommitteeInfo(models.Model):
     def delete(self, *args, **kwargs):
         super(CommitteeInfo, self).delete(*args, **kwargs)
         delete_file(self, 'file')
+    
     """
 
     class Meta():

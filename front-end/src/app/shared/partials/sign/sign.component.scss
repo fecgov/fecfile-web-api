@@ -1,6 +1,14 @@
 @import '../../scss/global';
 
 .signee-container {
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+    .grid-row__col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
   header {
     .header-container {
       display: block;

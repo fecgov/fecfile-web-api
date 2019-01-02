@@ -1,7 +1,9 @@
  @import '../shared/scss/global';
 
 .app-container {
+  background-color: $mercury;
   color: $black;
+  font-family: $mainFontFamily;
   min-height: 100vh;
   transition: all 0.4s ease 0s;
   &.active {
@@ -18,6 +20,20 @@
     .app__side-nav {
       left: 0;
     }
+    footer {
+      .app__footer {
+        padding-left: 80px;
+        @include media(tablet) {
+          padding-left: 100px;
+        }
+        @include media(mediumDesktop) {
+          padding-left: 130px;
+        }         
+        @include media(largeDesktop) {
+          padding-left: 130px;
+        }
+      }
+    }    
   }
   &.dashboard.active {
     padding-left: 0;
@@ -25,17 +41,33 @@
       padding-left: 0
     }
     @include media(mediumDesktop) {
-      padding-left: 200px;
+      padding-left: 240px;
     }         
     @include media(largeDesktop) {
-      padding-left: 200px;
+      padding-left: 240px;
     }     
     .app__side-nav {
       left: 0;
-    }    
+    }   
+    footer {
+      .app__footer {
+        font-family: $mainFontFamily;
+        padding-left: 80px;
+        @include media(tablet) {
+          padding-left: 100px;
+        }
+        @include media(mediumDesktop) {
+          padding-left: 130px;
+        }         
+        @include media(largeDesktop) {
+          padding-left: 130px;
+        }         
+      }
+    } 
   }
  .app__top {
     background-color: $dustyGray;
+    font-family: $mainFontFamily;
     height: $topNavHeight;
     position: fixed;
     right: 0;
@@ -121,6 +153,7 @@
     @include clearfix();
   } // .app__top  
   .app__side-nav {
+    font-family: $mainFontFamily;
     height: 100%;
     left: -235px;
     position: fixed;
@@ -130,11 +163,12 @@
     z-index: 1000;
   } // .app__side-nav  
   main {
-    height: 98%;
+    height: 80%;
     .app__content-wrapper {
       background-color: $mercury;
+      font-family: $mainFontFamily;
       margin: 0 auto;
-      min-height: 100vh;
+      min-height: $mainContentHeight;
       padding-left: 50px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
@@ -169,19 +203,50 @@
         }
         .committee-id {
           font-size: 1.5em;
+          font-family: $committeeInfoFontFamily;
           margin-right: 25px;
         }
         .committee-name {
           font-size: 1em;
+          font-family: $committeeInfoFontFamily;
         }
         @include clearfix();
       }
       .app__content {
         background-color: $white;
         margin: 0 auto;
-        min-height: 85vh;
+        min-height: $mainContentHeight;
         width: 90%;
       }
     }
+  } // main
+  .app__footer {
+    background-color: $mercury;
+    color: $black;
+    margin-top: 5px;
+    padding-left: 80px;
+    @include media(tablet) {
+      padding-left: 100px;
+    }
+    @include media(mediumDesktop) {
+      padding-left: 130px;
+    }         
+    @include media(largeDesktop) {
+      padding-left: 130px;
+    }     
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+      div[class^="col-sm"] {
+        a {
+          color: $dodgerBlue;
+          &:hover,
+          &:active,
+          &:visited {
+            color: $dodgerBlue;
+          }
+        }
+      }
+    }
   }      
-}
+} // .app-container   

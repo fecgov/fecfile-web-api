@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -21,6 +21,8 @@ export class ReasonComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input('editor') editor: any;
+
+  @ViewChild('fileInput') fileInput: ElementRef;
 
   public frmReason: FormGroup;
   public reasonType: string = null;
@@ -122,7 +124,7 @@ export class ReasonComponent implements OnInit {
    *
    * @param      {Object}  e The event object.
    */
-  public setFile(e): void {
+  /*public setFile(e): void {
     if(e.target.files.length === 1) {
        this.file = e.target.files[0];
        if (this.file.name.includes('.pdf')){
@@ -144,6 +146,49 @@ export class ReasonComponent implements OnInit {
       localStorage.setItem(`form_${this._form_type}_file`, '');
     }
     console.log ('_valid_file:',this._valid_file);
+  }*/
+
+  public setFile(e): void {
+    if(e.target.files.length === 1) {
+       this.file = e.target.files[0];
+
+       console.log('this.file.name: ', this.file.name);
+       this._show_file_delete_button=true;
+
+       if (this.file.name.includes('.pdf')) {
+         let fileNameObj: any = {
+           'fileName': this.file.name
+         };
+         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));
+         this._not_valid_pdf=false;
+         this._valid_file=true;
+         this._show_file_delete_button=true;
+         this._form_99_details.filename = this.file.name;
+      }
+      else
+      {
+        this._not_valid_pdf=true;
+        this._valid_file=false;
+        this.file=null;
+      }
+    } 
+    else 
+    {
+         let fileNameObj: any = {
+           'fileName': ''
+         };
+         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));        
+        this._not_valid_pdf=true;
+        this._valid_file=false;
+        this.file=null;
+        this._show_file_delete_button=false;
+        this.fileInput.nativeElement.value = '';
+        this._form_99_details.filename = '';
+        localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));  
+    }
+
+    console.log('this._not_valid_pdf: ', this._not_valid_pdf);
+    console.log('this._valid_file: ', this._valid_file);
   }
 
   /**
@@ -151,6 +196,7 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
+    console.log('doValidateReason: ');
     if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved
@@ -163,9 +209,11 @@ export class ReasonComponent implements OnInit {
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
-        if (this.frmReason.get('file').value){
+        /*if (this.frmReason.get('file').value){
           this._form_99_details.file=this.frmReason.get('file').value;  
-        }
+        }*/
+
+        console.log('this._form_99_details: ', this._form_99_details);
 
         setTimeout(() => {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
@@ -173,6 +221,8 @@ export class ReasonComponent implements OnInit {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
         
+        this.saveForm();
+
         this.hideText = true;
 
         this.showValidateBar = false; 
@@ -225,6 +275,9 @@ export class ReasonComponent implements OnInit {
   public removeFile(): void {
     this.file = null;
     this._not_valid_pdf=false;
+    this._show_file_delete_button=false;
+    this._form_99_details.filename = '';
+    localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));     
   }
 
   /**
@@ -287,6 +340,8 @@ export class ReasonComponent implements OnInit {
               console.log('res: ', res);
 
               this._form_99_details.id = res.id;
+              this._form_99_details.org_fileurl = res.file;
+              console.log('res.file: ', res.file);
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
               
@@ -389,13 +444,13 @@ export class ReasonComponent implements OnInit {
 
 
 
-  public printPreview(): void {
+  /*public printPreview(): void {
     this.status.emit({
       form: {},
       direction: 'next',
       step: 'step_3'
     });
-  }
+  }*/
 
   /*public canDeactivate(): Observable<boolean> | boolean {
       if (!this.formSaved && this.frmReason.dirty) {
@@ -404,4 +459,53 @@ export class ReasonComponent implements OnInit {
       }
       return true;
   }*/
+  public printPreview () {
+    console.log('Reason screen printPreview: ');
+    if(this.frmReason.valid) {
+      if (this.frmReason.get('reasonText').value.length >= 1) {
+        let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
+        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+
+        this.reasonText = this.frmReason.get('reasonText').value;
+        this._form_99_details.text = this.reasonText;
+
+        this._form_99_details.file='';
+
+        if (this.file !== null){
+          this._form_99_details.file=this.file;
+          this._form_99_details.filename=this.file.name;
+        }
+        
+        localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+
+        this.hideText = true;
+
+        this.showValidateBar = false;
+        console.log('Reason screen printPreview: this.file: ',this.file);
+        
+        this._formsService
+          .PreviewForm_ReasonScreen({}, this.file, this._form_type)
+          .subscribe(res => {
+            if(res) {
+              console.log('Reason screen printPreview: res: ', res);
+
+              this._form_99_details.id = res.id;
+
+              localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+              
+              // success
+              this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });          
+      }
+    }
+  }
 }

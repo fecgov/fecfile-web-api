@@ -1,0 +1,1413 @@
+2018-12-13 17:52:07,571 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 17:54:48,306 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:01:22,136 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:01:50,057 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:03:53,223 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:12:02,482 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:13:25,772 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.info ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:13:49,757 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.info ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:13:59,990 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.info ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:14:17,815 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.info ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:14:25,625 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.info ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:21:25,145 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 18:21:49,059 [ERROR] django.request: Internal Server Error: /api/v1/f99/update_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 248, in update_f99_info
+    logger.info ({"error":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 251, in update_f99_info
+    return logger.debug ({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
+NameError: name 'sys' is not defined
+2018-12-13 18:25:33,793 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 19:46:34,676 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 19:46:51,344 [DEBUG] fecfiler.forms.views: It works
+2018-12-13 19:58:22,274 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 269, in create_f99_info
+    serializer.save()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/models.py", line 56, in save
+    super(CommitteeInfo, self).save(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+2018-12-13 19:59:53,550 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 269, in create_f99_info
+    serializer.save()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/serializers.py", line 214, in save
+    self.instance = self.create(validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 19, in create
+    return CommitteeInfo.objects.create(**validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 393, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/models.py", line 56, in save
+    super(CommitteeInfo, self).save(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 922, in _save_table
+    result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 961, in _do_insert
+    using=using, raw=raw)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 1060, in _insert
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1099, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: column "filename" of relation "forms_committeeinfo" does not exist
+LINE 1: ...e_1", "additional_email_1", "additional_email_2", "filename"...
+                                                             ^
+
+2018-12-13 20:03:17,078 [WARNING] django.request: Not Found: /api/v1/f99/update_f99_info
+2018-12-13 20:54:25,442 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 268, in create_f99_info
+    serializer.save()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/serializers.py", line 209, in save
+    self.instance = self.update(self.instance, validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 53, in update
+    instance.save()
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/models.py", line 56, in save
+    super(CommitteeInfo, self).save(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 903, in _save_table
+    forced_update)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 953, in _do_update
+    return filtered._update(values) > 0
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 661, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1191, in execute_sql
+    cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 876, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+2018-12-13 20:55:11,696 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 268, in create_f99_info
+    serializer.save()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/serializers.py", line 209, in save
+    self.instance = self.update(self.instance, validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 53, in update
+    instance.save()
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/models.py", line 56, in save
+    super(CommitteeInfo, self).save(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 903, in _save_table
+    forced_update)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 953, in _do_update
+    return filtered._update(values) > 0
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 661, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1191, in execute_sql
+    cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 876, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+2018-12-13 20:55:15,951 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+psycopg2.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 268, in create_f99_info
+    serializer.save()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/serializers.py", line 209, in save
+    self.instance = self.update(self.instance, validated_data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/serializers.py", line 53, in update
+    instance.save()
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/models.py", line 56, in save
+    super(CommitteeInfo, self).save(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 806, in save
+    force_update=force_update, update_fields=update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 836, in save_base
+    updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 903, in _save_table
+    forced_update)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/base.py", line 953, in _do_update
+    return filtered._update(values) > 0
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/query.py", line 661, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 1191, in execute_sql
+    cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/models/sql/compiler.py", line 876, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/utils.py", line 94, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/six.py", line 685, in reraise
+    raise value.with_traceback(tb)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/db/backends/utils.py", line 65, in execute
+    return self.cursor.execute(sql, params)
+django.db.utils.IntegrityError: null value in column "created_at" violates not-null constraint
+DETAIL:  Failing row contains (C01234567, DIGITAL, 332 W LEE HWY, street1, WARRENTON, VA, 92630, Marathe, Mahendra, B, Mr, II, null, null, f, null, Sample Text, 63, MSM, f, -, -, mahendra.marathe@salientcrgt.com, Mahendra Marathe, , null, null, F99, ranjith.dasaradhi@ctr.salientcrgt.com, null).
+
+2018-12-13 21:15:50,192 [WARNING] django.request: Not Found: /api/v1/f99/create_f99_i
+2018-12-13 21:20:50,156 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 226, in create_f99_info
+    if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
+NameError: name 'incoming_data' is not defined
+2018-12-13 21:25:49,165 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-13 21:32:53,783 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:06:05,653 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:06:41,563 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:11:39,299 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:15:42,387 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 364, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:17:10,657 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:22:18,244 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in ['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:22:57,695 [WARNING] django.request: Not Found: /
+2018-12-14 02:25:30,027 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in ['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 02:32:07,900 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.debug({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1267, in debug
+    self._log(DEBUG, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:33:52,090 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.debug({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1267, in debug
+    self._log(DEBUG, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:35:47,709 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.info({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:37:36,178 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.info({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1279, in info
+    self._log(INFO, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:38:47,707 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.debug({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1267, in debug
+    self._log(DEBUG, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:40:46,057 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 366, in submit_comm_info
+    return logger.error({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+  File "/usr/lib/python3.5/logging/__init__.py", line 1308, in error
+    self._log(ERROR, msg, args, **kwargs)
+TypeError: _log() got an unexpected keyword argument 'status'
+2018-12-14 02:40:52,357 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'is_submitted'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in ['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'is_submitted'"
+2018-12-14 02:41:17,508 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'is_submitted'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in ['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'is_submitted'"
+2018-12-14 02:42:14,355 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'is_submitted'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 365, in submit_comm_info
+    if not(request.data['is_submitted'] in ['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'is_submitted'"
+2018-12-14 02:58:26,975 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'is_submitted'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 367, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'is_submitted'"
+2018-12-14 02:58:44,801 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'is_submitted'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 367, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'is_submitted'"
+2018-12-14 03:02:23,503 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 367, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 03:04:06,112 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 390, in submit_comm_info
+    email(True, serializer.data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 789, in email
+    client = boto3.client('ses', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,region_name=settings.AWS_REGION)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/conf/__init__.py", line 57, in __getattr__
+    val = getattr(self._wrapped, name)
+AttributeError: 'Settings' object has no attribute 'AWS_ACCESS_KEY_ID'
+2018-12-14 03:23:24,734 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 390, in submit_comm_info
+    email(True, serializer.data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 789, in email
+    client = boto3.client('ses', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,region_name=settings.AWS_REGION)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/conf/__init__.py", line 57, in __getattr__
+    val = getattr(self._wrapped, name)
+AttributeError: 'Settings' object has no attribute 'AWS_ACCESS_KEY_ID'
+2018-12-14 03:24:05,264 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 83, in __getitem__
+    list_ = super(MultiValueDict, self).__getitem__(key)
+KeyError: 'id'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 371, in submit_comm_info
+    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/utils/datastructures.py", line 85, in __getitem__
+    raise MultiValueDictKeyError(repr(key))
+django.utils.datastructures.MultiValueDictKeyError: "'id'"
+2018-12-14 03:29:33,079 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 367, in submit_comm_info
+    if not(request.data['is_submitted'] in['True',True,'true'] and incoming_data['committeeid'] == request.user.username):
+KeyError: 'is_submitted'
+2018-12-14 03:39:58,463 [WARNING] django.request: Not Found: /
+2018-12-14 15:21:18,996 [WARNING] django.request: Not Found: /
+2018-12-14 15:21:19,527 [WARNING] django.request: Not Found: /favicon.ico
+2018-12-14 15:23:54,289 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 231, in create_f99_info
+    incoming_data['filename'] = request.data.get('file').name
+AttributeError: 'str' object has no attribute 'name'
+2018-12-14 15:24:50,062 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 231, in create_f99_info
+    incoming_data['filename'] = request.data.get('file').name
+AttributeError: 'str' object has no attribute 'name'
+2018-12-14 15:25:29,242 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 231, in create_f99_info
+    incoming_data['filename'] = request.data.get('file').name
+AttributeError: 'str' object has no attribute 'name'
+2018-12-14 15:25:41,540 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 231, in create_f99_info
+    incoming_data['filename'] = request.data.get('file').name
+AttributeError: 'str' object has no attribute 'name'
+2018-12-14 15:25:50,272 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 231, in create_f99_info
+    incoming_data['filename'] = request.data.get('file').name
+AttributeError: 'str' object has no attribute 'name'
+2018-12-14 15:28:01,610 [ERROR] django.request: Internal Server Error: /api/v1/f99/submit_comm_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 390, in submit_comm_info
+    email(True, serializer.data)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 789, in email
+    client = boto3.client('ses', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,region_name=settings.AWS_REGION)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/conf/__init__.py", line 57, in __getattr__
+    val = getattr(self._wrapped, name)
+AttributeError: 'Settings' object has no attribute 'AWS_ACCESS_KEY_ID'
+2018-12-14 16:08:32,864 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 227, in create_f99_info
+    logger.DEBUG("FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data")
+AttributeError: 'Logger' object has no attribute 'DEBUG'
+2018-12-14 16:10:35,918 [ERROR] django.request: Internal Server Error: /api/v1/f99/create_f99_info
+Traceback (most recent call last):
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/exception.py", line 41, in inner
+    response = get_response(request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 187, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/core/handlers/base.py", line 185, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/decorators/csrf.py", line 58, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/django/views/generic/base.py", line 68, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 483, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 443, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/views.py", line 480, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/venv/lib/python3.5/site-packages/rest_framework/decorators.py", line 53, in handler
+    return func(*args, **kwargs)
+  File "/home/ubuntu/rdash/FECeFileProject/nxg_fec/django-backend/fecfiler/forms/views.py", line 227, in create_f99_info
+    logger.bebug("FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data")
+AttributeError: 'Logger' object has no attribute 'bebug'
+2018-12-14 16:11:46,625 [DEBUG] fecfiler.forms.views: FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data
+2018-12-14 16:28:00,607 [DEBUG] fecfiler.forms.views: FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data
+2018-12-14 17:06:59,036 [WARNING] django.security.csrf: Forbidden (CSRF cookie not set.): /api/v1/f99/submit_comm_info
+2018-12-14 17:08:39,761 [WARNING] django.security.csrf: Forbidden (CSRF cookie not set.): /api/v1/f99/submit_comm_info
+2018-12-14 17:12:33,677 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:14:05,340 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:14:05,869 [DEBUG] urllib3.connectionpool: http://127.0.0.1:8002 "POST /api/v1/f99_data_receive HTTP/1.1" 400 94
+2018-12-14 17:16:38,307 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:17:43,942 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:20:50,826 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:22:19,195 [DEBUG] urllib3.connectionpool: http://127.0.0.1:8002 "POST /api/v1/f99_data_receive HTTP/1.1" 400 123
+2018-12-14 17:23:44,031 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:38:24,523 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:40:13,255 [DEBUG] urllib3.connectionpool: http://127.0.0.1:8002 "POST /api/v1/f99_data_receive HTTP/1.1" 400 111
+2018-12-14 17:41:53,407 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:42:33,208 [DEBUG] urllib3.connectionpool: http://127.0.0.1:8002 "POST /api/v1/f99_data_receive HTTP/1.1" 400 111
+2018-12-14 17:47:37,143 [DEBUG] urllib3.connectionpool: Starting new HTTP connection (1): 127.0.0.1:8002
+2018-12-14 17:47:38,903 [DEBUG] urllib3.connectionpool: http://127.0.0.1:8002 "POST /api/v1/f99_data_receive HTTP/1.1" 201 181
+2018-12-18 21:19:46,203 [WARNING] django.request: Not Found: /
+2018-12-18 21:19:51,558 [WARNING] django.request: Not Found: /
+2018-12-19 01:59:25,410 [DEBUG] fecfiler.forms.views: Incoming parameters: <QueryDict: {'street1': ['Street 1'], 'city': ['DC'], 'treasurerlastname': ['Smith'], 'additional_email_1': ['rdasaradhi.ctr@fec.gov'], 'form_type': ['F99'], 'text': ['abcd'], 'reason': ['MST'], 'email_on_file': ['mmarathe.ctr@fec.gov'], 'is_submitted': ['False'], 'committeeid': ['C01234567'], 'treasurermiddlename': ['null'], 'signee': ['Mathew Mark'], 'state': ['DC'], 'zipcode': ['91258'], 'committeename': ['Test Committee'], 'treasurerfirstname': ['Johnknlsf'], 'id': ['71']}>
+2018-12-19 02:00:15,647 [DEBUG] fecfiler.forms.views: Incoming parameters: <QueryDict: {'street1': ['Street 1'], 'city': ['DC'], 'treasurerlastname': ['Smith'], 'additional_email_1': ['rdasaradhi.ctr@fec.gov'], 'form_type': ['F99'], 'text': ['abcd'], 'reason': ['MST'], 'email_on_file': ['mmarathe.ctr@fec.gov'], 'is_submitted': ['False'], 'committeeid': ['C01234567'], 'treasurermiddlename': ['null'], 'signee': ['Mathew Mark'], 'state': ['DC'], 'zipcode': ['91258'], 'committeename': ['Test Committee'], 'treasurerfirstname': ['Johnknlsf'], 'id': ['71']}>
+2018-12-19 02:00:17,239 [DEBUG] fecfiler.forms.views: Incoming parameters: <QueryDict: {'street1': ['Street 1'], 'city': ['DC'], 'treasurerlastname': ['Smith'], 'additional_email_1': ['rdasaradhi.ctr@fec.gov'], 'form_type': ['F99'], 'text': ['abcd'], 'reason': ['MST'], 'email_on_file': ['mmarathe.ctr@fec.gov'], 'is_submitted': ['False'], 'committeeid': ['C01234567'], 'treasurermiddlename': ['null'], 'signee': ['Mathew Mark'], 'state': ['DC'], 'zipcode': ['91258'], 'committeename': ['Test Committee'], 'treasurerfirstname': ['Johnknlsf'], 'id': ['71']}>

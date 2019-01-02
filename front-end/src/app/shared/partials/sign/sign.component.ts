@@ -6,6 +6,8 @@ import { environment } from '../../../../environments/environment';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service'
+import { DialogService } from '../../services/DialogService/dialog.service';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-sign',
@@ -34,11 +36,13 @@ export class SignComponent implements OnInit {
   private _step: string = '';
 
   public _need_additional_email_2=false;
+
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _fb: FormBuilder,
     private _formsService: FormsService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +52,78 @@ export class SignComponent implements OnInit {
 
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
+    this._setForm();
+
+    this._messageService
+      .getMessage()
+      .subscribe(res => {
+        if(res.message) {
+          if(res.message === 'New form99') {
+            this._setForm();
+          }
+        }
+      });  
+  }
+
+  ngDoCheck(): void {
+    if(this.form_type === '99') {
+      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+      if(form_99_details) {
+        this.type_selected = form_99_details.reason;
+      }
+    }
+  }
+  
+  /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    if (this.hasUnsavedData()) {
+      let result: boolean = null;
+
+      result = await this._dialogService
+        .confirm('', ConfirmModalComponent)
+        .then(res => {
+          let val: boolean = null;
+
+          if(res === 'okay') {
+            val = true;
+          } else if(res === 'cancel') {
+            val = false;
+          }
+
+          return val;
+        });
+
+      return result;
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Determines if form has unsaved data.
+   * TODO: Move to service.
+   *
+   * @return     {boolean}  True if has unsaved data, False otherwise.
+   */
+  public hasUnsavedData(): boolean {
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
+
+    if(formSaved !== null) {
+      let formStatus: boolean = formSaved.saved;
+
+      if(!formStatus) {
+        return true;
+      }      
+    }
+
+    return false;
+  }    
+
+  private _setForm(): void {
     if(this._form_details) {
       if(this.form_type === '99') {
         this.type_selected = this._form_details.reason;
@@ -78,15 +154,9 @@ export class SignComponent implements OnInit {
         agreement: [false, Validators.requiredTrue]
       });
     }
-  }
 
-  ngDoCheck(): void {
-    if(this.form_type === '99') {
-      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
-      if(form_99_details) {
-        this.type_selected = form_99_details.reason;
-      }
-    }
+    this._messageService
+      .clearMessage();
   }
 
   /**
@@ -136,8 +206,10 @@ export class SignComponent implements OnInit {
 
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
       
+      /*.saveForm({}, {}, this.form_type)*/
+      console.log("Accessing Signee_SaveForm ...");
       this._formsService
-        .saveForm({}, {}, this.form_type)
+        .Signee_SaveForm({}, this.form_type)
         .subscribe(res => {
           if(res) {
             this.frmSaved = true;
@@ -281,6 +353,17 @@ export class SignComponent implements OnInit {
     }      
   }
 
+ 
+  public add_additional_email_2(): void {
+    this._need_additional_email_2=true;
+    console.log("2nd email needed");
+  }
+  public remove_additional_email_2(): void {
+    this._need_additional_email_2=false;
+    console.log("2nd email removed");
+  }
+
+
   /**
    * Goes to the previous step.
    *
@@ -303,14 +386,29 @@ export class SignComponent implements OnInit {
         }            
       });          
   }
+  public printPriview(): void {
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
-  public add_additional_email_2(): void {
-    this._need_additional_email_2=true;
-    console.log("2nd email needed");
-  }
-  public remove_additional_email_2(): void {
-    this._need_additional_email_2=false;
-    console.log("2nd email removed");
-    localStorage.setItem('form_99_details.additional_email_2',"");
-  }
+   if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
+     this.frmSignee.controls.additional_email_2.valid) {
+     
+     this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+     this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+
+     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+     
+     /*.saveForm({}, {}, this.form_type)*/
+     console.log("Accessing Sign printPriview ...");
+     this._formsService
+       .PreviewForm_Preview_sign_Screen({}, this.form_type)
+       .subscribe(res => {
+         if(res) {
+           console.log("Accessing Sign printPriview res ...",res);
+         }
+       },
+       (error) => {
+         console.log('error: ', error);
+       });
+   }
+ }
 }

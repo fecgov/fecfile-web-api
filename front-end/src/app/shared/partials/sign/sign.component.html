@@ -12,10 +12,11 @@
          <div class="header__btns">
            <button
              type="button"
-             class="btn btn-print-preview"
+             class="btn btn-validate"
+             (click)="printPriview()"
            >
              Print Preview
-           </button>
+           </button> &nbsp;
            <button
              type="button"
              class="btn btn-validate"
@@ -23,7 +24,7 @@
            >
                Validate
              </button>
-         </div>
+            </div>
        </div>
      </header>
      <section>
@@ -110,7 +111,10 @@
              </div>
            </div>
            <div class="grid-row">
+           <br />
+           <br />
              <div class="grid-row__col grid-row__col--12">
+               <br />
                <h4>Additional email(s) for your confirmation receipt</h4>
                <div class="additional-email__field">
                 <div class="grid-row">
@@ -137,7 +141,6 @@
                  </div>
                </div>
                <div class="additional-email__field"   *ngIf="_need_additional_email_2">
-               <!--<div class="additional-email__field"   >-->
                 <div class="grid-row">
                 <div class="grid-col">
                  <input
@@ -223,6 +226,10 @@
            </button>              
          </div>
        </div>    
-     </footer>
+       <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+          <h4>* = Required</h4>    
+          </div> 
+      </div>        </footer>
    </form>
  </div> <!-- ./signee-container -->
