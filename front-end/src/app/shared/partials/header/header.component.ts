@@ -1,5 +1,5 @@
 import { Component, ViewEncapsulation, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -17,24 +17,28 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private _messageService: MessageService,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private _router: Router
   ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this._router
+      .events
+      .subscribe(val => {
+        if(val instanceof NavigationEnd) {
+          if(val.url.indexOf('/logout') === 0) {
+            console.log('logout clicked: ');
+            this._messageService.sendMessage(
+              {
+                loggedOut: true,
+                msg: `You have successfully logged out of the ${environment.appTitle} application.`
+              }
+            );
 
-  /**
-   * Logs a user out.
-   *
-   */
-  public logout(): void {
-    this._messageService.sendMessage(
-      {
-        loggedOut: true,
-        msg: `You have successfully logged out of the ${environment.appTitle} application.`
-      }
-    );
-
-    this._authService.doSignOut();
+            this._authService.doSignOut();
+          }
+        }
+      });    
   }
 
   public toggleMenu(): void {

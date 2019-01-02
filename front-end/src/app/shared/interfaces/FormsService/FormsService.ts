@@ -1,4 +1,4 @@
- export interface form99 {
+export interface form99 {
   id: string,
   committeeid: string,
   committeename: string,
@@ -24,6 +24,8 @@
   filename:string,
   form_type:string,
   file:any,
-  org_filename:string,
-  org_fileurl:string
+  org_filename?:string,
+  org_fileurl?:string,
+  printpriview_filename?:string,
+  printpriview_fileurl?:string
  }

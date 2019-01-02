@@ -1,15 +1,23 @@
 @import '../../../../node_modules/bootstrap/scss/functions';
 @import '../../../../node_modules/bootstrap/scss/variables';
 @import '../../../../node_modules/bootstrap/scss/mixins';
+@import '../../../../node_modules/bootstrap/scss/grid';
 @import '../../../../node_modules/bootstrap/scss/dropdown';
 @import '../../../../node_modules/bootstrap/scss/tooltip';
 @import '../../../../node_modules/bootstrap/scss/card';
 @import '../../../../node_modules/bootstrap/scss/nav';
 @import '../../../../node_modules/bootstrap/scss/navbar';
+@import '../../../../node_modules/bootstrap/scss/modal';
+
+@import url('https://fonts.googleapis.com/css?family=Karla');
+@font-face {
+	font-family: 'Gandhi Serif Regular';
+	src: url('/assets/fonts/Gandhi-Serif-Regular.woff')
+}
 
 @import './custom-variables';
 @import './custom-colors';
 @import './custom-mixins';
 @import './custom-classes';
 
-@import url('https://fonts.googleapis.com/css?family=Karla');
+

@@ -279,8 +279,8 @@ def create_f99_info(request):
             logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
             return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
         except ValueError:
-                    logger.debug("FEC Error 006:This form Id number is not an integer")
-                    return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            logger.debug("FEC Error 006:This form Id number is not an integer")
+            return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
         #except:
             #logger.
             #return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
@@ -345,7 +345,6 @@ def update_f99_info(request):
             logger.debug("FEC Error 006:This form Id number is not an integer")
             return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
 
-
     """   
     #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
     
@@ -389,7 +388,6 @@ def update_f99_info(request):
     """
 @api_view(['POST'])
 def submit_comm_info(request):
-
     if request.method == 'POST':
         
         data = {
@@ -761,7 +759,7 @@ def get_form99list(request):
     """
     try:
 
-        comm = CommitteeInfo.objects.filter(committeeid=request.user.username)
+        comm = CommitteeInfo.objects.filter(committeeid=request.user.username).order_by('id').reverse()
 
     except CommitteeInfo.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
