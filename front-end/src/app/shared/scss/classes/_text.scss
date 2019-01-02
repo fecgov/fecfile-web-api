@@ -1,12 +1,14 @@
 // error classes
 .text-error {
   color: $red !important;
+  font-family: $mainFontFamily;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
 .text-info {
   color: $blue !important;
+  font-family: $mainFontFamily;
   font-weight: bold;
   margin-bottom: 10px;  
 }
