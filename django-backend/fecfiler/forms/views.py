@@ -888,7 +888,13 @@ def save_print_f99(request):
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     #import ipdb; ipdb.set_trace()
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data)
+    token_use = request.auth.decode("utf-8")
+
+    token_use = "JWT" + " " + token_use
+
+    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
+    
+    print(request.auth)
     if not createresp.ok:
         return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     #try:
@@ -974,7 +980,7 @@ def save_print_f99(request):
                 'data1': ('data.json', open('data.json', 'r'), 'application/json')
             }
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -984,6 +990,7 @@ def save_print_f99(request):
             #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
             #return Response(printresp.json(), status=status.HTTP_201_CREATED)
+        
     else:
         return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
     """    
@@ -999,7 +1006,11 @@ def update_print_f99(request):
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     #import ipdb; ipdb.set_trace()
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data)
+    token_use = request.auth.decode("utf-8")
+
+    token_use = "JWT" + " " + token_use
+
+    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
     if not createresp.ok:
         return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     #try:
@@ -1085,7 +1096,7 @@ def update_print_f99(request):
                 'data1': ('data.json', open('data.json', 'r'), 'application/json')
             }
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -1186,7 +1197,9 @@ def print_pdf(request):
 
     set_need_appearances_writer(pdf_writer)
 
-
+    if "/AcroForm" in pdf_writer._root_object:
+        pdf_writer._root_object["/AcroForm"].update(
+            {NameObject("/NeedAppearances"): BooleanObject(True)})
 
     for page_num in range(pdf_reader.numPages):
 
