@@ -16,48 +16,43 @@
 	}
 	section {
 		.content {
-			//padding-top: 10px;
-			//.grid-row {
-			//	.grid-row__col {
-			      .validate__form {
-			        &.show-alerts {
-			          display: block;
-			          margin-bottom: 15px;
-			          @include media(tablet) {
-			            display: block;
-			            margin-bottom: 15px;
-			          }
-			          @include media(mediumDesktop) {
-			            display: none;
-			          }         
-			          @include media(largeDesktop) {
-			            display: none;
-			          }
-			          .validate-results {
-			          	margin-top: 15px !important;
-			          }		                     
-			        }
-			        background-color: $bombay;
-			        display: none;
-			        height: 80px;
-			        margin-top: 10px;
-			        width: 100%;
-			        @include media(tablet) {
-			          background-color: $bombay;
-			          display: none;
-			          height: 80px;
-			          margin-top: 10px;
-			          width: 100%;        
-			        }
-			        @include media(mediumDesktop) {
-			          display: none;
-			        }         
-			        @include media(largeDesktop) {
-			          display: none;
-			        }        
-			      }						
-				//}
-			//}
+	      .validate__form {
+	        &.show-alerts {
+	          display: block;
+	          margin-bottom: 15px;
+	          @include media(tablet) {
+	            display: block;
+	            margin-bottom: 15px;
+	          }
+	          @include media(mediumDesktop) {
+	            display: none;
+	          }         
+	          @include media(largeDesktop) {
+	            display: none;
+	          }
+	          .validate-results {
+	          	margin-top: 15px !important;
+	          }		                     
+	        }
+	        background-color: $bombay;
+	        display: none;
+	        height: 80px;
+	        margin-top: 10px;
+	        width: 100%;
+	        @include media(tablet) {
+	          background-color: $bombay;
+	          display: none;
+	          height: 80px;
+	          margin-top: 10px;
+	          width: 100%;        
+	        }
+	        @include media(mediumDesktop) {
+	          display: none;
+	        }         
+	        @include media(largeDesktop) {
+	          display: none;
+	        }        
+	      }
 		 } // content
 	} // section
 }
