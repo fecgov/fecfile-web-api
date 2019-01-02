@@ -12,7 +12,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
                 'created_at','is_submitted', 'signee', 'email_on_file', 'email_on_file_1', 'additional_email_1', 'additional_email_2',
                 'form_type', 'coverage_start_date', 'coverage_end_date', 'updated_at')
         #read_only_fields = ('created_at', 'updated_at')
-        
+  
         # Methods to save the model objects to the database
         
     def create(self, validated_data):

@@ -38,8 +38,8 @@ class CommitteeInfo(models.Model):
     signee = models.CharField(max_length=30, null= False, default = "-")
     email_on_file = models.TextField(max_length=100, null= False, default = "-")
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
-    additional_email_1 = models.TextField(max_length=100, null= True, default = "-")
-    additional_email_2 = models.TextField(max_length=100, null= True, default = "-")
+    additional_email_1 = models.TextField(max_length=100, null= True, blank=True)
+    additional_email_2 = models.TextField(max_length=100, null= True, blank=True)
     filename = models.CharField(max_length=128, null=True)
     #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
     file = models.FileField(storage=MediaStorage(), null=True, blank=True)
@@ -51,6 +51,7 @@ class CommitteeInfo(models.Model):
     # class constructor
     def __unicode__(self):
         return self.committeename
+
     """
     def save(self, *args, **kwargs):
         delete_file_if_needed(self, 'file')
