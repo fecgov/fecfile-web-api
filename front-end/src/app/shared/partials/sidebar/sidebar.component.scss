@@ -81,7 +81,7 @@
       color: $white;
       cursor: pointer;
       float: right;
-      margin-right: 24px;
+      margin-right: 20px;
       text-decoration: none;
       &:hover ,
       &:visited,
@@ -109,8 +109,9 @@
       }
       .header-text {
         display: inline-block;
+        font-family: titleFontFamily;
         margin-left: 5px;
-        width: 200px;
+        width: 202px;
       }
       .btn-hide-form-nav {
         color: $white;
