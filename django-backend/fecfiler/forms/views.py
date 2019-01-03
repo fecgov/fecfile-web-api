@@ -26,6 +26,7 @@ from django.template import Context, Template
 import PyPDF2
 from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
 from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
+import urllib
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -892,7 +893,16 @@ def save_print_f99(request):
 
     token_use = "JWT" + " " + token_use
 
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
+    if 'file' in request.data:
+        filename = request.data.get('file').name
+        attachment = request.data.get('file')
+        decode_file = attachment.read()
+        #attachment = open(request.data.get('file'), 'rb')
+        files = {'file': (filename, decode_file, 'application/pdf')}
+        #'file': ('attachment.pdf', myfile, 'application/pdf')
+        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
+    else:
+        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
     
     print(request.auth)
     if not createresp.ok:
@@ -961,7 +971,7 @@ def save_print_f99(request):
         if not (comm_info.file in [None, '', 'null', ' ',""]):
             filename = comm_info.file.name 
             #print(filename)
-            myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+            myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
             #print(myurl)
             myfile = urllib.request.urlopen(myurl)
 
@@ -1077,7 +1087,8 @@ def update_print_f99(request):
         if not (comm_info.file in [None, '', 'null', ' ',""]):
             filename = comm_info.file.name 
             #print(filename)
-            myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+            myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
+            #myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
             #print(myurl)
             myfile = urllib.request.urlopen(myurl)
 
@@ -1183,7 +1194,7 @@ def print_pdf(request):
 
     input_stream = open(infile, "rb")
 
-    pdf_reader = PdfFileReader(input_stream, strict=False)
+    pdf_reader = PdfFileReader(input_stream, strict=True)
 
     if "/AcroForm" in pdf_reader.trailer["/Root"]:
 
@@ -1220,7 +1231,7 @@ def print_pdf(request):
 
         #attachment_stream = open(attachment_file, "rb")
 
-        attachment_reader = PdfFileReader(attachment_stream, strict=False)
+        attachment_reader = PdfFileReader(attachment_stream, strict=True)
 
         for attachment_page_num in range(attachment_reader.numPages):
 
