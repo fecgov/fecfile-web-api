@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.decorators import api_view
+import maya
 #from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -834,6 +835,10 @@ def email(boolean, data):
     #final_html = email_ack1.html.replace('{{@REPID}}',1234567).replace('{{@REPLACE_CMTE_ID}}',C0123456)
     #t = Template(email_ack1)
     #c= Context({'@REPID':123458},)
+
+    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")
+    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")	
+
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
     """<html>
