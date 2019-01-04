@@ -1,7 +1,7 @@
 {
   "transaction-categories": [
     {
-      "receipts": {
+      "type": {
         "name": "Receipts",
         "options": [
           {
@@ -18,7 +18,7 @@
             "name": "Transfers",
             "value": "transfers",
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-          },  
+          },
           {
             "name": "Refunds",
             "value": "refunds",
@@ -28,24 +28,24 @@
             "name": "Other",
             "value": "other",
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-          }        
+          }
         ]
       }
     },
     {
-      "disbursements": {
+      "type": {
         "name": "Disbursements",
         "options": []
       }
     },
     {
-      "loans-and-debts": {
+      "type": {
         "name": "Loans & Debts",
         "options": []
       }
     },
     {
-      "cash-on-hand": {
+      "type": {
         "name": "Cash on Hand",
         "options": []
       }

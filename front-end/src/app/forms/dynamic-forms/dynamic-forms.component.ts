@@ -9,16 +9,27 @@ import { HttpClient } from '@angular/common/http';
 export class DynamicFormsComponent implements OnInit {
 
   public currentStep: string = '';
+  public loading: boolean = true;
   public steps: any = {};
+  public sidebarLinks: any = {};
 
   constructor(
   	private _http: HttpClient
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
 	  this._http.get('http://localhost:3000/steps')
 	      .subscribe(resp => {
 	          this.steps = resp;
 	      });
+
+    this._http.get('http://localhost:3000/transaction-categories')
+        .subscribe(resp => {
+            this.sidebarLinks = resp;
+
+            console.log('resp: ', this.sidebarLinks);
+
+            this.loading = false;
+        });
   }
 }

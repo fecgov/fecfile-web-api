@@ -1,3 +1,7 @@
-<p>
-  form-sidebar works!
-</p>
+<div class="form-sidebar">
+  <ul class="form-sidebar__links">
+    <li *ngFor="let categoryType of sidebarLinks">
+      {{ categoryType?.type?.name }}
+    </li>
+  </ul>
+</div>
