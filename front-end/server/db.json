@@ -50,5 +50,27 @@
         "options": []
       }
     }
+  ],
+  "steps": [
+    {
+      "text": "Type",
+      "step": "step_1"
+    },
+    {
+      "text": "Form",
+      "step": "step_2"
+    },
+    {
+      "text": "Preview",
+      "step": "step_3"
+    },
+    {
+      "text": "Sign",
+      "step": "step_4"
+    },
+    {
+      "text": "Submit",
+      "step": "step_5"
+    }
   ]
 }

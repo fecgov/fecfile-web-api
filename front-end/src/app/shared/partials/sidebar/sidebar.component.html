@@ -20,22 +20,39 @@
           <div class="header-text">
             My Forms
           </div>
-          <div class="btn-hide-form-nav">
+          <button 
+            type="button"
+            class="btn btn-link btn-hide-form-nav"
+            (click)="toggleFormNav('my-forms')"
+          >
             <i
-              class="down-arrow-icon"
               aria-hidden="true"
-            ></i>            
-          </div>
+              [ngClass]="{'down-arrow-icon': myFormsHidden === false, 'up-arrow-icon': myFormsHidden === true}"
+            ></i>
+            <span class="sr-only">Click to hide My Forms</span>
+          </button>
         </div>
-        <div class="sidebar__nav--links">
+        <div class="sidebar__nav--links"  [ngClass]="{'d-none': myFormsHidden === true}">
           <ul class="links-list">
-            <li class="links-list__item">
-              <div class="list-item__link">
-                PAC &amp; Party Report of Receipts &amp; Disbursements (F3X)
+            <li class="links-list__item" [ngClass]="formType === 'f3x' ? 'links-list__item--selected' : ''">
+              <div class="list-item__link">                
+                  <a 
+                    [routerLink]="['/forms/form/', '3x']"
+                    [queryParams]="{ step: 'step_1' }"
+                    (click)="formSelected('f3x')"
+                  >
+                    PAC &amp; Party Report of Receipts &amp; Disbursements (F3X)
+                  </a>
               </div>
               <div class="list-item__info">
                 <div class="form-name">
-                  F3X
+                  <a 
+                    [routerLink]="['/forms/form/', '3x']"
+                    [queryParams]="{ step: 'step_1' }"
+                    (click)="formSelected('f3x')"
+                  >                  
+                    F3X
+                  </a>
                 </div>
                  <button 
                    type="button" 

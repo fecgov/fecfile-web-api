@@ -11,7 +11,7 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public formType: number = null;
+  public formType: string = null;
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public screenWidth: number = 0;
@@ -82,13 +82,9 @@ export class SidebarComponent implements OnInit {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
-    if(form) {
-      setTimeout(() => {
-        this.formType = parseInt(form);
-      }, 225);        
-    } else {
-      this.formType = null;
-    }
+    setTimeout(() => {
+      this.formType = form;
+    }, 225);
   }
 
   /**
@@ -124,6 +120,8 @@ export class SidebarComponent implements OnInit {
   public toggleFormNav(navType: string): void {
     if(navType === 'other-forms') {
       this.otherFormsHidden = (this.otherFormsHidden) ? false : true;
+    } else if (navType === 'my-forms') {
+      this.myFormsHidden = (this.myFormsHidden) ? false : true;
     }
   }
 

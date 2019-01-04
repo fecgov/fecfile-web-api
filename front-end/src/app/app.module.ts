@@ -50,6 +50,8 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
+import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sidebar.component';
+import { DynamicFormsComponent } from './forms/dynamic-forms/dynamic-forms.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -86,7 +88,9 @@ import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-m
     ToolsExportNamesComponent,
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    FormSidebarComponent,
+    DynamicFormsComponent
   ],
   entryComponents: [
     ConfirmModalComponent
