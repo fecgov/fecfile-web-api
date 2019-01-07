@@ -27,8 +27,6 @@ export class DynamicFormsComponent implements OnInit {
         .subscribe(resp => {
             this.sidebarLinks = resp;
 
-            console.log('resp: ', this.sidebarLinks);
-
             this.loading = false;
         });
   }

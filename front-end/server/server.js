@@ -20,6 +20,6 @@ server.get('', (req, res) => {});
 server.use(db);
 
 server.listen(3000, () => {
-  console.log('Run Auth API Server');
+  console.log('Run API Server');
   console.log('http://localhost:3000');
 });

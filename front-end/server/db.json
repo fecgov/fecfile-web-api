@@ -3,11 +3,49 @@
     {
       "type": {
         "name": "Receipts",
+        "value": "receipts",
         "options": [
           {
             "name": "Receipts",
             "value": "receipts",
-            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": [
+              {
+                "name": "individual-receipt",
+                "value": "Individual Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "partnership-receipt",
+                "value": "Partnership Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "in-kind-receipt",
+                "value": "In-Kind Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "individual-in-kind-bitcoin-receipt",
+                "value": "Individual In-Kind Bitcoin Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "reattribution",
+                "value": "Reattribution",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "returned-bounced-receipt",
+                "value": "Returned Bounced Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "earmark-receipt",
+                "value": "Earmark Receipt",
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              }
+            ]
           },
           {
             "name": "Contributions from individuals",
@@ -35,18 +73,21 @@
     {
       "type": {
         "name": "Disbursements",
+        "value": "disbursements",
         "options": []
       }
     },
     {
       "type": {
         "name": "Loans & Debts",
+        "value": "loans-debts",
         "options": []
       }
     },
     {
       "type": {
         "name": "Cash on Hand",
+        "value": "cash-on-hand",
         "options": []
       }
     }

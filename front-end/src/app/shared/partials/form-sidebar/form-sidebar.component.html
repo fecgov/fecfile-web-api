@@ -1,7 +1,23 @@
 <div class="form-sidebar">
+  <h3 class="text-center">{{ title }}</h3>
   <ul class="form-sidebar__links">
-    <li *ngFor="let categoryType of sidebarLinks">
-      {{ categoryType?.type?.name }}
+    <li class="form-sidebar-item"
+      *ngFor="let categoryType of sidebarLinks"
+    >
+      <button
+        #item
+        type="button"
+        value="{{ categoryType?.type?.value }}"
+        [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
+        (click)="selectItem(item)"
+      >
+        {{ categoryType?.type?.name }}
+      </button>
+      <div
+        [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
+      >
+        Text
+      </div>
     </li>
   </ul>
 </div>
