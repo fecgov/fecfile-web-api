@@ -9,7 +9,45 @@
             "name": "Contributions from individuals",
             "value": "contributions-from-individuals",
             "infoIcon": true,
-            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": [
+              {
+                "name": "Individual Receipt",
+                "value": "individual-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "Partnership Receipt",
+                "value": "partnership-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "In-Kind Receipt",
+                "value": "in-kind-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "Retribution",
+                "value": "retribution",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "Returned/Bounced Receipt",
+                "value": "returned-bounced-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "name": "Earmark Receipt",
+                "value": "earmark-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              }
+            ]
           },
           {
             "name": "Transfers",
@@ -75,5 +113,10 @@
       "text": "Submit",
       "step": "step_5"
     }
-  ]
+  ],
+  "transaction-search-field": {
+    "name": "transaction-search",
+    "type": "text",
+    "placeholder": "Search for transaction"
+  }
 }
