@@ -16,7 +16,22 @@
       <div
         [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
       >
-        Text
+        <ul class="additional-options-list">
+          <li *ngFor="let option of categoryType.type.options">
+            {{ option.name }}
+            <button
+              type="button"
+              class="btn btn-link btn-tooltip"
+              ngbTooltip="{{ option?.info }}"
+              *ngIf="option.infoIcon"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+                Click for more information
+              </span>
+            </button>
+          </li>
+        </ul>
       </div>
     </li>
   </ul>

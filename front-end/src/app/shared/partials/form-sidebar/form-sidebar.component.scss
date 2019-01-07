@@ -5,18 +5,22 @@
   margin-right: auto;
   .form-sidebar__links {
     list-style-type: none;
+    margin-top: 15px;
     .form-sidebar-item {
       &:first-child {
         border-top: 1px solid $white;
       }
       border-bottom: 1px solid $white;
       display: block;
-      height: 30px;
-      line-height: 30px;
-      padding-left: 15px;
+      padding-bottom: 15px;
+      // padding-left: 15px;
+      padding-top: 15px;
       vertical-align: middle;
       .btn-link {
         color: $black;
+        line-height: 0;
+        margin-left: 10px;
+        padding: 0;
         &:active,
         &:focus,
         &:hover,
@@ -37,8 +41,26 @@
       }
       .additional-options {
         display: none;
+        padding: 0;
         &.visible {
           display: block;
+        }
+        .additional-options-list {
+          list-style-type: none;
+          li {
+            background-color: $white;
+            padding-bottom: 10px;
+            padding-left: 10px;
+            padding-top: 10px;
+            &:nth-child(odd) {
+              background-color: $seaShell;
+            }
+            .btn-tooltip {
+              color: $blueZodiac;
+              float: right;
+            }
+            @include clearfix();
+          }
         }
       }
     } // .form-sidebar__links

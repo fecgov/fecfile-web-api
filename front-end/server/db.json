@@ -6,65 +6,27 @@
         "value": "receipts",
         "options": [
           {
-            "name": "Receipts",
-            "value": "receipts",
-            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
-            "options": [
-              {
-                "name": "individual-receipt",
-                "value": "Individual Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "partnership-receipt",
-                "value": "Partnership Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "in-kind-receipt",
-                "value": "In-Kind Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "individual-in-kind-bitcoin-receipt",
-                "value": "Individual In-Kind Bitcoin Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "reattribution",
-                "value": "Reattribution",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "returned-bounced-receipt",
-                "value": "Returned Bounced Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              },
-              {
-                "name": "earmark-receipt",
-                "value": "Earmark Receipt",
-                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
-              }
-            ]
-          },
-          {
             "name": "Contributions from individuals",
             "value": "contributions-from-individuals",
+            "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
             "name": "Transfers",
             "value": "transfers",
+            "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
             "name": "Refunds",
             "value": "refunds",
+            "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
             "name": "Other",
             "value": "other",
+            "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           }
         ]
