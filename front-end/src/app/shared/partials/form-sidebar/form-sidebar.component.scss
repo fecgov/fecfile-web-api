@@ -10,10 +10,12 @@
       &:first-child {
         border-top: 1px solid $white;
       }
+      &.selected {
+        padding-bottom: 0;
+      }
       border-bottom: 1px solid $white;
       display: block;
       padding-bottom: 15px;
-      // padding-left: 15px;
       padding-top: 15px;
       vertical-align: middle;
       .btn-link {

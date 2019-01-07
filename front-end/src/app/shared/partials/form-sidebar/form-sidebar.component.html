@@ -1,7 +1,7 @@
 <div class="form-sidebar">
   <h3 class="text-center">{{ title }}</h3>
   <ul class="form-sidebar__links">
-    <li class="form-sidebar-item"
+    <li [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
       *ngFor="let categoryType of sidebarLinks"
     >
       <button
