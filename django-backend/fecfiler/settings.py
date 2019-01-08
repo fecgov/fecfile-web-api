@@ -320,7 +320,7 @@ for logger in LOGGING['loggers']:
 
 
 # AWS SES Configuration Settings
-EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
+#EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
 
 AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
 AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
