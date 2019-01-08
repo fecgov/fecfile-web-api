@@ -1,49 +1,62 @@
 <div class="form-sidebar">
-  <h3 class="text-center">{{ title }}</h3>
-  <ul class="form-sidebar__links">
-    <li [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
-      *ngFor="let categoryType of sidebarLinks"
-    >
-      <button
-        #item
-        type="button"
-        value="{{ categoryType?.type?.value }}"
-        [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
-        (click)="selectItem(item)"
+  <header>
+    <h3 class="text-center">{{ title }}</h3>
+    <hr />
+  </header>
+  <section>
+    <div *ngIf="searchField">
+      <input
+        type="{{ searchField.type }}"
+        name="{{ searchField.name }}"
+        class="{{ searchField.name }}"
+        placeholder="{{ searchField.placeholder }}"
+      />
+    </div>
+    <ul class="form-sidebar__links">
+      <li [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        *ngFor="let categoryType of sidebarLinks"
       >
-        {{ categoryType?.type?.name }}
-      </button>
-      <div
-        [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
-      >
-        <ul class="additional-options-list">
-          <li
-            *ngFor="let option of categoryType.type.options"
-            [ngClass]="additionalItemSelected === option?.value ? 'additional-item selected' : 'additional-item'"
-          >
-            <button
-              #additionalItem
-              type="button"
-              value="{{ option.value }}"
-              [ngClass]="additionalItemSelected === option?.value ? 'btn btn-link selected' : 'btn btn-link'"
-              (click)="selectedAdditionalOption(additionalItem)"
+        <button
+          #item
+          type="button"
+          value="{{ categoryType?.type?.value }}"
+          [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
+          (click)="selectItem(item)"
+        >
+          {{ categoryType?.type?.name }}
+        </button>
+        <div
+          [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
+        >
+          <ul class="additional-options-list">
+            <li
+              *ngFor="let option of categoryType.type.options"
+              [ngClass]="additionalItemSelected === option?.value ? 'additional-item selected' : 'additional-item'"
             >
-              {{ option.name }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-link btn-tooltip"
-              ngbTooltip="{{ option?.info }}"
-              *ngIf="option.infoIcon"
-            >
-              <i class="info-icon" aria-hidden="true"></i>
-              <span class="sr-only">
-                Click for more information
-              </span>
-            </button>
-          </li>
-        </ul>
-      </div>
-    </li>
-  </ul>
+              <button
+                #additionalItem
+                type="button"
+                value="{{ option.value }}"
+                [ngClass]="additionalItemSelected === option?.value ? 'btn btn-link selected' : 'btn btn-link'"
+                (click)="selectedAdditionalOption(additionalItem)"
+              >
+                {{ option.name }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-link btn-tooltip"
+                ngbTooltip="{{ option?.info }}"
+                *ngIf="option.infoIcon"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">
+                  Click for more information
+                </span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+  </section>
 </div>

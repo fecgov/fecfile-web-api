@@ -42,5 +42,17 @@
       min-height: 100vh;
       width: 76%;
     }
+    main {
+      .form-content {
+        .options-list {
+          list-style-type: none;
+          .options-list__item {
+            padding-bottom: 10px;
+            padding-left: 10px;
+            padding-top: 10px;
+          }
+        }
+      }
+    }
    } // .form__container
 }

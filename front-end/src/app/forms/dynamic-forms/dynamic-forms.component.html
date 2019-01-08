@@ -1,14 +1,32 @@
-<div class="forms__wizard" *ngIf="!loading">
+<div class="forms__wizard" *ngIf="!loadingSteps && !loadingCategories && !loadingSearchField">
 	<div class="form__sidebar">
-   <form-sidebar
-    title="Transaction Categories"
-    [sidebarLinks]="sidebarLinks"
-   ></form-sidebar>
+     <form-sidebar
+      title="Transaction Categories"
+      [sidebarLinks]="sidebarLinks"
+      [searchField]="searchField"
+      (status)='onNotify($event)'
+     ></form-sidebar>
   </div>
 	<div class="form__container">
-    <app-steps
-      [steps]="steps"
-      [current_step]="step_1"
-    ></app-steps>
+    <header>
+      <app-steps
+        [steps]="steps"
+        [current_step]="step_1"
+      ></app-steps>
+    </header>
+    <main>
+      <div class="form-content">
+        <form>
+          <ul class="options-list">
+            <li
+              class="options-list__item"
+              *ngFor="let option of selectedOptions"
+            >
+              {{ option?.name }}
+            </li>
+          </ul>
+        </form>
+      </div>
+    </main>
 	</div>
 </div>

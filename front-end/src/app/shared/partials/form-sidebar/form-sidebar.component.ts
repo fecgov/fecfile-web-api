@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {NgbTooltipConfig} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -10,7 +10,10 @@ import {NgbTooltipConfig} from '@ng-bootstrap/ng-bootstrap';
 export class FormSidebarComponent implements OnInit {
 
   @Input() sidebarLinks: any = [];
+  @Input() searchField: any = {};
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
+
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
@@ -26,16 +29,22 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('this.sidebarLinks: ', this.sidebarLinks);
+    console.log('searchField: ', this.searchField);
   }
 
   public selectItem(item): void {
     this.itemSelected = item.getAttribute('value');
 
+    this.additionalOptions = [];
+
     this.sidebarLinks.findIndex((el, index) => {
       if (el.type.value === this.itemSelected) {
         this._indexOfItemSelected = index;
       }
+    });
+
+    this.status.emit({
+      additionalOptions: this.additionalOptions
     });
   }
 
@@ -54,5 +63,9 @@ export class FormSidebarComponent implements OnInit {
     this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].type.options[additionalItemIndex].options;
 
     console.log('this.additionalOptions: ', this.additionalOptions);
+
+    this.status.emit({
+      additionalOptions: this.additionalOptions
+    });
   }
 }
