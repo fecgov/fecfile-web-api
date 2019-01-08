@@ -17,8 +17,19 @@
         [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
       >
         <ul class="additional-options-list">
-          <li *ngFor="let option of categoryType.type.options">
-            {{ option.name }}
+          <li
+            *ngFor="let option of categoryType.type.options"
+            [ngClass]="additionalItemSelected === option?.value ? 'additional-item selected' : 'additional-item'"
+          >
+            <button
+              #additionalItem
+              type="button"
+              value="{{ option.value }}"
+              [ngClass]="additionalItemSelected === option?.value ? 'btn btn-link selected' : 'btn btn-link'"
+              (click)="selectedAdditionalOption(additionalItem)"
+            >
+              {{ option.name }}
+            </button>
             <button
               type="button"
               class="btn btn-link btn-tooltip"

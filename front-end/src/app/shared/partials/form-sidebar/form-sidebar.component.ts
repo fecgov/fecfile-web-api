@@ -13,6 +13,10 @@ export class FormSidebarComponent implements OnInit {
   @Input() title: string = '';
 
   public itemSelected: string = '';
+  public additionalItemSelected: string = '';
+  public additionalOptions: Array<any> = [];
+
+  private _indexOfItemSelected: number = null;
 
   constructor(
     private _config: NgbTooltipConfig
@@ -22,10 +26,33 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('form-sidebar: ');
+    console.log('this.sidebarLinks: ', this.sidebarLinks);
   }
 
   public selectItem(item): void {
     this.itemSelected = item.getAttribute('value');
+
+    this.sidebarLinks.findIndex((el, index) => {
+      if (el.type.value === this.itemSelected) {
+        this._indexOfItemSelected = index;
+      }
+    });
+  }
+
+  public selectedAdditionalOption(additionalItem): void {
+    console.log('selectedAdditionalOption: ');
+
+    let additionalItemIndex: number = null;
+
+    this.additionalItemSelected = additionalItem.getAttribute('value');
+    this.sidebarLinks[this._indexOfItemSelected].type.options.findIndex((el, index) => {
+      if (this.additionalItemSelected === el.value) {
+        additionalItemIndex = index;
+      }
+    });
+
+    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].type.options[additionalItemIndex].options;
+
+    console.log('this.additionalOptions: ', this.additionalOptions);
   }
 }

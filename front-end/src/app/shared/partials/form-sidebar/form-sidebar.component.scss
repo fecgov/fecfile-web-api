@@ -11,6 +11,7 @@
         border-top: 1px solid $white;
       }
       &.selected {
+        background-color: $shuttleGray;
         padding-bottom: 0;
       }
       border-bottom: 1px solid $white;
@@ -21,7 +22,7 @@
       .btn-link {
         color: $black;
         line-height: 0;
-        margin-left: 10px;
+        margin-left: 5px;
         padding: 0;
         &:active,
         &:focus,
@@ -32,6 +33,7 @@
         }
         &.selected {
           color: $white;
+          padding-bottom: 10px;
           &:active,
           &:focus,
           &:hover,
@@ -49,13 +51,25 @@
         }
         .additional-options-list {
           list-style-type: none;
-          li {
+          .additional-item {
             background-color: $white;
-            padding-bottom: 10px;
-            padding-left: 10px;
-            padding-top: 10px;
+            padding-bottom: 5px;
+            padding-top: 5px;
             &:nth-child(odd) {
               background-color: $seaShell;
+            }
+            &.selected {
+              background-color: $bombay;
+            }
+            .btn-link {
+              color: $black;
+              &:active,
+              &:focus,
+              &:hover,
+              &:visited {
+                color: $black;
+                text-decoration: none;
+              }
             }
             .btn-tooltip {
               color: $blueZodiac;
