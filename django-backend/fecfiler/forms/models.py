@@ -100,5 +100,75 @@ class Committee(models.Model):
         verbose_name = _('Committee')
         verbose_name_plural = _('Committee')
 
+class CommitteeLookup(models.Model):
+    cmte_id = models.CharField(primary_key=True, max_length=9)
+    cmte_name = models.CharField(max_length=200, blank=True, null=True)
+    street_1 = models.CharField(max_length=34, blank=True, null=True)
+    street_2 = models.CharField(max_length=34, blank=True, null=True)
+    city = models.CharField(max_length=30, blank=True, null=True)
+    state = models.CharField(max_length=2, blank=True, null=True)
+    zip_code = models.CharField(max_length=9, blank=True, null=True)
+    cmte_email_1 = models.CharField(max_length=100, blank=True, null=True)
+    cmte_email_2 = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = models.CharField(max_length=30, blank=True, null=True)
+    cmte_type = models.CharField(max_length=1, blank=True, null=True)
+    cmte_dsgn = models.CharField(max_length=1, blank=True, null=True)
+    cmte_filing_freq = models.CharField(max_length=1, blank=True, null=True)
+    cmte_filed_type = models.CharField(max_length=1, blank=True, null=True)
+    treasurer_last_name = models.CharField(max_length=90, blank=True, null=True)
+    treasurer_first_name = models.CharField(max_length=90, blank=True, null=True)
+    treasurer_middle_name = models.CharField(max_length=90, blank=True, null=True)
+    treasurer_prefix = models.CharField(max_length=10, blank=True, null=True)
+    treasurer_suffix = models.CharField(max_length=10, blank=True, null=True)
+    last_update_date = models.TimeField()
 
-    
+    class Meta:
+        managed = False
+        db_table = 'committee_lookup'
+
+        
+class RefCmteTypeVsForms(models.Model):
+    cmte_type = models.CharField(primary_key=True, max_length=1)
+    cmte_dsgn = models.CharField(max_length=1)
+    form_type = models.CharField(max_length=10)
+    category = models.CharField(max_length=25)
+    last_update_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_cmte_type_vs_forms'
+        unique_together = (('cmte_type', 'cmte_dsgn', 'form_type'),)
+
+
+class RefFormTypes(models.Model):
+    form_type = models.CharField(primary_key=True, max_length=10)
+    form_description = models.CharField(max_length=300, blank=True, null=True)
+    form_tooltip = models.CharField(max_length=1000, blank=True, null=True)
+    form_pdf_url = models.CharField(max_length=500, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_form_types'
+
+
+class RefFormsVsReports(models.Model):
+    form_type = models.CharField(primary_key=True, max_length=10)
+    report_type = models.CharField(max_length=10)
+    filing_freq = models.CharField(max_length=1, blank=True, null=True)
+    last_update_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_forms_vs_reports'
+        unique_together = (('form_type', 'report_type'),)
+
+
+class RefRptTypes(models.Model):
+    rpt_type = models.CharField(primary_key=True, max_length=9)
+    rpt_type_desc = models.CharField(max_length=200, blank=True, null=True)
+    rpt_type_order = models.IntegerField(blank=True, null=True)
+    last_update_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ref_rpt_types'
