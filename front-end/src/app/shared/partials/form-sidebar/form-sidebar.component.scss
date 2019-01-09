@@ -6,7 +6,21 @@
   .search-field {
     margin-left: auto;
     margin-right: auto;
+    position: relative;
     text-align: center;
+    .search-icon {
+      color: $shuttleGray;
+      position: absolute;
+      right: 30px;
+      top: 10px;
+      z-index: 1;
+    }
+    input[type='text'] {
+      @include make-text-input(175px, 1.5em, 1em, 1em);
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
   }
   .form-sidebar__links {
     list-style-type: none;
