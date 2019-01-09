@@ -30,6 +30,12 @@
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
+                "name": "Individual In-Kind Bitcoin Receipt",
+                "value": "individual-in-kind-bitcoin-receipt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
                 "name": "Retribution",
                 "value": "retribution",
                 "infoIcon": true,
@@ -74,21 +80,92 @@
       "type": {
         "name": "Disbursements",
         "value": "disbursements",
-        "options": []
+        "options": [
+          {
+            "name": "Operating Expenditures",
+            "value": "operating-expenditures",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": []
+          },
+          {
+            "name": "Contributions/Expenditures to Reg. Filers",
+            "value": "contributions-expenditures-filers",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "Other Expenditures",
+            "value": "other-expenditures",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "Refunds",
+            "value": "refunds",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "Allocated or FEA Expenditures",
+            "value": "allocated-or-fea-expenditures",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          }
+        ]
       }
     },
     {
       "type": {
         "name": "Loans & Debts",
         "value": "loans-debts",
-        "options": []
+        "options": [
+          {
+            "name": "Loans Owed to Committee",
+            "value": "loans-owed-to-committee",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": []
+          },
+          {
+            "name": "Loans Owed by Committee",
+            "value": "loans-owed-by-committee",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "Debts Owed to Committee",
+            "value": "debts-owed-to-committee",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "Debts owed by Committee",
+            "value": "debts-owed-by-committee",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          }
+        ]
       }
     },
     {
       "type": {
-        "name": "Cash on Hand",
-        "value": "cash-on-hand",
-        "options": []
+        "name": "Other",
+        "value": "other",
+        "options": [
+          {
+            "name": "H1 - Allocation Ratios",
+            "value": "H1-allocation-ratios",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "name": "H2 - Fundraising Ratios",
+            "value": "H2-fundraising-ratios",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          }
+        ]
       }
     }
   ],

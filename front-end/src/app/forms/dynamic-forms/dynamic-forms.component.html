@@ -1,4 +1,7 @@
-<div class="forms__wizard" *ngIf="!loadingSteps && !loadingCategories && !loadingSearchField">
+<div
+  class="forms__wizard"
+  *ngIf="!loadingSteps && !loadingCategories && !loadingSearchField"
+>
 	<div class="form__sidebar">
      <form-sidebar
       title="Transaction Categories"
@@ -11,7 +14,7 @@
     <header>
       <app-steps
         [steps]="steps"
-        [current_step]="step_1"
+        current_step="step_1"
       ></app-steps>
     </header>
     <main>
@@ -22,7 +25,29 @@
               class="options-list__item"
               *ngFor="let option of selectedOptions"
             >
-              {{ option?.name }}
+              <input
+                type="radio"
+                name="option-radio"
+                id="{{ option?.value }}"
+                class="option-radio"
+                value="{{ option?.value }}"
+              />
+              <label
+                for="{{ option?.value }}"
+              >
+                {{ option?.name }}
+              </label>
+              <button
+                type="button"
+                class="btn-info"
+                ngbTooltip="{{ option?.info }}"
+                *ngIf="option.infoIcon"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">
+                  Click for more information
+                </span>
+              </button>
             </li>
           </ul>
         </form>

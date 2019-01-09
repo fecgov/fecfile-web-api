@@ -12,6 +12,11 @@
     list-style-type: none;
     margin-top: 15px;
     .form-sidebar-item {
+      border-bottom: 1px solid $white;
+      display: block;
+      padding-bottom: 15px;
+      padding-top: 15px;
+      vertical-align: middle;
       &:first-child {
         border-top: 1px solid $white;
       }
@@ -19,11 +24,6 @@
         background-color: $shuttleGray;
         padding-bottom: 0;
       }
-      border-bottom: 1px solid $white;
-      display: block;
-      padding-bottom: 15px;
-      padding-top: 15px;
-      vertical-align: middle;
       .btn-link {
         color: $black;
         line-height: 0;
@@ -68,6 +68,11 @@
             }
             .btn-link {
               color: $black;
+              float: left;
+              line-height: 1em;
+              text-align: left;
+              width: 200px;
+              white-space: normal;
               &:active,
               &:focus,
               &:hover,
@@ -76,8 +81,7 @@
                 text-decoration: none;
               }
             }
-            .btn-tooltip {
-              color: $blueZodiac;
+            .btn-info {
               float: right;
             }
             @include clearfix();

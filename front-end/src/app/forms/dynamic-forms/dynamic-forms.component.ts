@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'dynamic-forms',
   templateUrl: './dynamic-forms.component.html',
   styleUrls: ['./dynamic-forms.component.scss'],
+  providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
 export class DynamicFormsComponent implements OnInit {
@@ -20,8 +22,12 @@ export class DynamicFormsComponent implements OnInit {
   public searchField: any = {};
 
   constructor(
-  	private _http: HttpClient
-  ) { }
+  	private _http: HttpClient,
+    private _config: NgbTooltipConfig
+  ) {
+    this._config.placement = 'right';
+    this._config.triggers = 'click';
+  }
 
   ngOnInit(): void {
 
@@ -53,8 +59,6 @@ export class DynamicFormsComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
-    console.log('onNotify: ');
-    console.log('e: ', e);
     this.selectedOptions = e.additionalOptions;
   }
 }
