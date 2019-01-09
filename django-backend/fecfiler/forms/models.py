@@ -100,7 +100,7 @@ class Committee(models.Model):
         verbose_name = _('Committee')
         verbose_name_plural = _('Committee')
 
-class CommitteeLookup(models.Model):
+class CommitteeMaster(models.Model):
     cmte_id = models.CharField(primary_key=True, max_length=9)
     cmte_name = models.CharField(max_length=200, blank=True, null=True)
     street_1 = models.CharField(max_length=34, blank=True, null=True)
@@ -125,7 +125,13 @@ class CommitteeLookup(models.Model):
     class Meta:
         managed = False
         db_table = 'committee_lookup'
-
+class My_Forms_View(models.Model):
+    cmte_id = models.CharField(primary_key=True, max_length=9)
+    category = models.CharField(max_length=25)
+    form_type = models.CharField(max_length=10)   
+    due_date = models.DateField(blank=True, null=True) 
+    form_description = models.CharField(max_length=300, blank=True, null=True)
+    form_info = models.CharField(max_length=1000, blank=True, null=True)
         
 class RefCmteTypeVsForms(models.Model):
     cmte_type = models.CharField(primary_key=True, max_length=1)
