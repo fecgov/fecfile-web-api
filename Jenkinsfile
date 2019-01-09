@@ -72,9 +72,9 @@ pipeline {
     stage('Build Flywaydb') {
         steps { 
             script {
-               def flywayImage = docker-build("fecfile-flyway-db:${VERSION}", 'data/')
+               def flywayImage = docker.build("fecfile-flyway-db:${VERSION}", 'data/')
                
-               docker.withRegistry('813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db') {
+               docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db') {
                    flywayImage.push()
                }    
             }
