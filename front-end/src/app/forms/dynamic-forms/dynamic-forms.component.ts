@@ -16,10 +16,12 @@ export class DynamicFormsComponent implements OnInit {
   public loadingSteps: boolean = true;
   public loadingCategories: boolean = true;
   public loadingSearchField: boolean = true;
+  public loadingCashOnHand: boolean = true;
   public steps: any = {};
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
   public searchField: any = {};
+  public cashOnHand: any = {};
 
   constructor(
   	private _http: HttpClient,
@@ -50,6 +52,13 @@ export class DynamicFormsComponent implements OnInit {
             this.searchField = resp;
 
             this.loadingSearchField = false;
+        });
+
+    this._http.get('http://localhost:3000/cashOnHand')
+        .subscribe(resp => {
+            this.cashOnHand = resp;
+
+            this.loadingCashOnHand = false;
         });
   }
 

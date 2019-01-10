@@ -66,6 +66,17 @@
           </ul>
         </div>
       </li>
+      <li
+        class="form-sidebar-item"
+        *ngIf="cashOnHand?.showCashOnHand"
+      >
+        <div class="form-sidebar-item__text">
+          {{ cashOnHand.text }}
+        </div>
+        <div class="form-sidebar-item__value">
+          ${{ cashOnHand.amount }}
+        </div>
+      </li>
     </ul>
   </section>
 </div>

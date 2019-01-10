@@ -13,6 +13,7 @@ export class FormSidebarComponent implements OnInit {
   @Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
+  @Input() cashOnHand: any = {};
 
 
   public itemSelected: string = '';
@@ -29,7 +30,7 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('searchField: ', this.searchField);
+    console.log('sidebarLinks: ', this.sidebarLinks);
   }
 
   public selectItem(item): void {

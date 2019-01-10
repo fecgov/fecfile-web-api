@@ -38,6 +38,16 @@
         background-color: $shuttleGray;
         padding-bottom: 0;
       }
+      .form-sidebar-item__text {
+        color: $white;
+        float: left;
+        padding-left: 18px;
+      }
+      .form-sidebar-item__value {
+        color: $white;
+        float: right;
+        padding-right: 10px;
+      }
       .form-sidebar-item-box {
         .btn-link {
           color: $black;

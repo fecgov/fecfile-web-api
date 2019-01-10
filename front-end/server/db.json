@@ -173,6 +173,12 @@
       }
     }
   ],
+  "cashOnHand": {
+    "amount": 0,
+    "text": "Cash on Hand",
+    "name": "cash-on-hand",
+    "showCashOnHand": true
+  },
   "steps": [
     {
       "text": "Type",
