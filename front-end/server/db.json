@@ -2,54 +2,69 @@
   "transaction-categories": [
     {
       "type": {
-        "name": "Receipts",
+        "text": "Receipts",
         "value": "receipts",
         "amount": 0,
         "options": [
           {
-            "name": "Contributions from individuals",
+            "text": "Contributions from individuals",
+            "name": "contributions-from-individuals",
             "value": "contributions-from-individuals",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
             "options": [
               {
-                "name": "Individual Receipt",
+                "type": "radio",
+                "text": "Individual Receipt",
+                "name": "contributions-from-individuals",
                 "value": "individual-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "Partnership Receipt",
+                "type": "radio",
+                "text": "Partnership Receipt",
+                "name": "contributions-from-individuals",
                 "value": "partnership-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "In-Kind Receipt",
+                "type": "radio",
+                "text": "In-Kind Receipt",
+                "name": "contributions-from-individuals",
                 "value": "in-kind-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "Individual In-Kind Bitcoin Receipt",
+                "type": "radio",
+                "text": "Individual In-Kind Bitcoin Receipt",
+                "name": "contributions-from-individuals",
                 "value": "individual-in-kind-bitcoin-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "Retribution",
+                "type": "radio",
+                "text": "Retribution",
+                "name": "contributions-from-individuals",
                 "value": "retribution",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "Returned/Bounced Receipt",
+                "type": "radio",
+                "text": "Returned/Bounced Receipt",
+                "name": "contributions-from-individuals",
                 "value": "returned-bounced-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
               },
               {
-                "name": "Earmark Receipt",
+                "type": "radio",
+                "text": "Earmark Receipt",
+                "name": "contributions-from-individuals",
                 "value": "earmark-receipt",
                 "infoIcon": true,
                 "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
@@ -57,19 +72,105 @@
             ]
           },
           {
-            "name": "Transfers",
+            "text": "Contributions/Expenditures to Reg. Filers",
+            "name": "contributions-expenditures-to-reg-filers",
+            "value": "contributions-expenditures-to-reg-filers",
+            "infoIcon": true,
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+          },
+          {
+            "text": "Transfers",
+            "name": "transfers",
             "value": "transfers",
             "infoIcon": true,
-            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": [
+              {
+                "type": "radio",
+                "text": "Transfers",
+                "name": "transfers",
+                "value": "transfers",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "JF Transfers",
+                "name": "transfers",
+                "value": "jf-transfers",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "In-Kind Transfers",
+                "name": "transfers",
+                "value": "in-kind-transfers",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "In-Kind Transfer-FEA",
+                "name": "transfers",
+                "value": "in-kind-transfer-fea",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Transfer from Non-Federal Account",
+                "name": "transfers",
+                "value": "transfer-from-non-federal-account",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Transfer from Levin Account",
+                "name": "transfers",
+                "value": "transfer-from-levin-account",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              }
+            ]
           },
           {
-            "name": "Refunds",
+            "text": "Refunds",
+            "name": "refunds",
             "value": "refunds",
             "infoIcon": true,
-            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+            "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
+            "options": [
+              {
+                "type": "radio",
+                "text": "Offsets to Operating Expenditures",
+                "name": "refunds",
+                "value": "offsets-to-operating-expenditures",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Refunds of Contributions to Candidate",
+                "name": "refunds",
+                "value": "refunds-of-contributions-to-candidate",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Refunds of Contributions to Other Committees",
+                "name": "refunds",
+                "value": "refunds-of-contributions-to-other-committees",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              }
+            ]
           },
           {
-            "name": "Other",
+            "text": "Other",
+            "name": "other",
             "value": "other",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
@@ -79,37 +180,108 @@
     },
     {
       "type": {
-        "name": "Disbursements",
+        "text": "Disbursements",
+        "name": "",
         "value": "disbursements",
         "amount": 0,
         "options": [
           {
-            "name": "Operating Expenditures",
+            "text": "Operating Expenditures",
+            "name": "operating-expenditures",
             "value": "operating-expenditures",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
-            "options": []
+            "options": [
+              {
+                "type": "radio",
+                "text": "Operating Expenditure",
+                "name": "operating-expenditures",
+                "value": "operating-expenditure",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Operating Expenditure-Debt",
+                "name": "operating-expenditures",
+                "value": "operating-expenditure-debt",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Credit Card Payment",
+                "name": "operating-expenditures",
+                "value": "credit-card-payment",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Staff Reimbursement",
+                "name": "operating-expenditures",
+                "value": "staff-reimbursement",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Payment to Payroll",
+                "name": "operating-expenditures",
+                "value": "payment-to-payroll",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Void",
+                "name": "operating-expenditures",
+                "value": "void",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Headquarters Account Operating Expense for National Party Expenses # Headquarters Account",
+                "name": "operating-expenditures",
+                "value": "headquarters-account-operating-expense",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              },
+              {
+                "type": "radio",
+                "text": "Convention Account Operating Expense for National Party Expense  # Conventions Account",
+                "name": "operating-expenditures",
+                "value": "convention-account-operating-expense",
+                "infoIcon": true,
+                "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
+              }
+            ]
           },
           {
-            "name": "Contributions/Expenditures to Reg. Filers",
+            "text": "Contributions/Expenditures to Reg. Filers",
+            "name": "contributions-expenditures-filers",
             "value": "contributions-expenditures-filers",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "Other Expenditures",
+            "text": "Other Expenditures",
+            "name": "other-expenditures",
             "value": "other-expenditures",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "Refunds",
+            "text": "Refunds",
+            "name": "refunds",
             "value": "refunds",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "Allocated or FEA Expenditures",
+            "text": "Allocated or FEA Expenditures",
+            "name": "",
             "value": "allocated-or-fea-expenditures",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
@@ -119,31 +291,36 @@
     },
     {
       "type": {
-        "name": "Loans & Debts",
+        "text": "Loans & Debts",
+        "name": "loans-debts",
         "value": "loans-debts",
         "amount": 0,
         "options": [
           {
-            "name": "Loans Owed to Committee",
+            "text": "Loans Owed to Committee",
+            "name": "loans-debts",
             "value": "loans-owed-to-committee",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu.",
             "options": []
           },
           {
-            "name": "Loans Owed by Committee",
+            "text": "Loans Owed by Committee",
+            "name": "loans-debts",
             "value": "loans-owed-by-committee",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "Debts Owed to Committee",
+            "text": "Debts Owed to Committee",
+            "name": "loans-debts",
             "value": "debts-owed-to-committee",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "Debts owed by Committee",
+            "text": "Debts owed by Committee",
+            "name": "loans-debts",
             "value": "debts-owed-by-committee",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
@@ -153,18 +330,21 @@
     },
     {
       "type": {
-        "name": "Other",
+        "text": "Other",
+        "name": "other",
         "value": "other",
         "amount": 0,
         "options": [
           {
-            "name": "H1 - Allocation Ratios",
+            "text": "H1 - Allocation Ratios",
+            "name": "other",
             "value": "H1-allocation-ratios",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
           },
           {
-            "name": "H2 - Fundraising Ratios",
+            "text": "H2 - Fundraising Ratios",
+            "name": "other",
             "value": "H2-fundraising-ratios",
             "infoIcon": true,
             "info": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi dui mi, ultrices non nulla eu."
@@ -176,7 +356,7 @@
   "cashOnHand": {
     "amount": 0,
     "text": "Cash on Hand",
-    "name": "cash-on-hand",
+    "text": "cash-on-hand",
     "showCashOnHand": true
   },
   "steps": [
@@ -202,7 +382,7 @@
     }
   ],
   "transaction-search-field": {
-    "name": "transaction-search",
+    "text": "transaction-search",
     "type": "text",
     "placeholder": "Search for transaction"
   }

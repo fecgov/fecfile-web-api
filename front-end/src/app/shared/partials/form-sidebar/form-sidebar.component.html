@@ -28,7 +28,7 @@
             [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
             (click)="selectItem(item)"
           >
-            {{ categoryType?.type?.name }}
+            {{ categoryType?.type?.text }}
           </button>
           <div class="amount">
             ${{ categoryType?.type?.amount }}
@@ -49,7 +49,7 @@
                 [ngClass]="additionalItemSelected === option?.value ? 'btn btn-link selected' : 'btn btn-link'"
                 (click)="selectedAdditionalOption(additionalItem)"
               >
-                {{ option.name }}
+                {{ option.text }}
               </button>
               <button
                 type="button"
@@ -78,5 +78,23 @@
         </div>
       </li>
     </ul>
+    <div class="form-sidebar__btns">
+      <div class="btn-row">
+        <button
+          type="button"
+          class="btn btn-secondary-gray"
+        >
+          Summary
+        </button>
+      </div>
+      <div class="btn-row">
+        <button
+          type="button"
+          class="btn btn-secondary"
+        >
+          Sign &amp; Submit
+        </button>
+      </div>
+    </div>
   </section>
 </div>

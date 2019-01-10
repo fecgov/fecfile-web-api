@@ -13,6 +13,7 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 export class DynamicFormsComponent implements OnInit {
 
   public currentStep: string = '';
+  public formOptionsVisible: boolean = false;
   public loadingSteps: boolean = true;
   public loadingCategories: boolean = true;
   public loadingSearchField: boolean = true;
@@ -69,5 +70,11 @@ export class DynamicFormsComponent implements OnInit {
    */
   public onNotify(e): void {
     this.selectedOptions = e.additionalOptions;
+
+    if (e.additionalOptions.length) {
+      this.formOptionsVisible = true;
+    } else {
+      this.formOptionsVisible = false;
+    }
   }
 }

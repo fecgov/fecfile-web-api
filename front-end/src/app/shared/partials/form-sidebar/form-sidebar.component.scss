@@ -41,12 +41,12 @@
       .form-sidebar-item__text {
         color: $white;
         float: left;
-        padding-left: 18px;
+        padding-left: 5px;
       }
       .form-sidebar-item__value {
         color: $white;
         float: right;
-        padding-right: 10px;
+        padding-right: 8px;
       }
       .form-sidebar-item-box {
         .btn-link {
@@ -54,6 +54,8 @@
           float: left;
           line-height: 0;
           margin-left: 5px;
+          padding-left: 0;
+          padding-right: 0;
           padding-top: 10px;
           &:active,
           &:focus,
@@ -97,6 +99,7 @@
           .additional-item {
             background-color: $white;
             padding-bottom: 5px;
+            padding-left: 5px;
             padding-top: 5px;
             &:nth-child(odd) {
               background-color: $seaShell;
@@ -108,6 +111,8 @@
               color: $black;
               float: left;
               line-height: 1em;
+              padding-left: 0;
+              padding-right: 0;
               text-align: left;
               width: 200px;
               white-space: normal;
@@ -129,4 +134,11 @@
       @include clearfix();
     } // .form-sidebar-item
   } // .form-sidebar__links
+  .form-sidebar__btns {
+    padding-top: 15px;
+    text-align: center;
+    .btn-row {
+      padding-top: 15px;
+    }
+  }
 }

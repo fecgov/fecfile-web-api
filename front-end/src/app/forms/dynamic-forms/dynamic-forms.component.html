@@ -18,7 +18,7 @@
         current_step="step_1"
       ></app-steps>
     </header>
-    <main>
+    <section>
       <div class="form-content">
         <form>
           <ul class="options-list">
@@ -27,8 +27,8 @@
               *ngFor="let option of selectedOptions"
             >
               <input
-                type="radio"
-                name="option-radio"
+                type="{{ option?.type }}"
+                name="{{ option?.name }}"
                 id="{{ option?.value }}"
                 class="option-radio"
                 value="{{ option?.value }}"
@@ -36,7 +36,7 @@
               <label
                 for="{{ option?.value }}"
               >
-                {{ option?.name }}
+                {{ option?.text }}
               </label>
               <button
                 type="button"
@@ -53,6 +53,20 @@
           </ul>
         </form>
       </div>
-    </main>
-	</div>
-</div>
+    </section>
+    <footer>
+      <div class="grid-row" *ngIf="formOptionsVisible">
+        <div class="grid-row__col grid-row__col--11">
+            <div class="forms__btn-container">
+              <button
+                class="btn btn-primary btn-right"
+                type="submit"
+              >
+                Next
+              </button>
+            </div>
+        </div>
+      </div>
+    </footer>
+	</div> <!-- ./form-contaner -->
+</div> <!-- ./forms-wizard -->
