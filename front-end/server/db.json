@@ -356,7 +356,7 @@
   "cashOnHand": {
     "amount": 0,
     "text": "Cash on Hand",
-    "text": "cash-on-hand",
+    "name": "cash-on-hand",
     "showCashOnHand": true
   },
   "steps": [
