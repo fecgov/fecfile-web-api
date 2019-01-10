@@ -38,29 +38,43 @@
         background-color: $shuttleGray;
         padding-bottom: 0;
       }
-      .btn-link {
-        color: $black;
-        line-height: 0;
-        margin-left: 5px;
-        padding: 0;
-        &:active,
-        &:focus,
-        &:hover,
-        &:visited {
+      .form-sidebar-item-box {
+        .btn-link {
           color: $black;
-          text-decoration: none;
-        }
-        &.selected {
-          color: $white;
-          padding-bottom: 10px;
+          float: left;
+          line-height: 0;
+          margin-left: 5px;
+          padding-top: 10px;
           &:active,
           &:focus,
           &:hover,
           &:visited {
-            color: $white;
+            color: $black;
             text-decoration: none;
           }
+          &.selected {
+            color: $white;
+            padding-bottom: 10px;
+            &:active,
+            &:focus,
+            &:hover,
+            &:visited {
+              color: $white;
+              text-decoration: none;
+            }
+          }
         }
+        .amount {
+          color: $black;
+          float: right;
+          padding-right: 10px;
+        }
+        &.selected {
+          .amount {
+            color: $white;
+          }
+        }
+        @include clearfix();
       }
       .additional-options {
         display: none;
@@ -101,7 +115,8 @@
             @include clearfix();
           }
         }
-      }
-    } // .form-sidebar__links
-  }
+      } // .additional-options
+      @include clearfix();
+    } // .form-sidebar-item
+  } // .form-sidebar__links
 }

@@ -14,18 +14,26 @@
       />
     </div>
     <ul class="form-sidebar__links">
-      <li [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+      <li
+        [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of sidebarLinks"
       >
-        <button
-          #item
-          type="button"
-          value="{{ categoryType?.type?.value }}"
-          [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
-          (click)="selectItem(item)"
+        <div
+          [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item-box selected' : 'form-sidebar-item-box'"
         >
-          {{ categoryType?.type?.name }}
-        </button>
+          <button
+            #item
+            type="button"
+            value="{{ categoryType?.type?.value }}"
+            [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
+            (click)="selectItem(item)"
+          >
+            {{ categoryType?.type?.name }}
+          </button>
+          <div class="amount">
+            ${{ categoryType?.type?.amount }}
+          </div>
+        </div>
         <div
           [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
         >

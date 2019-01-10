@@ -4,6 +4,7 @@
       "type": {
         "name": "Receipts",
         "value": "receipts",
+        "amount": 0,
         "options": [
           {
             "name": "Contributions from individuals",
@@ -80,6 +81,7 @@
       "type": {
         "name": "Disbursements",
         "value": "disbursements",
+        "amount": 0,
         "options": [
           {
             "name": "Operating Expenditures",
@@ -119,6 +121,7 @@
       "type": {
         "name": "Loans & Debts",
         "value": "loans-debts",
+        "amount": 0,
         "options": [
           {
             "name": "Loans Owed to Committee",
@@ -152,6 +155,7 @@
       "type": {
         "name": "Other",
         "value": "other",
+        "amount": 0,
         "options": [
           {
             "name": "H1 - Allocation Ratios",
