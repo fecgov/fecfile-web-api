@@ -88,6 +88,11 @@ export class DynamicFormsComponent implements OnInit {
     }
   }
 
+  /**
+   * Validates the form on submit.
+   *
+   * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
+   */
   public doValidateOption(): boolean {
     if (this.frmOption.invalid) {
       this.optionFailed = true;
@@ -98,6 +103,11 @@ export class DynamicFormsComponent implements OnInit {
     }
   }
 
+  /**
+   * Updates the status of any form erros when a radio button is clicked.
+   *
+   * @param      {Object}  e       The event object.
+   */
   public updateStatus(e): void {
     if (e.target.checked) {
       this.optionFailed = false;
