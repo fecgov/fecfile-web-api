@@ -1,5 +1,12 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { FormsService } from '../../services/FormsService/forms.service';
+import { MessageService } from '../../services/MessageService/message.service';
+/*import { APIService } from '/interfaces/services/APIService/APIService.ts';*/
+import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
+/*import SampleJson from '../../../../api/data.json';*/
+/*APIService/APIService.ts*/
 
 @Component({
   selector: 'app-sidebar',
@@ -11,23 +18,36 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public formType: number = null;
+  //public formType: number = null;
+  public formType: string = "";
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
-  public otherFormsHidden: boolean = false;
+  public otherFormsHidden: boolean = true;
   public myFormsHidden: boolean = false;
+  public committee_forms: Icommittee_forms[];
+  public committee_myforms: Icommittee_forms[];
+  public committee_otherforms: Icommittee_forms[];
+  
 
   constructor(
     private _router: Router,
-    private _activatedRoute: ActivatedRoute 
+    private _activatedRoute: ActivatedRoute,
+    private _formService:FormsService,
+    
+  
   ) { }
 
   ngOnInit(): void {  
     let route: string = this._router.url;
 
+    console.log("accessing form service call side bar ...");
+    
+    this._formService.get_filed_form_types()
+     .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
+         
     this._router
       .events
       .subscribe(val => {
@@ -36,7 +56,6 @@ export class SidebarComponent implements OnInit {
             if(val.url.indexOf('/forms/form/') === 0) {        
               this._closeNavBar();     
             } else if(val.url.indexOf('/dashboard') === 0) {
-              this.formType = null;
               this._openNavBar();   
             } else if(val.url.indexOf('/forms/form/') === -1) {
               this.formType = null;
@@ -82,13 +101,11 @@ export class SidebarComponent implements OnInit {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
-    if(form) {
-      setTimeout(() => {
-        this.formType = parseInt(form);
-      }, 225);        
-    } else {
-      this.formType = null;
-    }
+    setTimeout(() => {
+      //this.formType = parseInt(form);
+      this.formType = form.substring(2);
+    }, 225);    
+    console.log ("formSelected", form)
   }
 
   /**
