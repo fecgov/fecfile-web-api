@@ -30,7 +30,6 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('sidebarLinks: ', this.sidebarLinks);
   }
 
   public selectItem(item): void {

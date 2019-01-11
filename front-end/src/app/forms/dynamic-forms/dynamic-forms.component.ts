@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -14,10 +15,12 @@ export class DynamicFormsComponent implements OnInit {
 
   public currentStep: string = '';
   public formOptionsVisible: boolean = false;
+  public frmOption: FormGroup;
   public loadingSteps: boolean = true;
   public loadingCategories: boolean = true;
   public loadingSearchField: boolean = true;
   public loadingCashOnHand: boolean = true;
+  public optionFailed: boolean = false;
   public steps: any = {};
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
@@ -26,6 +29,7 @@ export class DynamicFormsComponent implements OnInit {
 
   constructor(
   	private _http: HttpClient,
+    private _fb: FormBuilder,
     private _config: NgbTooltipConfig
   ) {
     this._config.placement = 'right';
@@ -61,6 +65,12 @@ export class DynamicFormsComponent implements OnInit {
 
             this.loadingCashOnHand = false;
         });
+
+    this.frmOption = this._fb.group({
+      optionRadio: ['', Validators.required]
+    });
+
+
   }
 
   /**
@@ -75,6 +85,24 @@ export class DynamicFormsComponent implements OnInit {
       this.formOptionsVisible = true;
     } else {
       this.formOptionsVisible = false;
+    }
+  }
+
+  public doValidateOption(): boolean {
+    if (this.frmOption.invalid) {
+      this.optionFailed = true;
+      return false;
+    } else {
+      this.optionFailed = false;
+      return true;
+    }
+  }
+
+  public updateStatus(e): void {
+    if (e.target.checked) {
+      this.optionFailed = false;
+    } else {
+      this.optionFailed = true;
     }
   }
 }
