@@ -17,9 +17,9 @@ from django.db import connection
 @api_view(['GET'])
 def get_filed_report_types(request):
 
-    """
+    
     #Fields for identifying the committee type and committee design and filter the forms category 
-    """
+    
     try:
         #import ipdb;ipdb.set_trace()
         comm_id = request.user.username
