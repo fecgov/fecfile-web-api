@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
 from rest_framework.decorators import api_view
 import maya
+
 #from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,6 +24,8 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import Context, Template
+
+
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -904,7 +906,7 @@ def get_comm_lookup(request):
 @api_view(['GET'])
 def get_filed_form_types(request):
     """
-    fields fordentifying the committee type and committee design and filter the forms category 
+    Fields for identifying the committee type and committee design and filter the forms category 
     """
     try:
         comm_id = request.user.username
@@ -920,3 +922,26 @@ def get_filed_form_types(request):
         return Response(resp_data, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+"""
+@api_view(['GET'])
+def get_report_types_(request):
+    
+    #fields fordentifying the committee type and committee design and filter the forms category 
+    
+    try:
+        comm_id = request.user.username
+
+        #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
+        forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
+
+        for form_obj in forms_obj:
+            if form_obj['due_date']:
+                form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
+
+        resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
+        return Response(resp_data, status=status.HTTP_200_OK)
+    except:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+"""

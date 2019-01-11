@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     #'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
-		'django_ses_boto3',
+    'fecfiler.form3x',
+    'django_ses_boto3',
 ]
 
 
