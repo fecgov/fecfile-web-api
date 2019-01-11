@@ -62,8 +62,7 @@ INSTALLED_APPS = [
     'db_file_storage',
 
     #'fecfiler.form3x',
-    #'django_ses_boto3',
-
+    
 ]
 
 
