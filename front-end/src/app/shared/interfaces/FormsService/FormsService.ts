@@ -1,4 +1,4 @@
-export interface form99 {
+ export interface form99 {
   id: string,
   committeeid: string,
   committeename: string,
@@ -29,3 +29,15 @@ export interface form99 {
   printpriview_filename?:string,
   printpriview_fileurl?:string
  }
+
+ export interface Icommittee_forms {
+    category?: string, 
+    form_type?: string,
+    form_description?: string,
+    form_info?: string,
+    due_date?: string,
+    cmte_id?:string,
+    form_pdf_url?:string,
+    form_type_mini?: string,
+  }
+ 
