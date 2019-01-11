@@ -9,6 +9,7 @@ from .authentication.views import AccountViewSet, LoginView, LogoutView
 from .views import IndexView
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_swagger.views import get_swagger_view
+import fecfiler.form3x.urls as f3xurls
 schema_view = get_swagger_view(title='FEC-Filer API')
 
 router = routers.SimpleRouter()
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/v1/', include(accounts_router.urls)),
     url(r'^api/v1/', include('fecfiler.forms.urls')),
+    url(r'^api/v1/', include('fecfiler.form3x.urls')),
     
     #url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
     #url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
