@@ -18,7 +18,7 @@ from django.db import connection
 def get_filed_report_types(request):
 
     """
-    Fields for identifying the committee type and committee design and filter the forms category 
+    #Fields for identifying the committee type and committee design and filter the forms category 
     """
     try:
         #import ipdb;ipdb.set_trace()
