@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -209,16 +210,8 @@ export class FormsService {
   
     }
 
-    console.log ('Dupdated Data: ',data);
-
-    console.log ('loop through simple form Data: ');
-
-    for (var value of data.values()) {
-      console.log(value); 
-   }
-    console.log ('loop through form Data: ');
-    console.log(data);
-
+    console.log ('Formed Data: ',data);
+ 
    new Response(data).text().then(console.log)
     
     return this._http
@@ -229,6 +222,7 @@ export class FormsService {
           headers: httpOptions
         }
       )
+     
       .pipe(map(res => {
           if (res) {
             localStorage.setItem('form_99_details_res', JSON.stringify(res));
@@ -366,6 +360,8 @@ export class FormsService {
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token); 
 
+    console.log("httpOptions", httpOptions);
+    
     if(form_type === '99') {
 
       let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
@@ -459,13 +455,7 @@ export class FormsService {
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
 
-    for (var value of data.values()) {
-      console.log(value); 
-   }
-    console.log ('loop through form Data: ');
-    console.log(data);
-
-   new Response(data).text().then(console.log)
+    new Response(data).text().then(console.log)
     
     return this._http
       .post(
@@ -490,10 +480,11 @@ export class FormsService {
             localStorage.setItem('form_99_details.org_filename', org_filename);
             localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
 
-            console.log ('org_filename',org_filename);
-            console.log ('org_fileurl',org_fileurl);
-            console.log ('org_filename',printpriview_filename);
-            console.log ('org_fileurl',printpriview_fileurl);
+            console.log (' PreviewForm_ReasonScreen api Repsonse',res);
+            console.log (' PreviewForm_ReasonScreen org_filename',org_filename);
+            console.log (' PreviewForm_ReasonScreen org_fileurl',org_fileurl);
+            console.log (' PreviewForm_ReasonScreen org_filename',printpriview_filename);
+            console.log (' PreviewForm_ReasonScreen org_fileurl',printpriview_fileurl);
 
             if (fileuploaded)
             {
@@ -563,5 +554,30 @@ export class FormsService {
           }
           return false;
       }));      
+  }
+
+  public get_filed_form_types(): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+    
+    url = '/core/get_filed_form_types';
+    
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("token",token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    console.log("url = ", url);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
+
+     // return this._http.get('./assets/16.json');
+      
   }
 }
