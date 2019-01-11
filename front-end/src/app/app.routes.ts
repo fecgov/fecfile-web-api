@@ -1,7 +1,8 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
+// import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
+import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -44,9 +45,9 @@ export const AppRoutes: Routes = [
 		  { path: 'settings', component: SettingsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'contributors', component: ContributorsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  {
-        path: 'forms/form/:form_id', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuard],
+        path: 'forms/form/:form_id', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService],
         children: [
-          { path: ':form_step', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuard] }
+          { path: ':form_step', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService] }
         ]
       }
 		]

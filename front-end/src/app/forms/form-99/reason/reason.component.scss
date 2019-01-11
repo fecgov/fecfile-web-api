@@ -7,6 +7,10 @@
     margin: 0 auto 5px auto;
     width: 99%;
   }
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+  }
   header {
     .header-container {
       display: block;
@@ -185,6 +189,7 @@
     } // .content  
   } // section
   footer {
+    margin-top: 20px;
     .grid-row {
       margin-bottom: 15px !important;
       .grid-row__col--12 {
@@ -199,25 +204,15 @@
           }
           @include media(mediumDesktop) {
             width: 98%;
+            .btn-right {
+              margin-right: 20px;
+            }              
           }         
           @include media(largeDesktop) {
             width: 98%;
-          }  
-          .btn-container-row {
-            @include clearfix();
-            border-bottom: 1px solid $dustyGray;
-            height: 55px;
-            margin-bottom: 10px;
-            width: 100%;
-            .btn {
-              margin-right: 0;
-            }
-          }
-          .btn-left {
-            float: left;
-          }
-          .btn-right {
-            float: right;
+            .btn-right {
+              margin-right: 20px;
+            }              
           }          
         }       
       }

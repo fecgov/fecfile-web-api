@@ -185,19 +185,15 @@
       }
       @include media(mediumDesktop) {
         width: 95%;
+        .btn-right {
+          margin-right: 20px;
+        }    
       }         
       @include media(largeDesktop) {
         width: 95%;
-      }       
-      .btn-container-row {
-        @include clearfix();
-        border-bottom: 1px solid $dustyGray;
-        height: 55px;
-        margin-bottom: 10px;
-        width: 100%;
-        .btn {
-          margin-right: 0;
-        }
+        .btn-right {
+          margin-right: 20px;
+        }         
       }
       @include clearfix();
     }
