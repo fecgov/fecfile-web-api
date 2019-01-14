@@ -102,10 +102,16 @@ export class SidebarComponent implements OnInit {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
-    setTimeout(() => {
-      this.formType = form;
-      //form.substring(2);
-    }, 225);
+    this._router
+      .events
+      .subscribe(val => {
+        if(val instanceof NavigationEnd) {
+          if(val.url.indexOf(form) >= 1) {
+            this.formType = form;
+            //form.substring(2);
+          }
+        }
+      });
   }
 
   /**
