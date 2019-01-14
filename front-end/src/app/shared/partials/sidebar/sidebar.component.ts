@@ -1,5 +1,13 @@
+
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+import { FormsService } from '../../services/FormsService/forms.service';
+import { MessageService } from '../../services/MessageService/message.service';
+/*import { APIService } from '/interfaces/services/APIService/APIService.ts';*/
+import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
+/*import SampleJson from '../../../../api/data.json';*/
+/*APIService/APIService.ts*/
 
 @Component({
   selector: 'app-sidebar',
@@ -11,40 +19,52 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  public formType: string = null;
+  //public formType: number = null;
+  public formType: string = '';
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
-  public otherFormsHidden: boolean = false;
+  public otherFormsHidden: boolean = true;
   public myFormsHidden: boolean = false;
+  public committee_forms: Icommittee_forms[];
+  public committee_myforms: Icommittee_forms[];
+  public committee_otherforms: Icommittee_forms[];
+
 
   constructor(
     private _router: Router,
-    private _activatedRoute: ActivatedRoute 
+    private _activatedRoute: ActivatedRoute,
+    private _formService:FormsService,
+
+
   ) { }
 
-  ngOnInit(): void {  
+  ngOnInit(): void {
     let route: string = this._router.url;
+
+    console.log("accessing form service call side bar ...");
+
+    this._formService.get_filed_form_types()
+     .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
 
     this._router
       .events
       .subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
-            if(val.url.indexOf('/forms/form/') === 0) {        
-              this._closeNavBar();     
+            if(val.url.indexOf('/forms/form/') === 0) {
+              this._closeNavBar();
             } else if(val.url.indexOf('/dashboard') === 0) {
-              this.formType = null;
-              this._openNavBar();   
+              this._openNavBar();
             } else if(val.url.indexOf('/forms/form/') === -1) {
               this.formType = null;
             }
           }
         }
-      });  
- 
+      });
+
 
     this.screenWidth = window.innerWidth;
 
@@ -54,7 +74,7 @@ export class SidebarComponent implements OnInit {
     } else if (this.screenWidth >= 768) {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
-    } 
+    }
   }
 
   /**
@@ -74,7 +94,7 @@ export class SidebarComponent implements OnInit {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
     }
-  }    
+  }
 
   /**
    * Determines which form has been selected.
@@ -84,6 +104,7 @@ export class SidebarComponent implements OnInit {
   public formSelected(form: string): void {
     setTimeout(() => {
       this.formType = form;
+      //form.substring(2);
     }, 225);
   }
 
@@ -93,10 +114,10 @@ export class SidebarComponent implements OnInit {
    */
   public toggleSideNav(): void {
     if(this.iconClass === 'close-icon') {
-      this._closeNavBar();     
+      this._closeNavBar();
     } else {
-      this._openNavBar();      
-    } 	
+      this._openNavBar();
+    }
   }
 
   /**
@@ -109,8 +130,8 @@ export class SidebarComponent implements OnInit {
       tooltip.close();
     } else {
       tooltip.open();
-    }      
-  }    
+    }
+  }
 
   /**
    * Toggles weather or not the form navigation is visible.
@@ -120,8 +141,6 @@ export class SidebarComponent implements OnInit {
   public toggleFormNav(navType: string): void {
     if(navType === 'other-forms') {
       this.otherFormsHidden = (this.otherFormsHidden) ? false : true;
-    } else if (navType === 'my-forms') {
-      this.myFormsHidden = (this.myFormsHidden) ? false : true;
     }
   }
 
@@ -137,7 +156,7 @@ export class SidebarComponent implements OnInit {
 
     this.status.emit({
       showSidebar: false
-    });               
+    });
   }
 
   /**
@@ -148,10 +167,10 @@ export class SidebarComponent implements OnInit {
 
     setTimeout(() => {
       this.sidebarVisibleClass = 'sidebar-visible';
-    }, 100);    
+    }, 100);
 
     this.status.emit({
       showSidebar: true
-    });   
+    });
   }
 }

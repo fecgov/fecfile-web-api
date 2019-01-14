@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -64,10 +65,10 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let url: string = '';
     let data: any = {};
-   
-    
-    
-    
+
+
+
+
     if(form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -116,7 +117,7 @@ export class FormsService {
     let fileuploaded:boolean=false;
 
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token); 
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     if(form_type === '99') {
 
@@ -125,7 +126,7 @@ export class FormsService {
       if(file && file.name) {
         fileuploaded=true;
         localStorage.setItem('form_99_details.file', file);
-        formData.append('file', file, file.name);         
+        formData.append('file', file, file.name);
         formData.append('committeeid', form99_details.committeeid);
         formData.append('committeename', form99_details.committeename);
         formData.append('street1', form99_details.street1);
@@ -144,7 +145,7 @@ export class FormsService {
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
         formData.append('additional_email_1', form99_details.additional_email_1);
-        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
         formData.append('filename', form99_details.filename);
@@ -162,11 +163,11 @@ export class FormsService {
       {
 
         fileuploaded=false;
-        /*form99_details.is_submitted=false; 
+        /*form99_details.is_submitted=false;
         formData.append('file', form99_details.file);  */
 
         if (form99_details.filename!= null || form99_details.filename!= '' || form99_details.filename != "" || form99_details.filename != undefined){
-          formData.append('filename', form99_details.filename);    
+          formData.append('filename', form99_details.filename);
         }
 
         formData.append('committeeid', form99_details.committeeid);
@@ -187,13 +188,13 @@ export class FormsService {
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
         formData.append('additional_email_1', form99_details.additional_email_1);
-        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
         /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', "F99");
         if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
-        
+
           /*data['id']="0";*/
           formData.append('id', "0");
         }
@@ -202,25 +203,17 @@ export class FormsService {
           formData.append('id', form99_details.id.toString());
         }
 
-      }  
-     
+      }
+
       data=formData;
 
-  
+
     }
 
-    console.log ('Dupdated Data: ',data);
-
-    console.log ('loop through simple form Data: ');
-
-    for (var value of data.values()) {
-      console.log(value); 
-   }
-    console.log ('loop through form Data: ');
-    console.log(data);
+    console.log ('Formed Data: ',data);
 
    new Response(data).text().then(console.log)
-    
+
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -229,6 +222,7 @@ export class FormsService {
           headers: httpOptions
         }
       )
+
       .pipe(map(res => {
           if (res) {
             localStorage.setItem('form_99_details_res', JSON.stringify(res));
@@ -308,7 +302,7 @@ export class FormsService {
             return true;
           }
           return false;
-      }));      
+      }));
   }
 
   public Signee_SaveForm(formObj: any, form_type): Observable<any> {
@@ -344,7 +338,7 @@ export class FormsService {
             return true;
           }
           return false;
-      }));      
+      }));
   }
 
   public PreviewForm_ReasonScreen(formObj: any, file: any, form_type: string): Observable<any> {
@@ -364,7 +358,9 @@ export class FormsService {
     let printpriview_fileurl = "";
 
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token); 
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    console.log("httpOptions", httpOptions);
 
     if(form_type === '99') {
 
@@ -373,7 +369,7 @@ export class FormsService {
       if(file && file.name) {
         fileuploaded=true;
         localStorage.setItem('form_99_details.file', file);
-        formData.append('file', file, file.name);         
+        formData.append('file', file, file.name);
         formData.append('committeeid', form99_details.committeeid);
         formData.append('committeename', form99_details.committeename);
         formData.append('street1', form99_details.street1);
@@ -392,7 +388,7 @@ export class FormsService {
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
         formData.append('additional_email_1', form99_details.additional_email_1);
-        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
         formData.append('filename', form99_details.filename);
@@ -410,11 +406,11 @@ export class FormsService {
       {
 
         fileuploaded=false;
-        /*form99_details.is_submitted=false; 
+        /*form99_details.is_submitted=false;
         formData.append('file', form99_details.file);  */
 
         if (form99_details.filename!= null || form99_details.filename!= '' || form99_details.filename != "" || form99_details.filename != undefined){
-          formData.append('filename', form99_details.filename);    
+          formData.append('filename', form99_details.filename);
         }
 
         formData.append('committeeid', form99_details.committeeid);
@@ -435,13 +431,13 @@ export class FormsService {
         formData.append('email_on_file', form99_details.email_on_file);
         formData.append('email_on_file_1', form99_details.email_on_file_1);
         formData.append('additional_email_1', form99_details.additional_email_1);
-        formData.append('additional_email_2', form99_details.additional_email_2);        
+        formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', "False");
         /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', "F99");
         if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
-        
+
           /*data['id']="0";*/
           formData.append('id', "0");
         }
@@ -450,23 +446,17 @@ export class FormsService {
           formData.append('id', form99_details.id.toString());
         }
 
-      }  
-     
+      }
+
       data=formData;
 
-  
+
     }
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
 
-    for (var value of data.values()) {
-      console.log(value); 
-   }
-    console.log ('loop through form Data: ');
-    console.log(data);
+    new Response(data).text().then(console.log)
 
-   new Response(data).text().then(console.log)
-    
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -485,15 +475,16 @@ export class FormsService {
             org_fileurl=form99_details_res.file;
             printpriview_filename = form99_details_res.printpriview_filename;
             printpriview_fileurl = form99_details_res.printpriview_fileurl;
-            
+
             localStorage.setItem('form_99_details.id', id);
             localStorage.setItem('form_99_details.org_filename', org_filename);
             localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
 
-            console.log ('org_filename',org_filename);
-            console.log ('org_fileurl',org_fileurl);
-            console.log ('org_filename',printpriview_filename);
-            console.log ('org_fileurl',printpriview_fileurl);
+            console.log (' PreviewForm_ReasonScreen api Repsonse',res);
+            console.log (' PreviewForm_ReasonScreen org_filename',org_filename);
+            console.log (' PreviewForm_ReasonScreen org_fileurl',org_fileurl);
+            console.log (' PreviewForm_ReasonScreen org_filename',printpriview_filename);
+            console.log (' PreviewForm_ReasonScreen org_fileurl',printpriview_fileurl);
 
             if (fileuploaded)
             {
@@ -550,7 +541,7 @@ export class FormsService {
 
             printpriview_filename = form99_details_res.printpriview_filename;
             printpriview_fileurl = form99_details_res.printpriview_fileurl;
-            
+
             localStorage.setItem('form_99_details.id', id);
             localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
             localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
@@ -562,6 +553,31 @@ export class FormsService {
             return true;
           }
           return false;
-      }));      
+      }));
+  }
+
+  public get_filed_form_types(): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+
+    url = '/core/get_filed_form_types';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("token",token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    console.log("url = ", url);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
+
+     // return this._http.get('./assets/16.json');
+
   }
 }

@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
-# Create your views here.
 from rest_framework.decorators import api_view
 import maya
+
 #from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import CommitteeInfo, Committee
+from .models import CommitteeInfo, Committee, CommitteeMaster, RefFormTypes, My_Forms_View
 from .serializers import CommitteeInfoSerializer, CommitteeSerializer, CommitteeInfoListSerializer
 import json
 import os
@@ -28,6 +28,8 @@ import PyPDF2
 from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
 from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 import urllib
+
+
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -449,7 +451,7 @@ def submit_comm_info(request):
             
         if serializer.is_valid():
             serializer.save()
-            email(True, serializer.data)
+            #email(True, serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -753,7 +755,7 @@ def get_rad_analyst_info(request):
         except:
             return JsonResponse({"ERROR":"ERR_f99_03: Unexpected Error. Please contact administrator."})
 
-
+        
 @api_view(['GET'])
 def get_form99list(request):
     """
@@ -804,8 +806,8 @@ def delete_forms(request):
                 return Response({"error":"There is an error while deleting forms."}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"Forms deleted successfully"}, status=status.HTTP_200_OK)
     else:
-        return Response({"error":"ERRCODE: FEC02. POST method is expected."}, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response({"error":"ERRCODE: FEC02. POST method is expected."}, status=status.HTTP_400_BAD_REQUEST) 
+
 #email through AWS SES
 def email(boolean, data):
     SENDER = "donotreply@fec.gov"
@@ -842,6 +844,7 @@ def email(boolean, data):
 
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
+
     """<html>
     <head></head>
     <body>
@@ -887,6 +890,70 @@ def email(boolean, data):
     # Display an error if something goes wrong. 
     except ClientError as e:
         print(e.response['Error']['Message'])
+
+
+
+"""
+@api_view(['GET'])
+def get_comm_lookup(request):
+   
+    #fields for comm lookup
+    
+    try:
+        import ipdb; ipdb.set_trace()
+
+        comm = CommitteeLookup.objects.get(cmte_id=request.user.username)
+    except CommitteeLookup.DoesNotExist:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    # get details wrt to the committeeid
+    if request.method == 'GET':
+        new_obj = {'committeeid':comm.cmte_id, 'committee_type': comm.cmte_type, 'committee_name':comm.cmte_name, 'committee_design':comm.cmte_dsgn, 'committee_filing_freq':comm.cmte_filing_freq}
+        return Response(new_obj)
+"""
+
+@api_view(['GET'])
+def get_filed_form_types(request):
+    """
+    Fields for identifying the committee type and committee design and filter the forms category 
+    """
+    try:
+        comm_id = request.user.username
+        
+        #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
+        forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
+
+        for form_obj in forms_obj:
+            if form_obj['due_date']:
+                form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
+            
+        resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
+        return Response(resp_data, status=status.HTTP_200_OK)
+    except:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+"""
+@api_view(['GET'])
+def get_report_types_(request):
+    
+    #fields fordentifying the committee type and committee design and filter the forms category 
+    
+    try:
+        comm_id = request.user.username
+
+        #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
+        forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
+
+        for form_obj in forms_obj:
+            if form_obj['due_date']:
+                form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
+
+        resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
+        return Response(resp_data, status=status.HTTP_200_OK)
+    except:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+"""
 
 @api_view(['POST'])
 def save_print_f99(request):
@@ -1277,3 +1344,4 @@ def print_pdf(request):
     }
 
     return JsonResponse(resp, status=status.HTTP_201_CREATED)
+
