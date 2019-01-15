@@ -60,7 +60,11 @@ INSTALLED_APPS = [
     #'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
+
     'fecfiler.form3x',
+
+
+
 ]
 
 
@@ -320,7 +324,7 @@ for logger in LOGGING['loggers']:
 
 
 # AWS SES Configuration Settings
-EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
+#EMAIL_BACKEND = 'django_ses_boto3.ses_email_backend.SESEmailBackend'
 
 AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY', None)
 AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_KEY', None)
@@ -328,3 +332,48 @@ AWS_HOST_NAME = 'us-east-1'
 AWS_REGION = 'us-east-1'
 
 AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
+
+
+
+# add the credentials from IAM and bucket name
+
+AWS_STORAGE_BUCKET_NAME = 'dev-efile-repo' # or None if using service role
+#AWS_STORAGE_BUCKET_NAME = 'fecfile-filing'
+
+AWS_STORAGE_UPLOAD_BUCKET_NAME = 'dev-efile-upload' # or None if using service role
+
+
+# if False it will create unique file names for every uploaded file
+
+AWS_S3_FILE_OVERWRITE = False
+
+# the url, that your media and static files will be available at
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_CUSTOM_UPLOAD_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_UPLOAD_BUCKET_NAME
+
+
+
+# the sub-directories of media and static files
+
+STATICFILES_LOCATION = 'static'
+
+MEDIAFILES_LOCATION = 'media'
+
+
+
+# a custom storage file, so we can easily put static and media in one bucket
+
+DEFAULT_FILE_STORAGE = 'fecfiler.custom_storages.MediaStorage'
+
+
+
+# the regular Django file settings but with the custom S3 URLs
+
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION)
+
+
+
+NXG_FEC_API_URL = "127.0.0.1:8080"
+NXG_FEC_API_VERSION = "/api/v1/"

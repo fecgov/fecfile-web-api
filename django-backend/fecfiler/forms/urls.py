@@ -21,5 +21,9 @@ urlpatterns = [
     url(r'^f99/print_pdf_info$', views.print_pdf_info, name='print_pdf_info'),
     url(r'^core/get_committee_details$', views.get_committee, name='get_committee' ),
     url(r'^core/update_committee_details/(?P<cid>[0-9,a-z,A-Z]+)$', views.update_committee, name='update_committee' ),    
-    url(r'^core/create_committee$', views.create_committee, name='create_committee')
+    url(r'^core/create_committee$', views.create_committee, name='create_committee'),
+    url(r'^f99/save_print_f99$', views.save_print_f99, name='save_print_f99'),
+    url(r'^f99/update_print_f99$', views.update_print_f99, name='update_print_f99'),
+    url(r'^f99/print_pdf$', views.print_pdf, name='print_pdf'),
+
 ]

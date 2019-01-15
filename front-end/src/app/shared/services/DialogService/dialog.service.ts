@@ -1,16 +1,40 @@
-import { Injectable } from '@angular/core';
+import { Injectable, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DialogService {
 
-  constructor() { }
+	@ViewChild('content') modalContent;
 
-  confirm(message?: string): Observable<boolean> {
-    const confirmation = window.confirm(message || 'Are you sure?');
+  constructor(
+  	private _modalService: NgbModal
+  ) { }
 
-    return of(confirmation);
-  };
+  public confirm(message?: string, modalContent?: any): Promise<any> {
+    let modalOptions: any = {
+    	'backdrop': true,
+    	'keyboard': false,
+    };
+    
+    return this._modalService
+    	.open(modalContent, modalOptions)
+    	.result
+    	.then(res => {
+    		/**
+    		 * Returned if a button on the modal is clicked.
+    		 */
+    		return res;
+    	}, (res) => {
+    		/**
+    		 * Returned if the modal backdrop or escape is clicked.
+    		 * Although in this case I have the keyboard disabled.
+    		 */
+    		if(res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
+    			return 'cancel';
+    		}
+    	});
+  }
 }

@@ -22,7 +22,8 @@ export class AppLayoutComponent implements OnInit {
   public committeeName: string = '';
   public committeeId: string = '';
   public dashboardClass: string = '';
-
+  public showLegalDisclaimer: boolean = false;
+  
 	constructor(
     private _apiService: ApiService,
 		private _sessionService: SessionService,
@@ -108,4 +109,9 @@ export class AppLayoutComponent implements OnInit {
       this.sideBarClass = '';
     }
   }  
+
+  public open(): void{
+    this.showLegalDisclaimer = !this.showLegalDisclaimer;
+  }
+
 }
