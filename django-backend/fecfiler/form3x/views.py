@@ -50,3 +50,38 @@ def get_filed_report_types(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_transaction_categories(request):
+
+    
+    #Fields for identifying the committee type and committee design and filter the forms category 
+    
+    #try:
+    #import ipdb;ipdb.set_trace()
+    #form_type = request.data.get('form_type')
+    
+    #forms_obj = [obj.__dict__ for obj in Cmte_Report_Types_View.objects.raw("select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,
+    #cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")]
+
+    #forms_obj = []
+    with connection.cursor() as cursor:
+        cursor.execute("select transaction_category_json from transaction_category_json_view where form_type='F3X'")
+        for row in cursor.fetchall():
+            #forms_obj.append(data_row)
+            data_row = list(row)
+            for idx,elem in enumerate(row):
+                if not elem:
+                    data_row[idx]=''
+            forms_obj=data_row[0]
+            
+    if forms_obj is None:
+        return Response("No entries were found for this committee", status=status.HTTP_201_OK)                              
+    #for form_obj in forms_obj:
+    #    if form_obj['due_date']:
+    #        form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
+        
+    #resp_data = [{k:v.strip(" ") for k,v in form_obj.items() if k not in ["_state"] and type(v) == str } for form_obj in forms_obj]
+    return Response(forms_obj, status=status.HTTP_200_OK)
+    #except:
+        #return Response({}, status=status.HTTP_404_NOT_FOUND)
