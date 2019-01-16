@@ -576,8 +576,27 @@ export class FormsService {
           headers: httpOptions
         }
       );
+  }
 
-     // return this._http.get('./assets/16.json');
+  public getTransactionCategories(): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
 
+    url = '/f3x/get_transaction_categories';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("token",token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    console.log("url = ", url);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
   }
 }
