@@ -27,7 +27,7 @@ export class F3xComponent implements OnInit {
   public cashOnHand: any = {};
 
   constructor(
-    private _formService: FormsService
+    private _formService: FormsService,
     private _http: HttpClient,
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig
@@ -37,25 +37,10 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    /*this._http.get<form3x_data>('http://localhost:3000/data')
-        .subscribe(resp => {
-            console.log('data: ', resp);
-
-            this.steps = resp.steps;
-
-            this.sidebarLinks = resp.transactionCategories;
-
-            this.searchField = resp.transactionSearchField;
-
-            this.step = this.currentStep;
-
-            this.loadingData = false;
-        });*/
     this._formService
       .getTransactionCategories()
       .subscribe(res => {
         console.log('resp: ', res);
-
 
         this.sidebarLinks = res.data.transactionCategories;
 

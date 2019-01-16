@@ -4,11 +4,11 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { CookieService } from 'ngx-cookie-service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormComponent } from './form.component';
+import { F99Component } from './f99.component';
 
-describe('FormComponent', () => {
-  let component: FormComponent;
-  let fixture: ComponentFixture<FormComponent>;
+describe('F99Component', () => {
+  let component: F99Component;
+  let fixture: ComponentFixture<F99Component>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -16,7 +16,7 @@ describe('FormComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule
       ],
-      declarations: [ FormComponent ],
+      declarations: [ F99Component ],
       providers: [
         CookieService,
         FormBuilder
@@ -29,7 +29,7 @@ describe('FormComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FormComponent);
+    fixture = TestBed.createComponent(F99Component);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -30,7 +30,7 @@ import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { ReportsComponent } from './reports/reports.component';
 import { ContributorsComponent } from './contributors/contributors.component';
 import { ToolsComponent } from './tools/tools.component';
-import { FormComponent } from './forms/form-99/form/form.component';
+import { F99Component } from './forms/form-99/f99/f99.component';
 import { TypeComponent } from './forms/form-99/type/type.component';
 import { ReasonComponent } from './forms/form-99/reason/reason.component';
 import { StepsComponent } from './shared/partials/steps/steps.component';
@@ -74,7 +74,7 @@ import { TransactionTypeComponent } from './forms/form-3x/transaction-type/trans
     ReportsComponent,
     ContributorsComponent,
     ToolsComponent,
-    FormComponent,
+    F99Component,
     TypeComponent,
     ReasonComponent,
     StepsComponent,
