@@ -38,6 +38,7 @@
                   (click)="formSelected(committee_form.form_type_mini)"
                 >
                 {{committee_form.form_description}}
+                <br />
                 {{committee_form.due_date}}
                 </a> 
               </div>
@@ -125,6 +126,10 @@
                  </button>
                 <ng-template #f99Content>
                   {{committee_form.form_info}} 
+                  <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.                     
+                  <i class="external-link-icon" aria-hidden="true">
+                   <span class="sr-only">Link opens in new window.</span>
+                  </i>                          
                 </ng-template>                                    
               </div>
             </li>
