@@ -59,14 +59,14 @@ def get_transaction_categories(request):
     
     #try:
     #import ipdb;ipdb.set_trace()
-    form_type = request.data.get('form_type')
+    #form_type = request.data.get('form_type')
     
     #forms_obj = [obj.__dict__ for obj in Cmte_Report_Types_View.objects.raw("select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,
     #cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")]
 
     #forms_obj = []
     with connection.cursor() as cursor:
-        cursor.execute("select transaction_category_json from transaction_category_json_view where form_type='" + form_type + "'")
+        cursor.execute("select transaction_category_json from transaction_category_json_view where form_type='F3X'")
         for row in cursor.fetchall():
             #forms_obj.append(data_row)
             data_row = list(row)
