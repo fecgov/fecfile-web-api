@@ -51,7 +51,9 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
 import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sidebar.component';
-import { DynamicFormsComponent } from './forms/dynamic-forms/dynamic-forms.component';
+
+import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
+import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -90,7 +92,8 @@ import { DynamicFormsComponent } from './forms/dynamic-forms/dynamic-forms.compo
     ToolsCreateBackupComponent,
     ConfirmModalComponent,
     FormSidebarComponent,
-    DynamicFormsComponent
+    F3xComponent,
+    TransactionTypeComponent
   ],
   entryComponents: [
     ConfirmModalComponent
@@ -112,7 +115,7 @@ import { DynamicFormsComponent } from './forms/dynamic-forms/dynamic-forms.compo
     NgbModule.forRoot()
   ],
   providers: [
-    CookieService, 
+    CookieService,
     CanActivateGuard,
     DialogService,
     CanDeactivateGuardService,
@@ -122,7 +125,7 @@ import { DynamicFormsComponent } from './forms/dynamic-forms/dynamic-forms.compo
       useFactory: appInitializerFn,
       multi: true,
       deps: [AppConfigService]
-    }    
+    }
   ],
   bootstrap: [AppComponent],
   schemas: [

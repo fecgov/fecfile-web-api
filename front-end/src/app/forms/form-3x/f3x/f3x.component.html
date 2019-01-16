@@ -1,0 +1,65 @@
+<div class="forms__wizard" *ngIf="!loadingData">
+  <div class="form__sidebar">
+     <form-sidebar
+      title="Transaction Categories"
+      [sidebarLinks]="sidebarLinks"
+      [searchField]="searchField"
+      [cashOnHand]="cashOnHand"
+      (status)='onNotify($event)'
+     ></form-sidebar>
+  </div>
+  <div
+    class="form__container"
+    [ngClass]="{
+      'show-alerts': showValidateBar === true,
+      'hide-alerts': step==='step_5'
+    }"
+  >
+    <div class="form__steps">
+      <app-steps
+        [steps]="[
+          {text: 'Type', step: 'step_1'},
+          {text: 'Form', step: 'step_2'},
+          {text: 'Preview', step: 'step_3'},
+          {text: 'Sign', step: 'step_4'},
+          {text: 'Submit', step: 'step_5'}
+        ]"
+        [current_step]="currentStep"
+      >
+      </app-steps>
+    </div>
+    <div
+      class="form__content"
+    >
+      <div
+        class="form__step"
+        [hidden]="step!=='step_1'"
+      >
+        <f3x-transaction-type
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+        ></f3x-transaction-type>
+      </div>
+      <div
+        class="form__step"
+        [hidden]="step!=='step_2'"
+      >
+      </div>
+      <div
+        class="form__step"
+        [hidden]="step!=='step_3'"
+      >
+      </div>
+      <div
+        class="form__step"
+        [hidden]="step!=='step_4'"
+      >
+      </div>
+      <div
+        class="form__step"
+        [hidden]="step!=='step_5'"
+      >
+      </div>
+    </div>
+  </div> <!-- ./form__container -->
+</div> <!-- ./forms__wizard -->

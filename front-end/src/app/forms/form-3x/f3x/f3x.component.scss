@@ -1,4 +1,4 @@
-@import '../../shared/scss/global';
+@import '../../../shared/scss/global';
 
 .forms__wizard {
     display: table;
@@ -10,20 +10,20 @@
  .form__sidebar {
     background-color: $bombay;
     flex-grow: 1;
-  	display: none;
-  	padding-left: 0;
+    display: none;
+    padding-left: 0;
     padding-bottom: 10px;
-  	@include media(tablet) {
-  		display: none;
-  	}
-  	@include media(mediumDesktop) {
-  		display: table-cell;
-  		width: 250px;
-  	}
-  	@include media(largeDesktop) {
-  		display: table-cell;
-  		width: 250px;
-  	}
+    @include media(tablet) {
+      display: none;
+    }
+    @include media(mediumDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
+    @include media(largeDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
   }
   .form__container {
     display: table-cell;

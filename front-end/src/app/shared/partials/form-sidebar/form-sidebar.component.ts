@@ -50,8 +50,6 @@ export class FormSidebarComponent implements OnInit {
   }
 
   public selectedAdditionalOption(additionalItem): void {
-    console.log('selectedAdditionalOption: ');
-
     let additionalItemIndex: number = null;
 
     this.additionalItemSelected = additionalItem.getAttribute('value');
@@ -62,8 +60,6 @@ export class FormSidebarComponent implements OnInit {
     });
 
     this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
-
-    console.log('this.additionalOptions: ', this.additionalOptions);
 
     this.status.emit({
       additionalOptions: this.additionalOptions
