@@ -14,11 +14,11 @@ import { SubmitComponent } from '../../../shared/partials/submit/submit.componen
 
 @Component({
   selector: 'app-form-99',
-  templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss'],
+  templateUrl: './f99.component.html',
+  styleUrls: ['./f99.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FormComponent implements OnInit {
+export class F99Component implements OnInit {
 
   @Input() status: any;
 
@@ -64,20 +64,20 @@ export class FormComponent implements OnInit {
         this._form99_details.additional_email_1 = '-';
         this._form99_details.additional_email_2 = '-';
         this._form99_details.created_at = '';
-        this._form99_details.is_submitted = false; 
-        this._form99_details.id = ''; 
-           
+        this._form99_details.is_submitted = false;
+        this._form99_details.id = '';
+
         let formSavedObj: any = {
           'saved': false
-        };          
+        };
 
         if(localStorage.getItem(`form_${this._form_type}_details`) === null && this.step !== 'step_5') {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
-        }        
+        }
 
         if(localStorage.getItem(`form_${this._form_type}_saved`) === null && this.step !== 'step_5') {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
-        } 
+        }
 
         this.isLoading = false;
       }
@@ -97,11 +97,11 @@ export class FormComponent implements OnInit {
               this.currentStep = this._activatedRoute.snapshot.queryParams.step;
               this.step = this._activatedRoute.snapshot.queryParams.step;
             }
-            window.scrollTo(0, 0);            
+            window.scrollTo(0, 0);
           }
         }
       });
-  
+
     this._messageService
       .getMessage()
       .subscribe(res => {
@@ -110,7 +110,7 @@ export class FormComponent implements OnInit {
         } else if (res.form_submitted) {
           this._form_submitted = true;
 
-          this._form99_details = this.committee_details;      
+          this._form99_details = this.committee_details;
         }
       });
   }
@@ -118,7 +118,7 @@ export class FormComponent implements OnInit {
   ngDoCheck(): void {
     if(this.currentStep !== this._activatedRoute.snapshot.queryParams.step) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-      this.step = this._activatedRoute.snapshot.queryParams.step;      
+      this.step = this._activatedRoute.snapshot.queryParams.step;
     }
 
     if(this._form_submitted) {
@@ -129,16 +129,16 @@ export class FormComponent implements OnInit {
         this._form99_details.additional_email_1 = '-';
         this._form99_details.additional_email_2 = '-';
         this._form99_details.created_at = '';
-        this._form99_details.is_submitted = false; 
-        this._form99_details.id = '';     
+        this._form99_details.is_submitted = false;
+        this._form99_details.id = '';
 
         let formSavedObj: any = {
           'saved': false
-        };          
+        };
 
         if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
           localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
-        }        
+        }
 
         if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
@@ -147,7 +147,7 @@ export class FormComponent implements OnInit {
         this._messageService
           .sendMessage({
             'message': 'New form99'
-          });                  
+          });
       }
     }
   }

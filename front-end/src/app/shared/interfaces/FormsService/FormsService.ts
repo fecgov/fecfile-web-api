@@ -30,14 +30,20 @@
   printpriview_fileurl?:string
  }
 
- export interface Icommittee_forms {
-    category?: string, 
-    form_type?: string,
-    form_description?: string,
-    form_info?: string,
-    due_date?: string,
-    cmte_id?:string,
-    form_pdf_url?:string,
-    form_type_mini?: string,
-  }
- 
+export interface Icommittee_forms {
+  category?: string,
+  form_type?: string,
+  form_description?: string,
+  form_info?: string,
+  due_date?: string,
+  cmte_id?:string,
+  form_pdf_url?:string,
+  form_type_mini?: string,
+}
+
+export interface form3x_data {
+  cashOnHand?: any,
+  steps?: any,
+  transactionCategories?: string,
+  transactionSearchField?: string
+}

@@ -1,0 +1,66 @@
+<div class="transaction-type" *ngIf="showForm">
+  <form
+    [formGroup]="frmOption"
+    (ngSubmit)="doValidateOption()"
+    (blur)="doValidateOption()"
+  >
+    <section>
+      <div class="form-content">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="text-error text-center"
+              *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (optionFailed)">
+              You must select a transaction type.
+            </div>
+          </div>
+        </div>
+          <ul class="options-list">
+            <li
+              class="options-list__item"
+              *ngFor="let option of selectedOptions"
+            >
+              <input
+                type="{{ option?.type }}"
+                name="{{ option?.name }}"
+                id="{{ option?.value }}"
+                class="option-radio"
+                value="{{ option?.value }}"
+                (click)="updateStatus($event)"
+                formControlName="optionRadio"
+              />
+              <label
+                for="{{ option?.value }}"
+              >
+                {{ option?.text }}
+              </label>
+              <button
+                type="button"
+                class="btn-info"
+                ngbTooltip="{{ option?.info }}"
+                *ngIf="option.infoIcon"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">
+                  Click for more information
+                </span>
+              </button>
+            </li>
+          </ul>
+      </div>
+    </section>
+    <footer>
+      <div class="grid-row" *ngIf="formOptionsVisible">
+        <div class="grid-row__col grid-row__col--11">
+            <div class="forms__btn-container">
+              <button
+                class="btn btn-primary btn-right"
+                type="submit"
+              >
+                Next
+              </button>
+            </div>
+        </div>
+      </div>
+    </footer>
+  </form>
+</div>

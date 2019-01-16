@@ -12,7 +12,7 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 
 @Component({
-  selector: 'app-reason',
+  selector: 'f99-reason',
   templateUrl: './reason.component.html',
   styleUrls: ['./reason.component.scss'],
   encapsulation: ViewEncapsulation.None
@@ -47,7 +47,7 @@ export class ReasonComponent implements OnInit {
   public _valid_file: boolean = true;
   public _show_file_delete_button: boolean=false;
   public _not_correct_pdf_size: boolean=false;
-  
+
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -61,14 +61,14 @@ export class ReasonComponent implements OnInit {
 
   ngOnInit(): void {
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-    
+
     this._form_99_details = JSON.parse(localStorage.getItem(`form_${this._form_type}_details`));
 
-    if(this._form_99_details) {  
+    if(this._form_99_details) {
       if(this._form_99_details.text) {
 
         if (this._form_99_details.reason){
-           this.typeSelected=this._form_99_details.reason; 
+           this.typeSelected=this._form_99_details.reason;
         }
 
         this.frmReason = this._fb.group({
@@ -164,7 +164,7 @@ export class ReasonComponent implements OnInit {
          {
           this._not_correct_pdf_size=false;
          }
-         
+
          localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));
          this._not_valid_pdf=false;
          this._valid_file=true;
@@ -182,14 +182,14 @@ export class ReasonComponent implements OnInit {
          let fileNameObj: any = {
            'fileName': ''
          };
-         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));        
+         localStorage.setItem(`form_${this._form_type}_file`, JSON.stringify(fileNameObj));
         this._not_valid_pdf=true;
         this._valid_file=false;
         this.file=null;
         this._show_file_delete_button=false;
         this.fileInput.nativeElement.value = '';
         this._form_99_details.filename = '';
-        localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));  
+        localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
     }
   }
 
@@ -212,7 +212,7 @@ export class ReasonComponent implements OnInit {
         this._form_99_details.text = this.frmReason.get('reasonText').value;
 
         /*if (this.frmReason.get('file').value){
-          this._form_99_details.file=this.frmReason.get('file').value;  
+          this._form_99_details.file=this.frmReason.get('file').value;
         }*/
 
         console.log('this._form_99_details: ', this._form_99_details);
@@ -222,23 +222,23 @@ export class ReasonComponent implements OnInit {
 
           localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSaved));
         }, 100);
-        
+
         this.saveForm();
 
         this.hideText = true;
 
-        this.showValidateBar = false; 
+        this.showValidateBar = false;
 
         this.hideText = true;
-        this.formSaved = false;        
+        this.formSaved = false;
 
         this._messageService
           .sendMessage({
             'validateMessage': {
               'validate': '',
-              'showValidateBar': false                  
-            }            
-          });          
+              'showValidateBar': false
+            }
+          });
 
         this.status.emit({
           form: this.frmReason,
@@ -264,22 +264,22 @@ export class ReasonComponent implements OnInit {
       return;
     }
   }
-  
+
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
     } else {
       tooltip.open();
-    }      
-  }  
+    }
+  }
 
-  
+
   public removeFile(): void {
     this.file = null;
     this._not_valid_pdf=false;
 
     this._form_99_details.filename = '';
-    localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));     
+    localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form_99_details));
   }
 
   /**
@@ -295,10 +295,10 @@ export class ReasonComponent implements OnInit {
       .sendMessage({
         'validateMessage': {
           'validate': {},
-          'showValidateBar': false                  
-        }            
-      });    
-    
+          'showValidateBar': false
+        }
+      });
+
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -332,7 +332,7 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
         console.log('this.file: ',this.file);
-        
+
         if (this.file !== null){
           this._form_99_details.file=this.file;
           this._formsService
@@ -346,7 +346,7 @@ export class ReasonComponent implements OnInit {
               console.log('res.file: ', res.file);
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-              
+
               // success
               this.formSaved = true;
 
@@ -358,7 +358,7 @@ export class ReasonComponent implements OnInit {
           },
           (error) => {
             console.log('error: ', error);
-          });          
+          });
       }
       else {
         this._formsService
@@ -370,7 +370,7 @@ export class ReasonComponent implements OnInit {
             this._form_99_details.id = res.id;
 
             localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-            
+
             // success
             this.formSaved = true;
 
@@ -382,7 +382,7 @@ export class ReasonComponent implements OnInit {
         },
         (error) => {
           console.log('error: ', error);
-        });         
+        });
       }
     }
   }
@@ -410,7 +410,7 @@ export class ReasonComponent implements OnInit {
               .sendMessage({
                 'validateMessage': {
                   'validate': environment.validateSuccess,
-                  'showValidateBar': true                  
+                  'showValidateBar': true
                 }
               });
         }
@@ -420,8 +420,8 @@ export class ReasonComponent implements OnInit {
           .sendMessage({
             'validateMessage': {
               'validate': error.error,
-              'showValidateBar': true                  
-            }            
+              'showValidateBar': true
+            }
           });
       });
   }
@@ -433,15 +433,15 @@ export class ReasonComponent implements OnInit {
     this.showValidateBar = false;
 
     this.hideText = true;
-    this.formSaved = false;      
+    this.formSaved = false;
 
     this._messageService
       .sendMessage({
         'validateMessage': {
           'validate': {},
-          'showValidateBar': false                  
-        }            
-      });       
+          'showValidateBar': false
+        }
+      });
   }
 
 
@@ -477,14 +477,14 @@ export class ReasonComponent implements OnInit {
           this._form_99_details.file=this.file;
           this._form_99_details.filename=this.file.name;
         }
-        
+
         localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
 
         this.hideText = true;
 
         this.showValidateBar = false;
         console.log('Reason screen printPreview: this.file: ',this.file);
-        
+
         this._formsService
           .PreviewForm_ReasonScreen({}, this.file, this._form_type)
           .subscribe(res => {
@@ -494,7 +494,7 @@ export class ReasonComponent implements OnInit {
               this._form_99_details.id = res.id;
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
-              
+
               // success
               this.formSaved = true;
 
@@ -506,7 +506,7 @@ export class ReasonComponent implements OnInit {
           },
           (error) => {
             console.log('error: ', error);
-          });          
+          });
       }
     }
   }

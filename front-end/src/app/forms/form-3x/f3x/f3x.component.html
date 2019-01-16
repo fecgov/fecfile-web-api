@@ -1,13 +1,14 @@
-<div class="forms__wizard">
-  <div 
-    class="form__alerts"
-    [ngClass]="{
-      'show-alerts': showValidateBar === true
-    }"
-  >
-    <app-validate></app-validate>
-  </div>    
-  <div 
+<div class="forms__wizard" *ngIf="!loadingData">
+  <div class="form__sidebar">
+     <form-sidebar
+      title="Transaction Categories"
+      [sidebarLinks]="sidebarLinks"
+      [searchField]="searchField"
+      [cashOnHand]="cashOnHand"
+      (status)='onNotify($event)'
+     ></form-sidebar>
+  </div>
+  <div
     class="form__container"
     [ngClass]="{
       'show-alerts': showValidateBar === true,
@@ -26,50 +27,38 @@
         [current_step]="currentStep"
       >
       </app-steps>
-    </div>    
-    <div 
-      class="form__content" 
-      *ngIf="!isLoading"
-      [ngClass]="{
-        'show-alerts': showValidateBar === true,
-        'hide-alerts': step==='step_5',
-        'preview': step==='step_3'
-      }"      
+    </div>
+    <div
+      class="form__content"
     >
       <div
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <app-type (status)='onNotify($event)'></app-type>
+        <f3x-transaction-type
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+        ></f3x-transaction-type>
       </div>
       <div
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-        <app-reason (status)='onNotify($event)'></app-reason>
       </div>
       <div
         class="form__step"
         [hidden]="step!=='step_3'"
       >
-        <app-preview (status)='onNotify($event)'></app-preview>
       </div>
       <div
         class="form__step"
         [hidden]="step!=='step_4'"
       >
-        <app-sign
-          [comittee_details]="comittee_details"
-          (status)='onNotify($event)'
-        ></app-sign>
       </div>
       <div
         class="form__step"
         [hidden]="step!=='step_5'"
       >
-        <app-submit
-          [comittee_details]="comittee_details"
-        ></app-submit>
       </div>
     </div>
   </div> <!-- ./form__container -->

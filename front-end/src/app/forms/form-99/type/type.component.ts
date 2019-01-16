@@ -7,7 +7,7 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 
 @Component({
-  selector: 'app-type',
+  selector: 'f99-type',
   templateUrl: './type.component.html',
   styleUrls: ['./type.component.scss'],
   encapsulation: ViewEncapsulation.None
@@ -51,18 +51,18 @@ export class TypeComponent implements OnInit {
     }
 
     this._setForm();
-  
+
     this._router
       .events
       .subscribe(e => {
         if(e instanceof NavigationEnd) {
-          this._previousUrl = e.url;        
+          this._previousUrl = e.url;
           if(this._previousUrl === '/forms/form/99?step=step_5') {
             this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
 
             this.typeSelected = '';
 
-            this._setForm(); 
+            this._setForm();
           }
         }
       });
@@ -79,7 +79,7 @@ export class TypeComponent implements OnInit {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
     }
-  }  
+  }
 
   private _setForm(): void {
     if(this._form_99_details) {
@@ -97,7 +97,7 @@ export class TypeComponent implements OnInit {
       this.frmType = this._fb.group({
             reasonTypeRadio: ['', Validators.required]
           });
-    }    
+    }
   }
 
   /**
@@ -131,7 +131,7 @@ export class TypeComponent implements OnInit {
         setTimeout(() => {
           localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
         }, 100);
-        
+
 
         this.status.emit({
           form: this.frmType,
@@ -161,8 +161,8 @@ export class TypeComponent implements OnInit {
       tooltip.close();
     } else {
       tooltip.open();
-    }      
-  }  
+    }
+  }
 
   public frmTypeValid() {
     return this.isValidType;

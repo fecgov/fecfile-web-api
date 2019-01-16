@@ -41,7 +41,7 @@ def get_filed_report_types(request):
                 forms_obj.append({"report_type":data_row[0],"rpt_type_desc":data_row[1],"regular_special_report_ind":data_row[2],"rpt_type_info":data_row[3],"cvg_start_date":data_row[4],"cvg_end_date":data_row[5],"due_date":data_row[6]})
                 
         if len(forms_obj)== 0:
-            return Response("No entries were found for this committee", status=status.HTTP_201_OK)	                            
+            return Response("No entries were found for this committee", status=status.HTTP_201_OK)                              
         #for form_obj in forms_obj:
         #    if form_obj['due_date']:
         #        form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
