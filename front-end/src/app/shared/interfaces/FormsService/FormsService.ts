@@ -31,7 +31,11 @@
  }
 
  export interface Icommittee_forms {
+<<<<<<< HEAD
     category?: string,
+=======
+    category?: string, 
+>>>>>>> develop
     form_type?: string,
     form_description?: string,
     form_info?: string,
@@ -40,6 +44,7 @@
     form_pdf_url?:string,
     form_type_mini?: string,
   }
+<<<<<<< HEAD
 
   export interface form3x_data {
     cashOnHand?: any,
@@ -48,3 +53,6 @@
     transactionSearchField?: string
   }
 
+=======
+ 
+>>>>>>> develop

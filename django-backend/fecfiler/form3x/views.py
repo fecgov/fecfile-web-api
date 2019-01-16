@@ -13,7 +13,7 @@ import logging
 from django.db import connection
 
 # Create your views here.
-"""
+
 @api_view(['GET'])
 def get_filed_report_types(request):
 
@@ -31,17 +31,17 @@ def get_filed_report_types(request):
         with connection.cursor() as cursor:
             cursor.execute("select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")
             for row in cursor.fetchall():
-                #forms_obj.append(brow)
-                brow = list(row)
+                #forms_obj.append(data_row)
+                data_row = list(row)
                 for idx,elem in enumerate(row):
                     if not elem:
-                        brow[idx]=''
+                        data_row[idx]=''
                     if type(elem)==datetime.date:
-                        brow[idx] = elem.strftime("%Cm-%d-%Y")
-                forms_obj.append(brow)
+                        data_row[idx] = elem.strftime("%m-%d-%Y")
+                forms_obj.append({"report_type":data_row[0],"rpt_type_desc":data_row[1],"regular_special_report_ind":data_row[2],"rpt_type_info":data_row[3],"cvg_start_date":data_row[4],"cvg_end_date":data_row[5],"due_date":data_row[6]})
                 
         if len(forms_obj)== 0:
-            return Response("No entries were found for this committee", status=status.HTTP_201_OK)	                            
+            return Response("No entries were found for this committee", status=status.HTTP_201_OK)                              
         #for form_obj in forms_obj:
         #    if form_obj['due_date']:
         #        form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
@@ -50,4 +50,3 @@ def get_filed_report_types(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
-"""
