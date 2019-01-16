@@ -41,3 +41,10 @@
     form_type_mini?: string,
   }
 
+  export interface form3x_data {
+    cashOnHand?: any,
+    steps?: any,
+    transactionCategories?: string,
+    transactionSearchField?: string
+  }
+

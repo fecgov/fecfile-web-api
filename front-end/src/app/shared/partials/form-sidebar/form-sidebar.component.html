@@ -15,31 +15,31 @@
     </div>
     <ul class="form-sidebar__links">
       <li
-        [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of sidebarLinks"
       >
         <div
-          [ngClass]="itemSelected === categoryType?.type?.value ? 'form-sidebar-item-box selected' : 'form-sidebar-item-box'"
+          [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item-box selected' : 'form-sidebar-item-box'"
         >
           <button
             #item
             type="button"
-            value="{{ categoryType?.type?.value }}"
-            [ngClass]="itemSelected === categoryType?.type?.value ? 'btn btn-link selected' : 'btn btn-link'"
+            value="{{ categoryType?.value }}"
+            [ngClass]="itemSelected === categoryType?.value ? 'btn btn-link selected' : 'btn btn-link'"
             (click)="selectItem(item)"
           >
-            {{ categoryType?.type?.text }}
+            {{ categoryType?.text }}
           </button>
           <div class="amount">
-            ${{ categoryType?.type?.amount }}
+            ${{ categoryType?.amount }}
           </div>
         </div>
         <div
-          [ngClass]="itemSelected === categoryType?.type?.value ? 'additional-options visible' : 'additional-options'"
+          [ngClass]="itemSelected === categoryType?.value ? 'additional-options visible' : 'additional-options'"
         >
           <ul class="additional-options-list">
             <li
-              *ngFor="let option of categoryType.type.options"
+              *ngFor="let option of categoryType?.options"
               [ngClass]="additionalItemSelected === option?.value ? 'additional-item selected' : 'additional-item'"
             >
               <button

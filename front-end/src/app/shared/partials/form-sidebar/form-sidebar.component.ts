@@ -30,6 +30,7 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('this.sidebarLinks: ', this.sidebarLinks);
   }
 
   public selectItem(item): void {
@@ -38,7 +39,7 @@ export class FormSidebarComponent implements OnInit {
     this.additionalOptions = [];
 
     this.sidebarLinks.findIndex((el, index) => {
-      if (el.type.value === this.itemSelected) {
+      if (el.value === this.itemSelected) {
         this._indexOfItemSelected = index;
       }
     });
@@ -54,13 +55,13 @@ export class FormSidebarComponent implements OnInit {
     let additionalItemIndex: number = null;
 
     this.additionalItemSelected = additionalItem.getAttribute('value');
-    this.sidebarLinks[this._indexOfItemSelected].type.options.findIndex((el, index) => {
+    this.sidebarLinks[this._indexOfItemSelected].options.findIndex((el, index) => {
       if (this.additionalItemSelected === el.value) {
         additionalItemIndex = index;
       }
     });
 
-    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].type.options[additionalItemIndex].options;
+    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
 
     console.log('this.additionalOptions: ', this.additionalOptions);
 

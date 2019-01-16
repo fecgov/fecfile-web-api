@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { form3x_data } from '../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'dynamic-forms',
@@ -16,10 +17,7 @@ export class DynamicFormsComponent implements OnInit {
   public currentStep: string = '';
   public formOptionsVisible: boolean = false;
   public frmOption: FormGroup;
-  public loadingSteps: boolean = true;
-  public loadingCategories: boolean = true;
-  public loadingSearchField: boolean = true;
-  public loadingCashOnHand: boolean = true;
+  public loadingData: boolean = true;
   public optionFailed: boolean = false;
   public steps: any = {};
   public sidebarLinks: any = {};
@@ -37,40 +35,24 @@ export class DynamicFormsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-	  this._http.get('http://localhost:3000/steps')
+	  this._http.get<form3x_data>('http://localhost:3000/data')
 	      .subscribe(resp => {
-	          this.steps = resp;
+            console.log('data: ', resp);
 
-            this.loadingSteps = false;
+            this.steps = resp.steps;
+
+            this.sidebarLinks = resp.transactionCategories;
+
+            console.log('sidebarLinks JSON: ', JSON.stringify(this.sidebarLinks));
+
+            this.searchField = resp.transactionSearchField;
+
+            this.loadingData = false;
 	      });
-
-    this._http.get('http://localhost:3000/transaction-categories')
-        .subscribe(resp => {
-            this.sidebarLinks = resp;
-
-            this.loadingCategories = false;
-        });
-
-    this._http.get('http://localhost:3000/transaction-search-field')
-        .subscribe(resp => {
-            this.searchField = resp;
-
-            this.loadingSearchField = false;
-        });
-
-    this._http.get('http://localhost:3000/cashOnHand')
-        .subscribe(resp => {
-            this.cashOnHand = resp;
-
-            this.loadingCashOnHand = false;
-        });
 
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
     });
-
-
   }
 
   /**
