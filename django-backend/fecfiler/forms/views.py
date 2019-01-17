@@ -857,7 +857,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses', aws_access_key_id=settings.AWS_ACCESS_KEY_ID, aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,region_name=settings.AWS_REGION)
+    client = boto3.client('ses')
 
     # Try to send the email.
     try:
@@ -980,7 +980,9 @@ def save_print_f99(request):
     if not createresp.ok:
         return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     #try:
-    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+    create_json_data = json.loads(createresp.text)
+
+    comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
         serializer = CommitteeInfoSerializer(comm_info)
         imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
@@ -996,6 +998,15 @@ def save_print_f99(request):
             treasurer_name = treasurer_name +  " " +  comm_info.treasurerlastname
         if not comm_info.treasurersuffix is None:
             treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
+        if comm_info.updated_at is None:
+            date_signed_mm = comm_info.created_at.strftime('%m')
+            date_signed_dd = comm_info.created_at.strftime('%d')
+            date_signed_yy = comm_info.created_at.strftime('%Y')
+        else:
+            date_signed_mm = comm_info.updated_at.strftime('%m')
+            date_signed_dd = comm_info.updated_at.strftime('%d')
+            date_signed_yy = comm_info.updated_at.strftime('%Y')
+
 
         data = {
             'IMGNO': imageno,
@@ -1007,14 +1018,13 @@ def save_print_f99(request):
             'STATE': comm_info.state,
             'ZIP': comm_info.zipcode,
             'REASON_TYPE': comm_info.reason,
-            'DATE_SIGNED_MM':comm_info.updated_at.strftime('%m'),
-            'DATE_SIGNED_DD':comm_info.updated_at.strftime('%d'),
-            'DATE_SIGNED_YY':comm_info.updated_at.strftime('%Y'),
+            'DATE_SIGNED_MM':date_signed_mm,
+            'DATE_SIGNED_DD':date_signed_dd,
+            'DATE_SIGNED_YY':date_signed_mm,
             'TREASURER_FULL_NAME': treasurer_name,
             'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
             'EF_STAMP':"[Electronically Filed]",
             'MISCELLANEOUS_TEXT': comm_info.text,
-
         }
 
         if not comm_info.street2 is None:
