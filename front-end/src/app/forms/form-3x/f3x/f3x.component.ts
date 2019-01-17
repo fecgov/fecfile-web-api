@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -26,17 +27,22 @@ export class F3xComponent implements OnInit {
   public searchField: any = {};
   public cashOnHand: any = {};
 
+  private _form_type: string = '';
+
   constructor(
     private _formService: FormsService,
     private _http: HttpClient,
     private _fb: FormBuilder,
-    private _config: NgbTooltipConfig
+    private _config: NgbTooltipConfig,
+    private _activatedRoute: ActivatedRoute,
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
+    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+
     this._formService
       .getTransactionCategories()
       .subscribe(res => {
@@ -47,6 +53,14 @@ export class F3xComponent implements OnInit {
         this.searchField = res.data.transactionSearchField;
 
         this.step = this.currentStep;
+
+        let formSavedObj: any = {
+          'saved': false
+        };
+
+        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
+          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
+        }
 
         this.loadingData = false;
       });
