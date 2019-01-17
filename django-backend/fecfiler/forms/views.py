@@ -961,6 +961,7 @@ def save_print_f99(request):
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     #import ipdb; ipdb.set_trace()
+    logger.debug("Incoming parameters: save_print_f99" + str(request.data))
     token_use = request.auth.decode("utf-8")
 
     token_use = "JWT" + " " + token_use
@@ -1055,7 +1056,8 @@ def save_print_f99(request):
             #print(filename)
             myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
             #print(myurl)
-            myfile = urllib.request.urlopen(myurl)
+            url_request = urllib.request.Request(myurl, headers = {"User-Agent", "Mozilla/5.0"})
+            myfile = urllib.request.urlopen(url_request)
 
             #s3 = boto3.client('s3')
 
