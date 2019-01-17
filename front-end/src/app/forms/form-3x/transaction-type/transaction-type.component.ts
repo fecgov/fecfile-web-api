@@ -35,6 +35,11 @@ export class TransactionTypeComponent implements OnInit {
     });
   }
 
+  ngDoCheck(): void {
+    if (this.selectedOptions) {
+      this.showForm = true;
+    }
+  }
   /**
    * Validates the form on submit.
    *
