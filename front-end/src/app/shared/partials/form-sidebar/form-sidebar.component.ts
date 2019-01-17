@@ -29,9 +29,7 @@ export class FormSidebarComponent implements OnInit {
     this._config.triggers = 'click';
   }
 
-  ngOnInit(): void {
-    console.log('this.sidebarLinks: ', this.sidebarLinks);
-  }
+  ngOnInit(): void {}
 
   public selectItem(item): void {
     this.itemSelected = item.getAttribute('value');
