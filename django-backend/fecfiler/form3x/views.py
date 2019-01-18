@@ -11,6 +11,7 @@ import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.db import connection
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -126,10 +127,11 @@ def get_special_report_types(request):
                     if not elem:
                         data_row[idx]=''
                 forms_obj=data_row[0]
+                d = json.loads(forms_obj)
                 
         if forms_obj is None:
             return Response("No entries were found for this committee", status=status.HTTP_201_OK)                              
         
-        return Response(forms_obj, status=status.HTTP_200_OK)
+        return JsonResponse(d, status=status.HTTP_200_OK, safe=False)
     except:
        return Response({}, status=status.HTTP_404_NOT_FOUND)
