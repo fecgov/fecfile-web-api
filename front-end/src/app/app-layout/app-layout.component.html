@@ -1,4 +1,4 @@
-<div 
+<div
   class="app-container"
   [ngClass]="sideBarClass"
 >
@@ -9,24 +9,24 @@
           <img src="assets/img/logo-transparent.png" />
         </a>
       </div>
-      <button 
-        class="navbar-toggler" 
-        type="button" 
-        data-toggle="collapse" 
-        data-target="#navbarSupportedContent" 
-        aria-controls="navbarSupportedContent" 
-        aria-expanded="false" 
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
         aria-label="Toggle navigation"
         (click)="toggleTopNav()"
       >
         <span class="sr-only">Toggle navigation</span>
         <span class="bars-icon"></span>
-      </button>             
-      <div 
-        class="collapse navbar-collapse app__top-nav" 
+      </button>
+      <div
+        class="collapse navbar-collapse app__top-nav"
         id="navbarSupportedContent"
         [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }"
-      >       
+      >
         <app-header></app-header>
       </div>
     </nav>
@@ -39,7 +39,7 @@
       <div class="app__committee-info">
         <div class="committee-id">
           {{ committeeId }}
-        </div>        
+        </div>
         <div class="committee-name">
           {{ committeeName }}
         </div>
@@ -87,25 +87,39 @@
             <a href="mailto:tech@fec.gov" target="_blank">tech@fec.gov</a>
             </address>
           </h6>
-        </div> 
+        </div>
          <div class="col-sm-4">
             <div class="legal-disclaimer">
                 <button
                   type="button"
                   class="btn btn-link"
-                  (click)="open()"
+                  (click)="open(legalDisclaimer)"
                 >
                   Legal Disclaimer
                 </button>
               </div>
-              <div class="legal-text" [hidden]="!showLegalDisclaimer">
-                <p>
-                  Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-                  government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-                  apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
-                </p>          
-              </div>          
-          </div>                
+          </div>
+          <ng-template #legalDisclaimer let-d="dismiss">
+            <div class="modal-header">
+              <h4 class="modal-title">
+                Legal Disclaimer
+              </h4>
+            </div>
+            <div class="modal-body">
+              <p>
+                Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
+                government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
+                apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-outline-dark"
+                (click)="d('Close click')"
+              >Close</button>
+            </div>
+          </ng-template>
       </div>
     </div>
   </footer>

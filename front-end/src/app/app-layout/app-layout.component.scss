@@ -13,10 +13,10 @@
     }
     @include media(mediumDesktop) {
       padding-left: 200px;
-    }         
+    }
     @include media(largeDesktop) {
       padding-left: 200px;
-    }     
+    }
     .app__side-nav {
       left: 0;
     }
@@ -28,12 +28,12 @@
         }
         @include media(mediumDesktop) {
           padding-left: 130px;
-        }         
+        }
         @include media(largeDesktop) {
           padding-left: 130px;
         }
       }
-    }    
+    }
   }
   &.dashboard.active {
     padding-left: 0;
@@ -42,13 +42,13 @@
     }
     @include media(mediumDesktop) {
       padding-left: 240px;
-    }         
+    }
     @include media(largeDesktop) {
       padding-left: 240px;
-    }     
+    }
     .app__side-nav {
       left: 0;
-    }   
+    }
     footer {
       .app__footer {
         font-family: $mainFontFamily;
@@ -58,12 +58,12 @@
         }
         @include media(mediumDesktop) {
           padding-left: 130px;
-        }         
+        }
         @include media(largeDesktop) {
           padding-left: 130px;
-        }         
+        }
       }
-    } 
+    }
   }
  .app__top {
     background-color: $dustyGray;
@@ -73,12 +73,12 @@
     right: 0;
     vertical-align: middle;
     width: 100%;
-    z-index: 1001;    
+    z-index: 1001;
     .navbar {
       background-color: $dustyGray;
       height: $topNavHeight;
       margin: 0 !important;
-      padding: 0 !important;      
+      padding: 0 !important;
       .navbar-toggler {
         padding-right: 20px;
         @include media(tablet) {
@@ -86,12 +86,12 @@
         }
         @include media(mediumDesktop) {
           padding-right: 0;
-        }         
+        }
         @include media(largeDesktop) {
           padding-right: 0;
-        }         
-      } 
-      .app__top-logo { 
+        }
+      }
+      .app__top-logo {
         float: left;
         margin: 0 !important;
         padding: 0 !important;
@@ -102,16 +102,16 @@
           }
           @include media(mediumDesktop) {
             width: 200px;
-          }         
+          }
           @include media(largeDesktop) {
             width: 260px;
-          }           
+          }
         }
       } // .app__top-logo
       .app__top-nav {
         float: left;
         width: auto;
-        &.toggleMenuStyle {  
+        &.toggleMenuStyle {
           background: $dustyGray;
           display: block;
           float: none;
@@ -131,27 +131,27 @@
             height: 60px;
             position: relative;
             top: 0;
-          }         
+          }
           @include media(largeDesktop) {
             height: 60px;
             position: relative;
             top: 0;
-          }                 
-        }        
+          }
+        }
         @include media(tablet) {
           width: auto;
-        }           
+        }
         @include media(mediumDesktop) {
           width: 80%;
-        }         
+        }
         @include media(largeDesktop) {
           width: 90%;
-        }         
+        }
       }
       @include clearfix();
-    } 
+    }
     @include clearfix();
-  } // .app__top  
+  } // .app__top
   .app__side-nav {
     font-family: $mainFontFamily;
     height: 100%;
@@ -161,7 +161,7 @@
     transition: all 0.4s ease 0s;
     width: $sideBarWidth;
     z-index: 1000;
-  } // .app__side-nav  
+  } // .app__side-nav
   main {
     height: 80%;
     .app__content-wrapper {
@@ -190,12 +190,12 @@
           height: 60px;
           line-height: 60px;
           padding-top: 0;
-        }         
+        }
         @include media(largeDesktop) {
           height: 60px;
           line-height: 60px;
           padding-top: 0;
-        }         
+        }
         .committee-name,
         .committee-id {
           display: inline-block;
@@ -230,10 +230,10 @@
     }
     @include media(mediumDesktop) {
       padding-left: 130px;
-    }         
+    }
     @include media(largeDesktop) {
       padding-left: 130px;
-    }     
+    }
     .row {
       margin-left: 0;
       margin-right: 0;
@@ -248,5 +248,8 @@
         }
       }
     }
-  }      
-} // .app-container   
+  }
+} // .app-container
+.modal-dialog {
+  color: $black;
+}
