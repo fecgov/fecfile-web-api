@@ -479,12 +479,15 @@ export class FormsService {
             localStorage.setItem('form_99_details.id', id);
             localStorage.setItem('form_99_details.org_filename', org_filename);
             localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
+            localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
 
-            console.log (' PreviewForm_ReasonScreen api Repsonse',res);
-            console.log (' PreviewForm_ReasonScreen org_filename',org_filename);
-            console.log (' PreviewForm_ReasonScreen org_fileurl',org_fileurl);
-            console.log (' PreviewForm_ReasonScreen org_filename',printpriview_filename);
-            console.log (' PreviewForm_ReasonScreen org_fileurl',printpriview_fileurl);
+            console.log ('PreviewForm_ReasonScreen api Repsonse',res);
+            console.log ('PreviewForm_ReasonScreen form_99_details.id', id);
+            console.log ('PreviewForm_ReasonScreen org_filename',org_filename);
+            console.log ('PreviewForm_ReasonScreen org_fileurl',org_fileurl);            
+            console.log ('PreviewForm_ReasonScreen printpriview_filename',printpriview_filename);
+            console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
 
             if (fileuploaded)
             {
@@ -511,6 +514,9 @@ export class FormsService {
     let id:string;
     let printpriview_filename = "";
     let printpriview_fileurl = "";
+    let org_filename="";
+    let org_fileurl="";    
+
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -543,10 +549,16 @@ export class FormsService {
             printpriview_fileurl = form99_details_res.printpriview_fileurl;
 
             localStorage.setItem('form_99_details.id', id);
+            localStorage.setItem('form_99_details.org_filename', org_filename);
+            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
             localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
-            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
 
             console.log ('PreviewForm_Preview_sign_Screen id',identity);
+            console.log ('PreviewForm_Preview_sign_Screen api Repsonse',res);
+            console.log ('PreviewForm_Preview_sign_Screen form_99_details.id', id);
+            console.log ('PreviewForm_Preview_sign_Screen org_filename',org_filename);
+            console.log ('PreviewForm_Preview_sign_Screen org_fileurl',org_fileurl);            
             console.log ('PreviewForm_Preview_sign_Screen printpriview_filename',printpriview_filename);
             console.log ('PreviewForm_Preview_sign_Screen printpriview_fileurl',printpriview_fileurl);
 
@@ -565,9 +577,6 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("token",token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-    console.log("url = ", url);
 
     return this._http
      .get(
@@ -587,9 +596,6 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("token",token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-    console.log("url = ", url);
 
     return this._http
      .get(
@@ -598,5 +604,47 @@ export class FormsService {
           headers: httpOptions
         }
       );
+  }
+
+  public get_form3x_reporttype(): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+    
+    url = '/f3x/get_filed_report_types';
+    
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+   
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
+  }
+
+  public getspecialreporttypes(): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+    
+    url = '/f3x/get_special_report_types';
+    
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
+
+     //return this._http.get('./assets/196.json');
+      
   }
 }

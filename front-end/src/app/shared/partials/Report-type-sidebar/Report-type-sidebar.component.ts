@@ -3,18 +3,18 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
-  selector: 'form-sidebar',
-  templateUrl: './form-sidebar.component.html',
-  styleUrls: ['./form-sidebar.component.scss'],
+  selector: 'report-type-sidebar',
+  templateUrl: './Report-type-sidebar.component.html',
+  styleUrls: ['./Report-type-sidebar.component.scss'],
   providers: [NgbTooltipConfig]
 })
-export class FormSidebarComponent implements OnInit {
+export class ReportTypeSidebarComponent implements OnInit {
 
-  @Input() sidebarLinks: any = [];
-  @Input() searchField: any = {};
+  //@Input() sidebarLinks: any = [];
+  //@Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
-  @Input() cashOnHand: any = {};
+  //@Input() cashOnHand: any = {};
 
 
   public itemSelected: string = '';
@@ -25,10 +25,10 @@ export class FormSidebarComponent implements OnInit {
 
   public loadingData: boolean = true;
   public steps: any = {};
-  //public sidebarLinks: any = {};
-  //public selectedOptions: any = [];
-  //public searchField: any = {};
-  //public cashOnHand: any = {};
+  public sidebarLinks: any = {};
+  public selectedOptions: any = [];
+  public searchField: any = {};
+  public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
 
@@ -41,10 +41,7 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-    /*setTimeout(() => {
-         
-    this._formService
+    /*this._formService
     .getTransactionCategories()
     .subscribe(res => {
       console.log('resp: ', res);
@@ -56,11 +53,9 @@ export class FormSidebarComponent implements OnInit {
       this.step = this.currentStep;
 
       this.loadingData = false;
-    });  
-  }, 200);*/
+    });
 
-    //console.log(' from ngOnInit searchField: ', this.searchField);
-    console.log(' from ngOnInit form sidebar this.sidebarLinks: ', this.sidebarLinks);
+    console.log('this.sidebarLinks: ', this.sidebarLinks);*/
   }
 
   public selectItem(item): void {
