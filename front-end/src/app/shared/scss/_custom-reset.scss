@@ -23,17 +23,14 @@ ul {
   }
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    -webkit-margin-before: 0.67em;
-    -webkit-margin-after: 0.67em;
-    -webkit-margin-start: 0px;
-    -webkit-margin-end: 0px;
+h1, h2, h3, h4, h5, h6 {
+  font-family: $titleFontFamily;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 0;
 }
+
 
 a:-webkit-any-link {
   text-decoration: none;

@@ -12,7 +12,7 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
                 'created_at','is_submitted', 'signee', 'email_on_file', 'email_on_file_1', 'additional_email_1', 'additional_email_2',
                 'form_type', 'coverage_start_date', 'coverage_end_date', 'updated_at')
         #read_only_fields = ('created_at', 'updated_at')
-        
+  
         # Methods to save the model objects to the database
         
     def create(self, validated_data):
@@ -39,8 +39,8 @@ class CommitteeInfoSerializer(serializers.ModelSerializer):
         instance.signee = validated_data.get('signee', instance.signee)
         instance.email_on_file = validated_data.get('email_on_file', instance.email_on_file)
         instance.email_on_file_1 = validated_data.get('email_on_file_1', instance.email_on_file_1)
-        instance.additional_email_1 = validated_data.get('additional_email', instance.additional_email_1)
-        instance.additional_email_2 = validated_data.get('additional_email', instance.additional_email_2)
+        instance.additional_email_1 = validated_data.get('additional_email_1', instance.additional_email_1)
+        instance.additional_email_2 = validated_data.get('additional_email_2', instance.additional_email_2)
         instance.form_type = validated_data.get('form_type', instance.form_type)
         instance.coverage_start_date = validated_data.get('coverage_start_date', instance.coverage_start_date)
         instance.coverage_end_date = validated_data.get('coverage_end_date', instance.coverage_end_date)

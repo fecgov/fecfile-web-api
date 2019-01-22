@@ -5,6 +5,14 @@
 		margin: 0 auto 5px auto;
 		width: 99%;
 	}	
+	.grid-row {
+		margin-left: 0;
+		margin-right: 0;
+		.grid-row__col {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
 	header {    
 	    .header-container {
 	      display: block;
@@ -96,7 +104,16 @@
 				    padding-left: 0;
 					position: relative;
 					width: 100%;				    				
-				} 				
+				} 
+				.label {
+					font-family: $labelFontFamily;
+					font-weight: bold;
+					margin-bottom: 1em;
+				}				
+				.text {
+					font-family: $mainFontFamily;
+					margin-bottom: 1em;
+				}
 			}	
 			.validate__form {
 			&.show-alerts {
@@ -134,6 +151,7 @@
 	}
 }
 footer {
+	margin-bottom: 10px;
 	.grid-row {
 		.grid-row__col--12 {
 		    .forms__btn-container {

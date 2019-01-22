@@ -2,6 +2,7 @@
   background-color: $blueZodiac;
   border-color: $blueZodiac;
   color: $white;
+  font-family: $mainFontFamily;
   &:hover {
     background-color: darken($blueZodiac, 10%);
     border-color: darken($blueZodiac, 10%);
@@ -12,6 +13,7 @@
   background-color: $pelorous;
   border-color: $pelorous;
   color: $white;
+  font-family: $mainFontFamily;
   &:hover {
     background-color: darken($pelorous, 10%);
     border-color: darken($pelorous, 10%);
@@ -22,6 +24,7 @@
   background-color: $mercury;
   border-color: $mercury;
   color: $shuttleGray;
+  font-family: $mainFontFamily;
   &:hover {
     background-color: darken($mercury, 10%);
     border-color: darken($mercury, 10%);
