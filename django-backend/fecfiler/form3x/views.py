@@ -1,3 +1,4 @@
+"""
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -29,7 +30,7 @@ def get_filed_report_types(request):
 
         forms_obj = []
         with connection.cursor() as cursor:
-            cursor.execute("select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")
+            cursor.execute("select form_type, report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")
             for row in cursor.fetchall():
                 #forms_obj.append(data_row)
                 data_row = list(row)
@@ -50,4 +51,4 @@ def get_filed_report_types(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
-
+"""
