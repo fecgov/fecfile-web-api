@@ -1,4 +1,4 @@
-"""
+
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.db import connection
 from django.http import JsonResponse
-
+"""
 # Create your views here.
 
 @api_view(['GET'])
