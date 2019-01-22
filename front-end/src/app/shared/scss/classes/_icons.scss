@@ -52,12 +52,12 @@
 
 .file-alt-icon {
   @extend .fas;
-  @extend .fa-file-alt;  
+  @extend .fa-file-alt;
 }
 
 .file-copy-icon {
   @extend .fas;
-  @extend .fa-copy;   
+  @extend .fa-copy;
 }
 
 .down-arrow-icon {
@@ -67,5 +67,10 @@
 
 .up-arrow-icon {
   @extend .fas;
-  @extend .fa-angle-up;  
+  @extend .fa-angle-up;
+}
+
+.search-icon {
+  @extend .fas;
+  @extend .fa-search;
 }

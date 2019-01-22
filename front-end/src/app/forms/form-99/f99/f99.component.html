@@ -1,13 +1,13 @@
 <div class="forms__wizard">
-  <div 
+  <div
     class="form__alerts"
     [ngClass]="{
       'show-alerts': showValidateBar === true
     }"
   >
     <app-validate></app-validate>
-  </div>    
-  <div 
+  </div>
+  <div
     class="form__container"
     [ngClass]="{
       'show-alerts': showValidateBar === true,
@@ -26,27 +26,27 @@
         [current_step]="currentStep"
       >
       </app-steps>
-    </div>    
-    <div 
-      class="form__content" 
+    </div>
+    <div
+      class="form__content"
       *ngIf="!isLoading"
       [ngClass]="{
         'show-alerts': showValidateBar === true,
         'hide-alerts': step==='step_5',
         'preview': step==='step_3'
-      }"      
+      }"
     >
       <div
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <app-type (status)='onNotify($event)'></app-type>
+        <f99-type (status)='onNotify($event)'></f99-type>
       </div>
       <div
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-        <app-reason (status)='onNotify($event)'></app-reason>
+        <f99-reason (status)='onNotify($event)'></f99-reason>
       </div>
       <div
         class="form__step"

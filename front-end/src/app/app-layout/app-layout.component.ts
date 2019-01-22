@@ -1,5 +1,6 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { ApiService } from '../shared/services/APIService/api.service';
@@ -10,7 +11,8 @@ import { FormsComponent } from '../forms/forms.component';
 @Component({
   selector: 'app-app-layout',
   templateUrl: './app-layout.component.html',
-  styleUrls: ['./app-layout.component.scss']
+  styleUrls: ['./app-layout.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppLayoutComponent implements OnInit {
 
@@ -21,14 +23,16 @@ export class AppLayoutComponent implements OnInit {
   public toggleMenu: boolean = false;
   public committeeName: string = '';
   public committeeId: string = '';
+  public closeResult: string = '';
   public dashboardClass: string = '';
   public showLegalDisclaimer: boolean = false;
-  
+
 	constructor(
     private _apiService: ApiService,
 		private _sessionService: SessionService,
     private _messageService: MessageService,
-    private _router: Router
+    private _router: Router,
+    private _modalService: NgbModal
 	) { }
 
 	ngOnInit(): void {
@@ -45,8 +49,8 @@ export class AppLayoutComponent implements OnInit {
           this._messageService
             .sendMessage({'committee_details_loaded': true});
         }
-      });      
-  
+      });
+
     this._router
       .events
       .subscribe(val => {
@@ -60,7 +64,7 @@ export class AppLayoutComponent implements OnInit {
             if(this.toggleMenu) {
               this.sideBarClass = 'visible';
             } else {
-              this.sideBarClass = ''; 
+              this.sideBarClass = '';
             }
           }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
             this.sideBarClass = 'active';
@@ -68,11 +72,11 @@ export class AppLayoutComponent implements OnInit {
         }
       });
   }
-  
+
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     localStorage.clear();
-  }   
+  }
 
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.
@@ -108,10 +112,31 @@ export class AppLayoutComponent implements OnInit {
     } else {
       this.sideBarClass = '';
     }
-  }  
-
-  public open(): void{
-    this.showLegalDisclaimer = !this.showLegalDisclaimer;
   }
 
+  /**
+   * Opens the modal dialog.
+   *
+   * @param      {Object}  content  The content
+   */
+  public open(content): void{
+    this._modalService
+      .open(content, {ariaLabelledBy: 'modal-basic-title'})
+      .result
+      .then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
+    });
+  }
+
+  private _getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
+  }
 }

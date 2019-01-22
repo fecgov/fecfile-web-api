@@ -1,6 +1,6 @@
 <aside>
   <div class="sidebar" [ngClass]="sidebarVisibleClass">
-    <div class="sidebar__toggle"> 
+    <div class="sidebar__toggle">
       <button
        type="button"
        class="btn btn-link toggle-sidebar"
@@ -8,9 +8,9 @@
       >
         <i [ngClass]="iconClass">
           <span class="sr-only">Toggle Sidebar</span>
-        </i>        
-      </button>          
-    </div>    
+        </i>
+      </button>
+    </div>
     <nav>
       <div class="sidebar__nav">
         <div class="sidebar__nav--header">
@@ -24,29 +24,39 @@
             <i
               class="down-arrow-icon"
               aria-hidden="true"
-            ></i>            
+            ></i>
           </div>
         </div>
         <div class="sidebar__nav--links"  >
           <ul class="links-list" *ngFor="let committee_form of committee_forms || async">
-            <li class="links-list__item" *ngIf="(committee_form.category === 'My Forms')" > 
+            <li
+              class="links-list__item"
+              *ngIf="(committee_form.category === 'My Forms')"
+              [ngClass]="formType === committee_form.form_type_mini ? 'links-list__item--selected' : ''"
+            >
               <div class="list-item__link">
-                <!--PAC &amp; Party Report of Receipts &amp; Disbursements (F3X) -->
                 <a
                   [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                   [queryParams]="{ step: 'step_1' }"
                   (click)="formSelected(committee_form.form_type_mini)"
                 >
                 {{committee_form.form_description}}
+                <br />
                 {{committee_form.due_date}}
-                </a> 
+                </a>
               </div>
               <div class="list-item__info">
                 <div class="form-name">
-                  {{committee_form.form_type}}
+                  <a
+                    [routerLink]="['/forms/form/', committee_form.form_type_mini]"
+                    [queryParams]="{ step: 'step_1' }"
+                    (click)="formSelected(committee_form.form_type_mini)"
+                  >
+                    {{committee_form.form_type}}
+                  </a>
                 </div>
-                 <button 
-                   type="button" 
+                 <button
+                   type="button"
                    class="btn btn-link"
                    [ngbTooltip]="f3xContent"
                    #f3xtoolTip="ngbTooltip"
@@ -59,12 +69,12 @@
                    <span class="sr-only">Click here for more information</span>
                  </button>
                 <ng-template #f3xContent>
-                  {{committee_form.form_info}} 
-                  <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.                     
+                  {{committee_form.form_info}}
+                  <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.
                   <i class="external-link-icon" aria-hidden="true">
                    <span class="sr-only">Link opens in new window.</span>
-                  </i>                  
-                </ng-template>                
+                  </i>
+                </ng-template>
               </div>
             </li>
           </ul>
@@ -74,9 +84,9 @@
             <i class="file-copy-icon" aria-hidden="true"></i>
           </div>
           <div class="header-text">
-           Other Forms 
+           Other Forms
           </div>
-          <button 
+          <button
             type="button"
             class="btn btn-link btn-hide-form-nav"
             (click)="toggleFormNav('other-forms')"
@@ -90,7 +100,12 @@
         </div>
         <div class="sidebar__nav--links" [ngClass]="{'d-none': otherFormsHidden === true}">
           <ul class="links-list" *ngFor="let committee_form of committee_forms || async" >
-            <li class="links-list__item" *ngIf="(committee_form.category === 'Other Forms')" [ngClass]="formType === 99 ? 'links-list__item--selected' : ''">
+            <li
+              class="links-list__item"
+              [attr.data-FormType]="committee_form.form_type_mini"
+              *ngIf="(committee_form.category === 'Other Forms')"
+              [ngClass]="formType === committee_form.form_type_mini ? 'links-list__item--selected' : ''"
+            >
               <div class="list-item__link" >
                 <a
                   [routerLink]="['/forms/form/', committee_form.form_type_mini]"
@@ -98,7 +113,7 @@
                   (click)="formSelected(committee_form.form_type_mini)"
                 >
                 {{committee_form.form_description}}
-                </a>                
+                </a>
               </div>
               <div class="list-item__info">
                 <div class="form-name">
@@ -106,12 +121,12 @@
                     [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                     [queryParams]="{ step: 'step_1' }"
                     (click)="formSelected(committee_form.form_type_mini)"
-                  >                  
+                  >
                   {{committee_form.form_type}}
                   </a>
                 </div>
-                 <button 
-                   type="button" 
+                 <button
+                   type="button"
                    class="btn btn-link"
                    [ngbTooltip]="f99Content"
                    #f99toolTip="ngbTooltip"
@@ -124,8 +139,8 @@
                    <span class="sr-only">Click here for more information</span>
                  </button>
                 <ng-template #f99Content>
-                  {{committee_form.form_info}} 
-                </ng-template>                                    
+                  {{committee_form.form_info}}
+                </ng-template>
               </div>
             </li>
           </ul>

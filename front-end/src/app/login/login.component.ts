@@ -42,7 +42,9 @@ export class LoginComponent implements OnInit {
       this._messageService
         .getMessage()
         .subscribe(res => {
-          this.loggedOut = res;
+          if(typeof res.loggedOut !== 'undefined') {
+            this.loggedOut = res;
+          }
         });
  }
 

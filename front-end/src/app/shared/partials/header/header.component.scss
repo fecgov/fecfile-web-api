@@ -11,10 +11,10 @@
   }
   @include media(mediumDesktop) {
     width: 958px;
-  }         
+  }
   @include media(largeDesktop) {
     width: 990px;
-  }   
+  }
   .header__nav {
     display: flex;
     flex-direction: column;
@@ -26,10 +26,10 @@
     }
     @include media(mediumDesktop) {
       display: block;
-    }         
+    }
     @include media(largeDesktop) {
       display: block;
-    }    
+    }
     a {
       color: $black;
       text-decoration: none;
@@ -42,22 +42,31 @@
       order: 2;
       padding-left: 0;
       padding-top: 10px;
+      position: relative;
       width: 100%;
+      .search-icon {
+        color: $shuttleGray;
+        position: absolute;
+        right: -5px;
+        top: 20px;
+        z-index: 1;
+      }
       input[type='text'] {
         @include make-text-input(300px, 1.5em, 1em, 1em);
         margin-left: auto;
-        margin-right: auto;        
-      }       
+        margin-right: auto;
+        position: relative;
+      }
       @include media(tablet) {
-        display: block;  
-        order: 2;     
+        display: block;
+        order: 2;
         padding-left: 5px;
         width: 100%;
         input[type='text'] {
-          @include make-text-input(130px, 1.5em, 1em, 1em);       
+          @include make-text-input(130px, 1.5em, 1em, 1em);
           margin-left: auto;
-          margin-right: auto;        
-        }         
+          margin-right: auto;
+        }
       }
       @include media(mediumDesktop) {
         float: left;
@@ -66,7 +75,7 @@
         width: 180px;
         input[type='text'] {
           @include make-text-input(165px, 1.5em, 1em, 1em);
-        }          
+        }
       }
       @include media(largeDesktop) {
         float: left;
@@ -75,7 +84,7 @@
         width: 180px;
         input[type='text'] {
           @include make-text-input(165px, 1.5em, 1em, 1em);
-        }        
+        }
       }
     }
     .header__links {
@@ -95,7 +104,7 @@
         float: left;
         padding-top: 10px;
         width: 773px;
-      } 
+      }
       @include media(largeDesktop) {
         float: left;
         padding-top: 10px;
@@ -108,7 +117,7 @@
           display: block;
           margin-bottom: 10px;
           padding-left: 10px;
-          padding-right: 0;          
+          padding-right: 0;
           text-align: left;
           vertical-align: middle;
           @include media(tablet) {
@@ -152,7 +161,7 @@
               background-color: $iron;
             }
           }
-          .dropdown {                    
+          .dropdown {
             .dropdown-menu {
               left: -45px !important;
               top: 20px;
@@ -165,7 +174,7 @@
                   padding-bottom: 0;
                   padding-left: 10px;
                   padding-right: 10px;
-                  padding-top: 0;              
+                  padding-top: 0;
                 @include media(tablet) {
                   display: inline-block;
                   height: 30px;
@@ -179,14 +188,14 @@
                 @include media(mediumDesktop) {
                   display: block;
                   padding-left: 0;
-                  padding-right: 0;                  
-                }         
+                  padding-right: 0;
+                }
                 @include media(largeDesktop) {
                   display: block;
                   padding-left: 0;
-                  padding-right: 0;                    
-                }                 
-              }              
+                  padding-right: 0;
+                }
+              }
             }
           }
           .secondary-dropdown-menu {
@@ -198,44 +207,44 @@
               @include media(mediumDesktop) {
                 border-top: 0;
                 margin: 0;
-                padding: 0; 
-                top: 60px;    
-                height: auto;         
-              }         
+                padding: 0;
+                top: 60px;
+                height: auto;
+              }
               @include media(largeDesktop) {
                 border-top: 0;
                 margin: 0;
                 padding: 0;
-                top: 60px;  
-                height: auto;                
-              }               
+                top: 60px;
+                height: auto;
+              }
             }
             &.tools {
               height: auto;
               @include media(mediumDesktop) {
                 border-top: 0;
                 margin: 0;
-                padding: 0; 
-                top: 60px;    
-                height: auto;         
-              }         
+                padding: 0;
+                top: 60px;
+                height: auto;
+              }
               @include media(largeDesktop) {
                 border-top: 0;
                 margin: 0;
                 padding: 0;
-                top: 60px;  
-                height: auto;                
-              }               
+                top: 60px;
+                height: auto;
+              }
             }
             div {
               @include media(mediumDesktop) {
                 height: 40px !important;
                 line-height: 40px;
-              }         
+              }
               @include media(largeDesktop) {
                 height: 40px !important;
                 line-height: 40px;
-              }               
+              }
             }
           }
         } // .nav-item

@@ -1,35 +1,30 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { CookieService } from 'ngx-cookie-service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FormComponent } from './form.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ReportTypeComponent } from './report-type.component';
 
-describe('FormComponent', () => {
-  let component: FormComponent;
-  let fixture: ComponentFixture<FormComponent>;
+describe('ReportTypeComponent', () => {
+  let component: ReportTypeComponent;
+  let fixture: ComponentFixture<ReportTypeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
+        FormsModule,
         RouterTestingModule,
-        HttpClientTestingModule
+        CollapseModule,
+        ReactiveFormsModule
       ],
-      declarations: [ FormComponent ],
-      providers: [
-        CookieService,
-        FormBuilder
-      ],
-      schemas: [
-        CUSTOM_ELEMENTS_SCHEMA
-      ]
+      declarations: [ ReportTypeComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FormComponent);
+    fixture = TestBed.createComponent(ReportTypeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

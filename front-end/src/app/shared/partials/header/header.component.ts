@@ -27,7 +27,6 @@ export class HeaderComponent implements OnInit {
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf('/logout') === 0) {
-            console.log('logout clicked: ');
             this._messageService.sendMessage(
               {
                 loggedOut: true,
@@ -38,7 +37,7 @@ export class HeaderComponent implements OnInit {
             this._authService.doSignOut();
           }
         }
-      });    
+      });
   }
 
   public toggleMenu(): void {

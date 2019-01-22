@@ -30,7 +30,7 @@ import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { ReportsComponent } from './reports/reports.component';
 import { ContributorsComponent } from './contributors/contributors.component';
 import { ToolsComponent } from './tools/tools.component';
-import { FormComponent } from './forms/form-99/form/form.component';
+import { F99Component } from './forms/form-99/f99/f99.component';
 import { TypeComponent } from './forms/form-99/type/type.component';
 import { ReasonComponent } from './forms/form-99/reason/reason.component';
 import { StepsComponent } from './shared/partials/steps/steps.component';
@@ -50,6 +50,12 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
+import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sidebar.component';
+
+import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
+import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
+import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
+import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sidebar/Report-type-sidebar.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -70,7 +76,7 @@ import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-m
     ReportsComponent,
     ContributorsComponent,
     ToolsComponent,
-    FormComponent,
+    F99Component,
     TypeComponent,
     ReasonComponent,
     StepsComponent,
@@ -86,7 +92,12 @@ import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-m
     ToolsExportNamesComponent,
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    FormSidebarComponent,
+    F3xComponent,
+    TransactionTypeComponent,
+    ReportTypeComponent,
+    ReportTypeSidebarComponent
   ],
   entryComponents: [
     ConfirmModalComponent
@@ -108,7 +119,7 @@ import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-m
     NgbModule.forRoot()
   ],
   providers: [
-    CookieService, 
+    CookieService,
     CanActivateGuard,
     DialogService,
     CanDeactivateGuardService,
@@ -118,7 +129,7 @@ import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-m
       useFactory: appInitializerFn,
       multi: true,
       deps: [AppConfigService]
-    }    
+    }
   ],
   bootstrap: [AppComponent],
   schemas: [

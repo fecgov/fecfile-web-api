@@ -1,6 +1,7 @@
 <div class="header">
   <div class="header__nav">
     <div class="header__search">
+      <i class="search-icon" aria-hidden="true"></i>
       <input
         type="text"
         name="search"
@@ -14,7 +15,7 @@
           <a [routerLink]="['/dashboard']">
             Dashboard
           </a>
-        </li>        
+        </li>
         <li class="nav-item">
           <a [routerLink]="['/reports']">
             Reports
@@ -26,22 +27,22 @@
           </a>
         </li>
         <li class="nav-item">
-          <div  
+          <div
             class="d-inline-block"
-            ngbDropdown 
-            placement="bottom-left"            
+            ngbDropdown
+            placement="bottom-left"
           >
-            <button 
+            <button
               type="button"
-              class="btn btn-link dropdown-toggle" 
-              id="dropdownMenu" 
+              class="btn btn-link dropdown-toggle"
+              id="dropdownMenu"
               [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
               (click)="toggleMenu()"
               ngbDropdownToggle
             >
             Tools
             </button>
-            <div 
+            <div
               class="secondary-dropdown-menu tools"
               aria-labelledby="dropdownMenu"
               ngbDropdownMenu
@@ -49,18 +50,18 @@
               <div>
                 <a [routerLink]="['/tools_import_transactions']">
                   Import Transactions
-                </a>                
+                </a>
               </div>
               <div>
                 <a [routerLink]="['/tools_import_names']">
                   Import Names
-                </a>                
-              </div>  
+                </a>
+              </div>
               <div>
                 <a [routerLink]="['/tools_export_names']">
                   Export Names
-                </a>                
-              </div>                            
+                </a>
+              </div>
               <div>
                   <a [routerLink]="['/tools_merge_names']">
                   Merge Names
@@ -70,8 +71,8 @@
                   <a [routerLink]="['/tools_create_backup']">
                   Create Backup
                   </a>
-              </div> 
-            </div>                       
+              </div>
+            </div>
           </div>
         </li>
         <li class="nav-item">
@@ -84,23 +85,23 @@
           </a>
         </li>
         <li class="nav-item">
-          <div  
+          <div
             class="d-inline-block"
-            ngbDropdown 
-            placement="bottom-left"            
-          >      
-            <button 
+            ngbDropdown
+            placement="bottom-left"
+          >
+            <button
               type="button"
-              class="btn btn-link dropdown-toggle" 
-              id="dropdownMenu" 
+              class="btn btn-link dropdown-toggle"
+              id="dropdownMenu"
               [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
               (click)="toggleMenu()"
               ngbDropdownToggle
             >
-              <i class="profile-icon icon" aria-hidden="true"></i>    
+              <i class="profile-icon icon" aria-hidden="true"></i>
               Profile
-            </button>            
-            <div 
+            </button>
+            <div
               class="secondary-dropdown-menu profile"
               aria-labelledby="dropdownMenu"
               ngbDropdownMenu
@@ -108,24 +109,24 @@
               <div>
                 <a [routerLink]="['/account']">
                   Account
-                </a>                 
+                </a>
               </div>
               <div>
                 <a [routerLink]="['/users']">
                   Users
-                </a>                    
+                </a>
               </div>
               <div>
                 <a [routerLink]="['/settings']">
                   Settings
-                </a>                  
+                </a>
               </div>
               <div>
                 <a [routerLink]="['/logout']">
                   Logout
-                </a>                
+                </a>
               </div>
-            </div>            
+            </div>
           </div>
         </li>
       </ul> <!-- ./nav-links -->

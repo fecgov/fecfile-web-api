@@ -1,6 +1,10 @@
 <div class="form__type-container">
   <div class="form__type">
-    <form [formGroup]="frmType" (ngSubmit)="doValidateType()" (blur)="doValidateType()">
+    <form
+      [formGroup]="frmType"
+      (ngSubmit)="doValidateType()"
+      (blur)="doValidateType()"
+    >
       <header>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
@@ -9,7 +13,7 @@
             </h1>
             <h1 class="text-left" *ngIf="typeSelected">
               Form 99 / {{ typeSelected }}
-            </h1>            
+            </h1>
           </div>
         </div>
       </header>
@@ -17,12 +21,12 @@
         <div class="content">
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <div class="text-error text-center" 
+              <div class="text-error text-center"
                 *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
                 You must select a type for filing.
               </div>
             </div>
-          </div>  
+          </div>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <ul class="type-list">
@@ -50,7 +54,7 @@
                           class="btn btn-link"
                           [ngbTooltip]="mstContent"
                           #mstTooltip="ngbTooltip"
-                          (click)="toggleToolTip(mstTooltip)"                          
+                          (click)="toggleToolTip(mstTooltip)"
                           triggers="manual"
                           tooltipClass="info-tooltip"
                           placement="{{ tooltipPosition }}"
@@ -61,13 +65,13 @@
                           </span>
                         </button>
                         <ng-template #mstContent>
-                          A Miscellaneous Text Submission (Form 99) may be used for narrative responses that do not affect actual entries within a report (for example, when outlining the committee’s procedures for making “best efforts” to obtain contributor information.)           
-                        </ng-template>                          
+                          A Miscellaneous Text Submission (Form 99) may be used for narrative responses that do not affect actual entries within a report (for example, when outlining the committee’s procedures for making “best efforts” to obtain contributor information.)
+                        </ng-template>
                       </div>
                     </div>
                   </div>
                 </li>
-                <li class="type-item" 
+                <li class="type-item"
                   [ngClass]="{'selected': typeSelected === 'msm'}"
                 >
                   <div class="type-item__box">
@@ -91,7 +95,7 @@
                           class="btn btn-link"
                           [ngbTooltip]="msmContent"
                           #msmTooltip="ngbTooltip"
-                          (click)="toggleToolTip(msmTooltip)"                          
+                          (click)="toggleToolTip(msmTooltip)"
                           triggers="manual"
                           tooltipClass="info-tooltip"
                           placement="{{ tooltipPosition }}"
@@ -102,8 +106,8 @@
                           </span>
                         </button>
                         <ng-template #msmContent>
-                          Notification to the FEC in writing where committees may change their filing schedule from quarterly to monthly (or vice versa) only once per calendar year.          
-                        </ng-template>                          
+                          Notification to the FEC in writing where committees may change their filing schedule from quarterly to monthly (or vice versa) only once per calendar year.
+                        </ng-template>
                       </div>
                     </div>
                   </div>
@@ -133,7 +137,7 @@
                           class="btn btn-link"
                           [ngbTooltip]="msiContent"
                           #msiTooltip="ngbTooltip"
-                          (click)="toggleToolTip(msiTooltip)"                          
+                          (click)="toggleToolTip(msiTooltip)"
                           triggers="manual"
                           tooltipClass="info-tooltip"
                           placement="{{ tooltipPosition }}"
@@ -144,13 +148,13 @@
                           </span>
                         </button>
                         <ng-template #msiContent>
-                          A letter to the FEC where a candidate disavows unauthorized campaign activity within 30 days after being notified by the agency that another person or group has received contributions or made expenditures of more than $5,000 on the individual’s behalf. 100.3(a)(3) and 102.13(a)(2).          
-                        </ng-template>                         
+                          A letter to the FEC where a candidate disavows unauthorized campaign activity within 30 days after being notified by the agency that another person or group has received contributions or made expenditures of more than $5,000 on the individual’s behalf. 100.3(a)(3) and 102.13(a)(2).
+                        </ng-template>
                       </div>
                     </div>
                   </div>
                 </li>
-                <li class="type-item"  
+                <li class="type-item"
                   [ngClass]="typeSelected === 'msw'? 'selected' : ''"
                 >
                   <div class="type-item__box">
@@ -175,7 +179,7 @@
                           aria-controls="msw_collapse"
                           [ngbTooltip]="mswContent"
                           #mswTooltip="ngbTooltip"
-                          (click)="toggleToolTip(mswTooltip)"                          
+                          (click)="toggleToolTip(mswTooltip)"
                           triggers="manual"
                           tooltipClass="info-tooltip"
                           placement="{{ tooltipPosition }}"
@@ -186,15 +190,15 @@
                           </span>
                         </button>
                         <ng-template #mswContent>
-                          Loans and Line of Credit from Lending Institutions, including copies of loan agreements.          
-                        </ng-template>                      
+                          Loans and Line of Credit from Lending Institutions, including copies of loan agreements.
+                        </ng-template>
                       </div>
                     </div>
                   </div>
                 </li>
               </ul>
             </div>
-          </div>                  
+          </div>
         </div>
       </section>
       <footer>
@@ -216,7 +220,7 @@
                 </button>
               </div>
           </div>
-        </div>        
+        </div>
       </footer>
     </form>
   </div> <!-- ./form__type -->
