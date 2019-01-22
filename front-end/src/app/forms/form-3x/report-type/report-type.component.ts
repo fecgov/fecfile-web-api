@@ -21,7 +21,7 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('mswCollapse') mswCollapse;
 
-  public frmreporttype: FormGroup;
+  public frmReportType: FormGroup;
   public typeSelected: string = '';
   public isValidType: boolean = false;
   public optionFailed: boolean = false;
@@ -35,7 +35,6 @@ export class ReportTypeComponent implements OnInit {
   public reporttypes: any = {};
 
   public committee_form3x_reporttypes: Icommittee_form3x_reporttype[];
-  //public committee_form3x_reporttypes: any = {};
 
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
@@ -68,14 +67,14 @@ export class ReportTypeComponent implements OnInit {
    this._formService
     .get_form3x_reporttype()
      .subscribe(res => {
-      console.log(' getspecialreporttypes res: ', res); 
+      console.log(' getspecialreporttypes res: ', res);
       this.committee_form3x_reporttypes = <Icommittee_form3x_reporttype[]> res;
-      console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes); 
-     }); 
+      console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
+     });
 
-    
+
     console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
-    
+
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
     this.screenWidth = window.innerWidth;
@@ -120,26 +119,9 @@ export class ReportTypeComponent implements OnInit {
   }
 
   private _setForm(): void {
-    /*if(this._form_3x_details) {
-      if(this._form_3x_details.reason) {
-        this.typeSelected = this._form_3x_details.reason;
-        this.frmType = this._fb.group({
-          reportTypeRadio: [this._form_3x_details.reason, Validators.required]
-        });
-      } else {
-        this.frmType = this._fb.group({
-          reportTypeRadio: ['', Validators.required]
-        });
-      }
-    } else {
-      this.frmType = this._fb.group({
-            reportTypeRadio: ['', Validators.required]
-          });
-    }*/
-    this.frmreporttype = this._fb.group({
-      //reportTypeRadio: [this._form_3x_details.reason, Validators.required]
+    this.frmReportType = this._fb.group({
       reportTypeRadio: ["", Validators.required]
-      
+
     });
   }
 
@@ -164,7 +146,7 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidatereportType() {
-    if (this.frmreporttype.get('reportTypeRadio').value) {
+    if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
         this._form_3x_details = JSON.parse(localStorage.getItem('form_3x_details'));
@@ -178,7 +160,7 @@ export class ReportTypeComponent implements OnInit {
         console.log(" report-type.component doValidateType");
 
         this.status.emit({
-          form: this.frmreporttype,
+          form: this.frmReportType,
           direction: 'next',
           step: 'step_2',
           previousStep: 'step_1'
@@ -191,7 +173,7 @@ export class ReportTypeComponent implements OnInit {
       this.isValidType = false;
 
       this.status.emit({
-        form: this.frmreporttype,
+        form: this.frmReportType,
         direction: 'next',
         step: 'step_2',
         previousStep: ''
@@ -237,8 +219,8 @@ export class ReportTypeComponent implements OnInit {
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.next_step; } });
       }
     }*/
-    localStorage.setItem('form_3X_details.printpriview_fileurl', "");  
+    localStorage.setItem('form_3X_details.printpriview_fileurl', "");
     this._router.navigateByUrl('/forms/form/3X?step=step_2');
   }
-  
+
 }

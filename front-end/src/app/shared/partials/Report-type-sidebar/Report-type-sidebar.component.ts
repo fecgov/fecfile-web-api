@@ -10,12 +10,8 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 })
 export class ReportTypeSidebarComponent implements OnInit {
 
-  //@Input() sidebarLinks: any = [];
-  //@Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
-  //@Input() cashOnHand: any = {};
-
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';

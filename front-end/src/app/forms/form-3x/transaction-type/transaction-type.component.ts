@@ -1,10 +1,12 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+
 @Component({
   selector: 'f3x-transaction-type',
   templateUrl: './transaction-type.component.html',
@@ -14,6 +16,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 })
 export class TransactionTypeComponent implements OnInit {
 
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
 
@@ -24,22 +27,20 @@ export class TransactionTypeComponent implements OnInit {
   constructor(
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
-    private _formService:FormsService
+    private _formService: FormsService,
+    private _messageService: MessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-    console.log("transaction-type.component before this.frmOption ...");
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
     });
-    console.log("transaction-type.component after this.frmOption ...");
   }
 
   ngDoCheck(): void {
-    console.log("transaction-type.component ngDoCheck...");
     if (this.selectedOptions) {
       this.showForm = true;
     }
@@ -72,4 +73,22 @@ export class TransactionTypeComponent implements OnInit {
     }
   }
 
+  /**
+   * Goes to the previous step.
+   */
+  public previousStep(): void {
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false
+        }
+      });
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_1'
+    });
+  }
 }

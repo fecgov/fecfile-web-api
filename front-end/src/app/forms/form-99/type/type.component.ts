@@ -113,7 +113,6 @@ export class TypeComponent implements OnInit {
       this.typeSelected = '';
       this.typeFailed = true;
     }
-    // this.frmType.controls['reasonTypeRadio'].setValue(val);
   }
 
   /**

@@ -1,22 +1,23 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <div class="form__sidebar">
-  <div [hidden]="step!=='step_1'">
+    <div *ngIf="step==='step_1'">
       <report-type-sidebar
-      title="Report Coverage Dates"
-       [cashOnHand]="cashOnHand"
-      (status)='onNotify($event)'>
-    </report-type-sidebar>
-  </div>
- </div>
-  <div [hidden]="step!=='step_2'">
-       <form-sidebar
+          title="Report Coverage Dates"
+          (status)='onNotify($event)'
+        >
+      </report-type-sidebar>
+    </div>
+    <div *ngIf="step==='step_2'">
+      <form-sidebar
         title="Transaction Categories"
         [sidebarLinks]="sidebarLinks"
         [searchField]="searchField"
         [cashOnHand]="cashOnHand"
-        (status)='onNotify($event)'>
-       </form-sidebar>
-   </div>
+        (status)='onNotify($event)'
+      >
+      </form-sidebar>
+    </div>
+  </div>
   <div
     class="form__container"
     [ngClass]="{
@@ -27,8 +28,8 @@
     <div class="form__steps">
       <app-steps
         [steps]="[
-          {text: 'Report type', step: 'step_1'},
-          {text: 'Transaction Type', step: 'step_2'},
+          {text: 'Report<br/>type', step: 'step_1'},
+          {text: 'Transaction<br/>Type', step: 'step_2'},
           {text: 'Form', step: 'step_3'},
           {text: 'Preview', step: 'step_4'},
           {text: 'Sign', step: 'step_5'},
@@ -45,11 +46,7 @@
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-      <!--<f3x-transaction-type
-          [formOptionsVisible]="formOptionsVisible"
-          [selectedOptions]="selectedOptions"
-        ></f3x-transaction-type> -->
-        <f3x-report-type></f3x-report-type> 
+        <f3x-report-type></f3x-report-type>
       </div>
 
       <div
@@ -57,8 +54,10 @@
         [hidden]="step!=='step_2'"
       >
       <f3x-transaction-type
-          [formOptionsVisible]="formOptionsVisible"
-          [selectedOptions]="selectedOptions">
+        [formOptionsVisible]="formOptionsVisible"
+        [selectedOptions]="selectedOptions"
+        (status)='onNotify($event)'
+      >
       </f3x-transaction-type>
       </div>
 
