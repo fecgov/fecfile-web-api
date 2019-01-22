@@ -116,7 +116,7 @@ def get_special_report_types(request):
 
                                 join cmte_report_types_view cr on cr.report_type=duedate_by_report.report_type
 
-                                where cmte_id='""" + cmte_id + """';"""
+                                where cmte_id='""" + cmte_id + """' and form_type='F3X';"""
             
             cursor.execute(query_string)
 

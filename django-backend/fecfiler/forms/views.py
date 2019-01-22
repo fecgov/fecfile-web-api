@@ -1056,7 +1056,8 @@ def save_print_f99(request):
             #print(filename)
             myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
             #print(myurl)
-            url_request = urllib.request.Request(myurl, headers = {"User-Agent", "Mozilla/5.0"})
+            #url_request = urllib.request.Request(myurl, headers = {"User-Agent", "Mozilla/5.0"})
+            url_request = urllib.request.Request(myurl)
             myfile = urllib.request.urlopen(url_request)
 
             #s3 = boto3.client('s3')
