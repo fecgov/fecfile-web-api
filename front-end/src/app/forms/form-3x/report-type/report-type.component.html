@@ -1,6 +1,6 @@
 <div class="report-type" *ngIf="showForm">
   <form
-    [formGroup]="frmreporttype"
+    [formGroup]="frmReportType"
     (ngSubmit)="doValidatereportType()"
     (blur)="doValidatereportType()"
   >
@@ -9,7 +9,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="text-error text-center"
-              *ngIf="(frmreporttype.invalid && (frmreporttype.dirty || frmreporttype.touched)) || (optionFailed)">
+              *ngIf="(frmReportType.invalid && (frmReportType.dirty || frmReportType.touched)) || (optionFailed)">
               You must select a repoty type for filing.
             </div>
           </div>
