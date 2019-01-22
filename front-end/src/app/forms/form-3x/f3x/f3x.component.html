@@ -3,7 +3,6 @@
     <div *ngIf="step==='step_1'">
       <report-type-sidebar
           title="Report Coverage Dates"
-          [cashOnHand]="cashOnHand"
           (status)='onNotify($event)'
         >
       </report-type-sidebar>
@@ -47,10 +46,6 @@
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-      <!--<f3x-transaction-type
-          [formOptionsVisible]="formOptionsVisible"
-          [selectedOptions]="selectedOptions"
-        ></f3x-transaction-type> -->
         <f3x-report-type></f3x-report-type>
       </div>
 

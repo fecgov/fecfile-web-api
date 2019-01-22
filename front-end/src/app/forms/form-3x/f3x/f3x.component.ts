@@ -59,9 +59,7 @@ export class F3xComponent implements OnInit {
 
         this.loadingData = false;
       });
-      console.log("step = ",this.step);
 
-    //this.step = this.currentStep;
     this.loadingData = false;
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
@@ -85,6 +83,13 @@ export class F3xComponent implements OnInit {
           }
         }
       });
+  }
+
+  ngDoCheck(): void {
+    if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+      this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+      this.step = this._activatedRoute.snapshot.queryParams.step;
+    }
   }
 
   /**
@@ -117,7 +122,6 @@ export class F3xComponent implements OnInit {
    }
 
    public canContinue(): void {
-    console.log("canContinue...");
 
     if(this.frm && this.direction) {
       if(this.direction === 'next') {

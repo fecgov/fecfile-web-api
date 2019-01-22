@@ -35,15 +35,12 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("transaction-type.component before this.frmOption ...");
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
     });
-    console.log("transaction-type.component after this.frmOption ...");
   }
 
   ngDoCheck(): void {
-    console.log("transaction-type.component ngDoCheck...");
     if (this.selectedOptions) {
       this.showForm = true;
     }
@@ -80,11 +77,6 @@ export class TransactionTypeComponent implements OnInit {
    * Goes to the previous step.
    */
   public previousStep(): void {
-    /* this.hideText = true;
-    this.formSaved = false;
-
-    this.showValidateBar = false; */
-
     this._messageService
       .sendMessage({
         'validateMessage': {

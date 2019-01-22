@@ -52,23 +52,21 @@
   </section>
   <footer>
     <div class="grid-row">
-      <div class="grid-row__col grid-row__col--11">
-          <div class="forms__btn-container">
-          <button
-            class="btn btn-previous btn-left"
-            type="button"
-            (click)="previousStep()"
-          >
-            Previous
-          </button>
-            <button
-              class="btn btn-primary btn-right"
-              type="submit"
-               *ngIf="formOptionsVisible"
-            >
-              Next
-            </button>
-          </div>
+      <div class="grid-row__col grid-row__col--11 forms__btn-container">
+        <button
+          class="btn btn-previous btn-left"
+          type="button"
+          (click)="previousStep()"
+        >
+          Previous
+        </button>
+        <button
+          class="btn btn-primary btn-right"
+          type="submit"
+           *ngIf="formOptionsVisible"
+        >
+          Next
+        </button>
       </div>
     </div>
   </footer>

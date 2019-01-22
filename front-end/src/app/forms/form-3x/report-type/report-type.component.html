@@ -1,4 +1,4 @@
-<div class="report-type" *ngIf="showForm">
+<div class="report-type-container" *ngIf="showForm">
   <form
     [formGroup]="frmReportType"
     (ngSubmit)="doValidatereportType()"
@@ -21,7 +21,6 @@
             >
               <input
                 type="radio"
-                id="report-type-radio"
                 name="reportTypeRadio"
                 class="option-radio"
                 value="{{committee_form3x_reporttype.report_type}}"
@@ -50,23 +49,21 @@
     </section>
     <footer>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--11">
-            <div class="forms__btn-container">
-              <button
-                class="btn btn-default btn-left"
-                type="button"
-                (click)="cancel()"
-              >
-                Cancel
-              </button>
-              <button
-                class="btn btn-primary btn-right"
-                type="submit"
-                (click)="Savadata()"
-              >
-                Next
-              </button>
-            </div>
+        <div class="grid-row__col grid-row__col--11 forms__btn-container">
+          <button
+            class="btn btn-default btn-left"
+            type="button"
+            (click)="cancel()"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary btn-right"
+            type="submit"
+            (click)="Savadata()"
+          >
+            Next
+          </button>
         </div>
       </div>
     </footer>
