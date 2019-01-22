@@ -7,6 +7,7 @@
   left: 0;
   margin: 0 auto;
   padding: 24px 0;
+  text-align: center;
   width: 100%;
   @include media(tablet) {
     padding: 24px 0 10px;
@@ -15,11 +16,11 @@
   @include media(mediumDesktop) {
     padding: 24px 0 10px;
     width: 100%;
-  }         
+  }
   @include media(largeDesktop) {
     padding: 24px 0 10px;
     width: 100%;
-  }   
+  }
   li {
     &:not(:last-child) {
       &:before {
@@ -56,13 +57,14 @@
     display: inline-block;
     position: relative;
     padding: 10px 0 0;
-    width: 20%;
+    width: 15%;
     div {
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
       flex-direction: column;
       align-items: center;
+      text-align: center;
       // font-family: $mainFontFamily;
     }
   }
