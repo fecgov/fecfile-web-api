@@ -59,7 +59,7 @@ export class F3xComponent implements OnInit {
 
         this.loadingData = false;
       });
-      console.log("step = ",this.step); 
+      console.log("step = ",this.step);
 
     //this.step = this.currentStep;
     this.loadingData = false;
@@ -93,21 +93,18 @@ export class F3xComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
-    // console.log('onNotify: ');
-
-    if (e.additionalOptions.length) {
-      this.selectedOptions = e.additionalOptions;
-      this.formOptionsVisible = true;
-    } else {
-      this.selectedOptions = null;
-      this.formOptionsVisible = false;
+    if (typeof e.additionalOptions !== 'undefined') {
+      if (e.additionalOptions.length) {
+        this.selectedOptions = e.additionalOptions;
+        this.formOptionsVisible = true;
+      } else {
+        this.selectedOptions = null;
+        this.formOptionsVisible = false;
+      }
     }
-    // if (this.selectedOptions !== null) {
-    //   console.log('this.selectedOptions: ', this.selectedOptions);
-    // }
 
     this.frm = e.form;
-  
+
     this.direction = e.direction;
 
     this.previousStep = e.previousStep;

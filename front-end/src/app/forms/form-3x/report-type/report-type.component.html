@@ -1,107 +1,3 @@
-<!--<div class="form__type-container">
-  <div class="form__type">
-    <form
-      [formGroup]="frmreporttype"
-      (ngSubmit)="doValidateType()"
-      (blur)="doValidateType()"
-    >
-      <header>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <h1 class="text-left" *ngIf="!typeSelected">
-              Report Type
-            </h1>
-            <h1 class="text-left" *ngIf="typeSelected">
-              Form 3x / {{ typeSelected }}
-            </h1>
-          </div>
-        </div>
-      </header>
-      <section>
-        <div class="form-content">
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="text-error text-center"
-                *ngIf="(frmreporttype.invalid && (frmreporttype.dirty || frmreporttype.touched)) || (typeFailed)">
-                You must select a type for filing.
-              </div>
-            </div>
-          </div>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <ul class="ptions-list" *ngFor="let committee_form3x_reporttype of committee_form3x_reporttypes || async">
-                <li class="options-list__item"
-                  [ngClass]="{'selected': typeSelected === 'mst'}"
-                >
-                  <div class="type-item__box">
-                    <div class="type-item__box--top">
-                      <input
-                        type="radio"
-                        id="mst-radio"
-                        value= "{{committee_form3x_reporttype.report_type}}"
-                        (change)="updateTypeSelected($event)"
-                        formControlName="reasonTypeRadio"
-                      />
-                      <label
-                        for="mst-radio"
-                        class="type-text"
-                      >
-                     {{committee_form3x_reporttype.rpt_type_desc}}
-                     
-                      </label>
-                      <div class="type__info">
-                        <button
-                          type="button"
-                          class="btn btn-link"
-                          [ngbTooltip]="mstContent"
-                          #mstTooltip="ngbTooltip"
-                          (click)="toggleToolTip(mstTooltip)"
-                          triggers="manual"
-                          tooltipClass="info-tooltip"
-                          placement="{{ tooltipPosition }}"
-                        >
-                          <i class="info-icon" aria-hidden="true"></i>
-                          <span class="sr-only">
-                            Click for more information
-                          </span>
-                        </button>
-                        <ng-template #mstContent>
-                          {{committee_form3x_reporttype.rpt_type_info}}
-                        </ng-template>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-      <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-                <button
-                  class="btn btn-default btn-left"
-                  type="button"
-                  (click)="cancel()"
-                >
-                  Cancel
-                </button>
-                <button
-                  class="btn btn-primary btn-right"
-                  type="submit"
-                  (click)="Savadata()"
-                >
-                  Next
-                </button>
-              </div>
-          </div>
-        </div>
-      </footer>
-    </form>
-  </div> ./form__type -->
-<!--</div> --> <!-- ./form__type-container -->
 <div class="report-type" *ngIf="showForm">
   <form
     [formGroup]="frmreporttype"
@@ -141,7 +37,7 @@
                 type="button"
                 class="btn-info"
                 ngbTooltip=" {{committee_form3x_reporttype.rpt_type_info}}"
-                
+
               >
                 <i class="info-icon" aria-hidden="true"></i>
                 <span class="sr-only">
@@ -154,7 +50,7 @@
     </section>
     <footer>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+        <div class="grid-row__col grid-row__col--11">
             <div class="forms__btn-container">
               <button
                 class="btn btn-default btn-left"
