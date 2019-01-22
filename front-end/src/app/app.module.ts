@@ -54,6 +54,8 @@ import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sideba
 
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
+import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
+import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sidebar/Report-type-sidebar.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -93,7 +95,9 @@ import { TransactionTypeComponent } from './forms/form-3x/transaction-type/trans
     ConfirmModalComponent,
     FormSidebarComponent,
     F3xComponent,
-    TransactionTypeComponent
+    TransactionTypeComponent,
+    ReportTypeComponent,
+    ReportTypeSidebarComponent
   ],
   entryComponents: [
     ConfirmModalComponent

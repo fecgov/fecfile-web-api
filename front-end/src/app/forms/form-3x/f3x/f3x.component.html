@@ -1,28 +1,38 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <div class="form__sidebar">
-     <form-sidebar
-      title="Transaction Categories"
-      [sidebarLinks]="sidebarLinks"
-      [searchField]="searchField"
-      [cashOnHand]="cashOnHand"
-      (status)='onNotify($event)'
-     ></form-sidebar>
+  <div [hidden]="step!=='step_1'">
+      <report-type-sidebar
+      title="Report Coverage Dates"
+       [cashOnHand]="cashOnHand"
+      (status)='onNotify($event)'>
+    </report-type-sidebar>
   </div>
+ </div>
+  <div [hidden]="step!=='step_2'">
+       <form-sidebar
+        title="Transaction Categories"
+        [sidebarLinks]="sidebarLinks"
+        [searchField]="searchField"
+        [cashOnHand]="cashOnHand"
+        (status)='onNotify($event)'>
+       </form-sidebar>
+   </div>
   <div
     class="form__container"
     [ngClass]="{
       'show-alerts': showValidateBar === true,
-      'hide-alerts': step==='step_5'
+      'hide-alerts': step==='step_6'
     }"
   >
     <div class="form__steps">
       <app-steps
         [steps]="[
-          {text: 'Type', step: 'step_1'},
-          {text: 'Form', step: 'step_2'},
-          {text: 'Preview', step: 'step_3'},
-          {text: 'Sign', step: 'step_4'},
-          {text: 'Submit', step: 'step_5'}
+          {text: 'Report type', step: 'step_1'},
+          {text: 'Transaction Type', step: 'step_2'},
+          {text: 'Form', step: 'step_3'},
+          {text: 'Preview', step: 'step_4'},
+          {text: 'Sign', step: 'step_5'},
+          {text: 'Submit', step: 'step_6'}
         ]"
         [current_step]="currentStep"
       >
@@ -35,31 +45,47 @@
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <f3x-transaction-type
+      <!--<f3x-transaction-type
           [formOptionsVisible]="formOptionsVisible"
           [selectedOptions]="selectedOptions"
-        ></f3x-transaction-type>
+        ></f3x-transaction-type> -->
+        <f3x-report-type></f3x-report-type> 
       </div>
+
       <div
         class="form__step"
         [hidden]="step!=='step_2'"
       >
+      <f3x-transaction-type
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions">
+      </f3x-transaction-type>
       </div>
+
       <div
         class="form__step"
         [hidden]="step!=='step_3'"
-      >
+      ><f3x-form></f3x-form>
       </div>
+
       <div
         class="form__step"
         [hidden]="step!=='step_4'"
-      >
+      ><f3x-preview></f3x-preview>
       </div>
+
       <div
         class="form__step"
         [hidden]="step!=='step_5'"
-      >
+      ><f3x-sign></f3x-sign>
       </div>
+
+      <div
+        class="form__step"
+        [hidden]="step!=='step_6'"
+      ><f3x-submit></f3x-submit>
+      </div>
+
     </div>
   </div> <!-- ./form__container -->
 </div> <!-- ./forms__wizard -->
