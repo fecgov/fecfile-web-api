@@ -30,8 +30,8 @@ pipeline {
     stage('Build frontend') {
       steps {
         script {
-		  sh "sed -i 's/local/awsdev/g' front-end/Dockerfile"
-		  sh "sed -i 's/local/awsdev/g' front-end/Dockerfile-nginx"
+      sh "sed -i 's/local/awsdev/g' front-end/Dockerfile"
+      sh "sed -i 's/local/awsdev/g' front-end/Dockerfile-nginx"
 
           def frontendImage = docker.build("fecnxg-frontend:${VERSION}", 'front-end/')
 
@@ -51,8 +51,8 @@ pipeline {
     stage('Build frontend UAT') {
       steps {
         script {
-			sh " sed -i 's/awsdev/awsuat/g' front-end/Dockerfile "
-			sh " sed -i 's/awsdev/awsuat/g' front-end/Dockerfile-nginx "
+      sh " sed -i 's/awsdev/awsuat/g' front-end/Dockerfile "
+      sh " sed -i 's/awsdev/awsuat/g' front-end/Dockerfile-nginx "
           def frontendImage = docker.build("fecnxg-frontend:${VERSION}uat", 'front-end/')
 
           docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend') {
@@ -72,17 +72,19 @@ pipeline {
     stage('Build Flywaydb') {
         steps { 
             script {
-               def flywayImage = docker.build("fecfile-flyway-db:${VERSION}", 'data/')
-               
-               docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db') {
-                   flywayImage.push()
-               }    
+              sh("sed -i '11d' data/flyway_migration.sh")
+              def flywayImage = docker.build("fecfile-flyway-db:${VERSION}", 'data/')
+              
+              docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db') {
+                  flywayImage.push()
+              }
+              sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
             }
         }    
     }
-	stage ('Deployments'){
-	  when { branch "develop" }	
-	  parallel {
+    stage ('Deployments'){
+      when { branch "develop" }	
+      parallel {
          stage('Deploy backend-api to DEV environment'){
            steps {
             sh "kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=dev set image deployment/fecfile-backend-api fecfile-backend-api=813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-django-backend:${VERSION}"
@@ -98,10 +100,10 @@ pipeline {
   }
   post {
     success {
-        slackSend color: 'good', message: "Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/"   
+        slackSend color: 'good', message: env.BRANCH_NAME +": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/"   
     }
     failure {
-        slackSend color: 'danger', message: " Deployement of ${VERSION} failed!"
+        slackSend color: 'danger', message: env.BRANCH_NAME + ": Deployement of ${VERSION} failed!"
     }    
   }
 }
