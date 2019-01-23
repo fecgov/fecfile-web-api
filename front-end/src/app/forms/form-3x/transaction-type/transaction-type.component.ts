@@ -51,6 +51,7 @@ export class TransactionTypeComponent implements OnInit {
    * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
   public doValidateOption(): boolean {
+    console.log('doValidateOption: ');
     if (this.frmOption.invalid) {
       this.optionFailed = true;
       return false;

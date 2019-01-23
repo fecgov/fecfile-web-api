@@ -1,12 +1,11 @@
 <div class="transaction-type-container">
-  <section>
     <form
       [formGroup]="frmOption"
       (ngSubmit)="doValidateOption()"
       (blur)="doValidateOption()"
-      *ngIf="showForm"
     >
-      <div class="form-content">
+    <section>
+      <div class="form-content" *ngIf="showForm">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="text-error text-center"
@@ -48,26 +47,26 @@
             </li>
           </ul>
       </div>
-    </form>
-  </section>
-  <footer>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--11 forms__btn-container">
-        <button
-          class="btn btn-previous btn-left"
-          type="button"
-          (click)="previousStep()"
-        >
-          Previous
-        </button>
-        <button
-          class="btn btn-primary btn-right"
-          type="submit"
-           *ngIf="formOptionsVisible"
-        >
-          Next
-        </button>
+    </section>
+    <footer>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--11 forms__btn-container">
+          <button
+            class="btn btn-previous btn-left"
+            type="button"
+            (click)="previousStep()"
+          >
+            Previous
+          </button>
+          <button
+            class="btn btn-primary btn-right"
+            type="submit"
+             *ngIf="formOptionsVisible"
+          >
+            Next
+          </button>
+        </div>
       </div>
-    </div>
-  </footer>
+    </footer>
+  </form>
 </div>

@@ -52,7 +52,6 @@ export class F3xComponent implements OnInit {
     this._formService
       .getTransactionCategories(this._form_type)
       .subscribe(res => {
-        console.log('resp: ', res);
 
         this.sidebarLinks = res.data.transactionCategories;
 
