@@ -587,64 +587,58 @@ export class FormsService {
       );
   }
 
-  public getTransactionCategories(): Observable<any> {
+  public getTransactionCategories( form_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '';
+    let params = new HttpParams();
+    
 
-    url = '/f3x/get_transaction_categories';
+    url = '/f3x/get_transaction_categories?form_type=F3X';
+  
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
+    params = params.append('form_type', "F3X");
+  
     return this._http
-     .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions
-        }
-      );
+       .get(
+          `${environment.apiUrl}${url}`,
+          {
+           /* headers: httpOptions,
+            params*/
+            headers: httpOptions
+          }     
+       );
   }
 
-  public get_form3x_reporttype(): Observable<any> {
+  
+  public getreporttypes( form_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '';
-    
-    url = '/f3x/get_filed_report_types';
-    
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-   
-    return this._http
-     .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions
-        }
-      );
-  }
+    let params = new HttpParams();
 
-  public getspecialreporttypes(): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    let url: string = '';
-    
-    url = '/f3x/get_special_report_types';
+    url = '/f3x/get_report_types?form_type=F3X';
     
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
+    params = params.append('form_type', "F3X");
+  
     return this._http
-     .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions
-        }
-      );
-
+       .get(
+          `${environment.apiUrl}${url}`,
+          {
+           /* headers: httpOptions,
+            params*/
+            headers: httpOptions
+          }     
+         ); 
      //return this._http.get('./assets/196.json');
       
-  }
+ }
 }

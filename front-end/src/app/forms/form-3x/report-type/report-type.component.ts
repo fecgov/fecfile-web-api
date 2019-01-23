@@ -1,6 +1,6 @@
 import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { Router, NavigationEnd } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { form3x } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
@@ -34,7 +34,8 @@ export class ReportTypeComponent implements OnInit {
   private _previousUrl: string = null;
   public reporttypes: any = {};
 
-  public committee_form3x_reporttypes: Icommittee_form3x_reporttype[];
+  //public committee_form3x_reporttypes: Icommittee_form3x_reporttype[];
+  public committee_form3x_reporttypes: any = [];
 
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
@@ -55,7 +56,8 @@ export class ReportTypeComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _formService:FormsService
+    private _formService:FormsService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this._messageService.clearMessage();
   }
@@ -63,12 +65,15 @@ export class ReportTypeComponent implements OnInit {
   ngOnInit(): void {
 
     console.log("accessing form service call side bar ...");
+   
+    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
    this._formService
-    .get_form3x_reporttype()
+     .getreporttypes(this._form_type)
      .subscribe(res => {
       console.log(' getspecialreporttypes res: ', res);
-      this.committee_form3x_reporttypes = <Icommittee_form3x_reporttype[]> res;
+      //this.committee_form3x_reporttypes = <Icommittee_form3x_reporttype[]> res;
+      this.committee_form3x_reporttypes = res.report_type;
       console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
      });
 

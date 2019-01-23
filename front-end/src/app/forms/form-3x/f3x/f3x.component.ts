@@ -46,8 +46,11 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+
     this._formService
-      .getTransactionCategories()
+      .getTransactionCategories(this._form_type)
       .subscribe(res => {
         console.log('resp: ', res);
 
