@@ -42,25 +42,7 @@ export class FormSidebarComponent implements OnInit {
 
   ngOnInit(): void {
 
-    /*setTimeout(() => {
-         
-    this._formService
-    .getTransactionCategories()
-    .subscribe(res => {
-      console.log('resp: ', res);
-
-      this.sidebarLinks = res.data.transactionCategories;
-
-      this.searchField = res.data.transactionSearchField;
-
-      this.step = this.currentStep;
-
-      this.loadingData = false;
-    });  
-  }, 200);*/
-
-    //console.log(' from ngOnInit searchField: ', this.searchField);
-    console.log(' from ngOnInit form sidebar this.sidebarLinks: ', this.sidebarLinks);
+   console.log(' from ngOnInit form sidebar this.sidebarLinks: ', this.sidebarLinks);
   }
 
   public selectItem(item): void {

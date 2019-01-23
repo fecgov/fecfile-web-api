@@ -33,6 +33,12 @@ export class F3xComponent implements OnInit {
   private _step: string = '';
   private _form_type: string = '';
 
+  public specialreports: boolean = false;
+  public regularreports: boolean = false;
+  public reporttypeindicator: string='';
+  public loadingreportData: boolean = true;
+  public reporttypes: any = [];
+
   constructor(
     private _formService: FormsService,
     private _http: HttpClient,
@@ -46,12 +52,34 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.specialreports=true;
+    this.regularreports=false;
 
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formService
+      .getreporttypes(this._form_type)
+      .subscribe(res => {
+        console.log(' getreporttypes resp: ', res);
+        this.reporttypeindicator  =res.report_type.find(x=>x.default_disp_ind==="Y").regular_special_report_ind;
+        console.log("this.reporttypeindicator ",this.reporttypeindicator );
+     });
+
+     if (this.reporttypeindicator === "S")
+     {
+       this.specialreports=true;
+       this.regularreports=false;
+     }
+     else
+     {
+       this.specialreports=false;
+       this.regularreports=true;
+     }
+      
+    console.log("this.reporttypes", this.reporttypes);
 
     this._formService
       .getTransactionCategories(this._form_type)
       .subscribe(res => {
+        console.log(' getTransactionCategories resp: ', res);
 
         this.sidebarLinks = res.data.transactionCategories;
 

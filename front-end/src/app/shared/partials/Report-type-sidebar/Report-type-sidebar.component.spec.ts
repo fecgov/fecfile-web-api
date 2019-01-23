@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Form3XReporttypesidebarComponent } from './Report-type-sidebar.component';
+import { ReportTypeSidebarComponent } from './Report-type-sidebar.component';
 
 describe('FormSidebarComponent', () => {
-  let component: Form3XReporttypesidebarComponent;
-  let fixture: ComponentFixture<Form3XReporttypesidebarComponent>;
+  let component: ReportTypeSidebarComponent;
+  let fixture: ComponentFixture<ReportTypeSidebarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ Form3XReporttypesidebarComponent ]
+      declarations: [ ReportTypeSidebarComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(Form3XReporttypesidebarComponent);
+    fixture = TestBed.createComponent(ReportTypeSidebarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

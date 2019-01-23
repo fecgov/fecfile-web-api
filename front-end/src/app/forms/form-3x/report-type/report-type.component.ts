@@ -72,7 +72,6 @@ export class ReportTypeComponent implements OnInit {
      .getreporttypes(this._form_type)
      .subscribe(res => {
       console.log(' getspecialreporttypes res: ', res);
-      //this.committee_form3x_reporttypes = <Icommittee_form3x_reporttype[]> res;
       this.committee_form3x_reporttypes = res.report_type;
       console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
      });
@@ -185,6 +184,24 @@ export class ReportTypeComponent implements OnInit {
       });
 
       return 0;
+    }
+  }
+
+  public doValidateOption(): boolean {
+    if (this.frmReportType.invalid) {
+      this.optionFailed = true;
+      return false;
+    } else {
+      this.optionFailed = false;
+      return true;
+    }
+  }
+
+  public updateStatus(e): void {
+    if (e.target.checked) {
+      this.optionFailed = false;
+    } else {
+      this.optionFailed = true;
     }
   }
 

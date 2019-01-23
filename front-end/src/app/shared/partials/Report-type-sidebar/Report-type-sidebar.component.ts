@@ -12,6 +12,8 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
+  @Input() specialreports: boolean = false;
+  @Input() regularreports: boolean = false;
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
@@ -37,21 +39,11 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    /*this._formService
-    .getTransactionCategories()
-    .subscribe(res => {
-      console.log('resp: ', res);
-
-      this.sidebarLinks = res.data.transactionCategories;
-
-      this.searchField = res.data.transactionSearchField;
-
-      this.step = this.currentStep;
-
-      this.loadingData = false;
-    });
-
-    console.log('this.sidebarLinks: ', this.sidebarLinks);*/
+   
+    this.specialreports=false;
+       this.regularreports=true;
+    console.log("this.specialreports", this.specialreports);
+    console.log("this.regularreports", this.regularreports);
   }
 
   public selectItem(item): void {

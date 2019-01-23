@@ -4,6 +4,11 @@
       <report-type-sidebar
           title="Report Coverage Dates"
           (status)='onNotify($event)'
+          [searchField]="searchField"
+          [sidebarLinks]="sidebarLinks"
+          [specialreports]="specialreports"  
+          [regularreports]="regularreports"
+          
         >
       </report-type-sidebar>
     </div>
