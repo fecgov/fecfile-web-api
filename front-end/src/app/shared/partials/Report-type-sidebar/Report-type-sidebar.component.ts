@@ -40,8 +40,6 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngOnInit(): void {
    
-    this.specialreports=false;
-       this.regularreports=true;
     console.log("this.specialreports", this.specialreports);
     console.log("this.regularreports", this.regularreports);
   }
