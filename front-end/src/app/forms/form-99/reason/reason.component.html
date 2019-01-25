@@ -41,6 +41,14 @@
             </div>
           </div>
         </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+              You must enter a reason.
+            </div>
+          </div>
+        </div>
         <div class="grid-row info-row">
           <div class="grid-row__col grid-row__col--6 text-left">
             <b>Enter your text*</b>
@@ -65,14 +73,6 @@
           </div>
           <div  class="grid-row__col grid-row__col--6 text-right">
             *=Required
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12"
-            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-              You must enter a reason.
-            </div>
           </div>
         </div>
         <div class="grid-row">
