@@ -100,7 +100,8 @@ pipeline {
   }
   post {
     success {
-        slackSend color: 'good', message: env.BRANCH_NAME +": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/"   
+
+        slackSend color: 'good', message: env.BRANCH_NAME +": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/" 
     }
     failure {
         slackSend color: 'danger', message: env.BRANCH_NAME + ": Deployement of ${VERSION} failed!"
