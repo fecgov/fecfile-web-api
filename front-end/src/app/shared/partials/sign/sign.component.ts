@@ -20,8 +20,8 @@ export class SignComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public committee_details: any = {};
-  public form_type: string = '';
-  public type_selected: string = '';
+  public formType: string = '';
+  public typeSelected: string = '';
   public signFailed: boolean = false;
   public frmSaved: boolean = false;
   public frmSignee: FormGroup;
@@ -35,7 +35,7 @@ export class SignComponent implements OnInit {
   private _form_details: any = {};
   private _step: string = '';
 
-  public _need_additional_email_2=false;
+  public needAdditionalEmail_2=false;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -46,11 +46,11 @@ export class SignComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
     this._setForm();
 
@@ -62,18 +62,18 @@ export class SignComponent implements OnInit {
             this._setForm();
           }
         }
-      });  
+      });
   }
 
   ngDoCheck(): void {
-    if(this.form_type === '99') {
-      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    if(this.formType === '99') {
+      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
       if(form_99_details) {
-        this.type_selected = form_99_details.reason;
+        this.typeSelected = form_99_details.reason;
       }
     }
   }
-  
+
   /**
    * Determines ability for a person to leave a page with a form on it.
    *
@@ -110,23 +110,23 @@ export class SignComponent implements OnInit {
    * @return     {boolean}  True if has unsaved data, False otherwise.
    */
   public hasUnsavedData(): boolean {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
 
     if(formSaved !== null) {
       let formStatus: boolean = formSaved.saved;
 
       if(!formStatus) {
         return true;
-      }      
+      }
     }
 
     return false;
-  }    
+  }
 
   private _setForm(): void {
     if(this._form_details) {
-      if(this.form_type === '99') {
-        this.type_selected = this._form_details.reason;
+      if(this.formType === '99') {
+        this.typeSelected = this._form_details.reason;
         if(this._form_details.additional_email_1.length >= 1) {
           if(this._form_details.additional_email_1 === '-') {
             this._form_details.additional_email_1 = '';
@@ -137,7 +137,7 @@ export class SignComponent implements OnInit {
           if(this._form_details.additional_email_2 === '-') {
             this._form_details.additional_email_2 = '';
           }
-        }        
+        }
       }
 
       this.frmSignee = this._fb.group({
@@ -166,14 +166,14 @@ export class SignComponent implements OnInit {
   public validateForm(): void {
     this.showValidateBar = true;
     this._formsService
-      .validateForm({}, this.form_type)
+      .validateForm({}, this.formType)
       .subscribe(res => {
         if(res) {
             this._messageService
               .sendMessage({
                 'validateMessage': {
                   'validate': environment.validateSuccess,
-                  'showValidateBar': true                  
+                  'showValidateBar': true
                 }
               });
         }
@@ -183,8 +183,8 @@ export class SignComponent implements OnInit {
           .sendMessage({
             'validateMessage': {
               'validate': error.error,
-              'showValidateBar': true                  
-            }            
+              'showValidateBar': true
+            }
           });
       });
   }
@@ -194,22 +194,22 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
-    let formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
+    let formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
     let formStatus: boolean = true;
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
-        console.log("getting additonal emails");
+
       this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
       this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
-      localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-      
-      /*.saveForm({}, {}, this.form_type)*/
+      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+
+      /*.saveForm({}, {}, this.formType)*/
       console.log("Accessing Signee_SaveForm ...");
       this._formsService
-        .Signee_SaveForm({}, this.form_type)
+        .Signee_SaveForm({}, this.formType)
         .subscribe(res => {
           if(res) {
             this.frmSaved = true;
@@ -218,7 +218,7 @@ export class SignComponent implements OnInit {
               'saved': this.frmSaved
             };
 
-            localStorage.setItem(`form_${this.form_type}_saved`, JSON.stringify(formSavedObj));            
+            localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
           }
         },
         (error) => {
@@ -232,10 +232,10 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
-    if(this.form_type === '99') {
+    if(this.formType === '99') {
       this._form_details.file = '';
 
       if(this._form_details.additional_email_1 === '') {
@@ -244,10 +244,10 @@ export class SignComponent implements OnInit {
 
       if(this._form_details.additional_email_2 === '') {
         this._form_details.additional_email_2 = '-';
-      }    
-    }    
+      }
+    }
 
-    localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+    localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
 
     if(this.frmSignee.invalid) {
       if(this.frmSignee.get('agreement').value) {
@@ -260,11 +260,11 @@ export class SignComponent implements OnInit {
 
       if(!formSaved.form_saved) {
         this._formsService
-          .saveForm({}, {}, this.form_type)
+          .saveForm({}, {}, this.formType)
           .subscribe(res => {
             if(res) {
               this._formsService
-                .submitForm({}, this.form_type)
+                .submitForm({}, this.formType)
                 .subscribe(res => {
                   if(res) {
                     this.status.emit({
@@ -283,11 +283,11 @@ export class SignComponent implements OnInit {
                         .sendMessage({
                           'validateMessage': {
                             'validate': 'All required fields have passed validation.',
-                            'showValidateBar': true,                
-                          }            
-                        });                       
+                            'showValidateBar': true,
+                          }
+                        });
                   }
-                });              
+                });
             }
           },
           (error) => {
@@ -298,12 +298,12 @@ export class SignComponent implements OnInit {
           .sendMessage({
             'validateMessage': {
               'validate': '',
-              'showValidateBar': false                  
-            }            
-          });            
+              'showValidateBar': false
+            }
+          });
 
         this._formsService
-          .submitForm({}, this.form_type)
+          .submitForm({}, this.formType)
           .subscribe(res => {
             if(res) {
               this.status.emit({
@@ -326,18 +326,30 @@ export class SignComponent implements OnInit {
   public updateAdditionalEmail(e): void {
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
-       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
        this._form_details.additional_email_1 = e.target.value;
 
-       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+       localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+
+       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+         saved: false
+       }));
      } else if(e.target.name === 'additional_email_2') {
-       this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
        this._form_details.additional_email_2 = e.target.value;
 
-       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+       localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+
+       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+         saved: false
+       }));
      }
+    } else {
+     localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+       saved: true
+     }));
     }
   }
 
@@ -356,16 +368,16 @@ export class SignComponent implements OnInit {
       tooltip.close();
     } else {
       tooltip.open();
-    }      
+    }
   }
 
- 
+
   public add_additional_email_2(): void {
-    this._need_additional_email_2=true;
+    this.needAdditionalEmail_2=true;
     console.log("2nd email needed");
   }
   public remove_additional_email_2(): void {
-    this._need_additional_email_2=false;
+    this.needAdditionalEmail_2=false;
     console.log("2nd email removed");
   }
 
@@ -388,25 +400,25 @@ export class SignComponent implements OnInit {
       .sendMessage({
         'validateMessage': {
           'validate': '',
-          'showValidateBar': false                  
-        }            
-      });          
+          'showValidateBar': false
+        }
+      });
   }
   public printPriview(): void {
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
    if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
      this.frmSignee.controls.additional_email_2.valid) {
-     
+
      this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
      this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
-     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-     
-     /*.saveForm({}, {}, this.form_type)*/
+     localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+
+     /*.saveForm({}, {}, this.formType)*/
      console.log("Accessing Sign printPriview ...");
      this._formsService
-       .PreviewForm_Preview_sign_Screen({}, this.form_type)
+       .PreviewForm_Preview_sign_Screen({}, this.formType)
        .subscribe(res => {
          if(res) {
            console.log("Accessing Sign printPriview res ...",res);

@@ -2,12 +2,12 @@
     <form
      [formGroup]="frmSignee"
      (ngSubmit)="doSubmitForm()"
-   >  
+   >
      <header>
        <div class="header-container">
          <div class="header__text">
-           <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
-           <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
+           <h1 class="text-left" *ngIf="!typeSelected">Form {{ formType }}</h1>
+           <h1 class="text-left" *ngIf="typeSelected">Form {{ formType }} / {{ typeSelected }}</h1>
          </div>
          <div class="header__btns">
            <button
@@ -34,10 +34,10 @@
            <div class="grid-row__col grid-row__col--12">
              <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
                <app-validate></app-validate>
-             </div>            
+             </div>
            </div>
-         </div>      
-         <div class="grid-row" 
+         </div>
+         <div class="grid-row"
            *ngIf="(frmSignee.invalid || (frmSignee.dirty || frmSignee.touched))">
            <div class="grid-row__col grid-row__col--12">
              <div class="text-error text-center" *ngIf="signFailed">
@@ -50,7 +50,7 @@
          >
              <div class="grid-row__col grid-row__col--12" [hidden]="hideText">
                <div class="text-info text-center">
-                 Form {{ form_type }} has been successfully saved.
+                 Form {{ formType }} has been successfully saved.
                </div>
              </div>
            </div>
@@ -58,12 +58,12 @@
            <div class="grid-row">
              <div class="grid-row__col grid-row__col--6">
                <ng-template #tipContent>
-                 Only a treasurer or assistant treasurer designated on a Form 1 (Statement of Organization) may sign the report. 104.14(a)            
-               </ng-template>            
+                 Only a treasurer or assistant treasurer designated on a Form 1 (Statement of Organization) may sign the report. 104.14(a)
+               </ng-template>
                <h4>
                  Signee*
-                 <button 
-                   type="button" 
+                 <button
+                   type="button"
                    class="btn btn-info"
                    [ngbTooltip]="tipContent"
                    #t2="ngbTooltip"
@@ -74,7 +74,7 @@
                  >
                    <i class="info-icon" aria-hidden="true"></i>
                    <span class="sr-only">Click here for more information</span>
-                 </button>              
+                 </button>
                </h4>
                <div>
                  <label>
@@ -124,7 +124,7 @@
                    type="email"
                    name="additional_email_1"
                    value=""
-                   (blur)="updateAdditionalEmail($event)" 
+                   (blur)="updateAdditionalEmail($event)"
                    formControlName="additional_email_1"
                  >
                 </div>
@@ -141,7 +141,7 @@
                    </div>
                  </div>
                </div>
-               <div class="additional-email__field"   *ngIf="_need_additional_email_2">
+               <div class="additional-email__field"   *ngIf="needAdditionalEmail_2">
                 <div class="grid-row">
                 <div class="grid-col">
                  <input
@@ -154,7 +154,7 @@
                  </div>
                  <div class="grid-col">
                  <!--<button class="btn btn-danger" class="btn btn-link" type="button" id="button-addon2" (click)="remove_additional_email_2()>-->
-                    <button class="btn btn-danger" type="button" id="button-addon2" (click)="remove_additional_email_2()">  
+                    <button class="btn btn-danger" type="button" id="button-addon2" (click)="remove_additional_email_2()">
                           <i class="fa fa-minus-circle"></i>
                     </button>
                   </div>
@@ -180,7 +180,7 @@
              (click)="saveForm()"
            >
              Save
-           </button>             
+           </button>
          </div>
        </div>
        <div class="grid-row">
@@ -200,7 +200,7 @@
                and to the best of my knowledge and belief it
                is true, correct, and complete.
              </label>
-           </div>              
+           </div>
          </div>
        </div>
        <div class="grid-row">
@@ -216,7 +216,7 @@
              (click)="goToPreviousStep()"
            >
              Previous
-           </button>              
+           </button>
          </div>
          <div class="grid-row__col grid-row__col--6">
            <button
@@ -224,13 +224,13 @@
              class="btn btn-submit btn-right"
            >
              Submit
-           </button>              
+           </button>
          </div>
-       </div>    
+       </div>
        <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-          <h4>* = Required</h4>    
-          </div> 
+          <h4>* = Required</h4>
+          </div>
       </div>        </footer>
    </form>
  </div> <!-- ./signee-container -->
