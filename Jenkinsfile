@@ -70,6 +70,7 @@ pipeline {
 
     }
     stage('Build Flywaydb') {
+      when { branch "develop" }
         steps { 
             script {
               sh("sed -i '11d' data/flyway_migration.sh")
@@ -83,7 +84,7 @@ pipeline {
         }    
     }
     stage ('Deployments'){
-      when { branch "develop" }	
+      when { branch "develop" }
       parallel {
          stage('Deploy backend-api to DEV environment'){
            steps {
