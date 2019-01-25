@@ -10,7 +10,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 })
 export class FormSidebarComponent implements OnInit {
 
-  @Input() sidebarLinks: any = [];
+  @Input() transactionCategories: any = [];
   @Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
@@ -20,17 +20,12 @@ export class FormSidebarComponent implements OnInit {
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
   public additionalOptions: Array<any> = [];
-
-  private _indexOfItemSelected: number = null;
-
   public loadingData: boolean = true;
   public steps: any = {};
-  //public sidebarLinks: any = {};
-  //public selectedOptions: any = [];
-  //public searchField: any = {};
-  //public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
+
+  private _indexOfItemSelected: number = null;
 
   constructor(
     private _config: NgbTooltipConfig,
@@ -41,8 +36,7 @@ export class FormSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-   console.log(' from ngOnInit form sidebar this.sidebarLinks: ', this.sidebarLinks);
+    console.log('cashOnHand: ', this.cashOnHand);
   }
 
   public selectItem(item): void {
@@ -50,7 +44,7 @@ export class FormSidebarComponent implements OnInit {
 
     this.additionalOptions = [];
 
-    this.sidebarLinks.findIndex((el, index) => {
+    this.transactionCategories.findIndex((el, index) => {
       if (el.value === this.itemSelected) {
         this._indexOfItemSelected = index;
       }
@@ -65,13 +59,13 @@ export class FormSidebarComponent implements OnInit {
     let additionalItemIndex: number = null;
 
     this.additionalItemSelected = additionalItem.getAttribute('value');
-    this.sidebarLinks[this._indexOfItemSelected].options.findIndex((el, index) => {
+    this.transactionCategories[this._indexOfItemSelected].options.findIndex((el, index) => {
       if (this.additionalItemSelected === el.value) {
         additionalItemIndex = index;
       }
     });
 
-    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
+    this.additionalOptions = this.transactionCategories[this._indexOfItemSelected].options[additionalItemIndex].options;
 
     this.status.emit({
       additionalOptions: this.additionalOptions

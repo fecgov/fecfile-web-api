@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 
 @Component({
   selector: 'app-f3x',
@@ -22,7 +22,7 @@ export class F3xComponent implements OnInit {
   public frmOption: FormGroup;
   public loadingData: boolean = true;
   public steps: any = {};
-  public sidebarLinks: any = {};
+  public transactionCategories: any = {};
   public selectedOptions: any = [];
   public searchField: any = {};
   public cashOnHand: any = {};
@@ -35,7 +35,7 @@ export class F3xComponent implements OnInit {
 
   public specialreports: boolean = false;
   public regularreports: boolean = false;
-  public reporttypeindicator: string='';
+  public reporttypeindicator: any = '';
   public loadingreportData: boolean = true;
   public reporttypes: any = [];
 
@@ -58,37 +58,34 @@ export class F3xComponent implements OnInit {
     this._formService
       .getreporttypes(this._form_type)
       .subscribe(res => {
-        console.log(' getreporttypes resp: ', res);
-        this.reporttypeindicator  =res.report_type.find(x=>x.default_disp_ind==="Y").regular_special_report_ind;
-        console.log("this.reporttypeindicator ",this.reporttypeindicator );
-     });
+        this.reporttypeindicator  = res.report_type.find( x => {
+          return x.default_disp_ind === 'Y' ;
+        });
+        //}).regular_special_report_ind;
 
-     if (this.reporttypeindicator === "S")
-     {
+        if (typeof this.reporttypeindicator !== 'undefined') {
+          this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
+        }
+    });
+
+     if (this.reporttypeindicator === 'S') {
        this.specialreports=true;
        this.regularreports=false;
-     }
-     else
-     {
+     } else {
        this.specialreports=false;
        this.regularreports=true;
      }
-      
-    console.log("this.reporttypes", this.reporttypes);
-
     this._formService
       .getTransactionCategories(this._form_type)
       .subscribe(res => {
         console.log(' getTransactionCategories resp: ', res);
+        this.cashOnHand = res.data.cashOnHand;
 
-        this.sidebarLinks = res.data.transactionCategories;
+        this.transactionCategories = res.data.transactionCategories;
 
         this.searchField = res.data.transactionSearchField;
-
-        this.step = this.currentStep;
-
-        this.loadingData = false;
       });
+
 
     this.loadingData = false;
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
