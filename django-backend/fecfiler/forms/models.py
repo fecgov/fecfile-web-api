@@ -126,6 +126,7 @@ class CommitteeMaster(models.Model):
     class Meta:
         managed = False
         db_table = 'committee_lookup'
+
 class My_Forms_View(models.Model):
     cmte_id = models.CharField(primary_key=True, max_length=9)
     category = models.CharField(max_length=25)

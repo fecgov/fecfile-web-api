@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'fecfiler.forms',
     'db_file_storage',
 
-    'fecfiler.form3x',
+    'fecfiler.core',
 
 
 
