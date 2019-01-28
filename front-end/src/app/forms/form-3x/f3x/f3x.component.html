@@ -4,23 +4,21 @@
       <report-type-sidebar
           title="Report Coverage Dates"
           (status)='onNotify($event)'
-          [searchField]="searchField"
-          [sidebarLinks]="sidebarLinks"
-          [specialreports]="specialreports"  
+          [specialreports]="specialreports"
           [regularreports]="regularreports"
-          
+
         >
       </report-type-sidebar>
     </div>
     <div *ngIf="step==='step_2'">
-      <form-sidebar
-        title="Transaction Categories"
-        [sidebarLinks]="sidebarLinks"
+      <transaction-categories-sidebar
+        [transactionCategories]="transactionCategories"
         [searchField]="searchField"
         [cashOnHand]="cashOnHand"
+        title="Transaction Categories"
         (status)='onNotify($event)'
       >
-      </form-sidebar>
+      </transaction-categories-sidebar>
     </div>
   </div>
   <div

@@ -50,12 +50,12 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
-import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sidebar.component';
+import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transaction-categories-sidebar/transaction-categories-sidebar.component';
 
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
 import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
-import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sidebar/Report-type-sidebar.component';
+import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -93,7 +93,7 @@ import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sideba
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
     ConfirmModalComponent,
-    FormSidebarComponent,
+    TransactionCategoriesSidbarComponent,
     F3xComponent,
     TransactionTypeComponent,
     ReportTypeComponent,

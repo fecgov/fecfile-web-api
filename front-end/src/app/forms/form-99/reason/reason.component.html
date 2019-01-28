@@ -41,6 +41,14 @@
             </div>
           </div>
         </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12"
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+              You must enter a reason.
+            </div>
+          </div>
+        </div>
         <div class="grid-row info-row">
           <div class="grid-row__col grid-row__col--6 text-left">
             <b>Enter your text*</b>
@@ -69,24 +77,16 @@
         </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12"
-            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-              You must enter a reason.
-            </div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12"
-            *ngIf="_not_valid_pdf">
-            <div class="text-error text-center" *ngIf="_not_valid_pdf">
+            *ngIf="notValidPdf">
+            <div class="text-error text-center" *ngIf="notValidPdf">
               You are attempting to attach a non-PDF, please only attach a PDF.
             </div>
           </div>
         </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12"
-            *ngIf="_not_valid_pdf">
-            <div class="text-error text-center" *ngIf="_not_correct_pdf_size">
+            *ngIf="notValidPdf">
+            <div class="text-error text-center" *ngIf="notCorrectPdfSize">
               The attachment size exceeds the allowable limit.
             </div>
           </div>
@@ -117,7 +117,7 @@
             </div>
             <div class="error-text">
               <div class="text-info text-center"
-                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! _not_valid_pdf)">
+                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! notValidPdf)">
                 Form 99 has been successfully saved.
               </div>
             </div>
@@ -148,15 +148,6 @@
                 <span class="sr-only">Click here for more information</span>
               </button>
             </h4>
-            <!--<div class="file-upload-container" *ngIf="file === null">
-              <input
-                type="file"
-                name="file"
-                accept="application/pdf"
-                (change)="setFile($event)"
-                formControlName="file"
-              />
-            </div>-->
             <div class="file-upload-container" *ngIf="file === null">
               <input
                 #fileInput
@@ -201,7 +192,7 @@
             <button
               class="btn btn-primary btn-right"
               type="submit"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! _valid_file)"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
             >
              Save & Continue
             </button>

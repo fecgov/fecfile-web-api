@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 
 @Component({
   selector: 'app-f3x',
@@ -22,22 +22,21 @@ export class F3xComponent implements OnInit {
   public frmOption: FormGroup;
   public loadingData: boolean = true;
   public steps: any = {};
-  public sidebarLinks: any = {};
+  public transactionCategories: any = {};
   public selectedOptions: any = [];
   public searchField: any = {};
   public cashOnHand: any = {};
-
   public frm: any;
   public direction: string;
   public previousStep: string = '';
-  private _step: string = '';
-  private _form_type: string = '';
-
   public specialreports: boolean = false;
   public regularreports: boolean = false;
-  public reporttypeindicator: string='';
+  public reporttypeindicator: any = '';
   public loadingreportData: boolean = true;
   public reporttypes: any = [];
+
+  private _step: string = '';
+  private _formType: string = '';
 
   constructor(
     private _formService: FormsService,
@@ -52,46 +51,47 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.specialreports=true;
     this.regularreports=false;
 
     this._formService
-      .getreporttypes(this._form_type)
+      .getreporttypes(this._formType)
       .subscribe(res => {
-        console.log(' getreporttypes resp: ', res);
-        this.reporttypeindicator  =res.report_type.find(x=>x.default_disp_ind==="Y").regular_special_report_ind;
-        console.log("this.reporttypeindicator ",this.reporttypeindicator );
-     });
+        this.reporttypeindicator  = res.report_type.find( x => {
+          return x.default_disp_ind === 'Y' ;
+        });
+        //}).regular_special_report_ind;
 
-     if (this.reporttypeindicator === "S")
-     {
+        if (typeof this.reporttypeindicator !== 'undefined') {
+          this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
+        }
+    });
+
+     if (this.reporttypeindicator === 'S') {
        this.specialreports=true;
        this.regularreports=false;
-     }
-     else
-     {
+     } else {
        this.specialreports=false;
        this.regularreports=true;
      }
-      
-    console.log("this.reporttypes", this.reporttypes);
-
     this._formService
-      .getTransactionCategories(this._form_type)
+      .getTransactionCategories(this._formType)
       .subscribe(res => {
         console.log(' getTransactionCategories resp: ', res);
+        this.cashOnHand = res.data.cashOnHand;
 
-        this.sidebarLinks = res.data.transactionCategories;
+        this.transactionCategories = res.data.transactionCategories;
 
         this.searchField = res.data.transactionSearchField;
-
-        this.step = this.currentStep;
-
-        this.loadingData = false;
       });
 
+      if(localStorage.getItem(`form_${this._formType}_saved`) === null && this.step !== 'step_5') {
+        localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved': false}));
+      }
+
     this.loadingData = false;
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
@@ -101,8 +101,8 @@ export class F3xComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/3X') === -1) {
-              localStorage.removeItem(`form_${this._form_type}_details`);
-              localStorage.removeItem(`form_${this._form_type}_saved`);
+              localStorage.removeItem(`form_${this._formType}_details`);
+              localStorage.removeItem(`form_${this._formType}_saved`);
             }
           } else {
             if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {

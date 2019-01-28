@@ -3,32 +3,29 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
-  selector: 'report-type-sidebar',
-  templateUrl: './Report-type-sidebar.component.html',
-  styleUrls: ['./Report-type-sidebar.component.scss'],
+  selector: 'transaction-categories-sidebar',
+  templateUrl: './transaction-categories-sidebar.component.html',
+  styleUrls: ['./transaction-categories-sidebar.component.scss'],
   providers: [NgbTooltipConfig]
 })
-export class ReportTypeSidebarComponent implements OnInit {
+export class TransactionCategoriesSidbarComponent implements OnInit {
 
+  @Input() transactionCategories: any = [];
+  @Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
-  @Input() specialreports: boolean = false;
-  @Input() regularreports: boolean = false;
+  @Input() cashOnHand: any = {};
+
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
   public additionalOptions: Array<any> = [];
-
-  private _indexOfItemSelected: number = null;
-
   public loadingData: boolean = true;
   public steps: any = {};
-  public sidebarLinks: any = {};
-  public selectedOptions: any = [];
-  public searchField: any = {};
-  public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
+
+  private _indexOfItemSelected: number = null;
 
   constructor(
     private _config: NgbTooltipConfig,
@@ -39,9 +36,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
-    console.log("this.specialreports", this.specialreports);
-    console.log("this.regularreports", this.regularreports);
+    console.log('cashOnHand: ', this.cashOnHand);
   }
 
   public selectItem(item): void {
@@ -49,7 +44,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
     this.additionalOptions = [];
 
-    this.sidebarLinks.findIndex((el, index) => {
+    this.transactionCategories.findIndex((el, index) => {
       if (el.value === this.itemSelected) {
         this._indexOfItemSelected = index;
       }
@@ -64,13 +59,13 @@ export class ReportTypeSidebarComponent implements OnInit {
     let additionalItemIndex: number = null;
 
     this.additionalItemSelected = additionalItem.getAttribute('value');
-    this.sidebarLinks[this._indexOfItemSelected].options.findIndex((el, index) => {
+    this.transactionCategories[this._indexOfItemSelected].options.findIndex((el, index) => {
       if (this.additionalItemSelected === el.value) {
         additionalItemIndex = index;
       }
     });
 
-    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
+    this.additionalOptions = this.transactionCategories[this._indexOfItemSelected].options[additionalItemIndex].options;
 
     this.status.emit({
       additionalOptions: this.additionalOptions

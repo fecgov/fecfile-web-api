@@ -3,19 +3,17 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
-  selector: 'form-sidebar',
-  templateUrl: './form-sidebar.component.html',
-  styleUrls: ['./form-sidebar.component.scss'],
+  selector: 'report-type-sidebar',
+  templateUrl: './report-type-sidebar.component.html',
+  styleUrls: ['./report-type-sidebar.component.scss'],
   providers: [NgbTooltipConfig]
 })
-export class FormSidebarComponent implements OnInit {
+export class ReportTypeSidebarComponent implements OnInit {
 
-  @Input() sidebarLinks: any = [];
-  @Input() searchField: any = {};
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
-  @Input() cashOnHand: any = {};
-
+  @Input() specialreports: boolean = false;
+  @Input() regularreports: boolean = false;
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
@@ -25,10 +23,10 @@ export class FormSidebarComponent implements OnInit {
 
   public loadingData: boolean = true;
   public steps: any = {};
-  //public sidebarLinks: any = {};
-  //public selectedOptions: any = [];
-  //public searchField: any = {};
-  //public cashOnHand: any = {};
+  public sidebarLinks: any = {};
+  public selectedOptions: any = [];
+  public searchField: any = {};
+  public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
 
@@ -42,7 +40,8 @@ export class FormSidebarComponent implements OnInit {
 
   ngOnInit(): void {
 
-   console.log(' from ngOnInit form sidebar this.sidebarLinks: ', this.sidebarLinks);
+    console.log("this.specialreports", this.specialreports);
+    console.log("this.regularreports", this.regularreports);
   }
 
   public selectItem(item): void {
