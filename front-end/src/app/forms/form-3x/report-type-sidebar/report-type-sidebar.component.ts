@@ -4,8 +4,8 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 
 @Component({
   selector: 'report-type-sidebar',
-  templateUrl: './Report-type-sidebar.component.html',
-  styleUrls: ['./Report-type-sidebar.component.scss'],
+  templateUrl: './report-type-sidebar.component.html',
+  styleUrls: ['./report-type-sidebar.component.scss'],
   providers: [NgbTooltipConfig]
 })
 export class ReportTypeSidebarComponent implements OnInit {
@@ -39,7 +39,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
+
     console.log("this.specialreports", this.specialreports);
     console.log("this.regularreports", this.regularreports);
   }
