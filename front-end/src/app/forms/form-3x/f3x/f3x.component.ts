@@ -26,18 +26,17 @@ export class F3xComponent implements OnInit {
   public selectedOptions: any = [];
   public searchField: any = {};
   public cashOnHand: any = {};
-
   public frm: any;
   public direction: string;
   public previousStep: string = '';
-  private _step: string = '';
-  private _form_type: string = '';
-
   public specialreports: boolean = false;
   public regularreports: boolean = false;
   public reporttypeindicator: any = '';
   public loadingreportData: boolean = true;
   public reporttypes: any = [];
+
+  private _step: string = '';
+  private _formType: string = '';
 
   constructor(
     private _formService: FormsService,
@@ -52,11 +51,12 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.specialreports=true;
     this.regularreports=false;
 
     this._formService
-      .getreporttypes(this._form_type)
+      .getreporttypes(this._formType)
       .subscribe(res => {
         this.reporttypeindicator  = res.report_type.find( x => {
           return x.default_disp_ind === 'Y' ;
@@ -76,7 +76,7 @@ export class F3xComponent implements OnInit {
        this.regularreports=true;
      }
     this._formService
-      .getTransactionCategories(this._form_type)
+      .getTransactionCategories(this._formType)
       .subscribe(res => {
         console.log(' getTransactionCategories resp: ', res);
         this.cashOnHand = res.data.cashOnHand;
@@ -86,9 +86,12 @@ export class F3xComponent implements OnInit {
         this.searchField = res.data.transactionSearchField;
       });
 
+      if(localStorage.getItem(`form_${this._formType}_saved`) === null && this.step !== 'step_5') {
+        localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved': false}));
+      }
 
     this.loadingData = false;
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
@@ -98,8 +101,8 @@ export class F3xComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/3X') === -1) {
-              localStorage.removeItem(`form_${this._form_type}_details`);
-              localStorage.removeItem(`form_${this._form_type}_saved`);
+              localStorage.removeItem(`form_${this._formType}_details`);
+              localStorage.removeItem(`form_${this._formType}_saved`);
             }
           } else {
             if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {

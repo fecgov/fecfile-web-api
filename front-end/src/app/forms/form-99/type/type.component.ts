@@ -25,7 +25,7 @@ export class TypeComponent implements OnInit {
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
 
-  private _form_99_details: form99;
+  private _form99Details: form99;
   private _newForm: boolean = false;
   private _previousUrl: string = null;
 
@@ -38,7 +38,7 @@ export class TypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+    this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
     this.screenWidth = window.innerWidth;
 
@@ -58,7 +58,7 @@ export class TypeComponent implements OnInit {
         if(e instanceof NavigationEnd) {
           this._previousUrl = e.url;
           if(this._previousUrl === '/forms/form/99?step=step_5') {
-            this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+            this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
             this.typeSelected = '';
 
@@ -82,11 +82,11 @@ export class TypeComponent implements OnInit {
   }
 
   private _setForm(): void {
-    if(this._form_99_details) {
-      if(this._form_99_details.reason) {
-        this.typeSelected = this._form_99_details.reason;
+    if(this._form99Details) {
+      if(this._form99Details.reason) {
+        this.typeSelected = this._form99Details.reason;
         this.frmType = this._fb.group({
-          reasonTypeRadio: [this._form_99_details.reason, Validators.required]
+          reasonTypeRadio: [this._form99Details.reason, Validators.required]
         });
       } else {
         this.frmType = this._fb.group({
@@ -124,12 +124,12 @@ export class TypeComponent implements OnInit {
     if (this.frmType.get('reasonTypeRadio').value) {
         this.typeFailed = false;
         this.isValidType = true;
-        this._form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
+        this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this._form_99_details.reason = this.frmType.get('reasonTypeRadio').value;
+        this._form99Details.reason = this.frmType.get('reasonTypeRadio').value;
 
         setTimeout(() => {
-          localStorage.setItem('form_99_details', JSON.stringify(this._form_99_details));
+          localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
         }, 100);
 
 

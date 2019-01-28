@@ -1,31 +1,4 @@
 <div class="preview-container">
-  <!--<header>
-    <div class="header-container">
-      <div class="header__text">
-        <h1 class="text-left" *ngIf="!type_selected">Form {{ form_type }}</h1>
-        <h1 class="text-left" *ngIf="type_selected">Form {{ form_type }} / {{ type_selected }}</h1>
-      </div>
-    <div class="header__btns" >
-        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-        <button
-          type="button"
-          class="btn btn-validate"
-          (click)="printPriview()"
-        >
-          Print Preview
-        </button> &nbsp;
-        <button
-          type="button"
-          class="btn btn-validate"
-          (click)="validateForm()"
-        >
-            Validate
-          </button>
-         </div>
-    </div>   
-    <hr />          
-  </header>-->
-
   <header>
       <div class="header-container">
         <div class="header__text">
@@ -54,21 +27,21 @@
             </button>
         </div>
       </div>
-    </header>  
+    </header>
   <section>
     <div class="content">
     <div class="grid-row">
       <div class="grid-row__col grid-row__col--12">
         <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
           <app-validate></app-validate>
-        </div>            
+        </div>
       </div>
-    </div>      
+    </div>
       <div class="grid-row">
         <div class="grid-col">
           <div class="label">
             Name of Committee in Full
-          </div>          
+          </div>
           <div class="text">
             {{ committee_details?.committeename }}
           </div>
@@ -84,17 +57,17 @@
         <div class="grid-col">
           <div class="label">
             Address Line 2
-          </div>          
+          </div>
           <div class="text">
             {{ committee_details?.street2 }}
           </div>
-        </div>        
+        </div>
       </div>
       <div class="grid-row">
         <div class="grid-col">
           <div class="label">
             City
-          </div>          
+          </div>
           <div class="text">
             {{ committee_details?.city }}
           </div>
@@ -102,7 +75,7 @@
         <div class="grid-col">
           <div class="label">
             State
-          </div>     
+          </div>
           <div class="text">
             {{ committee_details?.state }}
           </div>
@@ -110,7 +83,7 @@
         <div class="grid-col">
           <div class="label">
             Zip Code
-          </div> 
+          </div>
           <div class="text">
             {{ committee_details?.zipcode }}
           </div>
@@ -124,11 +97,11 @@
           <div class="text">
             {{ committee_details?.treasurerlastname }}
           </div>
-        </div>        
+        </div>
         <div class="grid-col">
           <div class="label">
             Treasurer First Name
-          </div> 
+          </div>
           <div class="text">
            {{ committee_details?.treasurerfirstname }}
           </div>
@@ -154,11 +127,11 @@
         <div class="grid-col">
           <div class="label">
             Treasurer Sufix
-          </div>           
+          </div>
           <div class="text">
            {{ committee_details?.treasurersuffix }}
           </div>
-        </div>        
+        </div>
       </div>
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
@@ -201,7 +174,7 @@
           <hr />
           <br />
         </div>
-      </div>      
+      </div>
     </div> <!-- ./content -->
   </section>
   <footer>
@@ -225,10 +198,5 @@
         </div>
       </div>
     </div>
-    <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-        <h4>* = Required</h4>    
-        </div> 
-    </div>        
   </footer>
 </div>
