@@ -1,6 +1,24 @@
 @import '../../../shared/scss/global';
 
 .transaction-type-container {
+  header {
+    .header-content {
+      display: block;
+      margin: 0 auto;
+      width: 96%;
+      @include clearfix();
+      .btn-options {
+        color: $shuttleGray;
+        text-decoration: none;
+        &:hover,
+        &:visited,
+        &:active {
+          color: $shuttleGray;
+          text-decoration: none;
+        }
+      }
+    }
+  }
   .forms__btn-container {
     height: 100%;
     margin-bottom: 10px;
