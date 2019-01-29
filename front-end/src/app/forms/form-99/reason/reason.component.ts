@@ -40,6 +40,7 @@ export class ReasonComponent implements OnInit {
   public validFile: boolean = true;
   public showFileDeleteButton: boolean=false;
   public notCorrectPdfSize: boolean=false;
+  public printPrivewPdfFileLink: string ='';
 
   private _form99Details: any = {}
   private _editorMax: number = 20000;
@@ -461,7 +462,8 @@ export class ReasonComponent implements OnInit {
           .subscribe(res => {
             if(res) {
               console.log('Reason screen printPreview: res: ', res);
-
+              this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));  
+              console.log('Reason screen printPreview: rthis.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
               this._form99Details.id = res.id;
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));

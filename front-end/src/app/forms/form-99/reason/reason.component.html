@@ -1,206 +1,204 @@
 <div class="reason-container">
-  <form
-    [formGroup]="frmReason"
-    (ngSubmit)="doValidateReason()"
-  >
-    <header>
-      <div class="header-container">
-        <div class="header__text">
-          <h1 class="text-left" *ngIf="!typeSelected">
-            Form 99
-          </h1>
-          <h1 class="text-left" *ngIf="typeSelected">
-            Form 99 / {{ typeSelected }}
-          </h1>
-        </div>
-        <div class="header__btns">
-          <button
-            type="button"
-            class="btn btn-validate"
-            (click)="printPreview()"
-            [disabled]="true"
-          >
-            Print Preview
-          </button> &nbsp;
-          <button
-            type="button"
-            class="btn btn-validate"
-            (click)="validateForm()"
-          >
-              Validate
-            </button>
-        </div>
-      </div>
-    </header>
-    <section>
-      <div class="content">
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
-              <app-validate></app-validate>
-            </div>
+    <form
+      [formGroup]="frmReason"
+      (ngSubmit)="doValidateReason()"
+    >
+      <header>
+        <div class="header-container">
+          <div class="header__text">
+            <h1 class="text-left" *ngIf="!typeSelected">
+              Form 99
+            </h1>
+            <h1 class="text-left" *ngIf="typeSelected">
+              Form 99 / {{ typeSelected }}
+            </h1>
           </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12"
-            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-            <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-              You must enter a reason.
-            </div>
-          </div>
-        </div>
-        <div class="grid-row info-row">
-          <div class="grid-row__col grid-row__col--12 text-left">
-            <b>Enter your text*</b>
-            <ng-template #tipContent1>
-                Please note that if you copy and paste text into the text box the formatting may be lost.
-                The text box is only for composing a message or letter. The text box does feature basic formatting.
-                If you need to include supplemental information, you can use the attachment feature below the text box.
-             </ng-template>
-             <button
-                type="button"
-                class="btn btn-info"
-                [ngbTooltip]="tipContent1"
-                #t1="ngbTooltip"
-                (click)="toggleToolTip(t1)"
-                triggers="manual"
-                tooltipClass="custom-tooltip-class"
-                placement="right"
-              >
-                <i class="info-icon" aria-hidden="true"></i>
-                <span class="sr-only">Click here for more information</span>
-              </button>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12"
-            *ngIf="notValidPdf">
-            <div class="text-error text-center" *ngIf="notValidPdf">
-              You are attempting to attach a non-PDF, please only attach a PDF.
-            </div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12"
-            *ngIf="notValidPdf">
-            <div class="text-error text-center" *ngIf="notCorrectPdfSize">
-              The attachment size exceeds the allowable limit.
-            </div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="text-editor">
-              <textarea
-                placeholder="Enter text here..."
-                (keyup)="updateValidation()"
-                formControlName="reasonText"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="editor-character-count">
-              {{ characterCount }}
-              characters
-            </div>
-            <div class="error-text"
-              *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
-              <div class="text-error text-center"
-                *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
-                You can only enter up to 20,000 characters.
-              </div>
-            </div>
-            <div class="error-text">
-              <div class="text-info text-center"
-                *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! notValidPdf)">
-                Form 99 has been successfully saved.
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- file upload start -->
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <hr />
-            <ng-template #tipContent2>
-              The attachment feature can be used to attach documents that may fall outside of a simple letter.
-              Examples include copies of refund checks sent to contributors, tables for disclosing information, or the ability to submit a C-1 Loan Agreement.
-              Please note that if you have more than one PDF attachment, you will need to merge them into a single PDF.
-            </ng-template>
-            <h4>
-              File Attachment
-              <button
-                type="button"
-                class="btn btn-info"
-                [ngbTooltip]="tipContent2"
-                #t2="ngbTooltip"
-                (click)="toggleToolTip(t2)"
-                triggers="manual"
-                tooltipClass="custom-tooltip-class"
-                placement="right"
-              >
-                <i class="info-icon" aria-hidden="true"></i>
-                <span class="sr-only">Click here for more information</span>
-              </button>
-            </h4>
-            <div class="file-upload-container" *ngIf="file === null">
-              <input
-                #fileInput
-                type="file"
-                name="file"
-                accept="application/pdf"
-                (change)="setFile($event)"
-              />
-            </div>
-            <div class="file-attached-container" *ngIf="file !== null">
-              <div class="grid-row">
-                <div class="grid-row__col--2">
-                  {{ file.name }}
-                </div>
-                <div class="grid-row__col--2 text-left">
-                  <button
-                    type="button"
-                    class="btn btn-link"
-                    (click)="removeFile()"
-                  >
-                      <span vertical-align="top" class="close-icon"></span>
-                    </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- file upload end -->
-      </div> <!-- ./content -->
-    </section>
-    <footer>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <div class="forms__btn-container">
+          <div class="header__btns">
             <button
-              class="btn btn-previous btn-left"
               type="button"
-              (click)="previousStep()"
+              class="btn btn-validate"
+              (click)="printPreview()"
+              [disabled]="false"
             >
-              Previous
-            </button>
+              Print Preview
+            </button> &nbsp;
             <button
-              class="btn btn-primary btn-right"
-              type="submit"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
+              type="button"
+              class="btn btn-validate"
+              (click)="validateForm()"
             >
-             Save & Continue
-            </button>
+                Validate
+              </button>
           </div>
         </div>
-      </div>
-       <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <h4>* = Required</h4>
+      </header>
+      <section>
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="validate__form" [ngClass]="showValidateBar === true ? 'show-alerts' : ''">
+                <app-validate></app-validate>
+              </div>
+            </div>
           </div>
-      </div>
-    </footer>
-  </form>
-</div> <!-- ./reason-container -->
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12"
+              *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+              <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
+                You must enter a reason.
+              </div>
+            </div>
+          </div>
+          <div class="grid-row info-row">
+            <div class="grid-row__col grid-row__col--6 text-left">
+              <b>Enter your text*</b>
+              <ng-template #tipContent1>
+                  Please note that if you copy and paste text into the text box the formatting may be lost.
+                  The text box is only for composing a message or letter. The text box does feature basic formatting.
+                  If you need to include supplemental information, you can use the attachment feature below the text box.
+               </ng-template>
+               <button
+                  type="button"
+                  class="btn btn-info"
+                  [ngbTooltip]="tipContent1"
+                  #t1="ngbTooltip"
+                  (click)="toggleToolTip(t1)"
+                  triggers="manual"
+                  tooltipClass="custom-tooltip-class"
+                  placement="right"
+                >
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+            </div>
+            <div  class="grid-row__col grid-row__col--6 text-right">
+              *=Required
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12"
+              *ngIf="notValidPdf">
+              <div class="text-error text-center" *ngIf="notValidPdf">
+                You are attempting to attach a non-PDF, please only attach a PDF.
+              </div>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12"
+              *ngIf="notValidPdf">
+              <div class="text-error text-center" *ngIf="notCorrectPdfSize">
+                The attachment size exceeds the allowable limit.
+              </div>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="text-editor">
+                <textarea
+                  placeholder="Enter text here..."
+                  (keyup)="updateValidation()"
+                  formControlName="reasonText"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="editor-character-count">
+                {{ characterCount }}
+                characters
+              </div>
+              <div class="error-text"
+                *ngIf="frmReason.invalid && (frmReason.dirty || frmReason.touched)">
+                <div class="text-error text-center"
+                  *ngIf="frmReason.controls.reasonText.errors?.requiredLength">
+                  You can only enter up to 20,000 characters.
+                </div>
+              </div>
+              <div class="error-text">
+                <div class="text-info text-center"
+                  *ngIf="frmReason.valid && (frmReason.dirty || frmReason.touched) && formSaved && (! notValidPdf)">
+                  Form 99 has been successfully saved.
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- file upload start -->
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <hr />
+              <ng-template #tipContent2>
+                The attachment feature can be used to attach documents that may fall outside of a simple letter.
+                Examples include copies of refund checks sent to contributors, tables for disclosing information, or the ability to submit a C-1 Loan Agreement.
+                Please note that if you have more than one PDF attachment, you will need to merge them into a single PDF.
+              </ng-template>
+              <h4>
+                File Attachment
+                <button
+                  type="button"
+                  class="btn btn-info"
+                  [ngbTooltip]="tipContent2"
+                  #t2="ngbTooltip"
+                  (click)="toggleToolTip(t2)"
+                  triggers="manual"
+                  tooltipClass="custom-tooltip-class"
+                  placement="right"
+                >
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </h4>
+              <div class="file-upload-container" *ngIf="file === null">
+                <input
+                  #fileInput
+                  type="file"
+                  name="file"
+                  accept="application/pdf"
+                  (change)="setFile($event)"
+                />
+              </div>
+              <div class="file-attached-container" *ngIf="file !== null">
+                <div class="grid-row">
+                  <div class="grid-row__col--2">
+                    {{ file.name }}
+                  </div>
+                  <div class="grid-row__col--2 text-left">
+                    <button
+                      type="button"
+                      class="btn btn-link"
+                      (click)="removeFile()"
+                    >
+                        <span vertical-align="top" class="close-icon"></span>
+                      </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- file upload end -->
+        </div> <!-- ./content -->
+      </section>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <button
+                class="btn btn-previous btn-left"
+                type="button"
+                (click)="previousStep()"
+              >
+                Previous
+              </button>
+              <button
+                class="btn btn-primary btn-right"
+                type="submit"
+                [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
+              >
+               Save & Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </form>
+  </div> <!-- ./reason-container -->

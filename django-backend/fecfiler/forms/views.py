@@ -451,7 +451,7 @@ def submit_comm_info(request):
             
         if serializer.is_valid():
             serializer.save()
-            #email(True, serializer.data)
+            email(True, serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
