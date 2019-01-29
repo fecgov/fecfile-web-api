@@ -14,11 +14,23 @@
           </h1>
         </div>
         <div class="header__btns">
-          <button
+            <button
+            id="viewpdf"
+            name="viewpdf"
             type="button"
             class="btn btn-validate"
-            (click)="printPreview()"
-            [disabled]="true"
+            onclick="window.open('{{ printPrivewPdfFileLink }}','_blank')"
+            [disabled]="false"
+          >
+            view pdf
+          </button> &nbsp;          
+          <button
+            id="viewpdf"
+            name="viewpdf"
+            type="button"
+            class="btn btn-validate"
+            (click)="window.location.href='www.google.com'"
+            [disabled]="false"
           >
             Print Preview
           </button> &nbsp;

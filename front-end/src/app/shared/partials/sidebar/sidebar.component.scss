@@ -169,7 +169,9 @@
                 max-width: 300px;
                 text-align: left;
                 a {
-                  color: $white;
+                  //color: $white;
+                  color: $primaryBlue;
+                  background-color: $white;
                   text-decoration: underline;
                   &:hover {
                     text-decoration: none;
