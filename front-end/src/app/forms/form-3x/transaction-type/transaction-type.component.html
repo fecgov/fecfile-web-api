@@ -1,8 +1,11 @@
 <div class="transaction-type-container">
     <header>
       <div class="header-content">
-        <div class="float-left">
+        <div class="float-left"  *ngIf="showForm">
           <h1>Transaction Type</h1>
+        </div>
+        <div class="float-left" *ngIf="!showForm">
+          <h1>Financial Summary</h1>
         </div>
         <div class="float-right">
           <button
@@ -63,6 +66,9 @@
               </button>
             </li>
           </ul>
+      </div>
+      <div *ngIf="!showForm">
+        <f3x-financial-summary></f3x-financial-summary>
       </div>
     </section>
     <footer>
