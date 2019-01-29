@@ -501,7 +501,7 @@ export class FormsService {
               console.log ('org_fileurl on Reason screen',org_fileurl);
             }
 
-            return res;
+            return true;
           }
           return false;
       }));
