@@ -6,14 +6,14 @@
   <section><!-- Start: Wizard Sidebar Report Coverage Dates -->
     <form class="sidebar-form-content">
        <div class="form-row" *ngIf="(regularreports===true)">
- 
+
         <div class="form-row">
           <label for="dateFrom">Date From* </label>
           <button
           type="button"
           class="btn-info"
           ngbTooltip="Language will be provided by RAD"
-  
+
         >
           <i class="info-icon" aria-hidden="true"></i>
           <span class="sr-only">
@@ -23,10 +23,10 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="date" 
-          name="txttodate" 
+          <input type="date"
+          name="txttodate"
           value=""
-          class="form-control" 
+          class="form-control"
           aria-label="Contribution Date"/>
         </div>
         <div class="form-row">
@@ -35,7 +35,7 @@
           type="button"
           class="btn-info"
           ngbTooltip="Language will be provided by RAD"
-  
+
         >
           <i class="info-icon" aria-hidden="true"></i>
           <span class="sr-only">
@@ -45,23 +45,23 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="date" 
-          name="txtfromdate" 
+          <input type="date"
+          name="txtfromdate"
           value=""
-          class="form-control" 
+          class="form-control"
           aria-label="Contribution Date">
         </div>
-          
-          <div class="form-row" *ngIf="cashOnHand?.showCashOnHand"> 
+
+          <div class="form-row" *ngIf="cashOnHand?.showCashOnHand">
           <div class="form-sidebar-item__text">
             {{ cashOnHand.text }}
           </div>
           <div class="form-sidebar-item__value">
             ${{ cashOnHand.amount }}
           </div>
-        </div>  
+        </div>
     </div> <!-- regular reports-->
-    
+
     <div class="form-row" *ngIf="specialreports===true">
         <div class="form-row">
             <label for="State">State*</label>
@@ -159,13 +159,13 @@
           Click for more information
         </span>
       </button>
-     
+
       </div>
       <div class="form-row">
           <select id="electiondate" name="state" class="form-control">
               <option value="---">--- </option>
-          </select> 
-        
+          </select>
+
       </div>
       <div class="form-row">
         <label for="dateFrom">Date From* <i class="fas fa-info-circle"></i></label>
@@ -183,10 +183,10 @@
       </div>
       <div class="form-row">
         <i class="fas fa-calendar-alt"></i>
-        <input type="date" 
-        name="txttodate" 
+        <input type="date"
+        name="txttodate"
         value=""
-        class="form-control" 
+        class="form-control"
         aria-label="Contribution Date"/>
       </div>
       <div class="form-row">
@@ -205,31 +205,32 @@
       </div>
       <div class="form-row">
         <i class="fas fa-calendar-alt"></i>
-        <input type="date" 
-        name="txtfromdate" 
+        <input type="date"
+        name="txtfromdate"
         value=""
-        class="form-control" 
+        class="form-control"
         aria-label="Contribution Date">
       </div>
-  
-      <div class="form-row" *ngIf="cashOnHand?.showCashOnHand"> 
+
+      <div class="form-row" *ngIf="cashOnHand?.showCashOnHand">
       <div class="form-sidebar-item__text">
         {{ cashOnHand.text }}
       </div>
       <div class="form-sidebar-item__value">
         ${{ cashOnHand.amount }}
       </div>
-    </div>  
+    </div>
   </div> <!-- special reports-->
    <!-- buttons started here-->
     <div class="form-sidebar__btns">
     <div class="btn-row">
-      <button
-        type="button"
+      <a
         class="btn btn-secondary-gray"
+        [routerLink]="['/forms/form/', '3X']"
+        [queryParams]="{ step: 'financial_summary' }"
       >
         Summary
-      </button>
+      </a>
     </div>
     <br />
     <div class="btn-row">

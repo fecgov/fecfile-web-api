@@ -1,1 +1,93 @@
-<div>Test</div>
+<div class="financial-summary-container">
+  <header>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--6">
+        <h1>Financial Summary</h1>
+      </div>
+      <div class="grid-row__col grid-row__col--6 text-right">
+        <button
+          type="button"
+          class="btn btn-secondary-gray"
+        >
+          Browse Receipts
+        </button>
+        <button
+          type="button"
+          class="btn btn-link btn-options"
+        >
+          <span class="ellipsis-icon" aria-hidden="true"></span>
+          <span class="sr-only">Click for more options</span>
+        </button>
+      </div>
+    </div>
+    <hr />
+  </header>
+  <section>
+    <div class="financial-summary-content">
+      <div class="row">
+        <div class="col text-center">
+          <button
+            type="button"
+            (click)="viewMode = 'tab1'"
+            [ngClass]="viewMode === 'tab1' ? 'btn btn-primary' : 'btn btn-link btn-secondary-gray'"
+          >
+            Total Raised
+          </button>
+        </div>
+        <div class="col text-center">
+          <button
+            type="button"
+            (click)="viewMode = 'tab2'"
+            [ngClass]="viewMode === 'tab2' ? 'btn btn-primary' : 'btn btn-secondary-gray'"
+          >
+            Total Spent
+          </button>
+        </div>
+        <div class="col text-center">
+          <button
+            type="button"
+            (click)="viewMode = 'tab3'"
+            [ngClass]="viewMode === 'tab3' ? 'btn btn-primary' : 'btn btn-secondary-gray'"
+          >
+            Cash Summary
+          </button>
+        </div>
+      </div>
+      <div class="tab-container" [ngSwitch]="viewMode">
+        <div id="tab1" *ngSwitchDefault>
+          <table class="total-raised-table">
+            <thead>
+              <tr>
+                <th>&nbsp;</th>
+                <th>Total This Period</th>
+                <th>Calendar Year-to-Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of tab1Data.rows"></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="tab2" *ngSwitchCase="'tab2'">
+          Tab 2 Content
+        </div>
+        <div id="tab3" *ngSwitchCase="'tab3'">
+          Tab 3 Content
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <a
+          class="btn btn-secondary-gray"
+          [routerLink]="['/forms/form/', '3X']"
+          [queryParams]="{ step: 'step_1' }"
+        >
+          Return to form
+        </a>
+      </div>
+    </div>
+  </footer>
+</div>

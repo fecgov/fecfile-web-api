@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
-import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
@@ -78,7 +77,6 @@ export class F3xComponent implements OnInit {
     this._formService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
-        console.log(' getTransactionCategories resp: ', res);
         this.cashOnHand = res.data.cashOnHand;
 
         this.transactionCategories = res.data.transactionCategories;

@@ -17,6 +17,7 @@
           text-decoration: none;
         }
       }
+      @include clearfix();
     }
   }
   .forms__btn-container {

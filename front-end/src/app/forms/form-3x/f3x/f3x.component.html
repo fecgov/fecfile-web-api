@@ -1,5 +1,5 @@
 <div class="forms__wizard" *ngIf="!loadingData">
-  <div class="form__sidebar">
+  <div class="form__sidebar" *ngIf="step!=='financial_summary'">
     <div *ngIf="step==='step_1'">
       <report-type-sidebar
           title="Report Coverage Dates"
@@ -28,7 +28,7 @@
       'hide-alerts': step==='step_6'
     }"
   >
-    <div class="form__steps">
+    <div class="form__steps" *ngIf="step!=='financial_summary'">
       <app-steps
         [steps]="[
           {text: 'Report<br/>type', step: 'step_1'},
@@ -45,6 +45,9 @@
     <div
       class="form__content"
     >
+      <div *ngIf="step==='financial_summary'">
+        <f3x-financial-summary></f3x-financial-summary>
+      </div>
       <div
         class="form__step"
         [hidden]="step!=='step_1'"

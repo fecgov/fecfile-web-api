@@ -1,0 +1,43 @@
+@import '../../../shared/scss/global';
+
+.financial-summary-container {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+    .grid-row__col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  header {
+    .btn-options {
+      color: $shuttleGray;
+      text-decoration: none;
+      &:hover,
+      &:visited,
+      &:active {
+        color: $shuttleGray;
+        text-decoration: none;
+      }
+    }
+    @include clearfix();
+  }
+  section {
+    .financial-summary-content {
+      .total-raised-table {
+        width: 100%;
+        thead {
+          tr {
+            th {
+              width: 200px;
+            }
+          }
+        }
+      }
+      @include clearfix();
+    }
+  }
+}

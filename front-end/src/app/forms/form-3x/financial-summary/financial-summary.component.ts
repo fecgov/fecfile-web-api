@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'f3x-financial-summary',
@@ -7,9 +8,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FinancialSummaryComponent implements OnInit {
 
-  constructor() { }
+  public viewMode: string = '';
+  public tab1Data: any = {};
 
-  ngOnInit() {
+  constructor(
+    private _http: HttpClient
+  ) { }
+
+  ngOnInit(): void {
+    this.viewMode = 'tab1';
+
+    this._http
+     .get('http://localhost:3000/data')
+     .subscribe(res => {
+       console.log('res: ', res);
+       if(res) {
+         this.tab1Data = res[0];
+       }
+     });
   }
 
 }

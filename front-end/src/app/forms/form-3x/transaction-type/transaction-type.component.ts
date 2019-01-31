@@ -43,7 +43,6 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('this.showForm: ', this.showForm);
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
 
@@ -53,11 +52,8 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    console.log('this.selectedOptions: ', this.selectedOptions);
-    console.log('this.showForm: ', this.showForm);
     if (Array.isArray(this.selectedOptions)) {
       if (this.selectedOptions.length >= 1) {
-        console.log('selectedOptions length: ');
         this.showForm = true;
       }
     }
