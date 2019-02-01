@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'f3x-financial-summary',
@@ -18,8 +19,12 @@ export class FinancialSummaryComponent implements OnInit {
   public viewMode: string = '';
 
   constructor(
+    private _config: NgbTooltipConfig,
     private _http: HttpClient
-  ) { }
+  ) {
+    this._config.placement = 'right';
+    this._config.triggers = 'click';
+  }
 
   ngOnInit(): void {
     this.viewMode = 'tab1';
