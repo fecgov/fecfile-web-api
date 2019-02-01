@@ -8,8 +8,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class FinancialSummaryComponent implements OnInit {
 
-  public viewMode: string = '';
+  public categoryId: string = '';
+  public column: string = '';
+  public isDesc: boolean = null;
   public tab1Data: any = {};
+  public viewMode: string = '';
 
   constructor(
     private _http: HttpClient
@@ -26,6 +29,24 @@ export class FinancialSummaryComponent implements OnInit {
          this.tab1Data = res[0];
        }
      });
+  }
+
+  public sort(property: string): void {
+    this.isDesc = !this.isDesc; //change the direction
+    this.column = property;
+    let direction = this.isDesc ? 1 : -1;
+
+    this.tab1Data.rows.sort(function(a, b){
+        if(a[property] < b[property]){
+            return -1 * direction;
+        }
+        else if( a[property] > b[property]){
+            return 1 * direction;
+        }
+        else{
+            return 0;
+        }
+    });
   }
 
 }

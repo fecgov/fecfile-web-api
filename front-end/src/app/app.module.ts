@@ -13,6 +13,7 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { DataTableModule } from "angular-6-datatable";
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -99,7 +100,7 @@ import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/fin
     TransactionTypeComponent,
     ReportTypeComponent,
     ReportTypeSidebarComponent,
-    FinancialSummaryComponent,
+    FinancialSummaryComponent
   ],
   entryComponents: [
     ConfirmModalComponent
@@ -118,7 +119,8 @@ import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/fin
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    DataTableModule
   ],
   providers: [
     CookieService,

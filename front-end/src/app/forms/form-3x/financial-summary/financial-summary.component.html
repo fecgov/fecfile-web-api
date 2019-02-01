@@ -59,12 +59,60 @@
             <thead>
               <tr>
                 <th>&nbsp;</th>
-                <th>Total This Period</th>
-                <th>Calendar Year-to-Date</th>
+                <th
+                  data-categoryId="totalThisPeriod"
+                  (click)="sort('totalThisPeriod')"
+                >
+                  Total This Period
+                  <i
+                    aria-hidden="true"
+                    [ngClass]="{
+                      'sort-icon': column != 'totalThisPeriod',
+                      'sort-icon-asc': column === 'totalThisPeriod' && !isDesc,
+                      'sort-icon-desc': column === 'totalThisPeriod' && isDesc
+                    }"
+                  >
+                    <span class="sr-only">
+                      Click to sort column.
+                    </span>
+                  </i>
+                </th>
+                <th
+                  data-categoryId="calendarYearToDate"
+                  (click)="sort('calendarYearToDate')"
+                >
+                  Calendar Year-to-Date
+                  <i
+                    aria-hidden="true"
+                    [ngClass]="{
+                      'sort-icon': column != 'calendarYearToDate',
+                      'sort-icon-asc': column === 'calendarYearToDate' && !isDesc,
+                      'sort-icon-desc': column === 'calendarYearToDate' && isDesc
+                    }"
+                  >
+                    <span class="sr-only">
+                      Click to sort column.
+                    </span>
+                  </i>
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of tab1Data.rows"></tr>
+              <tr *ngFor="let row of tab1Data.rows">
+                <td>
+                  {{ row.rowKey.text }}
+                 <button
+                   type="button"
+                   class="btn btn-link btn-info"
+                   *ngIf="row.rowKey.infoIcon"
+                 >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                 </button>
+                </td>
+                <td class="col-item-text">${{ row.totalThisPeriod }}</td>
+                <td class="col-item-text">${{ row.calendarYearToDate }}</td>
+              </tr>
             </tbody>
           </table>
         </div>

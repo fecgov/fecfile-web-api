@@ -28,11 +28,25 @@
   section {
     .financial-summary-content {
       .total-raised-table {
+        margin-top: 20px;
         width: 100%;
         thead {
           tr {
             th {
+              cursor: pointer;
+              font-weight: bold;
               width: 200px;
+            }
+          }
+        }
+        tbody {
+          tr {
+            td {
+              padding-top: 10px;
+              padding-bottom: 10px;
+              &.col-item-text {
+                text-align: center;
+              }
             }
           }
         }
