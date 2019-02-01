@@ -5,7 +5,7 @@ import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
+import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'app-f3x',
@@ -34,10 +34,19 @@ export class F3xComponent implements OnInit {
   public reporttypeindicator: any = '';
   public loadingreportData: boolean = true;
   public reporttypes: any = [];
+  public stateSelection: string ='';
+  public formRadioOptionsVisible: boolean = false;
+  public selectedreportTypeRadio: string = '';
+  public reporttype: any = {};
 
   private _step: string = '';
   private _formType: string = '';
-
+  //private _form3XReportDetails:  any = {};
+  private _form3XReportDetails:  form3XReport={};
+  private _currentReportType: string='';
+  
+  
+  
   constructor(
     private _formService: FormsService,
     private _http: HttpClient,
@@ -54,27 +63,36 @@ export class F3xComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.specialreports=true;
     this.regularreports=false;
+    
+    this._form3XReportDetails.reportId='';
+    this._form3XReportDetails.reportType='';
+    this._form3XReportDetails.regularSpecialReportInd='';
+    this._form3XReportDetails.stateOfElection='';
+    this._form3XReportDetails.cvgStartDate='';
+    this._form3XReportDetails.cvgEndDate='';
+    this._form3XReportDetails.dueDate='';
+
+    
+    localStorage.setItem('form3XReportInfo', JSON.stringify(this._form3XReportDetails));
+
+     /*localStorage.setItem('form3XReportInfo.reportId', this._form3XReportDetails.reportId);
+    localStorage.setItem('form3XReportInfo.reportType', this._form3XReportDetails.reportType);
+    localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this._form3XReportDetails.regularSpecialReportInd);
+    localStorage.setItem('form3XReportInfo.stateOfElection', this._form3XReportDetails.stateOfElection);
+    localStorage.setItem('form3XReportInfo.cvgStartDate', this._form3XReportDetails.cvgStartDate);
+    localStorage.setItem('form3XReportInfo.cvgEndDate', this._form3XReportDetails.cvgEndDate);
+    localStorage.setItem('form3XReportInfo.dueDate', this._form3XReportDetails.dueDate);*/
 
     this._formService
       .getreporttypes(this._formType)
       .subscribe(res => {
-        this.reporttypeindicator  = res.report_type.find( x => {
-          return x.default_disp_ind === 'Y' ;
-        });
-        //}).regular_special_report_ind;
+        this.reporttypes  = res.report_type;
+        localStorage.setItem('form3xReportTypes', JSON.stringify(this.reporttypes));
+        console.log ("F3xComponent ngOnInit this.reporttypes",this.reporttypes)
 
-        if (typeof this.reporttypeindicator !== 'undefined') {
-          this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
-        }
     });
 
-     if (this.reporttypeindicator === 'S') {
-       this.specialreports=true;
-       this.regularreports=false;
-     } else {
-       this.specialreports=false;
-       this.regularreports=true;
-     }
+    
     this._formService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
@@ -120,6 +138,48 @@ export class F3xComponent implements OnInit {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
+
+    console.log(" F3x Componenets ngdoCheck stateSelection",this.stateSelection);
+    console.log(" F3x Componenets ngdoCheck formRadioOptionsVisible",this.formRadioOptionsVisible);
+    console.log(" F3x Componenets ngdoCheck selectedRadioOptions",this.selectedreportTypeRadio);
+    
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log("ngDoCheck this._currentReportTyp", this._currentReportType);
+
+
+    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+    this.reporttypeindicator  = this.reporttypes.find( x => {
+      return x.default_disp_ind === 'Y' ;
+    });
+    //}).regular_special_report_ind;
+
+    if (typeof this.reporttypeindicator !== 'undefined') {
+      this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
+    }
+
+    this.reporttype=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+
+    if (this.reporttype === null)
+    {
+     if (this.reporttypeindicator === 'S') {
+       this.specialreports=true;
+       this.regularreports=false;
+     } else {
+       this.specialreports=false;
+       this.regularreports=true;
+     }
+    }
+    else
+    {
+      if (this.reporttype.regular_special_report_ind === 'S') {
+        this.specialreports=true;
+        this.regularreports=false;
+      } else {
+        this.specialreports=false;
+        this.regularreports=true;
+      }
+    }
+   
   }
 
   /**
@@ -128,15 +188,34 @@ export class F3xComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
+    console.log(" F3x Componenets onNotify ...");
+
+
+    
     if (typeof e.additionalOptions !== 'undefined') {
       if (e.additionalOptions.length) {
         this.selectedOptions = e.additionalOptions;
         this.formOptionsVisible = true;
+        console.log(" F3x Componenets onNotify additionalOptions",this.selectedOptions);        
       } else {
         this.selectedOptions = null;
         this.formOptionsVisible = false;
       }
     }
+
+    console.log(" F3x Coomponenets onNtify selectedreportTypeRadio",e.reportTypeRadio);
+      if (typeof e.reportTypeRadio !== 'undefined') {
+        if (e.reportTypeRadio.length) {
+          this.selectedreportTypeRadio = e.reportTypeRadio;
+          console.log(" F3x Coomponenets onNtify selectedreportTypeRadio",this.selectedreportTypeRadio);
+         } 
+         else
+          {
+          this.selectedreportTypeRadio = null;
+        }
+    }
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log("onNotify this._currentReportTyp", this._currentReportType);
 
     this.frm = e.form;
 
@@ -170,5 +249,14 @@ export class F3xComponent implements OnInit {
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
     }
+  }
+
+  ngOnChanges(): void
+  {
+    console.log(" F3X Componenets ngOnChanges this.specialreports", this.specialreports);
+    console.log(" F3X Componenets ngOnChanges this.regularreports", this.regularreports);
+
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log(" F3X Componenets ngOnChangesthis._currentReportTyp", this._currentReportType);
   }
 }

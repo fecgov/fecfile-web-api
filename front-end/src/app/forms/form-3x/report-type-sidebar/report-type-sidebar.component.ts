@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
+
 
 @Component({
   selector: 'report-type-sidebar',
@@ -14,13 +16,18 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() title: string = '';
   @Input() specialreports: boolean = false;
   @Input() regularreports: boolean = false;
+  @Input() selectedreporttype:  selectedReportType;
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
   public additionalOptions: Array<any> = [];
+  //public electionState:string ='';
+  //public electionDates: Array<eleectionStateDate> = [];
+  public electionDates: selectedElectionDate = {};
+  public electionStates: any = {};
 
   private _indexOfItemSelected: number = null;
-
+  private _currentReportType: string ='';
   public loadingData: boolean = true;
   public steps: any = {};
   public sidebarLinks: any = {};
@@ -40,8 +47,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.log("this.specialreports", this.specialreports);
-    console.log("this.regularreports", this.regularreports);
+
   }
 
   public selectItem(item): void {
@@ -75,5 +81,49 @@ export class ReportTypeSidebarComponent implements OnInit {
     this.status.emit({
       additionalOptions: this.additionalOptions
     });
+  }
+
+  ngDoCheck(): void {
+    console.log(" Report type side bar ngDoCheck this.specialreports", this.specialreports);
+    console.log(" Report type side bar ngDoCheck this.regularreports", this.regularreports);
+
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log(" Report type side bar ngDoCheck this._currentReportTyp", this._currentReportType);
+
+    console.log (" ReportTypeSidebarComponent ngDoCheck reporttype = ", this.selectedreporttype);
+
+
+  }
+
+  ngOnChanges(): void
+  {
+    console.log (" ReportTypeSidebarComponent ngOnChanges reporttype = ", this.selectedreporttype);
+    console.log( "ReportTypeSidebarComponent ngOnChanges this.electionDates", this.electionDates);
+  }
+
+  selectStateChange(value: string): void
+  {
+    console.log( " ReportTypeSidebarComponent selectStateChange elction state value =", value);
+
+    if (this.selectedreporttype !== null)
+    {
+      this.electionStates=this.selectedreporttype.election_state
+      this.electionDates  = this.electionStates.find( x => x.state === value);
+    
+      console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates", this.electionDates);
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
+    }
+
+    console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates.dates", this.electionDates);
+    
+    /*this.status.emit({
+      electionDates: this.electionDates
+    });*/
+  }
+
+  selectElectionDateChange(value: string): void
+  {
+    console.log( " ReportTypeSidebarComponent selectElectionDateChange elction date value =", value);
+
   }
 }

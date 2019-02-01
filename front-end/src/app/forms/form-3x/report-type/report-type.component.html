@@ -22,6 +22,7 @@
               <input
                 type="radio"
                 name="reportTypeRadio"
+                id="{{committee_form3x_reporttype.report_type}}"
                 class="option-radio"
                 value="{{committee_form3x_reporttype.report_type}}"
                 (click)="updateTypeSelected($event)"
@@ -60,7 +61,7 @@
           <button
             class="btn btn-primary btn-right"
             type="submit"
-            (click)="Savadata()"
+            (click)="saveReport()"
           >
             Next
           </button>

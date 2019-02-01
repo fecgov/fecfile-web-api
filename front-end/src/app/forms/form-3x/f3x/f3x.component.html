@@ -4,9 +4,11 @@
       <report-type-sidebar
           title="Report Coverage Dates"
           (status)='onNotify($event)'
-          [specialreports]="specialreports"
-          [regularreports]="regularreports"
-
+          [stateSelection]="stateSelection"
+          [cashOnHand]="cashOnHand"
+          [specialreports]=specialreports
+          [regularreports]=regularreports
+          [selectedreporttype]=reporttype
         >
       </report-type-sidebar>
     </div>
@@ -49,7 +51,11 @@
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <f3x-report-type></f3x-report-type>
+        <f3x-report-type>
+          [formRadioOptionsVisible]="formRadioOptionsVisible"
+          [reportTypeRadio]="reportTypeRadio"
+          (status)='onNotify($event)'
+        </f3x-report-type>
       </div>
 
       <div

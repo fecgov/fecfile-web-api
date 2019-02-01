@@ -200,10 +200,35 @@ export interface form3x {
     dates?: string[]
   }
 
-  export interface Ielection_state_date {
+  export interface selectedElectionDate{
     election_date?: string, 
     cvg_start_date?: string, 
     cvg_end_date?: string, 
     due_date?: string
+  }
+  
+  export interface form3XReport {
+    reportId?: string, 
+    reportType?: string, 
+    regularSpecialReportInd?: string,
+    stateOfElection?:string,
+    cvgStartDate?: string,
+    cvgEndDate?:string,
+    dueDate?:string
+  }
+
+  export interface selectedElectionState{
+    state?: string,
+    state_description?: string,
+    dates?: string[]
+  }
+  export interface selectedReportType
+  {
+    default_disp_ind?: string,
+    election_state?: Array<selectedElectionState>,
+    regular_special_report_ind?: string,
+    report_type?: string ,
+    report_type_desciption?: string,
+    report_type_info?: string,
   }
   
