@@ -98,7 +98,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let row of tab1Data.rows">
+              <tr *ngFor="let row of tab1Data.rows | orderBy: {property: column, direction: direction}">
                 <td>
                   {{ row.rowKey.text }}
                  <button

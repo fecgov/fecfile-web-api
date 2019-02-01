@@ -28,6 +28,8 @@
   section {
     .financial-summary-content {
       .total-raised-table {
+        border-spacing: 0;
+        border-collapse: collapse;
         margin-top: 20px;
         width: 100%;
         thead {
@@ -41,6 +43,10 @@
         }
         tbody {
           tr {
+            border: 0;
+            &:nth-child(even) {
+              background-color: $mercury;
+            }
             td {
               padding-top: 10px;
               padding-bottom: 10px;

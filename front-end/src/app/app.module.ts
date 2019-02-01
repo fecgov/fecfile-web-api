@@ -13,7 +13,6 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { DataTableModule } from "angular-6-datatable";
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -58,6 +57,7 @@ import { TransactionTypeComponent } from './forms/form-3x/transaction-type/trans
 import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
 import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
+import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -100,7 +100,8 @@ import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/fin
     TransactionTypeComponent,
     ReportTypeComponent,
     ReportTypeSidebarComponent,
-    FinancialSummaryComponent
+    FinancialSummaryComponent,
+    OrderByPipe
   ],
   entryComponents: [
     ConfirmModalComponent
@@ -119,8 +120,7 @@ import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/fin
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot(),
-    DataTableModule
+    NgbModule.forRoot()
   ],
   providers: [
     CookieService,
