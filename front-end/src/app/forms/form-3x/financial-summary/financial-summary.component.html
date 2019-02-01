@@ -29,7 +29,7 @@
           <button
             type="button"
             (click)="viewMode = 'tab1'"
-            [ngClass]="viewMode === 'tab1' ? 'btn btn-primary' : 'btn btn-link btn-secondary-gray'"
+            [ngClass]="viewMode === 'tab1' ? 'btn btn-block btn-primary' : 'btn btn-block btn-link btn-secondary-gray'"
           >
             Total Raised
           </button>
@@ -38,7 +38,7 @@
           <button
             type="button"
             (click)="viewMode = 'tab2'"
-            [ngClass]="viewMode === 'tab2' ? 'btn btn-primary' : 'btn btn-secondary-gray'"
+            [ngClass]="viewMode === 'tab2' ? 'btn btn-block btn-primary' : 'btn btn-block btn-secondary-gray'"
           >
             Total Spent
           </button>
@@ -47,7 +47,7 @@
           <button
             type="button"
             (click)="viewMode = 'tab3'"
-            [ngClass]="viewMode === 'tab3' ? 'btn btn-primary' : 'btn btn-secondary-gray'"
+            [ngClass]="viewMode === 'tab3' ? 'btn btn-block btn-primary' : 'btn btn-block btn-secondary-gray'"
           >
             Cash Summary
           </button>
@@ -101,14 +101,14 @@
               <tr *ngFor="let row of tab1Data.rows | orderBy: {property: column, direction: direction}">
                 <td>
                   {{ row.rowKey.text }}
-                 <button
+                  <button
                    type="button"
                    class="btn btn-link btn-info"
                    *ngIf="row.rowKey.infoIcon"
-                 >
+                  >
                    <i class="info-icon" aria-hidden="true"></i>
                    <span class="sr-only">Click here for more information</span>
-                 </button>
+                  </button>
                 </td>
                 <td class="col-item-text">${{ row.totalThisPeriod }}</td>
                 <td class="col-item-text">${{ row.calendarYearToDate }}</td>
@@ -117,10 +117,86 @@
           </table>
         </div>
         <div id="tab2" *ngSwitchCase="'tab2'">
-          Tab 2 Content
+          <table class="total-spent-table">
+            <thead>
+              <tr>
+                <th>&nbsp;</th>
+                <th
+                  data-categoryId="totalThisPeriod"
+                  (click)="sort('totalThisPeriod')"
+                >
+                  Total This Period
+                  <i
+                    aria-hidden="true"
+                    [ngClass]="{
+                      'sort-icon': column != 'totalThisPeriod',
+                      'sort-icon-asc': column === 'totalThisPeriod' && !isDesc,
+                      'sort-icon-desc': column === 'totalThisPeriod' && isDesc
+                    }"
+                  >
+                    <span class="sr-only">
+                      Click to sort column.
+                    </span>
+                  </i>
+                </th>
+                <th
+                  data-categoryId="calendarYearToDate"
+                  (click)="sort('calendarYearToDate')"
+                >
+                  Calendar Year-to-Date
+                  <i
+                    aria-hidden="true"
+                    [ngClass]="{
+                      'sort-icon': column != 'calendarYearToDate',
+                      'sort-icon-asc': column === 'calendarYearToDate' && !isDesc,
+                      'sort-icon-desc': column === 'calendarYearToDate' && isDesc
+                    }"
+                  >
+                    <span class="sr-only">
+                      Click to sort column.
+                    </span>
+                  </i>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of tab2Data.rows | orderBy: {property: column, direction: direction}">
+                <td>
+                  {{ row.rowKey.text }}
+                  <button
+                   type="button"
+                   class="btn btn-link btn-info"
+                   *ngIf="row.rowKey.infoIcon"
+                  >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>
+                <td class="col-item-text">${{ row.totalThisPeriod }}</td>
+                <td class="col-item-text">${{ row.calendarYearToDate }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div id="tab3" *ngSwitchCase="'tab3'">
-          Tab 3 Content
+          <table class="cash-on-hand-table">
+            <tbody>
+              <tr *ngFor="let row of tab3Data.rows | orderBy: {property: column, direction: direction}">
+                <td>
+                  {{ row.rowKey.text }}
+                  <button
+                   type="button"
+                   class="btn btn-link btn-info"
+                   *ngIf="row.rowKey.infoIcon"
+                  >
+                   <i class="info-icon" aria-hidden="true"></i>
+                   <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>
+                <td class="col-item-text">${{ row.value }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

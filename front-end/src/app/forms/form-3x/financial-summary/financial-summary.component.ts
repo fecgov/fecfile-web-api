@@ -13,6 +13,8 @@ export class FinancialSummaryComponent implements OnInit {
   public direction: number = null;
   public isDesc: boolean = null;
   public tab1Data: any = {};
+  public tab2Data: any = {};
+  public tab3Data: any = {};
   public viewMode: string = '';
 
   constructor(
@@ -27,6 +29,8 @@ export class FinancialSummaryComponent implements OnInit {
      .subscribe(res => {
        if(res) {
          this.tab1Data = res[0];
+         this.tab2Data = res[1];
+         this.tab3Data = res[2];
        }
      });
   }

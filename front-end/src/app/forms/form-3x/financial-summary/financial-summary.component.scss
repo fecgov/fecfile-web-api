@@ -27,7 +27,9 @@
   }
   section {
     .financial-summary-content {
-      .total-raised-table {
+      .total-raised-table,
+      .total-spent-table,
+      .cash-on-hand-table {
         border-spacing: 0;
         border-collapse: collapse;
         margin-top: 20px;
@@ -50,8 +52,20 @@
             td {
               padding-top: 10px;
               padding-bottom: 10px;
+              width: 200px;
               &.col-item-text {
                 text-align: center;
+              }
+            }
+          }
+        }
+      }
+      .cash-on-hand-table {
+        tbody {
+          tr {
+            td {
+              &:nth-child(2) {
+                text-align: right;
               }
             }
           }

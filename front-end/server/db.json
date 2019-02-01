@@ -1,18 +1,5 @@
 {
   "data": [{
-    "headers": [{
-        "text": "",
-        "sorting": false
-      },
-      {
-        "text": "Total This Period",
-        "sorting": true
-      },
-      {
-        "text": "Calendar Year-to-Date",
-        "sorting": true
-      }
-    ],
     "rows": [{
         "rowKey": {
           "text": "Total receipts",
@@ -125,8 +112,143 @@
       }
     ]
   },
-{
-
-}
-]
+  {
+    "rows": [{
+        "rowKey": {
+          "text": "Total disbursements",
+          "code": "",
+          "infoIcon": true,
+          "infoText": "Waiting for text."
+        },
+        "totalThisPeriod": 54545676.15,
+        "calendarYearToDate": 5646662.15
+      },
+      {
+        "rowKey": {
+          "text": "Operating expenditures",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 324342.15,
+        "calendarYearToDate": 3243424.15
+      },
+      {
+        "rowKey": {
+          "text": "Transfer other authorized committees",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 34346556.64,
+        "calendarYearToDate": 563546.13
+      },
+      {
+        "rowKey": {
+          "text": "Total contribution refunds",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 83455499,
+        "calendarYearToDate": 85384345.34
+      },
+      {
+        "rowKey": {
+          "text": "Individual refunds",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 55634563.44,
+        "calendarYearToDate": 45454430.45
+      },
+      {
+        "rowKey": {
+          "text": "Political party refunds",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 38443593.45,
+        "calendarYearToDate": 5423345.54
+      },
+      {
+        "rowKey": {
+          "text": "Other committee refunds",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 38443593.45,
+        "calendarYearToDate": 5423345.54
+      },
+      {
+        "rowKey": {
+          "text": "Total loan repayments",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 38443593.45,
+        "calendarYearToDate": 5423345.54
+      },
+      {
+        "rowKey": {
+          "text": "Candidate loan repayments",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 5365465.65,
+        "calendarYearToDate": 5465666.99
+      },
+      {
+        "rowKey": {
+          "text": "Other loan repayments",
+          "code": "",
+          "infoIcon": false,
+          "infoText": ""
+        },
+        "totalThisPeriod": 3434454.65,
+        "calendarYearToDate": 4556655.99
+      }
+    ]
+  },{
+    "rows": [{
+      "rowKey": {
+        "text": "Begining cash on hand",
+        "code": "",
+        "infoIcon": false,
+        "infoText": ""
+      },
+      "value": 0
+    },
+    {
+      "rowKey": {
+        "text": "Ending cash on hand",
+        "code": "",
+        "infoIcon": false,
+        "infoText": ""
+      },
+      "value": 844854234.12
+    },
+    {
+      "rowKey": {
+        "text": "Debts/loans owed to committee",
+        "code": "",
+        "infoIcon": false,
+        "infoText": ""
+      },
+      "value": 0
+    },{
+      "rowKey": {
+        "text": "Debts/loans owed by committee",
+        "code": "",
+        "infoIcon": false,
+        "infoText": ""
+      },
+      "value": 3454566.67
+    }]
+  }]
 }
