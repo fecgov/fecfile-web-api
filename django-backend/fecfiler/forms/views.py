@@ -839,8 +839,8 @@ def email(boolean, data):
     #t = Template(email_ack1)
     #c= Context({'@REPID':123458},)
 
-    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")
-    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")	
+    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
+    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
 
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
@@ -857,7 +857,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses',region_name='us-east-1')
+    client = boto3.client('ses')
 
     # Try to send the email.
     try:
