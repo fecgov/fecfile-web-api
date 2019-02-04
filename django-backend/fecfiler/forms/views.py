@@ -451,7 +451,7 @@ def submit_comm_info(request):
             
         if serializer.is_valid():
             serializer.save()
-            email(True, serializer.data)
+            #email(True, serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -857,7 +857,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses',region_name='us-east-1')
+    client = boto3.client('ses')
 
     # Try to send the email.
     try:

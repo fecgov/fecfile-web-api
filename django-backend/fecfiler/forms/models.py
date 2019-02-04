@@ -12,6 +12,7 @@ class F99Attachment(models.Model):
     filename = models.CharField(max_length=255)
     mimetype = models.CharField(max_length=50)
 
+# added blank=True for null=True to avoid exception while saving to db.
 class CommitteeInfo(models.Model):
     # Committee Information Table Model
     id = models.AutoField(primary_key=True)
