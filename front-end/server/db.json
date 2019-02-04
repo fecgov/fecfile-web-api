@@ -1,112 +1,324 @@
 {
   "data": [
     {
-      "cols": {
-        "text": "Transaction Type",
-        "infoIcon": true,
-        "infoText": "Text coming soon.",
-        "name": "transactionType",
-        "type": "select",
-        "required": true
-      }
-    },
-    {
-      "cols": [
+      "formFields": [
         {
-          "text": "Entity Type",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "entityType",
-          "type": "text",
-          "required": true
+          "cols": {
+            "text": "Transaction Type",
+            "infoIcon": true,
+            "infoText": "Text coming soon.",
+            "name": "transactionType",
+            "type": "select",
+            "required": true
+          }
         },
         {
-          "text": "Contributor Last Name",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorLastName",
-          "type": "text",
-          "required": true
+          "cols": [
+            {
+              "text": "Entity Type",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "entityType",
+              "type": "text",
+              "required": true
+            },
+            {
+              "text": "Contributor Last Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorLastName",
+              "type": "text",
+              "required": true
+            },
+            {
+              "text": "Contributor First Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorFirstName",
+              "type": "text",
+              "required": true
+            }
+          ]
         },
         {
-          "text": "Contributor First Name",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorFirstName",
-          "type": "text",
-          "required": true
+          "cols": [
+            {
+              "text": "Contributor Middle Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorMiddleName",
+              "type": "text",
+              "required": false
+            },
+            {
+              "text": "Contributor Prefix",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorPrefix",
+              "type": "text",
+              "required": false
+            },
+            {
+              "text": "Contributor Sufix",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorSufix",
+              "type": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "cols": [
+            {
+              "text": "Contributor Street 1",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorStreet1",
+              "type": "text",
+              "required": true
+            },
+            {
+              "text": "Contributor Street 2",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorStreet2",
+              "type": "text",
+              "required": false
+            },
+            {
+              "text": "Contributor City",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorCity",
+              "type": "text",
+              "required": true
+            },
+            {
+              "text": "State",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorState",
+              "type": "select",
+              "required": true
+            },
+            {
+              "text": "Zip Code",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorZipCode",
+              "type": "text",
+              "required": true
+            }
+          ]
         }
       ]
     },
     {
-      "cols": [
+      "states": [
         {
-          "text": "Contributor Middle Name",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorMiddleName",
-          "type": "text",
-          "required": false
+          "name": "Alabama",
+          "code": "AL"
         },
         {
-          "text": "Contributor Prefix",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorPrefix",
-          "type": "text",
-          "required": false
+          "name": "Alaska",
+          "code": "AK"
         },
         {
-          "text": "Contributor Sufix",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorSufix",
-          "type": "text",
-          "required": false
-        }
-      ]
-    },
-    {
-      "cols": [
-        {
-          "text": "Contributor Street 1",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorStreet1",
-          "type": "text",
-          "required": true
+          "name": "Arizona",
+          "code": "AZ"
         },
         {
-          "text": "Contributor Street 2",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorStreet2",
-          "type": "text",
-          "required": false
+          "name": "Arkansas",
+          "code": "AR"
         },
         {
-          "text": "Contributor City",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorCity",
-          "type": "text",
-          "required": true
+          "name": "California",
+          "code": "CA"
         },
         {
-          "text": "State",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorState",
-          "type": "select",
-          "required": true
+          "name": "Colorado",
+          "code": "CO"
         },
         {
-          "text": "Zip Code",
-          "infoIcon": false,
-          "infoText": "",
-          "name": "contributorZipCode",
-          "type": "text",
-          "required": true
+          "name": "Connecticut",
+          "code": "CT"
+        },
+        {
+          "name": "Delaware",
+          "code": "DE"
+        },
+        {
+          "name": "District of Columbia",
+          "code": "DC"
+        },
+        {
+          "name": "Florida",
+          "code": "FL"
+        },
+        {
+          "name": "Georgia",
+          "code": "GA"
+        },
+        {
+          "name": "Hawaii",
+          "code": "HI"
+        },
+        {
+          "name": "Idaho",
+          "code": "ID"
+        },
+        {
+          "name": "Illinois",
+          "code": "IL"
+        },
+        {
+          "name": "Indiana",
+          "code": "IN"
+        },
+        {
+          "name": "Iowa",
+          "code": "IA"
+        },
+        {
+          "name": "Kansa",
+          "code": "KS"
+        },
+        {
+          "name": "Kentucky",
+          "code": "KY"
+        },
+        {
+          "name": "Lousiana",
+          "code": "LA"
+        },
+        {
+          "name": "Maine",
+          "code": "ME"
+        },
+        {
+          "name": "Maryland",
+          "code": "MD"
+        },
+        {
+          "name": "Massachusetts",
+          "code": "MA"
+        },
+        {
+          "name": "Michigan",
+          "code": "MI"
+        },
+        {
+          "name": "Minnesota",
+          "code": "MN"
+        },
+        {
+          "name": "Mississippi",
+          "code": "MS"
+        },
+        {
+          "name": "Missouri",
+          "code": "MO"
+        },
+        {
+          "name": "Montana",
+          "code": "MT"
+        },
+        {
+          "name": "Nebraska",
+          "code": "NE"
+        },
+        {
+          "name": "Nevada",
+          "code": "NV"
+        },
+        {
+          "name": "New Hampshire",
+          "code": "NH"
+        },
+        {
+          "name": "New Jersey",
+          "code": "NJ"
+        },
+        {
+          "name": "New Mexico",
+          "code": "NM"
+        },
+        {
+          "name": "New York",
+          "code": "NY"
+        },
+        {
+          "name": "North Carolina",
+          "code": "NC"
+        },
+        {
+          "name": "North Dakota",
+          "code": "ND"
+        },
+        {
+          "name": "Ohio",
+          "code": "OH"
+        },
+        {
+          "name": "Oklahoma",
+          "code": "OK"
+        },
+        {
+          "name": "Oregon",
+          "code": "OR"
+        },
+        {
+          "name": "Pennsylvania",
+          "code": "PA"
+        },
+        {
+          "name": "Rhode Island",
+          "code": "RI"
+        },
+        {
+          "name": "South Carolina",
+          "code": "SC"
+        },
+        {
+          "name": "South Dakota",
+          "code": "SD"
+        },
+        {
+          "name": "Tennessee",
+          "code": "TN"
+        },
+        {
+          "name": "Texas",
+          "code": "TX"
+        },
+        {
+          "name": "Utah",
+          "code": "UT"
+        },
+        {
+          "name": "Vermont",
+          "code": "VT"
+        },
+        {
+          "name": "Virginia",
+          "code": "VA"
+        },
+        {
+          "name": "Washington",
+          "code": "WA"
+        },
+        {
+          "name": "West Virginia",
+          "code": "WV"
+        },
+        {
+          "name": "Wisconsin",
+          "code": "WI"
+        },
+        {
+          "name": "Wyoming",
+          "code": "WY"
         }
       ]
     }

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -15,6 +16,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   public formFields: any = [];
   public formVisible: boolean = false;
+  public states: any = [];
 
   constructor(
     private _http: HttpClient
@@ -24,9 +26,14 @@ export class IndividualReceiptComponent implements OnInit {
     console.log('individual receipt component: ');
 
     this._http
-     .get('http://localhost:3000/data')
+     .get<f3xTransactionTypes>('http://localhost:3000/data')
      .subscribe(res => {
-       this.formFields = res;
+       console.log('res: ', res);
+       this.formFields = res[0].formFields;
+
+       this.states = res[1].states;
+
+       console.log('this.states: ', this.states);
      });
   }
 
