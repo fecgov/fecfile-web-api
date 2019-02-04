@@ -16,10 +16,10 @@ class F99Attachment(models.Model):
 class CommitteeInfo(models.Model):
     # Committee Information Table Model
     id = models.AutoField(primary_key=True)
-    committeeid = models.CharField(max_length=9)
+    committeeid = models.CharField(max_length=9, null=False)
     committeename = models.CharField(max_length=200, null=False)
     street1 = models.CharField(max_length=34, null=False)
-    street2 = models.CharField(max_length=34, null=True)
+    street2 = models.CharField(max_length=34, null=True, blank=True)
     text = models.TextField(max_length=20000, null=False, default="-")
     reason = models.CharField(max_length=3, null=False, default="-")
     city = models.CharField(max_length=30, null=False)
@@ -28,12 +28,12 @@ class CommitteeInfo(models.Model):
     #zipcode = models.IntegerField(null=False)
     treasurerlastname = models.CharField(max_length=30, null=False)
     treasurerfirstname = models.CharField(max_length=20, null=False)
-    treasurermiddlename = models.CharField(max_length=20, null=True)
-    treasurerprefix = models.CharField(max_length=10, null=True)
-    treasurersuffix = models.CharField(max_length=10, null=True)
-    created_at = models.DateTimeField(null=False )
-    updated_at = models.DateTimeField(null=True)
-    deleted_at = models.DateTimeField(null=True)
+    treasurermiddlename = models.CharField(max_length=20, null=True, blank=True)
+    treasurerprefix = models.CharField(max_length=10, null=True, blank=True)
+    treasurersuffix = models.CharField(max_length=10, null=True, blank=True)
+    created_at = models.DateTimeField(null=False)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     isdeleted = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
     signee = models.CharField(max_length=30, null= False, default = "-")
@@ -41,13 +41,13 @@ class CommitteeInfo(models.Model):
     email_on_file_1 = models.TextField(max_length=100, null=True, blank=True)
     additional_email_1 = models.TextField(max_length=100, null= True, blank=True)
     additional_email_2 = models.TextField(max_length=100, null= True, blank=True)
-    filename = models.CharField(max_length=128, null=True)
+    filename = models.CharField(max_length=128, null=True, blank=True)
     #file = models.FileField(upload_to='forms.F99Attachment/bytes/filename/mimetype', null=True, blank=True, validators=[validate_is_pdf,])
     file = models.FileField(storage=MediaStorage(), null=True, blank=True)
     # implememted file upload using the following module: https://django-db-file-storage.readthedocs.io/en/master/
     form_type = models.CharField(max_length=3, default="F99")
-    coverage_start_date = models.DateField(null=True)
-    coverage_end_date = models.DateField(null=True)
+    coverage_start_date = models.DateField(null=True, blank=True)
+    coverage_end_date = models.DateField(null=True, blank=True)
     
     # class constructor
     def __unicode__(self):

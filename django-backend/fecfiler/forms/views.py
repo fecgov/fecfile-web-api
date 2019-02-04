@@ -451,7 +451,7 @@ def submit_comm_info(request):
             
         if serializer.is_valid():
             serializer.save()
-            #email(True, serializer.data)
+            email(True, serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -839,8 +839,8 @@ def email(boolean, data):
     #t = Template(email_ack1)
     #c= Context({'@REPID':123458},)
 
-    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")
-    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")	
+    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
+    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
 
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
