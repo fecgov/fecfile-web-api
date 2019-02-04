@@ -1,0 +1,41 @@
+<div class="individual-receipt-container" *ngIf="formVisible">
+  <ng-container *ngFor="let row of formFields">
+    <div class="row">
+      <ng-container *ngIf="!isArray(row.cols)">
+        <div class="col">
+          <label for="{{ row.cols.name }}">
+            {{ row.cols.text }}
+            <ng-container *ngIf="row.cols.required">
+              *
+            </ng-container>
+          </label>
+          <ng-container *ngIf="row.cols.type === 'text'">
+            <input type="text" name="{{ col.name }}" class="form-control" />
+          </ng-container>
+          <ng-container *ngIf="row.cols.type === 'select'">
+            <ng-select class="transaction-type-select">
+              <ng-option *ngFor="let item of selectedOptions" [value]="item.value">
+                {{ item.text }}
+              </ng-option>
+            </ng-select>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="isArray(row.cols)">
+        <div class="col" *ngFor="let col of row.cols">
+          <div class="form-group">
+            <label for="{{ col.name }}">
+              {{ col.text }}
+              <ng-container *ngIf="col.required">
+                *
+              </ng-container>
+            </label>
+            <ng-container *ngIf="col.type === 'text'">
+              <input type="text" name="{{ col.name }}" class="form-control" />
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</div>

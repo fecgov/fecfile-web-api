@@ -13,6 +13,7 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -58,6 +59,8 @@ import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.com
 import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
+import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -101,13 +104,15 @@ import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
     ReportTypeComponent,
     ReportTypeSidebarComponent,
     FinancialSummaryComponent,
-    OrderByPipe
+    OrderByPipe,
+    IndividualReceiptComponent
   ],
   entryComponents: [
     ConfirmModalComponent
   ],
   imports: [
     BrowserModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,

@@ -9,12 +9,15 @@
 @import '../../../../node_modules/bootstrap/scss/navbar';
 @import '../../../../node_modules/bootstrap/scss/modal';
 @import '../../../../node_modules/bootstrap/scss/utilities';
+@import '../../../../node_modules/bootstrap/scss/forms';
 
 @import url('https://fonts.googleapis.com/css?family=Karla');
 @font-face {
 	font-family: 'Gandhi Serif Regular';
 	src: url('/assets/fonts/Gandhi-Serif-Regular.woff')
 }
+
+@import '../../../../node_modules/@ng-select/ng-select/scss/default.theme.scss';
 
 @import './custom-variables';
 @import './custom-colors';

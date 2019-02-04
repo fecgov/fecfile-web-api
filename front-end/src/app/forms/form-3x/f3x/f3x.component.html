@@ -59,36 +59,39 @@
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-      <f3x-transaction-type
-        [formOptionsVisible]="formOptionsVisible"
-        [selectedOptions]="selectedOptions"
-        (status)='onNotify($event)'
-      >
-      </f3x-transaction-type>
+        <f3x-individual-receipt
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+          (status)='onNotify($event)'
+        ></f3x-individual-receipt>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_3'"
-      ><f3x-form></f3x-form>
+      >
+        <f3x-form></f3x-form>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_4'"
-      ><f3x-preview></f3x-preview>
+      >
+        <f3x-preview></f3x-preview>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_5'"
-      ><f3x-sign></f3x-sign>
+      >
+        <f3x-sign></f3x-sign>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_6'"
-      ><f3x-submit></f3x-submit>
+      >
+        <f3x-submit></f3x-submit>
       </div>
 
     </div>

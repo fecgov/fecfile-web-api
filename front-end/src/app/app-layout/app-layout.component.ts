@@ -73,6 +73,18 @@ export class AppLayoutComponent implements OnInit {
       });
   }
 
+  ngDoCheck(): void {
+    let route: string = this._router.url;
+
+    if(route.indexOf('/forms') === 0) {
+      if(this.toggleMenu) {
+        this.sideBarClass = 'visible';
+      } else {
+        this.sideBarClass = '';
+      }
+    }
+  }
+
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     localStorage.clear();

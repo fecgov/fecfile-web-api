@@ -1,0 +1,22 @@
+.individual-receipt-container {
+  .row {
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    .col {
+      label {
+        display: block;
+      }
+      input[type='text'] {
+        &.form-control {
+          height: 30px;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+      .ng-select.transaction-type-select {
+        width: 350px;
+      }
+    }
+  }
+}

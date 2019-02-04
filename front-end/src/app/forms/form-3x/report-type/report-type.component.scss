@@ -1,6 +1,14 @@
 @import '../../../shared/scss/global';
 
 .report-type-container {
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+    .grid-row__col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
   header {
     .header-content {
       display: block;
