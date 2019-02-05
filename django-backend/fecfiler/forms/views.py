@@ -857,7 +857,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses')
+    client = boto3.client('ses',region_name='us-east-1')
 
     # Try to send the email.
     try:
