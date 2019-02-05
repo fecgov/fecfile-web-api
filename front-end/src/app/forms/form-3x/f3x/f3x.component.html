@@ -6,15 +6,11 @@
           (status)='onNotify($event)'
           [specialreports]="specialreports"
           [regularreports]="regularreports"
-
         >
       </report-type-sidebar>
     </div>
-    <div *ngIf="step==='step_2'">
+    <div *ngIf="step==='step_2' || step==='step_3'">
       <transaction-categories-sidebar
-        [transactionCategories]="transactionCategories"
-        [searchField]="searchField"
-        [cashOnHand]="cashOnHand"
         title="Transaction Categories"
         (status)='onNotify($event)'
       >
@@ -59,18 +55,23 @@
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-        <f3x-individual-receipt
+        <f3x-transaction-type
           [formOptionsVisible]="formOptionsVisible"
           [selectedOptions]="selectedOptions"
           (status)='onNotify($event)'
-        ></f3x-individual-receipt>
+        >
+        </f3x-transaction-type>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_3'"
       >
-        <f3x-form></f3x-form>
+        <f3x-individual-receipt
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+          (status)='onNotify($event)'
+        ></f3x-individual-receipt>
       </div>
 
       <div

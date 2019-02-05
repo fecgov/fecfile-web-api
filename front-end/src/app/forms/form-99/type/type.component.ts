@@ -120,7 +120,6 @@ export class TypeComponent implements OnInit {
    *
    */
   public doValidateType() {
-    console.log('this.frmType: ', this.frmType);
     if (this.frmType.get('reasonTypeRadio').value) {
         this.typeFailed = false;
         this.isValidType = true;

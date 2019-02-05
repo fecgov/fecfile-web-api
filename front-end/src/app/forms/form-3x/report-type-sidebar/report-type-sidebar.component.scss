@@ -1,13 +1,30 @@
 @import '../../../shared/scss/global';
 
-.form3X-reporttype-sidebar {
-  .sidebar-form-content {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-    .form-row {
-      &:nth-child(even) {
-        margin-bottom: 25px;
+.report-type-sidebar {
+  header {
+    margin-bottom: 20px;
+  }
+  section {
+    .sidebar-form-content {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      input[type='date'] {
+        &.form-control {
+          margin-left: auto;
+          margin-right: auto;
+          width: 190px !important;
+        }
+      }
+    }
+  }
+  footer {
+    .form-sidebar__btns {
+      padding-bottom: 10px;
+      padding-top: 15px;
+      text-align: center;
+      .btn-row {
+        padding-top: 15px;
       }
     }
   }

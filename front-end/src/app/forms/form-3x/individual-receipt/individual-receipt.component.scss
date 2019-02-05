@@ -17,6 +17,12 @@
       .ng-select.transaction-type-select {
         width: 350px;
       }
+      .ng-select.state-select {
+        .ng-select-container {
+          height: 45px;
+          width: 152px;
+        }
+      }
     }
   }
 }
