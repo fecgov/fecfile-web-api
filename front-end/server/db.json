@@ -111,6 +111,56 @@
               "required": true
             }
           ]
+        },
+        {
+          "cols": {
+            "text": "Contribution Purpose Description",
+            "infoIcon": true,
+            "infoText": "Waiting for text.",
+            "name": "contributorPurpose",
+            "type": "textarea",
+            "required": false
+          }
+        },
+        {
+          "cols": [
+            {
+              "text": "Contibutor Employer",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorEmployer",
+              "type": "text",
+              "required": true
+            },
+            {
+              "text": "Contibutor Occupation",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorOccupation",
+              "type": "text",
+              "required": true
+            }
+          ]
+        },
+        {
+          "cols":[
+            {
+              "text": "Memo Code",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorOccupation",
+              "type": "text",
+              "required": false
+            },
+            {
+              "text": "Memo Text/Description",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorOccupation",
+              "type": "text",
+              "required": false
+            }
+          ]
         }
       ]
     },
