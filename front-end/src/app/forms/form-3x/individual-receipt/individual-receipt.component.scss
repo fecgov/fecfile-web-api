@@ -25,7 +25,8 @@
               width: 400px;
             }
           }
-          .ng-select.transaction-type-select {
+          .ng-select.transaction-type-select,
+          .ng-select.transaction-category-select  {
             width: 350px;
           }
           .ng-select.state-select {

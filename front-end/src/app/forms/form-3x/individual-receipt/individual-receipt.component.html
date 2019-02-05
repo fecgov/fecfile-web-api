@@ -1,28 +1,53 @@
 <div class="individual-receipt-container">
   <form>
     <section>
+      <div class="row">
+        <div class="col">
+          <label for="transactionCategory">
+            Transaction Category *
+          </label>
+          <ng-select
+            name="transactionCategory"
+            class="transaction-category-select"
+            [items]="transactionCategories"
+            bindLabel="text"
+            bindValue="value"
+            groupBy="type"
+            (change)="transactionCategorySelected($event)"
+          >
+            <ng-template ng-optgroup-tmp let-item="item">
+              {{item.type || 'Unnamed group'}}
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="transactionType">
+            Transaction Type *
+          </label>
+          <ng-select
+            name="transactionType"
+            class="transaction-type-select"
+            [items]="transactionTypes"
+            bindLabel="text"
+            bindValue="value"
+          >
+          </ng-select>
+        </div>
+      </div>
       <ng-container *ngFor="let row of formFields">
         <div class="row">
           <ng-container *ngIf="!isArray(row.cols)">
             <div class="col">
               <label for="{{ row.cols.name }}">
-                {{ row.cols.text }}
+                {{ row.cols.text }}B
                 <ng-container *ngIf="row.cols.required">
                   *
                 </ng-container>
               </label>
               <ng-container *ngIf="row.cols.type === 'text'">
                 <input type="text" name="{{ row.cols.name }}" class="form-control" />
-              </ng-container>
-              <ng-container *ngIf="row.cols.type === 'select'">
-                <ng-select class="transaction-type-select">
-                  <ng-option
-                    *ngFor="let item of selectedOptions"
-                    [value]="item.value"
-                  >
-                    {{ item.text }}
-                  </ng-option>
-                </ng-select>
               </ng-container>
               <ng-container *ngIf="row.cols.type === 'textarea'">
                 <textarea class="form-control" name="{{ row.cols.name }}" rows="8"></textarea>

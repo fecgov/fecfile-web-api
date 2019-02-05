@@ -18,52 +18,11 @@
         [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
       >
-        <div
-          [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item-box selected' : 'form-sidebar-item-box'"
-        >
-          <button
-            #item
-            type="button"
-            value="{{ categoryType?.value }}"
-            [ngClass]="itemSelected === categoryType?.value ? 'btn btn-link selected' : 'btn btn-link'"
-            (click)="selectItem(item)"
-          >
-            {{ categoryType?.text }}
-          </button>
-          <div class="amount">
-            $0
-          </div>
+        <div class="float-left">
+          {{ categoryType?.text }}
         </div>
-        <div
-          [ngClass]="itemSelected === categoryType?.value ? 'additional-options visible' : 'additional-options'"
-        >
-          <ul class="additional-options-list">
-            <li
-              *ngFor="let option of categoryType?.options"
-              [ngClass]="additionalItemSelected === option?.value ? 'additional-item selected' : 'additional-item'"
-            >
-              <button
-                #additionalItem
-                type="button"
-                value="{{ option.value }}"
-                [ngClass]="additionalItemSelected === option?.value ? 'btn btn-link selected' : 'btn btn-link'"
-                (click)="selectedAdditionalOption(additionalItem)"
-              >
-                {{ option.text }}
-              </button>
-              <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="{{ option?.info }}"
-                *ngIf="option.infoIcon"
-              >
-                <i class="info-icon" aria-hidden="true"></i>
-                <span class="sr-only">
-                  Click for more information
-                </span>
-              </button>
-            </li>
-          </ul>
+        <div class="float-right amount">
+          $0
         </div>
       </li>
     </ul>

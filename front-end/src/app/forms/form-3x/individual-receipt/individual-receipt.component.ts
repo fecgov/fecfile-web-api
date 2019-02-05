@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
@@ -17,24 +19,36 @@ export class IndividualReceiptComponent implements OnInit {
   public formFields: any = [];
   public formVisible: boolean = false;
   public states: any = [];
+  public transactionCategories: any = [];
+  public transactionTypes: any = [];
+
+  private _formType: string = '';
+  private _types: any = [];
 
   constructor(
-    private _http: HttpClient
+    private _http: HttpClient,
+    private _formService: FormsService,
+    private _activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    console.log('individual receipt component: ');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._http
      .get<f3xTransactionTypes>('http://localhost:3000/data')
      .subscribe(res => {
-       console.log('res: ', res);
        this.formFields = res[0].formFields;
 
        this.states = res[1].states;
 
-       console.log('this.states: ', this.states);
+       this.transactionCategories = res[2].transactionCategories;
      });
+
+    this._formService
+      .getTransactionCategories(this._formType)
+      .subscribe(res => {
+        this._types = res.data.transactionCategories;
+      });
   }
 
   ngDoCheck(): void {
@@ -51,5 +65,25 @@ export class IndividualReceiptComponent implements OnInit {
 
   public previous(): void {
 
+  }
+
+  public transactionCategorySelected(e): void {
+    const selectedValue: string = e.value;
+    const selectedType: string = e.type;
+    let selectedIndex: number = 0;
+    let childIndex: number = 0;
+
+    this._types.findIndex((el, index) => {
+      if(el.text === selectedType) {
+        selectedIndex = index;
+      }
+    });
+    this._types[selectedIndex].options.findIndex((el, index) => {
+      if(el.value === selectedValue) {
+        childIndex = index;
+      }
+    });
+
+    this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
   }
 }

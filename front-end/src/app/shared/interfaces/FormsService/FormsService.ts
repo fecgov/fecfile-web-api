@@ -209,6 +209,7 @@ export interface Ielection_state_date {
 
 export interface f3xTransactionTypes {
   formFields?: Array<any>,
-  states?: Array<any>
+  states?: Array<any>,
+  transactionCategories?: Array<any>
 }
 

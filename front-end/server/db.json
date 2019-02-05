@@ -3,16 +3,6 @@
     {
       "formFields": [
         {
-          "cols": {
-            "text": "Transaction Type",
-            "infoIcon": true,
-            "infoText": "Text coming soon.",
-            "name": "transactionType",
-            "type": "select",
-            "required": true
-          }
-        },
-        {
           "cols": [
             {
               "text": "Entity Type",
@@ -373,6 +363,105 @@
         {
           "name": "Wyoming",
           "code": "WY"
+        }
+      ]
+    },
+    {
+      "transactionCategories": [
+        {
+          "value": "contributions-from-individuals",
+          "text": "Contributions From Individuals",
+          "type": "Receipts"
+        },
+        {
+          "value": "contributions-from-registered-filers",
+          "text": "Contributions From Registered Filers",
+          "type": "Receipts"
+        },
+        {
+          "value": "transfers",
+          "text": "Transfers",
+          "type": "Receipts"
+        },
+        {
+          "value": "refunds",
+          "text": "Refunds",
+          "type": "Receipts"
+        },
+        {
+          "value": "refunds",
+          "text": "Refunds",
+          "type": "Receipts"
+        },
+        {
+          "value": "other",
+          "text": "Other",
+          "type": "Receipts"
+        },
+        {
+          "value": "operating-expenditures",
+          "text": "Opertaing Expenditures",
+          "type": "Disbursments"
+        },
+        {
+          "value": "contributions-expenditures-to-reg--filers",
+          "text": "Contributions/Expenditures to Reg. Filers",
+          "type": "Disbursments"
+        },
+        {
+          "value": "other-expenditures",
+          "text": "Other Expenditures",
+          "type": "Disbursments"
+        },
+        {
+          "value": "refund",
+          "text": "Refund",
+          "type": "Disbursments"
+        },
+        {
+          "value": "refund",
+          "text": "Refund",
+          "type": "Disbursmentss"
+        },
+        {
+          "value": "allocated-or-fea-expenditures",
+          "text": "Allocated or FEA Expenditures",
+          "type": "Disbursmentss"
+        },
+        {
+          "value": "loans-owed-to-committee",
+          "text": "Loans Owed to Committee",
+          "type": "Loans and Debts"
+        },
+        {
+          "value": "loans-owed-by-committee",
+          "text": "Loans Owed by Committee",
+          "type": "Loans and Debts"
+        },
+        {
+          "value": "debts-owed-to-committee",
+          "text":  "Debts Owed to Committee",
+          "type": "Loans and Debts"
+        },
+        {
+          "value": "debts-owed-to-committee",
+          "text":  "Debts Owed to Committee",
+          "type": "Loans and Debts"
+        },
+        {
+          "value": "h1---allocation-ratios",
+          "text":  "H1 - Allocation Ratios",
+          "type": "Other"
+        },
+        {
+          "value": "h2---fundraising-ratios",
+          "text":  "H2 - Fundraising Ratios",
+          "type": "Other"
+        },
+        {
+          "value": "schedule-l",
+          "text":  "Schedule L",
+          "type": "Other"
         }
       ]
     }
