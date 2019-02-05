@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^f3x/get_report_types$', views.get_report_types, name='get_report_types'),
     url(r'^f3x/get_f3x_transaction_fields$', views.get_f3x_transaction_fields, name='get_f3x_transaction_fields'),
     url(r'^core/reports$', views.reports, name='reports'),
+    url(r'^core/entities$', views.entities, name='entities'),
+
 ]

@@ -261,7 +261,8 @@ def reports(request):
             forms_obj = None
             with connection.cursor() as cursor:
 
-                query_string = query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
+
+                query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
                                                     FROM public.reports WHERE cmte_id ='""" + cmte_id + """' AND delete_ind is distinct from 'Y'"""
                 failed_response = "No entries were found for this committee"
 
@@ -463,5 +464,195 @@ def reports(request):
             return Response("The Report with ID: {} has been successfully deleted".format(report_id),status=status.HTTP_201_CREATED)
 
         except:
+          
+            return Response("crud_reports-DELETE call is throwing an exception", status=status.HTTP_404_NOT_FOUND)
 
-            return Response("crud_reports-DELETE call is throwing an exception", status=status.HTTP_404_NOT_FOUND) 
+
+@api_view(['POST','GET','DELETE','PUT'])
+def entities(request):
+
+    #insert a new record for reports table
+    if request.method == 'POST':
+
+        try:
+
+            cmte_id = request.user.username
+            entity_type = request.data.get('entity_type')
+
+            if not (entity_type in ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]):
+                    return Response("Entity Type is not correctly specified. Input received is: {}".format(entity_type), status=status.HTTP_400_BAD_REQUEST)       
+
+
+            with connection.cursor() as cursor:
+
+                try:
+
+                    cursor.execute("""SELECT public.get_next_entity_id('""" + entity_type + """')""")
+                    entity_ids = cursor.fetchone()
+                    entity_id = entity_ids[0]
+                    print(entity_id)
+
+                except Exception as e:
+
+                    logger.debug(e)
+                    return Response(str(e), status=status.HTTP_400_BAD_REQUEST)          
+
+            data = {
+
+                'entity_id': entity_id,
+                'entity_type': entity_type,
+                'cmte_id': cmte_id,
+                'entity_name': request.data.get('entity_name'),
+                'first_name': request.data.get('first_name'),
+                'last_name': request.data.get('last_name'),
+                'middle_name': request.data.get('middle_name'),
+                'preffix': request.data.get('preffix'),
+                'suffix': request.data.get('suffix'),
+                'street_1': request.data.get('street_1'),
+                'street_2': request.data.get('street_2'),
+                'city': request.data.get('city'),
+                'state': request.data.get('state'),
+                'zip_code': request.data.get('zip_code'),
+                'occupation': request.data.get('occupation'),
+                'employer': request.data.get('employer'),
+                'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
+            }
+
+            with connection.cursor() as cursor:
+
+                try:
+
+                    # Insert data into Reports table
+                    cursor.execute("""INSERT INTO public.entity (entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, create_date)
+                                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",(data.get('entity_id'), data.get('entity_type'), data.get('cmte_id'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'),data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'), datetime.now()))                       
+                
+                except Exception as e:
+
+                    logger.debug(e)
+                    return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+            return JsonResponse(data, status=status.HTTP_201_CREATED)
+
+        except:
+
+            return Response("crud_entity-POST call is throwing an exception", status=status.HTTP_404_NOT_FOUND)
+
+
+    if request.method == 'GET':
+
+        try:
+
+            entity_id = request.query_params.get('entity_id')
+
+            query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+                                                    FROM public.entity WHERE entity_id ='""" + entity_id + """' AND delete_ind is distinct from 'Y'"""
+            
+            failed_response = "No entries were found for this committee"
+
+            forms_obj = None
+            with connection.cursor() as cursor:
+
+                try:
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""")
+
+                    for row in cursor.fetchall():
+                    #forms_obj.append(data_row)
+                        data_row = list(row)
+                        for idx,elem in enumerate(row):
+                            if not elem:
+                                data_row[idx]=''
+                        forms_obj=data_row[0]
+                    
+                    if len(forms_obj)== 0:
+                        return Response(failed_response, status=status.HTTP_400_BAD_REQUEST)
+
+                    else:
+                        return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+
+                except Exception as e:
+
+                    logger.debug(e)
+                    return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        except:
+
+            return Response("crud_entity-GET call is throwing an exception", status=status.HTTP_404_NOT_FOUND)
+
+
+    if request.method == 'PUT':
+
+        try:
+
+            entity_type = request.data.get('entity_type')
+
+            if not (entity_type in ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]):
+                    return Response("Entity Type is not correctly specified. Input received is: {}".format(entity_type), status=status.HTTP_400_BAD_REQUEST)       
+
+            data = {
+
+                'entity_id': request.data.get('entity_id'),
+                'entity_type': entity_type,
+                'cmte_id': request.user.username,
+                'entity_name': request.data.get('entity_name'),
+                'first_name': request.data.get('first_name'),
+                'last_name': request.data.get('last_name'),
+                'middle_name': request.data.get('middle_name'),
+                'preffix': request.data.get('preffix'),
+                'suffix': request.data.get('suffix'),
+                'street_1': request.data.get('street_1'),
+                'street_2': request.data.get('street_2'),
+                'city': request.data.get('city'),
+                'state': request.data.get('state'),
+                'zip_code': request.data.get('zip_code'),
+                'occupation': request.data.get('occupation'),
+                'employer': request.data.get('employer'),
+                'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
+            }
+
+            with connection.cursor() as cursor:
+
+                try:
+
+                    # Insert data into Reports table
+                    cursor.execute("""UPDATE public.entity SET entity_type = %s, cmte_id = %s, entity_name = %s, first_name = %s, last_name = %s, middle_name = %s, preffix = %s, suffix = %s, street_1 = %s, street_2 = %s, city = %s, state = %s, zip_code = %s, occupation = %s, employer = %s, ref_cand_cmte_id = %s, last_update_date = %s WHERE entity_id = %s AND delete_ind is distinct FROM 'Y'""",
+                        (data.get('entity_type'), data.get('cmte_id'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'),data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'), datetime.now(), data.get('entity_id')))                       
+                    
+                    if (cursor.rowcount == 0):
+                            return Response("This Entity ID does not exist in Entity table", status=status.HTTP_400_BAD_REQUEST)
+
+                except Exception as e:
+
+                    logger.debug(e)
+                    return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+            return JsonResponse(data, status=status.HTTP_201_CREATED)
+
+        except:
+
+            return Response("crud_entity-PUT call is throwing an exception", status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'DELETE':
+
+        try:
+            entity_id = request.query_params.get('entity_id')
+
+            with connection.cursor() as cursor:
+
+                try:
+
+                    cursor.execute("""UPDATE public.entity SET delete_ind = 'Y' WHERE entity_id = '""" + entity_id + """' AND delete_ind is distinct from 'Y'""")
+
+                    if (cursor.rowcount == 0):
+                        return Response("This Report ID is either already deleted or does not exist in Reports table", status=status.HTTP_400_BAD_REQUEST)
+
+                except Exception as e:
+
+                    logger.debug(e)
+                    return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+            return Response("The Report with ID: {} has been successfully deleted".format(entity_id),status=status.HTTP_201_CREATED)
+
+        except:
+
+            return Response("crud_entity-DELETE call is throwing an exception", status=status.HTTP_404_NOT_FOUND)
