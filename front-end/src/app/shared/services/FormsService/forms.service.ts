@@ -83,6 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    
 
     return this._http
       .post<form99>(
@@ -210,7 +211,7 @@ export class FormsService {
 
     }
 
-    console.log ('Formed Data: ',data);
+    console.log ('saveForm Formed Data: ',data);
 
    new Response(data).text().then(console.log)
 
@@ -349,17 +350,20 @@ export class FormsService {
     let data: any = {};
     let formData: FormData = new FormData();
     let httpOptions =  new HttpHeaders();
-    let url: string = '/f99/save_print_f99';
+    let url: string = '/printpdf/v1/print';
     let id:string;
     let org_filename="";
     let org_fileurl="";
     let fileuploaded:boolean=false;
     let printpriview_filename = "";
     let printpriview_fileurl = "";
+    let form99DetailsJsonObj: any = {};
+    console.log("PreviewForm_ReasonScreen start...")
 
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+    
+    
     console.log("httpOptions", httpOptions);
 
     if(form_type === '99') {
@@ -369,20 +373,36 @@ export class FormsService {
       if(file && file.name) {
         fileuploaded=true;
         localStorage.setItem('form_99_details.file', file);
-        formData.append('file', file, file.name);
-        formData.append('committeeid', form99_details.committeeid);
-        formData.append('committeename', form99_details.committeename);
-        formData.append('street1', form99_details.street1);
-        formData.append('street2', form99_details.street2);
-        formData.append('city', form99_details.city);
-        formData.append('state', form99_details.state);
-        formData.append('zipcode', form99_details.zipcode);
-        formData.append('treasurerprefix', form99_details.treasurerprefix);
+        formData.append('FILE', file, file.name);
+
+       /* "IMGNO" ??
+        "FILING_TIMESTAMP" ??
+        "FILING_TIMESTAMP":"12/17/2018 17 : 09", */
+       
+        formData.append('FILER_FEC_ID_NUMBER', form99_details.committeeid);
+        formData.append('COMMITTEE_NAME', form99_details.committeename);
+        formData.append('IMGNO', null);
+        formData.append('FILING_TIMESTAMP', null);
+        
+        formData.append('STREET_1', form99_details.street1);
+        formData.append('STREET_2', form99_details.street2);
+        formData.append('CITY', form99_details.city);
+        formData.append('STATE', form99_details.state);
+        formData.append('ZIP', form99_details.zipcode);
+        formData.append('TREASURER_FULL_NAME', form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('TREASURER_NAME',form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('EF_STAMP', null);
+        formData.append('DATE_SIGNED_MM', null);
+        formData.append('DATE_SIGNED_DD', null);
+        formData.append('DATE_SIGNED_YY', null);
+        formData.append('MISCELLANEOUS_TEXT', form99_details.text);
+
+       /* formData.append('treasurerprefix', form99_details.treasurerprefix);
         formData.append('treasurerfirstname', form99_details.treasurerfirstname);
         formData.append('treasurermiddlename', form99_details.treasurermiddlename);
         formData.append('treasurerlastname', form99_details.treasurerlastname);
         formData.append('treasurersuffix', form99_details.treasurersuffix);
-        formData.append('reason', form99_details.reason);
+        formData.append('REASON_TYPE', form99_details.reason);
         formData.append('text', form99_details.text);
         formData.append('signee', form99_details.signee);
         formData.append('email_on_file', form99_details.email_on_file);
@@ -390,17 +410,19 @@ export class FormsService {
         formData.append('additional_email_1', form99_details.additional_email_1);
         formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
-        formData.append('is_submitted', "False");
-        formData.append('filename', form99_details.filename);
-        formData.append('form_type', "F99");
-        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
-          /*data['id']="0";*/
+        formData.append('is_submitted', "False");*/
+
+        formData.append('FILE_JSON', form99DetailsJsonObj);
+        formData.append('FILENAME', form99_details.filename);
+        formData.append('FORM_TYPE', "F99");
+        
+        /*if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
           formData.append('id', "0");
         }
         else
         {
           formData.append('id', form99_details.id.toString());
-        }
+        }*/
       }
       else
       {
@@ -410,52 +432,45 @@ export class FormsService {
         formData.append('file', form99_details.file);  */
 
         if (form99_details.filename!= null || form99_details.filename!= '' || form99_details.filename != "" || form99_details.filename != undefined){
-          formData.append('filename', form99_details.filename);
+          //formData.append('filename', form99_details.filename);
         }
 
-        formData.append('committeeid', form99_details.committeeid);
-        formData.append('committeename', form99_details.committeename);
-        formData.append('street1', form99_details.street1);
-        formData.append('street2', form99_details.street2);
-        formData.append('city', form99_details.city);
-        formData.append('state', form99_details.state);
-        formData.append('zipcode', form99_details.zipcode);
-        formData.append('treasurerprefix', form99_details.treasurerprefix);
-        formData.append('treasurerfirstname', form99_details.treasurerfirstname);
-        formData.append('treasurermiddlename', form99_details.treasurermiddlename);
-        formData.append('treasurerlastname', form99_details.treasurerlastname);
-        formData.append('treasurersuffix', form99_details.treasurersuffix);
-        formData.append('reason', form99_details.reason);
-        formData.append('text', form99_details.text);
-        formData.append('signee', form99_details.signee);
-        formData.append('email_on_file', form99_details.email_on_file);
-        formData.append('email_on_file_1', form99_details.email_on_file_1);
-        formData.append('additional_email_1', form99_details.additional_email_1);
-        formData.append('additional_email_2', form99_details.additional_email_2);
-        formData.append('created_at', form99_details.created_at);
-        formData.append('is_submitted', "False");
-        /*formData.append('filename', form99_details.filename);*/
-        formData.append('form_type', "F99");
-        if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
+        formData.append('FILER_FEC_ID_NUMBER', form99_details.committeeid);
+        formData.append('COMMITTEE_NAME', form99_details.committeename);
+        formData.append('IMGNO', null);
+        formData.append('FILING_TIMESTAMP', null);
+        
+        formData.append('STREET_1', form99_details.street1);
+        formData.append('STREET_2', form99_details.street2);
+        formData.append('CITY', form99_details.city);
+        formData.append('STATE', form99_details.state);
+        formData.append('ZIP', form99_details.zipcode);
+        formData.append('TREASURER_FULL_NAME', form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('TREASURER_NAME',form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('EF_STAMP', null);
+        formData.append('DATE_SIGNED_MM', null);
+        formData.append('DATE_SIGNED_DD', null);
+        formData.append('DATE_SIGNED_YY', null);
+        formData.append('MISCELLANEOUS_TEXT', form99_details.text);
 
-          /*data['id']="0";*/
+        formData.append('FORM_TYPE', "F99");
+        //formData.append('file_json', form99DetailsJsonObj);
+
+        /*if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
           formData.append('id', "0");
         }
         else
         {
           formData.append('id', form99_details.id.toString());
-        }
+        }*/
 
       }
 
       data=formData;
-
-
     }
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
-
-    new Response(data).text().then(console.log)
+    console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
 
     return this._http
       .post(
@@ -510,27 +525,57 @@ export class FormsService {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let data: any = {};
     let httpOptions =  new HttpHeaders();
-    let url: string = '';
+    let url: string = '/printpdf/v1/print';
     let id:string;
     let printpriview_filename = "";
     let printpriview_fileurl = "";
     let org_filename="";
     let org_fileurl="";
+    let formData: FormData = new FormData();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     if(form_type === '99') {
-      let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
-      url = '/f99/update_print_f99';
-      data = form99_details;
+      let form99_details: form99 = JSON.parse(localStorage.getItem(`form_${form_type}_details`));
 
-       data['form_type'] = 'F99';
+     
+        formData.append('FILER_FEC_ID_NUMBER', form99_details.committeeid);
+        formData.append('COMMITTEE_NAME', form99_details.committeename);
+        formData.append('IMGNO', null);
+        formData.append('FILING_TIMESTAMP', null);
+        
+        formData.append('STREET_1', form99_details.street1);
+        formData.append('STREET_2', form99_details.street2);
+        formData.append('CITY', form99_details.city);
+        formData.append('STATE', form99_details.state);
+        formData.append('ZIP', form99_details.zipcode);
+        formData.append('TREASURER_FULL_NAME', form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('TREASURER_NAME',form99_details.treasurerprefix + ", "+form99_details.treasurerfirstname + ", "+form99_details.treasurermiddlename + " "+form99_details.treasurermiddlename);
+        formData.append('EF_STAMP', null);
+        formData.append('DATE_SIGNED_MM', null);
+        formData.append('DATE_SIGNED_DD', null);
+        formData.append('DATE_SIGNED_YY', null);
+        formData.append('MISCELLANEOUS_TEXT', form99_details.text);
 
-       console.log('PreviewForm_Preview_Screen form99_details',form99_details);
-       console.log('PreviewForm_Preview_Screen Data',data);
+        formData.append('FORM_TYPE', "F99");
+        //formData.append('file_json', form99DetailsJsonObj);
+
+        /*if (form99_details.id ==='' || form99_details.id ==="" || form99_details.id===null){
+          formData.append('id', "0");
+        }
+        else
+        {
+          formData.append('id', form99_details.id.toString());
+        }*/
+
+     
+      data=formData;
     }
+    console.log ('PreviewForm_ReasonScreen Data: ',data);
+    console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
+
     return this._http
       .post(
         `${environment.apiUrl}${url}`,

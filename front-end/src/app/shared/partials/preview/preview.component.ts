@@ -35,6 +35,7 @@ export class PreviewComponent implements OnInit {
   private _form_details: any = {}
   public printpriview_filename: string="";
   public printpriview_fileurl: string="";
+  public printPrivewPdfFileLink: string = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -234,22 +235,42 @@ export class PreviewComponent implements OnInit {
           });
       });    
   }
-  public printPriview(): void {
+  public printPreview(): void {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
 
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
      
      /*.saveForm({}, {}, this.form_type)*/
-     console.log("Accessing Sign printPriview ...");
+     console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
-       .PreviewForm_Preview_sign_Screen({}, this.form_type)
-       .subscribe(res => {
-         if(res) {
-           console.log("Accessing Preview printPriview res ...",res);
-         }
-       },
-       (error) => {
-         console.log('error: ', error);
-       });
+     .PreviewForm_Preview_sign_Screen({}, "F99")
+     .subscribe(res => {
+       if(res) {
+           console.log("Accessing PreviewComponent printPriview res ...",res);
+           console.log('PreviewComponent printPreview: step -IX');
+            console.log('PreviewComponent printPreview: res: ', res);
+            this.printPrivewPdfFileLink=res.printpriview_fileurl;
+            console.log('PreviewComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+
+            //this._form99Details.id = res.id;
+
+            //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+
+            // success
+           /* this.formSaved = true;
+
+            let formSavedObj: any = {
+              'saved': this.formSaved
+            };
+            localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
+            window.open(this.printPrivewPdfFileLink, '_blank');
+
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });
+     
+    }
  }
-}
+

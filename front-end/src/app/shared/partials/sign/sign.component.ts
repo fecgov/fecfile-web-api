@@ -28,6 +28,7 @@ export class SignComponent implements OnInit {
   public date_stamp: Date = new Date();
   public hideText: boolean = false;
   public showValidateBar: boolean = false;
+  public printPrivewPdfFileLink: string='';
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -404,10 +405,13 @@ export class SignComponent implements OnInit {
         }
       });
   }
-  public printPriview(): void {
+  public printPreview(): void {
+    console.log("SignComponent printPriview ...");
+    this.saveForm();
+
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
-   if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
+    if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
      this.frmSignee.controls.additional_email_2.valid) {
 
      this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
@@ -421,12 +425,65 @@ export class SignComponent implements OnInit {
        .PreviewForm_Preview_sign_Screen({}, this.formType)
        .subscribe(res => {
          if(res) {
-           console.log("Accessing Sign printPriview res ...",res);
+             console.log("Accessing SignComponent printPriview res ...",res);
+             console.log('SignComponent printPreview: step -IX');
+              console.log('SignComponent printPreview: res: ', res);
+              this.printPrivewPdfFileLink=res.printpriview_fileurl;
+              console.log('SignComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+
+              //this._form99Details.id = res.id;
+
+              //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+
+              // success
+             /* this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
+              window.open(this.printPrivewPdfFileLink, '_blank');
+
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
          }
-       },
-       (error) => {
-         console.log('error: ', error);
-       });
+       else
+       {
+        /*.saveForm({}, {}, this.formType)*/
+        this.saveForm();
+        console.log("Accessing Sign printPriview ...");
+        this._formsService
+        .PreviewForm_Preview_sign_Screen({}, this.formType)
+        .subscribe(res => {
+         if(res) {
+             console.log("Accessing SignComponent printPriview res ...",res);
+             console.log('SignComponent printPreview: step -IX');
+              console.log('SignComponent printPreview: res: ', res);
+              this.printPrivewPdfFileLink=res.printpriview_fileurl;
+              console.log('SignComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+
+              //this._form99Details.id = res.id;
+
+              //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+
+              // success
+             /* this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
+              window.open(this.printPrivewPdfFileLink, '_blank');
+
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+     }       
    }
- }
+
 }

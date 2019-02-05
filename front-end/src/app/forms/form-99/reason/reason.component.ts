@@ -10,6 +10,7 @@ import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'f99-reason',
@@ -435,7 +436,15 @@ export class ReasonComponent implements OnInit {
   }*/
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
-    if(this.frmReason.valid) {
+    this.saveForm();
+    this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+
+    /*const blob = new Blob([JSON.stringify(this._form99Details)], {type : 'application/json'});
+    let filename="/tmp/abc.json";
+     saveAs(blob, `${environment.apiUrl}${filename}`); */
+
+     console.log('Reason screen printPreview: step-I ');
+     if(this.frmReason.valid) {
        console.log('Reason screen printPreview: step -II');
 
       if (this.frmReason.get('reasonText').value.length >= 1) {
@@ -459,6 +468,7 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
         console.log('Reason screen printPreview: this.file: ',this.file);
+        
         //this.printPrivewPdfFileLink="https://www.yahoo.com";
 
         if (this.file !== null){

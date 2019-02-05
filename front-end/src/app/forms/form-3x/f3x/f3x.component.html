@@ -8,7 +8,12 @@
           [cashOnHand]="cashOnHand"
           [specialreports]=specialreports
           [regularreports]=regularreports
-          [selectedreporttype]=reporttype
+          [selectedreporttype]=selectedReportType
+          [selectedstate]=selectedstate
+          [electiondates]=electionDates
+          [fromDate]=fromDate
+          [toDate]=toDate
+         
         >
       </report-type-sidebar>
     </div>
@@ -51,10 +56,12 @@
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <f3x-report-type>
+        <f3x-report-type 
           [formRadioOptionsVisible]="formRadioOptionsVisible"
           [reportTypeRadio]="reportTypeRadio"
           (status)='onNotify($event)'
+          [reportType]=reportType>
+         
         </f3x-report-type>
       </div>
 

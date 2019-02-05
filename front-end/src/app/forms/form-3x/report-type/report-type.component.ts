@@ -22,7 +22,7 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('mswCollapse') mswCollapse;
   @Input() formRadioOptionsVisible: boolean = false;
-  
+  @Input() reportType:string ='';
   
   //@Input() reportTypeRadio: string ='';
 
@@ -169,14 +169,17 @@ export class ReportTypeComponent implements OnInit {
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
     console.log (" ReportTypeComponent updateTypeSelected this.reporttypes ", this.reporttypes)
 
-    if (this.reporttypes !== null)
+    if (this.reporttypes !== null && this.reporttypes !== undefined)
     {
       this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
     
       console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
-      console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype.report_type);
+      console.log( "ReportTypeComponent updateTypeSelected this.reporttype.report_type", this.reporttype.report_type);
+      console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype);
 
       localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
+      //localStorage.setItem('form3XReportInfo.state', "");
+      localStorage.removeItem('form3XReportInfo.state');
     }
 
 
