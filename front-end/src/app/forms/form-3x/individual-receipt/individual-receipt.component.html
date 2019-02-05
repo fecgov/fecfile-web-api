@@ -5,6 +5,19 @@
         <div class="col">
           <label for="transactionCategory">
             Transaction Category *
+             <button
+                type="button"
+                class="btn btn-info"
+                [ngbTooltip]="tipContent1"
+                #t1="ngbTooltip"
+                (click)="toggleToolTip(t1)"
+                triggers="manual"
+                tooltipClass="sidebar-tooltip"
+                placement="right"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
           </label>
           <ng-select
             name="transactionCategory"
@@ -25,6 +38,19 @@
         <div class="col">
           <label for="transactionType">
             Transaction Type *
+             <button
+                type="button"
+                class="btn btn-info"
+                [ngbTooltip]="tipContent1"
+                #t1="ngbTooltip"
+                (click)="toggleToolTip(t1)"
+                triggers="manual"
+                tooltipClass="sidebar-tooltip"
+                placement="right"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
           </label>
           <ng-select
             name="transactionType"
@@ -41,7 +67,7 @@
           <ng-container *ngIf="!isArray(row.cols)">
             <div class="col">
               <label for="{{ row.cols.name }}">
-                {{ row.cols.text }}B
+                {{ row.cols.text }}
                 <ng-container *ngIf="row.cols.required">
                   *
                 </ng-container>
