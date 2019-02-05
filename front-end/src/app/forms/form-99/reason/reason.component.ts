@@ -155,7 +155,7 @@ export class ReasonComponent implements OnInit {
          let fileNameObj: any = {
            'fileName': ''
          };
-         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+        localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
         this.notValidPdf=true;
         this.validFile=false;
         this.file=null;
