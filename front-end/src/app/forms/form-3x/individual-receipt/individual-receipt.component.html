@@ -1,60 +1,87 @@
 <div class="individual-receipt-container">
-  <ng-container *ngFor="let row of formFields">
-    <div class="row">
-      <ng-container *ngIf="!isArray(row.cols)">
-        <div class="col">
-          <label for="{{ row.cols.name }}">
-            {{ row.cols.text }}
-            <ng-container *ngIf="row.cols.required">
-              *
-            </ng-container>
-          </label>
-          <ng-container *ngIf="row.cols.type === 'text'">
-            <input type="text" name="{{ row.cols.name }}" class="form-control" />
+  <form>
+    <section>
+      <ng-container *ngFor="let row of formFields">
+        <div class="row">
+          <ng-container *ngIf="!isArray(row.cols)">
+            <div class="col">
+              <label for="{{ row.cols.name }}">
+                {{ row.cols.text }}
+                <ng-container *ngIf="row.cols.required">
+                  *
+                </ng-container>
+              </label>
+              <ng-container *ngIf="row.cols.type === 'text'">
+                <input type="text" name="{{ row.cols.name }}" class="form-control" />
+              </ng-container>
+              <ng-container *ngIf="row.cols.type === 'select'">
+                <ng-select class="transaction-type-select">
+                  <ng-option
+                    *ngFor="let item of selectedOptions"
+                    [value]="item.value"
+                  >
+                    {{ item.text }}
+                  </ng-option>
+                </ng-select>
+              </ng-container>
+              <ng-container *ngIf="row.cols.type === 'textarea'">
+                <textarea class="form-control" name="{{ row.cols.name }}" rows="8"></textarea>
+              </ng-container>
+            </div>
           </ng-container>
-          <ng-container *ngIf="row.cols.type === 'select'">
-            <ng-select class="transaction-type-select">
-              <ng-option
-                *ngFor="let item of selectedOptions"
-                [value]="item.value"
-              >
-                {{ item.text }}
-              </ng-option>
-            </ng-select>
-          </ng-container>
-          <ng-container *ngIf="row.cols.type === 'textarea'">
-            <textarea class="form-group" name="{{ row.cols.name }}" rows="8"></textarea>
+          <ng-container *ngIf="isArray(row.cols)">
+            <div class="col" *ngFor="let col of row.cols">
+              <div class="form-group">
+                <label for="{{ col.name }}">
+                  {{ col.text }}
+                  <ng-container *ngIf="col.required">
+                    *
+                  </ng-container>
+                </label>
+                <ng-container *ngIf="col.type === 'text'">
+                  <input type="text" name="{{ col.name }}" class="form-control" />
+                </ng-container>
+                <ng-container *ngIf="col.type === 'textarea'">
+                  <textarea class="form-control" rows="5"></textarea>
+                </ng-container>
+                <ng-container *ngIf="col.type === 'select' && col.name === 'contributorState'">
+                  <ng-select class="state-select">
+                    <ng-option
+                      *ngFor="let item of states"
+                      [value]="item.code"
+                    >
+                      {{ item.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>
+              </div>
+            </div>
           </ng-container>
         </div>
       </ng-container>
-      <ng-container *ngIf="isArray(row.cols)">
-        <div class="col" *ngFor="let col of row.cols">
-          <div class="form-group">
-            <label for="{{ col.name }}">
-              {{ col.text }}
-              <ng-container *ngIf="col.required">
-                *
-              </ng-container>
-            </label>
-            <ng-container *ngIf="col.type === 'text'">
-              <input type="text" name="{{ col.name }}" class="form-control" />
-            </ng-container>
-            <ng-container *ngIf="col.type === 'textarea'">
-              <textarea class="form-control" rows="5"></textarea>
-            </ng-container>
-            <ng-container *ngIf="col.type === 'select' && col.name === 'contributorState'">
-              <ng-select class="state-select">
-                <ng-option
-                  *ngFor="let item of states"
-                  [value]="item.code"
+    </section>
+    <footer>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
+                <button
+                  class="btn btn-secondary btn-right"
+                  type="submit"
                 >
-                  {{ item.name }}
-                </ng-option>
-              </ng-select>
-            </ng-container>
+                  Save &amp; Add Transaction
+                </button>
+                <button
+                  class="btn btn-default btn-right"
+                  type="button"
+                  (click)="previous()"
+                >
+                  View Transactions
+                </button>
+              </div>
           </div>
         </div>
-      </ng-container>
-    </div>
-  </ng-container>
+      </footer>
+    </footer>
+  </form>
 </div>

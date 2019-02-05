@@ -48,4 +48,8 @@ export class IndividualReceiptComponent implements OnInit {
   public isArray(item: Array<any>): boolean {
     return Array.isArray(item);
   }
+
+  public previous(): void {
+
+  }
 }
