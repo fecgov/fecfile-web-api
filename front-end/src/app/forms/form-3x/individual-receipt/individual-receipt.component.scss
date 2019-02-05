@@ -1,4 +1,5 @@
 .individual-receipt-container {
+  padding-right: 10px;
   .row {
     margin-bottom: 20px;
     margin-left: 0;
@@ -14,13 +15,19 @@
           padding-right: 5px;
         }
       }
+      textarea {
+        &.form-group {
+          overflow: scroll;
+          width: 400px;
+        }
+      }
       .ng-select.transaction-type-select {
         width: 350px;
       }
       .ng-select.state-select {
         .ng-select-container {
           height: 45px;
-          width: 152px;
+          width: 300px;
         }
       }
     }

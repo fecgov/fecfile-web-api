@@ -85,7 +85,11 @@
               "name": "contributorStreet2",
               "type": "text",
               "required": false
-            },
+            }
+          ]
+        },
+        {
+          "cols": [
             {
               "text": "Contributor City",
               "infoIcon": false,
@@ -113,16 +117,6 @@
           ]
         },
         {
-          "cols": {
-            "text": "Contribution Purpose Description",
-            "infoIcon": true,
-            "infoText": "Waiting for text.",
-            "name": "contributorPurpose",
-            "type": "textarea",
-            "required": false
-          }
-        },
-        {
           "cols": [
             {
               "text": "Contibutor Employer",
@@ -148,7 +142,7 @@
               "text": "Memo Code",
               "infoIcon": true,
               "infoText": "Waiting for text.",
-              "name": "contributorOccupation",
+              "name": "memoCode",
               "type": "text",
               "required": false
             },
@@ -156,11 +150,21 @@
               "text": "Memo Text/Description",
               "infoIcon": true,
               "infoText": "Waiting for text.",
-              "name": "contributorOccupation",
+              "name": "memoDescription",
               "type": "text",
               "required": false
             }
           ]
+        },
+        {
+          "cols": {
+            "text": "Contribution Purpose Description",
+            "infoIcon": true,
+            "infoText": "Waiting for text.",
+            "name": "contributorPurpose",
+            "type": "textarea",
+            "required": false
+          }
         }
       ]
     },

@@ -10,7 +10,7 @@
             </ng-container>
           </label>
           <ng-container *ngIf="row.cols.type === 'text'">
-            <input type="text" name="{{ col.name }}" class="form-control" />
+            <input type="text" name="{{ row.cols.name }}" class="form-control" />
           </ng-container>
           <ng-container *ngIf="row.cols.type === 'select'">
             <ng-select class="transaction-type-select">
@@ -21,6 +21,9 @@
                 {{ item.text }}
               </ng-option>
             </ng-select>
+          </ng-container>
+          <ng-container *ngIf="row.cols.type === 'textarea'">
+            <textarea class="form-group" name="{{ row.cols.name }}" rows="8"></textarea>
           </ng-container>
         </div>
       </ng-container>
@@ -35,6 +38,9 @@
             </label>
             <ng-container *ngIf="col.type === 'text'">
               <input type="text" name="{{ col.name }}" class="form-control" />
+            </ng-container>
+            <ng-container *ngIf="col.type === 'textarea'">
+              <textarea class="form-control" rows="5"></textarea>
             </ng-container>
             <ng-container *ngIf="col.type === 'select' && col.name === 'contributorState'">
               <ng-select class="state-select">

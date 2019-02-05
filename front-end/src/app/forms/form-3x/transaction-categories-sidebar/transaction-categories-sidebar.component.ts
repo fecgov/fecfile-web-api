@@ -81,7 +81,7 @@ export class TransactionCategoriesSidbarComponent implements OnInit {
 
     transactionType.type = this.additionalItemSelected;
 
-    localStorage.setItem(`form_${this._formType}_transactionType`, JSON.stringify(transactionType);
+    localStorage.setItem(`form_${this._formType}_transactionType`, JSON.stringify(transactionType));
 
     this.transactionCategories[this._indexOfItemSelected].options.findIndex((el, index) => {
       if (this.additionalItemSelected === el.value) {
