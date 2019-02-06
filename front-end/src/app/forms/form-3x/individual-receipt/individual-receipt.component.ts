@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
@@ -17,6 +18,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() formOptionsVisible: boolean = false;
 
   public formFields: any = [];
+  public frmIndividualReceipt: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
   public transactionCategories: any = [];
@@ -27,6 +29,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   constructor(
     private _http: HttpClient,
+    private _fb: FormBuilder,
     private _formService: FormsService,
     private _activatedRoute: ActivatedRoute
   ) { }
@@ -49,6 +52,15 @@ export class IndividualReceiptComponent implements OnInit {
       .subscribe(res => {
         this._types = res.data.transactionCategories;
       });
+
+      this.frmIndividualReceipt = this._fb.group({
+        transactionCategory: ['', [
+          Validators.required
+        ]],
+        transactionType: ['', [
+          Validators.required
+        ]]
+      });
   }
 
   ngDoCheck(): void {
@@ -68,22 +80,46 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public transactionCategorySelected(e): void {
-    const selectedValue: string = e.value;
-    const selectedType: string = e.type;
-    let selectedIndex: number = 0;
-    let childIndex: number = 0;
+    if(typeof e !== 'undefined') {
+      const selectedValue: string = e.value;
+      const selectedType: string = e.type;
+      let selectedIndex: number = 0;
+      let childIndex: number = 0;
 
-    this._types.findIndex((el, index) => {
-      if(el.text === selectedType) {
-        selectedIndex = index;
-      }
-    });
-    this._types[selectedIndex].options.findIndex((el, index) => {
-      if(el.value === selectedValue) {
-        childIndex = index;
-      }
-    });
+      this.frmIndividualReceipt.setValue({
+        transactionCategory: selectedValue,
+        transactionType: ''
+      });
 
-    this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
+      this._types.findIndex((el, index) => {
+        if(el.text === selectedType) {
+          selectedIndex = index;
+        }
+      });
+      this._types[selectedIndex].options.findIndex((el, index) => {
+        if(el.value === selectedValue) {
+          childIndex = index;
+        }
+      });
+
+      this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
+    } else {
+      this.frmIndividualReceipt.setValue({
+        transactionCategory: '',
+        transactionType: ''
+      });
+    }
+  }
+
+  public transactionTypeSelected(e): void {
+    console.log('transactionTypeSelected: ');
+    if(typeof e !== 'undefined') {
+      const selectedValue: string = e.value;
+      const selectedType: string = e.type;
+
+      console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
+    } else {
+
+    }
   }
 }

@@ -170,7 +170,6 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    console.log('doValidateReason: ');
     if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved
@@ -462,7 +461,7 @@ export class ReasonComponent implements OnInit {
           .subscribe(res => {
             if(res) {
               console.log('Reason screen printPreview: res: ', res);
-              this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));  
+              this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
               console.log('Reason screen printPreview: rthis.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
               this._form99Details.id = res.id;
 

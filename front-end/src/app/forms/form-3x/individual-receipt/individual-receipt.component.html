@@ -1,5 +1,5 @@
 <div class="individual-receipt-container">
-  <form>
+  <form [formGroup]="frmIndividualReceipt">
     <section>
       <div class="row">
         <div class="col">
@@ -27,11 +27,23 @@
             bindValue="value"
             groupBy="type"
             (change)="transactionCategorySelected($event)"
+            formControlName="transactionCategory"
           >
             <ng-template ng-optgroup-tmp let-item="item">
               {{item.type || 'Unnamed group'}}
             </ng-template>
           </ng-select>
+          <div
+            class="error-text"
+            *ngIf="(frmIndividualReceipt.invalid && (frmIndividualReceipt.dirty || frmIndividualReceipt.touched))"
+          >
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory?.errors?.required"
+            >
+              You must select a transaction category.
+            </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -58,8 +70,21 @@
             [items]="transactionTypes"
             bindLabel="text"
             bindValue="value"
+            (change)="transactionTypeSelected($event)"
+            formControlName="transactionType"
           >
           </ng-select>
+          <div
+            class="error-text"
+            *ngIf="(frmIndividualReceipt.invalid && (frmIndividualReceipt.dirty || frmIndividualReceipt.touched))"
+          >
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionType?.errors?.required"
+            >
+              You must select a transaction type.
+            </div>
+          </div>
         </div>
       </div>
       <ng-container *ngFor="let row of formFields">
