@@ -21,6 +21,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
+  public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
   public transactionCategories: any = [];
@@ -51,6 +52,10 @@ export class IndividualReceiptComponent implements OnInit {
        this.states = res[1].states;
 
        this.transactionCategories = res[2].transactionCategories;
+
+       if(this.formFields.length) {
+         this._setForm(this.formFields);
+       }
      });
 
     this._formService
@@ -59,14 +64,14 @@ export class IndividualReceiptComponent implements OnInit {
         this._types = res.data.transactionCategories;
       });
 
-      this.frmIndividualReceipt = this._fb.group({
-        transactionCategory: ['', [
-          Validators.required
-        ]],
-        transactionType: ['', [
-          Validators.required
-        ]]
-      });
+    this.frmIndividualReceipt = this._fb.group({
+      transactionCategory: ['', [
+        Validators.required
+      ]],
+      transactionType: ['', [
+        Validators.required
+      ]]
+    });
   }
 
   ngDoCheck(): void {
@@ -77,15 +82,53 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  private _setForm(fields: any): void {
+    const formGroup: any = [];
+
+    fields.forEach((el) => {
+      el.cols.forEach((e) => {
+        formGroup[e.name] = new FormControl(e.value || '', this._mapValidators(e.validation));
+      });
+    });
+
+    formGroup['transactionCategory'] = new FormControl(
+       '',
+       [Validators.required]
+    );
+
+    formGroup['transactionType'] = new FormControl(
+      '',
+      [Validators.required]
+    );
+
+    this.frmIndividualReceipt = new FormGroup(formGroup);
+
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
+  }
+
+  private _mapValidators(validators): Array<any> {
+    const formValidators = [];
+
+    if(validators) {
+      for(const validation of Object.keys(validators)) {
+        if(validation === 'required') {
+          formValidators.push(Validators.required);
+        } else if(validation === 'min') {
+          formValidators.push(Validators.min(validators[validation]));
+        }
+      }
+    }
+
+    return formValidators;
+  }
+
   public isArray(item: Array<any>): boolean {
     return Array.isArray(item);
   }
 
-  public previous(): void {
-
-  }
-
   public transactionCategorySelected(e): void {
+    console.log('transactionCategorySelected: ');
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if(typeof e !== 'undefined') {
       const selectedValue: string = e.value;
       const selectedType: string = e.type;

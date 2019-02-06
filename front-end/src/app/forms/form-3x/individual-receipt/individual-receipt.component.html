@@ -81,22 +81,6 @@
       </div>
       <ng-container *ngFor="let row of formFields">
         <div class="row">
-          <ng-container *ngIf="!isArray(row.cols)">
-            <div class="col">
-              <label for="{{ row.cols.name }}">
-                {{ row.cols.text }}
-                <ng-container *ngIf="row.cols.required">
-                  *
-                </ng-container>
-              </label>
-              <ng-container *ngIf="row.cols.type === 'text'">
-                <input type="text" name="{{ row.cols.name }}" class="form-control" />
-              </ng-container>
-              <ng-container *ngIf="row.cols.type === 'textarea'">
-                <textarea class="form-control" name="{{ row.cols.name }}" rows="8"></textarea>
-              </ng-container>
-            </div>
-          </ng-container>
           <ng-container *ngIf="isArray(row.cols)">
             <div class="col" *ngFor="let col of row.cols">
               <div class="form-group">

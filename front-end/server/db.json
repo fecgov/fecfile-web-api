@@ -1,16 +1,15 @@
 {
-  "data": [
-    {
-      "formFields": [
-        {
-          "cols": [
-            {
+  "data": [{
+      "formFields": [{
+          "cols": [{
               "text": "Entity Type",
               "infoIcon": false,
               "infoText": "",
               "name": "entityType",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contributor Last Name",
@@ -18,7 +17,9 @@
               "infoText": "",
               "name": "contributorLastName",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contributor First Name",
@@ -26,13 +27,14 @@
               "infoText": "",
               "name": "contributorFirstName",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             }
           ]
         },
         {
-          "cols": [
-            {
+          "cols": [{
               "text": "Contributor Middle Name",
               "infoIcon": false,
               "infoText": "",
@@ -59,14 +61,15 @@
           ]
         },
         {
-          "cols": [
-            {
+          "cols": [{
               "text": "Contributor Street 1",
               "infoIcon": false,
               "infoText": "",
               "name": "contributorStreet1",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contributor Street 2",
@@ -79,14 +82,15 @@
           ]
         },
         {
-          "cols": [
-            {
+          "cols": [{
               "text": "Contributor City",
               "infoIcon": false,
               "infoText": "",
               "name": "contributorCity",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "State",
@@ -94,7 +98,9 @@
               "infoText": "",
               "name": "contributorState",
               "type": "select",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Zip Code",
@@ -102,19 +108,22 @@
               "infoText": "",
               "name": "contributorZipCode",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             }
           ]
         },
         {
-          "cols": [
-            {
+          "cols": [{
               "text": "Contribution Date",
               "infoIcon": true,
               "infoText": "Waiting for text.",
               "name": "contributionDate",
               "type": "date",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contribution Amount",
@@ -122,7 +131,9 @@
               "infoText": "Waiting for text.",
               "name": "contributionAmount",
               "type": "number",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contribution Aggregate",
@@ -130,19 +141,22 @@
               "infoText": "Waiting for text.",
               "name": "contributionAggregate",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             }
           ]
         },
         {
-          "cols": [
-            {
+          "cols": [{
               "text": "Contibutor Employer",
               "infoIcon": true,
               "infoText": "Waiting for text.",
               "name": "contributorEmployer",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             },
             {
               "text": "Contibutor Occupation",
@@ -150,13 +164,14 @@
               "infoText": "Waiting for text.",
               "name": "contributorOccupation",
               "type": "text",
-              "required": true
+              "validation": {
+                "required": true
+              }
             }
           ]
         },
         {
-          "cols":[
-            {
+          "cols": [{
               "text": "Memo Code",
               "infoIcon": true,
               "infoText": "Waiting for text.",
@@ -175,20 +190,19 @@
           ]
         },
         {
-          "cols": {
+          "cols": [{
             "text": "Contribution Purpose Description",
             "infoIcon": true,
             "infoText": "Waiting for text.",
             "name": "contributorPurpose",
             "type": "textarea",
             "required": false
-          }
+          }]
         }
       ]
     },
     {
-      "states": [
-        {
+      "states": [{
           "name": "Alabama",
           "code": "AL"
         },
@@ -395,8 +409,7 @@
       ]
     },
     {
-      "transactionCategories": [
-        {
+      "transactionCategories": [{
           "value": "contributions-from-individuals",
           "text": "Contributions From Individuals",
           "type": "Receipts"
@@ -468,27 +481,27 @@
         },
         {
           "value": "debts-owed-to-committee",
-          "text":  "Debts Owed to Committee",
+          "text": "Debts Owed to Committee",
           "type": "Loans and Debts"
         },
         {
           "value": "debts-owed-to-committee",
-          "text":  "Debts Owed to Committee",
+          "text": "Debts Owed to Committee",
           "type": "Loans and Debts"
         },
         {
           "value": "h1---allocation-ratios",
-          "text":  "H1 - Allocation Ratios",
+          "text": "H1 - Allocation Ratios",
           "type": "Other"
         },
         {
           "value": "h2---fundraising-ratios",
-          "text":  "H2 - Fundraising Ratios",
+          "text": "H2 - Fundraising Ratios",
           "type": "Other"
         },
         {
           "value": "schedule-l",
-          "text":  "Schedule L",
+          "text": "Schedule L",
           "type": "Other"
         }
       ]

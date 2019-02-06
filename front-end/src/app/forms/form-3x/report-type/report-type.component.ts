@@ -64,20 +64,20 @@ export class ReportTypeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    console.log("accessing form service call side bar ...");
-   
+    // console.log("accessing form service call side bar ...");
+
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
    this._formService
      .getreporttypes(this._form_type)
      .subscribe(res => {
-      console.log(' getspecialreporttypes res: ', res);
+      // console.log(' getspecialreporttypes res: ', res);
       this.committee_form3x_reporttypes = res.report_type;
-      console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
+      // console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
      });
 
 
-    console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
+    // console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
 
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
