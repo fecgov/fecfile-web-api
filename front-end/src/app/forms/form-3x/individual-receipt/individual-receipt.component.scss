@@ -12,7 +12,9 @@
           label {
             display: block;
           }
-          input[type='text'] {
+          input[type='text'],
+          input[type='date'],
+          input[type='number'] {
             &.form-control {
               height: 30px;
               padding-left: 5px;

@@ -109,6 +109,34 @@
         {
           "cols": [
             {
+              "text": "Contribution Date",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionDate",
+              "type": "date",
+              "required": true
+            },
+            {
+              "text": "Contribution Amount",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionAmount",
+              "type": "number",
+              "required": true
+            },
+            {
+              "text": "Contribution Aggregate",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionAggregate",
+              "type": "text",
+              "required": true
+            }
+          ]
+        },
+        {
+          "cols": [
+            {
               "text": "Contibutor Employer",
               "infoIcon": true,
               "infoText": "Waiting for text.",
