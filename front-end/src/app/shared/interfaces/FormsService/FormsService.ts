@@ -208,20 +208,26 @@ export interface form3x {
   }
   
   export interface form3XReport {
+    cmteId?:string;
     reportId?: string, 
+    formType?:string;
+    amend_Indicator?:string;
     reportType?: string, 
     regularSpecialReportInd?: string,
     stateOfElection?:string,
+    electionDate?:string,
     cvgStartDate?: string,
     cvgEndDate?:string,
-    dueDate?:string
+    dueDate?:string,
+    coh_bop?:string
   }
 
   export interface selectedElectionState{
     state?: string,
     state_description?: string,
-    dates?: string[]
+    dates?: Array<selectedElectionDate>
   }
+
   export interface selectedReportType
   {
     default_disp_ind?: string,
@@ -231,4 +237,14 @@ export interface form3x {
     report_type_desciption?: string,
     report_type_info?: string,
   }
+
+  export interface form99PrintPreviewResponse{
+    message?:string,
+    results?:pdfResonse,
+    success?:string
+  }
+  
+  export interface pdfResonse{
+    pdf_url?:string,
+   }
   

@@ -35,7 +35,7 @@ export class PreviewComponent implements OnInit {
   private _form_details: any = {}
   public printpriview_filename: string="";
   public printpriview_fileurl: string="";
-  public printPrivewPdfFileLink: string = '';
+  private _printPriviewPdfFileLink: string = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -249,21 +249,12 @@ export class PreviewComponent implements OnInit {
            console.log("Accessing PreviewComponent printPriview res ...",res);
            console.log('PreviewComponent printPreview: step -IX');
             console.log('PreviewComponent printPreview: res: ', res);
-            this.printPrivewPdfFileLink=res.printpriview_fileurl;
-            console.log('PreviewComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+            this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));       
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
 
-            //this._form99Details.id = res.id;
+            console.log('PreviewComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
 
-            //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
-            // success
-           /* this.formSaved = true;
-
-            let formSavedObj: any = {
-              'saved': this.formSaved
-            };
-            localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
-            window.open(this.printPrivewPdfFileLink, '_blank');
+            window.open(this._printPriviewPdfFileLink, '_blank');
 
           }
         },

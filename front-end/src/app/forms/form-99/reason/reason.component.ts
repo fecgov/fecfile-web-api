@@ -11,6 +11,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 
+
 @Component({
   selector: 'f99-reason',
   templateUrl: './reason.component.html',
@@ -40,7 +41,7 @@ export class ReasonComponent implements OnInit {
   public validFile: boolean = true;
   public showFileDeleteButton: boolean=false;
   public notCorrectPdfSize: boolean=false;
-  public printPrivewPdfFileLink: string ='';
+  private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
   private _editorMax: number = 20000;
@@ -154,7 +155,7 @@ export class ReasonComponent implements OnInit {
          let fileNameObj: any = {
            'fileName': ''
          };
-        localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
         this.notValidPdf=true;
         this.validFile=false;
         this.file=null;
@@ -435,15 +436,7 @@ export class ReasonComponent implements OnInit {
   }*/
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
-    this.saveForm();
-    this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
-
-    /*const blob = new Blob([JSON.stringify(this._form99Details)], {type : 'application/json'});
-    let filename="/tmp/abc.json";
-     saveAs(blob, `${environment.apiUrl}${filename}`); */
-
-     console.log('Reason screen printPreview: step-I ');
-     if(this.frmReason.valid) {
+    if(this.frmReason.valid) {
        console.log('Reason screen printPreview: step -II');
 
       if (this.frmReason.get('reasonText').value.length >= 1) {
@@ -467,8 +460,7 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
         console.log('Reason screen printPreview: this.file: ',this.file);
-        
-        //this.printPrivewPdfFileLink="https://www.yahoo.com";
+
 
         if (this.file !== null){
           console.log('Reason screen printPreview: step -IV');
@@ -478,8 +470,9 @@ export class ReasonComponent implements OnInit {
             if(res) {
               console.log('Reason screen printPreview: step -IX');
               console.log('Reason screen printPreview: res: ', res);
-              this.printPrivewPdfFileLink=res.printpriview_fileurl;
-              console.log('Reason screen printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+              this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));       
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
+              console.log('Reason screen printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
 
               this._form99Details.id = res.id;
 
@@ -492,7 +485,7 @@ export class ReasonComponent implements OnInit {
                 'saved': this.formSaved
               };
               localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
-              window.open(this.printPrivewPdfFileLink, '_blank');
+              window.open(this._printPriviewPdfFileLink, '_blank');
 
             }
           },
@@ -510,8 +503,8 @@ export class ReasonComponent implements OnInit {
 
               console.log('Reason screen printPreview: step -VII');
               console.log('Reason screen printPreview: res: ', res);
-              this.printPrivewPdfFileLink=res.printpriview_fileurl;
-              console.log('Reason screen printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+              this._printPriviewPdfFileLink=res.printpriview_fileurl;
+              console.log('Reason screen printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
               this._form99Details.id = res.id;
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
@@ -523,7 +516,7 @@ export class ReasonComponent implements OnInit {
                 'saved': this.formSaved
               };
               localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
-              window.open(this.printPrivewPdfFileLink, '_blank');
+              window.open(this._printPriviewPdfFileLink, '_blank');
 
             }
           },
@@ -535,4 +528,5 @@ export class ReasonComponent implements OnInit {
       }
     }
   }
+
 }

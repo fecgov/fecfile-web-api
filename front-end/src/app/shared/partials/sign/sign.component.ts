@@ -28,7 +28,7 @@ export class SignComponent implements OnInit {
   public date_stamp: Date = new Date();
   public hideText: boolean = false;
   public showValidateBar: boolean = false;
-  public printPrivewPdfFileLink: string='';
+  private _printPriviewPdfFileLink: string='';
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -407,7 +407,7 @@ export class SignComponent implements OnInit {
   }
   public printPreview(): void {
     console.log("SignComponent printPriview ...");
-    this.saveForm();
+    //this.saveForm();
 
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
@@ -428,21 +428,11 @@ export class SignComponent implements OnInit {
              console.log("Accessing SignComponent printPriview res ...",res);
              console.log('SignComponent printPreview: step -IX');
               console.log('SignComponent printPreview: res: ', res);
-              this.printPrivewPdfFileLink=res.printpriview_fileurl;
-              console.log('SignComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+              this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));       
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
 
-              //this._form99Details.id = res.id;
-
-              //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
-              // success
-             /* this.formSaved = true;
-
-              let formSavedObj: any = {
-                'saved': this.formSaved
-              };
-              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
-              window.open(this.printPrivewPdfFileLink, '_blank');
+              console.log('SignComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
+              window.open(this._printPriviewPdfFileLink, '_blank');
 
             }
           },
@@ -462,21 +452,12 @@ export class SignComponent implements OnInit {
              console.log("Accessing SignComponent printPriview res ...",res);
              console.log('SignComponent printPreview: step -IX');
               console.log('SignComponent printPreview: res: ', res);
-              this.printPrivewPdfFileLink=res.printpriview_fileurl;
-              console.log('SignComponent printPreview: this.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+              this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));       
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
 
-              //this._form99Details.id = res.id;
+              console.log('SignComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
 
-              //localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
-              // success
-             /* this.formSaved = true;
-
-              let formSavedObj: any = {
-                'saved': this.formSaved
-              };
-              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));*/
-              window.open(this.printPrivewPdfFileLink, '_blank');
+              window.open(this._printPriviewPdfFileLink, '_blank');
 
             }
           },
