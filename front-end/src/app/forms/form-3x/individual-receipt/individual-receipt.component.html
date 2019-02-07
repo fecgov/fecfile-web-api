@@ -59,10 +59,10 @@
           <ng-select
             name="transactionType"
             class="transaction-type-select"
+            placeholder="You must select a transaction category first."
             [items]="transactionTypes"
             bindLabel="text"
             bindValue="value"
-            (change)="transactionTypeSelected($event)"
             formControlName="transactionType"
           >
           </ng-select>

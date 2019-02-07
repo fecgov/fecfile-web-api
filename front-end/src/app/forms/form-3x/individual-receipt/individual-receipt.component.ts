@@ -24,8 +24,8 @@ export class IndividualReceiptComponent implements OnInit {
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
-  public transactionCategories: any = [];
-  public transactionTypes: any = [];
+  public transactionCategories: any = null;
+  public transactionTypes: any = null;
 
   private _formType: string = '';
   private _types: any = [];
@@ -65,10 +65,10 @@ export class IndividualReceiptComponent implements OnInit {
 
 
     this.frmIndividualReceipt = this._fb.group({
-      transactionCategory: ['', [
+      transactionCategory: [null, [
         Validators.required
       ]],
-      transactionType: ['', [
+      transactionType: [null, [
         Validators.required
       ]]
     });
@@ -87,17 +87,17 @@ export class IndividualReceiptComponent implements OnInit {
 
     fields.forEach((el) => {
       el.cols.forEach((e) => {
-        formGroup[e.name] = new FormControl(e.value || '', this._mapValidators(e.validation));
+        formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
       });
     });
 
     formGroup['transactionCategory'] = new FormControl(
-       this._types['transactionCategory'] || '',
+       this._types['transactionCategory'] || null,
        [Validators.required]
     );
 
     formGroup['transactionType'] = new FormControl(
-      this._types['transactionType'] || '',
+      this._types['transactionType'] || null,
       [Validators.required]
     );
 
@@ -122,13 +122,23 @@ export class IndividualReceiptComponent implements OnInit {
     return formValidators;
   }
 
+  /**
+   * Determines if element passed in from template is an array.
+   *
+   * @param      {<Array>}   item    The item
+   * @return     {Boolean}  True if array, False otherwise.
+   */
   public isArray(item: Array<any>): boolean {
     return Array.isArray(item);
   }
 
+  /**
+   * Sets the transaction category when selected and sets the child items for transaction type.
+   *
+   * @param      {Object}  e       { parameter_description }
+   */
   public transactionCategorySelected(e): void {
     if(typeof e !== 'undefined') {
-      console.log('e: ', e);
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
       let selectedIndex: number = 0;
@@ -149,26 +159,8 @@ export class IndividualReceiptComponent implements OnInit {
 
       this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
     } else {
-      this.frmIndividualReceipt.setValue({
-        transactionCategory: '',
-        transactionType: ''
-      });
-    }
-  }
 
-  public transactionTypeSelected(e): void {
-    if(typeof e !== 'undefined') {
-      const selectedValue: string = e.value;
-      const selectedType: string = e.type;
-
-      this._types['transactionType'] = selectedValue;
-
-      // if(this.formFields.length) {
-      //  this._setForm(this.formFields);
-      // }
-      console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
-    } else {
-
+      this.frmIndividualReceipt.controls['transactionType'].setValue(null);
     }
   }
 }
