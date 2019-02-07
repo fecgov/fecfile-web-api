@@ -103,13 +103,26 @@
                 <ng-container
                   *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'"
                 >
-                  <input type="{{ col.type }}" name="{{ col.name }}" class="form-control" />
+                  <input
+                    type="{{ col.type }}"
+                    name="{{ col.name }}"
+                    class="form-control"
+                    [formControlName]="col.name"
+                  />
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
-                  <textarea class="form-control" rows="5"></textarea>
+                  <textarea
+                    class="form-control"
+                    rows="5"
+                    name="{{ col.name }}"
+                    [formControlName]="col.name"
+                  ></textarea>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'select' && col.name === 'contributorState'">
-                  <ng-select class="state-select">
+                  <ng-select
+                    class="state-select"
+                    [formControlName]="col.name"
+                  >
                     <ng-option
                       *ngFor="let item of states"
                       [value]="item.code"

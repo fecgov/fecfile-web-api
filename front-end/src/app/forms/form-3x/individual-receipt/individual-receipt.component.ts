@@ -29,6 +29,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   private _formType: string = '';
   private _types: any = [];
+  private _transaction: any = {};
 
   constructor(
     private _http: HttpClient,
@@ -49,13 +50,11 @@ export class IndividualReceiptComponent implements OnInit {
      .subscribe(res => {
        this.formFields = res[0].formFields;
 
+       this._setForm(this.formFields);
+
        this.states = res[1].states;
 
        this.transactionCategories = res[2].transactionCategories;
-
-       if(this.formFields.length) {
-         this._setForm(this.formFields);
-       }
      });
 
     this._formService
@@ -63,6 +62,7 @@ export class IndividualReceiptComponent implements OnInit {
       .subscribe(res => {
         this._types = res.data.transactionCategories;
       });
+
 
     this.frmIndividualReceipt = this._fb.group({
       transactionCategory: ['', [
@@ -92,12 +92,12 @@ export class IndividualReceiptComponent implements OnInit {
     });
 
     formGroup['transactionCategory'] = new FormControl(
-       '',
+       this._types['transactionCategory'] || '',
        [Validators.required]
     );
 
     formGroup['transactionType'] = new FormControl(
-      '',
+      this._types['transactionType'] || '',
       [Validators.required]
     );
 
@@ -127,18 +127,14 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public transactionCategorySelected(e): void {
-    console.log('transactionCategorySelected: ');
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if(typeof e !== 'undefined') {
+      console.log('e: ', e);
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
       let selectedIndex: number = 0;
       let childIndex: number = 0;
 
-      this.frmIndividualReceipt.setValue({
-        transactionCategory: selectedValue,
-        transactionType: ''
-      });
+      this._types['transactionCategory'] = selectedValue;
 
       this._types.findIndex((el, index) => {
         if(el.text === selectedType) {
@@ -161,11 +157,15 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public transactionTypeSelected(e): void {
-    console.log('transactionTypeSelected: ');
     if(typeof e !== 'undefined') {
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
 
+      this._types['transactionType'] = selectedValue;
+
+      // if(this.formFields.length) {
+      //  this._setForm(this.formFields);
+      // }
       console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     } else {
 
