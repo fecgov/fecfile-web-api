@@ -83,6 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    
 
     return this._http
       .post<form99>(
@@ -357,6 +358,8 @@ export class FormsService {
     let printpriview_filename = "";
     let printpriview_fileurl = "";
 
+    console.log("PreviewForm_ReasonScreen start...")
+
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -454,7 +457,7 @@ export class FormsService {
     }
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
-
+    console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
     new Response(data).text().then(console.log)
 
     return this._http
@@ -501,7 +504,7 @@ export class FormsService {
               console.log ('org_fileurl on Reason screen',org_fileurl);
             }
 
-            return true;
+            return res;
           }
           return false;
       }));
