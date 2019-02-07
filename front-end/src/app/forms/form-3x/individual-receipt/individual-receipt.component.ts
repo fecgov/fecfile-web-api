@@ -21,6 +21,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
+  public formSubmitted: boolean = false;
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
@@ -173,12 +174,14 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
-  public doValidateReceipt(): boolean {
+  public doValidateReceipt() {
     console.log('doValidate: ');
     console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
 
-    if(this.frmIndividualReceipt.valid) {
+    this.formSubmitted = true;
 
+    if(this.frmIndividualReceipt.valid) {
+      this.formSubmitted = false;
     }
     return;
   }
