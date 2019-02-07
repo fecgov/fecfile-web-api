@@ -479,18 +479,6 @@ export class FormsService {
             console.log ('PreviewForm_ReasonScreen api Repsonse',res);
             console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
 
-            if (fileuploaded)
-            {
-              org_filename=form99_details_res.filename;
-              org_fileurl=form99_details_res.file;
-              /*form_99_details_res_tmp.id=form_99_details_res.id; //just to get form 99 id
-              localStorage.setItem('id', form_99_details_res_tmp.id);*/
-              localStorage.setItem('orm_99_details.org_filename', org_filename);
-              localStorage.setItem('orm_99_details.org_fileurl', org_fileurl);
-              console.log ('org_filename on Reason screen',org_filename);
-              console.log ('org_fileurl on Reason screen',org_fileurl);
-            }
-
             return res;
           }
           return false;
