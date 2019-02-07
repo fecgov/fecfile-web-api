@@ -3,6 +3,28 @@
     [formGroup]="frmIndividualReceipt"
     (ngSubmit)="doValidateReceipt()"
   >
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h1>
+            Form 3X
+            <ng-container *ngIf="transactionType">
+              / {{ transactionType }}
+            </ng-container>
+          </h1>
+        </div>
+        <div class="float-right">
+          <button
+            type="button"
+            class="btn btn-link btn-options"
+          >
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+        </div>
+      </div>
+      <hr />
+    </header>
     <section>
       <div class="row">
         <div class="col">
@@ -21,6 +43,7 @@
           <ng-select
             name="transactionCategory"
             class="transaction-category-select"
+            placeholder="Select a transaction category first."
             [items]="transactionCategories"
             bindLabel="text"
             bindValue="value"
@@ -62,11 +85,12 @@
           <ng-select
             name="transactionType"
             class="transaction-type-select"
-            placeholder="You must select a transaction category first."
+            [placeholder]="frmIndividualReceipt.controls.transactionCategory.invalid ? 'You must select a transaction category first.' : ''"
             [items]="transactionTypes"
             bindLabel="text"
             bindValue="value"
             formControlName="transactionType"
+            (change)="transactionTypeSelected($event)"
           >
           </ng-select>
           <div

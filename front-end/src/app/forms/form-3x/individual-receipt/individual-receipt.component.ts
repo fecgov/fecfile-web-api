@@ -26,6 +26,7 @@ export class IndividualReceiptComponent implements OnInit {
   public formVisible: boolean = false;
   public states: any = [];
   public transactionCategories: any = null;
+  public transactionType: string = null;
   public transactionTypes: any = null;
 
   private _formType: string = '';
@@ -56,6 +57,8 @@ export class IndividualReceiptComponent implements OnInit {
        this.states = res[1].states;
 
        this.transactionCategories = res[2].transactionCategories;
+
+       console.log('this.transactionCategories: ', this.transactionCategories);
      });
 
     this._formService
@@ -171,6 +174,14 @@ export class IndividualReceiptComponent implements OnInit {
     } else {
 
       this.frmIndividualReceipt.controls['transactionType'].setValue(null);
+    }
+  }
+
+  public transactionTypeSelected(e): void {
+    if(typeof e !== 'undefined') {
+      this.transactionType = e.text;
+    } else {
+      this.transactionType = null;
     }
   }
 

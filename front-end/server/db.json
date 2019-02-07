@@ -409,7 +409,8 @@
       ]
     },
     {
-      "transactionCategories": [{
+      "transactionCategories": [
+        {
           "value": "contributions-from-individuals",
           "text": "Contributions From Individuals",
           "type": "Receipts"
@@ -481,27 +482,27 @@
         },
         {
           "value": "debts-owed-to-committee",
-          "text": "Debts Owed to Committee",
+          "text":  "Debts Owed to Committee",
           "type": "Loans and Debts"
         },
         {
           "value": "debts-owed-to-committee",
-          "text": "Debts Owed to Committee",
+          "text":  "Debts Owed to Committee",
           "type": "Loans and Debts"
         },
         {
           "value": "h1---allocation-ratios",
-          "text": "H1 - Allocation Ratios",
+          "text":  "H1 - Allocation Ratios",
           "type": "Other"
         },
         {
           "value": "h2---fundraising-ratios",
-          "text": "H2 - Fundraising Ratios",
+          "text":  "H2 - Fundraising Ratios",
           "type": "Other"
         },
         {
           "value": "schedule-l",
-          "text": "Schedule L",
+          "text":  "Schedule L",
           "type": "Other"
         }
       ]
