@@ -382,5 +382,6 @@ NXG_FEC_API_URL = "127.0.0.1:8080"
 NXG_FEC_API_VERSION = "/api/v1/"
 
 
-NXG_FEC_PRINT_API_URL = 'http://dev-efile-api.efdev.fec.gov/printpdf/v1/print'
+NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.efdev.fec.gov/printpdf')
+NXG_FEC_PRINT_API_VERSION = "/v1/print"
 

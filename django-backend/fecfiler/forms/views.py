@@ -1077,7 +1077,7 @@ def save_print_f99(request):
             }
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
-        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL, data=data_obj, files=file_obj)
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
@@ -1197,7 +1197,7 @@ def update_print_f99(request):
             }
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
-        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL, data=data_obj, files=file_obj)
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
