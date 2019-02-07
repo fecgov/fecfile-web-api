@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
+import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'app-f3x',
@@ -38,6 +39,14 @@ export class F3xComponent implements OnInit {
   public formRadioOptionsVisible: boolean = false;
   public selectedreportTypeRadio: string = '';
   public reporttype: any = {};
+  public electionDates: selectedElectionDate = {};
+  public electionStates: any = {};
+  public form3xSelectedReportType: any = {};
+  public selectedstate: string = '';
+  public fromDate: string = '';
+  public toDate: string = '';
+  public selectedReportType: selectedReportType = {};
+  public reportType: string = '';
 
   private _step: string = '';
   private _formType: string = '';
@@ -139,48 +148,186 @@ export class F3xComponent implements OnInit {
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
 
-    console.log(" F3x Componenets ngdoCheck stateSelection",this.stateSelection);
-    console.log(" F3x Componenets ngdoCheck formRadioOptionsVisible",this.formRadioOptionsVisible);
-    console.log(" F3x Componenets ngdoCheck selectedRadioOptions",this.selectedreportTypeRadio);
+    console.log("F3xComponent ngdoCheck stateSelection",this.stateSelection);
+    console.log("F3xComponent ngdoCheck formRadioOptionsVisible",this.formRadioOptionsVisible);
+    console.log("F3xComponent ngdoCheck selectedRadioOptions",this.selectedreportTypeRadio);
     
-    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-    console.log("ngDoCheck this._currentReportTyp", this._currentReportType);
-
-
+    //this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-    this.reporttypeindicator  = this.reporttypes.find( x => {
-      return x.default_disp_ind === 'Y' ;
-    });
-    //}).regular_special_report_ind;
+     console.log("F3xComponent ngdoCheck this.reporttypes", this.reporttypes);
 
-    if (typeof this.reporttypeindicator !== 'undefined') {
-      this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
-    }
 
-    this.reporttype=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+    /*this.reporttypeindicator  = this.reporttypes.find( x => {
+      return x.default_disp_ind === 'Y' ;*/
 
-    if (this.reporttype === null)
+    this.reporttype=localStorage.getItem('form3XReportInfo.reportType');  
+
+    if ( typeof  this.reportType === 'undefined')
     {
-     if (this.reporttypeindicator === 'S') {
-       this.specialreports=true;
-       this.regularreports=false;
-     } else {
-       this.specialreports=false;
-       this.regularreports=true;
-     }
-    }
-    else
-    {
-      if (this.reporttype.regular_special_report_ind === 'S') {
+      this.selectedReportType  = this.reporttypes.find( x => x.default_disp_ind === 'Y');
+      console.log("F3xComponent ngdoCheck this.selectedReportType", this.selectedReportType);
+
+      if (this.selectedReportType !== null && this.selectedReportType !== undefined)
+      {
+        this.reportType  = this.selectedReportType.report_type;
+        console.log("F3xComponent ngdoCheck this.selectedReportType", this.selectedReportType);
+        this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+        this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+      }
+      else
+      {
+        console.log("F3xComponent ngdoCheck I'm here");
+        this.reportType  = this.reporttypes[0].report_type;
+        console.log("F3xComponent ngdoCheck this.selectedReportType", this.selectedReportType);
+
+        this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+        this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+        //this.reportType  = this.selectedReportType.report_type;
+      }
+
+      if (this.reporttypeindicator === 'S') {
         this.specialreports=true;
         this.regularreports=false;
-      } else {
+      } 
+      else 
+      {
         this.specialreports=false;
         this.regularreports=true;
       }
+      
     }
+    else
+    {
+      if (this.selectedReportType !== null && this.selectedReportType !== undefined)
+      {
+       this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+        console.log("F3xComponent ngDoCheck this.selectedReportType.regular_special_report_ind", this.selectedReportType.regular_special_report_ind);  
+        if (this.selectedReportType.regular_special_report_ind === 'S') 
+        {
+         this.specialreports=true;
+         this.regularreports=false;
+         this.electionStates=this.selectedReportType.election_state
+         console.log("F3xComponent ngDoCheck this.electionStates", this.electionStates);  
+         this.fromDate="01/20/2019";
+         this.fromDate="02/20/2019";
+
+        } 
+        else 
+        {
+         this.specialreports=false;
+         this.regularreports=true;
+         this.fromDate="01/20/2019";
+         this.fromDate="02/20/2019";
+         
+        /*this.fromDate=this.electionStates[0].cvg_start_date;
+        this.toDate=this.electionStates[0].cvg_end_date;*/
+        
+        }
+     }
+     else
+     {
+      this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+      if (typeof this.reporttypes !== 'undefined')
+      {
+       this.reportType  = this.reporttypes[0].report_type;
+      }
+      console.log("F3xComponent ngdoCheck this.selectedReportType", this.selectedReportType);
+
+      this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+      this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+
+      if (this.reporttypeindicator === 'S') 
+        {
+          this.specialreports=true;
+          this.regularreports=false;
+        } 
+        else 
+        {
+         this.specialreports=false;
+         this.regularreports=true;
+         this.fromDate="01/20/2019";
+         this.fromDate="02/20/2019";
+        }
+     }
+    
+
+    }
+
+    console.log("F3xComponent ngdoCheck this.reportType", this.reportType);
+    console.log("F3xComponent ngdoCheck this.reporttypeindicator", this.reporttypeindicator);
+
+
+    //this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);    
+   // });
+    //}).regular_special_report_ind;
+
+    /*if (typeof this.reporttypeindicator !== 'undefined') {
+      this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
+    }*/
+    
+    console.log("F3xComponent ngDoCheck this.fromDate", this.fromDate);
+    console.log("F3xComponent ngDoCheck this.toDate", this.toDate);
    
+    this.selectedstate = localStorage.getItem('form3XReportInfo.state');
+    console.log("F3xComponent ngDoCheck this.selectedstate", this.selectedstate);
+
+    this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+    console.log("F3xComponent ngDoCheck this.form3xSelectedReportType", this.form3xSelectedReportType);
+
+    
+    if ( typeof  this.selectedReportType !== 'undefined')
+    {
+      this.electionStates=this.selectedReportType.election_state
+      if (this.selectedstate === null || this.selectedstate === undefined)
+      {
+        this.electionDates  = this.electionStates[0];
+      }
+      else
+      {
+       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
+      }
+      console.log( "F3xComponent ngDoCheck  this.electionStates", this.electionStates);
+      console.log( "F3xComponent ngDoCheck  this.electionDates", this.electionDates);
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
+    }
+
+    console.log("F3xComponent ngDoCheck this.fromDate", this.fromDate);
+    console.log("F3xComponent ngDoCheck this.toDate", this.toDate);
+   
+    this.selectedstate = localStorage.getItem('form3XReportInfo.state');
+    console.log("F3xComponent ngDoCheck this.selectedstate", this.selectedstate);
+
+    this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+    console.log("F3xComponent ngDoCheck this.form3xSelectedReportType", this.form3xSelectedReportType);
+
+    /*if (this.selectedReportType !== null && this.form3xSelectedReportType !== undefined)
+    {
+      this.electionStates=this.selectedReportType.election_state;
+
+      if (this.selectedstate !== null &&  this.selectedstate !== undefined)
+      {
+       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
+      }
+      else
+      {
+        this.electionDates  = this.electionStates[0].dates;
+      }
+    
+      console.log( "F3xComponent ngDoCheck  this.electionStates", this.electionStates);
+      console.log( "F3xComponent ngDoCheck  this.electionDates", this.electionDates);
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
+    }*/
+
+    console.log("F3xComponent ngDoCheck this.specialreports", this.specialreports);
+    console.log("F3xComponent ngDoCheck this.regularreports", this.regularreports);
+    
+    localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.selectedReportType));
+    
+    /*this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log("F3X Componenets ngOnChanges this._currentReportTyp", this._currentReportType);  */
   }
+
 
   /**
    * Get's message from child components.
@@ -204,7 +351,7 @@ export class F3xComponent implements OnInit {
     }
 
     console.log(" F3x Coomponenets onNtify selectedreportTypeRadio",e.reportTypeRadio);
-      if (typeof e.reportTypeRadio !== 'undefined') {
+      if (typeof e.reportTypeRadio !== undefined) {
         if (e.reportTypeRadio.length) {
           this.selectedreportTypeRadio = e.reportTypeRadio;
           console.log(" F3x Coomponenets onNtify selectedreportTypeRadio",this.selectedreportTypeRadio);
@@ -217,6 +364,7 @@ export class F3xComponent implements OnInit {
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
     console.log("onNotify this._currentReportTyp", this._currentReportType);
 
+    
     this.frm = e.form;
 
     this.direction = e.direction;
@@ -253,10 +401,85 @@ export class F3xComponent implements OnInit {
 
   ngOnChanges(): void
   {
-    console.log(" F3X Componenets ngOnChanges this.specialreports", this.specialreports);
-    console.log(" F3X Componenets ngOnChanges this.regularreports", this.regularreports);
+
+    console.log("F3x Componenets ngOnChanges stateSelection",this.stateSelection);
+    console.log("F3x Componenets ngOnChanges formRadioOptionsVisible",this.formRadioOptionsVisible);
+    console.log("F3x Componenets ngOnChanges selectedRadioOptions",this.selectedreportTypeRadio);
+    
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+    console.log("F3x Componenets ngOnChanges this._currentReportTyp", this._currentReportType);
+
+
+    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+    this.reporttypeindicator  = this.reporttypes.find( x => {
+      return x.default_disp_ind === 'Y' ;
+    });
+    //}).regular_special_report_ind;
+
+    if (typeof this.reporttypeindicator !== 'undefined') {
+      this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
+    }
+
+    this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+
+    if (this.reportType === null || this.reportType === undefined)
+    {
+     if (this.reporttypeindicator === 'S') {
+       this.specialreports=true;
+       this.regularreports=false;
+     } else {
+       this.specialreports=false;
+       this.regularreports=true;
+     }
+    }
+    else
+    {
+      if (this.selectedReportType.regular_special_report_ind === 'S') {
+        this.specialreports=true;
+        this.regularreports=false;
+      } 
+      else 
+      {
+        this.specialreports=false;
+        this.regularreports=true;
+        this.electionStates=this.form3xSelectedReportType.election_state
+
+        this.fromDate=this.electionStates.cvg_start_date;
+        this.toDate=this.electionStates.cvg_end_date;
+        
+      }
+    }
+    console.log("F3xComponent ngOnChanges this.fromDate", this.fromDate);
+    console.log("F3xComponent ngOnChanges this.toDate", this.toDate);
+   
+    this.selectedstate = localStorage.getItem('form3XReportInfo.state');
+    console.log("F3xComponent ngOnChanges this.selectedstate", this.selectedstate);
+
+    this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+    console.log("F3xComponent ngOnChanges this.form3xSelectedReportType", this.form3xSelectedReportType);
+
+    if (this.selectedReportType !== null || this.form3xSelectedReportType !== undefined)
+    {
+      this.electionStates=this.selectedReportType.election_state
+
+      if (this.selectedstate===null || this.selectedstate ===undefined)
+      {
+       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
+      }
+      else
+      {
+        this.electionDates  = this.electionStates[0].dates;
+      }
+    
+      console.log( "F3xComponent ngOnChanges  this.electionStates", this.electionStates);
+      console.log( "F3xComponent ngOnChanges  this.electionDates", this.electionDates);
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
+    }
+
+    console.log("F3xComponent ngOnChanges this.specialreports", this.specialreports);
+    console.log("F3xComponent ngOnChanges this.regularreports", this.regularreports);
 
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-    console.log(" F3X Componenets ngOnChangesthis._currentReportTyp", this._currentReportType);
+    console.log("F3X Componenets ngOnChanges this._currentReportTyp", this._currentReportType);
   }
 }

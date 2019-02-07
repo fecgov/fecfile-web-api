@@ -17,6 +17,13 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() specialreports: boolean = false;
   @Input() regularreports: boolean = false;
   @Input() selectedreporttype:  selectedReportType;
+  @Input() selectedstate:  selectedReportType;
+  @Input() electiondates:  selectedElectionDate={};
+  //@Input() electiondates:  any ={};
+  @Input() fromDate:  string='';
+  @Input() toDate:  string='';
+  @Input() electiontoDatedates: string='';
+  @Input() cashOnHand: any = {};
 
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
@@ -33,9 +40,13 @@ export class ReportTypeSidebarComponent implements OnInit {
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
   public searchField: any = {};
-  public cashOnHand: any = {};
+  //public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
+  public fromdate: string = '';
+  public todate: string = '';
+  public reporttypes: any = {};
+  public selectedReportType: any = {};
 
   constructor(
     private _config: NgbTooltipConfig,
@@ -83,42 +94,54 @@ export class ReportTypeSidebarComponent implements OnInit {
     });
   }
 
-  ngDoCheck(): void {
-    console.log(" Report type side bar ngDoCheck this.specialreports", this.specialreports);
-    console.log(" Report type side bar ngDoCheck this.regularreports", this.regularreports);
-
+  ngDoCheck(): void
+  {
+    this.fromDate="01/23/2019";
+    this.toDate="02/23/2019";
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-    console.log(" Report type side bar ngDoCheck this._currentReportTyp", this._currentReportType);
-
-    console.log (" ReportTypeSidebarComponent ngDoCheck reporttype = ", this.selectedreporttype);
-
-
+    console.log (" ReportTypeSidebarComponent ngDoCheck this.electiondates = ", this.electiondates);
+    console.log (" ReportTypeSidebarComponent ngDoCheck this.electiondates = ", this.electiondates);
   }
 
   ngOnChanges(): void
   {
+    this.fromDate="01/23/2019";
+    this.toDate="02/23/2019";
     console.log (" ReportTypeSidebarComponent ngOnChanges reporttype = ", this.selectedreporttype);
-    console.log( "ReportTypeSidebarComponent ngOnChanges this.electionDates", this.electionDates);
+    console.log (" ReportTypeSidebarComponent ngOnChanges this.electiondates", this.electiondates);
+    if (this.electiondates !== null && this.electiondates !== undefined )
+    {
+      this.fromDate="01/23/2019";
+      this.toDate="02/23/2019";
+    }
+    console.log (" ReportTypeSidebarComponent ngOnChanges fromdate = ", this.fromdate);
+    console.log (" ReportTypeSidebarComponent ngOnChanges fromtodatedate = ", this.todate);
   }
 
   selectStateChange(value: string): void
   {
-    console.log( " ReportTypeSidebarComponent selectStateChange elction state value =", value);
 
-    if (this.selectedreporttype !== null)
+    this.fromDate="01/23/2019";
+    this.toDate="02/23/2019";
+    
+    console.log( " ReportTypeSidebarComponent selectStateChange elction state value =", value);
+    localStorage.setItem('form3XReportInfo.state', value);
+    if (this.selectedreporttype !== null || this.selectedreporttype !== undefined)
     {
       this.electionStates=this.selectedreporttype.election_state
-      this.electionDates  = this.electionStates.find( x => x.state === value);
+      this.electiondates  = this.electionStates.find( x => x.state === value);
     
-      console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates", this.electionDates);
+      console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates", this.electiondates);
       //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
     }
 
-    console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates.dates", this.electionDates);
+    console.log( "ReportTypeSidebarComponent selectStateChange this.electiondates.dates", this.electiondates);
+
     
-    /*this.status.emit({
-      electionDates: this.electionDates
-    });*/
+       
+    this.status.emit({
+      electiondates: this.electiondates
+    });
   }
 
   selectElectionDateChange(value: string): void

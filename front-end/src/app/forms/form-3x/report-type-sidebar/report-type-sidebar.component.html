@@ -23,9 +23,9 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="date" 
-          name="txttodate" 
-          value=""
+          <input type="text" 
+          name="txtfromdate"
+          value={{fromDate}}
           class="form-control" 
           aria-label="Contribution Date"/>
         </div>
@@ -45,21 +45,14 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="date" 
-          name="txtfromdate" 
-          value=""
+          <input type="text" 
+          name="txttodate"
+          value={{toDate}}
           class="form-control" 
           aria-label="Contribution Date">
         </div>
           
-          <div class="form-row" *ngIf="cashOnHand?.showCashOnHand"> 
-          <div class="form-sidebar-item__text">
-            {{ cashOnHand.text }}
-          </div>
-          <div class="form-sidebar-item__value">
-            ${{ cashOnHand.amount }}
-          </div>
-        </div>  
+ 
     </div> <!-- regular reports-->
     
     <div class="form-row" *ngIf="specialreports===true">
@@ -103,9 +96,9 @@
      
       </div>
       <div class="form-row">
-          <select id="electiondate" name="electiondate" [(ngModel)]="selectedElectionDate" class="form-control" #electionDate (change)="selectElectionDateChange($event.target.value)">
-              <option value="---">--- </option>
-              <option *ngFor='let electionDate of electionDates.dates' [value]="electionDate.election_date">{{electionDate.election_date}}</option>
+          <select id="electiondate" [(ngModel)]="selectedElectionDate" name="electiondate"  class="form-control" #electionDate (change)="selectElectionDateChange($event.target.value)">
+              <option ngvalue="---">--- </option>
+              <option *ngFor='let electiondate of electiondates.dates' [value]="electiondate.election_date">{{electiondate.election_date}}</option>
           </select> 
         
       </div>
@@ -125,9 +118,9 @@
       </div>
       <div class="form-row">
         <i class="fas fa-calendar-alt"></i>
-        <input type="date" 
-        name="txttodate" 
-        value=""
+        <input type="text" 
+        name="txtfromdate" 
+        value={{fromDate}}
         class="form-control" 
         aria-label="Contribution Date"/>
       </div>
@@ -147,42 +140,45 @@
       </div>
       <div class="form-row">
         <i class="fas fa-calendar-alt"></i>
-        <input type="date" 
-        name="txtfromdate" 
-        value=""
+        <input type="text" 
+        name="txttodate" 
+        value={{toDate}}
         class="form-control" 
         aria-label="Contribution Date">
       </div>
-  
-      <div class="form-row" *ngIf="cashOnHand?.showCashOnHand"> 
-      <div class="form-sidebar-item__text">
-        {{ cashOnHand.text }}
-      </div>
-      <div class="form-sidebar-item__value">
-        ${{ cashOnHand.amount }}
-      </div>
-    </div>  
-  </div> <!-- special reports-->
-   <!-- buttons started here-->
-    <div class="form-sidebar__btns">
-    <div class="btn-row">
-      <button
-        type="button"
-        class="btn btn-secondary-gray"
-      >
-        Summary
-      </button>
     </div>
-    <br />
-    <div class="btn-row">
-      <button
-        type="button"
-        class="btn btn-secondary"
-      >
-        Sign &amp; Submit
-      </button>
-    </div>
-  </div>
     </form>
-  </section>
-</div>
+    </section>
+    <footer>
+      <div
+        class="form-sidebar__item"
+        *ngIf="cashOnHand?.showCashOnHand"
+      >
+        <div class="form-sidebar-item__text">
+          {{ cashOnHand.text }}
+        </div>
+        <div class="form-sidebar-item__value">
+          $0
+        </div>
+      </div>
+      <div class="form-sidebar__btns">
+        <div class="btn-row">
+          <button
+            type="button"
+            class="btn btn-secondary-gray"
+          >
+            Summary
+          </button>
+        </div>
+        <div class="btn-row">
+          <button
+            type="button"
+            class="btn btn-secondary"
+          >
+            Sign &amp; Submit
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
