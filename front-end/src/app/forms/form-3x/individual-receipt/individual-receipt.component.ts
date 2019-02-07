@@ -82,6 +82,11 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  /**
+   * Generates the dynamic form after all the form fields are retrived.
+   *
+   * @param      {Array}  fields  The fields
+   */
   private _setForm(fields: any): void {
     const formGroup: any = [];
 
@@ -102,10 +107,14 @@ export class IndividualReceiptComponent implements OnInit {
     );
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
-
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
   }
 
+  /**
+   * Sets the form field valition requirements.
+   *
+   * @param      {Object}  validators  The validators
+   * @return     {Array}  The validations in an Array.
+   */
   private _mapValidators(validators): Array<any> {
     const formValidators = [];
 
@@ -162,5 +171,15 @@ export class IndividualReceiptComponent implements OnInit {
 
       this.frmIndividualReceipt.controls['transactionType'].setValue(null);
     }
+  }
+
+  public doValidateReceipt(): boolean {
+    console.log('doValidate: ');
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
+
+    if(this.frmIndividualReceipt.valid) {
+
+    }
+    return;
   }
 }

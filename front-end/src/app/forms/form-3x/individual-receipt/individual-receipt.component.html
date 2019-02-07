@@ -1,5 +1,8 @@
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt">
+  <form
+    [formGroup]="frmIndividualReceipt"
+    (ngSubmit)="doValidateReceipt()"
+  >
     <section>
       <div class="row">
         <div class="col">
@@ -72,7 +75,13 @@
           >
             <div
               class="text-error text-left"
-              *ngIf="frmIndividualReceipt.controls.transactionType.errors?.required"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory.errors?.required  && frmIndividualReceipt.controls.transactionType.errors?.required"
+            >
+              You must select a transaction category first.
+            </div>
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory.valid && frmIndividualReceipt.controls.transactionType.errors?.required"
             >
               You must select a transaction type.
             </div>
@@ -86,7 +95,7 @@
               <div class="form-group">
                 <label for="{{ col.name }}">
                   {{ col.text }}
-                  <ng-container *ngIf="col.required">
+                  <ng-container *ngIf="col?.validation?.required">
                     *
                   </ng-container>
                  <button
@@ -109,6 +118,17 @@
                     class="form-control"
                     [formControlName]="col.name"
                   />
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea
