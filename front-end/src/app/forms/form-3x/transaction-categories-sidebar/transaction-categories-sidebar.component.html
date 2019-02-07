@@ -1,18 +1,8 @@
 <div class="form-sidebar">
   <header>
     <h3 class="text-center">{{ title }}</h3>
-    <hr />
   </header>
   <section>
-    <div class="search-field" *ngIf="searchField">
-      <i class="search-icon" aria-hidden="true"></i>
-      <input
-        type="{{ searchField.type }}"
-        name="{{ searchField.name }}"
-        class="{{ searchField.name }}"
-        placeholder="{{ searchField.placeholder }}"
-      />
-    </div>
     <ul class="form-sidebar__links" >
       <li
         [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
