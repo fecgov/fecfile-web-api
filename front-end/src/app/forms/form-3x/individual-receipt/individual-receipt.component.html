@@ -67,6 +67,9 @@
             </div>
           </div>
         </div>
+        <div class="col info-text">
+          {{ transactionCategoryInfo }}
+        </div>
       </div>
       <div class="row">
         <div class="col">
@@ -110,6 +113,9 @@
               You must select a transaction type.
             </div>
           </div>
+        </div>
+        <div class="col info-text">
+          {{ transactionTypeInfo }}
         </div>
       </div>
       <ng-container *ngFor="let row of formFields">

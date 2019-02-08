@@ -27,6 +27,9 @@
         margin-left: 0;
         margin-right: 0;
         .col {
+          &.info-text {
+            padding-top: 45px;
+          }
           label {
             display: block;
           }

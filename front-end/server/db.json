@@ -413,97 +413,98 @@
         {
           "value": "contributions-from-individuals",
           "text": "Contributions From Individuals",
-          "type": "Receipts"
+          "type": "Receipts",
+          "info": "Contributions From Individuals - Waiting for text."
         },
         {
           "value": "contributions-from-registered-filers",
           "text": "Contributions From Registered Filers",
-          "type": "Receipts"
+          "type": "Receipts",
+          "info": "Contributions From Registered Filers - Waiting for text."
         },
         {
           "value": "transfers",
           "text": "Transfers",
-          "type": "Receipts"
+          "type": "Receipts",
+          "info": "Transfers - Waiting for text."
         },
         {
           "value": "refunds",
           "text": "Refunds",
-          "type": "Receipts"
-        },
-        {
-          "value": "refunds",
-          "text": "Refunds",
-          "type": "Receipts"
+          "type": "Receipts",
+          "info": "Refunds - Waiting for text."
         },
         {
           "value": "other",
           "text": "Other",
-          "type": "Receipts"
+          "type": "Receipts",
+          "info": "Receipts - Waiting for text."
         },
         {
           "value": "operating-expenditures",
           "text": "Opertaing Expenditures",
-          "type": "Disbursments"
+          "type": "Disbursments",
+          "info": "Opertaing Expenditures - Waiting for text."
         },
         {
           "value": "contributions-expenditures-to-reg--filers",
           "text": "Contributions/Expenditures to Reg. Filers",
-          "type": "Disbursments"
+          "type": "Disbursments",
+          "info": "Contributions/Expenditures to Reg. Filers - Waiting for text."
         },
         {
           "value": "other-expenditures",
           "text": "Other Expenditures",
-          "type": "Disbursments"
+          "type": "Disbursments",
+          "info": "Other Expenditures - Waiting for text."
         },
         {
           "value": "refund",
           "text": "Refund",
-          "type": "Disbursments"
-        },
-        {
-          "value": "refund",
-          "text": "Refund",
-          "type": "Disbursmentss"
+          "type": "Disbursments",
+          "info": "Refund - Waiting for text."
         },
         {
           "value": "allocated-or-fea-expenditures",
           "text": "Allocated or FEA Expenditures",
-          "type": "Disbursmentss"
+          "type": "Disbursmentss",
+          "info": "Allocated or FEA Expenditures - Waiting for text."
         },
         {
           "value": "loans-owed-to-committee",
           "text": "Loans Owed to Committee",
-          "type": "Loans and Debts"
+          "type": "Loans and Debts",
+          "info": "Loans Owed to Committee - Waiting for text."
         },
         {
           "value": "loans-owed-by-committee",
           "text": "Loans Owed by Committee",
-          "type": "Loans and Debts"
+          "type": "Loans and Debts",
+          "info": "Loans Owed by Committee - Waiting for text."
         },
         {
           "value": "debts-owed-to-committee",
           "text":  "Debts Owed to Committee",
-          "type": "Loans and Debts"
-        },
-        {
-          "value": "debts-owed-to-committee",
-          "text":  "Debts Owed to Committee",
-          "type": "Loans and Debts"
+          "type": "Loans and Debts",
+          "info": "Debts Owed to Committee - Waiting for text."
         },
         {
           "value": "h1---allocation-ratios",
           "text":  "H1 - Allocation Ratios",
-          "type": "Other"
+          "type": "Other",
+          "info": "H1 - Allocation Ratios - Waiting for text."
         },
         {
           "value": "h2---fundraising-ratios",
           "text":  "H2 - Fundraising Ratios",
-          "type": "Other"
+          "type": "Other",
+          "info": "H2 - Fundraising Ratios - Waiting for text."
         },
         {
           "value": "schedule-l",
           "text":  "Schedule L",
-          "type": "Other"
+          "type": "Other",
+          "info": "Schedule L - Waiting for text."
         }
       ]
     }

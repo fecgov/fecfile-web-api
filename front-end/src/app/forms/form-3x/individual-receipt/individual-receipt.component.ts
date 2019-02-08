@@ -26,7 +26,9 @@ export class IndividualReceiptComponent implements OnInit {
   public formVisible: boolean = false;
   public states: any = [];
   public transactionCategories: any = null;
+  public transactionCategoryInfo: string = null;
   public transactionType: string = null;
+  public transactionTypeInfo: string = null;
   public transactionTypes: any = null;
 
   private _formType: string = '';
@@ -57,8 +59,6 @@ export class IndividualReceiptComponent implements OnInit {
        this.states = res[1].states;
 
        this.transactionCategories = res[2].transactionCategories;
-
-       console.log('this.transactionCategories: ', this.transactionCategories);
      });
 
     this._formService
@@ -152,10 +152,13 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public transactionCategorySelected(e): void {
     if(typeof e !== 'undefined') {
+      console.log('e: ', e);
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
       let selectedIndex: number = 0;
       let childIndex: number = 0;
+
+      this.transactionCategoryInfo = e.info;
 
       this._types['transactionCategory'] = selectedValue;
 
@@ -172,16 +175,20 @@ export class IndividualReceiptComponent implements OnInit {
 
       this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
     } else {
-
+      this.transactionCategoryInfo = null;
       this.frmIndividualReceipt.controls['transactionType'].setValue(null);
     }
   }
 
   public transactionTypeSelected(e): void {
+    console.log('transactionType: ');
     if(typeof e !== 'undefined') {
+      console.log('e: ', e);
       this.transactionType = e.text;
+      this.transactionTypeInfo = e.info;
     } else {
       this.transactionType = null;
+      this.transactionTypeInfo = null;
     }
   }
 
