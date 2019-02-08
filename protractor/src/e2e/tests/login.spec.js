@@ -4,7 +4,7 @@ describe('Login Test Suite',function(){
 
     beforeAll(function(done){
         //console.log('Hello beforeAll..');
-        browser.get('http://35.172.199.97/');
+        browser.get('http://dev-fecfile.efdev.fec.gov/');
         done();
     });
 
@@ -15,7 +15,6 @@ describe('Login Test Suite',function(){
     });
     afterAll(function(done){
         //console.log('Hello afterAll..');
-       // browser.close();
         done()
     });
     afterEach(function(done){
@@ -25,7 +24,7 @@ describe('Login Test Suite',function(){
     })
 
     it('Test Login',function(){
-        new LoginPageFunctions().Login('C01234567','test');
+        new LoginPageFunctions().Login('C00690222','test');
         //browser.waitForAngular();
     });
 
@@ -43,7 +42,7 @@ describe('Login Test Suite',function(){
     });
 
     it('Test Invalid Password',function(){
-        new LoginPageFunctions().checkInvalidCredentialsdError('C01234567','');
+        new LoginPageFunctions().checkInvalidCredentialsdError('C00690222','');
     });
 
     it('Test Forgot CommitteeId',function(){

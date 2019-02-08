@@ -28,6 +28,7 @@ export class SignComponent implements OnInit {
   public date_stamp: Date = new Date();
   public hideText: boolean = false;
   public showValidateBar: boolean = false;
+  private _printPriviewPdfFileLink: string='';
 
   private _subscription: Subscription;
   private _additional_email_1: string = '';
@@ -404,29 +405,44 @@ export class SignComponent implements OnInit {
         }
       });
   }
-  public printPriview(): void {
+  public printPreview(): void {
+    console.log("SignComponent printPriview ...");
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
-   if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
+    if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
      this.frmSignee.controls.additional_email_2.valid) {
 
      this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
      this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-
-     /*.saveForm({}, {}, this.formType)*/
      console.log("Accessing Sign printPriview ...");
      this._formsService
        .PreviewForm_Preview_sign_Screen({}, this.formType)
        .subscribe(res => {
          if(res) {
-           console.log("Accessing Sign printPriview res ...",res);
-         }
-       },
-       (error) => {
-         console.log('error: ', error);
-       });
+             console.log("Accessing SignComponent printPriview res ...",res);
+             window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+    }
+    else {
+        console.log("Accessing Sign printPriview ...");
+        this._formsService
+        .PreviewForm_Preview_sign_Screen({}, this.formType)
+        .subscribe(res => {
+         if(res) {
+            console.log("Accessing SignComponent printPriview res ...",res);
+            window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+           }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+     }       
    }
- }
+
 }

@@ -288,10 +288,9 @@ def create_f99_info(request):
         #except:
             #logger.
             #return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
-    
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 """
@@ -317,19 +316,22 @@ def update_f99_info(request):
         try:
             if 'id' in request.data and (not request.data['id']=='') and int(request.data['id'])>=1:
                 comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                print(request.data.get('email_on_file_1'))
+                print(comm_info.email_on_file_1)
+
                 if comm_info:
                     if comm_info.is_submitted==False:
-                        comm_info.signee = request.data['signee']
-                        comm_info.email_on_file = request.data['email_on_file']
-                        comm_info.email_on_file_1 = request.data['email_on_file_1']
-                        comm_info.additional_email_1 = request.data['additional_email_1']
-                        comm_info.additional_email_2 = request.data['additional_email_2']
+                        comm_info.signee = request.data.get('signee')
+                        comm_info.email_on_file = request.data.get('email_on_file')
+                        comm_info.email_on_file_1 = request.data.get('email_on_file_1')
+                        comm_info.additional_email_1 = request.data.get('additional_email_1')
+                        comm_info.additional_email_2 = request.data.get('additional_email_2')
                         comm_info.updated_at = datetime.datetime.now()
                         comm_info.save()
                         result = CommitteeInfo.objects.filter(id=request.data['id']).last()
                         if result:
                             serializer = CommitteeInfoSerializer(result)
-                            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
                         else:
                             return Response({})
                     else:
@@ -839,8 +841,8 @@ def email(boolean, data):
     #t = Template(email_ack1)
     #c= Context({'@REPID':123458},)
 
-    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")
-    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")	
+    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
+    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
 
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
@@ -857,7 +859,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses')
+    client = boto3.client('ses',region_name='us-east-1')
 
     # Try to send the email.
     try:
@@ -962,26 +964,41 @@ def save_print_f99(request):
     """
     #import ipdb; ipdb.set_trace()
     logger.debug("Incoming parameters: save_print_f99" + str(request.data))
-    token_use = request.auth.decode("utf-8")
+    # token_use = request.auth.decode("utf-8")
 
-    token_use = "JWT" + " " + token_use
+    # token_use = "JWT" + " " + token_use
 
-    if 'file' in request.data:
-        filename = request.data.get('file').name
-        attachment = request.data.get('file')
-        decode_file = attachment.read()
-        #attachment = open(request.data.get('file'), 'rb')
-        files = {'file': (filename, decode_file, 'application/pdf')}
-        #'file': ('attachment.pdf', myfile, 'application/pdf')
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
-    else:
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
+    # if 'file' in request.data:
+    #     filename = request.data.get('file').name
+    #     attachment = request.data.get('file')
+    #     decode_file = attachment.read()
+    #     #attachment = open(request.data.get('file'), 'rb')
+    #     files = {'file': (filename, decode_file, 'application/pdf')}
+
+    #     #print(request._request.content)
+    #     #request._request.content
+    #     #'file': ('attachment.pdf', myfile, 'application/pdf')
+    #     createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
+    #     #createresp = 
+    # else:
+    #     createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
     
-    #print(request.auth)
-    if not createresp.ok:
-        return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
-    #try:
-    create_json_data = json.loads(createresp.text)
+    createresp = create_f99_info(request._request)
+
+    if createresp.status_code != 201:
+        entity_status = status.HTTP_400_BAD_REQUEST
+        return Response(createresp.data, status=entity_status)
+
+    else:
+        print(createresp.content)
+        create_json_data = json.loads(createresp.content.decode("utf-8"))
+        #create_json_data = {"id" : "12"}
+
+    # #print(request.auth)
+    # if not createresp.ok:
+    #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
+    # #try:
+    # create_json_data = json.loads(createresp.text)
 
     comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
@@ -1045,6 +1062,7 @@ def save_print_f99(request):
         vendor_software_name='FECFILE'
 
         data_obj = {
+                'form_type': 'F99',
                 'filing_type':filing_type,
                 'vendor_software_name':vendor_software_name,
             }
@@ -1067,21 +1085,23 @@ def save_print_f99(request):
             #attachment = open(file_object['Body'], 'rb')
 
             file_obj = {
-                'data1': ('data.json', open('data.json', 'r'), 'application/json'),
-                'file': ('attachment.pdf', myfile, 'application/pdf')
+                'json_file': ('data.json', open('data.json', 'r'), 'application/json'),
+                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
             }
         else:
             file_obj = {
-                'data1': ('data.json', open('data.json', 'r'), 'application/json')
+                'json_file': ('data.json', open('data.json', 'r'), 'application/json')
             }
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
-            dictcreate = createresp.json()
+            #dictcreate = createresp.json()
             dictprint = printresp.json()
-            merged_dict = {**dictcreate, **dictprint}
+            merged_dict = {**create_json_data, **dictprint}
             #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
             #return Response(printresp.json(), status=status.HTTP_201_CREATED)
@@ -1101,15 +1121,26 @@ def update_print_f99(request):
     Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
     """
     #import ipdb; ipdb.set_trace()
-    token_use = request.auth.decode("utf-8")
+    # token_use = request.auth.decode("utf-8")
 
-    token_use = "JWT" + " " + token_use
+    # token_use = "JWT" + " " + token_use
 
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
-    if not createresp.ok:
-        return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
+    # createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
+    # if not createresp.ok:
+    #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
+
+    updateresp = update_f99_info(request._request)
+
+    if updateresp.status_code != 201:
+        entity_status = status.HTTP_400_BAD_REQUEST
+        return Response(updateresp.data, status=entity_status)
+
+    else:
+        print(updateresp.content)
+        update_json_data = json.loads(updateresp.content.decode("utf-8"))
+
     #try:
-    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+    comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
         serializer = CommitteeInfoSerializer(comm_info)
         imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
@@ -1163,6 +1194,7 @@ def update_print_f99(request):
         vendor_software_name='FECFILE'
 
         data_obj = {
+                'form_type':'F99',
                 'filing_type':filing_type,
                 'vendor_software_name':vendor_software_name,
             }
@@ -1184,21 +1216,22 @@ def update_print_f99(request):
             #attachment = open(file_object['Body'], 'rb')
 
             file_obj = {
-                'data1': ('data.json', open('data.json', 'rb'), 'application/json'),
-                'file': ('attachment.pdf', myfile, 'application/pdf')
+                'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
+                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
             }
         else:
             file_obj = {
-                'data1': ('data.json', open('data.json', 'rb'), 'application/json')
+                'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
             }
-        #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
-            dictcreate = createresp.json()
+            #dictcreate = createresp.json()
             dictprint = printresp.json()
-            merged_dict = {**dictcreate, **dictprint}
+            merged_dict = {**update_json_data, **dictprint}
             #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
             #return Response(printresp.json(), status=status.HTTP_201_CREATED)

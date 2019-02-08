@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -6,8 +6,9 @@ import { form3x } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { form3x_data, Icommittee_form3x_reporttype} from '../../../shared/interfaces/FormsService/FormsService';
+import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
 import { forkJoin, of, interval } from 'rxjs';
+import { CompileShallowModuleMetadata } from '@angular/compiler';
 
 
 @Component({
@@ -20,6 +21,10 @@ export class ReportTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('mswCollapse') mswCollapse;
+  @Input() formRadioOptionsVisible: boolean = false;
+  @Input() reportType:string ='';
+  
+  //@Input() reportTypeRadio: string ='';
 
   public frmReportType: FormGroup;
   public typeSelected: string = '';
@@ -32,7 +37,6 @@ export class ReportTypeComponent implements OnInit {
   private _form_3x_details: form3x;
   private _newForm: boolean = false;
   private _previousUrl: string = null;
-  public reporttypes: any = {};
 
   //public committee_form3x_reporttypes: Icommittee_form3x_reporttype[];
   public committee_form3x_reporttypes: any = [];
@@ -41,14 +45,21 @@ export class ReportTypeComponent implements OnInit {
   public selectedOptions: any = [];
   public searchField: any = {};
   public cashOnHand: any = {};
+  public typeSelectedId: string='';
+  public reportTypeRadio: string ='';
 
   public frm: any;
   public direction: string;
   public previousStep: string = '';
+  public reporttypes: any = [];
+  public reporttype: any = {};
+  
+
   private _step: string = '';
   private _form_type: string = '';
   private step: string = "";
   private next_step: string = "Step-2";
+  private _form3XReportDetails:  form3XReport={};
 
   public showForm: boolean = true;
 
@@ -135,13 +146,46 @@ export class ReportTypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
+    console.log("updateTypeSelected");
     if(e.target.checked) {
       this.typeSelected = e.target.value;
+      this.typeSelectedId = e.target.id;
+      this.reportTypeRadio = e.target.id;
       this.optionFailed = false;
     } else {
       this.typeSelected = '';
       this.optionFailed = true;
+      this.reportTypeRadio = '';
     }
+    
+    console.log ("e.target.name = ",e.target.name);
+    console.log ("e.target.value = ",e.target.value);
+    console.log ("e.target.id = ",e.target.id);
+
+    console.log ("this.typeSelected = ",this.typeSelected);
+    localStorage.setItem('form3XReportInfo.reportType', e.target.id);
+    //console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
+
+    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+    console.log (" ReportTypeComponent updateTypeSelected this.reporttypes ", this.reporttypes)
+
+    if (this.reporttypes !== null && this.reporttypes !== undefined)
+    {
+      this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
+    
+      console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
+      console.log( "ReportTypeComponent updateTypeSelected this.reporttype.report_type", this.reporttype.report_type);
+      console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype);
+
+      localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
+      //localStorage.setItem('form3XReportInfo.state', "");
+      localStorage.removeItem('form3XReportInfo.state');
+    }
+
+
+    this.status.emit({
+      reportTypeRadio: e.target.id
+    });
     // this.frmType.controls['reportTypeRadio'].setValue(val);
   }
 
@@ -220,7 +264,7 @@ export class ReportTypeComponent implements OnInit {
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
   }
-  public Savadata(): void {
+  public saveReport(): void {
 
    /* console.log("this.direction=",this.direction);
 

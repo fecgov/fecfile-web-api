@@ -11,6 +11,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 
+
 @Component({
   selector: 'f99-reason',
   templateUrl: './reason.component.html',
@@ -40,7 +41,7 @@ export class ReasonComponent implements OnInit {
   public validFile: boolean = true;
   public showFileDeleteButton: boolean=false;
   public notCorrectPdfSize: boolean=false;
-  public printPrivewPdfFileLink: string ='';
+  private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
   private _editorMax: number = 20000;
@@ -433,9 +434,12 @@ export class ReasonComponent implements OnInit {
       return true;
   }*/
   public printPreview () {
-    console.log('Reason screen printPreview: ');
+    console.log('Reason screen printPreview: step-I ');
     if(this.frmReason.valid) {
+       console.log('Reason screen printPreview: step -II');
+
       if (this.frmReason.get('reasonText').value.length >= 1) {
+        console.log('Reason screen printPreview: step -III');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -456,30 +460,60 @@ export class ReasonComponent implements OnInit {
         this.showValidateBar = false;
         console.log('Reason screen printPreview: this.file: ',this.file);
 
-        this._formsService
+
+        if (this.file !== null){
+          console.log('Reason screen printPreview: step -IV');
+         this._formsService
           .PreviewForm_ReasonScreen({}, this.file, this._formType)
           .subscribe(res => {
             if(res) {
               console.log('Reason screen printPreview: res: ', res);
+
               this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
               console.log('Reason screen printPreview: rthis.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+
               this._form99Details.id = res.id;
-
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
               // success
               this.formSaved = true;
-
               let formSavedObj: any = {
                 'saved': this.formSaved
               };
               localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+              window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
             }
           },
           (error) => {
             console.log('error: ', error);
           });
+        }
+        else
+        {
+          console.log('Reason screen printPreview: step -V');
+          this._formsService
+          .PreviewForm_ReasonScreen({}, {}, this._formType)
+          .subscribe(res => {
+            if(res) {
+              console.log('Reason screen printPreview: res: ', res);
+              this._form99Details.id = res.id;
+              localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+              // success
+              this.formSaved = true;
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+              window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+        }
+
       }
     }
   }
+
 }
