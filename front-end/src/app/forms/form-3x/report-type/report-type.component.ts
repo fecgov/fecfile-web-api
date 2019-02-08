@@ -23,11 +23,7 @@ export class ReportTypeComponent implements OnInit {
   @ViewChild('mswCollapse') mswCollapse;
   @Input() formRadioOptionsVisible: boolean = false;
   @Input() reportType:string ='';
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 5246b251c92d7c93f33676d9396b438cb15d1863
   //@Input() reportTypeRadio: string ='';
 
   public frmReportType: FormGroup;
@@ -57,11 +53,7 @@ export class ReportTypeComponent implements OnInit {
   public previousStep: string = '';
   public reporttypes: any = [];
   public reporttype: any = {};
-<<<<<<< HEAD
-  
-=======
 
->>>>>>> 5246b251c92d7c93f33676d9396b438cb15d1863
 
   private _step: string = '';
   private _form_type: string = '';
@@ -83,20 +75,20 @@ export class ReportTypeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    // console.log("accessing form service call side bar ...");
+    console.log("accessing form service call side bar ...");
 
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
    this._formService
      .getreporttypes(this._form_type)
      .subscribe(res => {
-      // console.log(' getspecialreporttypes res: ', res);
+      console.log(' getspecialreporttypes res: ', res);
       this.committee_form3x_reporttypes = res.report_type;
-      // console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
+      console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
      });
 
 
-    // console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
+    console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
 
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
@@ -164,9 +156,8 @@ export class ReportTypeComponent implements OnInit {
       this.typeSelected = '';
       this.optionFailed = true;
       this.reportTypeRadio = '';
-<<<<<<< HEAD
     }
-    
+
     console.log ("e.target.name = ",e.target.name);
     console.log ("e.target.value = ",e.target.value);
     console.log ("e.target.id = ",e.target.id);
@@ -181,7 +172,7 @@ export class ReportTypeComponent implements OnInit {
     if (this.reporttypes !== null && this.reporttypes !== undefined)
     {
       this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
-    
+
       console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
       console.log( "ReportTypeComponent updateTypeSelected this.reporttype.report_type", this.reporttype.report_type);
       console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype);
@@ -190,22 +181,6 @@ export class ReportTypeComponent implements OnInit {
       //localStorage.setItem('form3XReportInfo.state', "");
       localStorage.removeItem('form3XReportInfo.state');
     }
-=======
-    }
-    localStorage.setItem('form3XReportInfo.reportType', e.target.id);
-    //console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
-
-    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-
-    if (this.reporttypes !== null && this.reporttypes !== undefined)
-    {
-      this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
-
-      localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
-      //localStorage.setItem('form3XReportInfo.state', "");
-      localStorage.removeItem('form3XReportInfo.state');
-    }
->>>>>>> 5246b251c92d7c93f33676d9396b438cb15d1863
 
 
     this.status.emit({
@@ -230,6 +205,7 @@ export class ReportTypeComponent implements OnInit {
           localStorage.setItem('form_3x_details', JSON.stringify(this._form_3x_details));
         }, 100);
 
+        console.log(" report-type.component doValidateType");
 
         this.status.emit({
           form: this.frmReportType,
@@ -237,6 +213,8 @@ export class ReportTypeComponent implements OnInit {
           step: 'step_2',
           previousStep: 'step_1'
         });
+
+        console.log(" report-type.component After status.emit");
         return 1;
     } else {
       this.optionFailed = true;

@@ -1,14 +1,12 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
-
 
 @Component({
   selector: 'app-f3x',
@@ -20,13 +18,21 @@ import { selectedElectionState, selectedElectionDate, selectedReportType } from 
 export class F3xComponent implements OnInit {
 
   public currentStep: string = 'step_1';
-  public direction: string = '';
+  public step: string = '';
+  public formOptionsVisible: boolean = false;
+  public frmOption: FormGroup;
+  public loadingData: boolean = true;
+  public steps: any = {};
+  public transactionCategories: any = {};
+  public selectedOptions: any = [];
+  public searchField: any = {};
+  public cashOnHand: any = {};
   public frm: any;
+  public direction: string;
   public previousStep: string = '';
+  public specialreports: boolean = false;
   public regularreports: boolean = false;
   public reporttypeindicator: any = '';
-  public specialreports: boolean = false;
-  public step: string = '';
   public loadingreportData: boolean = true;
   public reporttypes: any = [];
   public stateSelection: string ='';
@@ -78,26 +84,28 @@ export class F3xComponent implements OnInit {
 
     localStorage.setItem('form3XReportInfo', JSON.stringify(this._form3XReportDetails));
 
+     /*localStorage.setItem('form3XReportInfo.reportId', this._form3XReportDetails.reportId);
+    localStorage.setItem('form3XReportInfo.reportType', this._form3XReportDetails.reportType);
+    localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this._form3XReportDetails.regularSpecialReportInd);
+    localStorage.setItem('form3XReportInfo.stateOfElection', this._form3XReportDetails.stateOfElection);
+    localStorage.setItem('form3XReportInfo.cvgStartDate', this._form3XReportDetails.cvgStartDate);
+    localStorage.setItem('form3XReportInfo.cvgEndDate', this._form3XReportDetails.cvgEndDate);
+    localStorage.setItem('form3XReportInfo.dueDate', this._form3XReportDetails.dueDate);*/
 
     this._formService
       .getreporttypes(this._formType)
       .subscribe(res => {
         this.reporttypes  = res.report_type;
         localStorage.setItem('form3xReportTypes', JSON.stringify(this.reporttypes));
+        console.log ("F3xComponent ngOnInit this.reporttypes",this.reporttypes)
 
     });
 
-     if (this.reporttypeindicator === 'S') {
-       this.specialreports=true;
-       this.regularreports=false;
-     } else {
-       this.specialreports=false;
-       this.regularreports=true;
-     }
 
     this._formService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
+        console.log(' getTransactionCategories resp: ', res);
         this.cashOnHand = res.data.cashOnHand;
 
         this.transactionCategories = res.data.transactionCategories;
@@ -140,6 +148,7 @@ export class F3xComponent implements OnInit {
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
 
+
     //this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
 
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
@@ -157,6 +166,7 @@ export class F3xComponent implements OnInit {
       if (this.selectedReportType !== null && this.selectedReportType !== undefined)
       {
         this.reportType  = this.selectedReportType.report_type;
+        console.log("F3xComponent ngdoCheck this.selectedReportType", this.selectedReportType);
         this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
         this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
       }
@@ -185,27 +195,25 @@ export class F3xComponent implements OnInit {
       if (this.selectedReportType !== null && this.selectedReportType !== undefined)
       {
        this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
-       if(this.selectedReportType !== null) {
-          if (this.selectedReportType.regular_special_report_ind === 'S')
-          {
-           this.specialreports=true;
-           this.regularreports=false;
-           this.electionStates=this.selectedReportType.election_state
-           this.fromDate="01/20/2019";
-           this.fromDate="02/20/2019";
+       if (this.selectedReportType.regular_special_report_ind === 'S')
+        {
+         this.specialreports=true;
+         this.regularreports=false;
+         this.electionStates=this.selectedReportType.election_state
+         this.fromDate="01/20/2019";
+         this.fromDate="02/20/2019";
 
-          }
-          else
-          {
-           this.specialreports=false;
-           this.regularreports=true;
-           this.fromDate="01/20/2019";
-           this.fromDate="02/20/2019";
+        }
+        else
+        {
+         this.specialreports=false;
+         this.regularreports=true;
+         this.fromDate="01/20/2019";
+         this.fromDate="02/20/2019";
 
-          /*this.fromDate=this.electionStates[0].cvg_start_date;
-          this.toDate=this.electionStates[0].cvg_end_date;*/
+        /*this.fromDate=this.electionStates[0].cvg_start_date;
+        this.toDate=this.electionStates[0].cvg_end_date;*/
 
-          }
         }
      }
      else
@@ -215,7 +223,6 @@ export class F3xComponent implements OnInit {
       {
        this.reportType  = this.reporttypes[0].report_type;
       }
-
       this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
       this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
 
@@ -234,7 +241,7 @@ export class F3xComponent implements OnInit {
      }
 
 
-    }
+     }
 
 
     //this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
@@ -261,7 +268,9 @@ export class F3xComponent implements OnInit {
       {
        this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
       }
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
     }
+
 
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
 
@@ -285,13 +294,15 @@ export class F3xComponent implements OnInit {
       //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
     }*/
 
+
     localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.selectedReportType));
 
     /*this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
     console.log("F3X Componenets ngOnChanges this._currentReportTyp", this._currentReportType);  */
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(): void
+  {
 
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
 
@@ -337,7 +348,6 @@ export class F3xComponent implements OnInit {
     }
 
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
-
     this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
 
     if (this.selectedReportType !== null || this.form3xSelectedReportType !== undefined)
@@ -352,11 +362,11 @@ export class F3xComponent implements OnInit {
       {
         this.electionDates  = this.electionStates[0].dates;
       }
+      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
     }
 
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
   }
-
 
 
   /**
@@ -365,6 +375,9 @@ export class F3xComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
+
+
+
     if (typeof e.additionalOptions !== 'undefined') {
       if (e.additionalOptions.length) {
         this.selectedOptions = e.additionalOptions;
@@ -374,6 +387,7 @@ export class F3xComponent implements OnInit {
         this.formOptionsVisible = false;
       }
     }
+
       if (typeof e.reportTypeRadio !== undefined) {
         if (e.reportTypeRadio.length) {
           this.selectedreportTypeRadio = e.reportTypeRadio;
@@ -384,7 +398,6 @@ export class F3xComponent implements OnInit {
         }
     }
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-
 
     this.frm = e.form;
 
@@ -399,32 +412,26 @@ export class F3xComponent implements OnInit {
     this.canContinue();
    }
 
- /**
-  * Determines ability to continue.
-  *
-  * @return     {boolean}  True if able to continue, False otherwise.
-  */
- public canContinue(): void {
-  if(this.frm && this.direction) {
-    if(this.direction === 'next') {
-      if(this.frm.valid) {
-        this.step = this._step;
+   public canContinue(): void {
 
-        this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
-      } else if (this.frm === 'transactionCategories') {
-        this.step = this._step;
+    if(this.frm && this.direction) {
+      if(this.direction === 'next') {
+        if(this.frm.valid) {
+          this.step = this._step;
 
-        this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
-      } else if(this.frm === 'preview') {
+          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+        } else if(this.frm === 'preview') {
+          this.step = this._step;
+
+          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+        }
+      } else if(this.direction === 'previous') {
         this.step = this._step;
 
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
-    } else if(this.direction === 'previous') {
-      this.step = this._step;
-
-      this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
     }
   }
+
 
 }
