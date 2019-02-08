@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'f3x-financial-summary',
@@ -29,15 +30,19 @@ export class FinancialSummaryComponent implements OnInit {
   ngOnInit(): void {
     this.viewMode = 'tab1';
 
-    this._http
-     .get('http://localhost:3000/data')
-     .subscribe(res => {
-       if(res) {
-         this.tab1Data = res[0];
-         this.tab2Data = res[1];
-         this.tab3Data = res[2];
-       }
-     });
+    if (environment.name === 'development') {
+      this._http
+       .get('http://localhost:3000/data')
+       .subscribe(res => {
+         if(res) {
+           const summary = res[3].financialSummary;
+           console.log('summary: ', summary);
+           this.tab1Data = summary[0];
+           this.tab2Data = summary[1];
+           this.tab3Data = summary[2];
+         }
+       });
+     }
   }
 
   /**

@@ -18,8 +18,8 @@
   </header>
   <form
     [formGroup]="frmReportType"
-    (ngSubmit)="doValidateOption()"
-    (blur)="doValidateOption()"
+    (ngSubmit)="doValidatereportType()"
+    (blur)="doValidatereportType()"
   >
     <section>
       <div class="form-content">
@@ -44,7 +44,7 @@
                 value="{{committee_form3x_reporttype.report_type}}"
                 (click)="updateTypeSelected($event)"
                 formControlName="reportTypeRadio"
-                
+
               />
               <label
                 for="{{committee_form3x_reporttype.report_type_desciption}}"
@@ -79,7 +79,6 @@
           <button
             class="btn btn-primary btn-right"
             type="submit"
-            (click)="saveReport()"
           >
             Next
           </button>

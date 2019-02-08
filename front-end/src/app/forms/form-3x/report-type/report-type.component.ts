@@ -82,13 +82,8 @@ export class ReportTypeComponent implements OnInit {
    this._formService
      .getreporttypes(this._form_type)
      .subscribe(res => {
-      console.log(' getspecialreporttypes res: ', res);
       this.committee_form3x_reporttypes = res.report_type;
-      console.log(' this.committee_form3x_reporttypes: ', this.committee_form3x_reporttypes);
      });
-
-
-    console.log("this.committee_form3x_reporttypes = ",this.committee_form3x_reporttypes);
 
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
@@ -146,7 +141,6 @@ export class ReportTypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
-    console.log("updateTypeSelected");
     if(e.target.checked) {
       this.typeSelected = e.target.value;
       this.typeSelectedId = e.target.id;
@@ -158,24 +152,15 @@ export class ReportTypeComponent implements OnInit {
       this.reportTypeRadio = '';
     }
 
-    console.log ("e.target.name = ",e.target.name);
-    console.log ("e.target.value = ",e.target.value);
-    console.log ("e.target.id = ",e.target.id);
-
-    console.log ("this.typeSelected = ",this.typeSelected);
     localStorage.setItem('form3XReportInfo.reportType', e.target.id);
     //console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
 
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-    console.log (" ReportTypeComponent updateTypeSelected this.reporttypes ", this.reporttypes)
 
     if (this.reporttypes !== null && this.reporttypes !== undefined)
     {
       this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
 
-      console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
-      console.log( "ReportTypeComponent updateTypeSelected this.reporttype.report_type", this.reporttype.report_type);
-      console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype);
 
       localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
       //localStorage.setItem('form3XReportInfo.state', "");
@@ -194,7 +179,9 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidatereportType() {
-    if (this.frmReportType.get('reportTypeRadio').value) {
+    console.log('doValidate: ');
+    if (this.frmReportType.controls['reportTypeRadio'].valid) {
+      console.log('form is valid: ');
         this.optionFailed = false;
         this.isValidType = true;
         this._form_3x_details = JSON.parse(localStorage.getItem('form_3x_details'));
@@ -205,8 +192,6 @@ export class ReportTypeComponent implements OnInit {
           localStorage.setItem('form_3x_details', JSON.stringify(this._form_3x_details));
         }, 100);
 
-        console.log(" report-type.component doValidateType");
-
         this.status.emit({
           form: this.frmReportType,
           direction: 'next',
@@ -214,7 +199,8 @@ export class ReportTypeComponent implements OnInit {
           previousStep: 'step_1'
         });
 
-        console.log(" report-type.component After status.emit");
+        this.saveReport();
+
         return 1;
     } else {
       this.optionFailed = true;
