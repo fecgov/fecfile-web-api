@@ -256,7 +256,7 @@ export class PreviewComponent implements OnInit {
 
             console.log('PreviewComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
 
-            window.open(this._printPriviewPdfFileLink, '_blank');
+            window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
           }
         },
         (error) => {
