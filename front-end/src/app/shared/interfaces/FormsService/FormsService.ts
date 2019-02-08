@@ -212,4 +212,51 @@ export interface f3xTransactionTypes {
   states?: Array<any>,
   transactionCategories?: Array<any>
 }
+  export interface selectedElectionDate{
+    election_date?: string,
+    cvg_start_date?: string,
+    cvg_end_date?: string,
+    due_date?: string
+  }
+
+  export interface form3XReport {
+    cmteId?:string;
+    reportId?: string,
+    formType?:string;
+    amend_Indicator?:string;
+    reportType?: string,
+    regularSpecialReportInd?: string,
+    stateOfElection?:string,
+    electionDate?:string,
+    cvgStartDate?: string,
+    cvgEndDate?:string,
+    dueDate?:string,
+    coh_bop?:string
+  }
+
+  export interface selectedElectionState{
+    state?: string,
+    state_description?: string,
+    dates?: Array<selectedElectionDate>
+  }
+
+  export interface selectedReportType
+  {
+    default_disp_ind?: string,
+    election_state?: Array<selectedElectionState>,
+    regular_special_report_ind?: string,
+    report_type?: string ,
+    report_type_desciption?: string,
+    report_type_info?: string,
+  }
+
+  export interface form99PrintPreviewResponse{
+    message?:string,
+    results?:pdfResonse,
+    success?:string
+  }
+
+  export interface pdfResonse{
+    pdf_url?:string,
+   }
 

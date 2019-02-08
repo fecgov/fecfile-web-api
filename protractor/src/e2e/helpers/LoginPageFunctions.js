@@ -18,9 +18,11 @@ class LoginPageFunctions {
     Logout() {
 
         loginPage.logoutdropdownmenu.click(); 
+        browser.sleep(1000);
         loginPage.logout.click();
+        browser.sleep(1000);
         var logouttext = element(by.className('logged-out-msg'));
-        expect(logouttext.getText()).toBe('You have successfully logged out of the FEC eFile application.'); 
+        expect(logouttext.getText()).toBe('You have successfully logged out of the FECFile Online application.'); 
         loginPage.loginusername.clear();
         loginPage.loginpassword.clear();
     }

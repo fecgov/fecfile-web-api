@@ -1,6 +1,8 @@
 @import '../../../shared/scss/global';
 
 .report-type-sidebar {
+  position: relative;
+  height: 775px;
   header {
     margin-bottom: 20px;
   }
@@ -11,14 +13,49 @@
       text-align: center;
       input[type='date'] {
         &.form-control {
-          margin-left: auto;
-          margin-right: auto;
-          width: 190px !important;
+        margin-left: auto;
+        margin-right: auto;
+        width: 170px !important;
         }
+      }
+      label {
+        margin: 0 auto;
+      }
+      .state-select,
+      .election-date-select {
+        margin: 0 auto !important;
+        width: 200px !important;
+      }
+      .calendar-icon {
+        left: 4px;
+        position: absolute;
+        padding-top: 20px;
       }
     }
   }
   footer {
+    background-color: $mineShaft;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    .form-sidebar__item {
+      border-bottom: 1px solid $white;
+      color: $white;
+      height: 25px;
+      line-height: 25px;
+      padding-bottom: 10px;
+      vertical-align: middle;
+      .form-sidebar-item__text {
+        color: $white;
+        float: left;
+        padding-left: 5px;
+      }
+      .form-sidebar-item__value {
+        color: $white;
+        float: right;
+        padding-right: 8px;
+      }
+    }
     .form-sidebar__btns {
       padding-bottom: 10px;
       padding-top: 15px;

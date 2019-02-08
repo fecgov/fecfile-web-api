@@ -839,8 +839,8 @@ def email(boolean, data):
     #t = Template(email_ack1)
     #c= Context({'@REPID':123458},)
 
-    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")
-    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%Y-%m-%d %T")	
+    data['updated_at'] = maya.parse(data['updated_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
+    data['created_at'] = maya.parse(data['created_at']).datetime(to_timezone='US/Eastern', naive=True).strftime("%m-%d-%Y %T")
 
     BODY_HTML = render_to_string('email_ack.html',{'data':data})
     #data.get('committeeid')
@@ -857,7 +857,7 @@ def email(boolean, data):
     CHARSET = "UTF-8"
 
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses')
+    client = boto3.client('ses',region_name='us-east-1')
 
     # Try to send the email.
     try:
@@ -973,9 +973,9 @@ def save_print_f99(request):
         #attachment = open(request.data.get('file'), 'rb')
         files = {'file': (filename, decode_file, 'application/pdf')}
         #'file': ('attachment.pdf', myfile, 'application/pdf')
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
+        createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
     else:
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
+        createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
     
     #print(request.auth)
     if not createresp.ok:
@@ -1045,6 +1045,7 @@ def save_print_f99(request):
         vendor_software_name='FECFILE'
 
         data_obj = {
+                'form_type': 'F99',
                 'filing_type':filing_type,
                 'vendor_software_name':vendor_software_name,
             }
@@ -1067,15 +1068,17 @@ def save_print_f99(request):
             #attachment = open(file_object['Body'], 'rb')
 
             file_obj = {
-                'data1': ('data.json', open('data.json', 'r'), 'application/json'),
-                'file': ('attachment.pdf', myfile, 'application/pdf')
+                'json_file': ('data.json', open('data.json', 'r'), 'application/json'),
+                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
             }
         else:
             file_obj = {
-                'data1': ('data.json', open('data.json', 'r'), 'application/json')
+                'json_file': ('data.json', open('data.json', 'r'), 'application/json')
             }
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -1105,7 +1108,7 @@ def update_print_f99(request):
 
     token_use = "JWT" + " " + token_use
 
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
+    createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
     if not createresp.ok:
         return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     #try:
@@ -1163,6 +1166,7 @@ def update_print_f99(request):
         vendor_software_name='FECFILE'
 
         data_obj = {
+                'form_type':'F99',
                 'filing_type':filing_type,
                 'vendor_software_name':vendor_software_name,
             }
@@ -1184,15 +1188,16 @@ def update_print_f99(request):
             #attachment = open(file_object['Body'], 'rb')
 
             file_obj = {
-                'data1': ('data.json', open('data.json', 'rb'), 'application/json'),
-                'file': ('attachment.pdf', myfile, 'application/pdf')
+                'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
+                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
             }
         else:
             file_obj = {
-                'data1': ('data.json', open('data.json', 'rb'), 'application/json')
+                'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
             }
-        #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
         if not printresp.ok:
             return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
