@@ -242,7 +242,7 @@ export class PreviewComponent implements OnInit {
      /*.saveForm({}, {}, this.form_type)*/
      console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
-     .PreviewForm_Preview_sign_Screen({}, "F99")
+     .PreviewForm_Preview_sign_Screen({}, "99")
      .subscribe(res => {
        if(res) {
            console.log("Accessing PreviewComponent printPriview res ...",res);
