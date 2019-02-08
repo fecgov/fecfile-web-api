@@ -48,6 +48,7 @@ export class ReasonComponent implements OnInit {
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
+  private _printPriviewPdfFileLink: string = '';
 
   constructor(
     private _fb: FormBuilder,
@@ -417,22 +418,6 @@ export class ReasonComponent implements OnInit {
   }
 
 
-
-  /*public printPreview(): void {
-    this.status.emit({
-      form: {},
-      direction: 'next',
-      step: 'step_3'
-    });
-  }*/
-
-  /*public canDeactivate(): Observable<boolean> | boolean {
-      if (!this.formSaved && this.frmReason.dirty) {
-
-          return this._dialogService.confirm('Discard changes for this form?');
-      }
-      return true;
-  }*/
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
     if(this.frmReason.valid) {
@@ -467,10 +452,19 @@ export class ReasonComponent implements OnInit {
           .PreviewForm_ReasonScreen({}, this.file, this._formType)
           .subscribe(res => {
             if(res) {
+
               console.log('Reason screen printPreview: res: ', res);
 
               this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
               console.log('Reason screen printPreview: rthis.printPrivewPdfFileLink: ', this.printPrivewPdfFileLink);
+
+
+              this.printPrivewPdfFileLink=JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
+
+              this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
+
+              this._form99Details.id = res.id;
 
               this._form99Details.id = res.id;
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
@@ -511,6 +505,40 @@ export class ReasonComponent implements OnInit {
             console.log('error: ', error);
           });
         }
+<<<<<<< HEAD
+=======
+        else
+        {
+          console.log('Reason screen printPreview: step -V');
+          this._formsService
+          .PreviewForm_ReasonScreen({}, {}, this._formType)
+          .subscribe(res => {
+            if(res) {
+
+              console.log('Reason screen printPreview: step -VII');
+              console.log('Reason screen printPreview: res: ', res);
+              this._printPriviewPdfFileLink=res.printpriview_fileurl;
+              console.log('Reason screen printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
+              this._form99Details.id = res.id;
+
+              localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+
+              // success
+              this.formSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.formSaved
+              };
+              localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+              window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+        }
+>>>>>>> 5246b251c92d7c93f33676d9396b438cb15d1863
 
       }
     }

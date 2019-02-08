@@ -259,3 +259,7 @@ export interface f3xTransactionTypes {
   export interface pdfResonse{
     pdf_url?:string,
    }
+
+  export interface pdfResonse{
+    pdf_url?:string,
+   }

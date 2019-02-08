@@ -24,7 +24,7 @@ export class PreviewComponent implements OnInit {
   public date_stamp: Date = new Date();
   public form_details: form99;
   public showValidateBar: boolean = false;
-  
+
   private _subscription: Subscription;
   private _step: string = '';
 
@@ -47,11 +47,11 @@ export class PreviewComponent implements OnInit {
   ngOnInit(): void {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
     /*this.filename = this._activatedRoute.snapshot.paramMap.get(`form_${this.form_type}_file`);*/
-    
-     
-     //this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));         
 
-    
+
+     //this.org_fileurl = JSON.parse(localStorage.getItem('form_99_details.org_fileurl'));
+
+
     // console.log('On Preview Screen org_fileurl: ', this.org_fileurl);
 
 
@@ -68,7 +68,7 @@ export class PreviewComponent implements OnInit {
           if(this.form_type === '99') {
             if (this.form_details) {
               if (typeof this.form_details.filename !== 'undefined') {
-                
+
                 if (this.form_details.filename !== null) {
                   this.fileName = this.form_details.filename;
                 } else {
@@ -82,13 +82,13 @@ export class PreviewComponent implements OnInit {
                   this.org_fileurl = this.form_details.org_fileurl;
                 } else {
                   this.org_fileurl = '';
-                }                
+                }
               }
             }
             if(typeof this.form_details !== 'undefined') {
               if(typeof this.form_details.reason !== 'undefined') {
                 this.type_selected = this.form_details.reason;
-              }              
+              }
             }
           }
         });
@@ -96,12 +96,12 @@ export class PreviewComponent implements OnInit {
 
   ngDoCheck(): void {
     if(this.form_details) {
-     console.log('this.form_details.org_fileurl: ', this.form_details.org_fileurl); 
+     console.log('this.form_details.org_fileurl: ', this.form_details.org_fileurl);
      if(this.form_details.org_fileurl) {
        this.org_fileurl = this.form_details.org_fileurl;
      }
     }
-    
+
     if(!this.form_details) {
       if(localStorage.getItem(`form_${this.form_type}_details`) !== null) {
         this.form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
@@ -150,24 +150,24 @@ export class PreviewComponent implements OnInit {
    * @return     {boolean}  True if has unsaved data, False otherwise.
    */
   public hasUnsavedData(): boolean {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`)); 
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.form_type}_saved`));
 
     if(formSaved !== null) {
       let formStatus: boolean = formSaved.saved;
 
       if(!formStatus) {
         return true;
-      }      
+      }
     }
 
     return false;
-  }    
+  }
 
   public goToPreviousStep(): void {
     setTimeout(() => {
       localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this.form_details));
     }, 100);
-        
+
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -181,9 +181,9 @@ export class PreviewComponent implements OnInit {
     .sendMessage({
       'validateMessage': {
         'validate': {},
-        'showValidateBar': false                  
-      }            
-    });          
+        'showValidateBar': false
+      }
+    });
   }
 
   public goToNextStep(): void {
@@ -204,9 +204,9 @@ export class PreviewComponent implements OnInit {
       .sendMessage({
         'validateMessage': {
           'validate': {},
-          'showValidateBar': false                  
-        }            
-      });          
+          'showValidateBar': false
+        }
+      });
   }
 
   public validateForm(): void {
@@ -220,7 +220,7 @@ export class PreviewComponent implements OnInit {
               .sendMessage({
                 'validateMessage': {
                   'validate': environment.validateSuccess,
-                  'showValidateBar': true                  
+                  'showValidateBar': true
                 }
               });
         }
@@ -230,21 +230,33 @@ export class PreviewComponent implements OnInit {
           .sendMessage({
             'validateMessage': {
               'validate': error.error,
-              'showValidateBar': true                  
-            }            
+              'showValidateBar': true
+            }
           });
-      });    
+      });
   }
   public printPreview(): void {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
+
+     /*.saveForm({}, {}, this.form_type)*/
      console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
      .PreviewForm_Preview_sign_Screen({}, "F99")
      .subscribe(res => {
        if(res) {
            console.log("Accessing PreviewComponent printPriview res ...",res);
+
            window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+
+           console.log('PreviewComponent printPreview: step -IX');
+            console.log('PreviewComponent printPreview: res: ', res);
+            this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
+              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
+
+            console.log('PreviewComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
+
+            window.open(this._printPriviewPdfFileLink, '_blank');
           }
         },
         (error) => {

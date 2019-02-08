@@ -1390,4 +1390,3 @@ def print_pdf(request):
     }
 
     return JsonResponse(resp, status=status.HTTP_201_CREATED)
-

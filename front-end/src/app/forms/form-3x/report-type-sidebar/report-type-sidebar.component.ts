@@ -19,7 +19,6 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() selectedreporttype:  selectedReportType;
   @Input() selectedstate:  selectedReportType;
   @Input() electiondates:  selectedElectionDate={};
-  //@Input() electiondates:  any ={};
   @Input() fromDate:  string='';
   @Input() toDate:  string='';
   @Input() electiontoDatedates: string='';
@@ -28,8 +27,6 @@ export class ReportTypeSidebarComponent implements OnInit {
   public itemSelected: string = '';
   public additionalItemSelected: string = '';
   public additionalOptions: Array<any> = [];
-  //public electionState:string ='';
-  //public electionDates: Array<eleectionStateDate> = [];
   public electionDates: selectedElectionDate = {};
   public electionStates: any = {};
 
@@ -40,7 +37,6 @@ export class ReportTypeSidebarComponent implements OnInit {
   public sidebarLinks: any = {};
   public selectedOptions: any = [];
   public searchField: any = {};
-  //public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
   public fromdate: string = '';
@@ -57,8 +53,22 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
 
+  ngDoCheck(): void {
+    this.fromDate="01/23/2019";
+    this.toDate="02/23/2019";
+    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
+  }
 
+  ngOnChanges(): void {
+    this.fromDate="01/23/2019";
+    this.toDate="02/23/2019";
+    if (this.electiondates !== null && this.electiondates !== undefined )
+    {
+      this.fromDate="01/23/2019";
+      this.toDate="02/23/2019";
+    }
   }
 
   public selectItem(item): void {
@@ -94,51 +104,21 @@ export class ReportTypeSidebarComponent implements OnInit {
     });
   }
 
-  ngDoCheck(): void
-  {
-    this.fromDate="01/23/2019";
-    this.toDate="02/23/2019";
-    this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-    console.log (" ReportTypeSidebarComponent ngDoCheck this.electiondates = ", this.electiondates);
-    console.log (" ReportTypeSidebarComponent ngDoCheck this.electiondates = ", this.electiondates);
-  }
-
-  ngOnChanges(): void
-  {
-    this.fromDate="01/23/2019";
-    this.toDate="02/23/2019";
-    console.log (" ReportTypeSidebarComponent ngOnChanges reporttype = ", this.selectedreporttype);
-    console.log (" ReportTypeSidebarComponent ngOnChanges this.electiondates", this.electiondates);
-    if (this.electiondates !== null && this.electiondates !== undefined )
-    {
-      this.fromDate="01/23/2019";
-      this.toDate="02/23/2019";
-    }
-    console.log (" ReportTypeSidebarComponent ngOnChanges fromdate = ", this.fromdate);
-    console.log (" ReportTypeSidebarComponent ngOnChanges fromtodatedate = ", this.todate);
-  }
-
   selectStateChange(value: string): void
   {
 
     this.fromDate="01/23/2019";
     this.toDate="02/23/2019";
-    
-    console.log( " ReportTypeSidebarComponent selectStateChange elction state value =", value);
     localStorage.setItem('form3XReportInfo.state', value);
     if (this.selectedreporttype !== null || this.selectedreporttype !== undefined)
     {
       this.electionStates=this.selectedreporttype.election_state
       this.electiondates  = this.electionStates.find( x => x.state === value);
-    
-      console.log( "ReportTypeSidebarComponent selectStateChange this.electionDates", this.electiondates);
       //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
     }
 
-    console.log( "ReportTypeSidebarComponent selectStateChange this.electiondates.dates", this.electiondates);
 
-    
-       
+
     this.status.emit({
       electiondates: this.electiondates
     });
@@ -146,7 +126,5 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   selectElectionDateChange(value: string): void
   {
-    console.log( " ReportTypeSidebarComponent selectElectionDateChange elction date value =", value);
-
   }
 }
