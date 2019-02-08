@@ -6,18 +6,18 @@ phases:
       - apt-get update -y
       - apt-get install -y maven curl wget
       - apt-get purge nodejs npm
-      - curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -
+      - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
       - apt-get install -y nodejs
       - node --version
   pre_build:
     commands:
+      - pip install -U setuptools
       - pip install -r django-backend/requirements.txt
-      - npm install -g gulp bower @angular/cli
-#      - cd front-end && bower install --allow-root && cd ..
+      - pip install  flake8 safety python-taint
+      - safety check -r django-backend/requirements.txt
+      - npm install -g @angular/cli
       - cd front-end && npm install && cd ..
       - cd front-end && ng build && cd ..
-      - cd front-end && gulp && cd ..
-      - cd django-backend && python manage.py collectstatic --noinput && cd ..
   build:
     commands:
   post_build:
