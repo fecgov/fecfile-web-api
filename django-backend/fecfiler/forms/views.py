@@ -973,9 +973,9 @@ def save_print_f99(request):
         #attachment = open(request.data.get('file'), 'rb')
         files = {'file': (filename, decode_file, 'application/pdf')}
         #'file': ('attachment.pdf', myfile, 'application/pdf')
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
+        createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, files=files, headers={'Authorization': token_use})
     else:
-        createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
+        createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/create_f99_info", data=request.data, headers={'Authorization': token_use})
     
     #print(request.auth)
     if not createresp.ok:
@@ -1108,7 +1108,7 @@ def update_print_f99(request):
 
     token_use = "JWT" + " " + token_use
 
-    createresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
+    createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
     if not createresp.ok:
         return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     #try:
