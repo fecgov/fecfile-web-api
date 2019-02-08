@@ -18,8 +18,7 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  //public formType: number = null;
-  public formType: string = '';
+  public formType: string = null;
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public screenWidth: number = 0;
@@ -36,14 +35,10 @@ export class SidebarComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formService:FormsService,
-
-
   ) { }
 
   ngOnInit(): void {
-    let route: string = this._router.url;
-
-    console.log("accessing form service call side bar ...");
+    const route: string = this._router.url;
 
     this._formService.get_filed_form_types()
      .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
@@ -73,6 +68,28 @@ export class SidebarComponent implements OnInit {
     } else if (this.screenWidth >= 768) {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
+    }
+  }
+
+  ngDoCheck(): void {
+    const route: string = this._router.url;
+
+    if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
+      let formSelected: string = null;
+
+      this._activatedRoute
+        .children[0]
+        .params
+        .subscribe(param => {
+          formSelected = param['form_id'];
+          this.formSelected(formSelected);
+        });
+
+      this._closeNavBar();
+
+      if(this.formType === null) {
+        this.formType = formSelected;
+      }
     }
   }
 
@@ -107,7 +124,6 @@ export class SidebarComponent implements OnInit {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf(form) >= 1) {
             this.formType = form;
-            //form.substring(2);
           }
         }
       });
@@ -153,6 +169,7 @@ export class SidebarComponent implements OnInit {
    * Closes the navbar.
    */
   private _closeNavBar(): void {
+    console.log('_closeNavBar: ');
     this.iconClass = 'bars-icon';
 
     setTimeout(() => {
