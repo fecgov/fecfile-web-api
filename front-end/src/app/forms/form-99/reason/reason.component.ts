@@ -11,6 +11,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 
+
 @Component({
   selector: 'f99-reason',
   templateUrl: './reason.component.html',
@@ -40,14 +41,13 @@ export class ReasonComponent implements OnInit {
   public validFile: boolean = true;
   public showFileDeleteButton: boolean=false;
   public notCorrectPdfSize: boolean=false;
-  public printPrivewPdfFileLink: string ='';
+  private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
   private _editorMax: number = 20000;
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
-  private _printPriviewPdfFileLink: string = '';
 
   constructor(
     private _fb: FormBuilder,
@@ -468,25 +468,16 @@ export class ReasonComponent implements OnInit {
           .PreviewForm_ReasonScreen({}, this.file, this._formType)
           .subscribe(res => {
             if(res) {
-              console.log('Reason screen printPreview: step -IX');
               console.log('Reason screen printPreview: res: ', res);
-              this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));
-              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
-              console.log('Reason screen printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
-
               this._form99Details.id = res.id;
-
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
               // success
               this.formSaved = true;
-
               let formSavedObj: any = {
                 'saved': this.formSaved
               };
               localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
               window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
-
             }
           },
           (error) => {
@@ -500,18 +491,11 @@ export class ReasonComponent implements OnInit {
           .PreviewForm_ReasonScreen({}, {}, this._formType)
           .subscribe(res => {
             if(res) {
-
-              console.log('Reason screen printPreview: step -VII');
               console.log('Reason screen printPreview: res: ', res);
-              this._printPriviewPdfFileLink=res.printpriview_fileurl;
-              console.log('Reason screen printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
               this._form99Details.id = res.id;
-
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-
               // success
               this.formSaved = true;
-
               let formSavedObj: any = {
                 'saved': this.formSaved
               };
@@ -528,4 +512,5 @@ export class ReasonComponent implements OnInit {
       }
     }
   }
+
 }
