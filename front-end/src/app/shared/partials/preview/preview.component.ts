@@ -240,7 +240,7 @@ export class PreviewComponent implements OnInit {
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
      console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
-     .PreviewForm_Preview_sign_Screen({}, "F99")
+     .PreviewForm_Preview_sign_Screen({}, "99")
      .subscribe(res => {
        if(res) {
            console.log("Accessing PreviewComponent printPriview res ...",res);
