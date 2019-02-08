@@ -990,7 +990,7 @@ def save_print_f99(request):
         return Response(createresp.data, status=entity_status)
 
     else:
-        print(createresp.content)
+        #print(createresp.content)
         create_json_data = json.loads(createresp.content.decode("utf-8"))
         #create_json_data = {"id" : "12"}
 
@@ -1003,7 +1003,7 @@ def save_print_f99(request):
     comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
         serializer = CommitteeInfoSerializer(comm_info)
-        imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
+        # imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
 
         treasurer_name = ''
         if not comm_info.treasurerprefix is None:
@@ -1020,15 +1020,21 @@ def save_print_f99(request):
             date_signed_mm = comm_info.created_at.strftime('%m')
             date_signed_dd = comm_info.created_at.strftime('%d')
             date_signed_yy = comm_info.created_at.strftime('%Y')
+            # filing_timestamp = comm_info.created_at.strftime('%m/%d/%Y %H:%M:%S')
+            # print(comm_info.created_at)
+            # print(filing_timestamp)
         else:
             date_signed_mm = comm_info.updated_at.strftime('%m')
             date_signed_dd = comm_info.updated_at.strftime('%d')
             date_signed_yy = comm_info.updated_at.strftime('%Y')
+            # filing_timestamp = comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S')
+            # print(comm_info.updated_at)
+            # print(filing_timestamp)
 
 
         data = {
-            'IMGNO': imageno,
-            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            #'IMGNO': imageno,
+            #'FILING_TIMESTAMP': filing_timestamp,
             'COMMITTEE_NAME': comm_info.committeename,
             'FILER_FEC_ID_NUMBER':comm_info.committeeid,
             'STREET_1': comm_info.street1,
@@ -1038,7 +1044,7 @@ def save_print_f99(request):
             'REASON_TYPE': comm_info.reason,
             'DATE_SIGNED_MM':date_signed_mm,
             'DATE_SIGNED_DD':date_signed_dd,
-            'DATE_SIGNED_YY':date_signed_mm,
+            'DATE_SIGNED_YY':date_signed_yy,
             'TREASURER_FULL_NAME': treasurer_name,
             'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
             'EF_STAMP':"[Electronically Filed]",
@@ -1136,14 +1142,14 @@ def update_print_f99(request):
         return Response(updateresp.data, status=entity_status)
 
     else:
-        print(updateresp.content)
+        #print(updateresp.content)
         update_json_data = json.loads(updateresp.content.decode("utf-8"))
 
     #try:
     comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
         serializer = CommitteeInfoSerializer(comm_info)
-        imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
+        # imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
 
         treasurer_name = ''
         if not comm_info.treasurerprefix is None:
@@ -1158,8 +1164,8 @@ def update_print_f99(request):
             treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
 
         data = {
-            'IMGNO': imageno,
-            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            # 'IMGNO': imageno,
+            # 'FILING_TIMESTAMP': comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S'),
             'COMMITTEE_NAME': comm_info.committeename,
             'FILER_FEC_ID_NUMBER':comm_info.committeeid,
             'STREET_1': comm_info.street1,
