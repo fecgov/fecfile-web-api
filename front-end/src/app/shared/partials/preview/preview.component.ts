@@ -237,31 +237,19 @@ export class PreviewComponent implements OnInit {
   }
   public printPreview(): void {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
-
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-     
-     /*.saveForm({}, {}, this.form_type)*/
      console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
      .PreviewForm_Preview_sign_Screen({}, "F99")
      .subscribe(res => {
        if(res) {
            console.log("Accessing PreviewComponent printPriview res ...",res);
-           console.log('PreviewComponent printPreview: step -IX');
-            console.log('PreviewComponent printPreview: res: ', res);
-            this._printPriviewPdfFileLink = JSON.parse(localStorage.getItem('form_99_details.printpriview_fileurl'));       
-              //this._printPriviewPdfFileLink=res.printpriview_fileurl;
-
-            console.log('PreviewComponent printPreview: this._printPriviewPdfFileLink: ', this._printPriviewPdfFileLink);
-
-            window.open(this._printPriviewPdfFileLink, '_blank');
-
+           window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
           }
         },
         (error) => {
           console.log('error: ', error);
         });
-     
     }
  }
 
