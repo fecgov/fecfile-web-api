@@ -1020,15 +1020,17 @@ def save_print_f99(request):
             date_signed_mm = comm_info.created_at.strftime('%m')
             date_signed_dd = comm_info.created_at.strftime('%d')
             date_signed_yy = comm_info.created_at.strftime('%Y')
+            filing_timestamp = comm_info.created_at.strftime('%m/%d/%Y %H:%M:%S')
         else:
             date_signed_mm = comm_info.updated_at.strftime('%m')
             date_signed_dd = comm_info.updated_at.strftime('%d')
             date_signed_yy = comm_info.updated_at.strftime('%Y')
+            filing_timestamp = comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S')
 
 
         data = {
             'IMGNO': imageno,
-            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            'FILING_TIMESTAMP': filing_timestamp,
             'COMMITTEE_NAME': comm_info.committeename,
             'FILER_FEC_ID_NUMBER':comm_info.committeeid,
             'STREET_1': comm_info.street1,
@@ -1038,7 +1040,7 @@ def save_print_f99(request):
             'REASON_TYPE': comm_info.reason,
             'DATE_SIGNED_MM':date_signed_mm,
             'DATE_SIGNED_DD':date_signed_dd,
-            'DATE_SIGNED_YY':date_signed_mm,
+            'DATE_SIGNED_YY':date_signed_yy,
             'TREASURER_FULL_NAME': treasurer_name,
             'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
             'EF_STAMP':"[Electronically Filed]",
@@ -1159,7 +1161,7 @@ def update_print_f99(request):
 
         data = {
             'IMGNO': imageno,
-            'FILING_TIMESTAMP': datetime.datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            'FILING_TIMESTAMP': comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S'),
             'COMMITTEE_NAME': comm_info.committeename,
             'FILER_FEC_ID_NUMBER':comm_info.committeeid,
             'STREET_1': comm_info.street1,
