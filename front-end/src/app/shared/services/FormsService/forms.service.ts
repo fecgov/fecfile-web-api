@@ -569,7 +569,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    // console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
 
@@ -595,7 +595,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    // console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
 

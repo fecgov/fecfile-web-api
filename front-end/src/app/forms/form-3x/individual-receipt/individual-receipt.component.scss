@@ -1,0 +1,109 @@
+@import '../../../shared/scss/global';
+
+.individual-receipt-container {
+  padding-right: 10px;
+  form {
+  header {
+      .header-content {
+        display: block;
+        margin: 0 auto;
+        width: 96%;
+        @include clearfix();
+        .btn-options {
+          color: $shuttleGray;
+          text-decoration: none;
+          &:hover,
+          &:visited,
+          &:active {
+            color: $shuttleGray;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+    section {
+      .row {
+        margin-bottom: 20px;
+        margin-left: 0;
+        margin-right: 0;
+        .col {
+          &.info-text {
+            padding-top: 45px;
+          }
+          label {
+            display: block;
+          }
+          input[type='text'],
+          input[type='date'],
+          input[type='number'] {
+            &.form-control {
+              height: 30px;
+              padding-left: 5px;
+              padding-right: 5px;
+            }
+          }
+          textarea {
+            &.form-control {
+              overflow: scroll;
+              width: 400px;
+            }
+          }
+          .ng-select.transaction-type-select,
+          .ng-select.transaction-category-select  {
+            width: 360px;
+            .ng-select-container {
+              .ng-value-container {
+                .ng-placeholder {
+                  color: $black;
+                  font-weight: bold;
+                }
+              }
+            }
+          }
+          .ng-select.transaction-type-select {
+            .ng-dropdown-panel-items {
+              .ng-option-disabled {
+                &.ng-optgroup {
+                  color: $black;
+                  font-weight: bold;
+                }
+              }
+            }
+          }
+          .ng-select.state-select {
+            .ng-select-container {
+              height: 45px;
+              width: 300px;
+            }
+          }
+
+        }
+      }
+    }
+  }
+  footer {
+    .forms__btn-container {
+      margin: 0 auto;
+      padding: 0;
+      width: 80%;
+      @include media(tablet) {
+        margin: 0;
+        padding: 0;
+        width: 95%;
+      }
+      @include media(mediumDesktop) {
+        width: 95%;
+        .btn-right {
+          margin-right: 20px;
+        }
+      }
+      @include media(largeDesktop) {
+        width: 95%;
+        .btn-right {
+          margin-right: 20px;
+        }
+      }
+      @include clearfix();
+    }
+  }
+}

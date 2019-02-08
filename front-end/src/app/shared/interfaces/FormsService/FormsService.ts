@@ -49,58 +49,58 @@ export interface form3x_data {
 }
 
 export interface form3x {
-  category?: string, 
-  report_id?: string, 
-  cmte_id?: string, 
-  cmte_nm?: string, 
-  cmte_addr_chg_flag?: string, 
-  cmte_street_1?: string, 
-  cmte_street_2?: string, 
-  cmte_city?: string, 
-  cmte_state?: string, 
-  cmte_zip?: string, 
-  report_type?: string, 
-  election_code?: string, 
-  date_of_election?: string, 
-  state_of_election?: string, 
-  cvg_start_dt?: string, 
-  cvg_end_dt?: string, 
-  qual_cmte_flag?: string, 
-  treasurer_last_name?: string, 
-  treasurer_first_name?: string, 
-  treasurer_middle_name?: string, 
-  treasurer_prefix?: string, 
-  treasurer_suffix?: string, 
-  date_signed?: string, 
-  coh_bop?: string, 
-  ttl_receipts_sum_page_per?: string, 
-  subttl_sum_page_per?: string, 
-  ttl_disb_sum_page_per?: string, 
-  coh_cop?: string, 
-  debts_owed_to_cmte?: string, 
-  debts_owed_by_cmte?: string, 
-  indv_item_contb_per?: string, 
-  indv_unitem_contb_per?: string, 
-  ttl_indv_contb?: string, 
-  pol_pty_cmte_contb_per_i?: string, 
-  other_pol_cmte_contb_per_i?: string, 
-  ttl_contb_col_ttl_per?: string, 
-  tranf_from_affiliated_pty_per?: string, 
-  all_loans_received_per?: string, 
-  loan_repymts_received_per?: string, 
-  offsets_to_op_exp_per_i?: string, 
-  fed_cand_contb_ref_per?: string, 
-  other_fed_receipts_per?: string, 
-  tranf_from_nonfed_acct_per?: string, 
-  tranf_from_nonfed_levin_per?: string, 
-  ttl_nonfed_tranf_per?: string, 
-  ttl_receipts_per?: string, 
-  ttl_fed_receipts_per?: string, 
-  shared_fed_op_exp_per?: string, 
-  shared_nonfed_op_exp_per?: string, 
-  other_fed_op_exp_per?: string, 
-  ttl_op_exp_per?: string, 
-  tranf_to_affliliated_cmte_per?: string, 
+  category?: string,
+  report_id?: string,
+  cmte_id?: string,
+  cmte_nm?: string,
+  cmte_addr_chg_flag?: string,
+  cmte_street_1?: string,
+  cmte_street_2?: string,
+  cmte_city?: string,
+  cmte_state?: string,
+  cmte_zip?: string,
+  report_type?: string,
+  election_code?: string,
+  date_of_election?: string,
+  state_of_election?: string,
+  cvg_start_dt?: string,
+  cvg_end_dt?: string,
+  qual_cmte_flag?: string,
+  treasurer_last_name?: string,
+  treasurer_first_name?: string,
+  treasurer_middle_name?: string,
+  treasurer_prefix?: string,
+  treasurer_suffix?: string,
+  date_signed?: string,
+  coh_bop?: string,
+  ttl_receipts_sum_page_per?: string,
+  subttl_sum_page_per?: string,
+  ttl_disb_sum_page_per?: string,
+  coh_cop?: string,
+  debts_owed_to_cmte?: string,
+  debts_owed_by_cmte?: string,
+  indv_item_contb_per?: string,
+  indv_unitem_contb_per?: string,
+  ttl_indv_contb?: string,
+  pol_pty_cmte_contb_per_i?: string,
+  other_pol_cmte_contb_per_i?: string,
+  ttl_contb_col_ttl_per?: string,
+  tranf_from_affiliated_pty_per?: string,
+  all_loans_received_per?: string,
+  loan_repymts_received_per?: string,
+  offsets_to_op_exp_per_i?: string,
+  fed_cand_contb_ref_per?: string,
+  other_fed_receipts_per?: string,
+  tranf_from_nonfed_acct_per?: string,
+  tranf_from_nonfed_levin_per?: string,
+  ttl_nonfed_tranf_per?: string,
+  ttl_receipts_per?: string,
+  ttl_fed_receipts_per?: string,
+  shared_fed_op_exp_per?: string,
+  shared_nonfed_op_exp_per?: string,
+  other_fed_op_exp_per?: string,
+  ttl_op_exp_per?: string,
+  tranf_to_affliliated_cmte_per?: string,
   fed_cand_cmte_contb_per?: string,
   indt_exp_per?: string,
   coord_exp_by_pty_cmte_per?: string,
@@ -176,43 +176,55 @@ export interface form3x {
   create_date?: string,
   last_update_date?: string
   }
-  
-  export interface Icommittee_form3x_reporttype {
-    report_type?: string, 
-    rpt_type_desc?: string,
-    regular_special_report_ind?: string,
-    rpt_type_info?: string,
-    cvg_start_date?: string,
-    cvg_end_date?:string,
-    due_date?:string
-  }
 
-  /*export interface Icommittee_form3x_reporttype {
-    report_type?: string, 
-    report_type_desciption?: string,
-    report_type_info?: string,
-    regular_special_report_ind?: string,
-    election_state?: string[]
-  }*/
+export interface Icommittee_form3x_reporttype {
+  report_type?: string,
+  rpt_type_desc?: string,
+  regular_special_report_ind?: string,
+  rpt_type_info?: string,
+  cvg_start_date?: string,
+  cvg_end_date?:string,
+  due_date?:string
+}
 
-  export interface Ielection_state {
-    state?: string, 
-    dates?: string[]
-  }
+/*export interface Icommittee_form3x_reporttype {
+  report_type?: string,
+  report_type_desciption?: string,
+  report_type_info?: string,
+  regular_special_report_ind?: string,
+  election_state?: string[]
+}*/
 
+export interface Ielection_state {
+  state?: string,
+  dates?: string[]
+}
+
+export interface Ielection_state_date {
+  election_date?: string,
+  cvg_start_date?: string,
+  cvg_end_date?: string,
+  due_date?: string
+}
+
+export interface f3xTransactionTypes {
+  formFields?: Array<any>,
+  states?: Array<any>,
+  transactionCategories?: Array<any>
+}
   export interface selectedElectionDate{
-    election_date?: string, 
-    cvg_start_date?: string, 
-    cvg_end_date?: string, 
+    election_date?: string,
+    cvg_start_date?: string,
+    cvg_end_date?: string,
     due_date?: string
   }
-  
+
   export interface form3XReport {
     cmteId?:string;
-    reportId?: string, 
+    reportId?: string,
     formType?:string;
     amend_Indicator?:string;
-    reportType?: string, 
+    reportType?: string,
     regularSpecialReportInd?: string,
     stateOfElection?:string,
     electionDate?:string,
@@ -243,8 +255,11 @@ export interface form3x {
     results?:pdfResonse,
     success?:string
   }
-  
+
   export interface pdfResonse{
     pdf_url?:string,
    }
-  
+
+  export interface pdfResonse{
+    pdf_url?:string,
+   }

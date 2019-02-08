@@ -23,7 +23,7 @@ export class ReportTypeComponent implements OnInit {
   @ViewChild('mswCollapse') mswCollapse;
   @Input() formRadioOptionsVisible: boolean = false;
   @Input() reportType:string ='';
-  
+
   //@Input() reportTypeRadio: string ='';
 
   public frmReportType: FormGroup;
@@ -53,7 +53,7 @@ export class ReportTypeComponent implements OnInit {
   public previousStep: string = '';
   public reporttypes: any = [];
   public reporttype: any = {};
-  
+
 
   private _step: string = '';
   private _form_type: string = '';
@@ -76,7 +76,7 @@ export class ReportTypeComponent implements OnInit {
   ngOnInit(): void {
 
     console.log("accessing form service call side bar ...");
-   
+
     this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
 
    this._formService
@@ -157,7 +157,7 @@ export class ReportTypeComponent implements OnInit {
       this.optionFailed = true;
       this.reportTypeRadio = '';
     }
-    
+
     console.log ("e.target.name = ",e.target.name);
     console.log ("e.target.value = ",e.target.value);
     console.log ("e.target.id = ",e.target.id);
@@ -172,7 +172,7 @@ export class ReportTypeComponent implements OnInit {
     if (this.reporttypes !== null && this.reporttypes !== undefined)
     {
       this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
-    
+
       console.log( "ReportTypeComponent updateTypeSelected this.reporttypes", this.reporttypes);
       console.log( "ReportTypeComponent updateTypeSelected this.reporttype.report_type", this.reporttype.report_type);
       console.log( "ReportTypeComponent updateTypeSelected this.reporttype", this.reporttype);

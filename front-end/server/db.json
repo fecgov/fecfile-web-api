@@ -1,1376 +1,512 @@
 {
-  "data": {
-   "cashOnHand":{
-      "text":"Cash on Hand",
-      "showCashOnHand":"true",
-      "value":"cash-on-hand"
-   },
-   "steps":[
-      {
-         "text":"Type",
-         "step":"step_1"
-      },
-      {
-         "text":"Form",
-         "step":"step_2"
-      },
-      {
-         "text":"Preview",
-         "step":"step_3"
-      },
-      {
-         "text":"Sign",
-         "step":"step_4"
-      },
-      {
-         "text":"Submit",
-         "step":"step_5"
-      }
-   ],
-   "transactionSearchField":{
-      "text":"transaction-search",
-      "type":"text",
-      "placeholder":"Search for transaction"
-   },
-   "transactionCategories":[
-      {
-         "text":"Receipts",
-         "options":[
-            {
-               "info":null,
-               "name":"contributions-from-individuals",
-               "infoIcon":"true",
-               "text":"Contributions from Individuals",
-               "value":"contributions-from-individuals",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Individual Receipt",
-                     "value":"individual-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Partnership Receipt",
-                     "value":"partnership-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Tribal Receipt",
-                     "value":"tribal-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"In-Kind Receipt",
-                     "value":"in-kind-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Ind. In-Kind Bitcoin Receipt",
-                     "value":"ind--in-kind-bitcoin-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Reattribution",
-                     "value":"reattribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Returned/Bounced Receipt",
-                     "value":"returned-bounced-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt",
-                     "value":"earmark-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt (In)",
-                     "value":"earmark-receipt--in-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Bitcoin Sold to Ind",
-                     "value":"bitcoin-sold-to-ind",
-                     "type":"radio"
-                  },
-                  {
-                     "info":"# Bitcoins sold via # - purchaser unknown\n# Bitcoins sold via # - purchaser unknown\n# Bitcoins sold via # - purchaser unknown",
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Bitcoin Sold to Unknown",
-                     "value":"bitcoin-sold-to-unknown",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":"Earmark contribution",
-                     "value":"earmark-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-individuals",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+  "data": [{
+      "formFields": [{
+          "cols": [{
+              "text": "Entity Type",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "entityType",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             },
             {
-               "info":null,
-               "name":"contributions-from-registered-filers",
-               "infoIcon":"true",
-               "text":"Contributions from Registered Filers",
-               "value":"contributions-from-registered-filers",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Party Receipt",
-                     "value":"party-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Party In-Kind",
-                     "value":"party-in-kind",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Party In-Kind Bitcoin Receipt",
-                     "value":"party-in-kind-bitcoin-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Bitcoin Sold to Party",
-                     "value":"bitcoin-sold-to-party",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Returned/Bounced Receipt",
-                     "value":"returned-bounced-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Earmark contribution",
-                     "value":"earmark-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"PAC Receipt",
-                     "value":"pac-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"PAC In-Kind",
-                     "value":"pac-in-kind",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"PAC In-Kind Bitcoin Receipt",
-                     "value":"pac-in-kind-bitcoin-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt",
-                     "value":"earmark-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Bitcoin Sold to PAC",
-                     "value":"bitcoin-sold-to-pac",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt (In)",
-                     "value":"earmark-receipt--in-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Earmark contribution",
-                     "value":"earmark-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Returned/Bounced Receipt",
-                     "value":"returned-bounced-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Non-Federal Committee Receipt",
-                     "value":"non-federal-committee-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":"Non-Federal Committee Receipt Returned/Bounced Receipt",
-                     "value":"non-federal-committee-receipt-returned-bounced-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-from-registered-filers",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Contributor Last Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorLastName",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             },
             {
-               "info":null,
-               "name":"transfers",
-               "infoIcon":"true",
-               "text":"Transfers",
-               "value":"transfers",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"Transfers",
-                     "value":"transfers",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers",
-                     "value":"jf-transfers",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers Individual",
-                     "value":"jf-transfers-individual",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers Party",
-                     "value":"jf-transfers-party",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers PAC",
-                     "value":"jf-transfers-pac",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers Party HQ",
-                     "value":"jf-transfers-party-hq",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers Party Concention Account",
-                     "value":"jf-transfers-party-concention-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"JF Transfers Party Recount Account",
-                     "value":"jf-transfers-party-recount-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"In-Kind Transfer",
-                     "value":"in-kind-transfer",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"In-Kind Transfer-FEA",
-                     "value":"in-kind-transfer-fea",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"Transfer from Non-Federal Account",
-                     "value":"transfer-from-non-federal-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":"Transfer from Levin Account",
-                     "value":"transfer-from-levin-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"transfers",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"refunds",
-               "infoIcon":"true",
-               "text":"Refunds",
-               "value":"refunds",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"refunds",
-                     "infoIcon":"true",
-                     "text":"Refunds of Contributions to Candidate",
-                     "value":"refunds-of-contributions-to-candidate",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refunds",
-                     "infoIcon":"true",
-                     "text":"Refunds of Contributions to Other Committees",
-                     "value":"refunds-of-contributions-to-other-committees",
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"other",
-               "infoIcon":"true",
-               "text":"Other",
-               "value":"other",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Offsets to Operating Expenditures",
-                     "value":"offsets-to-operating-expenditures",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Other Receipts",
-                     "value":"other-receipts",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Ind. Recount Receipt",
-                     "value":"ind--recount-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Party Recount Receipt",
-                     "value":"party-recount-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"PAC Recount Receipt",
-                     "value":"pac-recount-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Transfer National Party Recount account",
-                     "value":"transfer-national-party-recount-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Party National Party Recount account",
-                     "value":"party-national-party-recount-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"PAC National Party Recount  account",
-                     "value":"pac-national-party-recount--account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Ind National party headquarters buildings account",
-                     "value":"ind-national-party-headquarters-buildings-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Party National party headquarters buildings account",
-                     "value":"party-national-party-headquarters-buildings-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"PAC National party headquarters buildings account",
-                     "value":"pac-national-party-headquarters-buildings-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Ind National party Convention account",
-                     "value":"ind-national-party-convention-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Party National Party Convention account",
-                     "value":"party-national-party-convention-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"PAC National Party Convention  account",
-                     "value":"pac-national-party-convention--account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt for Recount Account (contribution)",
-                     "value":"earmark-receipt-for-recount-account--contribution-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt for Convention Account (contribution)",
-                     "value":"earmark-receipt-for-convention-account--contribution-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Earmark Receipt for Headquarters Account (contribution)",
-                     "value":"earmark-receipt-for-headquarters-account--contribution-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Ind. Receipt - Non-Contribution Account",
-                     "value":"ind--receipt---non-contribution-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Other Committee Receipt - Non-Contribution Account",
-                     "value":"other-committee-receipt---non-contribution-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Business/Labor Org. Receipt - Non-Contribution Account",
-                     "value":"business-labor-org--receipt---non-contribution-account",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":"Tribal Receipt",
-                     "value":"tribal-receipt",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Contributor First Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorFirstName",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             }
-         ],
-         "value":"receipts"
-      },
-      {
-         "text":"Disbursements",
-         "options":[
-            {
-               "info":null,
-               "name":"operating-expenditures",
-               "infoIcon":"true",
-               "text":"Operating Expenditures",
-               "value":"operating-expenditures",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Operating Expenditure",
-                     "value":"operating-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Operating Expenditure",
-                     "value":"operating-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Credit Card Payment",
-                     "value":"credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement",
-                     "value":"staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Void - Payment to Payroll",
-                     "value":"void---payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Headquarters Account Operating Expense for National Party Expenses",
-                     "value":"headquarters-account-operating-expense-for-national-party-expenses",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":"Convention Account Operating Expense for National Party Expense",
-                     "value":"convention-account-operating-expense-for-national-party-expense",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"operating-expenditures",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Contributor Middle Name",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorMiddleName",
+              "type": "text",
+              "required": false
             },
             {
-               "info":null,
-               "name":"contributions-expenditures-to-reg--filers",
-               "infoIcon":"true",
-               "text":"Contributions/Expenditures to Reg. Filers",
-               "value":"contributions-expenditures-to-reg--filers",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Transfers to Affiliates/Other Committees",
-                     "value":"transfers-to-affiliates-other-committees",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Contribution to Candidate",
-                     "value":"contribution-to-candidate",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Redesignation",
-                     "value":"redesignation",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Contribution to Other Committee",
-                     "value":"contribution-to-other-committee",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Void - Contribution to Other Committee",
-                     "value":"void---contribution-to-other-committee",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Independent Expenditure",
-                     "value":"independent-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"IE Before Dissemination - Memo",
-                     "value":"ie-before-dissemination---memo",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Credit Card Payment",
-                     "value":"credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement",
-                     "value":"staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"VOID -Payment to Payroll",
-                     "value":"void--payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Coordinated Party Expenditure",
-                     "value":"coordinated-party-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Credit Card Payment",
-                     "value":"credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement",
-                     "value":"staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":"VOID -Payment to Payroll",
-                     "value":"void--payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"contributions-expenditures-to-reg--filers",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Contributor Prefix",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorPrefix",
+              "type": "text",
+              "required": false
             },
             {
-               "info":null,
-               "name":"other-expenditures",
-               "infoIcon":"true",
-               "text":"Other Expenditures",
-               "value":"other-expenditures",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Other Disbursements",
-                     "value":"other-disbursements",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Credit Card Payment",
-                     "value":"credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement",
-                     "value":"staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Recount Disbursements",
-                     "value":"recount-disbursements",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"National Party Recount Account Disbursements",
-                     "value":"national-party-recount-account-disbursements",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Non-Contribution Account Disbursements",
-                     "value":"non-contribution-account-disbursements",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Non-Contribution Account Credit Card Payment",
-                     "value":"non-contribution-account-credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Non-Contribution Account Staff Reimbursement",
-                     "value":"non-contribution-account-staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"Non-Contribution Account Payment to Payroll",
-                     "value":"non-contribution-account-payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":"VOID -Non-Contribution Account Payment to Payroll",
-                     "value":"void--non-contribution-account-payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"other-expenditures",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"refund",
-               "infoIcon":"true",
-               "text":"Refund",
-               "value":"refund",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"Refund of Ind. Contribution",
-                     "value":"refund-of-ind--contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"VOID - Refund of Ind. Contribution",
-                     "value":"void---refund-of-ind--contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"Refund of Party Contribution",
-                     "value":"refund-of-party-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"VOID - Refund of Party Contribution",
-                     "value":"void---refund-of-party-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"Refund of PAC Contribution",
-                     "value":"refund-of-pac-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"VOID - Refund of PAC Contribution",
-                     "value":"void---refund-of-pac-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"Non-Federal Committee Refund",
-                     "value":"non-federal-committee-refund",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"refund",
-                     "infoIcon":"true",
-                     "text":"Non-Federal Committee Refund Void",
-                     "value":"non-federal-committee-refund-void",
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"refunds",
-               "infoIcon":"true",
-               "text":"Refunds",
-               "value":"refunds",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"refunds",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"allocated-or-fea-expenditures",
-               "infoIcon":"true",
-               "text":"Allocated or FEA Expenditures",
-               "value":"allocated-or-fea-expenditures",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Allocated Federal/Non-Federal Expenditure",
-                     "value":"allocated-federal-non-federal-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Credit Card Payment for Allocated Expenditure",
-                     "value":"credit-card-payment-for-allocated-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement for Allocated Expenditure",
-                     "value":"staff-reimbursement-for-allocated-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Direct Candidate Support",
-                     "value":"direct-candidate-support",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Direct Candidate Support Contribution",
-                     "value":"direct-candidate-support-contribution",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Direct Candidate Support - IE",
-                     "value":"direct-candidate-support---ie",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Direct Candidate Support - Coordinated",
-                     "value":"direct-candidate-support---coordinated",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Allocated Federal/Non-Federal Expenditure",
-                     "value":"allocated-federal-non-federal-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Void - Allocated Federal/Non-Federal Expenditure",
-                     "value":"void---allocated-federal-non-federal-expenditure",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Allocated FEA Disbursement",
-                     "value":"allocated-fea-disbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Allocated FEA Credit Card Payment",
-                     "value":"allocated-fea-credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Staff Reimbursement for Allocated FEA Payment",
-                     "value":"staff-reimbursement-for-allocated-fea-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"VOID -Staff Reimbursement for Allocated FEA Payment",
-                     "value":"void--staff-reimbursement-for-allocated-fea-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"100% FEA Payment",
-                     "value":"100--fea-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"100% FEA Payment-Debt Payment",
-                     "value":"100--fea-payment-debt-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"FEA Credit Card Payment",
-                     "value":"fea-credit-card-payment",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"FEA Staff Reimbursement",
-                     "value":"fea-staff-reimbursement",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"Payment to Payroll",
-                     "value":"payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":"VOID - Payment to Payroll",
-                     "value":"void---payment-to-payroll",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"allocated-or-fea-expenditures",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Contributor Sufix",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorSufix",
+              "type": "text",
+              "required": false
             }
-         ],
-         "value":"disbursements"
-      },
-      {
-         "text":"Loans and Debts",
-         "options":[
-            {
-               "info":null,
-               "name":"loans-owed-to-committee",
-               "infoIcon":"true",
-               "text":"Loans Owed to Committee",
-               "value":"loans-owed-to-committee",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"loans-owed-to-committee",
-                     "infoIcon":"true",
-                     "text":"Loans Received\n",
-                     "value":"loans-received-",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"loans-owed-to-committee",
-                     "infoIcon":"true",
-                     "text":"Loan Repayments Received",
-                     "value":"loan-repayments-received",
-                     "type":"radio"
-                  },
-                  {
-                     "info":null,
-                     "name":"loans-owed-to-committee",
-                     "infoIcon":"true",
-                     "text":"Loan Repayments Made\n",
-                     "value":"loan-repayments-made-",
-                     "type":"radio"
-                  }
-               ]
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Contributor Street 1",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorStreet1",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             },
             {
-               "info":null,
-               "name":"loans-owed-by-committee",
-               "infoIcon":"true",
-               "text":"Loans Owed by Committee",
-               "value":"loans-owed-by-committee",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"loans-owed-by-committee",
-                     "infoIcon":"true",
-                     "text":"Loans Made\n",
-                     "value":"loans-made-",
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"debts-owed-to-committee",
-               "infoIcon":"true",
-               "text":"Debts Owed to Committee",
-               "value":"debts-owed-to-committee",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"debts-owed-to-committee",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
-            },
-            {
-               "info":null,
-               "name":"debts-owed-by-committee",
-               "infoIcon":"true",
-               "text":"Debts owed by Committee",
-               "value":"debts-owed-by-committee",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"debts-owed-by-committee",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Contributor Street 2",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorStreet2",
+              "type": "text",
+              "required": false
             }
-         ],
-         "value":"loans-and-debts"
-      },
-      {
-         "text":"Other",
-         "options":[
-            {
-               "info":null,
-               "name":"h1---allocation-ratios",
-               "infoIcon":"true",
-               "text":"H1 - Allocation Ratios",
-               "value":"h1---allocation-ratios",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"h1---allocation-ratios",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Contributor City",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorCity",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             },
             {
-               "info":null,
-               "name":"h2---fundraising-ratios",
-               "infoIcon":"true",
-               "text":"H2 - Fundraising Ratios",
-               "value":"h2---fundraising-ratios",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"h2---fundraising-ratios",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "State",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorState",
+              "type": "select",
+              "validation": {
+                "required": true
+              }
             },
             {
-               "info":null,
-               "name":"schedule-l",
-               "infoIcon":"true",
-               "text":"Schedule L",
-               "value":"schedule-l",
-               "options":[
-                  {
-                     "info":null,
-                     "name":"schedule-l",
-                     "infoIcon":"true",
-                     "text":null,
-                     "value":null,
-                     "type":"radio"
-                  }
-               ]
+              "text": "Zip Code",
+              "infoIcon": false,
+              "infoText": "",
+              "name": "contributorZipCode",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
             }
-         ],
-         "value":"other"
-      }
-   ]
-  }
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Contribution Date",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionDate",
+              "type": "date",
+              "validation": {
+                "required": true
+              }
+            },
+            {
+              "text": "Contribution Amount",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionAmount",
+              "type": "number",
+              "validation": {
+                "required": true
+              }
+            },
+            {
+              "text": "Contribution Aggregate",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributionAggregate",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
+            }
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Contibutor Employer",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorEmployer",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
+            },
+            {
+              "text": "Contibutor Occupation",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "contributorOccupation",
+              "type": "text",
+              "validation": {
+                "required": true
+              }
+            }
+          ]
+        },
+        {
+          "cols": [{
+              "text": "Memo Code",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "memoCode",
+              "type": "text",
+              "required": false
+            },
+            {
+              "text": "Memo Text/Description",
+              "infoIcon": true,
+              "infoText": "Waiting for text.",
+              "name": "memoDescription",
+              "type": "text",
+              "required": false
+            }
+          ]
+        },
+        {
+          "cols": [{
+            "text": "Contribution Purpose Description",
+            "infoIcon": true,
+            "infoText": "Waiting for text.",
+            "name": "contributorPurpose",
+            "type": "textarea",
+            "required": false
+          }]
+        }
+      ]
+    },
+    {
+      "states": [{
+          "name": "Alabama",
+          "code": "AL"
+        },
+        {
+          "name": "Alaska",
+          "code": "AK"
+        },
+        {
+          "name": "Arizona",
+          "code": "AZ"
+        },
+        {
+          "name": "Arkansas",
+          "code": "AR"
+        },
+        {
+          "name": "California",
+          "code": "CA"
+        },
+        {
+          "name": "Colorado",
+          "code": "CO"
+        },
+        {
+          "name": "Connecticut",
+          "code": "CT"
+        },
+        {
+          "name": "Delaware",
+          "code": "DE"
+        },
+        {
+          "name": "District of Columbia",
+          "code": "DC"
+        },
+        {
+          "name": "Florida",
+          "code": "FL"
+        },
+        {
+          "name": "Georgia",
+          "code": "GA"
+        },
+        {
+          "name": "Hawaii",
+          "code": "HI"
+        },
+        {
+          "name": "Idaho",
+          "code": "ID"
+        },
+        {
+          "name": "Illinois",
+          "code": "IL"
+        },
+        {
+          "name": "Indiana",
+          "code": "IN"
+        },
+        {
+          "name": "Iowa",
+          "code": "IA"
+        },
+        {
+          "name": "Kansa",
+          "code": "KS"
+        },
+        {
+          "name": "Kentucky",
+          "code": "KY"
+        },
+        {
+          "name": "Lousiana",
+          "code": "LA"
+        },
+        {
+          "name": "Maine",
+          "code": "ME"
+        },
+        {
+          "name": "Maryland",
+          "code": "MD"
+        },
+        {
+          "name": "Massachusetts",
+          "code": "MA"
+        },
+        {
+          "name": "Michigan",
+          "code": "MI"
+        },
+        {
+          "name": "Minnesota",
+          "code": "MN"
+        },
+        {
+          "name": "Mississippi",
+          "code": "MS"
+        },
+        {
+          "name": "Missouri",
+          "code": "MO"
+        },
+        {
+          "name": "Montana",
+          "code": "MT"
+        },
+        {
+          "name": "Nebraska",
+          "code": "NE"
+        },
+        {
+          "name": "Nevada",
+          "code": "NV"
+        },
+        {
+          "name": "New Hampshire",
+          "code": "NH"
+        },
+        {
+          "name": "New Jersey",
+          "code": "NJ"
+        },
+        {
+          "name": "New Mexico",
+          "code": "NM"
+        },
+        {
+          "name": "New York",
+          "code": "NY"
+        },
+        {
+          "name": "North Carolina",
+          "code": "NC"
+        },
+        {
+          "name": "North Dakota",
+          "code": "ND"
+        },
+        {
+          "name": "Ohio",
+          "code": "OH"
+        },
+        {
+          "name": "Oklahoma",
+          "code": "OK"
+        },
+        {
+          "name": "Oregon",
+          "code": "OR"
+        },
+        {
+          "name": "Pennsylvania",
+          "code": "PA"
+        },
+        {
+          "name": "Rhode Island",
+          "code": "RI"
+        },
+        {
+          "name": "South Carolina",
+          "code": "SC"
+        },
+        {
+          "name": "South Dakota",
+          "code": "SD"
+        },
+        {
+          "name": "Tennessee",
+          "code": "TN"
+        },
+        {
+          "name": "Texas",
+          "code": "TX"
+        },
+        {
+          "name": "Utah",
+          "code": "UT"
+        },
+        {
+          "name": "Vermont",
+          "code": "VT"
+        },
+        {
+          "name": "Virginia",
+          "code": "VA"
+        },
+        {
+          "name": "Washington",
+          "code": "WA"
+        },
+        {
+          "name": "West Virginia",
+          "code": "WV"
+        },
+        {
+          "name": "Wisconsin",
+          "code": "WI"
+        },
+        {
+          "name": "Wyoming",
+          "code": "WY"
+        }
+      ]
+    },
+    {
+      "transactionCategories": [
+        {
+          "value": "contributions-from-individuals",
+          "text": "Contributions From Individuals",
+          "type": "Receipts",
+          "info": "Contributions From Individuals - Waiting for text."
+        },
+        {
+          "value": "contributions-from-registered-filers",
+          "text": "Contributions From Registered Filers",
+          "type": "Receipts",
+          "info": "Contributions From Registered Filers - Waiting for text."
+        },
+        {
+          "value": "transfers",
+          "text": "Transfers",
+          "type": "Receipts",
+          "info": "Transfers - Waiting for text."
+        },
+        {
+          "value": "refunds",
+          "text": "Refunds",
+          "type": "Receipts",
+          "info": "Refunds - Waiting for text."
+        },
+        {
+          "value": "other",
+          "text": "Other",
+          "type": "Receipts",
+          "info": "Receipts - Waiting for text."
+        },
+        {
+          "value": "operating-expenditures",
+          "text": "Opertaing Expenditures",
+          "type": "Disbursments",
+          "info": "Opertaing Expenditures - Waiting for text."
+        },
+        {
+          "value": "contributions-expenditures-to-reg--filers",
+          "text": "Contributions/Expenditures to Reg. Filers",
+          "type": "Disbursments",
+          "info": "Contributions/Expenditures to Reg. Filers - Waiting for text."
+        },
+        {
+          "value": "other-expenditures",
+          "text": "Other Expenditures",
+          "type": "Disbursments",
+          "info": "Other Expenditures - Waiting for text."
+        },
+        {
+          "value": "refund",
+          "text": "Refund",
+          "type": "Disbursments",
+          "info": "Refund - Waiting for text."
+        },
+        {
+          "value": "allocated-or-fea-expenditures",
+          "text": "Allocated or FEA Expenditures",
+          "type": "Disbursmentss",
+          "info": "Allocated or FEA Expenditures - Waiting for text."
+        },
+        {
+          "value": "loans-owed-to-committee",
+          "text": "Loans Owed to Committee",
+          "type": "Loans and Debts",
+          "info": "Loans Owed to Committee - Waiting for text."
+        },
+        {
+          "value": "loans-owed-by-committee",
+          "text": "Loans Owed by Committee",
+          "type": "Loans and Debts",
+          "info": "Loans Owed by Committee - Waiting for text."
+        },
+        {
+          "value": "debts-owed-to-committee",
+          "text":  "Debts Owed to Committee",
+          "type": "Loans and Debts",
+          "info": "Debts Owed to Committee - Waiting for text."
+        },
+        {
+          "value": "h1---allocation-ratios",
+          "text":  "H1 - Allocation Ratios",
+          "type": "Other",
+          "info": "H1 - Allocation Ratios - Waiting for text."
+        },
+        {
+          "value": "h2---fundraising-ratios",
+          "text":  "H2 - Fundraising Ratios",
+          "type": "Other",
+          "info": "H2 - Fundraising Ratios - Waiting for text."
+        },
+        {
+          "value": "schedule-l",
+          "text":  "Schedule L",
+          "type": "Other",
+          "info": "Schedule L - Waiting for text."
+        }
+      ]
+    }
+  ]
 }

@@ -1,6 +1,32 @@
 @import '../../../shared/scss/global';
 
 .report-type-container {
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+    .grid-row__col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  header {
+    .header-content {
+      display: block;
+      margin: 0 auto;
+      width: 96%;
+      @include clearfix();
+      .btn-options {
+        color: $shuttleGray;
+        text-decoration: none;
+        &:hover,
+        &:visited,
+        &:active {
+          color: $shuttleGray;
+          text-decoration: none;
+        }
+      }
+    }
+  }
   .forms__btn-container {
     height: 100%;
     margin-bottom: 10px;

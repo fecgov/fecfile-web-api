@@ -3,6 +3,8 @@
 .form-sidebar {
   margin-left: auto;
   margin-right: auto;
+  min-height: 1385px;
+  position: relative;
   .search-field {
     margin-left: auto;
     margin-right: auto;
@@ -25,8 +27,8 @@
   section {
     .form-sidebar__links {
       list-style-type: none;
-      min-height: 445px;
       margin-top: 15px;
+      position: relative;
       .form-sidebar-item {
         border-bottom: 1px solid $white;
         display: block;
@@ -129,6 +131,9 @@
   }
   footer {
     background-color: $mineShaft;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
     .form-sidebar__item {
       border-bottom: 1px solid $white;
       color: $white;

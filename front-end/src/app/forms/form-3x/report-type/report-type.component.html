@@ -1,4 +1,21 @@
 <div class="report-type-container" *ngIf="showForm">
+  <header>
+    <div class="header-content">
+      <div class="float-left">
+        <h1>Report Type</h1>
+      </div>
+      <div class="float-right">
+        <button
+          type="button"
+          class="btn btn-link btn-options"
+        >
+          <span class="ellipsis-icon" aria-hidden="true"></span>
+          <span class="sr-only">Click for more options</span>
+        </button>
+      </div>
+    </div>
+    <hr />
+  </header>
   <form
     [formGroup]="frmReportType"
     (ngSubmit)="doValidateOption()"

@@ -20,6 +20,15 @@
     .app__side-nav {
       left: 0;
     }
+    main {
+      .app__content-wrapper {
+        padding-left: 10px;
+        .app__content {
+          margin-left: 60px;
+          width: 95%;
+        }
+      }
+    }
     footer {
       .app__footer {
         padding-left: 80px;
@@ -169,7 +178,8 @@
       font-family: $mainFontFamily;
       margin: 0 auto;
       min-height: $mainContentHeight;
-      padding-left: 50px;
+      padding-left: 40px;
+      padding-right: 30px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       z-index: 0;
@@ -216,7 +226,7 @@
         background-color: $white;
         margin: 0 auto;
         min-height: $mainContentHeight;
-        width: 90%;
+        width: 98%;
       }
     }
   } // main

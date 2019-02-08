@@ -1,19 +1,18 @@
-<div class="form3X-reporttype-sidebar">
+<div class="report-type-sidebar">
   <header>
     <h3 class="text-center">{{ title }}</h3>
     <hr />
   </header>
   <section><!-- Start: Wizard Sidebar Report Coverage Dates -->
     <form class="sidebar-form-content">
-       <div class="form-row" *ngIf="(regularreports===true)">
- 
+      <ng-container *ngIf="(regularreports===true)">
         <div class="form-row">
           <label for="dateFrom">Date From* </label>
           <button
           type="button"
           class="btn-info"
           ngbTooltip="Language will be provided by RAD"
-  
+
         >
           <i class="info-icon" aria-hidden="true"></i>
           <span class="sr-only">
@@ -23,10 +22,10 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="text" 
+          <input type="text"
           name="txtfromdate"
           value={{fromDate}}
-          class="form-control" 
+          class="form-control"
           aria-label="Contribution Date"/>
         </div>
         <div class="form-row">
@@ -35,7 +34,7 @@
           type="button"
           class="btn-info"
           ngbTooltip="Language will be provided by RAD"
-  
+
         >
           <i class="info-icon" aria-hidden="true"></i>
           <span class="sr-only">
@@ -45,117 +44,120 @@
         </div>
         <div class="form-row">
           <i class="fas fa-calendar-alt"></i>
-          <input type="text" 
+          <input type="text"
           name="txttodate"
           value={{toDate}}
-          class="form-control" 
+          class="form-control"
           aria-label="Contribution Date">
         </div>
-          
- 
-    </div> <!-- regular reports-->
-    
-    <div class="form-row" *ngIf="specialreports===true">
+      </ng-container> <!-- regular reports -->
+      <ng-container *ngIf="specialreports===true">
         <div class="form-row">
-            <label for="State">State*</label>
+          <label for="State">
+            State*
             <button
-        type="button"
-        class="btn-info"
-        ngbTooltip="Language will be provided by RAD"
-
-      >
-        <i class="info-icon" aria-hidden="true"></i>
-        <span class="sr-only">
-          Click for more information
-        </span>
-      </button>
+              type="button"
+              class="btn-info"
+              ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
         </div>
-
-     <div class="form-row">
-          <select id="state" [(ngModel)]="selectedElectionState" name="state" class="form-control" #electionState (change)="selectStateChange($event.target.value)">
-          <option value="---">--- </option>
-          <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
-         </select>
-      </div>
-      <div class="form-row">
-        <label for="electionDate">
-          Election Date
-          <i class="fas fa-info-circle"></i>
-        </label>
-        <button
-        type="button"
-        class="btn-info"
-        ngbTooltip="Language will be provided by RAD"
-
-      >
-        <i class="info-icon" aria-hidden="true"></i>
-        <span class="sr-only">
-          Click for more information
-        </span>
-      </button>
-     
-      </div>
-      <div class="form-row">
-          <select id="electiondate" [(ngModel)]="selectedElectionDate" name="electiondate"  class="form-control" #electionDate (change)="selectElectionDateChange($event.target.value)">
-              <option ngvalue="---">--- </option>
-              <option *ngFor='let electiondate of electiondates.dates' [value]="electiondate.election_date">{{electiondate.election_date}}</option>
-          </select> 
-        
-      </div>
-      <div class="form-row">
-        <label for="dateFrom">Date From* <i class="fas fa-info-circle"></i></label>
-        <button
-        type="button"
-        class="btn-info"
-        ngbTooltip="Language will be provided by RAD"
-
-      >
-        <i class="info-icon" aria-hidden="true"></i>
-        <span class="sr-only">
-          Click for more information
-        </span>
-      </button>
-      </div>
-      <div class="form-row">
-        <i class="fas fa-calendar-alt"></i>
-        <input type="text" 
-        name="txtfromdate" 
-        value={{fromDate}}
-        class="form-control" 
-        aria-label="Contribution Date"/>
-      </div>
-      <div class="form-row">
-        <label for="dateTo">Date To* <i class="fas fa-info-circle"></i></label>
-        <button
-        type="button"
-        class="btn-info"
-        ngbTooltip="Language will be provided by RAD"
-
-      >
-        <i class="info-icon" aria-hidden="true"></i>
-        <span class="sr-only">
-          Click for more information
-        </span>
-      </button>
-      </div>
-      <div class="form-row">
-        <i class="fas fa-calendar-alt"></i>
-        <input type="text" 
-        name="txttodate" 
-        value={{toDate}}
-        class="form-control" 
-        aria-label="Contribution Date">
-      </div>
-    </div>
+        <div class="form-row">
+          <select
+            id="state"
+            [(ngModel)]="selectedElectionState"
+            name="state"
+            class="form-control state-select"
+            #electionState
+            (change)="selectStateChange($event.target.value)"
+          >
+            <option value="---">--- </option>
+            <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="electionDate">
+            Election Date
+            <button
+            type="button"
+            class="btn-info"
+            ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+          <select id="electiondate" [(ngModel)]="selectedElectionDate" name="electiondate"  class="form-control election-date-select" #electionDate (change)="selectElectionDateChange($event.target.value)">
+            <option ngvalue="---">--- </option>
+            <option *ngFor='let electiondate of electiondates.dates' [value]="electiondate.election_date">{{electiondate.election_date}}</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="dateFrom">
+            Date From*
+            <button
+            type="button"
+            class="btn-info"
+            ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+        <i class="calendar-icon"></i>
+        <input
+          type="date"
+          name="txtfromdate"
+          value={{fromDate}}
+          class="form-control"
+          aria-label="Contribution Date"
+        />
+        </div>
+        <div class="form-row">
+          <label for="dateTo">
+            Date To*
+            <button
+              type="button"
+              class="btn-info"
+              ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+        <i class="calendar-icon"></i>
+        <input
+          type="date"
+          name="txttodate"
+          value={{toDate}}
+          class="form-control"
+          aria-label="Contribution Date"
+        />
+        </div>
+      </ng-container>
     </form>
     </section>
     <footer>
-      <div
-        class="form-sidebar__item"
-        *ngIf="cashOnHand?.showCashOnHand"
-      >
+      <div class="form-sidebar__item">
         <div class="form-sidebar-item__text">
-          {{ cashOnHand.text }}
+          Cash On Hand
         </div>
         <div class="form-sidebar-item__value">
           $0
@@ -181,4 +183,3 @@
       </div>
     </footer>
   </div>
-  

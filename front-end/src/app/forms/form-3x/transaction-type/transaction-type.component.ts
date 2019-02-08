@@ -52,8 +52,10 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    if (this.selectedOptions) {
-      this.showForm = true;
+    if (Array.isArray(this.selectedOptions)) {
+      if (this.selectedOptions.length >= 1) {
+        this.showForm = true;
+      }
     }
   }
   /**

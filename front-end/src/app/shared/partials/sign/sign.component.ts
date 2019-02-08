@@ -442,7 +442,7 @@ export class SignComponent implements OnInit {
           (error) => {
             console.log('error: ', error);
           });
-     }       
+     }
    }
 
 }

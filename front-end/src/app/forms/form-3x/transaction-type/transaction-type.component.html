@@ -1,53 +1,26 @@
 <div class="transaction-type-container">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h1>Transaction Type</h1>
+        </div>
+        <div class="float-right">
+          <button
+            type="button"
+            class="btn btn-link btn-options"
+          >
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+        </div>
+      </div>
+      <hr />
+    </header>
     <form
       [formGroup]="frmOption"
       (ngSubmit)="doValidateOption()"
       (blur)="doValidateOption()"
     >
-    <section>
-      <div class="form-content" *ngIf="showForm">
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="text-error text-center"
-              *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (optionFailed)">
-              You must select a transaction type.
-            </div>
-          </div>
-        </div>
-          <ul class="options-list">
-            <li
-              class="options-list__item"
-              *ngFor="let option of selectedOptions"
-            >
-              <input
-                type="{{ option?.type }}"
-                name="{{ option?.name }}"
-                id="{{ option?.value }}"
-                class="option-radio"
-                value="{{ option?.value }}"
-                (click)="updateStatus($event)"
-                formControlName="optionRadio"
-              />
-              <label
-                for="{{ option?.value }}"
-              >
-                {{ option?.text }}
-              </label>
-              <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="{{ option?.info }}"
-                *ngIf="option.infoIcon"
-              >
-                <i class="info-icon" aria-hidden="true"></i>
-                <span class="sr-only">
-                  Click for more information
-                </span>
-              </button>
-            </li>
-          </ul>
-      </div>
-    </section>
     <footer>
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--11 forms__btn-container">
