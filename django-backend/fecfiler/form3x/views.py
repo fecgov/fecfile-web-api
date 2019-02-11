@@ -108,7 +108,7 @@ def get_report_types(request):
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
-def get_f3x_transaction_fields(request):
+def get_dynamic_forms_fields(request):
 
     try:
         with connection.cursor() as cursor:
@@ -117,28 +117,22 @@ def get_f3x_transaction_fields(request):
             cmte_id = request.user.username
             form_type = request.query_params.get('form_type')
             transaction_type = request.query_params.get('transaction_type')
-
-            query_string = """select report_types_json From public.report_type_and_due_dates_view where cmte_id='""" + cmte_id + """' and form_type='""" + form_type + """';"""
+            forms_obj = {}
+            
+            query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
             
             cursor.execute(query_string)
 
             for row in cursor.fetchall():
-                #forms_obj.append(data_row)
                 data_row = list(row)
-                for idx,elem in enumerate(row):
-                    if not elem:
-                        data_row[idx]=''
                 forms_obj=data_row[0]
-                d = json.loads(forms_obj)
                 
-        if forms_obj is None:
+        if not bool(forms_obj):
             return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)                              
         
-        return JsonResponse(d, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-
+        return Response("get_dynamic_forms_fields API is throwing an error", status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST','GET','DELETE','PUT'])
 def reports(request):
