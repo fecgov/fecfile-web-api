@@ -44,34 +44,31 @@ export class IndividualReceiptComponent implements OnInit {
     private _config: NgbTooltipConfig,
   ) {
     this._config.placement = 'right'
-    this._formsS
-
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-    console.log('individual receipt ngOnInit: ');
+   console.log('individual receipt ngOnInit: ');
 
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+   this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this._http
-     .get('http://localhost:3000/data')
+   this._formService
+     .getDynamicFormFields(this._formType, 'Individual Receipt')
      .subscribe(res => {
-       this.formFields = res[0].formFields;
+        this.formFields = res.data.formFields;
 
-       this._setForm(this.formFields);
+        this._setForm(this.formFields);
 
-       this.states = res[1].states;
+        this.states = res.data.states;
 
-       this.transactionCategories = res[2].transactionCategories;
+        this.transactionCategories = res.data.transactionCategories;
      });
 
-     // this._formService
-     //   .getDynamicFormFields(this._formType)
-     //   .subscribe(res => {
-     //     console.log('getDynamicFormFields: ');
-     //     console.log('res: ', res);
-     //   });
+    this._formService
+      .getTransactionCategories(this._formType)
+      .subscribe(res => {
+        this._types = res.data.transactionCategories;
+      });
 
     this.frmIndividualReceipt = this._fb.group({
       transactionCategory: [null, [
@@ -157,7 +154,6 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public transactionCategorySelected(e): void {
     if(typeof e !== 'undefined') {
-      console.log('e: ', e);
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
       let selectedIndex: number = 0;

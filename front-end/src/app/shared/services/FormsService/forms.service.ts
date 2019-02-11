@@ -662,7 +662,7 @@ export class FormsService {
       }));
  }
 
- public getDynamicFormFields(formType: string): Observable<any> {
+ public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
   let token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
   let url: string = '/core/get_dynamic_forms_fields';
@@ -672,15 +672,15 @@ export class FormsService {
   httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-  params = params.append('data', {});
+  params = params.append('form_type', `F${formType}`);
+  params = params.append('transaction_type', transactionType);
 
   return this._http
       .get(
         `${environment.apiUrl}${url}`,
-        formData,
         {
-          params,
-          headers: httpOptions
+          headers: httpOptions,
+          params
         }
       );
  }
