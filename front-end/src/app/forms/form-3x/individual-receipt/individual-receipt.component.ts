@@ -48,8 +48,6 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   console.log('individual receipt ngOnInit: ');
-
    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
    this._formService
@@ -182,9 +180,7 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public transactionTypeSelected(e): void {
-    console.log('transactionType: ');
     if(typeof e !== 'undefined') {
-      console.log('e: ', e);
       this.transactionType = e.text;
       this.transactionTypeInfo = e.info;
     } else {
@@ -194,9 +190,6 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public doValidateReceipt() {
-    console.log('doValidate: ');
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
-
     this.formSubmitted = true;
 
     if(this.frmIndividualReceipt.valid) {
