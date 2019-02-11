@@ -169,7 +169,6 @@ export class SidebarComponent implements OnInit {
    * Closes the navbar.
    */
   private _closeNavBar(): void {
-    console.log('_closeNavBar: ');
     this.iconClass = 'bars-icon';
 
     setTimeout(() => {
