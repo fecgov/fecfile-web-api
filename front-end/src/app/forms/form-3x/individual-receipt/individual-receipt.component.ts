@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
@@ -42,15 +43,19 @@ export class IndividualReceiptComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
   ) {
-    this._config.placement = 'right';
+    this._config.placement = 'right'
+    this._formsS
+
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
+    console.log('individual receipt ngOnInit: ');
+
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._http
-     .get<f3xTransactionTypes>('http://localhost:3000/data')
+     .get('http://localhost:3000/data')
      .subscribe(res => {
        this.formFields = res[0].formFields;
 
@@ -61,12 +66,12 @@ export class IndividualReceiptComponent implements OnInit {
        this.transactionCategories = res[2].transactionCategories;
      });
 
-    this._formService
-      .getTransactionCategories(this._formType)
-      .subscribe(res => {
-        this._types = res.data.transactionCategories;
-      });
-
+     // this._formService
+     //   .getDynamicFormFields(this._formType)
+     //   .subscribe(res => {
+     //     console.log('getDynamicFormFields: ');
+     //     console.log('res: ', res);
+     //   });
 
     this.frmIndividualReceipt = this._fb.group({
       transactionCategory: [null, [

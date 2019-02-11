@@ -3,10 +3,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
-/*import { APIService } from '/interfaces/services/APIService/APIService.ts';*/
 import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
-/*import SampleJson from '../../../../api/data.json';*/
-/*APIService/APIService.ts*/
 
 @Component({
   selector: 'app-sidebar',
@@ -30,6 +27,7 @@ export class SidebarComponent implements OnInit {
   public committee_myforms: Icommittee_forms[];
   public committee_otherforms: Icommittee_forms[];
 
+  private _toggleNavClicked: boolean = false;
 
   constructor(
     private _router: Router,
@@ -73,22 +71,23 @@ export class SidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     const route: string = this._router.url;
+    if (!this._toggleNavClicked) {
+      if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
+        let formSelected: string = null;
 
-    if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
-      let formSelected: string = null;
+        this._activatedRoute
+          .children[0]
+          .params
+          .subscribe(param => {
+            formSelected = param['form_id'];
+            this.formSelected(formSelected);
+          });
 
-      this._activatedRoute
-        .children[0]
-        .params
-        .subscribe(param => {
-          formSelected = param['form_id'];
-          this.formSelected(formSelected);
-        });
+        this._closeNavBar();
 
-      this._closeNavBar();
-
-      if(this.formType === null) {
-        this.formType = formSelected;
+        if(this.formType === null) {
+          this.formType = formSelected;
+        }
       }
     }
   }
@@ -134,6 +133,8 @@ export class SidebarComponent implements OnInit {
    *
    */
   public toggleSideNav(): void {
+    console.log('toggleSideNav: ');
+    this._toggleNavClicked = true;
     if(this.iconClass === 'close-icon') {
       this._closeNavBar();
     } else {
