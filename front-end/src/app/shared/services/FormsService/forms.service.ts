@@ -84,7 +84,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
 
     return this._http
       .post<form99>(
@@ -475,7 +475,7 @@ export class FormsService {
             let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
             printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
 
-            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
             console.log ('PreviewForm_ReasonScreen api Repsonse',res);
             console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
@@ -494,7 +494,7 @@ export class FormsService {
     let printpriview_filename = "";
     let printpriview_fileurl = "";
     let org_filename="";
-    let org_fileurl="";    
+    let org_fileurl="";
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -525,7 +525,7 @@ export class FormsService {
             let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
             printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
 
-            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
             console.log ('PreviewForm_ReasonScreen api Repsonse',res);
             console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
@@ -537,7 +537,7 @@ export class FormsService {
       }));
   }
 
-  
+
   public get_filed_form_types(): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
@@ -597,7 +597,7 @@ export class FormsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     // console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
-    params = params.append('form_type', "F3X");
+    params = params.append('form_type', 'F3X');
 
     return this._http
        .get(
@@ -633,7 +633,6 @@ export class FormsService {
 
   httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
 
@@ -644,7 +643,7 @@ export class FormsService {
   formData.append('date_of_election', formF3X_ReportInfo.formType);
   formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
+
   return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -663,4 +662,26 @@ export class FormsService {
       }));
  }
 
+ public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
+  let token: string = JSON.parse(this._cookieService.get('user'));
+  let httpOptions =  new HttpHeaders();
+  let url: string = '/core/get_dynamic_forms_fields';
+  let params = new HttpParams();
+  let formData: FormData = new FormData();
+
+  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  params = params.append('form_type', `F${formType}`);
+  params = params.append('transaction_type', transactionType);
+
+  return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          params
+        }
+      );
+ }
 }

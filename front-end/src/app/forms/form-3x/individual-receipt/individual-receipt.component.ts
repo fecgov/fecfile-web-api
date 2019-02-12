@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
@@ -42,23 +43,23 @@ export class IndividualReceiptComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
   ) {
-    this._config.placement = 'right';
+    this._config.placement = 'right'
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+   this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this._http
-     .get<f3xTransactionTypes>('http://localhost:3000/data')
+   this._formService
+     .getDynamicFormFields(this._formType, 'Individual Receipt')
      .subscribe(res => {
-       this.formFields = res[0].formFields;
+        this.formFields = res.data.formFields;
 
-       this._setForm(this.formFields);
+        this._setForm(this.formFields);
 
-       this.states = res[1].states;
+        this.states = res.data.states;
 
-       this.transactionCategories = res[2].transactionCategories;
+        this.transactionCategories = res.data.transactionCategories;
      });
 
     this._formService
@@ -66,7 +67,6 @@ export class IndividualReceiptComponent implements OnInit {
       .subscribe(res => {
         this._types = res.data.transactionCategories;
       });
-
 
     this.frmIndividualReceipt = this._fb.group({
       transactionCategory: [null, [
@@ -152,7 +152,6 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public transactionCategorySelected(e): void {
     if(typeof e !== 'undefined') {
-      console.log('e: ', e);
       const selectedValue: string = e.value;
       const selectedType: string = e.type;
       let selectedIndex: number = 0;
@@ -181,9 +180,7 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public transactionTypeSelected(e): void {
-    console.log('transactionType: ');
     if(typeof e !== 'undefined') {
-      console.log('e: ', e);
       this.transactionType = e.text;
       this.transactionTypeInfo = e.info;
     } else {
@@ -193,9 +190,6 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public doValidateReceipt() {
-    console.log('doValidate: ');
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
-
     this.formSubmitted = true;
 
     if(this.frmIndividualReceipt.valid) {

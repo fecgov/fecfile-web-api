@@ -13,14 +13,21 @@
             </ng-container>
           </h1>
         </div>
-        <div class="float-right">
+        <div class="float-right" ngbDropdown>
           <button
             type="button"
             class="btn btn-link btn-options"
+            id="dropdownBasic2"
+            ngbDropdownToggle
           >
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
           </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item">View</button>
+            <button class="dropdown-item">Print</button>
+            <button class="dropdown-item">Import</button>
+          </div>
         </div>
       </div>
       <hr />

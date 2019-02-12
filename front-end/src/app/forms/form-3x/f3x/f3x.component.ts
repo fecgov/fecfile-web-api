@@ -49,7 +49,7 @@ export class F3xComponent implements OnInit {
   public fromDate: string = '';
   public toDate: string = '';
   public selectedReportType: selectedReportType = {};
- 
+
   public reportType: string = '';
 
   private _step: string = '';
@@ -57,9 +57,9 @@ export class F3xComponent implements OnInit {
   //private _form3XReportDetails:  any = {};
   private _form3XReportInfo:  form3XReport={};
   private _currentReportType: string='';
-  
-  
-  
+
+
+
   constructor(
     private _formService: FormsService,
     private _http: HttpClient,
@@ -89,8 +89,8 @@ export class F3xComponent implements OnInit {
     this._form3XReportInfo.dueDate='';
     this._form3XReportInfo.amend_Indicator='';
     this._form3XReportInfo.coh_bop='';
-   
-  
+
+
     localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
 
     this._formService
@@ -102,7 +102,7 @@ export class F3xComponent implements OnInit {
 
     });
 
-    
+
     this._formService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
@@ -151,7 +151,7 @@ export class F3xComponent implements OnInit {
 
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
     this.reporttype=localStorage.getItem('form3XReportInfo.reportType');
-  
+
     if ( typeof  this.reportType === 'undefined' || this.reportType === null)
     {
       this.selectedReportType  = this.reporttypes.find( x => x.default_disp_ind === 'Y');
@@ -174,11 +174,11 @@ export class F3xComponent implements OnInit {
         this.fromDate=this.electionDate.cvg_start_date;
         this.toDate=this.electionDate.cvg_end_date;
         this.electionDates=this.selectedReportType.election_state[0].dates;
-       
-      } 
-      else 
-      { 
-       
+
+      }
+      else
+      {
+
         this.specialreports=false;
         this.regularreports=true;
         this.electionDate=this.selectedReportType.election_state[0].dates[0];
@@ -187,30 +187,30 @@ export class F3xComponent implements OnInit {
         localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
         localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
       }
-      
+
     }
     else
     {
-      
+
       this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
       if ( typeof this.selectedReportType !== 'undefined' ||  typeof this.selectedReportType !== null ) {
         this.selectedstate = localStorage.getItem('form3XReportInfo.state');
         if (this.selectedReportType !== null)
         {
-          if (this.selectedReportType.regular_special_report_ind === 'S') 
+          if (this.selectedReportType.regular_special_report_ind === 'S')
           {
             this.specialreports=true;
             this.regularreports=false;
             this.electionStates=this.selectedReportType.election_state;
             this.electionDates=this.electionStates[0].dates;
-            
-          } 
-          else 
-          { 
+
+          }
+          else
+          {
             this.specialreports=false;
             this.regularreports=true;
             this.electionDate=this.selectedReportType.election_state[0].dates[0];
-            this.fromDate=this.electionDate.cvg_start_date; 
+            this.fromDate=this.electionDate.cvg_start_date;
             this.toDate=this.electionDate.cvg_end_date;
             localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
             localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
@@ -218,7 +218,7 @@ export class F3xComponent implements OnInit {
         }
         else
         {
-          
+
           this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
           if ( typeof this.reporttypes !== 'undefined' && this.reporttypes !== null) {
             this.reportType  = this.reporttypes[0].report_type;
@@ -236,7 +236,7 @@ export class F3xComponent implements OnInit {
 
         this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
         this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
-      
+
         if (this.reporttypeindicator === 'S') {
           this.specialreports=true;
           this.regularreports=false;
@@ -246,8 +246,8 @@ export class F3xComponent implements OnInit {
             this.fromDate=this.electionDate.cvg_start_date;
             this.toDate=this.electionDate.cvg_end_date;
           }
-        } 
-        else 
+        }
+        else
         {
          this.specialreports=false;
          this.regularreports=true;
@@ -266,7 +266,7 @@ export class F3xComponent implements OnInit {
     this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
     if ( typeof  this.selectedReportType !== 'undefined' || this.selectedReportType !== null)
     {
-      
+
       if (this.selectedReportType !== null)
       {
         this.electionStates=this.selectedReportType.election_state;
@@ -317,13 +317,13 @@ export class F3xComponent implements OnInit {
       if (this.selectedReportType.regular_special_report_ind === 'S') {
         this.specialreports=true;
         this.regularreports=false;
-  
-      } 
-      else 
+
+      }
+      else
       {
         this.specialreports=false;
         this.regularreports=true;
-       
+
       }
     }
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
@@ -349,7 +349,7 @@ export class F3xComponent implements OnInit {
    *
    * @param      {Object}  e       The event object.
    */
-  
+
   public onNotify(e): void {
 
 
@@ -411,5 +411,5 @@ export class F3xComponent implements OnInit {
 
   }
 
- 
+
 }

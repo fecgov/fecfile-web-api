@@ -22,7 +22,7 @@ export class ReportTypeComponent implements OnInit {
   @ViewChild('mswCollapse') mswCollapse;
   @Input() formRadioOptionsVisible: boolean = false;
   @Input() reportType:string ='';
-  
+
   //@Input() reportTypeRadio: string ='';
 
   public frmReportType: FormGroup;
@@ -87,7 +87,7 @@ export class ReportTypeComponent implements OnInit {
       this.reportType=this.committee_form3x_reporttypes[0].report_type;
      }
 
-  
+
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
     this.screenWidth = window.innerWidth;
@@ -135,7 +135,7 @@ export class ReportTypeComponent implements OnInit {
     if (localStorage.getItem('form3XReportInfo.fromDate') !== null && localStorage.getItem('form3XReportInfo.fromDate') !== null){
       this.coverageDateNotSelected=false;
     }
-    
+
   }
 
   private _setForm(): void {
@@ -162,16 +162,16 @@ export class ReportTypeComponent implements OnInit {
       this.optionFailed = true;
       this.reportTypeRadio = '';
     }
-    
+
     //this.reporttype=e.target.id;
 
     localStorage.setItem('form3XReportInfo.reportType', e.target.id);
     this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
     this.reportType = localStorage.getItem('form3XReportInfo.reportType');
-    
-  
+
+
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-  
+
     if (this.reporttypes !== null && this.reporttypes !== undefined)
     {
       this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
@@ -263,7 +263,7 @@ export class ReportTypeComponent implements OnInit {
     this._router.navigateByUrl('/dashboard');
   }
   public saveReport(): void {
-  
+
     console.log ("saveReport...");
     this._form3XReportInfo.cmteId='';
     this._form3XReportInfo.reportId='';
@@ -277,7 +277,7 @@ export class ReportTypeComponent implements OnInit {
     this._form3XReportInfo.dueDate=localStorage.getItem('form3XReportInfo.dueDate');
     this._form3XReportInfo.amend_Indicator='';
     this._form3XReportInfo.coh_bop="0";
-   
+
     localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
     console.log ("form_3X_ReportInfo =...", JSON.parse(localStorage.getItem('form_3X_ReportInfo')));
 
@@ -297,16 +297,16 @@ export class ReportTypeComponent implements OnInit {
     console.log ("Math.abs((firstDate.valueOf() ", Math.abs(firstDate.valueOf()));
     console.log ("secondDate.valueOf()", secondDate.valueOf());
 
-  
+
     var date1, date2;
     date1 = new Date();
     date2 = new Date(localStorage.getItem('form3XReportInfo.dueDate'));
-   
+
     var res = Math.abs(date1 - date2) / 1000;
     var days = Math.floor(res / 86400);
     console.log("res", res);
     console.log("days", days);
-  
+
     localStorage.setItem('form3XReportInfo.showDashBoard',"Y");
     localStorage.setItem('form3XReportInfo.DashBoardLine1',"Form 3X |" + localStorage.getItem('form3XReportInfo.reportDescription') + " | " + localStorage.getItem('form3XReportInfo.fromDate') + "-" + localStorage.getItem('form3XReportInfo.toDate'));
     localStorage.setItem('form3XReportInfo.DashBoardLine2',"due in " + days + " days|" + localStorage.getItem('form3XReportInfo.dueDate'));
@@ -314,6 +314,6 @@ export class ReportTypeComponent implements OnInit {
 
   }
 
-  
-    
+
+
 }
