@@ -87,6 +87,7 @@ export class ReportTypeComponent implements OnInit {
       this.reportType=this.committee_form3x_reporttypes[0].report_type;
      }
 
+
     this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
     this.screenWidth = window.innerWidth;
@@ -150,6 +151,7 @@ export class ReportTypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
+    console.log("updateTypeSelected");
     if(e.target.checked) {
       this.typeSelected = e.target.value;
       this.typeSelectedId = e.target.id;
@@ -190,9 +192,7 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidatereportType() {
-    console.log('doValidate: ');
-    if (this.frmReportType.controls['reportTypeRadio'].valid) {
-      console.log('form is valid: ');
+    if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
         this._form_3x_details = JSON.parse(localStorage.getItem('form_3x_details'));
@@ -203,6 +203,8 @@ export class ReportTypeComponent implements OnInit {
           localStorage.setItem('form_3x_details', JSON.stringify(this._form_3x_details));
         }, 100);
 
+        console.log(" report-type.component doValidateType");
+
         this.status.emit({
           form: this.frmReportType,
           direction: 'next',
@@ -210,8 +212,7 @@ export class ReportTypeComponent implements OnInit {
           previousStep: 'step_1'
         });
 
-        this.saveReport();
-
+        console.log(" report-type.component After status.emit");
         return 1;
     } else {
       this.optionFailed = true;
