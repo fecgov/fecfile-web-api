@@ -71,14 +71,15 @@ def get_transaction_categories(request):
 
     try:
         with connection.cursor() as cursor:
+            forms_obj= {}
             form_type = request.query_params.get('form_type')
             cursor.execute("select transaction_category_json from transaction_category_json_view where form_type='"+ form_type +"'")
             for row in cursor.fetchall():
                 data_row = list(row)
-                forms_obj=data_row
+                forms_obj=data_row[0]
                 
-        if forms_obj is None:
-            return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        if not bool(forms_obj):
+            return Response("No entries were found for the form_type: {} for this committee".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
@@ -96,6 +97,7 @@ def get_report_types(request):
         with connection.cursor() as cursor:
 
             #report_year = datetime.datetime.now().strftime('%Y')
+            forms_obj = {}
             cmte_id = request.user.username
             form_type = request.query_params.get('form_type')
 
@@ -105,14 +107,12 @@ def get_report_types(request):
 
             for row in cursor.fetchall():
                 data_row = list(row)
-                forms_obj=data_row
-
-            d = json.loads(forms_obj)
+                forms_obj= json.loads(data_row[0])
                 
-        if forms_obj is None:
-            return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        if not bool(forms_obj):
+            return Response("No entries were found for the form type: {} for this committee".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
         
-        return JsonResponse(d, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_report_types API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -139,10 +139,10 @@ def get_dynamic_forms_fields(request):
 
             for row in cursor.fetchall():
                 data_row = list(row)
-                forms_obj=data_row
+                forms_obj=data_row[0]
                 
         if not bool(forms_obj):
-            return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+            return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)                              
         
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -899,4 +899,41 @@ def entities(request):
 END - ENTITIES API - CORE APP
 ******************************************************************************************************************************
 """
+"""
+******************************************************************************************************************************
+SEARCH ENTITY API- CORE APP - SPRINT 7 - FNE 588 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+"""
+************************************************ FUNCTIONS - ENTITIES **********************************************************
+"""
+@api_view(['GET'])
+def search_entities(request):
+    try:
+        cmte_id = request.user.username
+        param_string = ""
+        order_string = ""
+        for key, value in request.query_params.items(): 
+            param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+            order_string = key + ","
 
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+                                                    FROM public.entity WHERE cmte_id ='""" + cmte_id + """'""" + param_string +""" AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
+        print(query_string)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        status_value = status.HTTP_200_OK
+        if forms_obj is None:
+            forms_obj =[]
+            status_value = status.HTTP_204_NO_CONTENT
+        return Response(forms_obj, status=status_value)
+    except Exception as e:
+        return Response("The search_entities API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+"""
+******************************************************************************************************************************
+END - SEARCH ENTITIES API - CORE APP
+******************************************************************************************************************************
+"""
