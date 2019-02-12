@@ -193,18 +193,15 @@
         vertical-align: bottom;
         @include media(tablet) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         @include media(mediumDesktop) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         @include media(largeDesktop) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         .committee-name,
         .committee-id {
