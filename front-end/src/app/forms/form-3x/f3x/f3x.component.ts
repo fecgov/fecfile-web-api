@@ -7,6 +7,7 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 
 @Component({
   selector: 'app-f3x',
@@ -39,19 +40,22 @@ export class F3xComponent implements OnInit {
   public formRadioOptionsVisible: boolean = false;
   public selectedreportTypeRadio: string = '';
   public reporttype: any = {};
-  public electionDates: selectedElectionDate = {};
-  public electionStates: any = {};
+  public electionDates: Array<selectedElectionDate>;
+  public electionDate: selectedElectionDate = {};
+  public electionStates: Array<selectedElectionState>;
+  public electionState: selectedElectionState = {};
   public form3xSelectedReportType: any = {};
   public selectedstate: string = '';
   public fromDate: string = '';
   public toDate: string = '';
   public selectedReportType: selectedReportType = {};
+
   public reportType: string = '';
 
   private _step: string = '';
   private _formType: string = '';
   //private _form3XReportDetails:  any = {};
-  private _form3XReportDetails:  form3XReport={};
+  private _form3XReportInfo:  form3XReport={};
   private _currentReportType: string='';
 
 
@@ -63,6 +67,7 @@ export class F3xComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _activatedRoute: ActivatedRoute
+
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -70,27 +75,23 @@ export class F3xComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    this.specialreports=true;
-    this.regularreports=false;
+    console.log (" this._formType ",  this._formType );
 
-    this._form3XReportDetails.reportId='';
-    this._form3XReportDetails.reportType='';
-    this._form3XReportDetails.regularSpecialReportInd='';
-    this._form3XReportDetails.stateOfElection='';
-    this._form3XReportDetails.cvgStartDate='';
-    this._form3XReportDetails.cvgEndDate='';
-    this._form3XReportDetails.dueDate='';
+    this._form3XReportInfo.cmteId='';
+    this._form3XReportInfo.reportId='';
+    this._form3XReportInfo.formType= this._formType;
+    this._form3XReportInfo.reportType='';
+    this._form3XReportInfo.regularSpecialReportInd='';
+    this._form3XReportInfo.stateOfElection='';
+    this._form3XReportInfo.electionDate;
+    this._form3XReportInfo.cvgStartDate='';
+    this._form3XReportInfo.cvgEndDate='';
+    this._form3XReportInfo.dueDate='';
+    this._form3XReportInfo.amend_Indicator='';
+    this._form3XReportInfo.coh_bop='';
 
 
-    localStorage.setItem('form3XReportInfo', JSON.stringify(this._form3XReportDetails));
-
-     /*localStorage.setItem('form3XReportInfo.reportId', this._form3XReportDetails.reportId);
-    localStorage.setItem('form3XReportInfo.reportType', this._form3XReportDetails.reportType);
-    localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this._form3XReportDetails.regularSpecialReportInd);
-    localStorage.setItem('form3XReportInfo.stateOfElection', this._form3XReportDetails.stateOfElection);
-    localStorage.setItem('form3XReportInfo.cvgStartDate', this._form3XReportDetails.cvgStartDate);
-    localStorage.setItem('form3XReportInfo.cvgEndDate', this._form3XReportDetails.cvgEndDate);
-    localStorage.setItem('form3XReportInfo.dueDate', this._form3XReportDetails.dueDate);*/
+    localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
 
     this._formService
       .getreporttypes(this._formType)
@@ -148,176 +149,152 @@ export class F3xComponent implements OnInit {
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
 
-
-    //this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-
-
-    /*this.reporttypeindicator  = this.reporttypes.find( x => {
-      return x.default_disp_ind === 'Y' ;*/
-
     this.reporttype=localStorage.getItem('form3XReportInfo.reportType');
 
-    if ( typeof  this.reportType === 'undefined')
+    if ( typeof  this.reportType === 'undefined' || this.reportType === null)
     {
       this.selectedReportType  = this.reporttypes.find( x => x.default_disp_ind === 'Y');
 
-      if (this.selectedReportType !== null && this.selectedReportType !== undefined)
+      if ( typeof this.selectedReportType !== 'undefined' || typeof this.selectedReportType !== null)
       {
-        this.reportType  = this.selectedReportType.report_type;
-        this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
         this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
       }
       else
       {
         this.reportType  = this.reporttypes[0].report_type;
-
         this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
         this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
-        //this.reportType  = this.selectedReportType.report_type;
       }
 
       if (this.reporttypeindicator === 'S') {
         this.specialreports=true;
         this.regularreports=false;
+        this.electionDate=this.selectedReportType.election_state[0].dates[0];
+        this.fromDate=this.electionDate.cvg_start_date;
+        this.toDate=this.electionDate.cvg_end_date;
+        this.electionDates=this.selectedReportType.election_state[0].dates;
+
       }
       else
       {
+
         this.specialreports=false;
         this.regularreports=true;
+        this.electionDate=this.selectedReportType.election_state[0].dates[0];
+        this.fromDate=this.electionDate.cvg_start_date;
+        this.toDate=this.electionDate.cvg_end_date;
+        localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
+        localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
       }
 
     }
     else
     {
-      if (this.selectedReportType !== null && this.selectedReportType !== undefined)
-      {
-       this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
-       if(this.selectedReportType !== null) {
-         if (this.selectedReportType.regular_special_report_ind === 'S') {
+
+      this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
+      if ( typeof this.selectedReportType !== 'undefined' ||  typeof this.selectedReportType !== null ) {
+        this.selectedstate = localStorage.getItem('form3XReportInfo.state');
+        if (this.selectedReportType !== null)
+        {
+          if (this.selectedReportType.regular_special_report_ind === 'S')
+          {
             this.specialreports=true;
             this.regularreports=false;
-            this.electionStates=this.selectedReportType.election_state
-            this.fromDate="01/20/2019";
-            this.fromDate="02/20/2019";
+            this.electionStates=this.selectedReportType.election_state;
+            this.electionDates=this.electionStates[0].dates;
 
-          } else {
+          }
+          else
+          {
             this.specialreports=false;
             this.regularreports=true;
-            this.fromDate="01/20/2019";
-            this.fromDate="02/20/2019";
-
-          /*this.fromDate=this.electionStates[0].cvg_start_date;
-          this.toDate=this.electionStates[0].cvg_end_date;*/
-
-          }
-        } else {
-          this.specialreports=false;
-          this.regularreports=true;
-          this.fromDate="01/20/2019";
-          this.fromDate="02/20/2019";
+            this.electionDate=this.selectedReportType.election_state[0].dates[0];
+            this.fromDate=this.electionDate.cvg_start_date;
+            this.toDate=this.electionDate.cvg_end_date;
+            localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
+            localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
+            }
         }
-     }
-     else
-     {
-      this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-      if (typeof this.reporttypes !== null)
-      {
-        if (Array.isArray(this.reporttypes)) {
-          this.reportType  = this.reporttypes[0].report_type;
-        }
-      }
-      if (this.reporttypes !== null) {
-          if (Array.isArray(this.reporttypes)) {
-            this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
-          }
-      }
-
-      if (this.selectedReportType !== null) {
-        if (typeof this.selectedReportType.regular_special_report_ind === 'string') {
-          this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
-        }
-      }
-
-      if (this.reporttypeindicator === 'S')
+        else
         {
+
+          this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+          if ( typeof this.reporttypes !== 'undefined' && this.reporttypes !== null) {
+            this.reportType  = this.reporttypes[0].report_type;
+            this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+            this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+          }
+        }
+       }
+       else
+       {
+        this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+        if ( this.reporttypes !==undefined) {
+         this.reportType  = this.reporttypes[0].report_type;
+        }
+
+        this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+        this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+
+        if (this.reporttypeindicator === 'S') {
           this.specialreports=true;
           this.regularreports=false;
+          this.electionDates=this.selectedReportType.election_state[0].dates;
+          this.electionDate=this.selectedReportType.election_state[0].dates[0];
+          if (  this.electionDates !== undefined) {
+            this.fromDate=this.electionDate.cvg_start_date;
+            this.toDate=this.electionDate.cvg_end_date;
+          }
         }
         else
         {
          this.specialreports=false;
          this.regularreports=true;
-         this.fromDate="01/20/2019";
-         this.fromDate="02/20/2019";
+         this.electionDate=this.selectedReportType.election_state[0].dates[0];
+         if ( typeof this.electionDates !== 'undefined') {
+          this.fromDate=this.electionDate.cvg_start_date;
+          this.toDate=this.electionDate.cvg_end_date;
+          localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
+          localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
+         }
         }
-     }
-
-
-     }
+       }
+    }
 
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
-
     this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
-
-    if ( typeof  this.selectedReportType !== null)
+    if ( typeof  this.selectedReportType !== 'undefined' || this.selectedReportType !== null)
     {
-      if (this.selectedReportType !== null) {
+
+      if (this.selectedReportType !== null)
+      {
         this.electionStates=this.selectedReportType.election_state;
-        if (this.selectedstate === null || this.selectedstate === undefined)
+        if ( typeof this.selectedstate  === 'undefined' ||  this.selectedstate  === null)
         {
-          this.electionDates  = this.electionStates[0];
+          this.electionDates  = this.selectedReportType.election_state[0].dates;
         }
         else
         {
-         this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
+          this.electionState = this.electionStates.find( x => x.state === this.selectedstate);
+          this.electionDates  =  this.electionState.dates;
         }
       }
-      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
     }
-
-
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
-
     this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
-
-    /*if (this.selectedReportType !== null && this.form3xSelectedReportType !== undefined)
-    {
-      this.electionStates=this.selectedReportType.election_state;
-
-      if (this.selectedstate !== null &&  this.selectedstate !== undefined)
-      {
-       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
-      }
-      else
-      {
-        this.electionDates  = this.electionStates[0].dates;
-      }
-
-      console.log( "F3xComponent ngDoCheck  this.electionStates", this.electionStates);
-      console.log( "F3xComponent ngDoCheck  this.electionDates", this.electionDates);
-      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
-    }*/
-
-
     localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.selectedReportType));
+    localStorage.setItem('form3XReportInfo.reportDescription', JSON.stringify(this.selectedReportType.report_type_desciption));
 
-    /*this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-    console.log("F3X Componenets ngOnChanges this._currentReportTyp", this._currentReportType);  */
   }
 
   ngOnChanges(): void
   {
-
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
-
-
     this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
     this.reporttypeindicator  = this.reporttypes.find( x => {
       return x.default_disp_ind === 'Y' ;
     });
-    //}).regular_special_report_ind;
 
     if (typeof this.reporttypeindicator !== 'undefined') {
       this.reporttypeindicator = this.reporttypeindicator.regular_special_report_ind;
@@ -325,7 +302,7 @@ export class F3xComponent implements OnInit {
 
     this.selectedReportType=JSON.parse(localStorage.getItem('form3xSelectedReportType'));
 
-    if (this.reportType === null || this.reportType === undefined)
+    if ( typeof this.reportType === 'undefined')
     {
      if (this.reporttypeindicator === 'S') {
        this.specialreports=true;
@@ -340,47 +317,42 @@ export class F3xComponent implements OnInit {
       if (this.selectedReportType.regular_special_report_ind === 'S') {
         this.specialreports=true;
         this.regularreports=false;
+
       }
       else
       {
         this.specialreports=false;
         this.regularreports=true;
-        this.electionStates=this.form3xSelectedReportType.election_state
-
-        this.fromDate=this.electionStates.cvg_start_date;
-        this.toDate=this.electionStates.cvg_end_date;
 
       }
     }
-
     this.selectedstate = localStorage.getItem('form3XReportInfo.state');
     this.form3xSelectedReportType = JSON.parse(localStorage.getItem('form3xSelectedReportType'));
-
-    if (this.selectedReportType !== null || this.form3xSelectedReportType !== undefined)
+    if (typeof this.form3xSelectedReportType !== 'undefined')
     {
       this.electionStates=this.selectedReportType.election_state
 
-      if (this.selectedstate===null || this.selectedstate ===undefined)
+      if (typeof this.selectedstate === 'undefined')
       {
-       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate);
+       this.electionDates  = this.electionStates.find( x => x.state === this.selectedstate).dates;
       }
       else
       {
         this.electionDates  = this.electionStates[0].dates;
       }
-      //localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reportType));
     }
-
     this._currentReportType= localStorage.getItem('form3XReportInfo.reportType');
   }
-
 
   /**
    * Get's message from child components.
    *
    * @param      {Object}  e       The event object.
    */
+
   public onNotify(e): void {
+
+
 
     if (typeof e.additionalOptions !== 'undefined') {
       if (e.additionalOptions.length) {
@@ -416,6 +388,7 @@ export class F3xComponent implements OnInit {
     this.canContinue();
    }
 
+
    public canContinue(): void {
 
     if(this.frm && this.direction) {
@@ -435,6 +408,7 @@ export class F3xComponent implements OnInit {
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
     }
+
   }
 
 

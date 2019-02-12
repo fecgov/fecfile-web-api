@@ -26,7 +26,9 @@ export class AppLayoutComponent implements OnInit {
   public closeResult: string = '';
   public dashboardClass: string = '';
   public showLegalDisclaimer: boolean = false;
-
+  public showForm3XDashBoard: boolean = false;
+  public form3XReportDashBoardLine1 = '';
+  public form3XReportDashBoardLine2 = '';
 	constructor(
     private _apiService: ApiService,
 		private _sessionService: SessionService,
@@ -76,13 +78,12 @@ export class AppLayoutComponent implements OnInit {
   ngDoCheck(): void {
     let route: string = this._router.url;
 
-    // if(route.indexOf('/forms') === 0) {
-    //   if(this.toggleMenu) {
-    //     this.sideBarClass = 'visible';
-    //   } else {
-    //     this.sideBarClass = '';
-    //   }
-    // }
+    if(localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
+      this.showForm3XDashBoard = true;
+      this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
+      this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
+
+    }
   }
 
   @HostListener('window:beforeunload', ['$event'])
