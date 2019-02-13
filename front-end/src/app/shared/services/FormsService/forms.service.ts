@@ -651,7 +651,7 @@ export class FormsService {
   formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
   formData.append('report_type', formF3X_ReportInfo.reportType);
   formData.append('election_code', formF3X_ReportInfo.electionCode);
-  formData.append('date_of_election', formF3X_ReportInfo.formType);
+  formData.append('date_of_election', formF3X_ReportInfo.electionDate);
   formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
   formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
