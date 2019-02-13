@@ -100,7 +100,9 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
+    if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
+      localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
+    }
     
   }
 

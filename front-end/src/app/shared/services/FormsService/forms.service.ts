@@ -3,9 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99, form3XReport, form99PrintPreviewResponse  } from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
-
 
 
 @Injectable({
@@ -84,7 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+    
 
     return this._http
       .post<form99>(
@@ -212,7 +211,7 @@ export class FormsService {
 
     }
 
-    console.log ('saveForm Formed Data: ',data);
+    console.log ('Formed Data: ',data);
 
    new Response(data).text().then(console.log)
 
@@ -337,7 +336,7 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
-            return res;
+            return true;
           }
           return false;
       }));
@@ -459,7 +458,7 @@ export class FormsService {
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
     console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
-    new Response(data).text().then(console.log)
+    //new Response(data).text().then(console.log)
 
     return this._http
       .post(
@@ -503,7 +502,6 @@ export class FormsService {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
       url = '/f99/update_print_f99';
-      //url = '/f99/save_print_f99';
       data = form99_details;
 
        data['form_type'] = 'F99';
@@ -521,22 +519,32 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
-            localStorage.setItem('form99PrintPreviewResponse', JSON.stringify(res));
-            let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
-            printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
+            localStorage.setItem('form_99_details_res', JSON.stringify(res));
+            let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
+            id=form99_details_res.id.toString();
 
+            printpriview_filename = form99_details_res.printpriview_filename;
+            printpriview_fileurl = form99_details_res.printpriview_fileurl;
+
+            localStorage.setItem('form_99_details.id', id);
+            localStorage.setItem('form_99_details.org_filename', org_filename);
+            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
+            localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
             localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
-            console.log ('PreviewForm_ReasonScreen api Repsonse',res);
-            console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
+            console.log ('PreviewForm_Preview_sign_Screen id',identity);
+            console.log ('PreviewForm_Preview_sign_Screen api Repsonse',res);
+            console.log ('PreviewForm_Preview_sign_Screen form_99_details.id', id);
+            console.log ('PreviewForm_Preview_sign_Screen org_filename',org_filename);
+            console.log ('PreviewForm_Preview_sign_Screen org_fileurl',org_fileurl);
+            console.log ('PreviewForm_Preview_sign_Screen printpriview_filename',printpriview_filename);
+            console.log ('PreviewForm_Preview_sign_Screen printpriview_fileurl',printpriview_fileurl);
 
-
-            return res;
+            return true;
           }
           return false;
       }));
   }
-
 
   public get_filed_form_types(): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
@@ -569,7 +577,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    // console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
 
@@ -595,9 +603,9 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    // console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
-    params = params.append('form_type', 'F3X');
+    params = params.append('form_type', "F3X");
 
     return this._http
        .get(
@@ -627,23 +635,28 @@ export class FormsService {
  public saveReport(form_type: string): Observable<any> {
   let token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
-  let url: string = '/core/crud_reports';
+  let url: string = '/core/reports';
+
   let params = new HttpParams();
   let formData: FormData = new FormData();
 
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  //httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
 
+  formData.append('report_id', formF3X_ReportInfo.reportId);
   formData.append('form_type', formF3X_ReportInfo.formType);
-  formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
-  formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
+  formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
   formData.append('report_type', formF3X_ReportInfo.reportType);
+  formData.append('election_code', formF3X_ReportInfo.electionCode);
   formData.append('date_of_election', formF3X_ReportInfo.formType);
   formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
+  formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
+  formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-
+   
   return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -656,7 +669,7 @@ export class FormsService {
           if (res) {
             localStorage.setItem('`form_${form_type}_ReportInfo_Res', JSON.stringify(res));
             let form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
-            return true;
+            return res;
           }
           return false;
       }));

@@ -159,7 +159,7 @@ def check_form_type(form_type):
     form_list = ["F3X",]
 
     if not (form_type in form_list):
-        raise Exception('Form Type is not correctly specified. datum received is: {}'.format(form_type))
+        raise Exception('Form Type is not correctly specified. Input received is: {}'.format(form_type))
 
 def check_list_cvg_dates(args):
 
@@ -218,7 +218,17 @@ def check_report_id(report_id):
         check_report_id = int(report_id)
     except Exception as e:
         raise
-        
+
+def check_cvg_date(cvg_date):
+    try:
+        if cvg_date is None:
+            cvg_dt = None
+        else:
+            cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
+        return cvg_dt
+    except:
+        raise
+
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
@@ -373,7 +383,9 @@ def post_reports(data):
         cvg_end_dt = data.get('cvg_end_dt')
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
-        forms_obj = check_list_cvg_dates(args)
+        forms_obj = []
+        if not (cvg_start_dt is None or cvg_end_dt is None):
+            forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             report_id = get_next_report_id()
             data['report_id'] = report_id
@@ -426,8 +438,10 @@ def put_reports(data):
         check_form_type(data.get('form_type'))
         check_report_id(data.get('report_id'))
         report_id = data.get('report_id')
-        args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]                        
-        forms_obj = check_list_cvg_dates(args)
+        args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]
+        forms_obj = []
+        if not (cvg_start_dt is None or cvg_end_dt is None):                        
+            forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
             put_sql_report(data.get('report_id'), cmte_id, data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
@@ -470,6 +484,7 @@ def delete_reports(data):
                     raise Exception ('The delete_sql_form3x function is throwing an error: ' + str(e))
     except:
         raise
+
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
@@ -487,16 +502,17 @@ def reports(request):
                 election_code = request.data.get('election_code')
             else:
                 election_code = None
+            
             datum = {
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'amend_ind': amend_ind,
                 'report_type': request.data.get('report_type'),
                 'election_code': election_code,
-                'date_of_election': request.data.get('date_of_election'),
+                'date_of_election': check_cvg_date(request.data.get('date_of_election')),
                 'state_of_election': request.data.get('state_of_election'),
-                'cvg_start_dt': datetime.strptime(request.data.get('cvg_start_dt'), '%Y-%m-%d').date(),
-                'cvg_end_dt': datetime.strptime(request.data.get('cvg_end_dt'), '%Y-%m-%d').date(),
+                'cvg_start_dt': check_cvg_date(request.data.get('cvg_start_dt')),
+                'cvg_end_dt': check_cvg_date(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
             }    
             data = post_reports(datum)
@@ -538,15 +554,16 @@ def reports(request):
     if request.method == 'PUT':
 
         try:
+            
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'report_type': request.data.get('report_type'),
-                'date_of_election': request.data.get('date_of_election'),
+                'date_of_election': check_cvg_date(request.data.get('date_of_election')),
                 'state_of_election': request.data.get('state_of_election'),
-                'cvg_start_dt': datetime.strptime(request.data.get('cvg_start_dt'), '%Y-%m-%d').date(),
-                'cvg_end_dt': datetime.strptime(request.data.get('cvg_end_dt'), '%Y-%m-%d').date(),
+                'cvg_start_dt': check_cvg_date(request.data.get('cvg_start_dt')),
+                'cvg_end_dt': check_cvg_date(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
             }
             if 'amend_ind' in request.data:

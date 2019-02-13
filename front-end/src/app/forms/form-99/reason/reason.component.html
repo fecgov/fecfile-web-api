@@ -92,6 +92,22 @@
             </div>
           </div>
           <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12"
+              *ngIf="PdfUploaded">
+              <div class="text-success text-center" *ngIf="PdfUploaded">
+                  File has been successfully attached.
+              </div>
+            </div>
+          </div>
+          <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12"
+                *ngIf="PdfDeleted">
+                <div class="text-success text-center" *ngIf="PdfDeleted">
+                    File has been successfully deleted.
+                </div>
+              </div>
+            </div>
+          <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="text-editor">
                 <textarea
@@ -166,11 +182,35 @@
                     <button
                       type="button"
                       class="btn btn-link"
-                      (click)="removeFile()"
+                      (click)="open(deletePDF)"
                     >
                         <span vertical-align="top" class="close-icon"></span>
                       </button>
                   </div>
+                  <ng-template #deletePDF let-d="dismiss">
+                    <div class="modal-header">
+                      <h2 class="modal-title">
+                        Delete PDF file
+                      </h2>
+                    </div>
+                    <div class="modal-body">
+                       <p> Do you want to delete uploaded pdf file?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-outline-dark"
+                        (click)="d('Yes click')"
+                      >Yes</button> &nbsp;
+        
+                      <button
+                      type="button"
+                      class="btn btn-outline-dark"
+                      (click)="d('No click')"
+                    >No</button> &nbsp;
+                    </div>
+                  </ng-template>
+
                 </div>
               </div>
             </div>
@@ -199,6 +239,7 @@
             </div>
           </div>
         </div>
-      </footer>
+      </footer>modal
     </form>
   </div> <!-- ./reason-container -->
+  

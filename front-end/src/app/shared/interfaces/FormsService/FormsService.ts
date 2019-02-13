@@ -1,4 +1,4 @@
- export interface form99 {
+export interface form99 {
   id: string,
   committeeid: string,
   committeename: string,
@@ -187,14 +187,6 @@ export interface Icommittee_form3x_reporttype {
   due_date?:string
 }
 
-/*export interface Icommittee_form3x_reporttype {
-  report_type?: string,
-  report_type_desciption?: string,
-  report_type_info?: string,
-  regular_special_report_ind?: string,
-  election_state?: string[]
-}*/
-
 export interface Ielection_state {
   state?: string,
   dates?: string[]
@@ -226,6 +218,7 @@ export interface f3xTransactionTypes {
     amend_Indicator?:string;
     reportType?: string,
     regularSpecialReportInd?: string,
+    electionCode?: string,
     stateOfElection?:string,
     electionDate?:string,
     cvgStartDate?: string,
@@ -260,6 +253,3 @@ export interface f3xTransactionTypes {
     pdf_url?:string,
    }
 
-  export interface pdfResonse{
-    pdf_url?:string,
-   }
