@@ -99,6 +99,7 @@
               </div>
             </div>
           </div>
+            
           <div class="grid-row">
               <div class="grid-row__col grid-row__col--12"
                 *ngIf="PdfDeleted">
@@ -234,12 +235,13 @@
                 type="submit"
                 [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
               >
+                  
                Save & Continue
               </button>
             </div>
           </div>
         </div>
-      </footer>modal
+      </footer>
     </form>
   </div> <!-- ./reason-container -->
   
