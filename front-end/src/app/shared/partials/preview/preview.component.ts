@@ -237,6 +237,7 @@ export class PreviewComponent implements OnInit {
   }
   public printPreview(): void {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
+    console.log("Accessing PreviewComponent printPriview ...");
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
      console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
