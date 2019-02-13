@@ -11,7 +11,6 @@ import { forkJoin, of, interval } from 'rxjs';
 import { CompileShallowModuleMetadata, ConditionalExpr } from '@angular/compiler';
 
 
-
 @Component({
   selector: 'f3x-report-type',
   templateUrl: './report-type.component.html',
