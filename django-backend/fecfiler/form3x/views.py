@@ -189,6 +189,13 @@ def check_list_cvg_dates(args):
     except Exception:
         raise 
 
+def date_format(cvg_date):
+    try:
+        cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
+        return cvg_dt
+    except:
+        raise
+
 """
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
 """
@@ -217,16 +224,6 @@ def check_report_id(report_id):
     try:
         check_report_id = int(report_id)
     except Exception as e:
-        raise
-
-def check_cvg_date(cvg_date):
-    try:
-        if cvg_date is None:
-            cvg_dt = None
-        else:
-            cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
-        return cvg_dt
-    except:
         raise
 
 """
@@ -388,7 +385,7 @@ def post_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             report_id = get_next_report_id()
-            data['report_id'] = report_id
+            data['report_id'] = str(report_id)
             try:
                 post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
             except Exception as e:
@@ -400,13 +397,15 @@ def post_reports(data):
                 #Insert data into Form 3X table
                 if data.get('form_type') == "F3X":
                     post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))                                            
+                output = get_reports(data)
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
                 # Delete report that was earlier created
                 remove_sql_report(report_id, cmte_id)
                 raise Exception('The post_sql_form3x function is throwing an error: ' + str(e))
-            return data
+            
+            return output[0]
         else:
             return forms_obj
     except:
@@ -450,14 +449,16 @@ def put_reports(data):
             prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
             prev_cvg_end_dt = old_dict_report.get('cvg_end_date')
             prev_last_update_date = old_dict_report.get('last_update_date')
-            
-            if data.get('form_type') == "F3X":                   
-                try:
+                                           
+            try:
+                if data.get('form_type') == "F3X":
                     put_sql_form3x(data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'), data.get('report_id'), cmte_id)                            
-                except Exception as e:
+                output = get_reports(data)
+            except Exception as e:
                     put_sql_report(data.get('report_id'), cmte_id, prev_report_type, prev_cvg_start_dt, prev_cvg_end_dt)
                     raise Exception('The put_sql_form3x function is throwing an error: ' + str(e))
-            return data
+            
+            return output[0]
         else:
             return forms_obj
     except:
@@ -509,10 +510,10 @@ def reports(request):
                 'amend_ind': amend_ind,
                 'report_type': request.data.get('report_type'),
                 'election_code': election_code,
-                'date_of_election': check_cvg_date(request.data.get('date_of_election')),
+                'date_of_election': date_format(request.data.get('date_of_election')),
                 'state_of_election': request.data.get('state_of_election'),
-                'cvg_start_dt': check_cvg_date(request.data.get('cvg_start_dt')),
-                'cvg_end_dt': check_cvg_date(request.data.get('cvg_end_dt')),
+                'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
+                'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
             }    
             data = post_reports(datum)
@@ -560,10 +561,10 @@ def reports(request):
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'report_type': request.data.get('report_type'),
-                'date_of_election': check_cvg_date(request.data.get('date_of_election')),
+                'date_of_election': date_format(request.data.get('date_of_election')),
                 'state_of_election': request.data.get('state_of_election'),
-                'cvg_start_dt': check_cvg_date(request.data.get('cvg_start_dt')),
-                'cvg_end_dt': check_cvg_date(request.data.get('cvg_end_dt')),
+                'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
+                'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
             }
             if 'amend_ind' in request.data:
@@ -743,7 +744,8 @@ def post_entities(data):
         entity_id = get_next_entity_id(entity_type)
         data['entity_id'] = entity_id
         post_sql_entity(entity_id, data.get('entity_type'), data.get('cmte_id'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'),data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'))
-        return data
+        output = get_entities(data)
+        return output[0]
     except:
         raise
 
@@ -776,7 +778,8 @@ def put_entities(data):
         entity_id = data.get('entity_id')
         check_entity_id(entity_id)
         put_sql_entity(data.get('entity_type'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'), data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'), data.get('entity_id'), cmte_id)
-        return data
+        output = get_entities(data)
+        return output[0]
     except:
         raise
 

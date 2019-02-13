@@ -12,7 +12,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
 from django.conf import settings
-from fecfiler.form3x.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, NoOPError
+from fecfiler.form3x.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError
 
 
 # Create your views here.
@@ -167,6 +167,7 @@ def post_schedA(datum):
         datum['transaction_id'] = transaction_id
         try:
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'))
+            output = get_schedA(datum)
         except Exception as e:
             if 'entity_id' in datum:
                 entity_data = put_entities(prev_entity_list[0])
@@ -177,7 +178,7 @@ def post_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The post_sql_schedA function is throwing an error: ' + str(e))
-        return datum
+        return output[0]
     except:
         raise
 
@@ -222,6 +223,7 @@ def put_schedA(datum):
         check_transaction_id(transaction_id)
         try:
             put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'))
+            output = get_schedA(datum)
         except Exception as e:
             print(datum)
             if flag:
@@ -233,7 +235,7 @@ def put_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The put_sql_schedA function is throwing an error: ' + str(e))
-        return datum
+        return output[0]
     except:
         raise
 
@@ -261,7 +263,7 @@ def schedA(request):
                 'transaction_type': request.data.get('transaction_type'),
                 'back_ref_transaction_id': request.data.get('back_ref_transaction_id'),
                 'back_ref_sched_name': request.data.get('back_ref_sched_name'),
-                'contribution_date': request.data.get('contribution_date'),
+                'contribution_date': date_format(request.data.get('contribution_date')),
                 'contribution_amount': request.data.get('contribution_amount'),
                 'purpose_description': request.data.get('purpose_description'),
                 'memo_code': request.data.get('memo_code'),
@@ -329,7 +331,7 @@ def schedA(request):
                 'transaction_type': request.data.get('transaction_type'),
                 'back_ref_transaction_id': request.data.get('back_ref_transaction_id'),
                 'back_ref_sched_name': request.data.get('back_ref_sched_name'),
-                'contribution_date': request.data.get('contribution_date'),
+                'contribution_date': date_format(request.data.get('contribution_date')),
                 'contribution_amount': request.data.get('contribution_amount'),
                 'purpose_description': request.data.get('purpose_description'),
                 'memo_code': request.data.get('memo_code'),
