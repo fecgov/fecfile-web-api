@@ -10,7 +10,7 @@ import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'f99-reason',
@@ -41,6 +41,10 @@ export class ReasonComponent implements OnInit {
   public validFile: boolean = true;
   public showFileDeleteButton: boolean=false;
   public notCorrectPdfSize: boolean=false;
+  public closeResult: string = '';
+  public PdfUploaded: boolean = false;
+  public PdfDeleted: boolean = false;
+  
   private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
@@ -55,7 +59,8 @@ export class ReasonComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _formsService: FormsService,
     private _messageService: MessageService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _modalService: NgbModal
   ) {
     this._messageService.clearMessage();
   }
@@ -143,6 +148,8 @@ export class ReasonComponent implements OnInit {
          this.validFile=true;
          this.showFileDeleteButton=true;
          this._form99Details.filename = this.file.name;
+         this.PdfUploaded=true;
+         this.PdfDeleted=false;
       }
       else
       {
@@ -150,6 +157,7 @@ export class ReasonComponent implements OnInit {
         this.validFile=false;
         this.file=null;
         this.notCorrectPdfSize=false;
+        this.PdfUploaded=false;
       }
     } else {
          let fileNameObj: any = {
@@ -162,6 +170,7 @@ export class ReasonComponent implements OnInit {
         this.showFileDeleteButton=false;
         this.fileInput.nativeElement.value = '';
         this._form99Details.filename = '';
+        this.PdfUploaded = false;
         localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
   }
@@ -247,12 +256,10 @@ export class ReasonComponent implements OnInit {
   }
 
 
-  public removeFile(): void {
-    this.file = null;
-    this.notValidPdf=false;
-
-    this._form99Details.filename = '';
-    localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+  public removeFile(modalId: string): void {
+    console.log("modalId =", modalId);
+    this._modalService.open(modalId);
+    
   }
 
   /**
@@ -512,5 +519,46 @@ export class ReasonComponent implements OnInit {
       }
     }
   }
+  public deletePDF( message: string,  modalId:string): void {
+    console.log("deletePDF message", message);
+    if (message==="Yes"){
+      this.file = null;
+      this.notValidPdf=false;
 
+      this._form99Details.filename = '';
+      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+    }
+    //this._modalService.close(modalId);
+ }
+
+ public open(content): void{
+  this._modalService
+    .open(content, {ariaLabelledBy: 'modal-basic-title'})
+    .result
+    .then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+  }, (reason) => {
+    this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
+  });
+}
+
+ private _getDismissReason(reason: any): string {
+  console.log(" ReasonComponent _getDismissReason reason", reason);
+  
+  if (reason === "Yes click") {
+    this.PdfDeleted=true;
+    this.file = null;
+    this.notValidPdf=false;
+    this.PdfUploaded = false;
+    this._form99Details.filename = '';
+    localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+  }
+  else if (reason === ModalDismissReasons.ESC) {
+    return 'by pressing ESC';
+  } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+    return 'by clicking on a backdrop';
+  } else {
+    return  `with: ${reason}`;
+  }
+ }
 }
