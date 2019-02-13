@@ -519,28 +519,17 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
-            localStorage.setItem('form_99_details_res', JSON.stringify(res));
-            let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
-            id=form99_details_res.id.toString();
 
-            printpriview_filename = form99_details_res.printpriview_filename;
-            printpriview_fileurl = form99_details_res.printpriview_fileurl;
+            localStorage.setItem('form99PrintPreviewResponse', JSON.stringify(res));
+            let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
+            printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
 
-            localStorage.setItem('form_99_details.id', id);
-            localStorage.setItem('form_99_details.org_filename', org_filename);
-            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
-            localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
             localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
-            console.log ('PreviewForm_Preview_sign_Screen id',identity);
-            console.log ('PreviewForm_Preview_sign_Screen api Repsonse',res);
-            console.log ('PreviewForm_Preview_sign_Screen form_99_details.id', id);
-            console.log ('PreviewForm_Preview_sign_Screen org_filename',org_filename);
-            console.log ('PreviewForm_Preview_sign_Screen org_fileurl',org_fileurl);
-            console.log ('PreviewForm_Preview_sign_Screen printpriview_filename',printpriview_filename);
-            console.log ('PreviewForm_Preview_sign_Screen printpriview_fileurl',printpriview_fileurl);
+            console.log ('PreviewForm_ReasonScreen api Repsonse',res);
+            console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
 
-            return true;
+            return res;
           }
           return false;
       }));
