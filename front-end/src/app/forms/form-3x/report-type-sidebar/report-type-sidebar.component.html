@@ -1,4 +1,4 @@
-  
+
   <div class="report-type-sidebar">
       <header>
         <h3 class="text-center">{{ title }}</h3>
@@ -14,7 +14,7 @@
               type="button"
               class="btn-info"
               ngbTooltip="Close of books for the report being filed."
-    
+
             >
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">
@@ -23,14 +23,15 @@
             </button>
             </div>
             <div class="form-row">
-              <i class="fas fa-calendar-alt"></i>
-
-              <input type="text"
-              name="txtfromdate"
-              value={{fromDate}}
-              (change)="fromDateChange($event.target.value)"
-              class="form-control"
-              aria-label="Contribution Date"/>
+              <i class="calendar-icon" aria-hidden="true"></i>
+              <input
+                type="date"
+                name="txtfromdate"
+                value={{fromDate}}
+                (change)="fromDateChange($event.target.value)"
+                class="form-control"
+                aria-label="Contribution Date"
+              />
             </div>
             <div class="form-row">
                 <br />
@@ -38,10 +39,10 @@
               <button
               type="button"
               class="btn-info"
-              ngbTooltip="Three day after the close of books of the last report filed by the committee. 
+              ngbTooltip="Three day after the close of books of the last report filed by the committee.
               If the report is the first one filed by a committee, then the reporting period begins with
                the date of the committee’s first activity."
-    
+
             >
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">
@@ -50,13 +51,15 @@
             </button>
             </div>
             <div class="form-row">
-              <i class="fas fa-calendar-alt"></i>
-              <input type="text"
-              name="txttodate"
-              (change)="fromDateChange($event.target.value)"
-              value={{toDate}}
-              class="form-control"
-              aria-label="Contribution Date">
+              <i class="calendar-icon" aria-hidden="true"></i>
+              <input
+                type="date"
+                name="txttodate"
+                (change)="fromDateChange($event.target.value)"
+                value={{toDate}}
+                class="form-control"
+                aria-label="Contribution Date"
+              >
             </div>
           </ng-container> <!-- regular reports -->
           <ng-container *ngIf="specialreports===true">
@@ -77,18 +80,18 @@
               </label>
             </div>
             <div class="form-row">
-                <select 
-                id="state" 
-                [(ngModel)]="selectedElectionState" 
-                name="state" 
-                class="form-control" 
+                <select
+                id="state"
+                [(ngModel)]="selectedElectionState"
+                name="state"
+                class="form-control"
                 #electionState (change)="selectStateChange($event.target.value)"
                 >
                 <option value="---">--- </option>
                 <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
                </select>
             </div>
-      
+
 
             <div class="form-row">
                 <br />
@@ -107,19 +110,19 @@
               </label>
             </div>
              <div class="form-row">
-                <select 
-                id="electiondate" 
-                [(ngModel)]="selectedElectionDate" 
-                name="electiondate" 
-                [disabled]="isDisabled" 
-                class="form-control" 
+                <select
+                id="electiondate"
+                [(ngModel)]="selectedElectionDate"
+                name="electiondate"
+                [disabled]="isDisabled"
+                class="form-control"
                 #electionDate (change)="ElectionDateChange($event.target.value)"
                 >
                    <option ngvalue="---">--- </option>
                    <option *ngFor='let dateSelected of electiondates' [value]="dateSelected.election_date">{{dateSelected.election_date}}</option>
-               </select> 
-             
-           </div>            
+               </select>
+
+           </div>
             <div class="form-row">
                 <br />
               <label for="dateFrom">
@@ -137,7 +140,7 @@
               </label>
             </div>
             <div class="form-row">
-            <i class="calendar-icon"></i>
+            <i class="calendar-icon" aria-hidden="true"></i>
             <input
               type="date"
               name="txtfromdate"
@@ -154,7 +157,7 @@
                 <button
                   type="button"
                   class="btn-info"
-                  ngbTooltip="Three day after the close of books of the last report filed by the committee. 
+                  ngbTooltip="Three day after the close of books of the last report filed by the committee.
                   If the report is the first one filed by a committee, then the reporting period begins with
                    the date of the committee’s first activity."
                 >
@@ -208,4 +211,4 @@
           </div>
         </footer>
       </div>
-    
+
