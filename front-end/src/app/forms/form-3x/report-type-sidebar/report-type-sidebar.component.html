@@ -14,7 +14,7 @@
                 <button
                 type="button"
                 class="btn-info"
-                ngbTooltip="Close of books for the report being filed."
+                ngbTooltip="Language will be provided by RAD"
                 >
                   <i class="info-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -41,7 +41,7 @@
                 <button
                 type="button"
                 class="btn-info"
-                ngbTooltip="Close of books for the report being filed."
+                ngbTooltip="Language will be provided by RAD"
                 >
                   <i class="info-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -119,7 +119,7 @@
                 #electionDate (change)="ElectionDateChange($event.target.value)"
                 >
                    <option ngvalue="---">--- </option>
-                   <option *ngFor='let dateSelected of electiondates' [value]="dateSelected.election_date">{{dateSelected.election_date}}</option>
+                   <option *ngFor='let dateSelected of electiondates' [value]="dateSelected.election_date">{{dateSelected.election_date | date: 'MM/dd/yyyy'}}</option>
                </select>
 
            </div>
@@ -130,7 +130,7 @@
                 <button
                 type="button"
                 class="btn-info"
-                ngbTooltip="Close of books for the report being filed."
+                ngbTooltip="Language will be provided by RAD"
                 >
                   <i class="info-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -157,9 +157,7 @@
                 <button
                   type="button"
                   class="btn-info"
-                  ngbTooltip="Three day after the close of books of the last report filed by the committee.
-                  If the report is the first one filed by a committee, then the reporting period begins with
-                   the date of the committee’s first activity."
+                  ngbTooltip="Language will be provided by RAD"
                 >
                   <i class="info-icon" aria-hidden="true"></i>
                   <span class="sr-only">

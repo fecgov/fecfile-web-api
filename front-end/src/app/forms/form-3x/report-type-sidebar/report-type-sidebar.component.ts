@@ -3,7 +3,6 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 
-
 @Component({
   selector: 'report-type-sidebar',
   templateUrl: './report-type-sidebar.component.html',
@@ -54,6 +53,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   public selectedState: string='';
   public electionDate: selectedElectionDate = {};
   public isDisabled: boolean=true;
+  public electiondatesTmp: Array<selectedElectionDate> ;
   constructor(
     private _config: NgbTooltipConfig,
     private _formService: FormsService
@@ -129,7 +129,18 @@ export class ReportTypeSidebarComponent implements OnInit {
             }
           }
          }
+      }
+
+    /*  for (var item  in this.electiondates){
+        if (item !== "election_date"){
+          this.electiondatesTmp[item]["cvg_start_date"]  =  this.electiondates[item]["cvg_start_date"]
+          this.electiondatesTmp[item]["cvg_end_date"]  =  this.electiondates[item]["cvg_end_date"]
+          this.electiondatesTmp[item]["due_date"]  =  this.electiondates[item]["due_date"]
+        } else {
+          this.electiondatesTmp[item]["election_date"]  =  this.electiondates[item]["election_date"]
         }
+      }*/
+
       this.fromDate = "";
       this.toDate = "";
      
@@ -150,11 +161,14 @@ export class ReportTypeSidebarComponent implements OnInit {
            if (this.electiondates[prop]["election_date"] === value ){
               this.fromDate = this.electiondates[prop]["cvg_start_date"];
               this.toDate = this.electiondates[prop]["cvg_end_date"];
-              localStorage.setItem('form3XReportInfo.electionDate', this.electiondates[prop]["election_date"]);
-              localStorage.setItem('form3XReportInfo.dueDate', this.electiondates[prop]["due_date"]);
-              localStorage.setItem('form3XReportInfo.toDate', this.electiondates[prop]["cvg_end_date"]);
-              localStorage.setItem('form3XReportInfo.fromDate', this.electiondates[prop]["cvg_start_date"]);
-           }
+              let eletionDateString = this.electiondates[prop]["election_date"];
+              let electionDateObject = new Date(eletionDateString);
+              eletionDateString = electionDateObject.toLocaleDateString();
+              localStorage.setItem('form3XReportInfo.dueDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["due_date"]));
+              localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_end_date"]));
+              localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_start_date"]));
+              localStorage.setItem('form3XReportInfo.electionDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["election_date"]));
+            }
        }
      }
   
@@ -164,11 +178,19 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   toDateChange(value: string): void{
-    localStorage.setItem('form3XReportInfo.toDate', value);
+    console.log("toDate ",value)
+    localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(value));
   }
   
   fromDateChange(value: string): void{
-    localStorage.setItem('form3XReportInfo.fromDate', value);
+    console.log("fromDate ",value);
+    localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(value));
   }
 
+  getDateInMMDDYYYYFormat(value: string):string {
+    let DateString = value;
+    let DateObject = new Date(DateString);
+    DateString = DateObject.toLocaleDateString();
+    return DateString;
+  }
 }

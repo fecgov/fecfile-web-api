@@ -305,9 +305,7 @@ export class ReportTypeComponent implements OnInit {
     let dueDateString: string ="";
 
     if (typeof localStorage.getItem('form3XReportInfo.fromDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.fromDate') !== null ){
-      fromDateString = localStorage.getItem('form3XReportInfo.fromDate')
-      let fromDateObject = new Date(fromDateString);
-      fromDateString = fromDateObject.toLocaleDateString();
+      fromDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.fromDate'));
     }
     else{
       fromDateString="";
@@ -315,9 +313,7 @@ export class ReportTypeComponent implements OnInit {
 
 
     if (typeof localStorage.getItem('form3XReportInfo.toDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.toDate') !== null ){
-      toDateString = localStorage.getItem('form3XReportInfo.toDate')
-      let toDateObject = new Date(toDateString);
-      toDateString = toDateObject.toLocaleDateString();
+      toDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.toDate'));
     }
     else{
       toDateString="";
@@ -325,9 +321,7 @@ export class ReportTypeComponent implements OnInit {
     
 
     if (typeof localStorage.getItem('form3XReportInfo.dueDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.dueDate') !== null ){
-      dueDateString = localStorage.getItem('form3XReportInfo.dueDate')
-      let dueDateObject = new Date(dueDateString);
-      dueDateString = dueDateObject.toLocaleDateString();
+      dueDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.dueDate'));
     }
     else{
       dueDateString="";
@@ -340,7 +334,12 @@ export class ReportTypeComponent implements OnInit {
     this._router.navigateByUrl('/forms/form/3X?step=step_2');
 
   }
-
+  getDateInMMDDYYYYFormat(value: string):string {
+    let DateString = value;
+    let DateObject = new Date(DateString);
+    DateString = DateObject.toLocaleDateString();
+    return DateString;
+  }
   
     
 }
