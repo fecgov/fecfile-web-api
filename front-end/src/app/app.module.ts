@@ -60,6 +60,7 @@ import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+import { TransactionsComponent } from './forms/transactions/transactions.component';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -81,6 +82,7 @@ import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/i
     ReportsComponent,
     ContributorsComponent,
     ToolsComponent,
+    TransactionsComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,

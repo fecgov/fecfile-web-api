@@ -1,0 +1,58 @@
+@import '../../shared/scss/global';
+
+.transactions-container {
+  .grid-row {
+    margin-left: 0;
+    margin-right: 0;
+    .grid-row__col {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  header {
+    .header-content {
+      display: block;
+      margin: 0 auto;
+      width: 96%;
+      @include clearfix();
+      .btn-options {
+        color: $shuttleGray;
+        text-decoration: none;
+        &:hover,
+        &:visited,
+        &:active {
+          color: $shuttleGray;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  .forms__btn-container {
+    height: 100%;
+    margin-bottom: 10px;
+  }
+
+  .forms__trx-btn {
+    margin: 5px;
+    width: 10em;
+  }
+
+  .forms__trx-search {
+    width: 27%;
+    float: right;
+    margin-right: 5px;
+  }
+
+  .forms__trx-applied-filter-row {
+    min-height: 48px;
+  }
+
+  .forms__trx-table {
+    width: 100%;
+  }
+
+  .forms__trx-table-checkbox {
+    width: 3%;
+  }
+
+}

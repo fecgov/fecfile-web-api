@@ -1,0 +1,162 @@
+<!-- <h2>View Transactions not yet supported</h2> -->
+<div class="forms__wizard" *ngIf="!loadingData">
+    <div class="form__sidebar">
+        <div>
+            <transaction-categories-sidebar title="Transaction Categories" (status)='onNotify($event)'>
+            </transaction-categories-sidebar>
+        </div>
+    </div>
+
+    <div
+      class="form__container"
+      [ngClass]="{}">
+
+        <div class="form__steps">
+            <app-steps
+            [steps]="[
+                {text: 'Report<br/>type', step: 'step_1'},
+                {text: 'Form', step: 'step_2'},
+                {text: 'Preview', step: 'step_4'},
+                {text: 'Sign', step: 'step_5'},
+                {text: 'Submit', step: 'step_6'}
+            ]"
+            [current_step]="currentStep"
+            >
+            </app-steps>
+        </div>
+
+        <div class="transactions-container">
+            <header>
+                <div class="header-content">
+                    <div class="float-left">
+                        <h1>Transactions / Form {{formType}}</h1>
+                    </div>
+                    <div class="float-right">
+                        <button class="btn btn-secondary btn-right" type="submit">Return to Transaction Categories</button>
+                    </div>
+                </div>
+                <hr />
+            </header>
+            <!-- consider wrapping the table in the form, but can't use ([ngModel]) syntax - see compiler error -->
+            <form
+                [formGroup]="formTransactions"
+                (ngSubmit)="doValidateTransaction()"
+            >
+            </form>
+            <div class="grid-row">
+                <div class="grid-row__col grid-row__col--12">
+                    <div class="forms__btn-container">
+                        <button
+                            class="btn btn-secondary btn-left forms__trx-btn"
+                            type="button"
+                            (click)="showPinColumns()"
+                        >
+                            <i class="fas fa-thumb-tack"></i>
+                            Pin Columns
+                        </button>
+                        <button
+                            class="btn btn-secondary btn-left forms__trx-btn"
+                            type="button"
+                            (click)="showRecycleBin()"
+                        >
+                            <i class="fas fa-trash"></i>
+                            Recycle Bin
+                        </button>
+                        <button
+                            class="btn btn-secondary btn-left forms__trx-btn"
+                            type="button"
+                            (click)="doImport()"
+                        >
+                            <i class="fas fa-chevron-circle-right"></i>
+                            Import
+                        </button>    
+                        <button
+                            class="btn btn-secondary btn-left forms__trx-btn"
+                            type="button"
+                            (click)="doFilter()"
+                        >
+                            <i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                        <!-- <div class="input-group forms__trx-search">
+                            <div class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                            </div>
+                            <input id="ao_list_tbl_search_filter"  type="text" 
+                                class="form-control" name="filterModel" placeholder="Type to search...">										
+                        </div>  -->
+                        <div class="input-group pl-0 forms__trx-search">
+                            <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="">
+                                    <i class="fas fa-search text-grey" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div> 
+                        
+                    </div>
+                  
+                </div>
+            </div> 
+            <div class="grid-row forms__trx-applied-filter-row">
+                <div class="forms__btn-container">
+                    <button
+                        class="btn btn-secondary btn-left forms__trx-btn"
+                        type="button"
+                        (click)="toogleAppliedFilter()"
+                    >
+                        <i class="fas fx-times"></i>
+                        {{appliedFilterNames[0]}}
+                    </button>                    
+                </div> 
+                <table class="table table-striped table-hover table__sortable forms__trx-table">
+                    <thead>
+                        <tr>
+                            <th class="forms__trx-table-checkbox"></th>
+                            <th [class]="getSortClass('type')" 
+                                (click)="changeSortDirection('type')">Type
+                            </th>
+                            <th [class]="getSortClass('transactionId')" 
+                                (click)="changeSortDirection('transactionId')">Transaction ID
+                            </th>
+                            <th [class]="getSortClass('name')" 
+                                (click)="changeSortDirection('name')">Name
+                            </th>
+                            <th [class]="getSortClass('date')" 
+                                (click)="changeSortDirection('date')">Date
+                            </th>
+                            <th [class]="getSortClass('amount')" 
+                                (click)="changeSortDirection('amount')">Amount
+                            </th>
+                            <th [class]=""></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let trx of transactionsModel">
+                            <td>
+                                <input [(ngModel)]="trx.selected"
+									    type="checkbox">
+                            </td>
+                            <td>{{trx.type}}</td>
+                            <td>{{trx.transactionId}}</td>
+                            <td>{{trx.name}}</td>
+                            <td>{{trx.date | date: 'MM/dd/yyyy'}}</td>
+                            <td>{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+                            <td>
+                                <button
+                                    class="btn btn-sm btn-secondary"
+                                    type="button"
+                                    (click)="doFilter()"
+                                >
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>           
+        </div>
+
+    </div>  <!-- ./form__container -->
+</div> <!-- ./forms__wizard -->
+  
