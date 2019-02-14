@@ -635,6 +635,7 @@ export class FormsService {
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
 
+  console.log("Save Report formF3X_ReportInfo ", formF3X_ReportInfo);
   formData.append('report_id', formF3X_ReportInfo.reportId);
   formData.append('form_type', formF3X_ReportInfo.formType);
   formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
@@ -645,7 +646,9 @@ export class FormsService {
   formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-   
+  
+  console.log(" saveReport formData ",formData );
+
   return this._http
       .post(
         `${environment.apiUrl}${url}`,
