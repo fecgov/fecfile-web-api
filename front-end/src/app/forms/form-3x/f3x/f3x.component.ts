@@ -110,21 +110,10 @@ export class F3xComponent implements OnInit {
       .subscribe(res => {
         console.log('getTransactionCategories resp: ', res);
 
-        if (typeof res !== 'undefined' && res !== null && res !== undefined ){
           console.log ("res.data.cashOnHand res",res);
-          if ( typeof res.data.cashOnHand !== 'undefined' &&  res.data.cashOnHand !== null && res.data.cashOnHand !== undefined ){
             this.cashOnHand = res.data.cashOnHand;   
-          }
-          
-          if ( typeof res.data.transactionCategories !== 'undefined' &&  res.data.transactionCategories !== null ){
             this.transactionCategories = res.data.transactionCategories;
-          }
-  
-          if (typeof res.data.transactionSearchField !== 'undefined' && res.data.transactionSearchField !== null){
             this.searchField = res.data.transactionSearchField;
-          }
-        }
-        
       });
 
       if(localStorage.getItem(`form_${this._formType}_saved`) === null && this.step !== 'step_5') {
