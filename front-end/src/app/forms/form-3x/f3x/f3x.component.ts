@@ -105,7 +105,7 @@ export class F3xComponent implements OnInit {
     });
 
     
-   /* this._formService
+    this._formService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
         console.log('getTransactionCategories resp: ', res);
@@ -125,7 +125,7 @@ export class F3xComponent implements OnInit {
           }
         }
         
-      });*/
+      });
 
       if(localStorage.getItem(`form_${this._formType}_saved`) === null && this.step !== 'step_5') {
         localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved': false}));
