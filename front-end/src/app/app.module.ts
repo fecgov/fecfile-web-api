@@ -13,6 +13,7 @@ import { ArchwizardModule } from 'angular-archwizard';
 import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -50,12 +51,16 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
-import { FormSidebarComponent } from './shared/partials/form-sidebar/form-sidebar.component';
+import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transaction-categories-sidebar/transaction-categories-sidebar.component';
 
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
 import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
-import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sidebar/Report-type-sidebar.component';
+import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
+import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
+import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
+import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -93,17 +98,21 @@ import { ReportTypeSidebarComponent } from './shared/partials/Report-type-sideba
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
     ConfirmModalComponent,
-    FormSidebarComponent,
+    TransactionCategoriesSidbarComponent,
     F3xComponent,
     TransactionTypeComponent,
     ReportTypeComponent,
-    ReportTypeSidebarComponent
+    ReportTypeSidebarComponent,
+    FinancialSummaryComponent,
+    OrderByPipe,
+    IndividualReceiptComponent
   ],
   entryComponents: [
     ConfirmModalComponent
   ],
   imports: [
     BrowserModule,
+    NgSelectModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,

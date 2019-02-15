@@ -35,6 +35,7 @@ export class PreviewComponent implements OnInit {
   private _form_details: any = {}
   public printpriview_filename: string="";
   public printpriview_fileurl: string="";
+  private _printPriviewPdfFileLink: string = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -234,22 +235,22 @@ export class PreviewComponent implements OnInit {
           });
       });    
   }
-  public printPriview(): void {
+  public printPreview(): void {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.form_type}_details`));
-
+    console.log("Accessing PreviewComponent printPriview ...");
     localStorage.setItem(`form_${this.form_type}_details`, JSON.stringify(this._form_details));
-     
-     /*.saveForm({}, {}, this.form_type)*/
-     console.log("Accessing Sign printPriview ...");
+     console.log("Accessing PreviewComponent printPriview ...");
      this._formsService
-       .PreviewForm_Preview_sign_Screen({}, this.form_type)
-       .subscribe(res => {
-         if(res) {
-           console.log("Accessing Preview printPriview res ...",res);
-         }
-       },
-       (error) => {
-         console.log('error: ', error);
-       });
+     .PreviewForm_Preview_sign_Screen({}, "99")
+     .subscribe(res => {
+       if(res) {
+           console.log("Accessing PreviewComponent printPriview res ...",res);
+           window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });
+    }
  }
-}
+

@@ -1,0 +1,68 @@
+@import '../../../shared/scss/global';
+
+.report-type-sidebar {
+  position: relative;
+  height: 500px;
+  header {
+    margin-bottom: 20px;
+  }
+  section {
+    .sidebar-form-content {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      input[type='date'] {
+        &.form-control {
+        margin-left: auto;
+        margin-right: auto;
+        width: 170px !important;
+        }
+      }
+      label {
+        margin: 0 auto;
+      }
+      #state,
+      #electiondate {
+        margin: 0 auto !important;
+        width: 200px !important;
+      }
+      .calendar-icon {
+        left: 4px;
+        position: absolute;
+        padding-top: 20px;
+      }
+    }
+  }
+  footer {
+    background-color: $mineShaft;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    .form-sidebar__item {
+      border-bottom: 1px solid $white;
+      color: $white;
+      height: 25px;
+      line-height: 25px;
+      padding-bottom: 10px;
+      vertical-align: middle;
+      .form-sidebar-item__text {
+        color: $white;
+        float: left;
+        padding-left: 5px;
+      }
+      .form-sidebar-item__value {
+        color: $white;
+        float: right;
+        padding-right: 8px;
+      }
+    }
+    .form-sidebar__btns {
+      padding-bottom: 10px;
+      padding-top: 15px;
+      text-align: center;
+      .btn-row {
+        padding-top: 15px;
+      }
+    }
+  }
+}

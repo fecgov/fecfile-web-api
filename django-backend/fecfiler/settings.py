@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     'db_file_storage',
 
     'fecfiler.core',
+    'fecfiler.form3x',
+    'fecfiler.sched_A',
 
 
 
@@ -100,6 +102,7 @@ TEMPLATES = [
 
 #if DEBUG == True:
 CORS_ORIGIN_ALLOW_ALL = True
+
 #else:
 #    CORS_ORIGIN_WHITELIST = ['localhost',os.environ.get('FRONTEND_URL', 'api')]
 
@@ -161,7 +164,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+#TIME_ZONE = 'UTC'
+TIME_ZONE = "America/New_York"
 
 USE_I18N = True
 
@@ -364,18 +368,22 @@ STATICFILES_LOCATION = 'static'
 MEDIAFILES_LOCATION = 'media'
 
 
-
 # a custom storage file, so we can easily put static and media in one bucket
 
 DEFAULT_FILE_STORAGE = 'fecfiler.custom_storages.MediaStorage'
-
-
 
 # the regular Django file settings but with the custom S3 URLs
 
 MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION)
 
+NXG_FEC_API_URL = os.environ.get('NXG_API_URL', '127.0.0.1:8080')
+NXG_FEC_API_VERSION = os.environ.get('NXG_API_VERSION', '/api/v1/')
 
+<<<<<<< HEAD
 
 NXG_FEC_API_URL = "127.0.0.1:8080"
 NXG_FEC_API_VERSION = "/api/v1/"
+=======
+NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.efdev.fec.gov/printpdf')
+NXG_FEC_PRINT_API_VERSION = "/v1/print"
+>>>>>>> a49224377f58bcea064cebd884857a53954b238b

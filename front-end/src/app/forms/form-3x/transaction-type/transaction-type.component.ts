@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -20,13 +21,20 @@ export class TransactionTypeComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
 
+  public cashOnHand: any = {};
   public frmOption: FormGroup;
   public optionFailed: boolean = false;
   public showForm: boolean = false;
+  public searchField: any = {};
+  public transActionCategories: any = {};
+
+
+  private _formType: string = '';
 
   constructor(
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
+    private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
     private _messageService: MessageService
   ) {
@@ -35,14 +43,19 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+
+
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
     });
   }
 
   ngDoCheck(): void {
-    if (this.selectedOptions) {
-      this.showForm = true;
+    if (Array.isArray(this.selectedOptions)) {
+      if (this.selectedOptions.length >= 1) {
+        this.showForm = true;
+      }
     }
   }
   /**
@@ -51,7 +64,6 @@ export class TransactionTypeComponent implements OnInit {
    * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
   public doValidateOption(): boolean {
-    console.log('doValidateOption: ');
     if (this.frmOption.invalid) {
       this.optionFailed = true;
       return false;

@@ -19,7 +19,7 @@
 					<tbody>
 						<tr *ngFor="let report of reports || async">
 							<td text-align="left">{{report.form_type}}</td>
-							<td text-align="left">{{report.is_submitted ? 'Submitted' :'Save'}}</td>
+							<td text-align="left">{{report.is_submitted ? 'Submitted' :'Saved'}}</td>
 							<td text-align="right" >{{report.is_submitted ? report.id : ''}}</td>
 							<td text-align="left">{{report.coverage_start_date | date: 'MM/dd/yyyy'}}</td>
 							<td text-align="left">{{report.coverage_end_date | date: 'MM/dd/yyyy'}}</td>

@@ -1,0 +1,221 @@
+<div class="individual-receipt-container">
+  <form
+    [formGroup]="frmIndividualReceipt"
+    (ngSubmit)="doValidateReceipt()"
+  >
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h1>
+            Form 3X
+            <ng-container *ngIf="transactionType">
+              / {{ transactionType }}
+            </ng-container>
+          </h1>
+        </div>
+        <div class="float-right" ngbDropdown>
+          <button
+            type="button"
+            class="btn btn-link btn-options"
+            id="dropdownBasic2"
+            ngbDropdownToggle
+          >
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item">View</button>
+            <button class="dropdown-item">Print</button>
+            <button class="dropdown-item">Import</button>
+          </div>
+        </div>
+      </div>
+      <hr />
+    </header>
+    <section>
+      <div class="row">
+        <div class="col">
+          <label for="transactionCategory">
+            Transaction Category *
+             <button
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Waiting for text."
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+          </label>
+          <ng-select
+            name="transactionCategory"
+            class="transaction-category-select"
+            placeholder="Select a transaction category first."
+            [items]="transactionCategories"
+            bindLabel="text"
+            bindValue="value"
+            groupBy="type"
+            (change)="transactionCategorySelected($event)"
+            formControlName="transactionCategory"
+          >
+            <ng-template ng-optgroup-tmp let-item="item">
+              {{item.type || 'Unnamed group'}}
+            </ng-template>
+          </ng-select>
+          <div
+            class="error-text"
+            *ngIf="(frmIndividualReceipt.controls.transactionCategory.invalid && (frmIndividualReceipt.controls.transactionCategory.dirty || frmIndividualReceipt.controls.transactionCategory.touched)) || formSubmitted"
+          >
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory.errors?.required"
+            >
+              You must select a transaction category.
+            </div>
+          </div>
+        </div>
+        <div class="col info-text">
+          {{ transactionCategoryInfo }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="transactionType">
+            Transaction Type *
+             <button
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Waiting for text."
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+          </label>
+          <ng-select
+            name="transactionType"
+            class="transaction-type-select"
+            [placeholder]="frmIndividualReceipt.controls.transactionCategory.invalid ? 'You must select a transaction category first.' : 'Select a transaction type.'"
+            [items]="transactionTypes"
+            bindLabel="text"
+            bindValue="value"
+            formControlName="transactionType"
+            (change)="transactionTypeSelected($event)"
+          >
+          </ng-select>
+          <div
+            class="error-text"
+            *ngIf="(frmIndividualReceipt.controls.transactionType.invalid && (frmIndividualReceipt.controls.transactionType.dirty || frmIndividualReceipt.controls.transactionType.touched)) || formSubmitted"
+          >
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory.errors?.required  && frmIndividualReceipt.controls.transactionType.errors?.required"
+            >
+              You must select a transaction category first.
+            </div>
+            <div
+              class="text-error text-left"
+              *ngIf="frmIndividualReceipt.controls.transactionCategory.valid && frmIndividualReceipt.controls.transactionType.errors?.required"
+            >
+              You must select a transaction type.
+            </div>
+          </div>
+        </div>
+        <div class="col info-text">
+          {{ transactionTypeInfo }}
+        </div>
+      </div>
+      <ng-container *ngFor="let row of formFields">
+        <div class="row">
+          <ng-container *ngIf="isArray(row.cols)">
+            <div class="col" *ngFor="let col of row.cols">
+              <div class="form-group">
+                <label for="{{ col.name }}">
+                  {{ col.text }}
+                  <ng-container *ngIf="col?.validation?.required">
+                    *
+                  </ng-container>
+                 <button
+                    type="button"
+                    class="btn btn-info"
+                    ngbTooltip="{{ col.infoText }}"
+                    tooltipClass="form-tooltip"
+                    *ngIf="col.infoIcon"
+                  >
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <ng-container
+                  *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'"
+                >
+                  <input
+                    type="{{ col.type }}"
+                    name="{{ col.name }}"
+                    class="form-control"
+                    [formControlName]="col.name"
+                  />
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="col.type === 'textarea'">
+                  <textarea
+                    class="form-control"
+                    rows="5"
+                    name="{{ col.name }}"
+                    [formControlName]="col.name"
+                  ></textarea>
+                </ng-container>
+                <ng-container *ngIf="col.type === 'select' && col.name === 'contributorState'">
+                  <ng-select
+                    class="state-select"
+                    [formControlName]="col.name"
+                  >
+                    <ng-option
+                      *ngFor="let item of states"
+                      [value]="item.code"
+                    >
+                      {{ item.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </section>
+    <footer>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
+                <button
+                  class="btn btn-secondary btn-right"
+                  type="submit"
+                >
+                  Save &amp; Add Transaction
+                </button>
+                <button
+                  class="btn btn-default btn-right"
+                  type="button"
+                  (click)="previous()"
+                >
+                  View Transactions
+                </button>
+              </div>
+          </div>
+        </div>
+      </footer>
+    </footer>
+  </form>
+</div>

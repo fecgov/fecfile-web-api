@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99 } from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
 
 
@@ -83,6 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    
 
     return this._http
       .post<form99>(
@@ -357,6 +358,8 @@ export class FormsService {
     let printpriview_filename = "";
     let printpriview_fileurl = "";
 
+    console.log("PreviewForm_ReasonScreen start...")
+
     httpOptions = httpOptions.append('enctype', 'multipart/form-data');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -454,8 +457,8 @@ export class FormsService {
     }
 
     console.log ('PreviewForm_ReasonScreen Data: ',data);
-
-    new Response(data).text().then(console.log)
+    console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
+    //new Response(data).text().then(console.log)
 
     return this._http
       .post(
@@ -467,39 +470,14 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
-            localStorage.setItem('form_99_details_res', JSON.stringify(res));
-            let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
-            id=form99_details_res.id.toString();
+            localStorage.setItem('form99PrintPreviewResponse', JSON.stringify(res));
+            let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
+            printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
 
-            org_filename=form99_details_res.filename;
-            org_fileurl=form99_details_res.file;
-            printpriview_filename = form99_details_res.printpriview_filename;
-            printpriview_fileurl = form99_details_res.printpriview_fileurl;
-
-            localStorage.setItem('form_99_details.id', id);
-            localStorage.setItem('form_99_details.org_filename', org_filename);
-            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
-            localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
-            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
             console.log ('PreviewForm_ReasonScreen api Repsonse',res);
-            console.log ('PreviewForm_ReasonScreen form_99_details.id', id);
-            console.log ('PreviewForm_ReasonScreen org_filename',org_filename);
-            console.log ('PreviewForm_ReasonScreen org_fileurl',org_fileurl);            
-            console.log ('PreviewForm_ReasonScreen printpriview_filename',printpriview_filename);
             console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
-
-            if (fileuploaded)
-            {
-              org_filename=form99_details_res.filename;
-              org_fileurl=form99_details_res.file;
-              /*form_99_details_res_tmp.id=form_99_details_res.id; //just to get form 99 id
-              localStorage.setItem('id', form_99_details_res_tmp.id);*/
-              localStorage.setItem('orm_99_details.org_filename', org_filename);
-              localStorage.setItem('orm_99_details.org_fileurl', org_fileurl);
-              console.log ('org_filename on Reason screen',org_filename);
-              console.log ('org_fileurl on Reason screen',org_fileurl);
-            }
 
             return res;
           }
@@ -515,7 +493,7 @@ export class FormsService {
     let printpriview_filename = "";
     let printpriview_fileurl = "";
     let org_filename="";
-    let org_fileurl="";    
+    let org_fileurl="";
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -541,28 +519,17 @@ export class FormsService {
       )
       .pipe(map(res => {
           if (res) {
-            localStorage.setItem('form_99_details_res', JSON.stringify(res));
-            let form99_details_res: form99 = JSON.parse(localStorage.getItem(`form_99_details_res`));
-            id=form99_details_res.id.toString();
 
-            printpriview_filename = form99_details_res.printpriview_filename;
-            printpriview_fileurl = form99_details_res.printpriview_fileurl;
+            localStorage.setItem('form99PrintPreviewResponse', JSON.stringify(res));
+            let form99PrintPreviewResponse: form99PrintPreviewResponse = JSON.parse(localStorage.getItem(`form99PrintPreviewResponse`));
+            printpriview_fileurl = form99PrintPreviewResponse.results.pdf_url;
 
-            localStorage.setItem('form_99_details.id', id);
-            localStorage.setItem('form_99_details.org_filename', org_filename);
-            localStorage.setItem('form_99_details.org_fileurl', org_fileurl);
-            localStorage.setItem('form_99_details.printpriview_filename', printpriview_filename);
-            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);            
+            localStorage.setItem('form_99_details.printpriview_fileurl', printpriview_fileurl);
 
-            console.log ('PreviewForm_Preview_sign_Screen id',identity);
-            console.log ('PreviewForm_Preview_sign_Screen api Repsonse',res);
-            console.log ('PreviewForm_Preview_sign_Screen form_99_details.id', id);
-            console.log ('PreviewForm_Preview_sign_Screen org_filename',org_filename);
-            console.log ('PreviewForm_Preview_sign_Screen org_fileurl',org_fileurl);            
-            console.log ('PreviewForm_Preview_sign_Screen printpriview_filename',printpriview_filename);
-            console.log ('PreviewForm_Preview_sign_Screen printpriview_fileurl',printpriview_fileurl);
+            console.log ('PreviewForm_ReasonScreen api Repsonse',res);
+            console.log ('PreviewForm_ReasonScreen printpriview_fileurl',printpriview_fileurl);
 
-            return true;
+            return res;
           }
           return false;
       }));
@@ -592,17 +559,17 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let url: string = '';
     let params = new HttpParams();
-    
+
 
     url = '/f3x/get_transaction_categories?form_type=F3X';
-  
+
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
-  
+
     return this._http
        .get(
           `${environment.apiUrl}${url}`,
@@ -610,11 +577,11 @@ export class FormsService {
            /* headers: httpOptions,
             params*/
             headers: httpOptions
-          }     
+          }
        );
   }
 
-  
+
   public getreporttypes( form_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
@@ -622,13 +589,13 @@ export class FormsService {
     let params = new HttpParams();
 
     url = '/f3x/get_report_types?form_type=F3X';
-    
+
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
-  
+
     return this._http
        .get(
           `${environment.apiUrl}${url}`,
@@ -636,9 +603,90 @@ export class FormsService {
            /* headers: httpOptions,
             params*/
             headers: httpOptions
-          }     
-         ); 
-     //return this._http.get('./assets/196.json');
-      
+          }
+         );
+     //return this._http.get('./assets/196.json')
+ }
+ public formHasUnsavedData(formType: string): boolean {
+    let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
+
+    if(formSaved !== null) {
+      let formStatus: boolean = formSaved.saved;
+
+      if(!formStatus) {
+        return true;
+      }
+    }
+
+    return false;
+ }
+
+ public saveReport(form_type: string): Observable<any> {
+  let token: string = JSON.parse(this._cookieService.get('user'));
+  let httpOptions =  new HttpHeaders();
+  let url: string = '/core/reports';
+
+  let params = new HttpParams();
+  let formData: FormData = new FormData();
+
+  //httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+
+  let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
+
+  console.log("Save Report formF3X_ReportInfo ", formF3X_ReportInfo);
+  formData.append('report_id', formF3X_ReportInfo.reportId);
+  formData.append('form_type', formF3X_ReportInfo.formType);
+  formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
+  formData.append('report_type', formF3X_ReportInfo.reportType);
+  formData.append('election_code', formF3X_ReportInfo.electionCode);
+  formData.append('date_of_election', formF3X_ReportInfo.electionDate);
+  formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
+  formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
+  formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
+  formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
+  
+  console.log(" saveReport formData ",formData );
+
+  return this._http
+      .post(
+        `${environment.apiUrl}${url}`,
+        formData,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            localStorage.setItem('`form_${form_type}_ReportInfo_Res', JSON.stringify(res));
+            let form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
+            return res;
+          }
+          return false;
+      }));
+ }
+
+ public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
+  let token: string = JSON.parse(this._cookieService.get('user'));
+  let httpOptions =  new HttpHeaders();
+  let url: string = '/core/get_dynamic_forms_fields';
+  let params = new HttpParams();
+  let formData: FormData = new FormData();
+
+  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  params = params.append('form_type', `F${formType}`);
+  params = params.append('transaction_type', transactionType);
+
+  return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          params
+        }
+      );
  }
 }

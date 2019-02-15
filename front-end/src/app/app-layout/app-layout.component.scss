@@ -20,6 +20,15 @@
     .app__side-nav {
       left: 0;
     }
+    main {
+      .app__content-wrapper {
+        padding-left: 10px;
+        .app__content {
+          margin-left: 60px;
+          width: 95%;
+        }
+      }
+    }
     footer {
       .app__footer {
         padding-left: 80px;
@@ -169,7 +178,8 @@
       font-family: $mainFontFamily;
       margin: 0 auto;
       min-height: $mainContentHeight;
-      padding-left: 50px;
+      padding-left: 40px;
+      padding-right: 30px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       z-index: 0;
@@ -183,18 +193,15 @@
         vertical-align: bottom;
         @include media(tablet) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         @include media(mediumDesktop) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         @include media(largeDesktop) {
           height: 60px;
-          line-height: 60px;
-          padding-top: 0;
+          padding-top: 10px;
         }
         .committee-name,
         .committee-id {
@@ -216,7 +223,7 @@
         background-color: $white;
         margin: 0 auto;
         min-height: $mainContentHeight;
-        width: 90%;
+        width: 98%;
       }
     }
   } // main

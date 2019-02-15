@@ -31,10 +31,10 @@ export class F99Component implements OnInit {
   public committee_details: any = {};
   public showValidateBar: boolean = false;
 
-  private _committee_details: any = {};
-  private _form99_details: any = {};
+  private _committeeDetails: any = {};
+  private _form99Details: any = {};
   private _step: string = '';
-  private _form_type: string = '';
+  private _formType: string = '';
   private _form_submitted: boolean = false;
 
   constructor(
@@ -47,36 +47,36 @@ export class F99Component implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this._committee_details = JSON.parse(localStorage.getItem('committee_details'));
-    this.committee_details = this._committee_details;
+    this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+    this.committee_details = this._committeeDetails;
 
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    if(this._committee_details) {
-      if(this._committee_details.committeeid) {
-        this._form99_details = this.committee_details;
+    if(this._committeeDetails) {
+      if(this._committeeDetails.committeeid) {
+        this._form99Details = this.committee_details;
 
-        this._form99_details.reason = '';
-        this._form99_details.text = '';
-        this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
-        this._form99_details.additional_email_1 = '-';
-        this._form99_details.additional_email_2 = '-';
-        this._form99_details.created_at = '';
-        this._form99_details.is_submitted = false;
-        this._form99_details.id = '';
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
 
         let formSavedObj: any = {
           'saved': false
         };
 
-        if(localStorage.getItem(`form_${this._form_type}_details`) === null && this.step !== 'step_5') {
-          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+        if(localStorage.getItem(`form_${this._formType}_details`) === null && this.step !== 'step_5') {
+          localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
 
-        if(localStorage.getItem(`form_${this._form_type}_saved`) === null && this.step !== 'step_5') {
-          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
+        if(localStorage.getItem(`form_${this._formType}_saved`) === null && this.step !== 'step_5') {
+          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSavedObj));
         }
 
         this.isLoading = false;
@@ -89,8 +89,8 @@ export class F99Component implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/99') === -1) {
-              localStorage.removeItem(`form_${this._form_type}_details`);
-              localStorage.removeItem(`form_${this._form_type}_saved`);
+              localStorage.removeItem(`form_${this._formType}_details`);
+              localStorage.removeItem(`form_${this._formType}_saved`);
             }
           } else {
             if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
@@ -110,7 +110,7 @@ export class F99Component implements OnInit {
         } else if (res.form_submitted) {
           this._form_submitted = true;
 
-          this._form99_details = this.committee_details;
+          this._form99Details = this.committee_details;
         }
       });
   }
@@ -123,25 +123,25 @@ export class F99Component implements OnInit {
 
     if(this._form_submitted) {
       if(this.step === 'step_1') {
-        this._form99_details.reason = '';
-        this._form99_details.text = '';
-        this._form99_details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
-        this._form99_details.additional_email_1 = '-';
-        this._form99_details.additional_email_2 = '-';
-        this._form99_details.created_at = '';
-        this._form99_details.is_submitted = false;
-        this._form99_details.id = '';
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
 
         let formSavedObj: any = {
           'saved': false
         };
 
-        if(localStorage.getItem(`form_${this._form_type}_details`) === null) {
-          localStorage.setItem(`form_${this._form_type}_details`, JSON.stringify(this._form99_details));
+        if(localStorage.getItem(`form_${this._formType}_details`) === null) {
+          localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
 
-        if(localStorage.getItem(`form_${this._form_type}_saved`) === null) {
-          localStorage.setItem(`form_${this._form_type}_saved`, JSON.stringify(formSavedObj));
+        if(localStorage.getItem(`form_${this._formType}_saved`) === null) {
+          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSavedObj));
         }
 
         this._messageService

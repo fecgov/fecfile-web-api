@@ -21,7 +21,7 @@ This is the projects root. It contains all of the necessary files and directorie
 
 ### `/django-backend`
 
-Contains all files and directories to build the API used by the front end. Written in python3 currently runs Django framework version 1.8.8
+Contains all files and directories to build the API used by the front end. Written in python3 currently runs Django framework version 1.11.18
 
 ### `/front-end`
 

@@ -1,26 +1,28 @@
 <div class="forms__wizard" *ngIf="!loadingData">
-  <div class="form__sidebar">
+  <div class="form__sidebar" *ngIf="step!=='financial_summary'">
     <div *ngIf="step==='step_1'">
-      <report-type-sidebar
+     <report-type-sidebar
           title="Report Coverage Dates"
           (status)='onNotify($event)'
-          [searchField]="searchField"
-          [sidebarLinks]="sidebarLinks"
-          [specialreports]="specialreports"  
+          [specialreports]="specialreports"
           [regularreports]="regularreports"
-          
+          [stateSelection]="stateSelection"
+          [specialreports]=specialreports
+          [regularreports]=regularreports
+          [selectedreporttype]=selectedReportType
+          [selectedstate]=selectedstate
+          [electiondates]=electionDates
+          [fromDate]=fromDate
+          [toDate]=toDate
         >
       </report-type-sidebar>
     </div>
-    <div *ngIf="step==='step_2'">
-      <form-sidebar
+    <div *ngIf="step==='step_2' || step==='step_3'">
+      <transaction-categories-sidebar
         title="Transaction Categories"
-        [sidebarLinks]="sidebarLinks"
-        [searchField]="searchField"
-        [cashOnHand]="cashOnHand"
         (status)='onNotify($event)'
       >
-      </form-sidebar>
+      </transaction-categories-sidebar>
     </div>
   </div>
   <div
@@ -30,12 +32,11 @@
       'hide-alerts': step==='step_6'
     }"
   >
-    <div class="form__steps">
+    <div class="form__steps" *ngIf="step!=='financial_summary'">
       <app-steps
         [steps]="[
           {text: 'Report<br/>type', step: 'step_1'},
-          {text: 'Transaction<br/>Type', step: 'step_2'},
-          {text: 'Form', step: 'step_3'},
+          {text: 'Form', step: 'step_2'},
           {text: 'Preview', step: 'step_4'},
           {text: 'Sign', step: 'step_5'},
           {text: 'Submit', step: 'step_6'}
@@ -47,47 +48,52 @@
     <div
       class="form__content"
     >
+      <div *ngIf="step==='financial_summary'">
+        <f3x-financial-summary></f3x-financial-summary>
+      </div>
       <div
         class="form__step"
         [hidden]="step!=='step_1'"
       >
-        <f3x-report-type></f3x-report-type>
+        <f3x-report-type
+          [formRadioOptionsVisible]="formRadioOptionsVisible"
+          [reportTypeRadio]="reportTypeRadio"
+          (status)='onNotify($event)'
+          [reportType]=reportType>
+
+        </f3x-report-type>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-      <f3x-transaction-type
-        [formOptionsVisible]="formOptionsVisible"
-        [selectedOptions]="selectedOptions"
-        (status)='onNotify($event)'
-      >
-      </f3x-transaction-type>
-      </div>
-
-      <div
-        class="form__step"
-        [hidden]="step!=='step_3'"
-      ><f3x-form></f3x-form>
+        <f3x-individual-receipt
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+          (status)='onNotify($event)'
+        ></f3x-individual-receipt>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_4'"
-      ><f3x-preview></f3x-preview>
+      >
+        <f3x-preview></f3x-preview>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_5'"
-      ><f3x-sign></f3x-sign>
+      >
+        <f3x-sign></f3x-sign>
       </div>
 
       <div
         class="form__step"
         [hidden]="step!=='step_6'"
-      ><f3x-submit></f3x-submit>
+      >
+        <f3x-submit></f3x-submit>
       </div>
 
     </div>

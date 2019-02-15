@@ -34,14 +34,24 @@
   <div class="app__side-nav">
     <app-sidebar (status)='onNotify($event)'></app-sidebar>
   </div>
-  <main>
+ <main>
     <div class="app__content-wrapper">
       <div class="app__committee-info">
-        <div class="committee-id">
-          {{ committeeId }}
+        <div class="float-left">
+          <div class="committee-id">
+            {{ committeeId }}
+          </div>
+          <div class="committee-name">
+            {{ committeeName }}
+          </div>
         </div>
-        <div class="committee-name">
-          {{ committeeName }}
+        <div class="float-right" *ngIf="(showForm3XDashBoard===true)">
+          <ng-container *ngIf="form3XReportDashBoardLine1">
+            {{ form3XReportDashBoardLine1 }}<br />
+          </ng-container>
+          <ng-container *ngIf="form3XReportDashBoardLine2">
+            {{ form3XReportDashBoardLine2 }}
+          </ng-container>
         </div>
       </div>
       <div class="app__content">

@@ -74,3 +74,28 @@
   @extend .fas;
   @extend .fa-search;
 }
+
+.ellipsis-icon {
+  @extend .fas;
+  @extend .fa-ellipsis-h;
+}
+
+.sort-icon {
+  @extend .fas;
+  @extend .fa-sort;
+}
+
+.sort-icon-asc {
+  @extend .fas;
+  @extend .fa-sort-up;
+}
+
+.sort-icon-desc {
+  @extend .fas;
+  @extend .fa-sort-down;
+}
+
+.calendar-icon {
+  @extend .fas;
+  @extend .fa-calendar-alt;
+}

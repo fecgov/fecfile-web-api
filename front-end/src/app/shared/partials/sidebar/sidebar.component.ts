@@ -3,10 +3,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
-/*import { APIService } from '/interfaces/services/APIService/APIService.ts';*/
 import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
-/*import SampleJson from '../../../../api/data.json';*/
-/*APIService/APIService.ts*/
 
 @Component({
   selector: 'app-sidebar',
@@ -18,8 +15,7 @@ export class SidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  //public formType: number = null;
-  public formType: string = '';
+  public formType: string = null;
   public iconClass: string = 'close-icon';
   public sidebarVisibleClass: string = 'sidebar-visible';
   public screenWidth: number = 0;
@@ -31,19 +27,16 @@ export class SidebarComponent implements OnInit {
   public committee_myforms: Icommittee_forms[];
   public committee_otherforms: Icommittee_forms[];
 
+  private _toggleNavClicked: boolean = false;
 
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formService:FormsService,
-
-
   ) { }
 
   ngOnInit(): void {
-    let route: string = this._router.url;
-
-    console.log("accessing form service call side bar ...");
+    const route: string = this._router.url;
 
     this._formService.get_filed_form_types()
      .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
@@ -73,6 +66,29 @@ export class SidebarComponent implements OnInit {
     } else if (this.screenWidth >= 768) {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
+    }
+  }
+
+  ngDoCheck(): void {
+    const route: string = this._router.url;
+    if (!this._toggleNavClicked) {
+      if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
+        let formSelected: string = null;
+
+        this._activatedRoute
+          .children[0]
+          .params
+          .subscribe(param => {
+            formSelected = param['form_id'];
+            this.formSelected(formSelected);
+          });
+
+        this._closeNavBar();
+
+        if(this.formType === null) {
+          this.formType = formSelected;
+        }
+      }
     }
   }
 
@@ -107,7 +123,6 @@ export class SidebarComponent implements OnInit {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf(form) >= 1) {
             this.formType = form;
-            //form.substring(2);
           }
         }
       });
@@ -118,6 +133,8 @@ export class SidebarComponent implements OnInit {
    *
    */
   public toggleSideNav(): void {
+    console.log('toggleSideNav: ');
+    this._toggleNavClicked = true;
     if(this.iconClass === 'close-icon') {
       this._closeNavBar();
     } else {
