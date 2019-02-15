@@ -1,7 +1,6 @@
 import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
 import { TransactionModel } from './model/transaction.model';
 import { TransactionsService, GetTransactionsResponse } from './service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -160,5 +159,54 @@ export class TransactionsComponent implements OnInit {
 		return false;
   }  
   
+
+  /**
+   * Clone the transaction selected by the user.
+   * 
+   * @param trx the Transaction to clone
+   */
+  public cloneTransaction(trx: TransactionModel) {
+    alert("Clone transaction is not yet supported");
+  }
+
+
+  /**
+   * Link the transaction selected by the user.
+   * 
+   * @param trx the Transaction to link
+   */
+  public linkTransaction(trx: TransactionModel) {
+    alert("Link requirements have not been finalized");
+  }
+
+
+  /**
+   * View the transaction selected by the user.
+   * 
+   * @param trx the Transaction to view
+   */
+  public viewTransaction(trx: TransactionModel) {
+    alert("View transaction is not yet supported");
+  } 
+
+
+  /**
+   * Edit the transaction selected by the user.
+   * 
+   * @param trx the Transaction to edit
+   */
+  public editTransaction(trx: TransactionModel) {
+    alert("Edit transaction is not yet supported");
+  }  
+
+
+  /**
+   * Trash the transaction selected by the user.
+   * 
+   * @param trx the Transaction to trash
+   */
+  public trashTransaction(trx: TransactionModel) {
+    alert("Trash transaction is not yet supported");
+  }  
 
 }

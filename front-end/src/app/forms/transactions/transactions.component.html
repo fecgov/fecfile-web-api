@@ -132,7 +132,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let trx of transactionsModel | paginate: config;">
+                        <tr *ngFor="let trx of transactionsModel | paginate: config; let i = index">
                             <td>
                                 <input [(ngModel)]="trx.selected"
 									    type="checkbox">
@@ -143,19 +143,61 @@
                             <td>{{trx.date | date: 'MM/dd/yyyy'}}</td>
                             <td>{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
                             <td>
-                                <button
+                                <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                                    <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                                        <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                                            <i class="fas fa-copy"></i>Clone
+                                        </button>
+                                        <button class="dropdown-item" (click)="linkTransaction(trx)">
+                                            <i class="fas fa-link"></i>Link
+                                        </button>
+                                        <button class="dropdown-item" (click)="viewTransaction(trx)">
+                                            <i class="fas fa-eye"></i>View
+                                        </button>
+                                        <button class="dropdown-item" (click)="editTransaction(trx)">
+                                            <i class="fas fa-edit"></i>Edit
+                                        </button>
+                                        <button class="dropdown-item" (click)="trashTransaction(trx)">
+                                            <i class="fas fa-trash"></i>Trash
+                                        </button>
+                                    </div>
+                                </div>
+       
+
+                                <!-- <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Separated link</a>
+                                    </div>
+                                </div> -->
+
+                               
+
+                                <!-- <button
                                     class="btn btn-sm btn-secondary"
                                     type="button"
                                     (click)="showActions()"
                                 >
                                     <i class="fas fa-ellipsis-h"></i>
-                                </button>
+                                </button> -->
                             </td>
                         </tr>
                     </tbody>
                 </table>
-            </div> 
-            <div *ngIf="showPagination()">
+            </div>
+            <hr/> 
+            <div *ngIf="showPagination()" 
+                class="d-flex justify-content-center forms__trx-table-pagination-container deleteme ">
                 <pagination-controls [id]="config.id"
                     (pageChange)="getPage($event)">
                 </pagination-controls>	

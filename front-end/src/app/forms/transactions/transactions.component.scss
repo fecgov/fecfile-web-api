@@ -8,63 +8,64 @@
   margin: 0;
   padding: 0;
   width: 100%;
-.form__sidebar {
-  background-color: $bombay;
-  flex-grow: 1;
-  display: none;
-  padding-left: 0;
-  @include media(tablet) {
+  .form__sidebar {
+    background-color: $bombay;
+    flex-grow: 1;
     display: none;
+    padding-left: 0;
+    @include media(tablet) {
+      display: none;
+    }
+    @include media(mediumDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
+    @include media(largeDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
   }
-  @include media(mediumDesktop) {
+  .form__container {
     display: table-cell;
-    width: 250px;
-  }
-  @include media(largeDesktop) {
-    display: table-cell;
-    width: 250px;
-  }
-}
-.form__container {
-  display: table-cell;
-  min-height: 100vh;
-  width: 99%;
-  @include media(tablet) {
     min-height: 100vh;
-  }
-  @include media(mediumDesktop) {
-    margin-left: 5px;
-    min-height: 100vh;
-    width: 70%;
-  }
-  @include media(largeDesktop) {
-    margin-left: 5px;
-    min-height: 100vh;
-    width: 76%;
-  }
-  section {
-    .form-content {
-      .options-list {
-        list-style-type: none;
-        .options-list__item {
-          border-bottom: 1px solid $iron;
-          border-top: 1px solid $iron;
-          padding-bottom: 20px;
-          padding-left: 10px;
-          padding-top: 20px;
-          &:nth-child(even) {
-            background-color: $seaShell;
+    width: 99%;
+    @include media(tablet) {
+      min-height: 100vh;
+    }
+    @include media(mediumDesktop) {
+      margin-left: 5px;
+      min-height: 100vh;
+      width: 70%;
+    }
+    @include media(largeDesktop) {
+      margin-left: 5px;
+      min-height: 100vh;
+      width: 76%;
+    }
+    section {
+      .form-content {
+        .options-list {
+          list-style-type: none;
+          .options-list__item {
+            border-bottom: 1px solid $iron;
+            border-top: 1px solid $iron;
+            padding-bottom: 20px;
+            padding-left: 10px;
+            padding-top: 20px;
+            &:nth-child(even) {
+              background-color: $seaShell;
+            }
           }
         }
       }
     }
-  }
-  footer {
-    div {
-      margin-top: 15px;
+    footer {
+      div {
+        margin-top: 15px;
+      }
     }
-  }
-} // .form__container
+  } // .form__container
+}
 /* taken from f3x - is it all needed? end */
 
 .transactions-container {
@@ -122,4 +123,21 @@
     width: 3%;
   }
 
+  .forms__trx-table-pagination-container {
+    padding: 1em;
+  }  
+
+  /** hide the dropdown caret **/
+  .dropdown-toggle:after {
+    border: none;
+  }  
+
+  #forms__trx-dropdown-action > button > i {
+    padding-right: 3px;
+  }
+
+  .dropdown-menu {
+    min-width: 6em;
+  }  
 }
+

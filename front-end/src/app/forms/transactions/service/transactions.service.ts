@@ -79,6 +79,7 @@ export class TransactionsService {
       totalTransactionCount: 20
     };
 
+    //console.log(JSON.stringify(mockResponse));
 
     return Observable.of(mockResponse);
   }
