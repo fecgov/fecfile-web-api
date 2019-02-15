@@ -209,4 +209,21 @@ export class TransactionsComponent implements OnInit {
     alert("Trash transaction is not yet supported");
   }  
 
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange() {
+    let start = 0;
+    let end = 0;
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
+      
+      end = this.config.currentPage * this.config.itemsPerPage;
+      start = (end - this.config.itemsPerPage) + 1;
+
+      // start = this.config.currentPage * this.config.itemsPerPage;
+      // end = start + this.config.itemsPerPage - 1;
+    }
+    return start + " - " + end;
+  }
 }

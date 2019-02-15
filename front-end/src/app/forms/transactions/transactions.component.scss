@@ -139,5 +139,43 @@
   .dropdown-menu {
     min-width: 6em;
   }  
+
+  .forms__trx-item-range {
+    font-size: 13px;
+    color: grey;
+    margin: 0 5px;
+  }
+
+  .forms__trx-total-amount > i {
+    color: #112E51;
+    padding-left: 3px;
+  }
+
+  .forms__trx-total-amount-container {
+    margin: 1.5em 0;
+  }
+
+/* style ngx-pagination - start */
+/* override some styling where use of !important is made. */
+
+  // .ngx-pagination li {
+  //   font-size: 1.5rem !important;
+  // }
+
+  .ngx-pagination .current{
+    padding: 0.1875rem 0.625rem;
+    background: #112E51 !important;;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a, .ngx-pagination button {
+    color: #112E51 !important;;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }	
+
+  /* style ngx-pagination - end */
 }
 
