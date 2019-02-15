@@ -14,6 +14,7 @@ import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -127,7 +128,8 @@ import { TransactionsComponent } from './forms/transactions/transactions.compone
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    NgxPaginationModule
   ],
   providers: [
     CookieService,

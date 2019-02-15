@@ -6,6 +6,7 @@ import { TransactionModel } from './model/transaction.model';
 import { TransactionsService, GetTransactionsResponse } from './service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
+import { PaginationInstance } from 'ngx-pagination';
 
 
 @Component({
@@ -36,6 +37,11 @@ export class TransactionsComponent implements OnInit {
 	 */
 	private currentSortedColumn: string;
 
+  // ngx-pagination config
+  public maxItemsPerPage: number = 100;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;	
+	public config: PaginationInstance;
 
   constructor(
     private _fb: FormBuilder,
@@ -55,11 +61,15 @@ export class TransactionsComponent implements OnInit {
     this.formType = this._formType;
     console.log("transactions for form " + this._formType);
 
-    this._transactionsService.getFormTrnsactions(this.formType).subscribe( (res:GetTransactionsResponse) => {
-      this.transactionsModel = res.transactions;
-      this.totalAmount = res.totalAmount;
-    });
+		let paginateConfig: PaginationInstance = {
+			// must be a unique id for all each table
+			id: 'forms__trx-table-pagination',
+			itemsPerPage: 5,
+			currentPage: 1
+		};	
+		this.config = paginateConfig;  
 
+    this.getPage(1);
 
 		// sort column names must match the domain model names
     let sortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
@@ -67,7 +77,7 @@ export class TransactionsComponent implements OnInit {
 		this.sortableColumns = [];
 		for (let field of sortColumns) {
 			this.sortableColumns.push(new SortableColumnModel(field, false));
-		}
+    }  
 
     this.formTransactions = this._fb.group({
       // transactionCategory: [null, [
@@ -80,6 +90,21 @@ export class TransactionsComponent implements OnInit {
 
     // push an applied filter for test
     this.appliedFilterNames.push("Filter " + this.appliedFilterNames.length + 1);
+  }
+
+
+  /**
+	 * The Transactions for a given page.
+	 * 
+	 * @param page the page containing the transactions to get
+	 */
+	public getPage(page: number) {
+    this.config.currentPage = page;
+    this._transactionsService.getFormTrnsactions(this.formType).subscribe( (res:GetTransactionsResponse) => {
+      this.transactionsModel = res.transactions;
+      this.totalAmount = res.totalAmount;
+      this.config.totalItems = res.totalTransactionCount;
+    });  
   }
 
 
@@ -121,6 +146,19 @@ export class TransactionsComponent implements OnInit {
     
     // call server for page data in new direction
     //this.getPage(this.config.currentPage);
-	}  
+  }  
+  
+
+	/**
+	 * Determine if pagination should be shown.
+	 */
+	public showPagination() : boolean {
+		if (this.config.totalItems > this.config.itemsPerPage) {
+			return true;
+		}
+		// otherwise, no show.
+		return false;
+  }  
+  
 
 }

@@ -10,6 +10,7 @@ import { TransactionModel } from '../model/transaction.model';
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
   totalAmount: number;
+  totalTransactionCount: number;
 }
 
 @Injectable({
@@ -67,18 +68,15 @@ export class TransactionsService {
     t1.type = "Individual";
     t1.zip = "22222";
 
-    let trxArray = [];
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
-    trxArray.push(new TransactionModel(t1));
+    let trxArray = []; 
+    for (let i = 0; i < 20; i++) {
+      trxArray.push(new TransactionModel(t1));  
+    }
 
     let mockResponse: GetTransactionsResponse = {
       transactions: trxArray,
-      totalAmount: 99999
+      totalAmount: 99999,
+      totalTransactionCount: 20
     };
 
 

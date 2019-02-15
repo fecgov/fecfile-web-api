@@ -51,7 +51,7 @@
                             type="button"
                             (click)="showPinColumns()"
                         >
-                            <i class="fas fa-thumb-tack"></i>
+                            <i class="fas fa-thumbtack"></i>
                             Pin Columns
                         </button>
                         <button
@@ -105,7 +105,7 @@
                         type="button"
                         (click)="toogleAppliedFilter()"
                     >
-                        <i class="fas fx-times"></i>
+                        <i class="fas fa-times"></i>
                         {{appliedFilterNames[0]}}
                     </button>                    
                 </div> 
@@ -132,7 +132,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let trx of transactionsModel">
+                        <tr *ngFor="let trx of transactionsModel | paginate: config;">
                             <td>
                                 <input [(ngModel)]="trx.selected"
 									    type="checkbox">
@@ -146,17 +146,21 @@
                                 <button
                                     class="btn btn-sm btn-secondary"
                                     type="button"
-                                    (click)="doFilter()"
+                                    (click)="showActions()"
                                 >
-                                    <i class="fas fa-filter"></i>
+                                    <i class="fas fa-ellipsis-h"></i>
                                 </button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-            </div>           
+            </div> 
+            <div *ngIf="showPagination()">
+                <pagination-controls [id]="config.id"
+                    (pageChange)="getPage($event)">
+                </pagination-controls>	
+            </div>                      
         </div>
-
-    </div>  <!-- ./form__container -->
-</div> <!-- ./forms__wizard -->
+    </div> 
+</div> 
   
