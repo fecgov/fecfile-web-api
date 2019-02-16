@@ -62,6 +62,8 @@ import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/fin
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
+import { ModalModule } from 'ngx-bootstrap';
+import { ColumnChangeComponent } from './forms/transactions/column-change/column-change.component';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -129,6 +131,7 @@ import { TransactionsComponent } from './forms/transactions/transactions.compone
     QuillModule,
     AngularEditorModule,
     NgbModule.forRoot(),
+    ModalModule.forRoot(), 
     NgxPaginationModule
   ],
   providers: [

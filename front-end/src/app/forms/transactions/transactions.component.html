@@ -1,17 +1,14 @@
-<!-- <h2>View Transactions not yet supported</h2> -->
 <div class="forms__wizard" *ngIf="!loadingData">
     <div class="form__sidebar">
         <div>
-            <transaction-categories-sidebar title="Transaction Categories" (status)='onNotify($event)'>
+            <transaction-categories-sidebar title="Transaction Categories" 
+                (status)='onNotify($event)'>
             </transaction-categories-sidebar>
         </div>
     </div>
-
     <div
-      class="form__container"
-      [ngClass]="{}">
-
-        <div class="form__steps">
+      class="form__container">
+        <!-- <div class="form__steps">
             <app-steps
             [steps]="[
                 {text: 'Report<br/>type', step: 'step_1'},
@@ -23,7 +20,7 @@
             [current_step]="currentStep"
             >
             </app-steps>
-        </div>
+        </div> -->
 
         <div class="transactions-container">
             <header>
@@ -49,7 +46,7 @@
                         <button
                             class="btn btn-secondary btn-left forms__trx-btn"
                             type="button"
-                            (click)="showPinColumns()"
+                            (click)="columnOptionsModal.show()"
                         >
                             <i class="fas fa-thumbtack"></i>
                             Pin Columns
@@ -195,4 +192,152 @@
         </div>
     </div> 
 </div> 
-  
+<div bsModal #columnOptionsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+                <button type="button" class="close" (click)="columnOptionsModal.hide()">
+                    <span class="fas fa-times"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">All Types
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">Zip
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">Contributor Employer
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">Type
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">Date
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control"
+                                        type="checkbox">Contributor Occupation
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Transaction ID
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Amount
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Memo Code
+                                </label>
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Name
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Aggregate
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Memo Text/Description
+                                </label>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">State
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input 
+                                        type="checkbox">Purpose Description
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                        </div>
+                    </div>                                                                             
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-cancel" class="btn btn-modal-footer btn-right"
+                    (click)="columnOptionsModal.hide()">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveColumnOptions()">
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

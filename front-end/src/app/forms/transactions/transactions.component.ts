@@ -1,4 +1,4 @@
-import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { TransactionModel } from './model/transaction.model';
@@ -6,6 +6,8 @@ import { TransactionsService, GetTransactionsResponse } from './service/transact
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { PaginationInstance } from 'ngx-pagination';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 
 @Component({
@@ -15,11 +17,10 @@ import { PaginationInstance } from 'ngx-pagination';
   encapsulation: ViewEncapsulation.None
 })
 export class TransactionsComponent implements OnInit {
+
   
   public transactionsModel: Array<TransactionModel>;
   public totalAmount: number;
-  public currentStep: string = 'step_1';
-  public step: string = '';
   private _formType: string = '';
   public formType: string = '';
   public formTransactions: FormGroup;
@@ -40,12 +41,15 @@ export class TransactionsComponent implements OnInit {
   public maxItemsPerPage: number = 100;
   public directionLinks: boolean = false;
   public autoHide: boolean = true;	
-	public config: PaginationInstance;
+  public config: PaginationInstance;
+  
+  modalRef: BsModalRef;
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
+    private _modalService: BsModalService,
     private _transactionsService: TransactionsService,
     private _tableService: TableService
   ) { }
@@ -97,7 +101,7 @@ export class TransactionsComponent implements OnInit {
 	 * 
 	 * @param page the page containing the transactions to get
 	 */
-	public getPage(page: number) {
+	public getPage(page: number) : void {
     this.config.currentPage = page;
     this._transactionsService.getFormTrnsactions(this.formType).subscribe( (res:GetTransactionsResponse) => {
       this.transactionsModel = res.transactions;
@@ -110,7 +114,7 @@ export class TransactionsComponent implements OnInit {
   /**
    * Validate the form. 
    */
-  public doValidateTransaction() {
+  public doValidateTransaction() : void {
     console.log('doValidateTransaction: ');
     console.log('this.formTransactions: ', this.formTransactions);
     console.log("save transactions not yet supported in backend");
@@ -140,7 +144,7 @@ export class TransactionsComponent implements OnInit {
 	 * 
 	 * @param colName the column name of the column to sort
 	 */
-	public changeSortDirection(colName: string) {
+	public changeSortDirection(colName: string) : void {
 		this.currentSortedColumn = this._tableService.changeSortDirection(colName, this.sortableColumns);
     
     // call server for page data in new direction
@@ -165,7 +169,7 @@ export class TransactionsComponent implements OnInit {
    * 
    * @param trx the Transaction to clone
    */
-  public cloneTransaction(trx: TransactionModel) {
+  public cloneTransaction(trx: TransactionModel) : void {
     alert("Clone transaction is not yet supported");
   }
 
@@ -175,7 +179,7 @@ export class TransactionsComponent implements OnInit {
    * 
    * @param trx the Transaction to link
    */
-  public linkTransaction(trx: TransactionModel) {
+  public linkTransaction(trx: TransactionModel) : void {
     alert("Link requirements have not been finalized");
   }
 
@@ -185,7 +189,7 @@ export class TransactionsComponent implements OnInit {
    * 
    * @param trx the Transaction to view
    */
-  public viewTransaction(trx: TransactionModel) {
+  public viewTransaction(trx: TransactionModel) : void {
     alert("View transaction is not yet supported");
   } 
 
@@ -195,7 +199,7 @@ export class TransactionsComponent implements OnInit {
    * 
    * @param trx the Transaction to edit
    */
-  public editTransaction(trx: TransactionModel) {
+  public editTransaction(trx: TransactionModel) : void {
     alert("Edit transaction is not yet supported");
   }  
 
@@ -205,7 +209,7 @@ export class TransactionsComponent implements OnInit {
    * 
    * @param trx the Transaction to trash
    */
-  public trashTransaction(trx: TransactionModel) {
+  public trashTransaction(trx: TransactionModel) : void {
     alert("Trash transaction is not yet supported");
   }  
 
@@ -213,17 +217,25 @@ export class TransactionsComponent implements OnInit {
   /**
    * Determine the item range shown by the server-side pagination.
    */
-  public determineItemRange() {
+  public determineItemRange() : string {
     let start = 0;
     let end = 0;
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
       
       end = this.config.currentPage * this.config.itemsPerPage;
       start = (end - this.config.itemsPerPage) + 1;
-
-      // start = this.config.currentPage * this.config.itemsPerPage;
-      // end = start + this.config.itemsPerPage - 1;
     }
     return start + " - " + end;
   }
+
+
+  /**
+   * Show the option to select/deselect columns in the table.
+   * @param template The Modal content to show
+   */
+  public showPinColumns(template: TemplateRef<any>) {
+    this.modalRef = this._modalService.show(template);
+  }
+
+
 }
