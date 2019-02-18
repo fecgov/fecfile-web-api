@@ -913,12 +913,12 @@ def get_comm_lookup(request):
         new_obj = {'committeeid':comm.cmte_id, 'committee_type': comm.cmte_type, 'committee_name':comm.cmte_name, 'committee_design':comm.cmte_dsgn, 'committee_filing_freq':comm.cmte_filing_freq}
         return Response(new_obj)
 """
-
+"""
 @api_view(['GET'])
 def get_filed_form_types(request):
-    """
-    Fields for identifying the committee type and committee design and filter the forms category 
-    """
+   
+    #Fields for identifying the committee type and committee design and filter the forms category 
+    
     try:
         comm_id = request.user.username
         
@@ -933,7 +933,7 @@ def get_filed_form_types(request):
         return Response(resp_data, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
-
+"""
 
 """
 @api_view(['GET'])
