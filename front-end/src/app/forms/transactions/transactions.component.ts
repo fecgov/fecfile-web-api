@@ -7,7 +7,8 @@ import { TableService } from 'src/app/shared/services/TableService/table.service
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { PaginationInstance } from 'ngx-pagination';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { BsModalService, BsModalRef, ModalDirective } from 'ngx-bootstrap/modal';
+import { UtilService } from 'src/app/shared/utils/util.service';
 
 
 @Component({
@@ -18,7 +19,9 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class TransactionsComponent implements OnInit {
 
-  
+  @ViewChild('columnOptionsModal')
+  public columnOptionsModal: ModalDirective; 
+
   public transactionsModel: Array<TransactionModel>;
   public totalAmount: number;
   private _formType: string = '';
@@ -27,10 +30,18 @@ export class TransactionsComponent implements OnInit {
   public formSubmitted: boolean = false;
   public appliedFilterNames: Array<string> = [];
 
+  private sortableColumnLocalStoragesKey: string = "sortableColumnLocalStoragesKey";
+
   /**
 	 * Array of columns to be made sortable.
 	 */
-	private sortableColumns: SortableColumnModel[];
+  private sortableColumns: SortableColumnModel[];
+  
+  /**
+	 * A clone of the sortableColumns for saving
+   * user settings in session.
+	 */
+	private cloneSortableColumns: SortableColumnModel[];  
 	
 	/**
 	 * Identifies the column currently sorted. 
@@ -43,9 +54,8 @@ export class TransactionsComponent implements OnInit {
   public autoHide: boolean = true;	
   public config: PaginationInstance;
   
-  modalRef: BsModalRef;
+  //modalRef: BsModalRef;
 
-  public stateVisible: boolean;
 
   constructor(
     private _fb: FormBuilder,
@@ -53,7 +63,8 @@ export class TransactionsComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _modalService: BsModalService,
     private _transactionsService: TransactionsService,
-    private _tableService: TableService
+    private _tableService: TableService,
+    private _utilService: UtilService
   ) { }
 
 
@@ -76,18 +87,26 @@ export class TransactionsComponent implements OnInit {
 
     this.getPage(1);
 
-		// sort column names must match the domain model names
-    let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-    let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
-      'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
+    // If cached sortableColumns settings in local storage, use it.
+    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnLocalStoragesKey);
+    if (localStorage.getItem(this.sortableColumnLocalStoragesKey) != null) {
+      this.sortableColumns = JSON.parse(sortableColumnsJson);
+    }
+    else {
+      // sort column names must match the domain model names
+      let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
+      let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
+        'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
 
-		this.sortableColumns = [];
-		for (let field of defaultSortColumns) {
-			this.sortableColumns.push(new SortableColumnModel(field, false, true));
-    }  
-		for (let field of otherSortColumns) {
-			this.sortableColumns.push(new SortableColumnModel(field, false, false));
-    }    
+      this.sortableColumns = [];
+      for (let field of defaultSortColumns) {
+        this.sortableColumns.push(new SortableColumnModel(field, false, true));
+      }  
+      for (let field of otherSortColumns) {
+        this.sortableColumns.push(new SortableColumnModel(field, false, false));
+      } 
+    }
+    this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
     this.formTransactions = this._fb.group({
       // transactionCategory: [null, [
@@ -174,6 +193,21 @@ export class TransactionsComponent implements OnInit {
 		return null;
   }
 
+  /**
+   * Get the SortableColumnModel by name.
+   * 
+   * @param colName the column name in the SortableColumnModel.
+   * @returns the SortableColumnModel matching the colName.
+   */
+  public getCloneSortableColumn(colName: string) : SortableColumnModel {
+    for (let col of this.cloneSortableColumns) {
+			if (col.getColName() == colName) {
+				return col;
+			}
+		}
+		return null;
+  }  
+
 
   /**
    * Determine if the column is to be visible in the table.
@@ -205,6 +239,7 @@ export class TransactionsComponent implements OnInit {
     }
   }  
 
+
   /**
    * Toggle the visibility of a column in the table.
    * 
@@ -216,8 +251,24 @@ export class TransactionsComponent implements OnInit {
     // TODO
     // validate only 5 are checked before set to visible.
 
-    this.setColumnVisible(colName, e.target.checked);
+    //this.setColumnVisible(colName, e.target.checked);
+
+    for (let col of this.sortableColumns) {
+      this.setColumnVisible(col.getColName(), col.isVisible())
+    }
   }  
+
+
+  public saveColumnOptions() {
+    this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
+    localStorage.setItem(this.sortableColumnLocalStoragesKey, JSON.stringify(this.sortableColumns));
+  }
+
+
+  public cancelColumnOptions() {
+    this.columnOptionsModal.hide();
+    this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+  }
 
 
   /**
@@ -310,13 +361,23 @@ export class TransactionsComponent implements OnInit {
   }
 
 
+  // /**
+  //  * Show the option to select/deselect columns in the table.
+  //  * @param template The Modal content to show
+  //  */
+  // public showPinColumns2(template: TemplateRef<any>) {
+  //   this.modalRef = this._modalService.show(template);
+  //   console.log("");
+  // }
+
   /**
    * Show the option to select/deselect columns in the table.
    * @param template The Modal content to show
    */
-  public showPinColumns(template: TemplateRef<any>) {
-    this.modalRef = this._modalService.show(template);
+  public showPinColumns() {
+    this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+    this.columnOptionsModal.show();
+    console.log("");
   }
-
 
 }

@@ -46,8 +46,8 @@
                         <button
                             class="btn btn-secondary btn-left forms__trx-btn"
                             type="button"
-                            (click)="columnOptionsModal.show()"
-                        >
+                            (click)="showPinColumns(columnOptionsModal)"
+                        > <!-- (click)="columnOptionsModal.show()" -->
                             <i class="fas fa-thumbtack"></i>
                             Pin Columns
                         </button>
@@ -244,7 +244,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
-                <button type="button" class="close" (click)="columnOptionsModal.hide()">
+                <button type="button" class="close" (click)="cancelColumnOptions()">
                     <span class="fas fa-times"></span>
                 </button>
             </div>
@@ -254,7 +254,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input (click)="toggleAllTypes($event)"
+                                    <input disabled (click)="toggleAllTypes($event)"
                                         type="checkbox">All Types
                                 </label>
                             </div>
@@ -262,7 +262,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('zip').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('zip').visible"
                                         (change)="toggleVisibility('zip', $event)"
                                         type="checkbox">Zip
                                 </label>
@@ -271,7 +271,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('contributorEmployer').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('contributorEmployer').visible"
                                         (change)="toggleVisibility('contributorEmployer', $event)"
                                         type="checkbox">Contributor Employer
                                 </label>
@@ -282,7 +282,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('type').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('type').visible"
                                     (change)="toggleVisibility('type', $event)"
                                         type="checkbox">Type
                                 </label>
@@ -291,7 +291,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('date').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('date').visible"
                                         (change)="toggleVisibility('date', $event)"
                                         type="checkbox">Date
                                 </label>
@@ -300,7 +300,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('contributorOccupation').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('contributorOccupation').visible"
                                         (change)="toggleVisibility('contributorOccupation', $event)"
                                         type="checkbox">Contributor Occupation
                                 </label>
@@ -311,7 +311,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('transactionId').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('transactionId').visible"
                                     (change)="toggleVisibility('transactionId', $event)"
                                         type="checkbox">Transaction ID
                                 </label>
@@ -320,7 +320,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('amount').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('amount').visible"
                                     (change)="toggleVisibility('amount', $event)"
                                         type="checkbox">Amount
                                 </label>
@@ -329,7 +329,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('memoCode').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('memoCode').visible"
                                         (change)="toggleVisibility('memoCode', $event)"
                                         type="checkbox">Memo Code
                                 </label>
@@ -340,7 +340,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('name').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('name').visible"
                                         (change)="toggleVisibility('name', $event)"
                                         type="checkbox">Name
                                 </label>
@@ -349,7 +349,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('aggregate').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('aggregate').visible"
                                         (change)="toggleVisibility('aggregate', $event)"
                                         type="checkbox">Aggregate
                                 </label>
@@ -358,7 +358,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('memoText').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('memoText').visible"
                                         (change)="toggleVisibility('memoText', $event)"
                                         type="checkbox">Memo Text/Description
                                 </label>
@@ -369,7 +369,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('state').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('state').visible"
                                         (change)="toggleVisibility('state', $event)"
                                         type="checkbox">State
                                 </label>
@@ -378,7 +378,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input [(ngModel)]="getSortableColumn('purposeDescription').visible"
+                                    <input [(ngModel)]="getCloneSortableColumn('purposeDescription').visible"
                                         (change)="toggleVisibility('purposeDescription', $event)"
                                         type="checkbox">Purpose Description
                                 </label>
@@ -391,7 +391,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="btn-cancel" class="btn btn-modal-footer btn-right"
-                    (click)="columnOptionsModal.hide()">
+                    (click)="cancelColumnOptions()">
                     Cancel
                 </button>
                 <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveColumnOptions()">

@@ -63,7 +63,6 @@ import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { ModalModule } from 'ngx-bootstrap';
-import { ColumnChangeComponent } from './forms/transactions/column-change/column-change.component';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
