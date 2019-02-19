@@ -45,6 +45,8 @@ export class TransactionsComponent implements OnInit {
   
   modalRef: BsModalRef;
 
+  public stateVisible: boolean;
+
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -75,12 +77,17 @@ export class TransactionsComponent implements OnInit {
     this.getPage(1);
 
 		// sort column names must match the domain model names
-    let sortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
+    let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
+    let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
+      'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
 
 		this.sortableColumns = [];
-		for (let field of sortColumns) {
-			this.sortableColumns.push(new SortableColumnModel(field, false));
+		for (let field of defaultSortColumns) {
+			this.sortableColumns.push(new SortableColumnModel(field, false, true));
     }  
+		for (let field of otherSortColumns) {
+			this.sortableColumns.push(new SortableColumnModel(field, false, false));
+    }    
 
     this.formTransactions = this._fb.group({
       // transactionCategory: [null, [
@@ -151,6 +158,80 @@ export class TransactionsComponent implements OnInit {
     //this.getPage(this.config.currentPage);
   }  
   
+
+  /**
+   * Get the SortableColumnModel by name.
+   * 
+   * @param colName the column name in the SortableColumnModel.
+   * @returns the SortableColumnModel matching the colName.
+   */
+  public getSortableColumn(colName: string) : SortableColumnModel {
+    for (let col of this.sortableColumns) {
+			if (col.getColName() == colName) {
+				return col;
+			}
+		}
+		return null;
+  }
+
+
+  /**
+   * Determine if the column is to be visible in the table.
+   * 
+   * @param colName 
+   * @returns true if visible
+   */
+  public isColumnVisible(colName: string) : boolean {
+    let sortableCol = this.getSortableColumn(colName);
+    if (sortableCol) {
+      return sortableCol.isVisible();
+    }
+    else{
+      return false;
+    }
+  }  
+
+
+  /**
+   * Set the visibility of a column in the table.
+   * 
+   * @param colName 
+   * @returns true if visible
+   */
+  public setColumnVisible(colName: string, visible: boolean) {
+    let sortableCol = this.getSortableColumn(colName);
+    if (sortableCol) {
+      return sortableCol.setVisible(visible);
+    }
+  }  
+
+  /**
+   * Toggle the visibility of a column in the table.
+   * 
+   * @param colName the name of the column to toggle
+   * @param e the click event 
+   */
+  public toggleVisibility(colName: string, e: any){
+
+    // TODO
+    // validate only 5 are checked before set to visible.
+
+    this.setColumnVisible(colName, e.target.checked);
+  }  
+
+
+  /**
+   * Toggle checking all types.
+   * 
+   * @param e the click event 
+   */
+  public toggleAllTypes(e: any) {
+    let checked = (e.target.checked) ? true : false;
+    for (let col of this.sortableColumns) {
+      this.setColumnVisible(col.getColName(), checked);
+    }    
+  }
+
 
 	/**
 	 * Determine if pagination should be shown.

@@ -109,21 +109,60 @@
                 <thead>
                     <tr>
                         <th class="forms__trx-table-checkbox"></th>
-                        <th [class]="getSortClass('type')" 
+                        <th *ngIf="isColumnVisible('type')"
+                            [class]="getSortClass('type')" 
                             (click)="changeSortDirection('type')">Type
                         </th>
-                        <th [class]="getSortClass('transactionId')" 
+                        <th *ngIf="isColumnVisible('transactionId')"
+                            [class]="getSortClass('transactionId')" 
                             (click)="changeSortDirection('transactionId')">Transaction ID
                         </th>
-                        <th [class]="getSortClass('name')" 
+                        <th *ngIf="isColumnVisible('name')"
+                            [class]="getSortClass('name')" 
                             (click)="changeSortDirection('name')">Name
                         </th>
-                        <th [class]="getSortClass('date')" 
+
+                        <th *ngIf="isColumnVisible('state')" 
+                            [class]="getSortClass('state')" 
+                            (click)="changeSortDirection('state')">State
+                        </th>
+                        <th *ngIf="isColumnVisible('zip')" 
+                            [class]="getSortClass('zip')" 
+                            (click)="changeSortDirection('zip')">Zip
+                        </th>                        
+
+                        <th *ngIf="isColumnVisible('date')"
+                            [class]="getSortClass('date')" 
                             (click)="changeSortDirection('date')">Date
                         </th>
-                        <th [class]="getSortClass('amount')" 
+                        <th *ngIf="isColumnVisible('amount')"
+                            [class]="getSortClass('amount')" 
                             (click)="changeSortDirection('amount')">Amount
                         </th>
+                        <th *ngIf="isColumnVisible('aggregate')"
+                            [class]="getSortClass('aggregate')" 
+                            (click)="changeSortDirection('aggregate')">Aggregate
+                        </th>   
+                        <th *ngIf="isColumnVisible('purposeDescription')"
+                            [class]="getSortClass('purposeDescription')" 
+                            (click)="changeSortDirection('purposeDescription')">Purpose Description
+                        </th>    
+                        <th *ngIf="isColumnVisible('contributorEmployer')"
+                            [class]="getSortClass('contributorEmployer')" 
+                            (click)="changeSortDirection('contributorEmployer')">Contributor Employer
+                        </th>   
+                        <th *ngIf="isColumnVisible('contributorOccupation')"
+                            [class]="getSortClass('contributorOccupation')" 
+                            (click)="changeSortDirection('contributorOccupation')">Contributor Occupation
+                        </th>
+                        <th *ngIf="isColumnVisible('memoCode')"
+                            [class]="getSortClass('memoCode')" 
+                            (click)="changeSortDirection('memoCode')">Memo Code
+                        </th>   
+                        <th *ngIf="isColumnVisible('memoText')"
+                            [class]="getSortClass('memoText')" 
+                            (click)="changeSortDirection('memoText')">Memo Text/Description
+                        </th>                                                                                                                                    
                         <th [class]=""></th>
                     </tr>
                 </thead>
@@ -133,11 +172,19 @@
                             <input [(ngModel)]="trx.selected"
                                     type="checkbox">
                         </td>
-                        <td>{{trx.type}}</td>
-                        <td>{{trx.transactionId}}</td>
-                        <td>{{trx.name}}</td>
-                        <td>{{trx.date | date: 'MM/dd/yyyy'}}</td>
-                        <td>{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+                        <td *ngIf="isColumnVisible('type')">{{trx.type}}</td>
+                        <td *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+                        <td *ngIf="isColumnVisible('name')">{{trx.name}}</td>
+                        <td *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+                        <td *ngIf="isColumnVisible('zip')">{{trx.zip}}</td>
+                        <td *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+                        <td *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+                        <td *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
+                        <td *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+                        <td *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
+                        <td *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
+                        <td *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+                        <td *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
                         <td>
                             <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                                 <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
@@ -192,7 +239,7 @@
         </div>
     </div> 
 </div> 
-<div bsModal #columnOptionsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+<div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -207,7 +254,7 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input (click)="toggleAllTypes($event)"
                                         type="checkbox">All Types
                                 </label>
                             </div>
@@ -215,7 +262,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input [(ngModel)]="getSortableColumn('zip').visible"
+                                        (change)="toggleVisibility('zip', $event)"
                                         type="checkbox">Zip
                                 </label>
                             </div>
@@ -223,7 +271,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input [(ngModel)]="getSortableColumn('contributorEmployer').visible"
+                                        (change)="toggleVisibility('contributorEmployer', $event)"
                                         type="checkbox">Contributor Employer
                                 </label>
                             </div>
@@ -233,7 +282,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input [(ngModel)]="getSortableColumn('type').visible"
+                                    (change)="toggleVisibility('type', $event)"
                                         type="checkbox">Type
                                 </label>
                             </div>
@@ -241,7 +291,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input [(ngModel)]="getSortableColumn('date').visible"
+                                        (change)="toggleVisibility('date', $event)"
                                         type="checkbox">Date
                                 </label>
                             </div>
@@ -249,7 +300,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input class="form-control"
+                                    <input [(ngModel)]="getSortableColumn('contributorOccupation').visible"
+                                        (change)="toggleVisibility('contributorOccupation', $event)"
                                         type="checkbox">Contributor Occupation
                                 </label>
                             </div>
@@ -259,7 +311,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('transactionId').visible"
+                                    (change)="toggleVisibility('transactionId', $event)"
                                         type="checkbox">Transaction ID
                                 </label>
                             </div>
@@ -267,7 +320,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('amount').visible"
+                                    (change)="toggleVisibility('amount', $event)"
                                         type="checkbox">Amount
                                 </label>
                             </div>
@@ -275,7 +329,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('memoCode').visible"
+                                        (change)="toggleVisibility('memoCode', $event)"
                                         type="checkbox">Memo Code
                                 </label>
                             </div>
@@ -285,7 +340,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('name').visible"
+                                        (change)="toggleVisibility('name', $event)"
                                         type="checkbox">Name
                                 </label>
                             </div>
@@ -293,7 +349,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('aggregate').visible"
+                                        (change)="toggleVisibility('aggregate', $event)"
                                         type="checkbox">Aggregate
                                 </label>
                             </div>
@@ -301,7 +358,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('memoText').visible"
+                                        (change)="toggleVisibility('memoText', $event)"
                                         type="checkbox">Memo Text/Description
                                 </label>
                             </div>
@@ -311,7 +369,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('state').visible"
+                                        (change)="toggleVisibility('state', $event)"
                                         type="checkbox">State
                                 </label>
                             </div>
@@ -319,7 +378,8 @@
                         <div class="col-md">
                             <div class="checkbox">
                                 <label>
-                                    <input 
+                                    <input [(ngModel)]="getSortableColumn('purposeDescription').visible"
+                                        (change)="toggleVisibility('purposeDescription', $event)"
                                         type="checkbox">Purpose Description
                                 </label>
                             </div>

@@ -2,8 +2,8 @@ export class TransactionModel {
     type: string;
     transactionId: string;
     name: string;
-    street: string;
-    city: string;
+    // street: string;
+    // city: string;
     state: string;
     zip: string
     date: Date;
@@ -20,8 +20,8 @@ export class TransactionModel {
         this.type = transaction.type ? transaction.type : "";
         this.transactionId = transaction.transactionId ? transaction.transactionId : "";
         this.name = transaction.name ? transaction.name : "";
-        this.street = transaction.street ? transaction.street : "";
-        this.city = transaction.city ? transaction.city : "";
+        // this.street = transaction.street ? transaction.street : "";
+        // this.city = transaction.city ? transaction.city : "";
         this.state = transaction.state ? transaction.state : "";
         this.zip = transaction.zip ? transaction.zip : "";
         this.date = transaction.date ? transaction.date : null;

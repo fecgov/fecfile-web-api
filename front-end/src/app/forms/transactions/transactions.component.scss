@@ -156,20 +156,9 @@
     margin: 1.5em 0;
   }
 
-  #btn-cancel {
-    background-color: grey;
-  }
 
-  .btn-modal-footer {
-    width: 6em;
-  }
-
-/* style ngx-pagination - start */
-/* override some styling where use of !important is made. */
-
-  // .ngx-pagination li {
-  //   font-size: 1.5rem !important;
-  // }
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
 
   .ngx-pagination .current{
     padding: 0.1875rem 0.625rem;
@@ -186,5 +175,27 @@
   }	
 
   /* style ngx-pagination - end */
+}
+
+
+.column-options-modal {
+
+  #btn-cancel {
+    background-color: lightgrey;
+  }
+
+  .btn-modal-footer {
+    width: 6em;
+  }
+
+  .row{
+    height: 3em;
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  .input:checked {
+    background-color: #2196F3;
+  }
+
 }
 
