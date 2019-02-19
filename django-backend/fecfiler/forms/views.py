@@ -545,6 +545,22 @@ def submit_comm_info(request):
 #     else:
 #         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+@api_view(["POST"])
+def create_json_file(request):
+   
+   #creating a JSON file so that it is handy for all the public API's
+   
+   try:
+       tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+       json.dump(serializer.data, open(tmp_filename, 'w'))
+
+"""
+
+
+
+
+
 @api_view(['GET'])
 def get_f99_reasons(request):
     """
