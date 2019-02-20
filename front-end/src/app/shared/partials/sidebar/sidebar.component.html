@@ -47,13 +47,18 @@
               </div>
               <div class="list-item__info">
                 <div class="form-name">
-                  <a
-                    [routerLink]="['/forms/form/', committee_form.form_type_mini]"
-                    [queryParams]="{ step: 'step_1' }"
-                    (click)="formSelected(committee_form.form_type_mini)"
-                  >
+                  <ng-container *ngIf="formType === committee_form.form_type_mini">
                     {{committee_form.form_type}}
-                  </a>
+                  </ng-container>
+                  <ng-container *ngIf="formType !== committee_form.form_type_mini">
+                    <a
+                      [routerLink]="['/forms/form/', committee_form.form_type_mini]"
+                      [queryParams]="{ step: 'step_1' }"
+                      (click)="formSelected(committee_form.form_type_mini)"
+                    >
+                      {{committee_form.form_type}}
+                    </a>
+                  </ng-container>
                 </div>
                  <button
                    type="button"
@@ -99,7 +104,7 @@
           </button>
         </div>
         <div class="sidebar__nav--links" [ngClass]="{'d-none': otherFormsHidden === true}">
-          <ul class="links-list" *ngFor="let committee_form of committee_forms || async" >
+          <ul class="links-list" *ngFor="let committee_form of committee_forms; trackBy: trackCommittee || async" >
             <li
               class="links-list__item"
               [attr.data-FormType]="committee_form.form_type_mini"
@@ -107,23 +112,33 @@
               [ngClass]="formType === committee_form.form_type_mini ? 'links-list__item--selected' : ''"
             >
               <div class="list-item__link" >
-                <a
-                  [routerLink]="['/forms/form/', committee_form.form_type_mini]"
-                  [queryParams]="{ step: 'step_1' }"
-                  (click)="formSelected(committee_form.form_type_mini)"
-                >
-                {{committee_form.form_description}}
-                </a>
-              </div>
-              <div class="list-item__info">
-                <div class="form-name">
+                <ng-container *ngIf="formType === committee_form.form_type_mini">
+                  {{committee_form.form_description}}
+                </ng-container>
+                <ng-container *ngIf="formType !== committee_form.form_type_mini">
                   <a
                     [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                     [queryParams]="{ step: 'step_1' }"
                     (click)="formSelected(committee_form.form_type_mini)"
                   >
-                  {{committee_form.form_type}}
+                  {{committee_form.form_description}}
                   </a>
+                </ng-container>
+              </div>
+              <div class="list-item__info">
+                <div class="form-name">
+                  <ng-container *ngIf="formType === committee_form.form_type_mini">
+                    {{committee_form.form_type}}
+                  </ng-container>
+                  <ng-container *ngIf="formType !== committee_form.form_type_mini">
+                    <a
+                      [routerLink]="['/forms/form/', committee_form.form_type_mini]"
+                      [queryParams]="{ step: 'step_1' }"
+                      (click)="formSelected(committee_form.form_type_mini)"
+                    >
+                      {{committee_form.form_type}}
+                    </a>
+                  </ng-container>
                 </div>
                  <button
                    type="button"
@@ -144,7 +159,7 @@
                   <i class="external-link-icon" aria-hidden="true">
                    <span class="sr-only">Link opens in new window.</span>
                   </i>
-                </ng-template>                
+                </ng-template>
               </div>
             </li>
           </ul>

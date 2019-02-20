@@ -38,6 +38,8 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     const route: string = this._router.url;
 
+    console.log('this.formType: ', this.formType);
+
     this._formService.get_filed_form_types()
      .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
 
@@ -71,6 +73,7 @@ export class SidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     const route: string = this._router.url;
+
     if (!this._toggleNavClicked) {
       if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
         let formSelected: string = null;
@@ -109,6 +112,11 @@ export class SidebarComponent implements OnInit {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
     }
+  }
+
+  public trackCommittee(index: number, committee_form: string): void {
+    console.log('trackCommittee: ');
+    console.log('committee_form: ', committee_form);
   }
 
   /**
