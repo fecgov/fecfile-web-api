@@ -53,23 +53,24 @@ export class TransactionsService {
     let t1: any = {};
     t1.aggregate = 1000;
     t1.amount = 1500;
-    t1.city = "New York";
+    // t1.city = "New York";
     t1.contributorEmployer = "Exxon";
     t1.contributorOccupation = "Lawyer";
-    t1.date = new Date();
+    let date = new Date('2019-01-01');
+    t1.date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     t1.memoCode = "Memo Code";
     t1.memoText = "The memo text";
     t1.name = "Mr. John Doe";
     t1.purposeDescription = "The purpose of this is to...";
     t1.selected = false;
     t1.state = "New York";
-    t1.street = "7th Avenue";
+    // t1.street = "7th Avenue";
     t1.transactionId = "TID12345";
     t1.type = "Individual";
     t1.zip = "22222";
 
     let trxArray = []; 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 2; i++) {
       trxArray.push(new TransactionModel(t1));  
     }
 
@@ -79,7 +80,7 @@ export class TransactionsService {
       totalTransactionCount: 20
     };
 
-    //console.log(JSON.stringify(mockResponse));
+    console.log(JSON.stringify(mockResponse));
 
     return Observable.of(mockResponse);
   }

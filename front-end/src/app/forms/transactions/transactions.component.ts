@@ -259,12 +259,19 @@ export class TransactionsComponent implements OnInit {
   }  
 
 
+  /**
+   * Save the columns to show selected by the user. 
+   */
   public saveColumnOptions() {
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
     localStorage.setItem(this.sortableColumnLocalStoragesKey, JSON.stringify(this.sortableColumns));
+    this.columnOptionsModal.hide();
   }
 
 
+  /**
+   * Cancel the request to save columns options.
+   */
   public cancelColumnOptions() {
     this.columnOptionsModal.hide();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
