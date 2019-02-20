@@ -29,7 +29,7 @@ export class TableService {
     if (col) {
       // if the colName is the currently sorted column, determing the sort direction and return either sort-true or sort-false
       // for ascending and descending respectively.  Otherwise return false for no sort direction as the column is not sorted.
-      sortCol = (colName == col.getColName()) ? 'sort-' + col.isDescending()  : 'false';			
+      sortCol = (colName == col.colName) ? 'sort-' + col.descending  : 'false';			
     }
     return 'table__sortable_col ' + sortCol;
   }
@@ -50,8 +50,8 @@ export class TableService {
 	public changeSortDirection(colName: string, sortableColumns: SortableColumnModel[]) : string {
 
 		for (let col of sortableColumns) {
-			if (col.getColName() == colName) {
-				col.setDescending(!col.isDescending());
+			if (col.colName == colName) {
+				col.descending = !col.descending;
 				return colName;
 			}
 		}
@@ -69,7 +69,7 @@ export class TableService {
 	 */
 	private findCurrentSortedColumn(currentSortedColumn: string, sortableColumns: SortableColumnModel[]) : SortableColumnModel {
 		for (let col of sortableColumns) {
-			if (col.getColName() == currentSortedColumn) {
+			if (col.colName == currentSortedColumn) {
 				return col;
 			}
 		}

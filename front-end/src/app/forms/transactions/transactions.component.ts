@@ -35,13 +35,13 @@ export class TransactionsComponent implements OnInit {
   /**
 	 * Array of columns to be made sortable.
 	 */
-  private sortableColumns: SortableColumnModel[];
+  private sortableColumns: SortableColumnModel[] = [];
   
   /**
 	 * A clone of the sortableColumns for saving
    * user settings in session.
 	 */
-	private cloneSortableColumns: SortableColumnModel[];  
+	private cloneSortableColumns: SortableColumnModel[] = [];  
 	
 	/**
 	 * Identifies the column currently sorted. 
@@ -186,7 +186,7 @@ export class TransactionsComponent implements OnInit {
    */
   public getSortableColumn(colName: string) : SortableColumnModel {
     for (let col of this.sortableColumns) {
-			if (col.getColName() == colName) {
+			if (col.colName == colName) {
 				return col;
 			}
 		}
@@ -201,7 +201,7 @@ export class TransactionsComponent implements OnInit {
    */
   public getCloneSortableColumn(colName: string) : SortableColumnModel {
     for (let col of this.cloneSortableColumns) {
-			if (col.getColName() == colName) {
+			if (col.colName == colName) {
 				return col;
 			}
 		}
@@ -218,7 +218,7 @@ export class TransactionsComponent implements OnInit {
   public isColumnVisible(colName: string) : boolean {
     let sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      return sortableCol.isVisible();
+      return sortableCol.visible;
     }
     else{
       return false;
@@ -235,7 +235,7 @@ export class TransactionsComponent implements OnInit {
   public setColumnVisible(colName: string, visible: boolean) {
     let sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      return sortableCol.setVisible(visible);
+      sortableCol.visible = visible;
     }
   }  
 
@@ -254,7 +254,7 @@ export class TransactionsComponent implements OnInit {
     //this.setColumnVisible(colName, e.target.checked);
 
     for (let col of this.sortableColumns) {
-      this.setColumnVisible(col.getColName(), col.isVisible())
+      this.setColumnVisible(col.colName, col.visible);
     }
   }  
 
@@ -279,7 +279,7 @@ export class TransactionsComponent implements OnInit {
   public toggleAllTypes(e: any) {
     let checked = (e.target.checked) ? true : false;
     for (let col of this.sortableColumns) {
-      this.setColumnVisible(col.getColName(), checked);
+      this.setColumnVisible(col.colName, checked);
     }    
   }
 
