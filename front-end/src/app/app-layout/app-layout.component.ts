@@ -60,7 +60,10 @@ export class AppLayoutComponent implements OnInit {
           if(this.toggleMenu) {
             this.toggleMenu = false;
           }
-          if(val.url.indexOf('/dashboard') === 0) {
+          if(
+            val.url.indexOf('/dashboard') === 0 ||
+            val.url.indexOf('/reports') === 0
+          ) {
             this.sideBarClass = 'dashboard active';
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
@@ -68,8 +71,6 @@ export class AppLayoutComponent implements OnInit {
             } else {
               this.sideBarClass = '';
             }
-          }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
-            this.sideBarClass = 'active';
           }
         }
       });
