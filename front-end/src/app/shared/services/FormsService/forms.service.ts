@@ -561,7 +561,8 @@ export class FormsService {
     let params = new HttpParams();
 
 
-    url = '/f3x/get_transaction_categories?form_type=F3X';
+    //url = '/f3x/get_transaction_categories?form_type=F3X';
+    url = '/core/get_transaction_categories?form_type=F3X';
 
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -588,7 +589,8 @@ export class FormsService {
     let url: string = '';
     let params = new HttpParams();
 
-    url = '/f3x/get_report_types?form_type=F3X';
+    //url = '/f3x/get_report_types?form_type=F3X';
+    url = '/core/get_report_types?form_type=F3X';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);

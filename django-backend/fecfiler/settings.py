@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     #'fecfiler.posts',
     'fecfiler.forms',
     'db_file_storage',
+
+    'fecfiler.core',
     'fecfiler.form3x',
     'fecfiler.sched_A',
 
@@ -377,5 +379,8 @@ MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_UPLOAD_DOMAIN, MEDIAFILES_LOCATION
 NXG_FEC_API_URL = os.environ.get('NXG_API_URL', '127.0.0.1:8080')
 NXG_FEC_API_VERSION = os.environ.get('NXG_API_VERSION', '/api/v1/')
 
+
+NXG_FEC_API_URL = "127.0.0.1:8080"
+NXG_FEC_API_VERSION = "/api/v1/"
 NXG_FEC_PRINT_API_URL = os.environ.get('PRINTPDF_URL', 'https://dev-efile-api.efdev.fec.gov/printpdf')
 NXG_FEC_PRINT_API_VERSION = "/v1/print"

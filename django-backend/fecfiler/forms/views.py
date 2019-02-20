@@ -545,6 +545,22 @@ def submit_comm_info(request):
 #     else:
 #         return Response({"error":"ERRCODE: FEC02. Error occured while trying to submit form f99."}, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+@api_view(["POST"])
+def create_json_file(request):
+   
+   #creating a JSON file so that it is handy for all the public API's
+   
+   try:
+       tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+       json.dump(serializer.data, open(tmp_filename, 'w'))
+
+"""
+
+
+
+
+
 @api_view(['GET'])
 def get_f99_reasons(request):
     """
@@ -913,12 +929,12 @@ def get_comm_lookup(request):
         new_obj = {'committeeid':comm.cmte_id, 'committee_type': comm.cmte_type, 'committee_name':comm.cmte_name, 'committee_design':comm.cmte_dsgn, 'committee_filing_freq':comm.cmte_filing_freq}
         return Response(new_obj)
 """
-
+"""
 @api_view(['GET'])
 def get_filed_form_types(request):
-    """
-    Fields for identifying the committee type and committee design and filter the forms category 
-    """
+   
+    #Fields for identifying the committee type and committee design and filter the forms category 
+    
     try:
         comm_id = request.user.username
         
@@ -933,7 +949,7 @@ def get_filed_form_types(request):
         return Response(resp_data, status=status.HTTP_200_OK)
     except:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
-
+"""
 
 """
 @api_view(['GET'])
