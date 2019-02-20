@@ -12,10 +12,12 @@
       padding-left: 0
     }
     @include media(mediumDesktop) {
-      padding-left: 200px;
+      padding-left: 220px;
+      overflow-x: hidden;
     }
     @include media(largeDesktop) {
-      padding-left: 200px;
+      padding-left: 220px;
+      overflow-x: hidden;
     }
     .app__side-nav {
       left: 0;
