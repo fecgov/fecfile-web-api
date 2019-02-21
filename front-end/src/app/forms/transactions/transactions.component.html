@@ -244,6 +244,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+                <div *ngIf="columnOptionsError != ''" [@fadeInOut] class="validation-error">
+                    {{columnOptionsError}}
+                </div>
                 <button type="button" class="close" (click)="cancelColumnOptions()">
                     <span class="fas fa-times"></span>
                 </button>

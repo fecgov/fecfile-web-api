@@ -63,6 +63,7 @@ import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { ModalModule } from 'ngx-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -121,6 +122,7 @@ import { ModalModule } from 'ngx-bootstrap';
     ReactiveFormsModule,
     HttpClientModule,
     HttpModule,
+    BrowserAnimationsModule,
     routing,
     AngularFileUploaderModule,
     ArchwizardModule,

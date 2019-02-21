@@ -1,6 +1,7 @@
 import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { style, animate, transition, trigger } from '@angular/animations';
 import { TransactionModel } from './model/transaction.model';
 import { TransactionsService, GetTransactionsResponse } from './service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -15,7 +16,18 @@ import { UtilService } from 'src/app/shared/utils/util.service';
   selector: 'app-transactions',
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+		trigger('fadeInOut', [
+			transition(':enter', [   // :enter is alias to 'void => *'
+				style({opacity:0}),
+				animate(200, style({opacity:1})) 
+			]),
+				transition(':leave', [   // :leave is alias to '* => void'
+				animate(500, style({opacity:0})) 
+			])
+		])
+	]
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
 
@@ -54,7 +66,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public autoHide: boolean = true;	
   public config: PaginationInstance;
   
-  //modalRef: BsModalRef;
+  public columnOptionsError = "";
 
 
   constructor(
@@ -149,9 +161,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Validate the form. 
    */
   public doValidateTransaction() : void {
-    console.log('doValidateTransaction: ');
-    console.log('this.formTransactions: ', this.formTransactions);
-    console.log("save transactions not yet supported in backend");
 
     this.formSubmitted = true;
 
@@ -200,22 +209,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 		}
 		return null;
   }
-
-
-  // /**
-  //  * Get the cloned SortableColumnModel by name.
-  //  * 
-  //  * @param colName the column name in the SortableColumnModel.
-  //  * @returns the SortableColumnModel matching the colName.
-  //  */
-  // public getCloneSortableColumn(colName: string) : SortableColumnModel {
-  //   for (let col of this.cloneSortableColumns) {
-	// 		if (col.colName == colName) {
-	// 			return col;
-	// 		}
-	// 	}
-	// 	return null;
-  // }  
 
 
   /**
@@ -273,8 +266,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public toggleVisibility(colName: string, e: any) {
 
-    // validate only 5 are checked before set to visible.
-
     if (!this.sortableColumns) {
       return;
     }
@@ -287,17 +278,20 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           count++;
         }
         if (count > 5) {
-          alert("Only 5 columns are permitted");
-          //e.target.checked = false;
+          //alert("Only 5 columns are permitted");
           this.setColumnChecked(colName, false);
+          e.target.checked = false;
+          this.columnOptionsError = "Only 5 columns may be selected";
+          
+          // TODO use Observable to delay
+          setTimeout(()=>{    
+            this.columnOptionsError = "";
+          }, 2000);
+
           return;
         }
       }
     }
-
-    // for (let col of this.sortableColumns) {
-    //   this.setColumnVisible(col.colName, col.visible);
-    // }
   }  
 
 
@@ -415,10 +409,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   /**
    * Show the option to select/deselect columns in the table.
-   * @param template The Modal content to show
    */
   public showPinColumns() {
-    //this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+    this.columnOptionsError = "";
     this.columnOptionsModal.show();
   }
 
