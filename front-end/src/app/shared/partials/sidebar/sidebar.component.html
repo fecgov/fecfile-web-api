@@ -20,14 +20,19 @@
           <div class="header-text">
             My Forms
           </div>
-          <div class="btn-hide-form-nav">
+          <button
+            type="button"
+            class="btn btn-link btn-hide-form-nav"
+            (click)="toggleFormNav('my-forms')"
+          >
             <i
-              class="down-arrow-icon"
               aria-hidden="true"
+              [ngClass]="{'down-arrow-icon': myFormsHidden === false, 'up-arrow-icon': myFormsHidden === true}"
             ></i>
-          </div>
+            <span class="sr-only">Click to hide Other Forms</span>
+          </button>
         </div>
-        <div class="sidebar__nav--links"  >
+        <div class="sidebar__nav--links"  [ngClass]="{'d-none': myFormsHidden === true}">
           <ul class="links-list" *ngFor="let committee_form of committee_forms || async">
             <li
               class="links-list__item"
