@@ -564,7 +564,6 @@ export class FormsService {
     //url = '/f3x/get_transaction_categories?form_type=F3X';
     url = '/core/get_transaction_categories?form_type=F3X';
 
-
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
@@ -577,7 +576,7 @@ export class FormsService {
           {
            /* headers: httpOptions,
             params*/
-            headers: httpOptions
+            headers: httpOptions/*  */
           }
        );
   }
@@ -690,5 +689,14 @@ export class FormsService {
           params
         }
       );
+ }
+
+ public removeFormDashBoard(formType: string): void {
+   if (formType === "3X") {
+      console.log ("FormsService removeFormDashBoard")
+      localStorage.removeItem('form3XReportInfo.showDashBoard');
+      localStorage.removeItem('form3XReportInfo.DashBoardLine1');
+      localStorage.removeItem('form3XReportInfo.DashBoardLine2');
+   }
  }
 }
