@@ -50,10 +50,12 @@ export class SidebarComponent implements OnInit {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
               this._closeNavBar();
-            } else if(val.url.indexOf('/dashboard') === 0) {
-              this._openNavBar();
-            } else if(val.url.indexOf('/forms/form/') === -1) {
+            } else if(
+              val.url.indexOf('/dashboard') === 0 ||
+              val.url.indexOf('/forms/form/') === -1
+            ) {
               this.formType = null;
+              this._openNavBar();
             }
           }
         }
@@ -112,11 +114,6 @@ export class SidebarComponent implements OnInit {
       this.tooltipPosition = 'right';
       this.tooltipLeft = 'auto';
     }
-  }
-
-  public trackCommittee(index: number, committee_form: string): void {
-    console.log('trackCommittee: ');
-    console.log('committee_form: ', committee_form);
   }
 
   /**
