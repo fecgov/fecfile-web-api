@@ -6,6 +6,9 @@ import { MessageService } from '../shared/services/MessageService/message.servic
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
+import { FormsService } from '../shared/services/FormsService/forms.service';
+
+
 
 @Component({
   selector: 'app-dashboard',
@@ -22,11 +25,17 @@ export class DashboardComponent implements OnInit {
     private _sessionService: SessionService,
     private _apiService: ApiService,
     private _modalService: NgbModal,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _formService: FormsService
   ) { }
 
   ngOnInit(): void {
+    if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
+       this._formService.removeFormDashBoard("3X");
+    }
   }
+  
+
 
   public closeResult: string;
 

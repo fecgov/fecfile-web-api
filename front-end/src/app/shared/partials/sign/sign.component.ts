@@ -375,11 +375,13 @@ export class SignComponent implements OnInit {
 
   public add_additional_email_2(): void {
     this.needAdditionalEmail_2=true;
+    this.frmSaved=false;
     console.log("2nd email needed");
   }
   public remove_additional_email_2(): void {
     this.needAdditionalEmail_2=false;
     console.log("2nd email removed");
+    this.frmSaved=false;
   }
 
 

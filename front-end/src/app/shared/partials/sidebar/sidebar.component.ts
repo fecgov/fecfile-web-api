@@ -21,7 +21,7 @@ export class SidebarComponent implements OnInit {
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
-  public otherFormsHidden: boolean = true;
+  public otherFormsHidden: boolean = false;
   public myFormsHidden: boolean = false;
   public committee_forms: Icommittee_forms[];
   public committee_myforms: Icommittee_forms[];
@@ -78,6 +78,7 @@ export class SidebarComponent implements OnInit {
 
     if (!this._toggleNavClicked) {
       if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
+        
         let formSelected: string = null;
 
         this._activatedRoute
@@ -122,11 +123,20 @@ export class SidebarComponent implements OnInit {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
+
     this._router
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf(form) >= 1) {
+            if (form !== "3X"){
+           // Except Forn3X screens we should not show Form3X related dashboard 
+            console.log("New form selected ...", form);
+              if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
+                this._formService.removeFormDashBoard("3X");
+              }
+            }
+            
             this.formType = form;
           }
         }
