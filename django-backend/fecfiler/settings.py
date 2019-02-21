@@ -64,10 +64,11 @@ INSTALLED_APPS = [
     'db_file_storage',
 
     'fecfiler.core',
-    'fecfiler.form3x',
+    #'fecfiler.form3x',
     'fecfiler.sched_A',
-
-
+    'storages',
+  
+  
 
 ]
 

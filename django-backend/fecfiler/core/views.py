@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 import maya
-from .models import Cmte_Report_Types_View, My_Forms_View
+from .models import Cmte_Report_Types_View, My_Forms_View, GenericDocument
 from rest_framework.response import Response
 import json
 import datetime
@@ -13,6 +13,9 @@ import logging
 from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
+import boto3
+from botocore.exceptions import ClientError
+
 
 # Create your views here.
 
@@ -979,4 +982,64 @@ def search_entities(request):
 ******************************************************************************************************************************
 END - SEARCH ENTITIES API - CORE APP
 ******************************************************************************************************************************
+"""
+"""
+@api_view(["POST"])
+def create_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's
+
+    # data = {
+    #         'committeeid': request.data.get('committeeid'),
+    #         'committeename': request.data.get('committeename'),
+    #         'street1': request.data.get('street1'),
+    #         'street2': request.data.get('street2'),
+    #         'city': request.data.get('city'),
+    #         'state': request.data.get('state'),
+    #         'text': request.data.get('text'),
+    #         #'reason' :request.data.get('text'),
+    #         'reason' :request.data.get('reason'),
+    #         'zipcode': request.data.get('zipcode'),
+    #         'treasurerlastname': request.data.get('treasurerlastname'),
+    #         'treasurerfirstname': request.data.get('treasurerfirstname'),
+    #         'treasurermiddlename': request.data.get('treasurermiddlename'),
+    #         'treasurerprefix': request.data.get('treasurerprefix'),
+    #         'treasurersuffix': request.data.get('treasurersuffix'),
+
+    #         'signee': request.data.get('signee'),
+    #         'email_on_file' : request.data.get('email_on_file'),
+    #         'email_on_file_1': request.data.get('email_on_file_1'),
+
+    #         'additional_email_1' : request.data.get('additional_email_1'),
+    #         'additional_email_2': request.data.get('additional_email_2'),
+    #         'form_type': request.data.get('form_type'),
+    #         'coverage_start_date': request.data.get('coverage_start_date'),
+    #         'coverage_end_date': request.data.get('coverage_end_date'),
+
+    #     }
+    #     logger.debug("Incoming parameters: submit_comm_info" + str(request.data))
+    #     new_data = data
+
+
+
+    model = GenericDocument
+    fields = ['upload', ]
+    success_url = reverse_lazy('home')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        documents = GenericDocument.objects.all()
+        context['documents'] = documents
+        return context
+
+
+   #  try:
+   #     tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
+   #     json.dump(serializer.data, open(tmp_filename, 'w'))
+
+       
+   # except:
+   #     try:
+   #         os.remove(tmp_filename)
+   #     except:
+   #         pass
 """

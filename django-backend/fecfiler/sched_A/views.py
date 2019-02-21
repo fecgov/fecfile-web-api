@@ -12,7 +12,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
 from django.conf import settings
-from fecfiler.form3x.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError
+from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError
 
 
 # Create your views here.
