@@ -149,6 +149,7 @@ export class SidebarComponent implements OnInit {
    */
   public toggleSideNav(): void {
     this._toggleNavClicked = true;
+
     if(this.iconClass === 'close-icon') {
       this._closeNavBar();
     } else {
