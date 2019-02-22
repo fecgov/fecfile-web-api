@@ -6,289 +6,227 @@
             </transaction-categories-sidebar>
         </div>
     </div>
-    <div
-      class="form__container">
-        <!-- <div class="form__steps">
-            <app-steps
-            [steps]="[
-                {text: 'Report<br/>type', step: 'step_1'},
-                {text: 'Form', step: 'step_2'},
-                {text: 'Preview', step: 'step_4'},
-                {text: 'Sign', step: 'step_5'},
-                {text: 'Submit', step: 'step_6'}
-            ]"
-            [current_step]="currentStep"
-            >
-            </app-steps>
-        </div> -->
-
-        <div class="transactions-container">
-            <header>
-                <div class="header-content">
-                    <div class="float-left">
-                        <h1>Transactions / Form {{formType}}</h1>
-                    </div>
-                    <div class="float-right">
-                        <button class="btn btn-secondary btn-right" type="submit">Return to Transaction Categories</button>
-                    </div>
+    <div [@fadeInOut] class="transactions-container">
+        <header>
+            <div class="header-content">
+                <div class="float-left">
+                    <h1>Transactions / Form {{formType}}</h1>
                 </div>
-                <hr />
-            </header>
-            <!-- consider wrapping the table in the form, but can't use ([ngModel]) syntax - see compiler error -->
-            <form
-                [formGroup]="formTransactions"
-                (ngSubmit)="doValidateTransaction()"
-            >
-            </form>
-            <div class="grid-row">
-                <div class="grid-row__col grid-row__col--12">
-                    <div class="forms__btn-container">
-                        <button
-                            class="btn btn-secondary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showPinColumns(columnOptionsModal)"
-                        > <!-- (click)="columnOptionsModal.show()" -->
-                            <i class="fas fa-thumbtack"></i>
-                            Pin Columns
-                        </button>
-                        <button
-                            class="btn btn-secondary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showRecycleBin()"
-                        >
-                            <i class="fas fa-trash"></i>
-                            Recycle Bin
-                        </button>
-                        <button
-                            class="btn btn-secondary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="doImport()"
-                        >
-                            <i class="fas fa-chevron-circle-right"></i>
-                            Import
-                        </button>    
-                        <button
-                            class="btn btn-secondary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="doFilter()"
-                        >
-                            <i class="fas fa-filter"></i>
-                            Filter
-                        </button>
-                        <div class="input-group pl-0 forms__trx-search">
-                            <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="">
-                                    <i class="fas fa-search text-grey" aria-hidden="true"></i>
-                                </span>
-                            </div>
-                        </div> 
-                        
-                    </div>
-                  
+                <div class="float-right">
+                    <button class="btn btn-secondary btn-right" type="submit">Return to Transaction Categories</button>
                 </div>
-            </div> 
-            <div class="grid-row forms__trx-applied-filter-row">
+            </div>
+            <hr />
+        </header>
+        <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
                 <div class="forms__btn-container">
                     <button
                         class="btn btn-secondary btn-left forms__trx-btn"
                         type="button"
-                        (click)="toogleAppliedFilter()"
+                        (click)="showPinColumns(columnOptionsModal)">
+                        <i class="fas fa-thumbtack"></i>
+                        Pin Columns
+                    </button>
+                    <button
+                        class="btn btn-secondary btn-left forms__trx-btn"
+                        type="button"
+                        (click)="showRecycleBin()"
                     >
-                        <i class="fas fa-times"></i>
-                        {{appliedFilterNames[0]}}
-                    </button>                    
-                </div> 
+                        <i class="fas fa-trash"></i>
+                        Recycle Bin
+                    </button>
+                    <button
+                        class="btn btn-secondary btn-left forms__trx-btn"
+                        type="button"
+                        (click)="doImport()"
+                    >
+                        <i class="fas fa-chevron-circle-right"></i>
+                        Import
+                    </button>    
+                    <button
+                        class="btn btn-secondary btn-left forms__trx-btn"
+                        type="button"
+                        (click)="doFilter()"
+                    >
+                        <i class="fas fa-filter"></i>
+                        Filter
+                    </button>
+                    <div class="input-group pl-0 forms__trx-search">
+                        <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="">
+                                <i class="fas fa-search text-grey" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                    </div> 
+                    
+                </div>
+                
             </div>
-            <div class="grid-row float-right">
-                <div class="float-right forms__trx-item-range">
-                    {{determineItemRange()}} of {{config.totalItems}}
-                </div>
-            </div>            
-            <table class="table table-striped table-hover table__sortable forms__trx-table">
-                <thead>
-                    <tr>
-                        <th class="forms__trx-table-checkbox"></th>
-                        <th *ngIf="isColumnVisible('type')"
-                            [class]="getSortClass('type')" 
-                            (click)="changeSortDirection('type')">Type
-                        </th>
-                        <th *ngIf="isColumnVisible('transactionId')"
-                            [class]="getSortClass('transactionId')" 
-                            (click)="changeSortDirection('transactionId')">Transaction ID
-                        </th>
-                        <th *ngIf="isColumnVisible('name')"
-                            [class]="getSortClass('name')" 
-                            (click)="changeSortDirection('name')">Name
-                        </th>
-
-                        <th *ngIf="isColumnVisible('state')" 
-                            [class]="getSortClass('state')" 
-                            (click)="changeSortDirection('state')">State
-                        </th>
-                        <th *ngIf="isColumnVisible('zip')" 
-                            [class]="getSortClass('zip')" 
-                            (click)="changeSortDirection('zip')">Zip
-                        </th>                        
-
-                        <th *ngIf="isColumnVisible('date')"
-                            [class]="getSortClass('date')" 
-                            (click)="changeSortDirection('date')">Date
-                        </th>
-                        <th *ngIf="isColumnVisible('amount')"
-                            [class]="getSortClass('amount')" 
-                            (click)="changeSortDirection('amount')">Amount
-                        </th>
-                        <th *ngIf="isColumnVisible('aggregate')"
-                            [class]="getSortClass('aggregate')" 
-                            (click)="changeSortDirection('aggregate')">Aggregate
-                        </th>   
-                        <th *ngIf="isColumnVisible('purposeDescription')"
-                            [class]="getSortClass('purposeDescription')" 
-                            (click)="changeSortDirection('purposeDescription')">Purpose Description
-                        </th>    
-                        <th *ngIf="isColumnVisible('contributorEmployer')"
-                            [class]="getSortClass('contributorEmployer')" 
-                            (click)="changeSortDirection('contributorEmployer')">Contributor Employer
-                        </th>   
-                        <th *ngIf="isColumnVisible('contributorOccupation')"
-                            [class]="getSortClass('contributorOccupation')" 
-                            (click)="changeSortDirection('contributorOccupation')">Contributor Occupation
-                        </th>
-                        <th *ngIf="isColumnVisible('memoCode')"
-                            [class]="getSortClass('memoCode')" 
-                            (click)="changeSortDirection('memoCode')">Memo Code
-                        </th>   
-                        <th *ngIf="isColumnVisible('memoText')"
-                            [class]="getSortClass('memoText')" 
-                            (click)="changeSortDirection('memoText')">Memo Text/Description
-                        </th>                                                                                                                                    
-                        <th [class]=""></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let trx of transactionsModel | paginate: config; let i = index">
-                        <td>
-                            <input [(ngModel)]="trx.selected"
-                                    type="checkbox">
-                        </td>
-                        <td *ngIf="isColumnVisible('type')">{{trx.type}}</td>
-                        <td *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
-                        <td *ngIf="isColumnVisible('name')">{{trx.name}}</td>
-                        <td *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-                        <td *ngIf="isColumnVisible('zip')">{{trx.zip}}</td>
-                        <td *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-                        <td *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
-                        <td *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
-                        <td *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
-                        <td *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
-                        <td *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
-                        <td *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
-                        <td *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
-                        <td>
-                            <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                                <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                                    <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                                        <i class="fas fa-copy"></i>Clone
-                                    </button>
-                                    <button class="dropdown-item" (click)="linkTransaction(trx)">
-                                        <i class="fas fa-link"></i>Link
-                                    </button>
-                                    <button class="dropdown-item" (click)="viewTransaction(trx)">
-                                        <i class="fas fa-eye"></i>View
-                                    </button>
-                                    <button class="dropdown-item" (click)="editTransaction(trx)">
-                                        <i class="fas fa-edit"></i>Edit
-                                    </button>
-                                    <button class="dropdown-item" (click)="trashTransaction(trx)">
-                                        <i class="fas fa-trash"></i>Trash
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="container">
-                <div class="row forms__trx-total-amount-container">
-                    <div class="col-sm forms__trx-total-amount">
-                        <b>Total Amount</b>
-                        <i class="fas fa-info-circle forms__trx-total-amount" 
-                            ngbTooltip="Represents the total amount of transactions entered on the report. 
-                                Those transactions that are memo entries are not added into the total amount."
-                            tooltipClass="form-tooltip">
-                        </i>
-                    </div>
-                    <div class="col-sm">                    
-                    </div>
-                    <div class="col-sm">
-                        <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.0-0'}}</b>
-                    </div>
-                </div>
-                </div>
-            <hr/> 
-            <div *ngIf="showPagination()" 
-                class="d-flex justify-content-center forms__trx-table-pagination-container deleteme ">
-                <pagination-controls [id]="config.id"
-                    (pageChange)="getPage($event)">
-                </pagination-controls>	
-            </div>                      
+        </div> 
+        <div class="grid-row forms__trx-applied-filter-row">
+            <div class="forms__btn-container">
+                <button
+                    class="btn btn-secondary btn-left forms__trx-btn"
+                    type="button"
+                    (click)="toogleAppliedFilter()"
+                >
+                    <i class="fas fa-times"></i>
+                    {{appliedFilterNames[0]}}
+                </button>                    
+            </div> 
         </div>
-    </div> 
+        <div class="grid-row float-right">
+            <div class="float-right forms__trx-item-range">
+                {{determineItemRange()}} of {{config.totalItems}}
+            </div>
+        </div>            
+        <table class="table table-striped table-hover table__sortable forms__trx-table">
+            <thead>
+                <tr>
+                    <th class="forms__trx-table-checkbox"></th>
+                    <th *ngIf="isColumnVisible('type')"
+                        [class]="getSortClass('type')" 
+                        (click)="changeSortDirection('type')">Type
+                    </th>
+                    <th *ngIf="isColumnVisible('transactionId')"
+                        [class]="getSortClass('transactionId')" 
+                        (click)="changeSortDirection('transactionId')">Transaction ID
+                    </th>
+                    <th *ngIf="isColumnVisible('name')"
+                        [class]="getSortClass('name')" 
+                        (click)="changeSortDirection('name')">Name
+                    </th>
+
+                    <th *ngIf="isColumnVisible('state')" 
+                        [class]="getSortClass('state')" 
+                        (click)="changeSortDirection('state')">State
+                    </th>
+                    <th *ngIf="isColumnVisible('zip')" 
+                        [class]="getSortClass('zip')" 
+                        (click)="changeSortDirection('zip')">Zip
+                    </th>                        
+
+                    <th *ngIf="isColumnVisible('date')"
+                        [class]="getSortClass('date')" 
+                        (click)="changeSortDirection('date')">Date
+                    </th>
+                    <th *ngIf="isColumnVisible('amount')"
+                        [class]="getSortClass('amount')" 
+                        (click)="changeSortDirection('amount')">Amount
+                    </th>
+                    <th *ngIf="isColumnVisible('aggregate')"
+                        [class]="getSortClass('aggregate')" 
+                        (click)="changeSortDirection('aggregate')">Aggregate
+                    </th>   
+                    <th *ngIf="isColumnVisible('purposeDescription')"
+                        [class]="getSortClass('purposeDescription')" 
+                        (click)="changeSortDirection('purposeDescription')">Purpose Description
+                    </th>    
+                    <th *ngIf="isColumnVisible('contributorEmployer')"
+                        [class]="getSortClass('contributorEmployer')" 
+                        (click)="changeSortDirection('contributorEmployer')">Contributor Employer
+                    </th>   
+                    <th *ngIf="isColumnVisible('contributorOccupation')"
+                        [class]="getSortClass('contributorOccupation')" 
+                        (click)="changeSortDirection('contributorOccupation')">Contributor Occupation
+                    </th>
+                    <th *ngIf="isColumnVisible('memoCode')"
+                        [class]="getSortClass('memoCode')" 
+                        (click)="changeSortDirection('memoCode')">Memo Code
+                    </th>   
+                    <th *ngIf="isColumnVisible('memoText')"
+                        [class]="getSortClass('memoText')" 
+                        (click)="changeSortDirection('memoText')">Memo Text/Description
+                    </th>                                                                                                                                    
+                    <th [class]=""></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let trx of transactionsModel | paginate: config; let i = index">
+                    <td>
+                        <input [(ngModel)]="trx.selected"
+                                type="checkbox">
+                    </td>
+                    <td *ngIf="isColumnVisible('type')">{{trx.type}}</td>
+                    <td *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+                    <td *ngIf="isColumnVisible('name')">{{trx.name}}</td>
+                    <td *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+                    <td *ngIf="isColumnVisible('zip')">{{trx.zip}}</td>
+                    <td *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+                    <td *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+                    <td *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
+                    <td *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+                    <td *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
+                    <td *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
+                    <td *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+                    <td *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+                    <td>
+                        <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                            <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                                <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                                    <i class="fas fa-copy"></i>Clone
+                                </button>
+                                <button class="dropdown-item" (click)="linkTransaction(trx)">
+                                    <i class="fas fa-link"></i>Link
+                                </button>
+                                <button class="dropdown-item" (click)="viewTransaction(trx)">
+                                    <i class="fas fa-eye"></i>View
+                                </button>
+                                <button class="dropdown-item" (click)="editTransaction(trx)">
+                                    <i class="fas fa-edit"></i>Edit
+                                </button>
+                                <button class="dropdown-item" (click)="trashTransaction(trx)">
+                                    <i class="fas fa-trash"></i>Trash
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="container">
+            <div class="row forms__trx-total-amount-container">
+                <div class="col-sm forms__trx-total-amount">
+                    <b>Total Amount</b>
+                    <i class="fas fa-info-circle forms__trx-total-amount" 
+                        ngbTooltip="Represents the total amount of transactions entered on the report. 
+                            Those transactions that are memo entries are not added into the total amount."
+                        tooltipClass="form-tooltip">
+                    </i>
+                </div>
+                <div class="col-sm">                    
+                </div>
+                <div class="col-sm">
+                    <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.0-0'}}</b>
+                </div>
+            </div>
+            </div>
+        <hr/> 
+        <div *ngIf="showPagination()" 
+            class="d-flex justify-content-center forms__trx-table-pagination-container deleteme ">
+            <pagination-controls [id]="config.id"
+                (pageChange)="getPage($event)">
+            </pagination-controls>	
+        </div>                      
+    </div>
+
 </div> 
 <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
-                <div *ngIf="showColumnOptionsError" [@columnOptionsFadeIn] class="validation-error">
-                    {{columnOptionsError}}
-                </div>                
                 <button type="button" class="close" (click)="cancelColumnOptions()">
                     <span class="fas fa-times"></span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-md">
-                            <div class="checkbox">
-                                <label>
-                                    <input disabled (click)="toggleAllTypes($event)"
-                                        type="checkbox">All Types
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="checkbox">
-                                <label>
-                                    <input [(ngModel)]="getSortableColumn('zip').checked"
-                                        (change)="toggleVisibility('zip', $event)"
-                                        type="checkbox" [disabled]="getSortableColumn('zip').disabled">
-                                    <span [ngClass]=
-                                        "{'disabled-column-option':getSortableColumn('zip').disabled}">
-                                        Zip
-                                    </span>   
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md">
-                            <div class="checkbox">
-                                <label>
-                                    <input [(ngModel)]="getSortableColumn('contributorEmployer').checked"
-                                        (change)="toggleVisibility('contributorEmployer', $event)"
-                                        type="checkbox" [disabled]="getSortableColumn('contributorEmployer').disabled">
-                                    <span [ngClass]=
-                                        "{'disabled-column-option':getSortableColumn('contributorEmployer').disabled}">
-                                        Contributor Employer
-                                    </span>          
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-md">
                             <div class="checkbox">
@@ -328,7 +266,7 @@
                                     </span>                                        
                                 </label>
                             </div>
-                        </div>
+                        </div>                                    
                     </div>
                     <div class="row">
                         <div class="col-md">
@@ -370,7 +308,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="row">
                         <div class="col-md">
                             <div class="checkbox">
@@ -438,7 +376,37 @@
                         </div>
                         <div class="col-md">
                         </div>
-                    </div>                                                                             
+                    </div>
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input [(ngModel)]="getSortableColumn('zip').checked"
+                                        (change)="toggleVisibility('zip', $event)"
+                                        type="checkbox" [disabled]="getSortableColumn('zip').disabled">
+                                    <span [ngClass]=
+                                        "{'disabled-column-option':getSortableColumn('zip').disabled}">
+                                        Zip
+                                    </span>   
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="checkbox">
+                                <label>
+                                    <input [(ngModel)]="getSortableColumn('contributorEmployer').checked"
+                                        (change)="toggleVisibility('contributorEmployer', $event)"
+                                        type="checkbox" [disabled]="getSortableColumn('contributorEmployer').disabled">
+                                    <span [ngClass]=
+                                        "{'disabled-column-option':getSortableColumn('contributorEmployer').disabled}">
+                                        Contributor Employer
+                                    </span>          
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                        </div>                                    
+                    </div>                                                                                      
                 </div>
             </div>
             <div class="modal-footer">

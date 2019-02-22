@@ -18,15 +18,13 @@ import { UtilService } from 'src/app/shared/utils/util.service';
   styleUrls: ['./transactions.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
-		trigger('columnOptionsFadeIn', [
+		trigger('fadeInOut', [
 			transition(':enter', [
 				style({opacity:0}),
-				animate(200, style({opacity:1})) 
+				animate(1000, style({opacity:1})) 
       ]),
-        // keep fadeout at 0 otherwise it may cause UI issues 
-        // when checkbox rapidly clicked.
 				transition(':leave', [
-				animate(0, style({opacity:0})) 
+				animate(10, style({opacity:0})) 
 			])
 		])
 	]
@@ -40,8 +38,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public totalAmount: number;
   private _formType: string = '';
   public formType: string = '';
-  public formTransactions: FormGroup;
-  public formSubmitted: boolean = false;
+  //public formTransactions: FormGroup;
+  //public formSubmitted: boolean = false;
   public appliedFilterNames: Array<string> = [];
 
   private sortableColumnLocalStoragesKey: string = "sortableColumnLocalStoragesKey";
@@ -68,10 +66,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public autoHide: boolean = true;	
   public config: PaginationInstance;
   
-  // TODO remove error fields as we don't need it now that checkboxes are disabled when > 5
-  public readonly columnOptionsError = "Only 5 columns may be selected at a time";
-  public showColumnOptionsError = false;
   private columnOptionCount: number = 0;
+  private readonly maxColumnOption = 5;
 
   constructor(
     private _fb: FormBuilder,
@@ -130,15 +126,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.formTransactions = this._fb.group({
-      // transactionCategory: [null, [
-      //   Validators.required
-      // ]],
-      // transactionType: [null, [
-      //   Validators.required
-      //]]
-    });
-
     // push an applied filter for test
     this.appliedFilterNames.push("Filter " + this.appliedFilterNames.length + 1);
   }
@@ -164,20 +151,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.totalAmount = res.totalAmount;
       this.config.totalItems = res.totalTransactionCount;
     });  
-  }
-
-
-  /**
-   * Validate the form. 
-   */
-  public doValidateTransaction() : void {
-
-    this.formSubmitted = true;
-
-    if(this.formTransactions.valid) {
-      this.formSubmitted = false;
-    }
-    return;
   }
 
 
@@ -275,7 +248,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public disableOption(colName: string) : boolean {
     let sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      if(!sortableCol.checked && this.columnOptionCount > 4) {
+      if(!sortableCol.checked && this.columnOptionCount > 
+          (this.maxColumnOption - 1)) {
         return true;
       } 
     }
@@ -295,14 +269,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // rapid clicking a checkbox causes UI issue where message is shown twice.
-    // It may be a race condition.  This may reduce the frequency of the issue.
-    // Alternate solution is to remove the animation fade and hide the message
-    // on mouse movement.
-    // if (this.showColumnOptionsError = true) {
-    //   this.showColumnOptionsError = false;
-    // }
-
     // only permit 5 checked at a time
     if (e.target.checked == true) {
       this.columnOptionCount = 0;
@@ -311,18 +277,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           this.columnOptionCount++;
         }
         if (this.columnOptionCount > 5) {
-          //alert("Only 5 columns are permitted");
-          this.showColumnOptionsError = true;
           this.setColumnChecked(colName, false);
           e.target.checked = false;
           this.columnOptionCount--;
-
-          // TODO use Observable to delay
-          setTimeout(()=>{    
-            //this.columnOptionsError = "";
-            this.showColumnOptionsError = false;
-          }, 2000);
-
           return;
         }
       }
@@ -331,7 +288,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.columnOptionCount--;
     }
 
-    if (this.columnOptionCount > 4) {
+    this.applyDisabledColumnOptions();
+  }  
+
+
+  /**
+   * Disable the unchecked column options if the max is met.
+   */
+  private applyDisabledColumnOptions() {
+    if (this.columnOptionCount > (this.maxColumnOption - 1)) {
       for (let col of this.sortableColumns) {
         col.disabled = !col.checked;
       }
@@ -341,7 +306,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         col.disabled = false;
       } 
     }
-  }  
+  }
 
 
   /**
@@ -460,20 +425,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
-
-    // TODO put this i provate method since done twice
-    // this is just to init the disabled attr because it's not applied the first time modal is opened
-    if (this.columnOptionCount > 4) {
-      for (let col of this.sortableColumns) {
-        col.disabled = !col.checked;
-      }
-    }
-    else {
-      for (let col of this.sortableColumns) {
-        col.disabled = false;
-      } 
-    }
-    this.showColumnOptionsError = false;
+    this.applyDisabledColumnOptions();
     this.columnOptionsModal.show();
   }
 
