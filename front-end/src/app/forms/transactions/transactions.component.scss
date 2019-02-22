@@ -203,5 +203,13 @@
     font-weight: bold;
   } 
 
+  // input[type="checkbox" i]:disabled > label {
+  // input {
+  //   color: lightgrey;
+  // }
+  input[type="checkbox" i]:disabled, .disabled-column-option{
+    color: lightgrey;
+} 
+
 }
 

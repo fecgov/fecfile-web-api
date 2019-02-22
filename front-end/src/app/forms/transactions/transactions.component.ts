@@ -18,13 +18,15 @@ import { UtilService } from 'src/app/shared/utils/util.service';
   styleUrls: ['./transactions.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [   // :enter is alias to 'void => *'
+		trigger('columnOptionsFadeIn', [
+			transition(':enter', [
 				style({opacity:0}),
 				animate(200, style({opacity:1})) 
-			]),
-				transition(':leave', [   // :leave is alias to '* => void'
-				animate(500, style({opacity:0})) 
+      ]),
+        // keep fadeout at 0 otherwise it may cause UI issues 
+        // when checkbox rapidly clicked.
+				transition(':leave', [
+				animate(0, style({opacity:0})) 
 			])
 		])
 	]
@@ -66,8 +68,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public autoHide: boolean = true;	
   public config: PaginationInstance;
   
-  public columnOptionsError = "";
-
+  // TODO remove error fields as we don't need it now that checkboxes are disabled when > 5
+  public readonly columnOptionsError = "Only 5 columns may be selected at a time";
+  public showColumnOptionsError = false;
+  private columnOptionCount: number = 0;
 
   constructor(
     private _fb: FormBuilder,
@@ -112,13 +116,19 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
       this.sortableColumns = [];
       for (let field of defaultSortColumns) {
-        this.sortableColumns.push(new SortableColumnModel(field, false, true, true));
+        this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
       }  
       for (let field of otherSortColumns) {
-        this.sortableColumns.push(new SortableColumnModel(field, false, false, false));
+        this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
       } 
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+
+    for (let col of this.sortableColumns) {
+      if(col.checked) {
+        this.columnOptionCount++;
+      }
+    }
 
     this.formTransactions = this._fb.group({
       // transactionCategory: [null, [
@@ -259,6 +269,21 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
+   * 
+   * @param colName Determine if the checkbox column option should be disabled.
+   */
+  public disableOption(colName: string) : boolean {
+    let sortableCol = this.getSortableColumn(colName);
+    if (sortableCol) {
+      if(!sortableCol.checked && this.columnOptionCount > 4) {
+        return true;
+      } 
+    }
+    return false;
+  }
+
+
+  /**
    * Toggle the visibility of a column in the table.
    * 
    * @param colName the name of the column to toggle
@@ -270,27 +295,51 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // rapid clicking a checkbox causes UI issue where message is shown twice.
+    // It may be a race condition.  This may reduce the frequency of the issue.
+    // Alternate solution is to remove the animation fade and hide the message
+    // on mouse movement.
+    // if (this.showColumnOptionsError = true) {
+    //   this.showColumnOptionsError = false;
+    // }
+
     // only permit 5 checked at a time
     if (e.target.checked == true) {
-      let count = 0;
+      this.columnOptionCount = 0;
       for (let col of this.sortableColumns) {
         if (col.checked) {
-          count++;
+          this.columnOptionCount++;
         }
-        if (count > 5) {
+        if (this.columnOptionCount > 5) {
           //alert("Only 5 columns are permitted");
+          this.showColumnOptionsError = true;
           this.setColumnChecked(colName, false);
           e.target.checked = false;
-          this.columnOptionsError = "Only 5 columns may be selected";
-          
+          this.columnOptionCount--;
+
           // TODO use Observable to delay
           setTimeout(()=>{    
-            this.columnOptionsError = "";
+            //this.columnOptionsError = "";
+            this.showColumnOptionsError = false;
           }, 2000);
 
           return;
         }
       }
+    }
+    else {
+      this.columnOptionCount--;
+    }
+
+    if (this.columnOptionCount > 4) {
+      for (let col of this.sortableColumns) {
+        col.disabled = !col.checked;
+      }
+    }
+    else {
+      for (let col of this.sortableColumns) {
+        col.disabled = false;
+      } 
     }
   }  
 
@@ -411,7 +460,20 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
-    this.columnOptionsError = "";
+
+    // TODO put this i provate method since done twice
+    // this is just to init the disabled attr because it's not applied the first time modal is opened
+    if (this.columnOptionCount > 4) {
+      for (let col of this.sortableColumns) {
+        col.disabled = !col.checked;
+      }
+    }
+    else {
+      for (let col of this.sortableColumns) {
+        col.disabled = false;
+      } 
+    }
+    this.showColumnOptionsError = false;
     this.columnOptionsModal.show();
   }
 
