@@ -126,6 +126,7 @@
                    type="email"
                    name="additional_email_1"
                    value=""
+                   (change)="changeAdditionalEmail($event)"
                    (blur)="updateAdditionalEmail($event)"
                    formControlName="additional_email_1"
                  >
@@ -150,6 +151,7 @@
                    type="email"
                    name="additional_email_2"
                    value=""
+                   (change)="changeAdditionalEmail($event)"
                    (blur)="updateAdditionalEmail($event)"
                    formControlName="additional_email_2"
                  >

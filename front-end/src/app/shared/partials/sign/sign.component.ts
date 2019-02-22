@@ -324,7 +324,13 @@ export class SignComponent implements OnInit {
     }
   }
 
+  
+  public changeAdditionalEmail(e): void {
+    this.frmSaved=false;
+  }
   public updateAdditionalEmail(e): void {
+    this.frmSaved=false;
+
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));

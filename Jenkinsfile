@@ -88,10 +88,16 @@ pipeline {
   post {
     success {
 
-      slackSend color: 'good', message: env.BRANCH_NAME +": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/" 
+      message_on_dev("good", ": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/") 
     }
     failure {
-      slackSend color: 'danger', message: env.BRANCH_NAME + ": Deployement of ${VERSION} failed!"
-    }    
+      message_on_dev("danger", ": Deployement of ${VERSION} failed!")
+    }
+  }
+}
+
+def message_on_dev(String col, String mess){
+  if( env.BRANCH_NAME == 'develop'){
+    slackSend color: col, message: env.BRANCH_NAME + mess
   }
 }
