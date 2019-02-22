@@ -178,7 +178,9 @@ export class IndividualReceiptComponent implements OnInit {
       this.frmIndividualReceipt.controls['transactionType'].setValue(null);
     }
   }
-
+  /**
+   * @param  {} e
+   */
   public transactionTypeSelected(e): void {
     if(typeof e !== 'undefined') {
       this.transactionType = e.text;

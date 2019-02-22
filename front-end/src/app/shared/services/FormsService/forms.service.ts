@@ -83,7 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
 
     return this._http
       .post<form99>(
@@ -198,8 +198,7 @@ export class FormsService {
 
           /*data['id']="0";*/
           formData.append('id', "0");
-        }
-        else
+        } else
         {
           formData.append('id', form99_details.id.toString());
         }
@@ -207,11 +206,7 @@ export class FormsService {
       }
 
       data=formData;
-
-
     }
-
-    console.log ('Formed Data: ',data);
 
    new Response(data).text().then(console.log)
 
@@ -647,7 +642,7 @@ export class FormsService {
   formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
+
   console.log(" saveReport formData ",formData );
 
   return this._http

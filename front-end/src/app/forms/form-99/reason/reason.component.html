@@ -6,11 +6,13 @@
       <header>
         <div class="header-container">
           <div class="header__text">
-            <h1 class="text-left" *ngIf="!typeSelected">
-              Form 99
-            </h1>
-            <h1 class="text-left" *ngIf="typeSelected">
-              Form 99 / {{ typeSelected }}
+            <h1 class="text-left">
+              <ng-container *ngIf="!typeSelected">
+                Form 99
+              </ng-container>
+              <ng-container  *ngIf="typeSelected">
+                Form 99 / {{ typeSelected }}
+              </ng-container>
             </h1>
           </div>
           <div class="header__btns">
@@ -99,7 +101,7 @@
               </div>
             </div>
           </div>
-            
+
           <div class="grid-row">
               <div class="grid-row__col grid-row__col--12"
                 *ngIf="PdfDeleted">
@@ -203,7 +205,7 @@
                         class="btn btn-outline-dark"
                         (click)="d('Yes click')"
                       >Yes</button> &nbsp;
-        
+
                       <button
                       type="button"
                       class="btn btn-outline-dark"
@@ -235,7 +237,7 @@
                 type="submit"
                 [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
               >
-                  
+
                Save & Continue
               </button>
             </div>
@@ -244,4 +246,4 @@
       </footer>
     </form>
   </div> <!-- ./reason-container -->
-  
+

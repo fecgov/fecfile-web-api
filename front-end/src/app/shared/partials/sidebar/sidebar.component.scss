@@ -9,7 +9,7 @@
         margin-right: 5px;
       }
       @include clearfix();
-    }      
+    }
     .sidebar__nav {
       .sidebar__nav--header {
         position: relative;
@@ -21,7 +21,7 @@
         }
         .header-text {
           width: 230px;
-        }        
+        }
       }
       .sidebar__nav--links {
         .links-list {
@@ -39,11 +39,11 @@
                     &:active,
                     &:visited {
                       color: $black;
-                    }             
-                  }                  
-                } 
-              }            
-            }            
+                    }
+                  }
+                }
+              }
+            }
             .list-item__link {
               font-family: $titleFontFamily;
               width: 197px;
@@ -91,7 +91,7 @@
       }
     }
     @include clearfix();
-  }  
+  }
   .sidebar__logo {
     padding-top: 15px;
     text-align: center;
@@ -134,7 +134,7 @@
           margin-bottom: 15px;
           margin-left: 30px;
           &.links-list__item--selected {
-            background-color: none;            
+            background-color: none;
           }
           .list-item__link {
             float: left;
@@ -145,7 +145,7 @@
               &:hover {
                 text-decoration: underline;
               }
-            }            
+            }
           }
           .list-item__info {
             float: left;
@@ -169,12 +169,10 @@
                 max-width: 300px;
                 text-align: left;
                 a {
-                  //color: $white;
-                  color: $primaryBlue;
-                  background-color: $white;
-                  text-decoration: underline;
+                  color: $white;
+                  text-decoration: none;
                   &:hover {
-                    text-decoration: none;
+                    text-decoration: underline;
                   }
                 }
                 .external-link-icon {

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -9,7 +10,8 @@ import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [NgbTooltipConfig]
 })
 export class SidebarComponent implements OnInit {
 
@@ -21,7 +23,7 @@ export class SidebarComponent implements OnInit {
   public screenWidth: number = 0;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
-  public otherFormsHidden: boolean = false;
+  public otherFormsHidden: boolean = true;
   public myFormsHidden: boolean = false;
   public committee_forms: Icommittee_forms[];
   public committee_myforms: Icommittee_forms[];
@@ -33,7 +35,8 @@ export class SidebarComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formService:FormsService,
-  ) { }
+    private _config: NgbTooltipConfig
+  ) {}
 
   ngOnInit(): void {
     const route: string = this._router.url;
@@ -48,10 +51,12 @@ export class SidebarComponent implements OnInit {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/') === 0) {
               this._closeNavBar();
-            } else if(val.url.indexOf('/dashboard') === 0) {
-              this._openNavBar();
-            } else if(val.url.indexOf('/forms/form/') === -1) {
+            } else if(
+              val.url.indexOf('/dashboard') === 0 ||
+              val.url.indexOf('/forms/form/') === -1
+            ) {
               this.formType = null;
+              this._openNavBar();
             }
           }
         }
@@ -71,9 +76,10 @@ export class SidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     const route: string = this._router.url;
+
     if (!this._toggleNavClicked) {
       if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
-        
+
         let formSelected: string = null;
 
         this._activatedRoute
@@ -124,14 +130,13 @@ export class SidebarComponent implements OnInit {
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf(form) >= 1) {
-            if (form !== "3X"){
-           // Except Forn3X screens we should not show Form3X related dashboard 
-            console.log("New form selected ...", form);
-              if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
-                this._formService.removeFormDashBoard("3X");
+            if (form !== '3X'){
+           // Except Forn3X screens we should not show Form3X related dashboard
+              if (localStorage.getItem('form3XReportInfo.showDashBoard')==='Y'){
+                this._formService.removeFormDashBoard('3X');
               }
             }
-            
+
             this.formType = form;
           }
         }
@@ -143,25 +148,12 @@ export class SidebarComponent implements OnInit {
    *
    */
   public toggleSideNav(): void {
-    console.log('toggleSideNav: ');
     this._toggleNavClicked = true;
+
     if(this.iconClass === 'close-icon') {
       this._closeNavBar();
     } else {
       this._openNavBar();
-    }
-  }
-
-  /**
-   * Toggles the tooltips.
-   *
-   * @param      {Object}  tooltip  The tooltip.
-   */
-  public toggleToolTip(tooltip): void {
-    if (tooltip.isOpen()) {
-      tooltip.close();
-    } else {
-      tooltip.open();
     }
   }
 
@@ -172,7 +164,9 @@ export class SidebarComponent implements OnInit {
    */
   public toggleFormNav(navType: string): void {
     if(navType === 'other-forms') {
-      this.otherFormsHidden = (this.otherFormsHidden) ? false : true;
+      this.otherFormsHidden = !this.otherFormsHidden;
+    } else if (navType === 'my-forms') {
+      this.myFormsHidden = !this.myFormsHidden;
     }
   }
 
