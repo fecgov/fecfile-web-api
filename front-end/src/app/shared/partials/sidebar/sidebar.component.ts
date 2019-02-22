@@ -1,5 +1,6 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -9,7 +10,8 @@ import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [NgbTooltipConfig]
 })
 export class SidebarComponent implements OnInit {
 
@@ -33,7 +35,8 @@ export class SidebarComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formService:FormsService,
-  ) { }
+    private _config: NgbTooltipConfig
+  ) {}
 
   ngOnInit(): void {
     const route: string = this._router.url;
@@ -127,11 +130,10 @@ export class SidebarComponent implements OnInit {
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf(form) >= 1) {
-            if (form !== "3X"){
+            if (form !== '3X'){
            // Except Forn3X screens we should not show Form3X related dashboard
-            console.log("New form selected ...", form);
-              if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
-                this._formService.removeFormDashBoard("3X");
+              if (localStorage.getItem('form3XReportInfo.showDashBoard')==='Y'){
+                this._formService.removeFormDashBoard('3X');
               }
             }
 
@@ -151,19 +153,6 @@ export class SidebarComponent implements OnInit {
       this._closeNavBar();
     } else {
       this._openNavBar();
-    }
-  }
-
-  /**
-   * Toggles the tooltips.
-   *
-   * @param      {Object}  tooltip  The tooltip.
-   */
-  public toggleToolTip(tooltip): void {
-    if (tooltip.isOpen()) {
-      tooltip.close();
-    } else {
-      tooltip.open();
     }
   }
 

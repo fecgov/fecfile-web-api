@@ -85,12 +85,12 @@ export class AppLayoutComponent implements OnInit {
         this.sideBarClass = '';
       }
     }
-     console.log("AppLayoutComponent ngDoCheck ...");
+
     if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
       this.showForm3XDashBoard = true;
       this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
       this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {  
+    } else {
         this.showForm3XDashBoard = false;
         this.form3XReportDashBoardLine1 = "";
         this.form3XReportDashBoardLine2 = ""}
@@ -101,13 +101,13 @@ export class AppLayoutComponent implements OnInit {
     localStorage.clear();
   }
 
-  ngOnChanges(): void{ 
+  ngOnChanges(): void{
     console.log("AppLayoutComponent ngOnChanges ...");
     if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
       this.showForm3XDashBoard = true;
       this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
       this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {  
+    } else {
         this.showForm3XDashBoard = false;
         this.form3XReportDashBoardLine1 = "";
         this.form3XReportDashBoardLine2 = ""}
@@ -142,7 +142,7 @@ export class AppLayoutComponent implements OnInit {
       this.showForm3XDashBoard = true;
       this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
       this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {  
+    } else {
         this.showForm3XDashBoard = false;
         this.form3XReportDashBoardLine1 = "";
         this.form3XReportDashBoardLine2 = "";

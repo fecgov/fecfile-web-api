@@ -68,17 +68,15 @@
                  <button
                    type="button"
                    class="btn btn-link"
-                   [ngbTooltip]="f3xContent"
-                   #f3xtoolTip="ngbTooltip"
-                   (click)="toggleToolTip(f3xtoolTip)"
-                   triggers="manual"
+                   [ngbTooltip]="myFormsToolTips"
+                   triggers="click"
                    tooltipClass="sidebar-tooltip"
                    placement="{{ tooltipPosition }}"
                  >
                    <i class="info-icon" aria-hidden="true"></i>
                    <span class="sr-only">Click here for more information</span>
                  </button>
-                <ng-template #f3xContent>
+                <ng-template #myFormsToolTips>
                   {{committee_form.form_info}}
                   <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.
                   <i class="external-link-icon" aria-hidden="true">
@@ -148,23 +146,21 @@
                  <button
                    type="button"
                    class="btn btn-link"
-                   [ngbTooltip]="f99Content"
-                   #f99toolTip="ngbTooltip"
-                   (click)="toggleToolTip(f99toolTip)"
-                   triggers="manual"
+                   [ngbTooltip]="otherFormsToolTips"
+                   triggers="click"
                    tooltipClass="sidebar-tooltip"
                    placement="{{ tooltipPosition }}"
                  >
                    <i class="info-icon" aria-hidden="true"></i>
                    <span class="sr-only">Click here for more information</span>
                  </button>
-                <ng-template #f99Content>
-                  {{committee_form.form_info}}
-                  <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.
-                  <i class="external-link-icon" aria-hidden="true">
-                   <span class="sr-only">Link opens in new window.</span>
-                  </i>
-                </ng-template>
+                 <ng-template #otherFormsToolTips>
+                    {{committee_form.form_info}}
+                    <a href="{{formpdf}}"  target="_blank">Instructions</a>.
+                    <i class="external-link-icon" aria-hidden="true">
+                      <span class="sr-only">Link opens in new window.</span>
+                    </i>
+                 </ng-template>
               </div>
             </li>
           </ul>
