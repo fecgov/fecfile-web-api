@@ -83,7 +83,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
 
     return this._http
       .post<form99>(
@@ -198,8 +198,7 @@ export class FormsService {
 
           /*data['id']="0";*/
           formData.append('id', "0");
-        }
-        else
+        } else
         {
           formData.append('id', form99_details.id.toString());
         }
@@ -207,11 +206,7 @@ export class FormsService {
       }
 
       data=formData;
-
-
     }
-
-    console.log ('Formed Data: ',data);
 
    new Response(data).text().then(console.log)
 
@@ -561,8 +556,8 @@ export class FormsService {
     let params = new HttpParams();
 
 
-    url = '/f3x/get_transaction_categories?form_type=F3X';
-
+    //url = '/f3x/get_transaction_categories?form_type=F3X';
+    url = '/core/get_transaction_categories?form_type=F3X';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -576,7 +571,7 @@ export class FormsService {
           {
            /* headers: httpOptions,
             params*/
-            headers: httpOptions
+            headers: httpOptions/*  */
           }
        );
   }
@@ -588,7 +583,8 @@ export class FormsService {
     let url: string = '';
     let params = new HttpParams();
 
-    url = '/f3x/get_report_types?form_type=F3X';
+    //url = '/f3x/get_report_types?form_type=F3X';
+    url = '/core/get_report_types?form_type=F3X';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -646,7 +642,7 @@ export class FormsService {
   formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
+
   console.log(" saveReport formData ",formData );
 
   return this._http
@@ -688,5 +684,14 @@ export class FormsService {
           params
         }
       );
+ }
+
+ public removeFormDashBoard(formType: string): void {
+   if (formType === "3X") {
+      console.log ("FormsService removeFormDashBoard")
+      localStorage.removeItem('form3XReportInfo.showDashBoard');
+      localStorage.removeItem('form3XReportInfo.DashBoardLine1');
+      localStorage.removeItem('form3XReportInfo.DashBoardLine2');
+   }
  }
 }

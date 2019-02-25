@@ -9,6 +9,7 @@ import { MessageService } from '../shared/services/MessageService/message.servic
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
+import { FormsService } from '../shared/services/FormsService/forms.service';
 
 @Component({
   selector: 'app-reports',
@@ -27,7 +28,8 @@ export class ReportsComponent implements OnInit {
     private _reportService:ReportService,
     private _sessionService: SessionService,
     private _apiService: ApiService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _formService: FormsService
     /*rivate _messageService: MessageService*/
     ){}
   
@@ -44,6 +46,11 @@ export class ReportsComponent implements OnInit {
 }
   ngOnInit() {
     console.log("accessing service call...");
+
+    if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
+      this._formService.removeFormDashBoard("3X");
+    }
+
     this._reportService.getReports()
       .subscribe(res => this.reports = <IReport[]> res);
     console.log(this.reports)

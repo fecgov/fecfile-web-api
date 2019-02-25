@@ -37,23 +37,35 @@
         </div>
       </div>
     </div>
+    <div class="grid-row">
+      <div class="grid-col">
+        <div class="label">
+          Committee Id
+        </div>
+        <div class="text">
+          {{ committee_details?.committeeid}}
+        </div>
+      </div>
+      <div class="grid-col">
+        <div class="label">
+          Name of Committee in Full
+        </div>
+        <div class="text">
+          {{ committee_details?.committeename }}
+        </div>
+      </div>
+      <div class="grid-col">
+        <div class="label">
+          Address Line 1
+        </div>
+        <div class="text">
+          {{ committee_details?.street1 }}
+        </div>
+      </div>
+     </div>
+    
       <div class="grid-row">
-        <div class="grid-col">
-          <div class="label">
-            Name of Committee in Full
-          </div>
-          <div class="text">
-            {{ committee_details?.committeename }}
-          </div>
-        </div>
-        <div class="grid-col">
-          <div class="label">
-            Address Line 1
-          </div>
-          <div class="text">
-            {{ committee_details?.street1 }}
-          </div>
-        </div>
+   
         <div class="grid-col">
           <div class="label">
             Address Line 2
@@ -62,8 +74,6 @@
             {{ committee_details?.street2 }}
           </div>
         </div>
-      </div>
-      <div class="grid-row">
         <div class="grid-col">
           <div class="label">
             City
@@ -80,6 +90,9 @@
             {{ committee_details?.state }}
           </div>
         </div>
+      </div>
+      <div class="grid-row">
+     
         <div class="grid-col">
           <div class="label">
             Zip Code
@@ -88,8 +101,6 @@
             {{ committee_details?.zipcode }}
           </div>
         </div>
-      </div>
-      <div class="grid-row">
         <div class="grid-col">
           <div class="label">
             Treasurer Last Name
@@ -105,7 +116,10 @@
           <div class="text">
            {{ committee_details?.treasurerfirstname }}
           </div>
-        </div>
+        </div> 
+      </div>
+      <div class="grid-row">
+
         <div class="grid-col">
           <div class="label">
             Treasurer Middle Name
@@ -114,8 +128,6 @@
            {{ committee_details?.treasurermiddlename }}
           </div>
         </div>
-      </div>
-      <div class="grid-row">
         <div class="grid-col">
           <div class="label">
             Treasurer Prefix
@@ -133,6 +145,7 @@
           </div>
         </div>
       </div>
+
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <hr />

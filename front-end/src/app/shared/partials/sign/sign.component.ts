@@ -324,7 +324,13 @@ export class SignComponent implements OnInit {
     }
   }
 
+  
+  public changeAdditionalEmail(e): void {
+    this.frmSaved=false;
+  }
   public updateAdditionalEmail(e): void {
+    this.frmSaved=false;
+
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
@@ -375,11 +381,13 @@ export class SignComponent implements OnInit {
 
   public add_additional_email_2(): void {
     this.needAdditionalEmail_2=true;
+    this.frmSaved=false;
     console.log("2nd email needed");
   }
   public remove_additional_email_2(): void {
     this.needAdditionalEmail_2=false;
     console.log("2nd email removed");
+    this.frmSaved=false;
   }
 
 

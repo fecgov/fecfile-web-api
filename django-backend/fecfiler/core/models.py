@@ -24,4 +24,15 @@ class Cmte_Report_Types_View(models.Model):
     class Meta:
         unique_together = (('cmte_id', 'form_type','report_type'),)
 
+class My_Forms_View(models.Model):
+    cmte_id = models.CharField(primary_key=True, max_length=9)
+    category = models.CharField(max_length=25)
+    form_type = models.CharField(max_length=10)
+    due_date = models.DateField(blank=True, null=True)
+    form_description = models.CharField(max_length=300, blank=True, null=True)
+    form_info = models.CharField(max_length=1000, blank=True, null=True)
 
+
+class GenericDocument(models.Model):
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    upload = models.FileField()

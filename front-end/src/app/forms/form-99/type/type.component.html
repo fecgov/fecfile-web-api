@@ -8,11 +8,13 @@
       <header>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-            <h1 class="text-left" *ngIf="!typeSelected">
-              Type
-            </h1>
-            <h1 class="text-left" *ngIf="typeSelected">
-              Form 99 / {{ typeSelected }}
+            <h1 class="text-left">
+              <ng-container  *ngIf="!typeSelected">
+                Type
+              </ng-container>
+              <ng-containr *ngIf="typeSelected">
+                Form 99 / {{ typeSelected }}
+              </ng-containr>
             </h1>
           </div>
         </div>
@@ -206,7 +208,7 @@
           <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
                 <button
-                  class="btn btn-default btn-left"
+                  class="btn btn-primary btn-left"
                   type="button"
                   (click)="cancel()"
                 >

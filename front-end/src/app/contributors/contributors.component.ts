@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { FormsService } from '../shared/services/FormsService/forms.service';
 @Component({
   selector: 'app-contributors',
   templateUrl: './contributors.component.html',
@@ -7,9 +7,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ContributorsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private _formService: FormsService) { }
 
   ngOnInit() {
+    if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
+      console.log("ContributorsComponent ngOnInit...")
+      this._formService.removeFormDashBoard("3X");
+    }
   }
-
 }

@@ -359,9 +359,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }  
 
 
-
-
-
   /**
    * View all transactions selected by the user.
    */
@@ -384,6 +381,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public exportAllSelected() : void {
     alert("Export all transactions is not yet supported");
   }
+
 
   /**
    * Link all transactions selected by the user.

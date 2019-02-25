@@ -3,7 +3,7 @@
 .dashboard {
   background-color: $mercury;
   min-height: $mainContentHeight;
-  position: relative;  
+  position: relative;
   .grid-row {
     margin-bottom: 5px;
     margin-left: 0;
@@ -13,7 +13,7 @@
       padding: 0;
     }
     .grid-col {
-      background-color: $white;   
+      background-color: $white;
       display: block;
       &:first-child {
         margin-right: 5px;
@@ -23,25 +23,25 @@
       }
       @include media(mediumDesktop) {
         flex: 0 0 46%;
-        max-width: 46%;  
+        max-width: 46%;
         padding-left: 10px;
-        padding-right: 10px;       
-      }         
+        padding-right: 10px;
+      }
       @include media(largeDesktop) {
         flex: 0 0 46%;
-        max-width: 46%;   
+        max-width: 46%;
         padding-left: 10px;
-        padding-right: 10px;              
-      }       
+        padding-right: 10px;
+      }
     }
-  }  
+  }
   a {
     color: $black;
     text-decoration: none;
     &:hover {
       text-decoration: underline;
     }
-  } 
+  }
   section {
     .content {
       min-height: 70vh;
@@ -54,24 +54,6 @@
           margin: 0 auto;
         }
       }
-      /* .forms-table {
-        width: 100%;
-        tbody {
-          tr {
-            td {
-              text-align: center;
-              .btn-group {
-                .btn {
-                  margin-right: 5px;
-                  &:last-child {
-                    margin-right: 0;
-                  }
-                }
-              }
-            }
-          }
-        }
-      } */ // .forms-table
     }
   }
   footer {
@@ -86,7 +68,7 @@
         }
       }
     }
-  }  
+  }
 } // .dashboard
 
 
