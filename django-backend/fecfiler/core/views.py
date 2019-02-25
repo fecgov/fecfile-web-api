@@ -2,8 +2,10 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 import maya
-from .models import Cmte_Report_Types_View, My_Forms_View, GenericDocument
+from .models import Cmte_Report_Types_View, My_Forms_View #, GenericDocument
 from rest_framework.response import Response
+from fecfiler.forms.models import CommitteeInfo
+from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import datetime
 import os
@@ -15,7 +17,9 @@ from django.http import JsonResponse
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
-
+import boto
+from boto.s3.key import Key
+from django.conf import settings
 
 # Create your views here.
 
@@ -983,7 +987,7 @@ def search_entities(request):
 END - SEARCH ENTITIES API - CORE APP
 ******************************************************************************************************************************
 """
-"""
+
 @api_view(["POST"])
 def create_json_file(request):
     #creating a JSON file so that it is handy for all the public API's
@@ -1021,25 +1025,38 @@ def create_json_file(request):
 
 
 
-    model = GenericDocument
-    fields = ['upload', ]
-    success_url = reverse_lazy('home')
+    # model = GenericDocument
+    # fields = ['upload', ]
+    # success_url = reverse_lazy('home')
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        documents = GenericDocument.objects.all()
-        context['documents'] = documents
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     documents = GenericDocument.objects.all()
+    #     context['documents'] = documents
+    #     return context
+
+    try:
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        if comm_info:
+            serializer = CommitteeInfoSerializer(comm_info)
+            #import ipdb; ipdb.set_trace()
+            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(serializer.data))
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            return Response(url, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            
+    #if serializer.is_valid():
+    #    serializer.save()
 
 
-   #  try:
-   #     tmp_filename = '/tmp/' + new_data['committeeid'] + "_" + 'f99' + new_data['updated_at'].strftime("%Y_%m_%d_%H_%M") + ".json"
-   #     json.dump(serializer.data, open(tmp_filename, 'w'))
 
-       
-   # except:
-   #     try:
-   #         os.remove(tmp_filename)
-   #     except:
-   #         pass
-"""
