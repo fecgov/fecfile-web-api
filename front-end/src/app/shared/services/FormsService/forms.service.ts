@@ -279,9 +279,6 @@ export class FormsService {
       data = form99_details;
 
        data['form_type'] = 'F99';
-
-       console.log('F99 Submit form99_details',form99_details);
-       console.log('F99 Submit Data',data);
     }
     return this._http
       .post(
@@ -664,9 +661,9 @@ export class FormsService {
  }
 
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
-  let token: string = JSON.parse(this._cookieService.get('user'));
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  const url: string = '/core/get_dynamic_forms_fields';
   let httpOptions =  new HttpHeaders();
-  let url: string = '/core/get_dynamic_forms_fields';
   let params = new HttpParams();
   let formData: FormData = new FormData();
 
@@ -685,6 +682,29 @@ export class FormsService {
         }
       );
  }
+
+ public getRadAnalyst(formType: string): Observable<any> {
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  const url: string = `/f${formType}/get_rad_analyst_info`;
+  let httpOptions =  new HttpHeaders();
+  let params = new HttpParams();
+  let formData: FormData = new FormData();
+
+  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  // params = params.append('form_type', `F${formType}`);
+  // params = params.append('transaction_type', transactionType);
+
+  return this._http
+    .get(
+      `${environment.apiUrl}${url}`,
+      {
+        headers: httpOptions,
+        params
+      }
+    );
+}
 
  public removeFormDashBoard(formType: string): void {
    if (formType === "3X") {
