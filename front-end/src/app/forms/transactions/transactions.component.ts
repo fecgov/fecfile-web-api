@@ -69,6 +69,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   private columnOptionCount: number = 0;
   private readonly maxColumnOption = 5;
 
+  private allTransactionsSelected: boolean;
+
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -150,6 +152,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.transactionsModel = res.transactions;
       this.totalAmount = res.totalAmount;
       this.config.totalItems = res.totalTransactionCount;
+      this.allTransactionsSelected = false;
     });  
   }
 
@@ -329,7 +332,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.columnOptionsModal.hide();
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
   }
-
+  
 
   /**
    * Toggle checking all types.
@@ -354,8 +357,48 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 		// otherwise, no show.
 		return false;
   }  
-  
 
+  
+  /**
+   * Clone the transactions selected by the user.
+   */
+  public cloneTransactionsSelected() : void {
+    alert("Clone transactions is not yet supported");
+  }
+
+
+  /**
+   * Link the transactions selected by the user.
+   */
+  public linkTransactionsSelected() : void {
+    alert("Link multiple transaction requirements have not been finalized");
+  }
+
+
+  /**
+   * View the transactions selected by the user.
+   */
+  public viewTransactionsSelected() : void {
+    alert("View transactions is not yet supported");
+  } 
+
+
+  /**
+   * Edit the transactions selected by the user.
+   */
+  public editTransactionsSelected() : void {
+    alert("Edit transactions is not yet supported");
+  }  
+
+
+  /**
+   * Trash the transactions selected by the user.
+   */
+  public trashTransactionsSelected() : void {
+    alert("Trash transactions is not yet supported");
+  }  
+
+  
   /**
    * Clone the transaction selected by the user.
    * 
@@ -427,6 +470,16 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public showPinColumns() {
     this.applyDisabledColumnOptions();
     this.columnOptionsModal.show();
+  }
+
+
+  /**
+   * Check/Uncheck all transactions in the table.
+   */
+  public changeAllTransactionsSelected() {
+    for (let t of this.transactionsModel) {
+      t.selected = this.allTransactionsSelected;
+    }
   }
 
 }

@@ -95,6 +95,10 @@
       padding-right: 3px;
     }
 
+    .bulk_action {
+      text-align: -webkit-left;
+    }
+
     .dropdown-menu {
       min-width: 6em;
     }  
@@ -151,20 +155,15 @@
     height: 3em;
   }
 
-  /* When the checkbox is checked, add a blue background */
-  .input:checked {
-    background-color: #2196F3;
-  }
-
-  .validation-error {
-    color: red;
-    padding: .15em 5em;
-    font-weight: bold;
-  } 
-
   input[type="checkbox" i]:disabled, .disabled-column-option{
     color: lightgrey;
   } 
+
+  input[type=checkbox] {
+    transform: scale(1.5);
+  }
+
+  
 
 }
 
