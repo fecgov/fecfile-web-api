@@ -31,24 +31,21 @@
                     <button
                         class="btn btn-secondary btn-left forms__trx-btn"
                         type="button"
-                        (click)="showRecycleBin()"
-                    >
+                        (click)="showRecycleBin()">
                         <i class="fas fa-trash"></i>
                         Recycle Bin
                     </button>
                     <button
                         class="btn btn-secondary btn-left forms__trx-btn"
                         type="button"
-                        (click)="doImport()"
-                    >
-                        <i class="fas fa-chevron-circle-right"></i>
+                        (click)="doImport()">
+                        <i class="fas fa-file-import"></i>
                         Import
                     </button>    
                     <button
                         class="btn btn-secondary btn-left forms__trx-btn"
                         type="button"
-                        (click)="doFilter()"
-                    >
+                        (click)="doFilter()">
                         <i class="fas fa-filter"></i>
                         Filter
                     </button>
@@ -60,9 +57,7 @@
                             </span>
                         </div>
                     </div> 
-                    
                 </div>
-                
             </div>
         </div> 
         <div class="grid-row forms__trx-applied-filter-row">
@@ -148,20 +143,21 @@
                             <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
+                            <!-- View, Print, Export, Link & Trash -->
                             <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                                <button class="dropdown-item" (click)="cloneTransactionsSelected()">
-                                    <i class="fas fa-copy"></i>Clone
-                                </button>
-                                <button class="dropdown-item" (click)="linkTransactionsSelected()">
-                                    <i class="fas fa-link"></i>Link
-                                </button>
-                                <button class="dropdown-item" (click)="viewTransactionsSelected()">
+                                <button class="dropdown-item" (click)="viewAllSelected()">
                                     <i class="fas fa-eye"></i>View
                                 </button>
-                                <button class="dropdown-item" (click)="editTransactionsSelected()">
-                                    <i class="fas fa-edit"></i>Edit
+                                <button class="dropdown-item" (click)="printAllSelected()">
+                                    <i class="fas fa-print"></i>Print
                                 </button>
-                                <button class="dropdown-item" (click)="trashTransactionsSelected()">
+                                <button class="dropdown-item" (click)="exportAllSelected()">
+                                    <i class="fas fa-file-export"></i>Export
+                                </button>
+                                <button class="dropdown-item" (click)="linkAllSelected()">
+                                    <i class="fas fa-link"></i>Link
+                                </button>                                
+                                <button class="dropdown-item" (click)="trashAllSelected()">
                                     <i class="fas fa-trash"></i>Trash
                                 </button>
                             </div>

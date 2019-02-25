@@ -358,47 +358,49 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 		return false;
   }  
 
-  
+
+
+
+
   /**
-   * Clone the transactions selected by the user.
+   * View all transactions selected by the user.
    */
-  public cloneTransactionsSelected() : void {
-    alert("Clone transactions is not yet supported");
+  public viewAllSelected() : void {
+    alert("View all transactions is not yet supported");
+  } 
+
+
+  /**
+   * Print all transactions selected by the user.
+   */
+  public printAllSelected() : void {
+    alert("Print all transactions is not yet supported");
+  }  
+
+
+  /**
+   * Export all transactions selected by the user.
+   */
+  public exportAllSelected() : void {
+    alert("Export all transactions is not yet supported");
   }
 
-
   /**
-   * Link the transactions selected by the user.
+   * Link all transactions selected by the user.
    */
-  public linkTransactionsSelected() : void {
+  public linkAllSelected() : void {
     alert("Link multiple transaction requirements have not been finalized");
   }
 
 
   /**
-   * View the transactions selected by the user.
+   * Trash all transactions selected by the user.
    */
-  public viewTransactionsSelected() : void {
-    alert("View transactions is not yet supported");
-  } 
-
-
-  /**
-   * Edit the transactions selected by the user.
-   */
-  public editTransactionsSelected() : void {
-    alert("Edit transactions is not yet supported");
+  public trashAllSelected() : void {
+    alert("Trash all transactions is not yet supported");
   }  
 
 
-  /**
-   * Trash the transactions selected by the user.
-   */
-  public trashTransactionsSelected() : void {
-    alert("Trash transactions is not yet supported");
-  }  
-
-  
   /**
    * Clone the transaction selected by the user.
    * 
