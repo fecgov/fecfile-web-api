@@ -31,7 +31,7 @@ def get_next_transaction_id(trans_char):
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT public.get_next_transaction_id('""" + trans_char + """')""")
+            cursor.execute("""SELECT public.get_next_transaction_id(%s)""", [trans_char])
             transaction_ids = cursor.fetchone()
             transaction_id = transaction_ids[0]
         return transaction_id
@@ -57,7 +57,7 @@ def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transacti
         with connection.cursor() as cursor:
             # Insert data into Reports table
             cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.now()))
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.now()])
     except Exception:
         raise
 
@@ -67,15 +67,15 @@ def get_list_all_schedA(report_id, cmte_id):
         with connection.cursor() as cursor:
             # GET all rows from Reports table
             query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                            FROM public.sched_a WHERE report_id ='""" + report_id + """' AND cmte_id ='""" + cmte_id + """' AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""")
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
             for row in cursor.fetchall():
             #forms_obj.append(data_row)
                 data_row = list(row)
                 schedA_list = data_row[0]
             if schedA_list is None:
-                raise NoOPError()  
+                raise NoOPError('The Report id:{} does not have any schedA transactions'.format(report_id))  
             merged_list= []
             for dictA in schedA_list:
                 entity_id = dictA.get('entity_id')
@@ -97,16 +97,16 @@ def get_list_schedA(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
             # GET single row from Reports table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                            FROM public.sched_a WHERE report_id ='""" + report_id + """' AND cmte_id ='""" + cmte_id + """' AND transaction_id ='""" + transaction_id + """' AND delete_ind is distinct from 'Y'"""
+                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""")
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
 
             for row in cursor.fetchall():
             #forms_obj.append(data_row)
                 data_row = list(row)
                 schedA_list = data_row[0]
             if schedA_list is None:
-                raise NoOPError()    
+                raise NoOPError('The transaction id: {} does not exist or is deleted'.format(transaction_id))    
             merged_list= []
             for dictA in schedA_list:
                 entity_id = dictA.get('entity_id')
@@ -128,7 +128,7 @@ def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transactio
         with connection.cursor() as cursor:
             # Insert data into Reports table
             cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", 
-                (line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, transaction_id, report_id, cmte_id))
+                [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception('The Transaction ID: {} does not exist in Reports table'.format(transaction_id))
     except Exception:
@@ -141,7 +141,7 @@ def delete_sql_schedA(transaction_id, report_id, cmte_id):
 
             # UPDATE delete_ind flag on a single row from Reports table
             # cursor.execute("""UPDATE public.reports SET delete_ind = 'Y', last_update_date = %s WHERE report_id = '""" + report_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
-            cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y' WHERE transaction_id = '""" + transaction_id + """' AND report_id = '""" + report_id + """' AND cmte_id = '""" + cmte_id + """'AND delete_ind is distinct from 'Y'""")
+            cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y' WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception('The Transaction ID: {} is either already deleted or does not exist in Reports table'.format(transaction_id))
     except Exception:
