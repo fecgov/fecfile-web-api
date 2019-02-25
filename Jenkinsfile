@@ -3,17 +3,26 @@ pipeline {
   stages {
     stage('Prepare Build') {
       steps {
-                script
-                {
-                    hash = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-                    VERSION = hash.take(7)
-                    currentBuild.displayName = "#${BUILD_ID}-${VERSION}"
+        script {
+          hash = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+          VERSION = hash.take(7)
+          currentBuild.displayName = "#${BUILD_ID}-${VERSION}"
 
-                    sh("eval \$(aws ecr --region us-east-1 get-login --no-include-email)")
-                }
-            }
+          sh("eval \$(aws ecr --region us-east-1 get-login --no-include-email)")
+        }
+      }
     }
-
+    stage('Code Quality') {
+      steps {
+        code_quality()
+      }
+      post {
+        always {
+          sh("ln -s ${BUILD_ID}-${VERSION}-flake8_junit.xml $WORKSPACE/${BUILD_ID}-${VERSION}-junit.xml")
+          // junit "${BUILD_ID}-${VERSION}-junit.xml"
+        }
+      }
+    }
     stage('Build backend') {
       steps {
         script {
@@ -100,4 +109,18 @@ def message_on_dev(String col, String mess){
   if( env.BRANCH_NAME == 'develop'){
     slackSend color: col, message: env.BRANCH_NAME + mess
   }
+}
+
+def code_quality() {
+    //Build python3.6 virtualenv
+    sh """
+      virtualenv -p python36 .venv
+      source .venv/bin/activate
+      pip3 install flake8 flake8-junit-report
+      flake8 --exit-zero django-backend --output-file ${BUILD_ID}-${VERSION}-flake8.txt
+      flake8_junit ${BUILD_ID}-${VERSION}-flake8.txt ${BUILD_ID}-${VERSION}-flake8_junit.xml
+      deactivate
+      rm -fr .venv
+    """
+    return 0
 }
