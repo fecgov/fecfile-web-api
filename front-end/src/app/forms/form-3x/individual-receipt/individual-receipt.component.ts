@@ -42,6 +42,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _formService: FormsService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
+    private _router: Router,
   ) {
     this._config.placement = 'right'
     this._config.triggers = 'click';
@@ -198,5 +199,12 @@ export class IndividualReceiptComponent implements OnInit {
       this.formSubmitted = false;
     }
     return;
+  }
+
+  public viewTransactions() {
+    //this._router.navigate(['/forms/transactions', this._formType], { queryParams: { step: this.step } }); 
+
+    //let form_id = this._formType;
+    this._router.navigate(['/forms/transactions', this._formType]); 
   }
 }

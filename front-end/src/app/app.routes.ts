@@ -20,6 +20,7 @@ import { ToolsImportNamesComponent } from './tools-import-names/tools-import-nam
 import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
 import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
 import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
+import { TransactionsComponent } from './forms/transactions/transactions.component';
 
 export const AppRoutes: Routes = [
 	{
@@ -49,7 +50,8 @@ export const AppRoutes: Routes = [
         children: [
           { path: ':form_step', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService] }
         ]
-      }
+			},
+			{ path: 'forms/transactions/:form_id', component: TransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		]
     },
     { path: '**', redirectTo: '' }
