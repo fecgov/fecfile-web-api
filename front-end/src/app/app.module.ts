@@ -64,6 +64,7 @@ import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/i
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -86,6 +87,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ContributorsComponent,
     ToolsComponent,
     TransactionsComponent,
+    TransactionsTableComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,
