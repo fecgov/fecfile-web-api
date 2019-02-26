@@ -27,8 +27,10 @@ export class AppLayoutComponent implements OnInit {
   public dashboardClass: string = '';
   public showLegalDisclaimer: boolean = false;
   public showForm3XDashBoard: boolean = false;
-  public form3XReportDashBoardLine1 = '';
-  public form3XReportDashBoardLine2 = '';
+  public form3XReportDashBoardLine1: string = '';
+  public form3XReportDashBoardLine2: string = '';
+  public radAnalystInfo: any = {};
+
 	constructor(
     private _apiService: ApiService,
 		private _sessionService: SessionService,
@@ -50,6 +52,17 @@ export class AppLayoutComponent implements OnInit {
           this.committeeId = res.committeeid;
           this._messageService
             .sendMessage({'committee_details_loaded': true});
+        }
+      });
+
+    this._apiService
+      .getRadAnalyst()
+      .subscribe(res => {
+        console.log('rad analyst: ', res);
+        if (res) {
+          if (Array.isArray(res.response)) {
+            this.radAnalystInfo = res.response[0];
+          }
         }
       });
 

@@ -54,12 +54,6 @@ export class F99Component implements OnInit {
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    this._formService
-      .getRadAnalyst(this._formType)
-      .subscribe(res => {
-        console.log('rad analyst: ', res);
-      });
-
     if(this._committeeDetails) {
       if(this._committeeDetails.committeeid) {
         this._form99Details = this.committee_details;

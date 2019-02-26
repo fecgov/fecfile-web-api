@@ -62,75 +62,27 @@
   <footer>
     <div class="app__footer">
       <div class="row">
-        <div class="col-sm-2">
-          <h6>
-            <strong>Federal Election Commission</strong>
-            <br>
-            <address>1050 First Street NE, Washington DC, 20002
-            <br>
-            <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
-            </address>
-          </h6>
-        </div>
-        <div class="col-sm-1">
-          <h6>
-            <strong>Main Office</strong>
-            <br>
-            <address>(202) 694-1000
-            </address>
-          </h6>
-        </div>
-        <div class="col-sm-2">
-          <h6><strong>RAD Analyst, Chami Mukerjee</strong>
-            <br>
-            <address>(202) 694-1001
-            <br>
-            <a href="#" target="_blank">Find & contact your committee's analyst</a>
-            </address>
-          </h6>
-        </div>
-        <div class="col-sm-1">
-          <h6><strong>Tech Support</strong>
-            <br>
-            <address>(202) 694-1002
-            <br>
-            <a href="mailto:tech@fec.gov" target="_blank">tech@fec.gov</a>
-            </address>
-          </h6>
-        </div>
-         <div class="col-sm-4">
-            <div class="legal-disclaimer">
-                <button
-                  type="button"
-                  class="btn btn-link"
-                  (click)="open(legalDisclaimer)"
-                >
-                  Legal Disclaimer
-                </button>
-              </div>
+        <div class="float-left">
+          <div class="col">
+            <h6>
+              <strong>Federal Election Commission</strong>
+              <br>
+              <address>1050 First Street NE, Washington DC, 20002
+              <br>
+              <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
+              </address>
+            </h6>
           </div>
-          <ng-template #legalDisclaimer let-d="dismiss">
-            <div class="modal-header">
-              <h4 class="modal-title">
-                Legal Disclaimer
-              </h4>
-            </div>
-            <div class="modal-body">
-              <p>
-                Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-                government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-                apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-outline-dark"
-                (click)="d('Close click')"
-              >Close</button>
-            </div>
-          </ng-template>
-      </div>
-    </div>
+          <div class="col">
+            <h6>
+              <strong>Main Office</strong>
+              <br>
+              <address>(202) 694-1000
+              </address>
+            </h6>
+          </div>
+        </div> <!-- ./float-left -->
+      </div> <!-- ./row -->
+    </div> <!-- ./app__footer -->
   </footer>
 </div>
