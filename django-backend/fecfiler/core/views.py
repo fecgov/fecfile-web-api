@@ -980,26 +980,25 @@ def create_json_file(request):
     #creating a JSON file so that it is handy for all the public API's
 
         
-        try:
-            #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-            comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, id=request.data['id'])
+    try:
+        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, id=request.data['id'])
 
-            if comm_info:
-                serializer = CommitteeInfoSerializer(comm_info)
-                #import ipdb; ipdb.set_trace()
-                conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-                bucket = conn.get_bucket("dev-efile-repo")
-                k = Key(bucket)
-                k.content_type = "application/json"
-                k.set_contents_from_string(json.dumps(serializer.data))
-                url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-                return Response(url, status=status.HTTP_200_OK)
+        if comm_info:
+            serializer = CommitteeInfoSerializer(comm_info)
+            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(serializer.data))
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            return Response(url, status=status.HTTP_200_OK)
             
-            else:
-                return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
             
-        except CommitteeInfo.DoesNotExist:
-            return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
             
             
 
