@@ -25,4 +25,23 @@
 @import './custom-mixins';
 @import './custom-classes';
 
+input,
+textarea,
+select,
+button,
+nav,
+h4, h5, h6,
+li,
+ol,
+p {
+  font-family: $mainFontFamily;
+ }
+
+h1,
+h2,
+h3,
+label {
+  font-family: $titleFontFamily;
+ }
+
 
