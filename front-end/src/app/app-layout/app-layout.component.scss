@@ -5,6 +5,7 @@
   color: $black;
   font-family: $mainFontFamily;
   min-height: 100vh;
+  overflow-y: hidden;
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
@@ -63,15 +64,15 @@
     footer {
       .app__footer {
         font-family: $mainFontFamily;
-        padding-left: 80px;
+        // padding-left: 80px;
         @include media(tablet) {
-          padding-left: 100px;
+          //padding-left: 100px;
         }
         @include media(mediumDesktop) {
-          padding-left: 60px;
+          padding-left: 75px;
         }
         @include media(largeDesktop) {
-          padding-left: 60px;
+          padding-left: 75px;
         }
       }
     }
@@ -185,6 +186,7 @@
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       z-index: 0;
+      // width: 100%;
       .app__committee-info {
         background-color: $mercury;
         height: 90px;
@@ -232,26 +234,60 @@
   .app__footer {
     background-color: $mercury;
     color: $black;
-    height: 80px;
+    height: 160px;
     margin-top: 5px;
+    overflow-y: hidden;
     padding-left: 80px;
     @include media(tablet) {
+      height: 160px;
       padding-left: 100px;
     }
     @include media(mediumDesktop) {
-      padding-left: 50;
+      height: 80px;
+      padding-left: 55px;
     }
     @include media(largeDesktop) {
-      padding-left: 50px;
+      height: 80px;
+      padding-left: 55px;
     }
-    .row {
-      margin-left: 0;
-      margin-right: 0;
-      .footer-col {
-        display: inline-block;
+    .contact-info {
+      float:left;
+      width: 75%;
+      .contact-info__item {
+        display: block;
+        @include media(tablet) {
+          display: block;
+        }
+        @include media(mediumDesktop) {
+          display: inline-block;
+        }
+        @include media(largeDesktop) {
+          display: inline-block;
+        }
+        padding-right: 10px;
+        &:last-child {
+          padding-right: 0;
+        }
+        a {
+          color: $pictonBlue;
+          text-decoration: none;
+          &:hover,
+          &:active,
+          &:visited {
+            color: $pictonBlue;
+          }
+          &:hover,
+          &:active {
+            text-decoration: underline;
+          }
+        }
       }
-      .btn-link,
-      a {
+    }
+    .legal-disclaimer {
+      float: left;
+      text-align: right;
+      width: 18%;
+      .btn-link {
         color: $pictonBlue;
         &:hover,
         &:active,
@@ -259,14 +295,8 @@
           color: $pictonBlue;
         }
       }
-      a {
-        text-decoration: none;
-        &:hover,
-        &:active {
-          text-decoration: underline;
-        }
-      }
     }
+    @include clearfix();
   }
 } // .app-container
 .modal-dialog {

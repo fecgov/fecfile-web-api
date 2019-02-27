@@ -61,28 +61,89 @@
   </main>
   <footer>
     <div class="app__footer">
-      <div class="row">
-        <div class="float-left">
-          <div class="col">
-            <h6>
-              <strong>Federal Election Commission</strong>
-              <br>
-              <address>1050 First Street NE, Washington DC, 20002
-              <br>
-              <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
-              </address>
-            </h6>
+      <div class="contact-info">
+        <div class="contact-info__item">
+          <h6>
+            <strong>Federal Election Commission</strong>
+            <br>
+            <address>1050 First Street NE, Washington DC, 20002
+            <br>
+            <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
+            </address>
+          </h6>
+        </div>
+        <div class="contact-info__item">
+          <h6>
+            <strong>Main Office</strong>
+            <br>
+            <address>
+              (202) 694-1000
+            </address>
+            <br>
+          </h6>
+        </div>
+        <div class="contact-info__item">
+          <h6>
+            <strong>Main Office</strong>
+            <br>
+            <address>
+              (202) 694-1000
+            </address>
+            <br>
+          </h6>
+        </div>
+        <div class="contact-info__item">
+          <h6>
+            <strong>
+              RAD Analyst,
+              {{ radAnalystInfo?.first_name }}
+              {{ radAnalystInfo?.last_name }}
+            </strong>
+            <br>
+            <address>
+              <ng-container *ngIf="radAnalystInfo">
+                (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }}
+              </ng-container>
+              <ng-container *ngIf="!radAnalystInfo">
+                <a href="#" target="_blank">
+                  Find & contact your committee's analyst
+                </a>
+              </ng-container>
+            </address>
+            <br>
+          </h6>
+        </div>
+      </div> <!-- ./contact-info -->
+      <div class="legal-disclaimer">
+        <button
+          type="button"
+          class="btn btn-link"
+          (click)="open(legalDisclaimer)"
+        >
+          Legal Disclaimer
+        </button>
+        <ng-template #legalDisclaimer let-d="dismiss">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              Legal Disclaimer
+            </h4>
           </div>
-          <div class="col">
-            <h6>
-              <strong>Main Office</strong>
-              <br>
-              <address>(202) 694-1000
-              </address>
-            </h6>
+          <div class="modal-body">
+            <p>
+              Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
+              government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
+              apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
+            </p>
           </div>
-        </div> <!-- ./float-left -->
-      </div> <!-- ./row -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-dark"
+              (click)="d('Close click')"
+            >Close</button>
+          </div>
+        </ng-template>
+      </div>
     </div> <!-- ./app__footer -->
   </footer>
 </div>
