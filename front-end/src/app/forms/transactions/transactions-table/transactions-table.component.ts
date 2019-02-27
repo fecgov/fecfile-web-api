@@ -39,9 +39,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public tableType: string;  
 
   public transactionsModel: Array<TransactionModel>;
-  public deletedTransactionsModel: Array<TransactionModel>;
   public totalAmount: number;
-  public appliedFilterNames: Array<string> = [];
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
 
@@ -86,12 +84,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
-    //this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    //this.formType = this._formType;
-    //console.log("transactions for form " + this._formType);
-
 		let paginateConfig: PaginationInstance = {
-			// must be a unique id for all each table
 			id: 'forms__trx-table-pagination',
 			itemsPerPage: 5,
 			currentPage: 1
@@ -135,7 +128,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
-
   }
 
 
@@ -161,7 +153,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.getRecyclingPage(page);
         break;                           
       default:
-        // invalid table type
         break;                            
     }  
   }
@@ -194,9 +185,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
         .subscribe( (res:GetTransactionsResponse) => {
       this.transactionsModel = res.transactions;
-      //this.totalAmount = res.totalAmount;
       this.config.totalItems = res.totalTransactionCount;
-      //this.allTransactionsSelected = false;
     });  
   }  
 
@@ -220,6 +209,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	public changeSortDirection(colName: string) : void {
 		this.currentSortedColumn = this._tableService.changeSortDirection(colName, this.sortableColumns);
     
+    // TODO this could be done client side or server side.
     // call server for page data in new direction
     //this.getPage(this.config.currentPage);
   }  
@@ -502,6 +492,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert("Restore transaction is not yet supported");
   }
 
+  
   /**
    * Determine the item range shown by the server-side pagination.
    */
