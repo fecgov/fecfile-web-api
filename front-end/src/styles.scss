@@ -22,6 +22,7 @@ $fa-font-path: '../node_modules/@fortawesome/fontawesome-free/webfonts';
 @import '../node_modules/bootstrap/scss/navbar';
 @import '../node_modules/bootstrap/scss/buttons';
 @import '../node_modules/bootstrap/scss/transitions';
+@import '../node_modules/bootstrap/scss/tables';
 
 
 
@@ -39,4 +40,34 @@ body {
 }
 
 
+/** table sort start **/
+  .table__sortable > thead > tr >.table__sortable_col {
+    cursor: pointer;
+    position: relative;
+    background-image: none;
+  }
 
+  .table__sortable > thead > tr > .table__sortable_col:after,
+  .table__sortable > thead > tr > .table__sortable_col.sort-false:after,
+  .table__sortable > thead > tr > .table__sortable_col.sort-true:after {
+    font-family: FontAwesome;
+    padding-left: 5px;
+  }
+
+  .table__sortable > thead > tr > .table__sortable_col:after {
+    content: "\f0dc";
+    color: #ddd;
+    font-family: "Font Awesome 5 Free";
+  }
+  .table__sortable > thead > tr > .table__sortable_col.sort-false:after {
+    content: "\f0de";
+    color: #767676;
+    font-family: "Font Awesome 5 Free";
+  }
+  .table__sortable > thead > tr > .table__sortable_col.sort-true:after {
+    content: "\f0dd";
+    color: #767676;
+    font-family: "Font Awesome 5 Free";
+  }
+
+/** table sort end **/

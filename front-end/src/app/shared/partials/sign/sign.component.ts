@@ -9,6 +9,7 @@ import { MessageService } from '../../services/MessageService/message.service'
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 
+
 @Component({
   selector: 'app-sign',
   templateUrl: './sign.component.html',
@@ -33,10 +34,20 @@ export class SignComponent implements OnInit {
   private _subscription: Subscription;
   private _additional_email_1: string = '';
   private _additional_email_2: string = '';
+  private _confirm_email_1: string = '';
+  private _confirm_email_2: string = '';
+
   private _form_details: any = {};
   private _step: string = '';
 
   public needAdditionalEmail_2=false;
+
+  public additionalEmail1Invalid=false;
+  public additionalEmail2Invalid=false;
+  public showAdditionalEmail1Warn=false;
+  public showAdditionalEmail2Warn=false;
+  public confirm_email_1: string = '';
+  public confirm_email_2: string = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -145,6 +156,8 @@ export class SignComponent implements OnInit {
         signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
         additional_email_1: [this._form_details.additional_email_1, Validators.email],
         additional_email_2: [this._form_details.additional_email_2, Validators.email],
+        confirm_email_1: [this._form_details.confirm_email_1, Validators.email],
+        confirm_email_2: [this._form_details.confirm_email_2, Validators.email],
         agreement: [false, Validators.requiredTrue]
       });
     } else {
@@ -152,6 +165,8 @@ export class SignComponent implements OnInit {
         signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
         additional_email_1: ['', Validators.email],
         additional_email_2: ['', Validators.email],
+        confirm_email_1: ['', Validators.email],
+        confirm_email_2: ['', Validators.email],
         agreement: [false, Validators.requiredTrue]
       });
     }
@@ -202,30 +217,73 @@ export class SignComponent implements OnInit {
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
 
-      this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
-      this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+      if (this.frmSignee.get('additional_email_1').value !== ""){
+        if (this.frmSignee.get('confirm_email_1').value === ""){
+          this.additionalEmail1Invalid =true;
+          this.showAdditionalEmail1Warn=true;
+        }
+        else {
+          if (this.frmSignee.get('additional_email_1').value !== this.frmSignee.get('confirm_email_1').value){
+                this.additionalEmail1Invalid =true;
+                this.showAdditionalEmail1Warn=true;
+            }else {
+              this.confirm_email_1=this.frmSignee.get('confirm_email_1').value;
+              this.additionalEmail1Invalid =false;
+              this.showAdditionalEmail1Warn=true;
+            }
+        }    
+      }
+ 
+      if (this.frmSignee.get('additional_email_2').value !== ""){
+        if (this.frmSignee.get('confirm_email_2').value === ""){
+          this.additionalEmail2Invalid =true;
+          this.showAdditionalEmail2Warn=true;
+        }
+        else {
+          if (this.frmSignee.get('additional_email_2').value !== this.frmSignee.get('confirm_email_2').value){
+                this.additionalEmail2Invalid =true;
+                this.showAdditionalEmail2Warn=true;
+            }else {
+              this.confirm_email_2=this.frmSignee.get('confirm_email_2').value;
+              this.additionalEmail2Invalid =false;
+              this.showAdditionalEmail2Warn=true;
+            }
+        }    
 
-      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+      }
 
-      /*.saveForm({}, {}, this.formType)*/
-      console.log("Accessing Signee_SaveForm ...");
-      this._formsService
-        .Signee_SaveForm({}, this.formType)
-        .subscribe(res => {
-          if(res) {
-            this.frmSaved = true;
+      console.log("this.additionalEmail1Invalid",this.additionalEmail1Invalid);
+      console.log("this.additionalEmail2Invalid",this.additionalEmail2Invalid);
+      console.log("this.showAdditionalEmail1Warn",this.showAdditionalEmail1Warn);
+      console.log("this.showAdditionalEmail2Warn",this.showAdditionalEmail2Warn);
 
-            let formSavedObj: any = {
-              'saved': this.frmSaved
-            };
 
-            localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });
-    }
+      if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
+        this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+        this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+
+        /*.saveForm({}, {}, this.formType)*/
+        console.log("Accessing Signee_SaveForm ...");
+        this._formsService
+          .Signee_SaveForm({}, this.formType)
+          .subscribe(res => {
+            if(res) {
+              this.frmSaved = true;
+
+              let formSavedObj: any = {
+                'saved': this.frmSaved
+              };
+
+              localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });
+      }
+    }  
   }
 
   /**
@@ -326,11 +384,20 @@ export class SignComponent implements OnInit {
 
   
   public changeAdditionalEmail(e): void {
+    
     this.frmSaved=false;
+    this.showAdditionalEmail1Warn=false;
+    this.showAdditionalEmail2Warn=false;
+    this.showAdditionalEmail1Warn=false;
+    this.showAdditionalEmail2Warn=false;
   }
   public updateAdditionalEmail(e): void {
     this.frmSaved=false;
-
+    this.showAdditionalEmail1Warn=false;
+    this.showAdditionalEmail2Warn=false;
+    this.showAdditionalEmail1Warn=false;
+    this.showAdditionalEmail2Warn=false;
+    
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
@@ -378,19 +445,6 @@ export class SignComponent implements OnInit {
     }
   }
 
-
-  public add_additional_email_2(): void {
-    this.needAdditionalEmail_2=true;
-    this.frmSaved=false;
-    console.log("2nd email needed");
-  }
-  public remove_additional_email_2(): void {
-    this.needAdditionalEmail_2=false;
-    console.log("2nd email removed");
-    this.frmSaved=false;
-  }
-
-
   /**
    * Goes to the previous step.
    *
@@ -418,24 +472,64 @@ export class SignComponent implements OnInit {
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
-     this.frmSignee.controls.additional_email_2.valid) {
+      this.frmSignee.controls.additional_email_2.valid) {
 
-     this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
-     this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
-
-     localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-     console.log("Accessing Sign printPriview ...");
-     this._formsService
-       .PreviewForm_Preview_sign_Screen({}, this.formType)
-       .subscribe(res => {
-         if(res) {
-             console.log("Accessing SignComponent printPriview res ...",res);
-             window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+      if (this.frmSignee.get('additional_email_1').value !== ""){
+        if (this.frmSignee.get('confirm_email_1').value === ""){
+          this.additionalEmail1Invalid =true;
+          this.showAdditionalEmail1Warn=true;
+        }
+        else {
+          if (this.frmSignee.get('additional_email_1').value !== this.frmSignee.get('confirm_email_1').value){
+                this.additionalEmail1Invalid =true;
+                this.showAdditionalEmail1Warn=true;
+            }else {
+              this.confirm_email_1=this.frmSignee.get('confirm_email_1').value;
+              this.additionalEmail1Invalid =false;
+              this.showAdditionalEmail1Warn=true;
             }
-          },
-          (error) => {
-            console.log('error: ', error);
-          });
+        }    
+      }
+ 
+      if (this.frmSignee.get('additional_email_2').value !== ""){
+        if (this.frmSignee.get('confirm_email_2').value === ""){
+          this.additionalEmail2Invalid =true;
+          this.showAdditionalEmail2Warn=true;
+        }
+        else {
+          if (this.frmSignee.get('additional_email_2').value !== this.frmSignee.get('confirm_email_2').value){
+                this.additionalEmail2Invalid =true;
+                this.showAdditionalEmail2Warn=true;
+            }else {
+              this.confirm_email_2=this.frmSignee.get('confirm_email_2').value;
+              this.additionalEmail2Invalid =false;
+              this.showAdditionalEmail2Warn=true;
+            }
+        }    
+
+      } 
+
+      if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
+        this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+        this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+
+        console.log ("this.additionalEmail1Invalid", this.additionalEmail1Invalid);
+        console.log ("this.additionalEmail2Invalid", this.additionalEmail2Invalid);
+
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+        console.log("Accessing Sign printPriview ...");
+        this._formsService
+          .PreviewForm_Preview_sign_Screen({}, this.formType)
+          .subscribe(res => {
+            if(res) {
+                console.log("Accessing SignComponent printPriview res ...",res);
+                window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+                }
+              },
+              (error) => {
+                console.log('error: ', error);
+              });
+      }        
     }
     else {
         console.log("Accessing Sign printPriview ...");
@@ -450,7 +544,7 @@ export class SignComponent implements OnInit {
           (error) => {
             console.log('error: ', error);
           });
-     }
+    }
    }
 
 }

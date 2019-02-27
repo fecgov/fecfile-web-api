@@ -14,6 +14,7 @@ import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -60,6 +61,10 @@ import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+import { TransactionsComponent } from './forms/transactions/transactions.component';
+import { ModalModule } from 'ngx-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
 
 
  const appInitializerFn = (appConfig: AppConfigService) => {
@@ -81,6 +86,8 @@ import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/i
     ReportsComponent,
     ContributorsComponent,
     ToolsComponent,
+    TransactionsComponent,
+    TransactionsTableComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,
@@ -117,6 +124,7 @@ import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/i
     ReactiveFormsModule,
     HttpClientModule,
     HttpModule,
+    BrowserAnimationsModule,
     routing,
     AngularFileUploaderModule,
     ArchwizardModule,
@@ -125,7 +133,9 @@ import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/i
     CollapseModule.forRoot(),
     QuillModule,
     AngularEditorModule,
-    NgbModule.forRoot()
+    NgbModule.forRoot(),
+    ModalModule.forRoot(), 
+    NgxPaginationModule
   ],
   providers: [
     CookieService,

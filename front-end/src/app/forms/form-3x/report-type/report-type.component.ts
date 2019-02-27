@@ -340,6 +340,11 @@ export class ReportTypeComponent implements OnInit {
     DateString = DateObject.toLocaleDateString();
     return DateString;
   }
+
+  // smahal: for dev only -
+  public viewTransactions() {
+    this._router.navigate(['/forms/transactions', this._form_type]); 
+  }
   
     
 }
