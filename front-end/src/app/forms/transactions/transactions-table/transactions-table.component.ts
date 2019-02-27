@@ -110,7 +110,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
       // sort column names must match the domain model names
       let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-      let otherSortColumns = ['state', 'zip', 'aggregate', 'purposeDescription',  
+      let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
         'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
 
       this.sortableColumns = [];
@@ -492,7 +492,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert("Restore transaction is not yet supported");
   }
 
-  
+
   /**
    * Determine the item range shown by the server-side pagination.
    */
