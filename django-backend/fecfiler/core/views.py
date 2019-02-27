@@ -183,6 +183,19 @@ def check_form_type(form_type):
     if not (form_type in form_list):
         raise Exception('Form Type is not correctly specified. Input received is: {}'.format(form_type))
 
+def check_form_data(field, data):
+
+    try:
+        if field in data:
+            if not data.get(field) in [None, "null", '', ""]:
+                return data.get(field)
+            else:
+                return None    
+        else:
+            return None
+    except Exception as e:
+        raise
+
 def check_list_cvg_dates(args):
 
     try:
@@ -212,6 +225,8 @@ def check_list_cvg_dates(args):
 
 def date_format(cvg_date):
     try:
+        if cvg_date == None:
+            return None
         cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
         return cvg_dt
     except:
@@ -521,6 +536,9 @@ def reports(request):
                 election_code = request.data.get('election_code')
             else:
                 election_code = None
+
+            date_of_election = check_form_data('date_of_election', request.data)
+            state_of_election = check_form_data('state_of_election', request.data)     
             
             datum = {
                 'cmte_id': request.user.username,
@@ -528,8 +546,8 @@ def reports(request):
                 'amend_ind': amend_ind,
                 'report_type': request.data.get('report_type'),
                 'election_code': election_code,
-                'date_of_election': date_format(request.data.get('date_of_election')),
-                'state_of_election': request.data.get('state_of_election'),
+                'date_of_election': date_format(date_of_election),
+                'state_of_election': state_of_election,
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
@@ -572,14 +590,17 @@ def reports(request):
     """
     if request.method == 'PUT':
 
-        try:  
+        try:
+            date_of_election = check_form_data('date_of_election', request.data)
+            state_of_election = check_form_data('state_of_election', request.data)
+             
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'report_type': request.data.get('report_type'),
-                'date_of_election': date_format(request.data.get('date_of_election')),
-                'state_of_election': request.data.get('state_of_election'),
+                'date_of_election': date_format(date_of_election),
+                'state_of_election': state_of_election,
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
@@ -955,10 +976,10 @@ def search_entities(request):
             order_string = key + ","
 
         query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
-                                                    FROM public.entity WHERE cmte_id = %s """ + param_string +""" AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
+                                                    FROM public.entity WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
         print(query_string)
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
@@ -999,8 +1020,40 @@ def create_json_file(request):
             
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
-            
-            
 
+"""
+******************************************************************************************************************************
+GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - FNE 613 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_all_transactions(request):
+    try:
+        cmte_id = request.user.username
+        param_string = ""
+        order_string = ""
+        for key, value in request.query_params.items(): 
+            param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+            order_string = key + ","
 
-
+        # print(param_string)
+        query_string = """SELECT report_id, line_number, transaction_type, transaction_id, entity_id, name, street_1, street_2, city, state, zip_code, occupation, employer, transaction_date, transaction_amount, purpose_description, memo_code, memo_text
+                                FROM public.all_transactions_view WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ ORDER BY """ + order_string[:-1] 
+        print(query_string)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        status_value = status.HTTP_200_OK
+        if forms_obj is None:
+            forms_obj =[]
+            status_value = status.HTTP_204_NO_CONTENT
+        return Response(forms_obj, status=status_value)
+    except Exception as e:
+        return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+"""
+******************************************************************************************************************************
+END - GET ALL TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
