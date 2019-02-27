@@ -65,7 +65,7 @@ export class TransactionsService {
       totalTransactionCount: count
     };
 
-    //console.log(JSON.stringify(mockResponse));
+    console.log(JSON.stringify(mockResponse));
 
     return Observable.of(mockResponse);
   }
