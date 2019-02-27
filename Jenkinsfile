@@ -12,17 +12,6 @@ pipeline {
         }
       }
     }
-    stage('Code Quality') {
-      steps {
-        code_quality()
-      }
-      post {
-        always {
-          sh("ln -s ${BUILD_ID}-${VERSION}-flake8_junit.xml $WORKSPACE/${BUILD_ID}-${VERSION}-junit.xml")
-          // junit "${BUILD_ID}-${VERSION}-junit.xml"
-        }
-      }
-    }
     stage('Build backend') {
       steps {
         script {
@@ -93,6 +82,11 @@ pipeline {
         }
       }
     }
+    stage('Code Quality') {
+      steps {
+        code_quality()
+      }
+    }
   }
   post {
     success {
@@ -117,10 +111,11 @@ def code_quality() {
       virtualenv -p python36 .venv
       source .venv/bin/activate
       pip3 install flake8 flake8-junit-report
-      flake8 --exit-zero django-backend --output-file ${BUILD_ID}-${VERSION}-flake8.txt
-      flake8_junit ${BUILD_ID}-${VERSION}-flake8.txt ${BUILD_ID}-${VERSION}-flake8_junit.xml
+			mkdir -p reports
+      flake8 --exit-zero django-backend --output-file reports/${BUILD_ID}-${VERSION}-flake8.txt
+      flake8_junit reports/${BUILD_ID}-${VERSION}-flake8.txt reports/${BUILD_ID}-${VERSION}-flake8_junit.xml
       deactivate
       rm -fr .venv
     """
-    return 0
+    junit '**/reports/*.xml'
 }
