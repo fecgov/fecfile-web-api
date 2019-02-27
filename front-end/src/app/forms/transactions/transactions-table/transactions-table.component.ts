@@ -8,6 +8,9 @@ import { TransactionsService, GetTransactionsResponse } from '../service/transac
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
 import { ActiveView } from '../transactions.component';
+import { TransactionsMessageService } from '../service/transactions-message.service';
+import { Subscription } from 'rxjs/Subscription';
+
 
 
 @Component({
@@ -68,7 +71,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	/**
 	 * Identifies the column currently sorted by name. 
 	 */
-	private currentSortedColumnName: string;
+  private currentSortedColumnName: string;
+  
+  /**
+   * Subscription for messags sent from the parent component to show the PIN Column
+   * options.
+   */
+  private showPinColumnsSubscription: Subscription;
 
   // ngx-pagination config
   public maxItemsPerPage: number = 100;
@@ -78,14 +87,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   
   private columnOptionCount: number = 0;
   private readonly maxColumnOption = 5;
-
   private allTransactionsSelected: boolean;
 
   constructor(
     private _transactionsService: TransactionsService,
+    private _transactionsMessageService: TransactionsMessageService,
     private _tableService: TableService,
     private _utilService: UtilService
-  ) { }
+  ) {
+    this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
+			message => { 
+        this.showPinColumns();
+			}
+		);
+  }
 
 
   /**
@@ -136,6 +151,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.setCachedValues();
+    this.showPinColumnsSubscription.unsubscribe();
   }
 
 

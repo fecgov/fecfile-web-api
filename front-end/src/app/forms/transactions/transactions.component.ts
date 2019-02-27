@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { style, animate, transition, trigger } from '@angular/animations';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
+import { TransactionsMessageService } from './service/transactions-message.service';
 
 export enum ActiveView {
   transactions = "transactions",
@@ -30,11 +31,6 @@ export enum ActiveView {
 })
 export class TransactionsComponent implements OnInit {
 
-  // TODO receiving circular dependency warning when compiling
-  // after adding this child component.
-  @ViewChild(TransactionsTableComponent)
-  public transactionsTableComponent: TransactionsTableComponent; 
-
   public formType: string = '';
   public appliedFilterNames: Array<string> = [];
   public view: string = ActiveView.transactions;
@@ -44,6 +40,7 @@ export class TransactionsComponent implements OnInit {
 
   constructor(
     private _activatedRoute: ActivatedRoute,
+    private _transactionsMessageService: TransactionsMessageService,
   ) { }
 
 
@@ -81,7 +78,7 @@ export class TransactionsComponent implements OnInit {
    */
   public showPinColumns() {
     this.showTransactions();
-    this.transactionsTableComponent.showPinColumns();
+    this._transactionsMessageService.sendMessage("show the Pin Col");
   }
 
 
@@ -108,7 +105,7 @@ export class TransactionsComponent implements OnInit {
     alert("Return to Categories is not yet supported");
   }
 
-  
+
   /**
    * Check if the view to show is Transactions.
    */
