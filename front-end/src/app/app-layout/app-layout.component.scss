@@ -27,7 +27,7 @@
       .app__content-wrapper {
         padding-left: 10px;
         .app__content {
-          margin-left: 60px;
+          margin-left: 50px;
           width: 95%;
         }
       }
@@ -60,6 +60,11 @@
     }
     .app__side-nav {
       left: 0;
+    }
+    main {
+      .app__content-wrapper {
+        padding-right: 20px;
+      }
     }
     footer {
       .app__footer {
@@ -182,11 +187,9 @@
       margin: 0 auto;
       min-height: $mainContentHeight;
       padding-left: 40px;
-      padding-right: 30px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       z-index: 0;
-      // width: 100%;
       .app__committee-info {
         background-color: $mercury;
         height: 90px;

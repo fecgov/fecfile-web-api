@@ -4,15 +4,12 @@
   background-color: $mercury;
   min-height: $mainContentHeight;
   position: relative;
-  .grid-row {
+  .row {
     margin-bottom: 5px;
     margin-left: 0;
     margin-right: 0;
     margin-top: 0;
-    .grid-row__col {
-      padding: 0;
-    }
-    .grid-col {
+    .col {
       background-color: $white;
       display: block;
       &:first-child {
@@ -46,10 +43,10 @@
     .content {
       min-height: 70vh;
       position: relative;
-      .grid-row {
+      .row {
         min-height: 350px;
         position: relative;
-        .grid-row__col {
+        .col {
           background-color: $white;
           margin: 0 auto;
         }
