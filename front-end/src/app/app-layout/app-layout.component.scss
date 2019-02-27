@@ -79,6 +79,12 @@
         @include media(largeDesktop) {
           padding-left: 75px;
         }
+        .contact-info {
+          width: 80%;
+        }
+        .legal-disclaimer {
+          width: 14%;
+        }
       }
     }
   }
@@ -255,7 +261,7 @@
     }
     .contact-info {
       float:left;
-      width: 75%;
+      width: 85%;
       .contact-info__item {
         display: block;
         @include media(tablet) {
@@ -289,7 +295,7 @@
     .legal-disclaimer {
       float: left;
       text-align: right;
-      width: 18%;
+      width: 14%;
       .btn-link {
         color: $pictonBlue;
         &:hover,
