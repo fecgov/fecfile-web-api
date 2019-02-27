@@ -1,15 +1,16 @@
 import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { style, animate, transition, trigger } from '@angular/animations';
-import { TransactionModel } from './model/transaction.model';
-import { PaginationInstance } from 'ngx-pagination';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 
 export enum ActiveView {
-  transactions = "1",
-  recycleBin = "2"
+  transactions = "transactions",
+  recycleBin = "recycleBin"
 }
 
+/**
+ * The parent component for transactions.
+ */
 @Component({
   selector: 'app-transactions',
   templateUrl: './transactions.component.html',
@@ -34,26 +35,11 @@ export class TransactionsComponent implements OnInit {
   @ViewChild(TransactionsTableComponent)
   public transactionsTableComponent: TransactionsTableComponent; 
 
-  
-
-  public transactionsModel: Array<TransactionModel>;
-  public deletedTransactionsModel: Array<TransactionModel>;
-  public totalAmount: number;
-  private _formType: string = '';
   public formType: string = '';
   public appliedFilterNames: Array<string> = [];
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
-  public pinColumns: boolean = false;
-
-
-
-  // ngx-pagination config
-  public maxItemsPerPage: number = 100;
-  public directionLinks: boolean = false;
-  public autoHide: boolean = true;	
-  public config: PaginationInstance;
   
 
   constructor(
@@ -66,9 +52,8 @@ export class TransactionsComponent implements OnInit {
    */
   public ngOnInit(): void {
 
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    this.formType = this._formType;
-    console.log("transactions for form " + this._formType);
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    console.log("transactions for form " + this.formType);
 
     // push an applied filter for test
     this.appliedFilterNames.push("Filter " + this.appliedFilterNames.length + 1);
@@ -100,6 +85,30 @@ export class TransactionsComponent implements OnInit {
   }
 
 
+  /**
+   * Import transactions from an external file.
+   */
+  public doImport() {
+    alert("Import transactions is not yet supported");
+  }
+
+
+  /**
+   * Show filter options for transactions.
+   */
+  public showFilters() {
+    alert("Transaction filters are not yet supported");
+  }
+  
+
+  /**
+   * Navigate to the Categories component.
+   */
+  public navigateToCategories() {
+    alert("Return to Categories is not yet supported");
+  }
+
+  
   /**
    * Check if the view to show is Transactions.
    */

@@ -1,0 +1,90 @@
+.transactions-table-container {
+
+  .forms__trx-table {
+    width: 100%;
+  }
+
+  .forms__trx-table-checkbox {
+    width: 3%;
+  }
+
+  .forms__trx-table-pagination-container {
+    padding: 1em;
+  }  
+
+  /** hide the dropdown caret **/
+  .dropdown-toggle:after {
+    border: none;
+  }  
+
+  #forms__trx-dropdown-action > button > i {
+    padding-right: 3px;
+  }
+
+  .bulk_action {
+    text-align: left;
+  }
+
+  .dropdown-menu {
+    min-width: 6em;
+  }  
+
+  .forms__trx-item-range {
+    font-size: 13px;
+    color: grey;
+    margin: 0 5px;
+  }
+
+  .forms__trx-total-amount > i {
+    color: #112E51;
+    padding-left: 3px;
+  }
+
+  .forms__trx-total-amount-container {
+    margin: 1.5em 0;
+  }
+
+
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
+
+  .ngx-pagination .current{
+    padding: 0.1875rem 0.625rem;
+    background: #9B9B9B !important;;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a, .ngx-pagination button {
+    color: #9B9B9B !important;;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }	
+
+  /* style ngx-pagination - end */
+
+
+  .column-options-modal {
+
+    #btn-cancel {
+      background-color: #cccccc;
+    }
+
+    .btn-modal-footer {
+      width: 6em;
+    }
+
+    .row{
+      height: 3em;
+    }
+
+    input[type="checkbox" i]:disabled, .disabled-column-option{
+      color: #cccccc;
+    } 
+
+    input[type=checkbox] {
+      transform: scale(1.5);
+    }
+  }
+}

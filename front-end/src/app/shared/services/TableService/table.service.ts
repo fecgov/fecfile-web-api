@@ -36,6 +36,26 @@ export class TableService {
 
 
 	/**
+	 * Set the column to indicate it is sorted in a specific direction.
+	 * 
+	 * @param colName the column name to set as sorted
+	 * @param sortableColumns all possible columns to sort
+	 * @param descending sort direction will be descending if true
+	 * @returns the name of sorted column or empty string if the column is not in the sortableColumns array
+	 */
+	public setSortDirection(colName: string, sortableColumns: SortableColumnModel[], descending: boolean) : string {
+
+		for (let col of sortableColumns) {
+			if (col.colName == colName) {
+				col.descending = descending;
+				return colName;
+			}
+		}
+		return "";
+	}		
+
+
+	/**
 	 * Change the sort direction on a given column.  
 	 * 
 	 * Typical usage of this
@@ -67,7 +87,7 @@ export class TableService {
 	 * @param sortableColumns all possible columns to sort
 	 * @returns the SortableColumnModel of the currently sorted column
 	 */
-	private findCurrentSortedColumn(currentSortedColumn: string, sortableColumns: SortableColumnModel[]) : SortableColumnModel {
+	public findCurrentSortedColumn(currentSortedColumn: string, sortableColumns: SortableColumnModel[]) : SortableColumnModel {
 		for (let col of sortableColumns) {
 			if (col.colName == currentSortedColumn) {
 				return col;
