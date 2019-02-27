@@ -384,6 +384,7 @@ export class SignComponent implements OnInit {
 
   
   public changeAdditionalEmail(e): void {
+    
     this.frmSaved=false;
     this.showAdditionalEmail1Warn=false;
     this.showAdditionalEmail2Warn=false;
