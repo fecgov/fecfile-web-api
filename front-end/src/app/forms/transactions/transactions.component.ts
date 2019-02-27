@@ -86,6 +86,30 @@ export class TransactionsComponent implements OnInit {
 
 
   /**
+   * Import transactions from an external file.
+   */
+  public doImport() {
+    alert("Import transactions is not yet supported");
+  }
+
+
+  /**
+   * Show filter options for transactions.
+   */
+  public showFilters() {
+    alert("Transaction filters are not yet supported");
+  }
+  
+
+  /**
+   * Navigate to the Categories component.
+   */
+  public navigateToCategories() {
+    alert("Return to Categories is not yet supported");
+  }
+
+  
+  /**
    * Check if the view to show is Transactions.
    */
   public isTransactionViewActive() {

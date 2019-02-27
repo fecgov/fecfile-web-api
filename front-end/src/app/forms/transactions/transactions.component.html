@@ -17,7 +17,10 @@
                     </h1>
                 </div>
                 <div class="float-right">
-                    <button class="btn btn-secondary btn-right" type="submit">Return to Transaction Categories</button>
+                    <button class="btn btn-secondary btn-right" type="submit"
+                        (click)="navigateToCategories()">
+                        Return to Transaction Categories
+                    </button>
                 </div>
             </div>
             <hr />
@@ -29,7 +32,7 @@
                         <button
                             class="btn btn-secondary btn-left forms__trx-btn"
                             type="button"
-                            (click)="showPinColumns(columnOptionsModal)">
+                            (click)="showPinColumns()">
                             <i class="fas fa-thumbtack"></i>
                             Pin Columns
                         </button>
@@ -50,7 +53,7 @@
                         <button
                             class="btn btn-secondary btn-left forms__trx-btn"
                             type="button"
-                            (click)="doFilter()">
+                            (click)="showFilters()">
                             <i class="fas fa-filter"></i>
                             Filter
                         </button>

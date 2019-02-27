@@ -43,9 +43,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
 
-  private sortableColumnLocalStoragesKey: string = "sortableColumnLocalStoragesKey";
+  // Local Storage Keys
+  private readonly sortableColumnsLSK: string = "transactions.sortableColumn";
+  private readonly transactionCurrentSortedColLSK: string = 
+    "transactions.trx.currentSortedColumn";
+  private readonly recycleCurrentSortedColLSK: string = 
+    "transactions.recycle.currentSortedColumn"; 
+  private readonly transactionPageLSK: string = 
+    "transactions.trx.page";
+  private readonly recyclePageLSK: string = 
+    "transactions.recycle.page";       
 
-  /**
+  /**.
 	 * Array of columns to be made sortable.
 	 */
   private sortableColumns: SortableColumnModel[] = [];
@@ -57,9 +66,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	private cloneSortableColumns: SortableColumnModel[] = [];  
 	
 	/**
-	 * Identifies the column currently sorted. 
+	 * Identifies the column currently sorted by name. 
 	 */
-	private currentSortedColumn: string;
+	private currentSortedColumnName: string;
 
   // ngx-pagination config
   public maxItemsPerPage: number = 100;
@@ -89,7 +98,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 			itemsPerPage: 5,
 			currentPage: 1
 		};	
-    this.config = paginateConfig;  
+    this.config = paginateConfig; 
+
+    this.setSortDefault();
 
     if (this.tableType == this.transactionsView) {
       this.getPage(1);
@@ -102,24 +113,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
     
     // If cached sortableColumns settings in local storage, use it.
-    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnLocalStoragesKey);
-    if (localStorage.getItem(this.sortableColumnLocalStoragesKey) != null) {
-      this.sortableColumns = JSON.parse(sortableColumnsJson);
+    // And get other cached values.
+    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnsLSK);
+    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
+      this.applyCachedValues();  
     }
     else {
-
-      // sort column names must match the domain model names
-      let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-      let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
-        'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
-
-      this.sortableColumns = [];
-      for (let field of defaultSortColumns) {
-        this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
-      }  
-      for (let field of otherSortColumns) {
-        this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
-      } 
+      this.setSortableColumns();
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
@@ -135,7 +135,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * When component is destroyed, save off user column options to be applied upon return.
    */
   public ngOnDestroy(): void {
-    localStorage.setItem(this.sortableColumnLocalStoragesKey, JSON.stringify(this.sortableColumns));
+    this.setCachedValues();
   }
 
 
@@ -197,7 +197,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @returns string of classes for CSS styling sorted/unsorted classes
 	 */
   public getSortClass(colName: string): string {
-		return this._tableService.getSortClass(colName, this.currentSortedColumn, this.sortableColumns);
+		return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
   }  
 
 
@@ -207,7 +207,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param colName the column name of the column to sort
 	 */
 	public changeSortDirection(colName: string) : void {
-		this.currentSortedColumn = this._tableService.changeSortDirection(colName, this.sortableColumns);
+		this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
     
     // TODO this could be done client side or server side.
     // call server for page data in new direction
@@ -541,5 +541,145 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public isRecycleBinViewActive() {
     return this.tableType == this.recycleBinView ? true : false;
   }   
+
+
+  /**
+   * Apply cached values in local storage to the component's class variables.
+   */
+  private applyCachedValues() : void {
+    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnsLSK);
+    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
+      this.sortableColumns = JSON.parse(sortableColumnsJson);
+    }
+    else {
+      // Just in case cache has an unexpected issue, use default.
+      this.setSortableColumns();
+    }
+
+    if (this.isTransactionViewActive()) {
+
+      let currentSortedColumnJson: string|null = 
+        localStorage.getItem(this.transactionCurrentSortedColLSK);
+      let currentSortedColumnL: SortableColumnModel = null;
+      if (currentSortedColumnJson) {
+        currentSortedColumnL = JSON.parse(currentSortedColumnJson);
+        
+        // sort by the column direction previously set
+        this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName, 
+          this.sortableColumns, currentSortedColumnL.descending);
+      }
+      else {
+        this.setSortDefault();
+      }
+      this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
+      this.applyCurrentPageCache(this.transactionPageLSK);
+
+    }
+    else if (this.isRecycleBinViewActive()) {
+      this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
+      this.applyCurrentPageCache(this.recyclePageLSK);
+    }
+    else {
+    }
+  }
+
+
+  /**
+   * Get the current sorted column from the cache and apply it to the component.
+   * @param key the key to the value in the local storage cache
+   */
+  private applyCurrentSortedColCache(key: string) {
+    let currentSortedColumnJson: string|null = 
+      localStorage.getItem(key);
+    let currentSortedColumnL: SortableColumnModel = null;
+    if (currentSortedColumnJson) {
+      currentSortedColumnL = JSON.parse(currentSortedColumnJson);
+      
+      // sort by the column direction previously set
+      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName, 
+        this.sortableColumns, currentSortedColumnL.descending);
+    }
+    else {
+      this.setSortDefault();
+    }
+  }
+
+
+  /**
+   * Get the current page from the cache and apply it to the component.
+   * @param key the key to the value in the local storage cache
+   */
+  private applyCurrentPageCache(key: string) {
+    let currentPageCache: string = 
+      localStorage.getItem(key);
+    if (this._utilService.isNumber(currentPageCache)) {
+      this.config.currentPage = this._utilService.toInteger(currentPageCache);
+    }
+    else {
+      this.config.currentPage = 1;
+    }
+  }
+
+  /**
+   * Retrieve the cahce values from local storage and set the
+   * component's class variables.
+   */
+  private setCachedValues() {
+
+    // shared between trx and recycle tables
+    localStorage.setItem(this.sortableColumnsLSK, 
+      JSON.stringify(this.sortableColumns));
+
+    let currentSortedCol = this._tableService.findCurrentSortedColumn(
+      this.currentSortedColumnName, this.sortableColumns);
+
+    if (this.isTransactionViewActive()) {
+
+      if (currentSortedCol) {
+        localStorage.setItem(this.transactionCurrentSortedColLSK, 
+          JSON.stringify(currentSortedCol));
+      }
+
+      localStorage.setItem(this.transactionPageLSK, this.config.currentPage.toString());
+    }
+    else if (this.isRecycleBinViewActive()) {
+
+      if (currentSortedCol) {
+        localStorage.setItem(this.recycleCurrentSortedColLSK, 
+          JSON.stringify(currentSortedCol));
+      }
+      localStorage.setItem(this.recyclePageLSK, this.config.currentPage.toString());
+    }
+    else {
+    }
+  }
+
+
+  /**
+   * Set the Table Columns model.
+   */
+  private setSortableColumns() : void {
+    // sort column names must match the domain model names
+    let defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
+    let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
+      'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];
+
+    this.sortableColumns = [];
+    for (let field of defaultSortColumns) {
+      this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
+    }  
+    for (let field of otherSortColumns) {
+      this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
+    }
+  }
+
+
+  /**
+   * Set the UI to show the default column sorted in the default direction.
+   */
+  private setSortDefault() : void {
+    this.currentSortedColumnName = this._tableService.setSortDirection('type', 
+      this.sortableColumns, false);
+  }
 
 }
