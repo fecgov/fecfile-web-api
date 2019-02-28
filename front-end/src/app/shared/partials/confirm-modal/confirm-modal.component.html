@@ -11,9 +11,10 @@
     </button>
   </div>
   <div class="modal-body">
-  	<div>
-  		You have unsaved changes! If you leave, your changes will be lost.
-  	</div>
+  	<div *ngIf="message; else default">
+        {{message}}
+    </div>
+    <ng-template #default>You have unsaved changes! If you leave, your changes will be lost.</ng-template>
   </div>
   <div class="modal-footer">
     <button 
