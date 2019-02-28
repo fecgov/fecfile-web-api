@@ -279,9 +279,6 @@ export class FormsService {
       data = form99_details;
 
        data['form_type'] = 'F99';
-
-       console.log('F99 Submit form99_details',form99_details);
-       console.log('F99 Submit Data',data);
     }
     return this._http
       .post(
@@ -664,9 +661,9 @@ export class FormsService {
  }
   
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
-  let token: string = JSON.parse(this._cookieService.get('user'));
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  const url: string = '/core/get_dynamic_forms_fields';
   let httpOptions =  new HttpHeaders();
-  let url: string = '/core/get_dynamic_forms_fields';
   let params = new HttpParams();
   let formData: FormData = new FormData();
 
