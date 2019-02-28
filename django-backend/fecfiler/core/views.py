@@ -1031,17 +1031,37 @@ def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
-        order_string = ""
-        for key, value in request.query_params.items(): 
-            param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
-            order_string = key + ","
+        # if 'order_params' in request.query_params:
+        #     order_string = request.query_params.get('order_params')
+        # else:
+        #     order_string = "transaction_id"
+        for key, value in request.query_params.items():
+            try:
+                int(value)
+                param_string = param_string + " AND " + key + "=" + str(value)
+            except Exception as e:
+                param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
         # print(param_string)
-        query_string = """SELECT report_id, line_number, transaction_type, transaction_id, entity_id, name, street_1, street_2, city, state, zip_code, occupation, employer, transaction_date, transaction_amount, purpose_description, memo_code, memo_text
-                                FROM public.all_transactions_view WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ ORDER BY """ + order_string[:-1] 
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
+                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            # + """ ORDER BY """ + order_string
         print(query_string)
+        # query_string = """SELECT report_id, line_number, transaction_type, transaction_id, entity_id, name, street_1, street_2, city, state, zip_code, occupation, employer, transaction_date, transaction_amount, purpose_description, memo_code, memo_text
+        #                         FROM public.all_transactions_view WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ ORDER BY """ + order_string[:-1] 
+       
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
+            cursor.execute(query_string)
+            result = cursor.fetchone()
+            count = result[0]
+            sum_trans = result[1]
+            
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    # + """ ORDER BY """ + order_string
+        print(trans_query_string)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
@@ -1049,7 +1069,10 @@ def get_all_transactions(request):
         if forms_obj is None:
             forms_obj =[]
             status_value = status.HTTP_204_NO_CONTENT
-        return Response(forms_obj, status=status_value)
+
+        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+        return Response(json_result, status=status_value)
+
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
