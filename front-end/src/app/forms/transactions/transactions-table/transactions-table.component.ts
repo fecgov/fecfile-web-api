@@ -10,6 +10,8 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { ActiveView } from '../transactions.component';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { Subscription } from 'rxjs/Subscription';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 
 
@@ -84,6 +86,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public directionLinks: boolean = false;
   public autoHide: boolean = true;	
   public config: PaginationInstance;
+  public numberOfPages = 0;
   
   private columnOptionCount: number = 0;
   private readonly maxColumnOption = 5;
@@ -93,7 +96,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
     private _tableService: TableService,
-    private _utilService: UtilService
+    private _utilService: UtilService,
+    private _dialogService: DialogService,
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
 			message => { 
@@ -114,18 +118,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 			currentPage: 1
 		};	
     this.config = paginateConfig; 
-
-    this.setSortDefault();
-
-    if (this.tableType == this.transactionsView) {
-      this.getPage(1);
-    }
-    else if (this.tableType == this.recycleBinView) {
-      this.getRecyclingPage(1);
-    }
-    else {
-      console.log("invalid table type = " + this.tableType);
-    }
     
     // If cached sortableColumns settings in local storage, use it.
     // And get other cached values.
@@ -143,6 +135,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
+
+    this.setSortDefault();
+    this.getPage(1);   
   }
 
 
@@ -180,8 +175,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
 	public getTransactionsPage(page: number) : void {
+
     this.config.currentPage = page;
-    this._transactionsService.getFormTransactions(this.formType)
+
+    let sortedCol: SortableColumnModel = 
+      this._tableService.findCurrentSortedColumn(this.currentSortedColumnName, this.sortableColumns);
+
+    this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
+      this.currentSortedColumnName, sortedCol.descending)
         .subscribe( (res:GetTransactionsResponse) => {
       this.transactionsModel = res.transactions;
       this.totalAmount = res.totalAmount;
@@ -197,7 +198,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
 	public getRecyclingPage(page: number) : void {
-    this.config.currentPage = page;
+    this.calculateNumberOfPages();
+    this.config.currentPage = page > this.numberOfPages ? this.numberOfPages : page;
+    //this.config.currentPage = page;
     this._transactionsService.getUserDeletedTransactions(this.formType)
         .subscribe( (res:GetTransactionsResponse) => {
       this.transactionsModel = res.transactions;
@@ -227,7 +230,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     
     // TODO this could be done client side or server side.
     // call server for page data in new direction
-    //this.getPage(this.config.currentPage);
+    this.getPage(this.config.currentPage);
   }  
   
 
@@ -504,8 +507,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * 
    * @param trx the Transaction to restore
    */
-  public restoreTransaction() : void {
-    alert("Restore transaction is not yet supported");
+  public restoreTransaction(trx: TransactionModel) : void {
+
+    this._dialogService
+      .confirm('You are about to restore transaction ' + trx.transactionId, ConfirmModalComponent)
+      .then(res => {
+        if(res === 'okay') {
+          this._transactionsService.restoreTransaction(trx)
+            .subscribe( (res:GetTransactionsResponse) => {
+              this.getRecyclingPage(this.config.currentPage);
+          });
+        } 
+        else if(res === 'cancel') {
+        }
+      });
   }
 
 
@@ -515,10 +530,26 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public determineItemRange() : string {
     let start = 0;
     let end = 0;
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
-      
-      end = this.config.currentPage * this.config.itemsPerPage;
-      start = (end - this.config.itemsPerPage) + 1;
+    this.numberOfPages = 0;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? 
+      this.config.currentPage : 1;
+
+    if (!this.transactionsModel) {
+      return;
+    }
+
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
+        && this.transactionsModel.length > 0) {
+      this.calculateNumberOfPages();
+
+      if (this.config.currentPage == this.numberOfPages) {
+        end = this.transactionsModel.length;
+        start = (this.config.currentPage -1) * this.config.itemsPerPage + 1;
+      }
+      else {
+        end = this.config.currentPage * this.config.itemsPerPage;
+        start = (end - this.config.itemsPerPage) + 1;
+      }
     }
     return start + " - " + end;
   }
@@ -696,6 +727,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private setSortDefault() : void {
     this.currentSortedColumnName = this._tableService.setSortDirection('type', 
       this.sortableColumns, false);
+  }
+
+
+  private calculateNumberOfPages() : void {
+
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
+      if (this.transactionsModel && this.transactionsModel.length > 0) {
+        this.numberOfPages =  this.transactionsModel.length / this.config.itemsPerPage;
+        this.numberOfPages = Math.ceil(this.numberOfPages);
+      }
+    }
   }
 
 }
