@@ -1037,19 +1037,19 @@ def get_all_transactions(request):
         #     order_string = "transaction_id"
         for key, value in request.query_params.items():
             try:
-                int(value)
+                check_value = int(value)
                 param_string = param_string + " AND " + key + "=" + str(value)
             except Exception as e:
-                param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+                if key == 'transaction_date':
+                    transaction_date = date_format(request.query_params.get('transaction_date'))
+                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+                else:
+                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
-        # print(param_string)
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
                             where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
                             # + """ ORDER BY """ + order_string
-        print(query_string)
-        # query_string = """SELECT report_id, line_number, transaction_type, transaction_id, entity_id, name, street_1, street_2, city, state, zip_code, occupation, employer, transaction_date, transaction_amount, purpose_description, memo_code, memo_text
-        #                         FROM public.all_transactions_view WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ ORDER BY """ + order_string[:-1] 
-       
+        # print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
@@ -1059,7 +1059,7 @@ def get_all_transactions(request):
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
                                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
-        print(trans_query_string)
+        # print(trans_query_string)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
