@@ -58,7 +58,6 @@ export class AppLayoutComponent implements OnInit {
     this._apiService
       .getRadAnalyst()
       .subscribe(res => {
-        console.log('rad analyst: ', res);
         if (res) {
           if (Array.isArray(res.response)) {
             this.radAnalystInfo = res.response[0];

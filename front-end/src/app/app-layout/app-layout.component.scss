@@ -76,10 +76,10 @@
           padding-left: 75px;
         }
         .contact-info {
-          width: 80%;
+          width: $footerContactInfoWidth;
         }
         .legal-disclaimer {
-          width: 14%;
+          width: $footerLegalDisclaimerWidth;
         }
       }
     }
@@ -239,25 +239,25 @@
   .app__footer {
     background-color: $mercury;
     color: $black;
-    height: 160px;
+    height: $footerMobileHeight;
     margin-top: 5px;
     overflow-y: hidden;
     padding-left: 80px;
     @include media(tablet) {
-      height: 160px;
+      height: $footerMobileHeight;
       padding-left: 100px;
     }
     @include media(mediumDesktop) {
-      height: 80px;
+      height: $footerDesktopHeight;
       padding-left: 70px;
     }
     @include media(largeDesktop) {
-      height: 80px;
+      height: $footerDesktopHeight;
       padding-left: 70px;
     }
     .contact-info {
       float:left;
-      width: 80%;
+      width: $footerContactInfoWidth;
       .contact-info__item {
         display: block;
         @include media(tablet) {
@@ -291,7 +291,7 @@
     .legal-disclaimer {
       float: left;
       text-align: right;
-      width: 18%;
+      width: $footerLegalDisclaimerWidth;
       .btn-link {
         color: $pictonBlue;
         &:hover,
