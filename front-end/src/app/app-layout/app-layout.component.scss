@@ -69,10 +69,6 @@
     footer {
       .app__footer {
         font-family: $mainFontFamily;
-        // padding-left: 80px;
-        @include media(tablet) {
-          //padding-left: 100px;
-        }
         @include media(mediumDesktop) {
           padding-left: 75px;
         }
@@ -253,15 +249,15 @@
     }
     @include media(mediumDesktop) {
       height: 80px;
-      padding-left: 55px;
+      padding-left: 70px;
     }
     @include media(largeDesktop) {
       height: 80px;
-      padding-left: 55px;
+      padding-left: 70px;
     }
     .contact-info {
       float:left;
-      width: 85%;
+      width: 80%;
       .contact-info__item {
         display: block;
         @include media(tablet) {
@@ -295,7 +291,7 @@
     .legal-disclaimer {
       float: left;
       text-align: right;
-      width: 14%;
+      width: 18%;
       .btn-link {
         color: $pictonBlue;
         &:hover,
