@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { TransactionModel } from '../model/transaction.model';
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -18,10 +19,25 @@ export interface GetTransactionsResponse {
 })
 export class TransactionsService {
 
+  // only for mock data
+  private restoreTrxArray = [];
+  private transactionId = "TID12345";
+  private transactionIdRecycle = "TIDRECY";
+  private _orderByPipe: OrderByPipe;
+
   constructor(
     private _http: HttpClient,
-    private _cookieService: CookieService
-  ) { }
+    private _cookieService: CookieService,
+    //private _orderByPipe: OrderByPipe
+  ) { 
+    // mock out the recycle trx
+    let t1: any = this.createMockTrx();
+    for (let i = 0; i < 13; i++) {
+      t1.transactionId = this.transactionIdRecycle + i;
+      this.restoreTrxArray.push(new TransactionModel(t1));  
+    }
+    this._orderByPipe = new OrderByPipe();
+  }
 
 
   /**
@@ -30,7 +46,8 @@ export class TransactionsService {
    * @param      {String}   formType      The form type of the transaction to get
    * @return     {Observable}             The form being retreived.
    */
-  public getFormTransactions(formType: string): Observable<any> {
+  public getFormTransactions(formType: string, page: number, itemsPerPage: number,
+      sortColumnName: string, descending: boolean): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
@@ -56,8 +73,13 @@ export class TransactionsService {
 
     let trxArray = []; 
     for (let i = 0; i < count; i++) {
+      t1.transactionId = this.transactionId + i;
+      t1.amount = 1500 + i;
       trxArray.push(new TransactionModel(t1));  
     }
+
+    let direction = descending ? -1 : 1;
+    this._orderByPipe.transform(trxArray, {property: sortColumnName, direction: direction});
 
     let mockResponse: GetTransactionsResponse = {
       transactions: trxArray,
@@ -98,22 +120,39 @@ export class TransactionsService {
     //   );
 
 
-    let t1: any = this.createMockTrx();
+    // let t1: any = this.createMockTrx();
 
-    let trxArray = []; 
-    for (let i = 0; i < 8; i++) {
-      trxArray.push(new TransactionModel(t1));  
-    }
+    // let trxArray = []; 
+    // for (let i = 0; i < 8; i++) {
+    //   trxArray.push(new TransactionModel(t1));  
+    // }
+
+    // let mockResponse: GetTransactionsResponse = {
+    //   transactions: trxArray,
+    //   totalAmount: 0,
+    //   totalTransactionCount: 8
+    // };
 
     let mockResponse: GetTransactionsResponse = {
-      transactions: trxArray,
+      transactions: this.restoreTrxArray,
       totalAmount: 0,
-      totalTransactionCount: 8
+      totalTransactionCount: this.restoreTrxArray.length
     };
 
     //console.log(JSON.stringify(mockResponse));
 
     return Observable.of(mockResponse);
+  }
+
+
+  public restoreTransaction(trx: TransactionModel) : Observable<any> {
+
+    var index = this.restoreTrxArray.indexOf(trx);
+		if (index !== -1) {
+      this.restoreTrxArray.splice(index, 1);		
+		}
+
+    return Observable.of("");
   }
 
  
@@ -133,7 +172,7 @@ export class TransactionsService {
     t1.selected = false;
     t1.state = "New York";
     t1.street = "7th Avenue";
-    t1.transactionId = "TID12345";
+    t1.transactionId = this.transactionId;
     t1.type = "Individual";
     t1.zip = "22222";
 
