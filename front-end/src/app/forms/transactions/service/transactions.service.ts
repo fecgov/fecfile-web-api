@@ -51,21 +51,39 @@ export class TransactionsService {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
-    let url: string = '';
+    let url: string = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('formType', formType);
+    params = params.append('report_id', '1');
+    //params = params.append('line_number', '11AI');
+    //params = params.append('transaction_type', '15');
+    //params = params.append('transaction_type_desc', 'Individual Receipt');
+    params = params.append('transaction_id', 'VVBSTFQ9X78');
+    //params = params.append('transaction_date', '2018-10-18');
 
-    // return this._http
-    //  .get(
-    //     `${environment.apiUrl}${url}`,
-    //     {
-    //       headers: httpOptions,
-    //       params
-    //     }
-    //   );
+
+    // http://localhost:8080/api/v1/core/get_all_transactions?report_id=1&transaction_id=VVBSTFQ9X78
+//     report_id = 1
+// line_number = 11AI
+// transaction_type = 15
+// transaction_type_desc = Individual Receipt
+// transaction_id = VVBSTFQ9X78
+// transaction_date = 2018-10-18
+
+    //return 
+    let ob = this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          params
+        }
+      );
+    ob.subscribe((res: any) => {
+      console.log(res);
+    });
 
 
     let count = 17;

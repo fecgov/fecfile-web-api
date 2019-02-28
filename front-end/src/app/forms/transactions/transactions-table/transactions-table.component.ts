@@ -137,7 +137,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
 
     this.setSortDefault();
-    this.getPage(1);   
+    this.getPage(this.config.currentPage);   
   }
 
 
@@ -199,12 +199,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 */
 	public getRecyclingPage(page: number) : void {
     this.calculateNumberOfPages();
-    this.config.currentPage = page > this.numberOfPages ? this.numberOfPages : page;
-    //this.config.currentPage = page;
     this._transactionsService.getUserDeletedTransactions(this.formType)
         .subscribe( (res:GetTransactionsResponse) => {
       this.transactionsModel = res.transactions;
       this.config.totalItems = res.totalTransactionCount;
+
+      // If a row was deleted, the current page may be greated than the last page
+      // as result of the delete.
+      this.config.currentPage = (page > this.numberOfPages && this.numberOfPages != 0) 
+        ? this.numberOfPages : page;
     });  
   }  
 
@@ -528,6 +531,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange() : string {
+
     let start = 0;
     let end = 0;
     this.numberOfPages = 0;
