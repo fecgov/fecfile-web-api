@@ -630,16 +630,16 @@ export class FormsService {
 
   console.log("Save Report formF3X_ReportInfo ", formF3X_ReportInfo);
   formData.append('report_id', formF3X_ReportInfo.reportId);
-  formData.append('form_type', formF3X_ReportInfo.formType);
+  formData.append('form_type', `F${formF3X_ReportInfo.formType}`);
   formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
   formData.append('report_type', formF3X_ReportInfo.reportType);
   formData.append('election_code', formF3X_ReportInfo.electionCode);
   formData.append('date_of_election', formF3X_ReportInfo.electionDate);
   formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
-  formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
-  formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
+  formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
+  formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-
+  
   console.log(" saveReport formData ",formData );
 
   return this._http
@@ -659,7 +659,7 @@ export class FormsService {
           return false;
       }));
  }
-
+  
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   const url: string = '/core/get_dynamic_forms_fields';

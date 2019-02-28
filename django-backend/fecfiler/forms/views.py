@@ -777,7 +777,7 @@ def get_rad_analyst_info(request):
 @api_view(['GET'])
 def get_form99list(request):
     """
-    API that provides all the reports for a specific committee
+    API that provides all the reports for a specific committee. FNE-608 SPRINT 8
     """
     if request.method == 'GET':
         try:
