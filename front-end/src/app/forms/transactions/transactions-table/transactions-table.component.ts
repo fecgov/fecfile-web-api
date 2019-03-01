@@ -177,7 +177,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetTransactionsResponse) => {
-        // this.transactionsModel = res.transactions;
         this.transactionsModel = [];
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions,
           this.transactionsModel);
