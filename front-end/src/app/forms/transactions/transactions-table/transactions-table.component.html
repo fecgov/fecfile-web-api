@@ -47,7 +47,7 @@
                 <th *ngIf="isColumnVisible('amount')"
                     [class]="getSortClass('amount')" 
                     (click)="changeSortDirection('amount')">Amount
-                </th>
+                </th>               
                 <th *ngIf="isColumnVisible('aggregate')"
                     [class]="getSortClass('aggregate')" 
                     (click)="changeSortDirection('aggregate')">Aggregate
@@ -71,7 +71,11 @@
                 <th *ngIf="isColumnVisible('memoText')"
                     [class]="getSortClass('memoText')" 
                     (click)="changeSortDirection('memoText')">Memo Text/Description
-                </th>                                                                                                                                    
+                </th>
+                <th *ngIf="isRecycleBinViewActive()"
+                    [class]="getSortClass('deletedDate')" 
+                    (click)="changeSortDirection('deletedDate')">Deleted Date
+                </th>                                                                                                                                                     
                 <th class="bulk_action">
                     <div *ngIf="isTransactionViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
@@ -120,6 +124,7 @@
                 <td *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
                 <td *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
                 <td *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+                <td *ngIf="isRecycleBinViewActive()">{{trx.date | date: 'MM/dd/yyyy'}}</td>
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-secondary" 
