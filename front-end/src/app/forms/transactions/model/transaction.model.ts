@@ -8,6 +8,7 @@ export class TransactionModel {
     zip: string;
     date: Date;
     amount: number;
+    deletedDate: Date;
     aggregate: number;
     purposeDescription: string;
     contributorEmployer: string;
@@ -26,6 +27,7 @@ export class TransactionModel {
         this.zip = transaction.zip ? transaction.zip : '';
         this.date = transaction.date ? transaction.date : null;
         this.amount = transaction.amount ? transaction.amount : null;
+        this.deletedDate = transaction.deletedDate ? transaction.deletedDate : null;
         this.aggregate = transaction.aggregate ? transaction.aggregate : null;
         this.purposeDescription = transaction.purposeDescription ? transaction.purposeDescription : '';
         this.contributorEmployer = transaction.contributorEmployer ? transaction.contributorEmployer : '';

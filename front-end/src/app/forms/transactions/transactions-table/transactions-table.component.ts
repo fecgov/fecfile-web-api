@@ -48,15 +48,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
 
+  // ngx-pagination config
+  public maxItemsPerPage = 100;
+  public directionLinks = false;
+  public autoHide = true;
+  public config: PaginationInstance;
+  public numberOfPages = 0;
+
   // Local Storage Keys
-  private readonly sortableColumnsLSK: string = 'transactions.sortableColumn';
-  private readonly transactionCurrentSortedColLSK: string =
+  private readonly transactionSortableColumnsLSK =
+    'transactions.trx.sortableColumn';
+  private readonly recycleSortableColumnsLSK =
+    'transactions.recycle.sortableColumn';
+  private readonly transactionCurrentSortedColLSK =
     'transactions.trx.currentSortedColumn';
-  private readonly recycleCurrentSortedColLSK: string =
+  private readonly recycleCurrentSortedColLSK =
     'transactions.recycle.currentSortedColumn';
-  private readonly transactionPageLSK: string =
+  private readonly transactionPageLSK =
     'transactions.trx.page';
-  private readonly recyclePageLSK: string =
+  private readonly recyclePageLSK =
     'transactions.recycle.page';
 
   /**.
@@ -80,13 +90,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * options.
    */
   private showPinColumnsSubscription: Subscription;
-
-  // ngx-pagination config
-  public maxItemsPerPage = 100;
-  public directionLinks = false;
-  public autoHide = true;
-  public config: PaginationInstance;
-  public numberOfPages = 0;
 
   private columnOptionCount = 0;
   private readonly maxColumnOption = 5;
@@ -119,14 +122,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     };
     this.config = paginateConfig;
 
-    // If cached sortableColumns settings in local storage, use it.
-    // And get other cached values.
-    const sortableColumnsJson: string | null = localStorage.getItem(this.sortableColumnsLSK);
-    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
-      this.applyCachedValues();
-    } else {
-      this.setSortableColumns();
-    }
+    this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
     for (const col of this.sortableColumns) {
@@ -134,8 +130,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
-
-    this.setSortDefault();
     this.getPage(this.config.currentPage);
   }
 
@@ -178,7 +172,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.config.currentPage = page;
 
     const sortedCol: SortableColumnModel =
-      this._tableService.findCurrentSortedColumn(this.currentSortedColumnName, this.sortableColumns);
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
     this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
@@ -589,38 +583,54 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Apply cached values in local storage to the component's class variables.
+   * Get cached values from session.
    */
-  private applyCachedValues(): void {
-    const sortableColumnsJson: string | null = localStorage.getItem(this.sortableColumnsLSK);
-    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
+  private getCachedValues() {
+    switch (this.tableType) {
+      case this.transactionsView:
+        this.applyColCache(this.transactionSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.transactionPageLSK);
+        break;
+      case this.recycleBinView:
+        this.applyColCache(this.recycleSortableColumnsLSK);
+        this.applyColumnsSelected();
+        this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.recyclePageLSK);
+        break;
+      default:
+        break;
+    }
+  }
+
+
+  /**
+   * Columns selected in the PIN dialog from the transactions view
+   * need to be applied to the Recycling Bin table.
+   */
+  private applyColumnsSelected() {
+    const key = this.transactionSortableColumnsLSK;
+    const sortableColumnsJson: string | null = localStorage.getItem(key);
+    if (localStorage.getItem(key) != null) {
+      const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
+      for (const col of trxCols) {
+        this._tableService.getColumnByName(col.colName,
+          this.sortableColumns).visible = col.visible;
+      }
+    }
+  }
+
+  /**
+   * Get the column and their settings from the cache and apply it to the component.
+   * @param key the key to the value in the local storage cache
+   */
+  private applyColCache(key: string) {
+    const sortableColumnsJson: string | null = localStorage.getItem(key);
+    if (localStorage.getItem(key) != null) {
       this.sortableColumns = JSON.parse(sortableColumnsJson);
     } else {
       // Just in case cache has an unexpected issue, use default.
       this.setSortableColumns();
-    }
-
-    if (this.isTransactionViewActive()) {
-
-      const currentSortedColumnJson: string | null =
-        localStorage.getItem(this.transactionCurrentSortedColLSK);
-      let currentSortedColumnL: SortableColumnModel = null;
-      if (currentSortedColumnJson) {
-        currentSortedColumnL = JSON.parse(currentSortedColumnJson);
-
-        // sort by the column direction previously set
-        this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName,
-          this.sortableColumns, currentSortedColumnL.descending);
-      } else {
-        this.setSortDefault();
-      }
-      this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
-      this.applyCurrentPageCache(this.transactionPageLSK);
-
-    } else if (this.isRecycleBinViewActive()) {
-      this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
-      this.applyCurrentPageCache(this.recyclePageLSK);
-    } else {
     }
   }
 
@@ -659,36 +669,49 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+
   /**
    * Retrieve the cahce values from local storage and set the
    * component's class variables.
    */
   private setCachedValues() {
+    switch (this.tableType) {
+      case this.transactionsView:
+        this.setCacheValuesforView(this.transactionSortableColumnsLSK,
+          this.transactionCurrentSortedColLSK, this.transactionPageLSK);
+        break;
+      case this.recycleBinView:
+        this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
+          this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+        break;
+      default:
+        break;
+    }
+  }
+
+
+  /**
+   * Set the currently sorted column and current page in the cache.
+   *
+   * @param columnsKey the column settings key for the cache
+   * @param sortedColKey currently sorted column key for the cache
+   * @param pageKey current page key from the cache
+   */
+  private setCacheValuesforView(columnsKey: string, sortedColKey: string,
+      pageKey: string) {
 
     // shared between trx and recycle tables
-    localStorage.setItem(this.sortableColumnsLSK,
+    localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
 
-    const currentSortedCol = this._tableService.findCurrentSortedColumn(
+    const currentSortedCol = this._tableService.getColumnByName(
       this.currentSortedColumnName, this.sortableColumns);
+    localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
 
-    if (this.isTransactionViewActive()) {
-
-      if (currentSortedCol) {
-        localStorage.setItem(this.transactionCurrentSortedColLSK,
-          JSON.stringify(currentSortedCol));
-      }
-
-      localStorage.setItem(this.transactionPageLSK, this.config.currentPage.toString());
-    } else if (this.isRecycleBinViewActive()) {
-
-      if (currentSortedCol) {
-        localStorage.setItem(this.recycleCurrentSortedColLSK,
-          JSON.stringify(currentSortedCol));
-      }
-      localStorage.setItem(this.recyclePageLSK, this.config.currentPage.toString());
-    } else {
+    if (currentSortedCol) {
+      localStorage.setItem(sortedColKey, JSON.stringify(currentSortedCol));
     }
+    localStorage.setItem(pageKey, this.config.currentPage.toString());
   }
 
 
@@ -708,6 +731,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     for (const field of otherSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }
+    this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
 
@@ -721,7 +745,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   private calculateNumberOfPages(): void {
-
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
       if (this.transactionsModel && this.transactionsModel.length > 0) {
         this.numberOfPages = this.transactionsModel.length / this.config.itemsPerPage;

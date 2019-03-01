@@ -179,6 +179,7 @@ export class TransactionsService {
     t1.contributorOccupation = 'Lawyer';
     const date = new Date('2019-01-01');
     t1.date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    t1.deletedDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
     t1.memoCode = 'Memo Code';
     t1.memoText = 'The memo text';
     t1.name = 'Mr. John Doe';
