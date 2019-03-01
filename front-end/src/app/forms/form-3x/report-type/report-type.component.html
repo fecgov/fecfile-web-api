@@ -1,5 +1,10 @@
 
 <div class="report-type-container" *ngIf="showForm">
+    <form
+    [formGroup]="frmReportType"
+    (ngSubmit)="doValidateOption()"
+    (blur)="doValidateOption()"
+  >
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -17,26 +22,36 @@
           
         </div>
         
-        <div class="float-right">
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-          >
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-        </div>
+        <div class="float-right" ngbDropdown>
+            <button
+              type="button"
+              class="btn btn-link btn-options"
+              id="dropdownBasic2"
+              ngbDropdownToggle
+            >
+              <span class="ellipsis-icon" aria-hidden="true"></span>
+              <span class="sr-only">Click for more options</span>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+              <button class="dropdown-item">View</button>
+              <button class="dropdown-item">Print</button>
+              <button class="dropdown-item">Import</button>
+            </div>
+          </div>
       </div>
-      <hr />
+     <!-- <hr /> -->  
     </header>
-    <form
+
+  <!-- <form
       [formGroup]="frmReportType"
       (ngSubmit)="doValidateOption()"
       (blur)="doValidateOption()"
-    >
+    > --> 
       <section>
         <div class="form-content">
           <div class="grid-row">
+         <!--<div class="row">
+          <div class="col">-->
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
                 *ngIf="(frmReportType.invalid && (frmReportType.dirty || frmReportType.touched)) ">

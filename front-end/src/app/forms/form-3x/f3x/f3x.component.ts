@@ -49,8 +49,8 @@ export class F3xComponent implements OnInit {
   public fromDate: string = '';
   public toDate: string = '';
   public selectedReportType: selectedReportType = {};
- 
   public reportType: string = '';
+  public coverageDateNotSelected: boolean = true;
 
   private _step: string = '';
   private _formType: string = '';
@@ -156,17 +156,24 @@ export class F3xComponent implements OnInit {
   
     if ( typeof  this.reportType === 'undefined' || this.reportType === null)
     {
-      this.selectedReportType  = this.reporttypes.find( x => x.default_disp_ind === 'Y');
+      if ( typeof  this.reporttypes !== 'undefined' && this.reporttypes !== null){
+        this.selectedReportType  = this.reporttypes.find( x => x.default_disp_ind === 'Y');
+      }
 
-      if ( typeof this.selectedReportType !== 'undefined' || typeof this.selectedReportType !== null)
+      if ( typeof this.selectedReportType !== 'undefined' &&  this.selectedReportType !== null)
       {
         this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
       }
       else
       {
-        this.reportType  = this.reporttypes[0].report_type;
-        this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
-        this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+        if ( typeof this.reporttypes !== 'undefined' &&  this.reporttypes !== null){
+          this.reportType  = this.reporttypes[0].report_type;
+          console.log(" F3xComponent this.reportType =", this.reportType)
+          localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttypes[0]));
+          localStorage.setItem('form3XReportInfo.reportType', this.reportType);
+          this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
+          this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
+        }
       }
 
       if (this.reporttypeindicator === 'S') {
@@ -183,11 +190,13 @@ export class F3xComponent implements OnInit {
        
         this.specialreports=false;
         this.regularreports=true;
-        this.electionDate=this.selectedReportType.election_state[0].dates[0];
-        this.fromDate=this.electionDate.cvg_start_date;
-        this.toDate=this.electionDate.cvg_end_date;
-        localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
-        localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
+        if ( typeof this.selectedReportType != 'undefined' && this.selectedReportType != null){
+          this.electionDate=this.selectedReportType.election_state[0].dates[0];
+          this.fromDate=this.electionDate.cvg_start_date;
+          this.toDate=this.electionDate.cvg_end_date;
+          localStorage.setItem('form3XReportInfo.toDate', this.electionDate.cvg_start_date);
+          localStorage.setItem('form3XReportInfo.fromDate', this.electionDate.cvg_end_date);
+        }
       }
       
     }
@@ -224,6 +233,9 @@ export class F3xComponent implements OnInit {
           this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
           if ( typeof this.reporttypes !== 'undefined' && this.reporttypes !== null) {
             this.reportType  = this.reporttypes[0].report_type;
+            console.log(" F3xComponent this.reportType =", this.reportType)
+            localStorage.setItem('form3XReportInfo.reportType', this.reportType);
+            localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttypes[0]));
             this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
             this.reporttypeindicator= this.selectedReportType.regular_special_report_ind;
           }
@@ -232,8 +244,11 @@ export class F3xComponent implements OnInit {
        else
        {
         this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-        if ( this.reporttypes !==undefined) {
+        if ( this.reporttypes !== 'undefined' && this.reporttypes !==null ) {
          this.reportType  = this.reporttypes[0].report_type;
+         console.log(" F3xComponent this.reportType =", this.reportType)
+         localStorage.setItem('form3XReportInfo.reportType', this.reportType);
+         localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttypes[0]));
         }
 
         this.selectedReportType = this.reporttypes.find( x => x.report_type===this.reportType)
@@ -279,7 +294,10 @@ export class F3xComponent implements OnInit {
         else
         {
           this.electionState = this.electionStates.find( x => x.state === this.selectedstate);
-          this.electionDates  =  this.electionState.dates;
+          if ( typeof this.electionState  !== 'undefined' &&  this.electionState  !== null){
+            this.electionDates  =  this.electionState.dates;  
+          }
+          
         }
       }
     }
@@ -289,6 +307,73 @@ export class F3xComponent implements OnInit {
     if (typeof this.form3xSelectedReportType !=='undefined' && this.form3xSelectedReportType !== null){
       localStorage.setItem('form3XReportInfo.reportDescription', this.selectedReportType.report_type_desciption);
     }
+   
+    // started here
+
+    this.reportType = localStorage.getItem('form3XReportInfo.reportType');
+    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+
+    
+    if (localStorage.getItem('form3XReportInfo.reportTypeSelected')==="Y"){
+
+      if (this.reporttypes !== null && this.reporttypes !== undefined)
+      {
+
+        if (typeof this.reportType === 'undefined' || this.reportType === null ){
+          this.reportType = this.reporttypes[0].report_type;
+        }
+
+        this.reporttype  = this.reporttypes.find( x => x.report_type ===  this.reportType);
+        localStorage.setItem('form3XReportInfo.reportType', this.reporttype.report_type);
+        localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
+        localStorage.setItem('form3XReportInfo.reportDescription', this.reporttype.report_type_desciption);
+        //localStorage.removeItem('form3XReportInfo.state');
+
+        if (this.reporttype.regular_special_report_ind==="R"){
+          this.coverageDateNotSelected=false;  
+        } else if (this.reporttype.regular_special_report_ind==="S"){
+            if (localStorage.getItem('form3XReportInfo.state') === "---" || localStorage.getItem('form3XReportInfo.state') === "") {
+              this.coverageDateNotSelected=true;
+            } else if (localStorage.getItem('form3XReportInfo.electionDate') === "---" || localStorage.getItem('form3XReportInfo.electionDate') === "") {
+              this.coverageDateNotSelected=true;
+              } else if ((localStorage.getItem('form3XReportInfo.toDate')) === "") {
+                  this.coverageDateNotSelected=true;
+                  } else if ((localStorage.getItem('form3XReportInfo.fromDate')) === "") {
+                    this.coverageDateNotSelected=true;
+                    }  
+          }  
+      } 
+      console.log (" F3xComponent this.coverageDateNotSelected =",this.coverageDateNotSelected);
+    }
+    else {
+      if (this.reporttypes !== null && this.reporttypes !== undefined)
+      {
+
+        if (typeof this.reportType === 'undefined' || this.reportType === null ){
+          this.reportType = this.reporttypes[0].report_type;
+        }
+
+        this.reporttype  = this.reporttypes.find( x => x.report_type ===  this.reportType);
+        localStorage.setItem('form3XReportInfo.reportType', this.reporttype.report_type);
+        localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
+        localStorage.setItem('form3XReportInfo.reportDescription', this.reporttype.report_type_desciption);
+        //localStorage.removeItem('form3XReportInfo.state');
+
+      /*  if (this.reporttype.regular_special_report_ind==="R"){
+          this.coverageDateNotSelected=false;  
+        } else if (this.reporttype.regular_special_report_ind==="S"){
+            if (localStorage.getItem('form3XReportInfo.state') === "---" || localStorage.getItem('form3XReportInfo.state') === "") {
+              this.coverageDateNotSelected=true;
+            } else if (localStorage.getItem('form3XReportInfo.electionDate') === "---" || localStorage.getItem('form3XReportInfo.electionDate') === "") {
+              this.coverageDateNotSelected=true;
+              } else if ((localStorage.getItem('form3XReportInfo.toDate')) === "") {
+                  this.coverageDateNotSelected=true;
+                  } else if ((localStorage.getItem('form3XReportInfo.fromDate')) === "") {
+                    this.coverageDateNotSelected=true;
+                    }  */
+          }  
+    }
+
   }
 
   ngOnChanges(): void

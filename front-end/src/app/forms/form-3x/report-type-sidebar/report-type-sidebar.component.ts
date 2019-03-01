@@ -112,10 +112,10 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   selectStateChange(value: string): void {
-    
+    console.log(" ReportTypeSidebarComponent selectStateChange state =", value);
     localStorage.setItem('form3XReportInfo.state', value);
     
-    
+    if (value !== "---"){
       for(var item in this.selectedreporttype) {
         if (item==="election_state"){
           for (var electionstate in this.selectedreporttype[item]){
@@ -140,10 +140,18 @@ export class ReportTypeSidebarComponent implements OnInit {
           this.electiondatesTmp[item]["election_date"]  =  this.electiondates[item]["election_date"]
         }
       }*/
+    }
+    else {
+      localStorage.removeItem('form3XReportInfo.electionDate');
+      localStorage.removeItem('form3XReportInfo.dueDate');
+      localStorage.removeItem('form3XReportInfo.toDate');
+      localStorage.removeItem('form3XReportInfo.fromDate');
+    }
+    
+    this.fromDate = "";
+    this.toDate = "";
+    
 
-      this.fromDate = "";
-      this.toDate = "";
-     
     
     this.status.emit({
       electiondates: this.electiondates
@@ -152,12 +160,10 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ElectionDateChange(value: string): void
   {
-    
-
     if ( typeof this.electiondates !== "undefined" &&  this.electiondates !== null)
     {
-     
-      for(var prop in this.electiondates) {
+      if (value !== "---"){
+        for(var prop in this.electiondates) {
            if (this.electiondates[prop]["election_date"] === value ){
               this.fromDate = this.electiondates[prop]["cvg_start_date"];
               this.toDate = this.electiondates[prop]["cvg_end_date"];
@@ -169,8 +175,15 @@ export class ReportTypeSidebarComponent implements OnInit {
               localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_start_date"]));
               localStorage.setItem('form3XReportInfo.electionDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["election_date"]));
             }
-       }
-     }
+        }
+      }
+      else {
+        localStorage.setItem('form3XReportInfo.electionDate', "---")
+        localStorage.removeItem('form3XReportInfo.dueDate');
+        localStorage.removeItem('form3XReportInfo.toDate');
+        localStorage.removeItem('form3XReportInfo.fromDate');        
+      }
+   }
   
       this.status.emit({
         electiondates: this.electiondates
