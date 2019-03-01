@@ -5,8 +5,8 @@ import { TransactionsTableComponent } from './transactions-table/transactions-ta
 import { TransactionsMessageService } from './service/transactions-message.service';
 
 export enum ActiveView {
-  transactions = "transactions",
-  recycleBin = "recycleBin"
+  transactions = 'transactions',
+  recycleBin = 'recycleBin'
 }
 
 /**
@@ -18,25 +18,25 @@ export enum ActiveView {
   styleUrls: ['./transactions.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [
-				style({opacity:0}),
-				animate(500, style({opacity:1})) 
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate(500, style({ opacity: 1 }))
       ]),
-				transition(':leave', [
-				animate(10, style({opacity:0})) 
-			])
-		])
-	]
+      transition(':leave', [
+        animate(10, style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class TransactionsComponent implements OnInit {
 
-  public formType: string = '';
+  public formType = '';
   public appliedFilterNames: Array<string> = [];
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
-  
+
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -50,10 +50,10 @@ export class TransactionsComponent implements OnInit {
   public ngOnInit(): void {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    console.log("transactions for form " + this.formType);
+    console.log('transactions for form ' + this.formType);
 
     // push an applied filter for test
-    this.appliedFilterNames.push("Filter " + this.appliedFilterNames.length + 1);
+    this.appliedFilterNames.push('Filter ' + this.appliedFilterNames.length + 1);
   }
 
 
@@ -64,21 +64,21 @@ export class TransactionsComponent implements OnInit {
     this.view = ActiveView.recycleBin;
   }
 
-  
+
   /**
    * Show the table of form transactions.
    */
   public showTransactions() {
-    this.view = ActiveView.transactions;    
+    this.view = ActiveView.transactions;
   }
 
-  
+
   /**
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
     this.showTransactions();
-    this._transactionsMessageService.sendMessage("show the Pin Col");
+    this._transactionsMessageService.sendMessage('show the Pin Col');
   }
 
 
@@ -86,7 +86,7 @@ export class TransactionsComponent implements OnInit {
    * Import transactions from an external file.
    */
   public doImport() {
-    alert("Import transactions is not yet supported");
+    alert('Import transactions is not yet supported');
   }
 
 
@@ -94,15 +94,15 @@ export class TransactionsComponent implements OnInit {
    * Show filter options for transactions.
    */
   public showFilters() {
-    alert("Transaction filters are not yet supported");
+    alert('Transaction filters are not yet supported');
   }
-  
+
 
   /**
    * Navigate to the Categories component.
    */
   public navigateToCategories() {
-    alert("Return to Categories is not yet supported");
+    alert('Return to Categories is not yet supported');
   }
 
 
@@ -110,7 +110,7 @@ export class TransactionsComponent implements OnInit {
    * Check if the view to show is Transactions.
    */
   public isTransactionViewActive() {
-    return this.view == this.transactionsView ? true : false;
+    return this.view === this.transactionsView ? true : false;
   }
 
 
@@ -118,7 +118,7 @@ export class TransactionsComponent implements OnInit {
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
-    return this.view == this.recycleBinView ? true : false;
-  }  
+    return this.view === this.recycleBinView ? true : false;
+  }
 
 }
