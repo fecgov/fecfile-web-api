@@ -418,10 +418,5 @@ export class ReportTypeComponent implements OnInit {
   public viewTransactions() {
     this._router.navigate(['/forms/transactions', this._form_type]); 
   }
-  
-// smahal: for dev only -
-  public viewTransactions() {
-    this._router.navigate(['/forms/transactions', this._form_type]); 
-  }
     
 }
