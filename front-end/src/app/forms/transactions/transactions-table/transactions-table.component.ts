@@ -178,10 +178,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
-        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions,
-          this.transactionsModel);
+
+        this._transactionsService.mockApplyRestoredTransaction(res);
+
+        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
+
         this.transactionsModel = this._transactionsService.sortTransactions(
             transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+
         this.totalAmount = res.totalAmount;
         this.config.totalItems = res.totalTransactionCount;
         this.allTransactionsSelected = false;
@@ -198,7 +202,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.calculateNumberOfPages();
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
-        this.transactionsModel = res.transactions;
+
+        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
+
+        this.transactionsModel = transactionsModelL; // res.transactions;
         this.config.totalItems = res.totalTransactionCount;
 
         // If a row was deleted, the current page may be greated than the last page
