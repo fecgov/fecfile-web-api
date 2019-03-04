@@ -27,7 +27,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
         animate(500, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        animate(10, style({ opacity: 0 }))
+        animate(0, style({ opacity: 0 }))
       ])
     ])
   ]

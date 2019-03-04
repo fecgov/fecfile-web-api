@@ -151,7 +151,6 @@ export class TransactionsService {
   }
 
 
-
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
       response.transactions.push(trx);
@@ -175,10 +174,10 @@ export class TransactionsService {
 
 
   /**
-   * Gets the transactions for the form type.
+   * Gets the transactions for the form.
    *
    * @param      {String}   formType      The form type of the transaction to get
-   * @return     {Observable}             The form being retreived.
+   * @return     {Observable}             An Observable of type `any` containing the transactions
    */
   public getUserDeletedTransactions(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));

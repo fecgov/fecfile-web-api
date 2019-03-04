@@ -115,7 +115,7 @@
                 <td *ngIf="isColumnVisible('street')">{{trx.street}}</td>
                 <td *ngIf="isColumnVisible('city')">{{trx.city}}</td>
                 <td *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-                <td *ngIf="isColumnVisible('zip')">{{trx.zip}}</td>
+                <td *ngIf="isColumnVisible('zip')">{{trx.zip}} / {{trx.zip | zipCode}}</td>
                 <td *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
                 <td *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
                 <td *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
