@@ -22,7 +22,7 @@
   <div class="form__container">
       <div class="form__content" >
         <div class="card pl-3 pr-3">
-                   <!--<h2 class="pb-3 pt-3 border-bottom">Reports
+                   <h2 class="pb-3 pt-3 border-bottom">Reports
                       <span class="float-right">
                       <button type="button" class="btn btn-success"><i class="fas fa-sync-alt"></i> Refresh</button>
                       <button type="button" class="btn btn-secondary"><i class="fas fa-filter"></i> Filter</button>
@@ -38,9 +38,10 @@
                    <div class="tab-content" id="nav-tabContent">
                       <div class="tab-pane fade show active" id="nav-year" role="tabpanel" aria-labelledby="nav-home-tab">
                           <app-reportdetails
-                          title="Report for current year"
+                          title="Report for Archives"
                           (status)='onNotify($event)'
-                          [specialreports]="specialreports"
+                          [reports]="reports"
+                          tableType="{{reportsView}}"
                         ></app-reportdetails>
                       </div>
       
@@ -48,19 +49,20 @@
                           <app-reportdetails
                           title="Report for Archives"
                           (status)='onNotify($event)'
-                          [specialreports]="specialreports"
+                          [reports]="reports"
+                          tableType="{{reportsView}}"
                         ></app-reportdetails>
                     </div>
-                   </div>  --> 
+                   </div>  
 
-                   <div >
+                 <!-- <div >
                        <app-reportdetails
                       title="Report for Archives"
                       (status)='onNotify($event)'
                       [reports]="reports"
                       tableType="{{reportsView}}">
                     ></app-reportdetails>
-                </div>
+                </div>-->
 
 
                    <!-- start here -->
