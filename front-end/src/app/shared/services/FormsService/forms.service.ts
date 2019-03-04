@@ -448,8 +448,6 @@ export class FormsService {
 
     }
 
-    console.log ('PreviewForm_ReasonScreen Data: ',data);
-    console.log ("${environment.apiUrl}${url}=", `${environment.apiUrl}${url}`)
     //new Response(data).text().then(console.log)
 
     return this._http
@@ -558,7 +556,6 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
 
@@ -585,7 +582,6 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
     params = params.append('form_type', "F3X");
 
@@ -624,7 +620,6 @@ export class FormsService {
 
   //httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
 
@@ -639,7 +634,7 @@ export class FormsService {
   formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
+
   console.log(" saveReport formData ",formData );
 
   return this._http
@@ -659,7 +654,7 @@ export class FormsService {
           return false;
       }));
  }
-  
+
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   const url: string = '/core/get_dynamic_forms_fields';

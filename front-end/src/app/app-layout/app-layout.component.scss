@@ -226,6 +226,16 @@
           font-size: 1em;
           font-family: $committeeInfoFontFamily;
         }
+        .btn-edit {
+          color: $black;
+          text-decoration: none;
+          &:hover,
+          &:visited,
+          &:active {
+            color: black;
+            text-decoration: none;
+          }
+        }
         @include clearfix();
       }
       .app__content {

@@ -19,7 +19,7 @@ export class AppLayoutComponent implements OnInit {
   @Input() status: any;
 
 	public showSideBar: boolean = true;
-  public sideBarClass: string = 'dashboard active';
+  public sideBarClass: string = '';
   public toggleMenu: boolean = false;
   public committeeName: string = '';
   public committeeId: string = '';
@@ -74,14 +74,12 @@ export class AppLayoutComponent implements OnInit {
           }
           if(val.url.indexOf('/dashboard') === 0) {
             this.sideBarClass = 'dashboard active';
+            this.showSideBar = true;
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
+              this.showSideBar = true;
               this.sideBarClass = 'active';
-            } else {
-              this.sideBarClass = '';
             }
-          }else if(val.url.indexOf('/dashboard') === -1 && val.url.indexOf('/forms') === -1) {
-            this.sideBarClass = 'active';
           }
         }
       });
@@ -89,6 +87,10 @@ export class AppLayoutComponent implements OnInit {
 
   ngDoCheck(): void {
     let route: string = this._router.url;
+
+    if (route === '/dashboard') {
+      this.sideBarClass = 'dashboard active';
+    }
 
     if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
       this.showForm3XDashBoard = true;
