@@ -1,5 +1,6 @@
-@import '../shared/scss/global';
-
+//  'src/app/shared/scss
+//@import 'src/app/shared/scss/global';
+@import '../../shared/scss/global';
 .forms__wizard {
     display: table;
     table-layout: fixed;
