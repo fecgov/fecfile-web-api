@@ -18,11 +18,11 @@
       </report-type-sidebar>
     </div>
     <div *ngIf="step==='step_2' || step==='step_3'">
-      <transaction-categories-sidebar
+      <transaction-sidebar
         title="Transaction Categories"
         (status)='onNotify($event)'
       >
-      </transaction-categories-sidebar>
+      </transaction-sidebar>
     </div>
   </div>
   <div

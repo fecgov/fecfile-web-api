@@ -53,9 +53,11 @@ export class TransactionSidebarComponent implements OnInit {
       });
   }
 
-  public selectItem(item): void {
+  public selectItem(e): void {
     console.log('selectItem: ');
-    this.itemSelected = item.getAttribute('value');
+    console.log('e: ', e.target.getAttribute('value'));
+    this.itemSelected = '';
+    // item.getAttribute('value');
 
     this.additionalOptions = [];
 

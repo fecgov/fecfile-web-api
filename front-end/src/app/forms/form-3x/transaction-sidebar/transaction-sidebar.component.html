@@ -9,7 +9,15 @@
         *ngFor="let categoryType of transactionCategories"
       >
         <div class="float-left">
-          {{ categoryType?.text }}
+          <button
+            type="button"
+            class="btn btn-link"
+            value="{{ categoryType?.text.toLowerCase() }}"
+            (click)="selectItem($event)"
+          >
+            <i class="plus-icon" aria-hidden="true"></i>
+           {{ categoryType?.text }}
+          </button>
         </div>
         <div class="float-right amount">
           $0
