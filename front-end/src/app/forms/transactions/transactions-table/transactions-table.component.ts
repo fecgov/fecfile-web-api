@@ -199,13 +199,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
   public getRecyclingPage(page: number): void {
+
     this.calculateNumberOfPages();
+
+    const sortedCol: SortableColumnModel =
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
-        this.transactionsModel = transactionsModelL; // res.transactions;
+        this.transactionsModel = this._transactionsService.sortTransactions(
+          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+
         this.config.totalItems = res.totalTransactionCount;
 
         // If a row was deleted, the current page may be greated than the last page
@@ -693,7 +700,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.transactionCurrentSortedColLSK, this.transactionPageLSK);
         break;
       case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
+        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
         break;
       default:

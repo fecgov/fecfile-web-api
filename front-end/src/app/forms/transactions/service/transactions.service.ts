@@ -155,7 +155,7 @@ export class TransactionsService {
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
       response.transactions.push(trx);
-      response.totalAmount += trx.amount;
+      response.totalAmount += trx.transaction_amount;
       response.totalTransactionCount++;
     }
   }
@@ -215,19 +215,8 @@ export class TransactionsService {
    */
   public restoreTransaction(trx: TransactionModel): Observable<any> {
 
-    // const index = this.mockRestoreTrxArray.indexOf(trx);
     const index = this.mockRestoreTrxArray.findIndex(
       item => item.transaction_id === trx.transactionId);
-
-    // let index = 0;
-    // for (const restoreItem of this.mockRestoreTrxArray) {
-    //   if (restoreItem.transaction_id === trx.transactionId) {
-    //     this.mockRestoreTrxArray.splice(index, 1);
-    //     this.mockRecycleBinArray.push(trx);
-    //     break;
-    //   }
-    //   index++;
-    // }
 
     if (index !== -1) {
       this.mockRestoreTrxArray.splice(index, 1);
