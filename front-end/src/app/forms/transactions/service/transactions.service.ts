@@ -20,6 +20,7 @@ export interface GetTransactionsResponse {
 export class TransactionsService {
 
   // only for mock data
+  // rename to mock
   private restoreTrxArray = [];
   private trxArray = [];
   private transactionId = 'TID12345';
