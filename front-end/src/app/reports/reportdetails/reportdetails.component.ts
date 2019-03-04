@@ -17,7 +17,7 @@ import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } fro
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { reportModel } from '../report';
+//import { reportModel } from '../report';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 //import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -28,6 +28,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
+import { reportModel} from 'src/app/shared/interfaces/FormsService/FormsService';
 
 
 @Component({
@@ -63,16 +64,21 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public reportsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
 
-  // Local Storage Keys
-  private readonly sortableColumnsLSK: string = "transactions.sortableColumn";
-  private readonly transactionCurrentSortedColLSK: string = 
-    "transactions.trx.currentSortedColumn";
-  private readonly recycleCurrentSortedColLSK: string = 
-    "transactions.recycle.currentSortedColumn"; 
-  private readonly transactionPageLSK: string = 
-    "transactions.trx.page";
-  private readonly recyclePageLSK: string = 
-    "transactions.recycle.page";       
+ // Local Storage Keys
+ private readonly transactionSortableColumnsLSK =
+ 'transactions.trx.sortableColumn';
+ private readonly recycleSortableColumnsLSK =
+ 'transactions.recycle.sortableColumn';
+ private readonly transactionCurrentSortedColLSK =
+ 'transactions.trx.currentSortedColumn';
+ private readonly recycleCurrentSortedColLSK =
+ 'transactions.recycle.currentSortedColumn';
+ private readonly transactionPageLSK =
+ 'transactions.trx.page';
+ private readonly recyclePageLSK =
+ 'transactions.recycle.page';
+
+
 
   /**.
 	 * Array of columns to be made sortable.
@@ -129,7 +135,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
-		let paginateConfig: PaginationInstance = {
+		/*let paginateConfig: PaginationInstance = {
 			id: 'Report-table-pagination',
 			itemsPerPage: 5,
 			currentPage: 1
@@ -146,6 +152,23 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     else {
       console.log("ngOnInit this.sortableColumns ...");
       this.setSortableColumns();
+
+      const paginateConfig: PaginationInstance = {
+        id: 'forms__trx-table-pagination',
+        itemsPerPage: 5,
+        currentPage: 1
+      };
+      this.config = paginateConfig;
+  
+      this.getCachedValues();
+      this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+  
+      for (const col of this.sortableColumns) {
+        if (col.checked) {
+          this.columnOptionCount++;
+        }
+      }
+      this.getPage(this.config.currentPage);
     }
 
     
@@ -159,7 +182,24 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
 
     this.setSortDefault();
-    this.getPage(this.config.currentPage);   
+    this.getPage(this.config.currentPage);   */
+
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__trx-table-pagination',
+      itemsPerPage: 5,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
+    this.getCachedValues();
+    this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
+
+    for (const col of this.sortableColumns) {
+      if (col.checked) {
+        this.columnOptionCount++;
+      }
+    }
+    this.getPage(this.config.currentPage);
   }
 
 
@@ -206,8 +246,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
     this.config.currentPage = page;
 
-    let sortedCol: SortableColumnModel = 
-    this._tableService.findCurrentSortedColumn(this.currentSortedColumnName, this.sortableColumns);
+    /*let sortedCol: SortableColumnModel = 
+    this._tableService.findCurrentSortedColumn(this.currentSortedColumnName, this.sortableColumns); */
+    
+    const sortedCol: SortableColumnModel =
+    this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
     
     console.log("this.formType", this.formType);
     console.log("page", page);
@@ -216,16 +260,50 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("sortedCol", sortedCol);
     
 
-    this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
+    /*this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
         .subscribe( (res:GetReportsResponse) => {
       this.reportsModel = res.reports;
       //this.totalAmount = res.totalAmount;
       //this.config.totalItems = res.totalTransactionCount;
       this.allTransactionsSelected = false;
-    });  
+    });  */
+
+
+    this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
+      this.currentSortedColumnName, sortedCol.descending)
+      .subscribe((res: GetReportsResponse) => {
+        this.reportsModel = [];
+        const reportsModel = this._formsService.mapFromServerFields(res.reports,
+          this.reportsModel);
+        this.reportsModel = this._formsService.sortTransactions(
+          reportsModel, this.currentSortedColumnName, sortedCol.descending);
+      
+        this.allTransactionsSelected = false;
+      });
+
   }  
 
+  /*public getTransactionsPage(page: number): void {
+
+    this.config.currentPage = page;
+
+    const sortedCol: SortableColumnModel =
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    this._formsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
+      this.currentSortedColumnName, sortedCol.descending)
+      .subscribe((res: GetTransactionsResponse) => {
+        this.transactionsModel = [];
+        const transactionsModelL = this._formsService.mapFromServerFields(res.transactions,
+          this.transactionsModel);
+        this.transactionsModel = this._formsService.sortTransactions(
+            transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+        this.totalAmount = res.totalAmount;
+        this.config.totalItems = res.totalTransactionCount;
+        this.allTransactionsSelected = false;
+      });
+  }*/
 
   /**
 	 * The Transactions for the recycling bin.
@@ -599,7 +677,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Apply cached values in local storage to the component's class variables.
    */
-  private applyCachedValues() : void {
+  
+  /* private applyCachedValues() : void {
     let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnsLSK);
     if (localStorage.getItem(this.sortableColumnsLSK) != null) {
       this.sortableColumns = JSON.parse(sortableColumnsJson);
@@ -634,7 +713,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
     else {
     }
-  }
+  }*/
 
 
   /**
@@ -677,7 +756,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Retrieve the cahce values from local storage and set the
    * component's class variables.
    */
-  private setCachedValues() {
+  
+  /* private setCachedValues() {
 
     // shared between trx and recycle tables
     localStorage.setItem(this.sortableColumnsLSK, 
@@ -705,8 +785,40 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
     else {
     }
+  } */
+
+  private setCachedValues() {
+    switch (this.tableType) {
+      case this.reportsView:
+        this.setCacheValuesforView(this.transactionSortableColumnsLSK,
+          this.transactionCurrentSortedColLSK, this.transactionPageLSK);
+        break;
+     /* case this.recycleBinView:
+        this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
+          this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+        break;*/
+      default:
+        break;
+    }
   }
 
+
+  private setCacheValuesforView(columnsKey: string, sortedColKey: string,
+    pageKey: string) {
+
+  // shared between trx and recycle tables
+  localStorage.setItem(columnsKey,
+    JSON.stringify(this.sortableColumns));
+
+  const currentSortedCol = this._tableService.getColumnByName(
+    this.currentSortedColumnName, this.sortableColumns);
+  localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
+
+  if (currentSortedCol) {
+    localStorage.setItem(sortedColKey, JSON.stringify(currentSortedCol));
+  }
+  localStorage.setItem(pageKey, this.config.currentPage.toString());
+}
 
   /**
    * Set the Table Columns model.
@@ -749,4 +861,30 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getCachedValues() {
+    switch (this.tableType) {
+      case this.reportsView:
+        this.applyColCache(this.transactionSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.transactionPageLSK);
+        break;
+      /*case this.recycleBinView:
+        this.applyColCache(this.recycleSortableColumnsLSK);
+        this.applyColumnsSelected();
+        this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.recyclePageLSK);
+        break;*/
+      default:
+        break;
+    }
+  }
+  private applyColCache(key: string) {
+    const sortableColumnsJson: string | null = localStorage.getItem(key);
+    if (localStorage.getItem(key) != null) {
+      this.sortableColumns = JSON.parse(sortableColumnsJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.setSortableColumns();
+    }
+  }
 }
