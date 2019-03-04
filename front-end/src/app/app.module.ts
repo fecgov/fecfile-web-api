@@ -65,7 +65,9 @@ import { TransactionsComponent } from './forms/transactions/transactions.compone
 import { ModalModule } from 'ngx-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
-
+import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -112,7 +114,10 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
     ReportTypeSidebarComponent,
     FinancialSummaryComponent,
     OrderByPipe,
-    IndividualReceiptComponent
+    IndividualReceiptComponent,
+    ReportsidebarComponent,
+    ReportheaderComponent,
+    ReportdetailsComponent
   ],
   entryComponents: [
     ConfirmModalComponent

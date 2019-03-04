@@ -8,6 +8,7 @@ import { ValidateComponent } from '../../../shared/partials/validate/validate.co
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
 
+
 @Component({
   selector: 'f3x-report-type',
   templateUrl: './report-type.component.html',
@@ -384,6 +385,10 @@ export class ReportTypeComponent implements OnInit {
     this._form3XReportInfo.amend_Indicator='';
     this._form3XReportInfo.coh_bop="0";
 
+    localStorage.setItem('form3XReportInfo.toDate', JSON.stringify(toDateString));  
+    localStorage.setItem('form3XReportInfo.fromDate', JSON.stringify(fromDateString));  
+    localStorage.setItem('form3XReportInfo.dueDate', JSON.stringify(dueDateString));  
+    localStorage.setItem('form3XReportInfo.electionDate', JSON.stringify(this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.electionDate'))));
 
     localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
 
@@ -407,13 +412,51 @@ export class ReportTypeComponent implements OnInit {
     this._router.navigateByUrl('/forms/form/3X?step=step_2');
 
   }
-  getDateInMMDDYYYYFormat(value: string):string {
-    let DateString = value;
-    let DateObject = new Date(DateString);
-    DateString = DateObject.toLocaleDateString();
-    return DateString;
-  }
 
+  public getDateInMMDDYYYYFormat(value: string):string {
+    let initial: string ="";
+    console.log("getDateInMMDDYYYYFormat =",value);
+
+    if (value !== null){
+      
+      /*let DateString = value;
+      let DateObject = new Date(DateString);
+      DateString = DateObject.toLocaleDateString();
+      return DateString;*/
+
+      /*var initial = 'dd/mm/yyyy'.split(/\//);
+      console.log( [ initial[1], initial[0], initial[2] ].join('/')); //=> 'mm/dd/yyyy'
+      // or in this case you could use*/
+      initial =value.split(/\//).reverse().join('-');
+      initial=[ initial[1], initial[0], initial[2] ].join('/');
+      initial="04/05/2018";
+      /*let newDate = new Date(initial);
+      let newdate=newDate.getDate()+1;
+      newdate.setDate(newdate.getDate() + 1);
+      //return this.getFormattedDate(newdate)*/
+      console.log("initial", value);
+
+      var datatoday = new Date(value);
+      var newdt = new Date(datatoday.setDate(datatoday.getDate() + 1));
+      //var datatodays = datatoday.setDate(new Date(value).getDate() + 1);
+      //var todate = new Date(datatodays);
+      console.log("initial todate", newdt);
+      console.log(" getDateInMMDDYYYYFormat todate = ", newdt)
+      return this.getFormattedDate(newdt)
+
+    }
+    else
+    {
+      return "";
+    }
+  }
+  public  getFormattedDate(date: Date) {
+    let year = date.getFullYear();
+    let month = (1 + date.getMonth()).toString().padStart(2, '0');
+    let day = date.getDate().toString().padStart(2, '0');
+  
+    return month + '/' + day + '/' + year;
+}
   // smahal: for dev only -
   public viewTransactions() {
     this._router.navigate(['/forms/transactions', this._form_type]); 

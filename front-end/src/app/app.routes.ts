@@ -22,6 +22,11 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 
+import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
+
+
 export const AppRoutes: Routes = [
 	{
         path: '',
@@ -35,7 +40,13 @@ export const AppRoutes: Routes = [
 		  { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'profile', component: ProfileComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'tools', component: ToolsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
-		  { path: 'reports', component: ReportsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+			{ path: 'reports', component: ReportheaderComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
+			/*{ path: 'reports', component: ReportsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], */
+		    children: [
+			   { path: 'reports/reportdetails', component: ReportdetailsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService], }/*  */
+			]
+		  },
+  
 			{ path: 'account', component: AccountComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_transactions', component: ToolsImportTransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_names', component: ToolsImportNamesComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },

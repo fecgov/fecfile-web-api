@@ -53,7 +53,7 @@
                  Form {{ formType }} has been successfully saved.
                </div>
              </div>
-           </div>
+         </div>
          <form [formGroup]="frmSignee" (ngSubmit)="doSubmitForm()">
            <div class="grid-row">
              <div class="grid-row__col grid-row__col--6">
@@ -98,6 +98,7 @@
                </div>
              </div>
            </div>
+
            <div class="grid-row">
              <div class="grid-row__col grid-row__col--12">
                If your name is not listed, please
@@ -105,22 +106,32 @@
              </div>
            </div>
            <hr />
+
            <div class="grid-row">
-             <div class="grid-row__col grid-row__col--6">
-               <div class="grid-col">
-                <h4>Email(s) on file</h4>
-                {{ committee_details?.email_on_file }}
-                <br />
-                {{ committee_details?.email_on_file_1 }}
+              <div class="grid-row__col grid-row__col--4">
+                  <h4>Email(s) on file</h4>
               </div>
-            </div>
-            <div class="grid-col">
-             <div class="grid-row__col grid-row__col--12">
-               <h4>Additional Email(s) For Your Confirmation Receipt</h4>
-               <div class="additional-email__field">
-                <div class="grid-row">
-                  <div class="grid-col">
-                    <label for="additional_email_1"> Additional Email 01 </label>  
+              <div class="grid-row__col grid-row__col--8">
+                  <h4>Additional Email(s) For Your Confirmation Receipt</h4>
+              </div>
+            <!-- <div class="grid-row__col grid-row__col--3">
+                  &nbsp;
+              </div>
+              <div class="grid-row__col grid-row__col--3">
+                  &nbsp;
+              </div> -->
+           </div>
+
+           <div class="grid-row">
+              <div class="grid-row__col grid-row__col--4">
+                   {{ committee_details?.email_on_file }}
+                  <br />
+                  {{ committee_details?.email_on_file_1 }}
+              </div>
+
+              <div class="grid-row__col grid-row__col--3">
+                
+                    <label for="additional_email_1"> Additional Email 01 </label> <br />
                     <input
                       type="email"
                       name="additional_email_1"
@@ -128,20 +139,53 @@
                       (change)="changeAdditionalEmail($event)"
                       (blur)="updateAdditionalEmail($event)"
                       formControlName="additional_email_1"
-                    >
+                    > &nbsp;&nbsp;
                     <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
                         <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
-                          Additional email 1 must be valid email address.
+                            &nbsp;Additional email 1 must <br />be valid email address.
                         </div>
                     </div>
-                  </div>
+              </div>
 
+              <div class="grid-row__col grid-row__col--2">
+                 
+                  <label for="confirm_email_1"> Confirm Email 01 </label> 
+                  &nbsp;&nbsp;
+                      <input
+                        type="email"
+                        name="confirm_email_1"
+                        value=""
+                        (change)="changeAdditionalEmail($event)"
+                        (blur)="updateAdditionalEmail($event)"
+                        formControlName="confirm_email_1"
+                      >
+                      <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
+                          <div class="text-error" *ngIf="frmSignee.controls.confirm_email_1.errors?.email">
+                              &nbsp;Confirm email 1 must<br /> be valid email address.
+                          </div>
+                      </div>
+              </div>
 
-                  <div class="grid-col">
-                      &nbsp;&nbsp;&nbsp;&nbsp; 
-                       </div>
-                  <div class="grid-col">
-                      <label for="additional_email_2"> Additional Email 02 </label>  
+              <div class="grid-row__col grid-row__col--3">
+                    &nbsp;&nbsp;
+                     <div class="text-error" *ngIf="additionalEmail1Invalid && showAdditionalEmail1Warn">
+                        &nbsp;&nbsp;&nbsp;Confirm additional Email 01.
+                    </div>
+                    <div class="text-success" *ngIf="!additionalEmail1Invalid && showAdditionalEmail1Warn">
+                        &nbsp;&nbsp;&nbsp;{{this.confirm_email_1}} has been successfully added.
+                    </div>
+               </div>   
+           </div>
+
+           <div class="grid-row">
+               <div class="grid-row__col grid-row__col--4">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+               </div>
+                 
+               <div class="grid-row__col grid-row__col--3">
+                  <br />
+                      <label for="additional_email_2"> Additional Email 02</label>
+                      &nbsp;&nbsp;
                       <input
                         type="email"
                         name="additional_email_2"
@@ -149,97 +193,46 @@
                         (change)="changeAdditionalEmail($event)"
                         (blur)="updateAdditionalEmail($event)"
                         formControlName="additional_email_2"
-                      >
-
+                      > 
                       <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
                           <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
-                            Additional email 2 must be valid email address.
+                            &nbsp;&nbsp;Additional email 2 must <br />be valid email address.
                           </div>
                       </div>
-                 </div>
-                </div>
-               </div>
-             </div>
-            </div>
-          </div>
+               </div> 
 
-          <div class="grid-row">
-              <div class="grid-row__col grid-row__col--6">
-                <div class="grid-col">
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-               </div>
-             </div>
-             <div class="grid-col">
-              <div class="grid-row__col grid-row__col--12">
-                <div class="additional-email__field">
-                 <div class="grid-row">
-                
-                  <div class="grid-col">
+               <div class="grid-row__col grid-row__col--2">
                   <br />
-                  
-                    <label for="confirm_email_1"> Confirm Email 01 </label>  
-                    <input
-                      type="email"
-                      name="confirm_email_1"
-                      value=""
-                      (change)="changeAdditionalEmail($event)"
-                      (blur)="updateAdditionalEmail($event)"
-                      formControlName="confirm_email_1"
-                    >
-                    <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                        <div class="text-error" *ngIf="frmSignee.controls.confirm_email_1.errors?.email">
-                          Confirm email 1 must be valid email address.
-                        </div>
-                    </div>
-                    <div>
-                      <br />
-    
-                      <div class="text-error" *ngIf="additionalEmail1Invalid && showAdditionalEmail1Warn">
-                          Additional email 1 is invalid.
-                      </div>
-                      <div class="text-success" *ngIf="!additionalEmail1Invalid && showAdditionalEmail1Warn">
-                          {{this.confirm_email_1}} <br /> has been successfully added.
-                      </div>
-                      <div class="text-error" *ngIf="additionalEmail2Invalid && showAdditionalEmail2Warn">
-                          Additional email 2 is invalid.
-                      </div>
-                      <div class="text-success" *ngIf="!additionalEmail2Invalid && showAdditionalEmail2Warn">
-                          {{this.confirm_email_2}}<br /> has been successfully added.
-                      </div>
-                    </div>
-                  </div>
-  
-                   <div class="grid-col">
-                      &nbsp;&nbsp;&nbsp;&nbsp; 
-                      
-                   </div>
-                   <div class="grid-col">
-                      <br />
-                     
-                     <label for="confirm_email_2"> Confirm Email  02 </label>  
-                     <input
+                  <label for="confirm_email_2"> Confirm Email  02 </label> 
+                  &nbsp;&nbsp;<input
                        type="email"
                        name="confirm_email_2"
                        value=""
                        (change)="changeAdditionalEmail($event)"
                        (blur)="updateAdditionalEmail($event)"
                        formControlName="confirm_email_2"
-                     >
+                     > 
                      <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
-                        <div class="text-error" *ngIf="frmSignee.controlsconfirm_email_2.errors?.email">
-                            Confirm email 2 must be valid email address.
+                        <div class="text-error" *ngIf="frmSignee.controls.confirm_email_2.errors?.email">
+                            &nbsp;Confirm email 2 must <br />be valid email address.
                         </div>
                      </div>
                      <br />
-                     <br />
-                 
-                   </div>
+               </div>
 
-                  </div>
-                 </div>
-              </div>
-             </div>
-           </div>  
+               <div class="grid-row__col grid-row__col--3">
+                      <br />
+                      <div class="text-error" *ngIf="additionalEmail2Invalid && showAdditionalEmail2Warn">
+                          &nbsp;&nbsp;&nbsp;Confirm additional Email 02.
+                      </div>
+                      <div class="text-success" *ngIf="!additionalEmail2Invalid && showAdditionalEmail2Warn">
+                          &nbsp;&nbsp;&nbsp;{{this.confirm_email_2}} has been successfully added.
+                      </div>
+               </div>
+           </div>
+  
+             <!-- this div-->
+
          
          </form>
        </div> <!-- ./content -->
@@ -306,6 +299,7 @@
           <div class="grid-row__col grid-row__col--12">
           <h4>* = Required</h4>
           </div>
-      </div>         </footer>
+      </div>         
+    </footer>
    </form>
  </div> <!-- ./signee-container -->

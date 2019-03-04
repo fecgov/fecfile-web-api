@@ -3,9 +3,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse, reportModel} from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
-
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+export interface GetReportsResponse {
+  reports: reportModel[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +20,10 @@ export class FormsService {
     private _cookieService: CookieService
   ) { }
 
-  /**
+  private _orderByPipe: OrderByPipe;
+
+
+ /**
    * Gets the form.
    *
    * @param      {String}   committee_id  The committee identifier.
@@ -31,7 +37,7 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
-
+    
     if(form_type === '99') {
       url = '/f99/fetch_f99_info';
     }
@@ -691,4 +697,70 @@ export class FormsService {
       localStorage.removeItem('form3XReportInfo.DashBoardLine2');
    }
  }
+
+ public getReports(formType: string, page: number, itemsPerPage: number,
+  sortColumnName: string, descending: boolean): Observable<any> 
+  {
+     let token: string = JSON.parse(this._cookieService.get('user'));
+     let httpOptions =  new HttpHeaders();
+     let params = new HttpParams();
+     let url: string = '';
+     let reports: reportModel[];
+     let reportResponse:GetReportsResponse;
+     url = '/f99/get_form99list';    
+ 
+     console.log("getReports formType =", formType);
+     console.log("getReports page =", page);
+     console.log("getReports itemsPerPage =", itemsPerPage);
+     console.log("getReports sortColumnName =", sortColumnName);
+     console.log("getReports descending =", descending);
+     
+
+     httpOptions = httpOptions.append('Content-Type', 'application/json');
+     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+     console.log(`${environment.apiUrl}${url}`);
+     
+     /*this._http
+     .get(
+     `${environment.apiUrl}${url}`,
+     {
+       headers: httpOptions
+     }
+
+     .subscribe((res: any) => {
+      console.log("getReports res = ", res);
+    
+      .subscribe(res => this.reports = <IReport[]> res);
+      console.log(this.reports) */
+
+     let ob = this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          //params
+        }
+     ); 
+
+     ob.subscribe((res: any) => {
+      console.log("new getReports res = ", res);
+
+      let direction = descending ? -1 : 1;
+      this._orderByPipe.transform(res, {property: sortColumnName, direction: direction});
+
+      let reportResponse:GetReportsResponse = {
+      reports:res
+
+      
+      };
+    });
+    
+    console.log(JSON.stringify(reportResponse));
+
+    return Observable.of(reportResponse);
+    
+  }
+
+  
 }
