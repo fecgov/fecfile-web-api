@@ -52,7 +52,7 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transaction-categories-sidebar/transaction-categories-sidebar.component';
+import { TransactionSidebarComponent } from './forms/form-3x/transaction-sidebar/transaction-sidebar.component';
 
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
@@ -105,7 +105,7 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
     ConfirmModalComponent,
-    TransactionCategoriesSidbarComponent,
+    TransactionSidebarComponent,
     F3xComponent,
     TransactionTypeComponent,
     ReportTypeComponent,
@@ -134,7 +134,7 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
     QuillModule,
     AngularEditorModule,
     NgbModule.forRoot(),
-    ModalModule.forRoot(), 
+    ModalModule.forRoot(),
     NgxPaginationModule
   ],
   providers: [

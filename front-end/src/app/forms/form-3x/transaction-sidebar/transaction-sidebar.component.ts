@@ -5,12 +5,12 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
-  selector: 'transaction-categories-sidebar',
-  templateUrl: './transaction-categories-sidebar.component.html',
-  styleUrls: ['./transaction-categories-sidebar.component.scss'],
+  selector: 'transaction-sidebar',
+  templateUrl: './transaction-sidebar.component.html',
+  styleUrls: ['./transaction-sidebar.component.scss'],
   providers: [NgbTooltipConfig]
 })
-export class TransactionCategoriesSidbarComponent implements OnInit {
+export class TransactionSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
