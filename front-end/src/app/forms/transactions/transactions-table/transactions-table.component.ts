@@ -27,7 +27,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
         animate(500, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        animate(10, style({ opacity: 0 }))
+        animate(0, style({ opacity: 0 }))
       ])
     ])
   ]
@@ -178,10 +178,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
-        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions,
-          this.transactionsModel);
+
+        this._transactionsService.mockApplyRestoredTransaction(res);
+
+        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
+
         this.transactionsModel = this._transactionsService.sortTransactions(
             transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+
         this.totalAmount = res.totalAmount;
         this.config.totalItems = res.totalTransactionCount;
         this.allTransactionsSelected = false;
@@ -195,10 +199,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
   public getRecyclingPage(page: number): void {
+
     this.calculateNumberOfPages();
+
+    const sortedCol: SortableColumnModel =
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
-        this.transactionsModel = res.transactions;
+
+        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
+
+        this.transactionsModel = this._transactionsService.sortTransactions(
+          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+
         this.config.totalItems = res.totalTransactionCount;
 
         // If a row was deleted, the current page may be greated than the last page
@@ -686,7 +700,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.transactionCurrentSortedColLSK, this.transactionPageLSK);
         break;
       case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
+        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
         break;
       default:
