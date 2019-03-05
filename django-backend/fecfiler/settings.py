@@ -32,6 +32,8 @@ DATA_RECEIVE_API_VERSION = "/api/v1/"
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
+TIME_ZONE = "America/New_York"
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
