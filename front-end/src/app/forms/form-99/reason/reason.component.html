@@ -49,6 +49,9 @@
               <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
                 You must enter a reason.
               </div>
+              <div class="text-error text-center" *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
+                You must enter text.
+              </div>
             </div>
           </div>
           <div class="grid-row info-row">
@@ -116,6 +119,7 @@
                 <textarea
                   placeholder="Enter text here..."
                   (keyup)="updateValidation()"
+                  [maxLength]="editorMax"
                   formControlName="reasonText"
                 ></textarea>
               </div>
