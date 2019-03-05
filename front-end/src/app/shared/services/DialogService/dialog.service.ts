@@ -1,6 +1,7 @@
 import { Injectable, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { ModalHeaderClassEnum } from '../../partials/confirm-modal/confirm-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,11 @@ export class DialogService {
     private _modalService: NgbModal
   ) { }
 
-  public confirm(message?: string, modalContent?: any): Promise<any> {
+  public confirm(message?: string,
+                  modalContent?: any,
+                  modalTitle?: string,
+                  isShowCancel?: boolean,
+                  headerClass?: ModalHeaderClassEnum): Promise<any> {
     const modalOptions: any = {
       'backdrop': true,
       'keyboard': false,
@@ -21,7 +26,19 @@ export class DialogService {
 
     const modalRef = this._modalService
       .open(modalContent, modalOptions);
-    modalRef.componentInstance.message = message;
+
+    if (message) {
+      modalRef.componentInstance.message = message;
+    }
+    if (modalTitle) {
+      modalRef.componentInstance.modalTitle = modalTitle;
+    }
+    if (isShowCancel !== undefined && isShowCancel !== null) {
+      modalRef.componentInstance.isShowCancel = isShowCancel;
+    }
+    if (headerClass) {
+      modalRef.componentInstance.headerClass = headerClass;
+    }
     return modalRef
       .result
       .then(res => {

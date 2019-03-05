@@ -25,6 +25,14 @@
     text-align: left;
   }
 
+
+
+  .transactions__bulk_action_btn[disabled]:hover {
+    background:#6c757d;
+    border-color: #6c757d;
+  }
+
+
   .dropdown-menu {
     min-width: 6em;
   }  

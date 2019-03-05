@@ -10,7 +10,7 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { ActiveView } from '../transactions.component';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 
@@ -530,12 +530,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public restoreTransaction(trx: TransactionModel): void {
 
     this._dialogService
-      .confirm('You are about to restore transaction ' + trx.transactionId, ConfirmModalComponent)
+      .confirm('You are about to restore transaction ' + trx.transactionId + '.',
+          ConfirmModalComponent,
+          'Caution!')
       .then(res => {
         if (res === 'okay') {
           this._transactionsService.restoreTransaction(trx)
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
+              this._dialogService
+              .confirm('Transaction ' + trx.transactionId + ' has been restored!',
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.infoHeader);
             });
         } else if (res === 'cancel') {
         }
