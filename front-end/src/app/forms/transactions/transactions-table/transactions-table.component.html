@@ -78,8 +78,9 @@
                 </th>                                                                                                                                                     
                 <th class="bulk_action">
                     <div *ngIf="isTransactionViewActive()" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                          ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle 
+                            [disabled]="bulkActionDisabled">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -107,7 +108,7 @@
             <tr *ngFor="let trx of transactionsModel | paginate: config; let i = index">
                 <td>
                     <input [(ngModel)]="trx.selected"
-                            type="checkbox">
+                            type="checkbox" (click)="checkForMultiChecked($event)"> 
                 </td>
                 <td *ngIf="isColumnVisible('type')">{{trx.type}}</td>
                 <td *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
@@ -115,7 +116,7 @@
                 <td *ngIf="isColumnVisible('street')">{{trx.street}}</td>
                 <td *ngIf="isColumnVisible('city')">{{trx.city}}</td>
                 <td *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-                <td *ngIf="isColumnVisible('zip')">{{trx.zip}} / {{trx.zip | zipCode}}</td>
+                <td *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
                 <td *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
                 <td *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
                 <td *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
