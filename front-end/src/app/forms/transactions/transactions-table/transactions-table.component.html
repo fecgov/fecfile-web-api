@@ -78,8 +78,9 @@
                 </th>                                                                                                                                                     
                 <th class="bulk_action">
                     <div *ngIf="isTransactionViewActive()" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle [disabled]="bulkActionDisabled">
+                          ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle 
+                            [disabled]="bulkActionDisabled">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
