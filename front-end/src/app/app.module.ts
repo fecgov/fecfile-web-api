@@ -60,12 +60,15 @@ import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.com
 import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
+import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
-
+import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -112,7 +115,11 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
     ReportTypeSidebarComponent,
     FinancialSummaryComponent,
     OrderByPipe,
-    IndividualReceiptComponent
+    ZipCodePipe,
+    IndividualReceiptComponent,
+    ReportsidebarComponent,
+    ReportheaderComponent,
+    ReportdetailsComponent
   ],
   entryComponents: [
     ConfirmModalComponent

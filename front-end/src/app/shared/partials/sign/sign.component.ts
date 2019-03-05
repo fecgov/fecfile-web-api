@@ -384,19 +384,12 @@ export class SignComponent implements OnInit {
 
   
   public changeAdditionalEmail(e): void {
-    
-    this.frmSaved=false;
-    this.showAdditionalEmail1Warn=false;
-    this.showAdditionalEmail2Warn=false;
-    this.showAdditionalEmail1Warn=false;
-    this.showAdditionalEmail2Warn=false;
+    this.frmSaved=false
+    this.clearWarnMsg();
   }
   public updateAdditionalEmail(e): void {
-    this.frmSaved=false;
-    this.showAdditionalEmail1Warn=false;
-    this.showAdditionalEmail2Warn=false;
-    this.showAdditionalEmail1Warn=false;
-    this.showAdditionalEmail2Warn=false;
+    this.frmSaved=false
+    this.clearWarnMsg();
     
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
@@ -428,6 +421,9 @@ export class SignComponent implements OnInit {
   }
 
   public updateValidation(e): void {
+
+    this.clearWarnMsg();
+
     if(e.target.checked) {
       this.signFailed = false;
     } else if (!e.target.checked) {
@@ -467,7 +463,8 @@ export class SignComponent implements OnInit {
         }
       });
   }
-  public printPreview(): void {
+
+    public printPreview(): void {
     console.log("SignComponent printPriview ...");
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
@@ -545,6 +542,15 @@ export class SignComponent implements OnInit {
             console.log('error: ', error);
           });
     }
+
    }
 
+   public clearWarnMsg(): void {
+
+    //this.frmSaved=false;
+    this.showAdditionalEmail1Warn=false;
+    this.showAdditionalEmail2Warn=false;
+    this.additionalEmail1Invalid = true;
+    this.additionalEmail2Invalid =true;
+  }
 }

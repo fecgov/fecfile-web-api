@@ -20,10 +20,13 @@ export interface GetTransactionsResponse {
 export class TransactionsService {
 
   // only for mock data
-  private restoreTrxArray = [];
-  private trxArray = [];
-  private transactionId = 'TID12345';
-  private transactionIdRecycle = 'TIDRECY';
+  private mockRestoreTrxArray = [];
+  private mockTrxArray = [];
+  private mockRecycleBinArray = [];
+  private mockTransactionId = 'TID12345';
+  private mockTransactionIdRecycle = 'TIDRECY';
+  // only for mock data - end
+
   private _orderByPipe: OrderByPipe;
 
   constructor(
@@ -31,22 +34,22 @@ export class TransactionsService {
     private _cookieService: CookieService,
   ) {
     // mock out the recycle trx
-    let t1: any = this.createMockTrx();
     for (let i = 0; i < 13; i++) {
-      t1.transactionId = this.transactionIdRecycle + i;
-      this.restoreTrxArray.push(new TransactionModel(t1));
+      const t1: any = this.createMockTrx();
+      t1.transaction_id = this.mockTransactionIdRecycle + i;
+      this.mockRestoreTrxArray.push(t1);
     }
 
     // mock out the trx
-    const count = 17;
-    t1 = this.createMockTrx();
+    // const count = 17;
+    // t1 = this.createMockTrx();
 
-    this.trxArray = [];
-    for (let i = 0; i < count; i++) {
-      t1.transactionId = this.transactionId + i;
-      t1.amount = 1500 + i;
-      this.trxArray.push(new TransactionModel(t1));
-    }
+    // this.mockTrxArray = [];
+    // for (let i = 0; i < count; i++) {
+    //   t1.transactionId = this.transactionId + i;
+    //   t1.amount = 1500 + i;
+    //   this.mockTrxArray.push(new TransactionModel(t1));
+    // }
 
     this._orderByPipe = new OrderByPipe();
   }
@@ -68,51 +71,113 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('report_id', '1');
+    // TODO these will be used for filtering
+    // params = params.append('report_id', '1');
     // params = params.append('line_number', '11AI');
     // params = params.append('transaction_type', '15');
     // params = params.append('transaction_type_desc', 'Individual Receipt');
-    params = params.append('transaction_id', 'VVBSTFQ9Z78');
+    // params = params.append('transaction_id', 'VVBSTFQ9Z78');
     // params = params.append('transaction_date', '2018-10-18');
 
-    // return
-    const ob = this._http
-     .get(
+    return this._http
+    .get(
         `${environment.apiUrl}${url}`,
         {
           headers: httpOptions,
           params
         }
       );
-    ob.subscribe((res: any) => {
-      console.log(res);
-    });
-
-    const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(this.trxArray, {property: sortColumnName, direction: direction});
-
-    let totalAmount = 0;
-    for (const trx of this.trxArray) {
-      totalAmount += trx.amount;
-    }
-
-    const mockResponse: GetTransactionsResponse = {
-      transactions: this.trxArray,
-      totalAmount: totalAmount,
-      totalTransactionCount: this.trxArray.length
-    };
-
-    console.log(JSON.stringify(mockResponse));
-
-    return Observable.of(mockResponse);
   }
 
 
   /**
-   * Gets the transactions for the form type.
+   * Map server fields from the response to the model.
+   */
+  public mapFromServerFields(serverData: any) {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
+    }
+    const modelArray = [];
+    for (const row of serverData) {
+      const model = new TransactionModel({});
+      model.type = row.transaction_type_desc;
+      model.transactionId = row.transaction_id;
+      model.name = row.name;
+      model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
+      model.city = row.city;
+      model.state = row.state;
+      model.zip = row.zip_code;
+      model.date = row.transaction_date;
+      model.amount = row.transaction_amount;
+      model.aggregate = 0;
+      model.purposeDescription = row.purpose_description;
+      model.contributorEmployer = row.employer;
+      model.contributorOccupation = row.occupation;
+      model.memoCode = row.memo_code;
+      model.memoText = row.memo_text;
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+
+
+  /**
+   * Map front-end model fields to server fields.
+   */
+  public mapToServerFields(model: TransactionModel) {
+
+    const serverObject: any = {};
+    if (!model) {
+      return serverObject;
+    }
+
+    serverObject.transaction_type_desc = model.type;
+    serverObject.transaction_id = model.transactionId;
+    serverObject.name =  model.name;
+    serverObject.street_1 = model.street;
+    serverObject.city = model.city;
+    serverObject.state = model.state;
+    serverObject.zip_code = model.zip;
+    serverObject.transaction_date = model.date;
+    serverObject.transaction_amount = model.amount;
+    serverObject.aggregate = model.aggregate;
+    serverObject.purpose_description = model.purposeDescription;
+    serverObject.employer = model.contributorEmployer;
+    serverObject.occupation = model.contributorOccupation;
+    serverObject.memo_code = model.memoCode;
+    serverObject.memo_text = model.memoText;
+
+    return serverObject;
+  }
+
+
+  public mockApplyRestoredTransaction(response: any) {
+    for (const trx of this.mockRecycleBinArray) {
+      response.transactions.push(trx);
+      response.totalAmount += trx.transaction_amount;
+      response.totalTransactionCount++;
+    }
+  }
+
+
+  /**
+   *
+   * @param array
+   * @param sortColumnName
+   * @param descending
+   */
+  public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
+    const direction = descending ? -1 : 1;
+    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    return array;
+  }
+
+
+  /**
+   * Gets the transactions for the form.
    *
    * @param      {String}   formType      The form type of the transaction to get
-   * @return     {Observable}             The form being retreived.
+   * @return     {Observable}             An Observable of type `any` containing the transactions
    */
   public getUserDeletedTransactions(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
@@ -134,36 +199,27 @@ export class TransactionsService {
     //     }
     //   );
 
-
-    // let t1: any = this.createMockTrx();
-
-    // let trxArray = [];
-    // for (let i = 0; i < 8; i++) {
-    //   trxArray.push(new TransactionModel(t1));
-    // }
-
-    // let mockResponse: GetTransactionsResponse = {
-    //   transactions: trxArray,
-    //   totalAmount: 0,
-    //   totalTransactionCount: 8
-    // };
-
     const mockResponse: GetTransactionsResponse = {
-      transactions: this.restoreTrxArray,
+      transactions: this.mockRestoreTrxArray,
       totalAmount: 0,
-      totalTransactionCount: this.restoreTrxArray.length
+      totalTransactionCount: this.mockRestoreTrxArray.length
     };
-    // console.log(JSON.stringify(mockResponse));
     return Observable.of(mockResponse);
   }
 
 
+  /**
+   *
+   * @param trx
+   */
   public restoreTransaction(trx: TransactionModel): Observable<any> {
 
-    const index = this.restoreTrxArray.indexOf(trx);
+    const index = this.mockRestoreTrxArray.findIndex(
+      item => item.transaction_id === trx.transactionId);
+
     if (index !== -1) {
-      this.restoreTrxArray.splice(index, 1);
-      this.trxArray.push(trx);
+      this.mockRestoreTrxArray.splice(index, 1);
+      this.mockRecycleBinArray.push(this.mapToServerFields(trx));
     }
 
     return Observable.of('');
@@ -173,23 +229,25 @@ export class TransactionsService {
   private createMockTrx() {
     const t1: any = {};
     t1.aggregate = 1000;
-    t1.amount = 1500;
+    t1.transaction_amount = 1500;
     t1.city = 'New York';
-    t1.contributorEmployer = 'Exxon';
-    t1.contributorOccupation = 'Lawyer';
+    t1.employer = 'Exxon';
+    t1.occupation = 'Lawyer';
     const date = new Date('2019-01-01');
-    t1.date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    t1.memoCode = 'Memo Code';
-    t1.memoText = 'The memo text';
+    t1.transaction_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    t1.deleted_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    t1.memo_code = 'Memo Code';
+    t1.memo_text = 'The memo text';
     t1.name = 'Mr. John Doe';
-    t1.purposeDescription = 'The purpose of this is to...';
+    t1.purpose_description = 'The purpose of this is to...';
     t1.selected = false;
     t1.state = 'New York';
-    t1.street = '7th Avenue';
-    t1.transactionId = this.transactionId;
-    t1.type = 'Individual';
-    t1.zip = '22222';
+    t1.street_1 = '7th Avenue';
+    t1.transaction_id = this.mockTransactionId;
+    t1.transaction_type_desc = 'Individual';
+    t1.zip_code = '22222';
 
     return t1;
   }
+
 }

@@ -3,13 +3,52 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse, reportModel} from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
-
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+export interface GetReportsResponse {
+  reports: reportModel[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
+
+/*export class TransactionsService {
+
+  // only for mock data
+  private restoreTrxArray = [];
+  private trxArray = [];
+  private transactionId = 'TID12345';
+  private transactionIdRecycle = 'TIDRECY';
+  private _orderByPipe: OrderByPipe;
+
+  constructor(
+    private _http: HttpClient,
+    private _cookieService: CookieService,
+  ) {
+    // mock out the recycle trx
+    let t1: any = this.createMockTrx();
+    for (let i = 0; i < 13; i++) {
+      t1.transactionId = this.transactionIdRecycle + i;
+      this.restoreTrxArray.push(new TransactionModel(t1));
+    }
+
+    // mock out the trx
+    const count = 17;
+    t1 = this.createMockTrx();
+
+    this.trxArray = [];
+    for (let i = 0; i < count; i++) {
+      t1.transactionId = this.transactionId + i;
+      t1.amount = 1500 + i;
+      this.trxArray.push(new TransactionModel(t1));
+    }
+
+    this._orderByPipe = new OrderByPipe();
+  }
+}*/
+
 export class FormsService {
 
   constructor(
@@ -17,7 +56,10 @@ export class FormsService {
     private _cookieService: CookieService
   ) { }
 
-  /**
+  private _orderByPipe: OrderByPipe;
+
+
+ /**
    * Gets the form.
    *
    * @param      {String}   committee_id  The committee identifier.
@@ -31,7 +73,7 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
-
+    
     if(form_type === '99') {
       url = '/f99/fetch_f99_info';
     }
@@ -686,4 +728,162 @@ export class FormsService {
       localStorage.removeItem('form3XReportInfo.DashBoardLine2');
    }
  }
+
+
+  /*public getReports(formType: string, page: number, itemsPerPage: number,
+    sortColumnName: string, descending: boolean): Observable<any> 
+    {
+       let token: string = JSON.parse(this._cookieService.get('user'));
+       let httpOptions =  new HttpHeaders();
+       let params = new HttpParams();
+       let url: string = '';
+       let reports: reportModel[];
+       let reportResponse:GetReportsResponse;
+       url = '/f99/get_form99list';    
+   
+       console.log("getReports formType =", formType);
+       console.log("getReports page =", page);
+       console.log("getReports itemsPerPage =", itemsPerPage);
+       console.log("getReports sortColumnName =", sortColumnName);
+       console.log("getReports descending =", descending);
+       
+  
+       httpOptions = httpOptions.append('Content-Type', 'application/json');
+       httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  
+       console.log(`${environment.apiUrl}${url}`);
+       
+       /*this._http
+       .get(
+       `${environment.apiUrl}${url}`,
+       {
+         headers: httpOptions
+       }
+  
+       .subscribe((res: any) => {
+        console.log("getReports res = ", res);
+      
+        .subscribe(res => this.reports = <IReport[]> res);
+        console.log(this.reports) 
+  
+       let ob = this._http
+       .get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions,
+            //params
+          }
+       ); 
+  
+       ob.subscribe((res: any) => {
+        console.log("new getReports res = ", res);
+  
+        let direction = descending ? -1 : 1;
+        this._orderByPipe.transform(res, {property: sortColumnName, direction: direction});
+  
+        let reportResponse:GetReportsResponse = {
+        reports:res
+  
+        
+        };
+      });
+      
+      
+      console.log(JSON.stringify(reportResponse));
+  
+      return Observable.of(reportResponse);
+      
+    }*/
+  
+  public getReports(formType: string, page: number, itemsPerPage: number,
+    sortColumnName: string, descending: boolean): Observable<any> {
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  let httpOptions =  new HttpHeaders();
+  let params = new HttpParams();
+  const url = '/core/get_all_transactions';
+
+  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  // TODO these will be used for filtering
+  // params = params.append('report_id', '1');
+  // params = params.append('line_number', '11AI');
+  // params = params.append('transaction_type', '15');
+  // params = params.append('transaction_type_desc', 'Individual Receipt');
+  // params = params.append('transaction_id', 'VVBSTFQ9Z78');
+  // params = params.append('transaction_date', '2018-10-18');
+
+  return this._http
+  .get(
+      `${environment.apiUrl}${url}`,
+      {
+        headers: httpOptions,
+        params
+      }
+    );
+  
+  }
+
+  /*private createMockTrx() {
+    const t1: any = {};
+    t1.aggregate = 1000;
+    t1.amount = 1500;
+    t1.city = 'New York';
+    t1.contributorEmployer = 'Exxon';
+    t1.contributorOccupation = 'Lawyer';
+    const date = new Date('2019-01-01');
+    t1.date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    t1.deletedDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    t1.memoCode = 'Memo Code';
+    t1.memoText = 'The memo text';
+    t1.name = 'Mr. John Doe';
+    t1.purposeDescription = 'The purpose of this is to...';
+    t1.selected = false;
+    t1.state = 'New York';
+    t1.street = '7th Avenue';
+    t1.transactionId = this.transactionId;
+    t1.type = 'Individual';
+    t1.zip = '22222';
+
+    return t1;
+  }*/
+
+
+  /**
+   * Map server fields from the response to the model.
+   */
+  public mapFromServerFields(serverData: any, modelArray: reportModel[]) {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
+    }
+    if (!modelArray) {
+      modelArray = [];
+    }
+
+    for (const row of serverData) {
+      const model = new reportModel({});
+      model.form_type = row.form_type;
+      model.status = row.status;
+      model.fec_id = row.fec_id;
+      model.amend_ind = row.amend_ind;
+      model.cvg_start_date = row.cvg_start_date;
+      model.report_type_desc = row.report_type_desc;
+      model.filed_date = row.filed_date;
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+
+  /**
+   *
+   * @param array
+   * @param sortColumnName
+   * @param descending
+   */
+  public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
+    const direction = descending ? -1 : 1;
+    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    return array;
+  }
+
 }

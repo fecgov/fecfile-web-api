@@ -23,7 +23,7 @@ export class TableService {
 	 */
   public getSortClass(colName: string, currentSortedColumn: string, sortableColumns: SortableColumnModel[]): string {
 
-    const col: SortableColumnModel = this.findCurrentSortedColumn(currentSortedColumn, sortableColumns);
+    const col: SortableColumnModel = this.getColumnByName(currentSortedColumn, sortableColumns);
     let sortCol = '';
 
     if (col) {
@@ -81,15 +81,15 @@ export class TableService {
 
 
   /**
-  * Given a column name of the currently sorted column, find it's SortableColumnModel object in the array of sortable columns.
+  * Given a column name find it's SortableColumnModel object in the array of columns.
   *
-  * @param currentSortedColumn the column name of the column currently sorted
-  * @param sortableColumns all possible columns to sort
-  * @returns the SortableColumnModel of the currently sorted column
+  * @param columnName the column name to find
+  * @param sortableColumns all possible columns
+  * @returns the SortableColumnModel of the columnName
   */
-  public findCurrentSortedColumn(currentSortedColumn: string, sortableColumns: SortableColumnModel[]): SortableColumnModel {
+  public getColumnByName(columnName: string, sortableColumns: SortableColumnModel[]): SortableColumnModel {
     for (const col of sortableColumns) {
-      if (col.colName === currentSortedColumn) {
+      if (col.colName === columnName) {
         return col;
       }
     }

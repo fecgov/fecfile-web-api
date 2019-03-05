@@ -1,0 +1,198 @@
+ <!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<!-- FontAwesome core CSS -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+<!-- FEC CSS -->
+<!--<link rel="stylesheet" href="src/styles.scss" >-->
+<link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+
+<div class="forms__wizard" >
+ 
+  <div class="form__sidebar" >
+     <app-reportsidebar
+          title="Report Coverage Dates"
+          (status)='onNotify($event)'
+          [specialreports]="specialreports"
+     >
+      </app-reportsidebar>
+  </div>
+ 
+  <div class="form__container">
+      <div class="form__content" >
+        <div class="card pl-3 pr-3">
+                   <h2 class="pb-3 pt-3 border-bottom">Reports
+                      <span class="float-right">
+                      <button type="button" class="btn btn-success"><i class="fas fa-sync-alt"></i> Refresh</button>
+                      <button type="button" class="btn btn-secondary"><i class="fas fa-filter"></i> Filter</button>
+                    </span>
+                    </h2>
+                    <nav class="pb-3">
+                      <div class="nav nav-pills nav-fill" id="nav-tab" role="tablist">
+                        <a class="nav-item nav-link active" id="nav-year-pill" data-toggle="tab" href="#nav-year" role="tab" aria-controls="nav-year" aria-selected="true">Current Year (<span>2019</span>)</a>
+                        <a class="nav-item nav-link" id="nav-archives-tab" data-toggle="tab" href="#nav-archives" role="tab" aria-controls="nav-archives" aria-selected="false">Archives</a>
+                      </div>
+                    </nav>
+                    
+                   <div class="tab-content" id="nav-tabContent">
+                      <div class="tab-pane fade show active" id="nav-year" role="tabpanel" aria-labelledby="nav-home-tab">
+                          <app-reportdetails
+                          title="Report for Archives"
+                          (status)='onNotify($event)'
+                          [reports]="reports"
+                          tableType="{{reportsView}}"
+                        ></app-reportdetails>
+                      </div>
+      
+                      <div class="tab-pane fade" id="nav-archives" role="tabpanel" aria-labelledby="nav-archives-tab">
+                          <app-reportdetails
+                          title="Report for Archives"
+                          (status)='onNotify($event)'
+                          [reports]="reports"
+                          tableType="{{reportsView}}"
+                        ></app-reportdetails>
+                    </div>
+                   </div>  
+
+                 <!-- <div >
+                       <app-reportdetails
+                      title="Report for Archives"
+                      (status)='onNotify($event)'
+                      [reports]="reports"
+                      tableType="{{reportsView}}">
+                    ></app-reportdetails>
+                </div>-->
+
+
+                   <!-- start here -->
+                  <!-- <div class="tab-content" id="nav-tabContent">
+                      <div class="tab-pane fade show active" id="nav-year" role="tabpanel" aria-labelledby="nav-home-tab">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th scope="col">Type <i class="fas fa-sort"></i></th>
+                              <th scope="col">FEC ID <i class="fas fa-sort"></i></th>
+                              <th scope="col">Coverage Start Date <i class="fas fa-sort"></i></th>
+                              <th scope="col">Coverage End Date <i class="fas fa-sort"></i></th>
+                              <th scope="col">Report <i class="fas fa-sort"></i></th>
+                              <th scope="col">Filed Date <i class="fas fa-sort"></i></th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>F99</td>
+                              <td>FEC-01234567</td>
+                              <td>10/01/2018</td>
+                              <td>10/17/2018</td>
+                              <td>Pre-General</td>
+                              <td>10/28/2018</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>F3X</td>
+                              <td>FEC-01239876</td>
+                              <td>07/01/2018</td>
+                              <td>10/17/2018</td>
+                              <td>Oct-Quarterly</td>
+                              <td>10/25/2018</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>F3L</td>
+                              <td>FEC-9876543210</td>
+                              <td>04/01/2018</td>
+                              <td>06/30/2018</td>
+                              <td>Year-End</td>
+                              <td>04/11/2018</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+        
+                      <div class="tab-pane fade" id="nav-archives" role="tabpanel" aria-labelledby="nav-archives-tab">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th scope="col">Type <i class="fas fa-sort"></i></th>
+                              <th scope="col">FEC ID <i class="fas fa-sort"></i></th>
+                              <th scope="col">Coverage Start Date <i class="fas fa-sort"></i></th>
+                              <th scope="col">Coverage End Date <i class="fas fa-sort"></i></th>
+                              <th scope="col">Report <i class="fas fa-sort"></i></th>
+                              <th scope="col">Filed Date <i class="fas fa-sort"></i></th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>F99</td>
+                              <td>FEC-034567</td>
+                              <td>10/01/2015</td>
+                              <td>10/17/2015</td>
+                              <td>Pre-General</td>
+                              <td>10/28/2015</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>F3X</td>
+                              <td>FEC-012376</td>
+                              <td>07/01/2016</td>
+                              <td>10/17/2016</td>
+                              <td>Oct-Quarterly</td>
+                              <td>10/25/2016</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>F3L</td>
+                              <td>FEC-98700653</td>
+                              <td>04/01/2017</td>
+                              <td>06/30/2017</td>
+                              <td>Year-End</td>
+                              <td>04/11/2017</td>
+                              <td>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="view-edit">
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-eye"></i></button>
+                                  <button type="button" class="btn btn-secondary"><i class="fas fa-edit"></i></button>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div> --> 
+                  <!-- End Body Card -->
+                  
+                   <!-- end here -->
+         </div>  
+      <div>         
+  </div> <!-- ./form__container -->
+
+</div> <!-- ./forms__wizard -->
