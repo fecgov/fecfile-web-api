@@ -47,6 +47,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public totalAmount: number;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
+  public bulkActionDisabled = true;
+  public bulkActionCounter = 0;
 
   // ngx-pagination config
   public maxItemsPerPage = 100;
@@ -54,6 +56,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
+
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK =
@@ -149,6 +154,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
   public getPage(page: number): void {
+
+    this.bulkActionCounter = 0;
+    this.bulkActionDisabled = true;
+
     switch (this.tableType) {
       case this.transactionsView:
         this.getTransactionsPage(page);
@@ -561,6 +570,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         start = (end - this.config.itemsPerPage) + 1;
       }
     }
+    this.firstItemOnPage = start;
+    this.lastItemOnPage = end;
     return start + ' - ' + end;
   }
 
@@ -578,9 +589,33 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Check/Uncheck all transactions in the table.
    */
   public changeAllTransactionsSelected() {
-    for (const t of this.transactionsModel) {
-      t.selected = this.allTransactionsSelected;
+
+    // TODO Iterating over the trsnactionsModel and setting the slected prop
+    // works when we have server-side pagination as the model will only contain
+    // transactions for the current page.
+
+    // Until the server is ready for pagination,
+    // we are getting the entire set of tranactions (> 500)
+    // and must only count and set the selected prop for the items
+    // on the current page.
+
+    this.bulkActionCounter = 0;
+    // for (const t of this.transactionsModel) {
+    //   t.selected = this.allTransactionsSelected;
+    //   if (this.allTransactionsSelected) {
+    //     this.bulkActionCounter++;
+    //   }
+    // }
+
+    // TODO replace this with the commented code above when server paginatin is ready.
+    for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
+      this.transactionsModel[i].selected = this.allTransactionsSelected;
+      if (this.allTransactionsSelected) {
+        this.bulkActionCounter++;
+      }
     }
+    console.log('this.bulkActionCounter multi = ' + this.bulkActionCounter);
+    this.bulkActionDisabled = !this.allTransactionsSelected;
   }
 
 
@@ -597,6 +632,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public isRecycleBinViewActive() {
     return this.tableType === this.recycleBinView ? true : false;
+  }
+
+
+  /**
+   * Check for multiple rows checked in the table
+   * and disable/enable the bulk action button
+   * accordingly.
+   *
+   * @param the event payload from the click
+   */
+  public checkForMultiChecked(e: any): void {
+
+    if (e.target.checked) {
+      this.bulkActionCounter++;
+    } else {
+      this.allTransactionsSelected = false;
+      if (this.bulkActionCounter > 0) {
+        this.bulkActionCounter--;
+      }
+    }
+    console.log('this.bulkActionCounter = ' + this.bulkActionCounter);
+    this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
   }
 
 
