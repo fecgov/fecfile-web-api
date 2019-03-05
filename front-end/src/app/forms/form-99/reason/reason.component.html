@@ -119,6 +119,7 @@
                 <textarea
                   placeholder="Enter text here..."
                   (keyup)="updateValidation()"
+                  [maxLength]="editorMax"
                   formControlName="reasonText"
                 ></textarea>
               </div>

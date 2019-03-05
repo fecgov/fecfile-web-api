@@ -44,11 +44,11 @@ export class ReasonComponent implements OnInit {
   public closeResult: string = '';
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
+  public editorMax: number = 20000;
 
   private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
-  private _editorMax: number = 20000;
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
@@ -80,7 +80,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            Validators.maxLength(this._editorMax),
+            Validators.maxLength(this.editorMax),
             Validators.pattern(/^$|\s+/)
           ]],
           file: ['']
@@ -89,7 +89,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            Validators.maxLength(this._editorMax),
+            Validators.maxLength(this.editorMax),
             Validators.pattern(/^$|\s+/)
           ]],
           file: ['']
@@ -99,7 +99,7 @@ export class ReasonComponent implements OnInit {
       this.frmReason = this._fb.group({
         reasonText: ['', [
           Validators.required,
-          Validators.maxLength(this._editorMax),
+          Validators.maxLength(this.editorMax),
           Validators.pattern(/^$|\s+/)
         ]],
         file: ['']
