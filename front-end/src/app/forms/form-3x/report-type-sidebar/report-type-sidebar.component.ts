@@ -13,8 +13,8 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() title: string = '';
-  @Input() specialreports: boolean = false;
-  @Input() regularreports: boolean = false;
+  @Input() specialReports: boolean = false;
+  @Input() regularReports: boolean = false;
   @Input() selectedreporttype:  selectedReportType;
   @Input() selectedstate:  selectedReportType;
   @Input() electiondates:  Array<selectedElectionDate> ;
@@ -32,7 +32,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   public electionDates: selectedElectionState = {};
   public electionDates1: selectedElectionState = {};
   //public electionDates1: any = [];
-  @Input() electiondates1:  Array<selectedElectionDate> ; 
+  @Input() electiondates1:  Array<selectedElectionDate> ;
 
   public electionStates: Array<selectedElectionState> ;
   public stateSelectedElectionDates: any = {};;
@@ -63,7 +63,17 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    
+    console.log('reportTypeSideBar: ');
+    console.log('this.specialReports: ', this.specialReports);
+    console.log('this.regularReports: ', this.regularReports);
+  }
+
+  ngDoCheck(): void {
+    // if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
+    //   if (typeof this.selectedreporttype.regular_special_report_ind !== 'undefined'){
+    //     localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
+    //   }
+    // }
   }
 
   public selectItem(item): void {
@@ -99,22 +109,10 @@ export class ReportTypeSidebarComponent implements OnInit {
     });
   }
 
-  ngDoCheck(): void {
-    if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
-      localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
-    }
-    
-  }
-
-  ngOnChanges(): void {
-    
-
-  }
-
-  selectStateChange(value: string): void {
+  public selectStateChange(value: string): void {
     console.log(" ReportTypeSidebarComponent selectStateChange state =", value);
     localStorage.setItem('form3XReportInfo.state', value);
-    
+
     if (value !== "---"){
       for(var item in this.selectedreporttype) {
         if (item==="election_state"){
@@ -147,12 +145,12 @@ export class ReportTypeSidebarComponent implements OnInit {
       localStorage.removeItem('form3XReportInfo.toDate');
       localStorage.removeItem('form3XReportInfo.fromDate');
     }
-    
+
     this.fromDate = "";
     this.toDate = "";
-    
 
-    
+
+
     this.status.emit({
       electiondates: this.electiondates
     });
@@ -181,10 +179,10 @@ export class ReportTypeSidebarComponent implements OnInit {
         localStorage.setItem('form3XReportInfo.electionDate', "---")
         localStorage.removeItem('form3XReportInfo.dueDate');
         localStorage.removeItem('form3XReportInfo.toDate');
-        localStorage.removeItem('form3XReportInfo.fromDate');        
+        localStorage.removeItem('form3XReportInfo.fromDate');
       }
    }
-  
+
       this.status.emit({
         electiondates: this.electiondates
       });
@@ -194,7 +192,7 @@ export class ReportTypeSidebarComponent implements OnInit {
     console.log("toDate ",value)
     localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(value));
   }
-  
+
   fromDateChange(value: string): void{
     console.log("fromDate ",value);
     localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(value));

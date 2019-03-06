@@ -1,5 +1,5 @@
 
-<div class="report-type-container" *ngIf="showForm">
+<div class="report-type-container" *ngIf="!reportsLoading">
     <form
     [formGroup]="frmReportType"
     (ngSubmit)="doValidateReportType()"
@@ -50,8 +50,7 @@
               value="{{committee_form3x_reporttype.report_type}}"
               (click)="updateTypeSelected($event)"
               formControlName="reportTypeRadio"
-
-            />
+              />
                 <label
                   for="{{committee_form3x_reporttype.report_type_desciption}}"
                 >

@@ -2,27 +2,19 @@
   <div class="form__sidebar" *ngIf="step!=='financial_summary'">
     <div *ngIf="step==='step_1'">
      <report-type-sidebar
-          title="Report Coverage Dates"
-          (status)='onNotify($event)'
-          [specialreports]="specialreports"
-          [regularreports]="regularreports"
-          [stateSelection]="stateSelection"
-          [specialreports]=specialreports
-          [regularreports]=regularreports
-          [selectedreporttype]=selectedReportType
-          [selectedstate]=selectedstate
-          [electiondates]=electionDates
-          [fromDate]=fromDate
-          [toDate]=toDate
+        title="Report Coverage Dates"
+        (status)='onNotify($event)'
+        [specialreports]=specialreports
+        [regularreports]=regularreports
         >
       </report-type-sidebar>
     </div>
     <div *ngIf="step==='step_2' || step==='step_3'">
-      <transaction-sidebar
+      <transaction-categories-sidebar
         title="Transaction Categories"
         (status)='onNotify($event)'
       >
-      </transaction-sidebar>
+      </transaction-categories-sidebar>
     </div>
   </div>
   <div
@@ -36,8 +28,7 @@
       <app-steps
         [steps]="[
           {text: 'Report<br/>type', step: 'step_1'},
-          {text: 'Transaction<br/>type', step: 'step_2'},
-          {text: 'Form', step: 'step_3'},
+          {text: 'Form', step: 'step_2'},
           {text: 'Preview', step: 'step_4'},
           {text: 'Sign', step: 'step_5'},
           {text: 'Submit', step: 'step_6'}
@@ -49,20 +40,20 @@
     <div
       class="form__content"
     >
-      <ng-container *ngIf="step==='financial_summary'">
+      <div *ngIf="step==='financial_summary'">
         <f3x-financial-summary></f3x-financial-summary>
-      </ng-container>
+      </div>
       <div
         class="form__step"
         [hidden]="step!=='step_1'"
       >
         <f3x-report-type
           [formRadioOptionsVisible]="formRadioOptionsVisible"
-          [reportTypeRadio]="reportTypeRadio"
-          (status)='onNotify($event)'
-          [reportType]=reportType
-          [coverageDateNotSelected]=coverageDateNotSelected>
-
+          (status)="onNotify($event)"
+          [reportType]="reportType"
+          [reportsLoading]="reportsLoading"
+          [coverageDateNotSelected]="coverageDateNotSelected"
+        >
         </f3x-report-type>
       </div>
 
@@ -70,12 +61,11 @@
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-      </div>
-
-      <div
-        class="form__step"
-        [hidden]="step!=='step_3'"
-      >
+        <f3x-individual-receipt
+          [formOptionsVisible]="formOptionsVisible"
+          [selectedOptions]="selectedOptions"
+          (status)='onNotify($event)'
+        ></f3x-individual-receipt>
       </div>
 
       <div

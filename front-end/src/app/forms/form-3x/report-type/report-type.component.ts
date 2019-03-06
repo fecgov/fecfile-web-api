@@ -20,7 +20,8 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('mswCollapse') mswCollapse;
   @Input() formRadioOptionsVisible: boolean = false;
-  @Input() reportType:string ='';
+  @Input() reportType: string ='';
+  @Input() reportsLoading;
 
   //@Input() reportTypeRadio: string ='';
 
@@ -179,7 +180,7 @@ export class ReportTypeComponent implements OnInit {
   /**
    * Updates the type selected.
    *
-   * @param      {<type>}  val     The value
+   * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
     if(e.target.checked) {
@@ -355,9 +356,9 @@ export class ReportTypeComponent implements OnInit {
     this._form3XReportInfo.amend_Indicator='';
     this._form3XReportInfo.coh_bop="0";
 
-    localStorage.setItem('form3XReportInfo.toDate', JSON.stringify(toDateString));  
-    localStorage.setItem('form3XReportInfo.fromDate', JSON.stringify(fromDateString));  
-    localStorage.setItem('form3XReportInfo.dueDate', JSON.stringify(dueDateString));  
+    localStorage.setItem('form3XReportInfo.toDate', JSON.stringify(toDateString));
+    localStorage.setItem('form3XReportInfo.fromDate', JSON.stringify(fromDateString));
+    localStorage.setItem('form3XReportInfo.dueDate', JSON.stringify(dueDateString));
     localStorage.setItem('form3XReportInfo.electionDate', JSON.stringify(this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.electionDate'))));
 
     localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
@@ -388,7 +389,7 @@ export class ReportTypeComponent implements OnInit {
     console.log("getDateInMMDDYYYYFormat =",value);
 
     if (value !== null){
-      
+
       /*let DateString = value;
       let DateObject = new Date(DateString);
       DateString = DateObject.toLocaleDateString();
@@ -424,7 +425,7 @@ export class ReportTypeComponent implements OnInit {
     let year = date.getFullYear();
     let month = (1 + date.getMonth()).toString().padStart(2, '0');
     let day = date.getDate().toString().padStart(2, '0');
-  
+
     return month + '/' + day + '/' + year;
 }
   // smahal: for dev only -
