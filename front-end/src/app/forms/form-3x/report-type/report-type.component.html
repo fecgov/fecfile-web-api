@@ -22,13 +22,10 @@
           </h1>
         </div>
       </div>
-     <!-- <hr /> -->
     </header>
       <section>
         <div class="form-content">
           <div class="grid-row">
-         <!--<div class="row">
-          <div class="col">-->
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
                 *ngIf="(frmReportType.invalid && (frmReportType.dirty || frmReportType.touched)) ">
@@ -42,14 +39,11 @@
                 *ngFor="let committee_form3x_reporttype of committee_form3x_reporttypes || async"
               >
               <input
-              type="radio"
-              name="reportTypeRadio"
-              id="{{committee_form3x_reporttype.report_type}}"
-              [checked]="committee_form3x_reporttype.report_type === reportType"
-              class="option-radio"
-              value="{{committee_form3x_reporttype.report_type}}"
-              (click)="updateTypeSelected($event)"
-              formControlName="reportTypeRadio"
+                type="radio"
+                name="reportTypeRadio"
+                [checked]="committee_form3x_reporttype.report_type === typeSelected"
+                (click)="updateTypeSelected($event)"
+                formControlName="reportTypeRadio"
               />
                 <label
                   for="{{committee_form3x_reporttype.report_type_desciption}}"

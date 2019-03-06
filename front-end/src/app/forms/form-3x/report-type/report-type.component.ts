@@ -185,50 +185,17 @@ export class ReportTypeComponent implements OnInit {
   public updateTypeSelected(e): void {
     if(e.target.checked) {
       this.typeSelected = e.target.value;
-      this.typeSelectedId = e.target.id;
-      this.reportTypeRadio = e.target.id;
+      console.log('updateTypeSelected: ');
+      console.log('this.typeSelected:', this.typeSelected);
       this.optionFailed = false;
     } else {
       this.typeSelected = '';
       this.optionFailed = true;
-      this.reportTypeRadio = '';
     }
-
-    //this.reporttype=e.target.id;
-    localStorage.setItem('form3XReportInfo.reportType', e.target.id);
-    this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
-    this.reportType = localStorage.getItem('form3XReportInfo.reportType');
-
-
-    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-
-    if (this.reporttypes !== null && typeof this.reporttypes !== 'undefined')
-    {
-      this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
-      localStorage.setItem('form3XReportInfo.reportType', this.reporttype.report_type);
-      localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
-      localStorage.setItem('form3XReportInfo.reportDescription', this.reporttype.report_type_desciption);
-      //localStorage.removeItem('form3XReportInfo.state');
-
-      if (this.reporttype.regular_special_report_ind==="R"){
-        this.coverageDateNotSelected=true;
-        localStorage.setItem('form3XReportInfo.toDate', JSON.stringify(""));
-        localStorage.setItem('form3XReportInfo.fromDate', JSON.stringify(""));
-       } else if (this.reporttype.regular_special_report_ind==="S"){
-          localStorage.setItem('form3XReportInfo.state', JSON.stringify("---"));
-          localStorage.setItem('form3XReportInfo.electionDate', JSON.stringify("---"));
-          localStorage.setItem('form3XReportInfo.toDate', JSON.stringify(""));
-          localStorage.setItem('form3XReportInfo.fromDate', JSON.stringify(""));
-          this.coverageDateNotSelected=true
-        }
-    }
-
-    localStorage.setItem('form3XReportInfo.reportTypeSelected',"Y");
 
     this.status.emit({
       reportTypeRadio: e.target.id
     });
-    // this.frmType.controls['reportTypeRadio'].setValue(val);
   }
 
   /**

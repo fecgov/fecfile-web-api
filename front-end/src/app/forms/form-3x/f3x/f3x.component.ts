@@ -68,16 +68,12 @@ export class F3xComponent implements OnInit {
     });
   }
 
-  // ngDoCheck(): void {
-  //   if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
-  //     this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-  //     this.step = this._activatedRoute.snapshot.queryParams.step;
-  //   }
-
-  //   if (typeof this.reportType === 'undefined' || this.reportType === null) {
-
-  //   }
-  // }
+  ngDoCheck(): void {
+    if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+      this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+      this.step = this._activatedRoute.snapshot.queryParams.step;
+    }
+  }
 
   /**
    * Sets the reports.
@@ -86,8 +82,6 @@ export class F3xComponent implements OnInit {
     if (typeof this.reportType === 'undefined' || this.reportType === null) {
       if (typeof this.reportTypes !== 'undefined' && this.reportTypes !== null) {
         this.selectedReportType  = this.reportTypes.find(x => x.default_disp_ind === 'Y');
-        console.log('this.selectedReportType: ', this.selectedReportType);
-
         if (typeof this.selectedReportType === 'object') {
           if (typeof this.selectedReportType.regular_special_report_ind === 'string') {
             this.reportTypeIndicator = this.selectedReportType.regular_special_report_ind;
@@ -101,8 +95,15 @@ export class F3xComponent implements OnInit {
             }
           }
         }
-
-
+        if (typeof this.selectedReportType === 'object') {
+          if (typeof this.selectedReportType.regular_special_report_ind === 'string') {
+            if (this.selectedReportType.regular_special_report_ind === 'S') {
+              this.specialReports = true;
+            } else {
+              this.regularReports = true;
+            }
+          }
+        }
       } // typeof this.reportTypes
     } // typeof this.reportType
   }

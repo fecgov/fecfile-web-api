@@ -3,9 +3,9 @@
     <div *ngIf="step==='step_1'">
      <report-type-sidebar
         title="Report Coverage Dates"
-        (status)='onNotify($event)'
-        [specialreports]=specialreports
-        [regularreports]=regularreports
+        (status)="onNotify($event)"
+        [specialReports]="specialReports"
+        [regularReports]="regularReports"
         >
       </report-type-sidebar>
     </div>
@@ -41,7 +41,8 @@
       class="form__content"
     >
       <div *ngIf="step==='financial_summary'">
-        <f3x-financial-summary></f3x-financial-summary>
+        <f3x-financial-summary>
+        </f3x-financial-summary>
       </div>
       <div
         class="form__step"
@@ -54,7 +55,7 @@
           [reportsLoading]="reportsLoading"
           [coverageDateNotSelected]="coverageDateNotSelected"
         >
-        </f3x-report-type>
+      </f3x-report-type>
       </div>
 
       <div
