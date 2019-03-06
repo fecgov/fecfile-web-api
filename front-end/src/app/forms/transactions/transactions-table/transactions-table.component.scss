@@ -1,3 +1,5 @@
+@import '../../../shared/scss/global';
+
 .transactions-table-container {
 
   .forms__trx-table {
@@ -25,13 +27,10 @@
     text-align: left;
   }
 
-
-
-  .transactions__bulk_action_btn[disabled]:hover {
+  .transactions__bulk_action_btn[disabled] {
     background:#6c757d;
     border-color: #6c757d;
   }
-
 
   .dropdown-menu {
     min-width: 6em;
@@ -75,8 +74,8 @@
 
   .column-options-modal {
 
-    #btn-cancel {
-      background-color: #cccccc;
+    #transactions__pin-modal-header {
+      background-color: $crusta;
     }
 
     .btn-modal-footer {

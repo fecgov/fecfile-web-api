@@ -18,7 +18,10 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 @Component({
   selector: 'app-transactions-table',
   templateUrl: './transactions-table.component.html',
-  styleUrls: ['./transactions-table.component.scss'],
+  styleUrls: [
+    './transactions-table.component.scss', 
+    '../../../shared/partials/confirm-modal/confirm-modal.component.scss'
+  ],
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('fadeInOut', [
@@ -540,7 +543,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService
               .confirm('Transaction ' + trx.transactionId + ' has been restored!',
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.infoHeader);
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
             });
         } else if (res === 'cancel') {
         }
