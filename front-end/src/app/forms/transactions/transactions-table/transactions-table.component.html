@@ -1,13 +1,13 @@
-<div class="transactions-table-container">
-    <div class="grid-row float-right">
-        <div class="float-right forms__trx-item-range">
+<div class="transactions__table-container">
+    <div class="grid-row float-right transactions__page-item-range">
+        <div class="float-right transactions__item-range">
             {{determineItemRange()}} of {{config.totalItems}}
         </div>
     </div>            
-    <table class="table table-striped table-hover table__sortable forms__trx-table">
+    <table class="table table-striped table-hover table__sortable transactions__table">
         <thead>
             <tr>
-                <th class="forms__trx-table-checkbox">
+                <th class="transactions__table-checkbox">
                     <input *ngIf="isTransactionViewActive()"
                         [(ngModel)]="allTransactionsSelected"
                         type="checkbox" (change)="changeAllTransactionsSelected()">
@@ -83,7 +83,7 @@
                             [disabled]="bulkActionDisabled">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewAllSelected()">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -138,7 +138,7 @@
                         <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="cloneTransaction(trx)">
                                 <i class="fas fa-copy"></i>Clone
                             </button>
@@ -161,10 +161,10 @@
         </tbody>
     </table>
     <div *ngIf="isTransactionViewActive()" class="container">
-        <div class="row forms__trx-total-amount-container">
-            <div class="col-sm forms__trx-total-amount">
+        <div class="row transactions__total-amount-container">
+            <div class="col-sm transactions__total-amount">
                 <b>Total Amount</b>
-                <i class="fas fa-info-circle forms__trx-total-amount" 
+                <i class="fas fa-info-circle transactions__total-amount" 
                     ngbTooltip="Represents the total amount of transactions entered on the report. 
                         Those transactions that are memo entries are not added into the total amount."
                     tooltipClass="form-tooltip">
@@ -179,7 +179,7 @@
         </div>
     <hr/> 
     <div *ngIf="showPagination()" 
-        class="d-flex justify-content-center forms__trx-table-pagination-container">
+        class="d-flex justify-content-center transactions__table-pagination-container">
         <pagination-controls [id]="config.id"
             (pageChange)="getPage($event)">
         </pagination-controls>	

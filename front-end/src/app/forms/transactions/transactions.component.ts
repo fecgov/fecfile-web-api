@@ -32,10 +32,10 @@ export enum ActiveView {
 export class TransactionsComponent implements OnInit {
 
   public formType = '';
-  public appliedFilterNames: Array<string> = [];
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
+  public isShowFilters = false;
 
 
   constructor(
@@ -48,12 +48,7 @@ export class TransactionsComponent implements OnInit {
    * Initialize the component.
    */
   public ngOnInit(): void {
-
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    console.log('transactions for form ' + this.formType);
-
-    // push an applied filter for test
-    this.appliedFilterNames.push('Filter ' + this.appliedFilterNames.length + 1);
   }
 
 
@@ -94,15 +89,15 @@ export class TransactionsComponent implements OnInit {
    * Show filter options for transactions.
    */
   public showFilters() {
-    alert('Transaction filters are not yet supported');
+    this.isShowFilters = true;
   }
 
 
   /**
-   * Navigate to the Categories component.
+   * Show the categories and hide the filters.
    */
-  public navigateToCategories() {
-    alert('Return to Categories is not yet supported');
+  public showCategories() {
+    this.isShowFilters = false;
   }
 
 
