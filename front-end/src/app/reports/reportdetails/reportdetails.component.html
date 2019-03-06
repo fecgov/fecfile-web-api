@@ -73,9 +73,9 @@
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
                 <td *ngIf="isColumnVisible('fec_id')">{{report.fec_id}}</td>
                 <td *ngIf="isColumnVisible('amend_ind')">{{report.amend_ind}}</td>
-                <td *ngIf="isColumnVisible('cvg_start_date')">{{report.cvg_start_date}}</td>
+                <td *ngIf="isColumnVisible('cvg_start_date')">{{report.cvg_start_date | date: 'MM/dd/yyyy'}}-{{report.cvg_end_date | date: 'MM/dd/yyyy'}}</td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
-                <td *ngIf="isColumnVisible('filed_date')">{{report.filed_date}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">{{report.filed_date | date: 'MM/dd/yyyy'}}</td>
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-secondary" 

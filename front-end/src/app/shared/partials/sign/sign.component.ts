@@ -213,7 +213,9 @@ export class SignComponent implements OnInit {
     let formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
     let formStatus: boolean = true;
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-
+    this.additionalEmail1Invalid=false;
+    this.additionalEmail2Invalid=false;
+    
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
 
@@ -252,13 +254,10 @@ export class SignComponent implements OnInit {
 
       }
 
-      console.log("this.additionalEmail1Invalid",this.additionalEmail1Invalid);
-      console.log("this.additionalEmail2Invalid",this.additionalEmail2Invalid);
-      console.log("this.showAdditionalEmail1Warn",this.showAdditionalEmail1Warn);
-      console.log("this.showAdditionalEmail2Warn",this.showAdditionalEmail2Warn);
-
-
       if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
+        console.log(" saveForm email confirmed");
+
+        this.frmSaved = true;
         this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
         this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
 
@@ -284,6 +283,7 @@ export class SignComponent implements OnInit {
           });
       }
     }  
+     console.log(" saveForm this.frmSaved =", this.frmSaved);
   }
 
   /**
@@ -421,7 +421,7 @@ export class SignComponent implements OnInit {
   }
 
   public updateValidation(e): void {
-
+    this.frmSaved=false;
     this.clearWarnMsg();
 
     if(e.target.checked) {
@@ -464,7 +464,7 @@ export class SignComponent implements OnInit {
       });
   }
 
-    public printPreview(): void {
+  public printPreview(): void {
     console.log("SignComponent printPriview ...");
     this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 

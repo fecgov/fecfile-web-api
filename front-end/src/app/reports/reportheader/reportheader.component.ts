@@ -13,7 +13,7 @@ export enum ActiveView {
 })
 
 export class ReportheaderComponent implements OnInit {
-
+public currentYear:number =2019;
 public reportsView = ActiveView.transactions;
   constructor() { }
 

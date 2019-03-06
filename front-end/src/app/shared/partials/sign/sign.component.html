@@ -109,11 +109,11 @@
 
            <div class="grid-row">
               <div class="grid-row__col grid-row__col--4">
-                  <h4>Email(s) on file</h4>
+                  <h4>Email(s) on File</h4>
               </div>
               <div class="grid-row__col grid-row__col--8">
                   <h4>Additional Email(s) For Your Confirmation Receipt</h4>
-              </div>
+                </div>
             <!-- <div class="grid-row__col grid-row__col--3">
                   &nbsp;
               </div>
@@ -124,13 +124,14 @@
 
            <div class="grid-row">
               <div class="grid-row__col grid-row__col--4">
+                <br />
                    {{ committee_details?.email_on_file }}
                   <br />
                   {{ committee_details?.email_on_file_1 }}
               </div>
 
               <div class="grid-row__col grid-row__col--3">
-                
+                  <br />
                     <label for="additional_email_1"> Additional Email 01 </label> <br />
                     <input
                       type="email"
@@ -142,13 +143,13 @@
                     > &nbsp;&nbsp;
                     <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
                         <div class="text-error" *ngIf="frmSignee.controls.additional_email_1.errors?.email">
-                            &nbsp;Additional email 1 must <br />be valid email address.
+                          &nbsp;&nbsp;Additional email 1 must <br />&nbsp;be valid email address.
                         </div>
                     </div>
               </div>
 
               <div class="grid-row__col grid-row__col--2">
-                 
+                  <br />
                   <label for="confirm_email_1"> Confirm Email 01 </label> 
                   &nbsp;&nbsp;
                       <input
@@ -167,12 +168,12 @@
               </div>
 
               <div class="grid-row__col grid-row__col--3">
-                    &nbsp;&nbsp;
+                  <br /> &nbsp;&nbsp;
                      <div class="text-error" *ngIf="additionalEmail1Invalid && showAdditionalEmail1Warn">
                         &nbsp;&nbsp;&nbsp;Confirm additional Email 01.
                     </div>
                     <div class="text-success" *ngIf="!additionalEmail1Invalid && showAdditionalEmail1Warn">
-                        &nbsp;&nbsp;&nbsp;{{this.confirm_email_1}} has been successfully added.
+                      &nbsp;&nbsp;&nbsp;{{this.confirm_email_1}}<br /> &nbsp;&nbsp;&nbsp;has been successfully added.
                     </div>
                </div>   
            </div>
@@ -196,7 +197,7 @@
                       > 
                       <div *ngIf="(frmSignee.invalid && (frmSignee.dirty || frmSignee.touched))">
                           <div class="text-error" *ngIf="frmSignee.controls.additional_email_2.errors?.email">
-                            &nbsp;&nbsp;Additional email 2 must <br />be valid email address.
+                            &nbsp;&nbsp;Additional email 2 must <br />&nbsp;&nbsp;be valid email address.
                           </div>
                       </div>
                </div> 
@@ -222,11 +223,12 @@
 
                <div class="grid-row__col grid-row__col--3">
                       <br />
+                      <br />
                       <div class="text-error" *ngIf="additionalEmail2Invalid && showAdditionalEmail2Warn">
                           &nbsp;&nbsp;&nbsp;Confirm additional Email 02.
                       </div>
                       <div class="text-success" *ngIf="!additionalEmail2Invalid && showAdditionalEmail2Warn">
-                          &nbsp;&nbsp;&nbsp;{{this.confirm_email_2}} has been successfully added.
+                          &nbsp;&nbsp;&nbsp;{{this.confirm_email_2}}<br /> &nbsp;&nbsp;&nbsp;has been successfully added.
                       </div>
                </div>
            </div>
