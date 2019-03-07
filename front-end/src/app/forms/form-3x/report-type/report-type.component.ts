@@ -18,15 +18,11 @@ import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../..
 export class ReportTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @ViewChild('mswCollapse') mswCollapse;
-  @Input() formRadioOptionsVisible: boolean = false;
-  @Input() reportType: string ='';
-  @Input() reportsLoading;
 
   //@Input() reportTypeRadio: string ='';
 
   public frmReportType: FormGroup;
-  public typeSelected: string = '';
+  public reportTypeSelected: string = '';
   public isValidType: boolean = false;
   public optionFailed: boolean = false;
   public screenWidth: number = 0;
@@ -110,7 +106,7 @@ export class ReportTypeComponent implements OnInit {
           if(this._previousUrl === '/forms/form/3X?step=step_5') {
             this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
-            this.typeSelected = '';
+            this.reportTypeSelected = '';
 
             this._setForm();
           }
@@ -132,41 +128,41 @@ export class ReportTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
-    this.reportType = localStorage.getItem('form3XReportInfo.reportType');
+    // this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
+    // this.reportType = localStorage.getItem('form3XReportInfo.reportType');
 
 
-    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-    this.reportType = localStorage.getItem('form3XReportInfo.reportType');
+    // this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
+    // this.reportType = localStorage.getItem('form3XReportInfo.reportType');
 
-    if (this.reporttypes !== null && this.reporttypes !== undefined)
-    {
-      this.reporttype  = this.reporttypes.find( x => x.report_type === this.reportType);
+    // if (this.reporttypes !== null && this.reporttypes !== undefined)
+    // {
+    //   this.reporttype  = this.reporttypes.find( x => x.report_type === this.reportType);
 
-      if (typeof this.reporttype !== 'undefined' && this.reporttype !== null && this.reporttype !== undefined){
-        if (this.reporttype.regular_special_report_ind ==="R"){
-          if (localStorage.getItem('form3XReportInfo.toDate') === "Invalid Date" || localStorage.getItem('form3XReportInfo.toDate') === "") {
-            this.coverageDateNotSelected=true;
-            } else if (localStorage.getItem('form3XReportInfo.fromDate') === "Invalid Date" || localStorage.getItem('form3XReportInfo.fromDate') === "" ) {
-              this.coverageDateNotSelected=true;
-              } else {
-                this.coverageDateNotSelected=false;
-                }
-        } else if (this.reporttype.regular_special_report_ind==="S"){
-          if (localStorage.getItem('form3XReportInfo.state') === "---" || localStorage.getItem('form3XReportInfo.state') === "" || localStorage.getItem('form3XReportInfo.state') === null) {
-            this.coverageDateNotSelected=true;
-          } else if (localStorage.getItem('form3XReportInfo.electionDate') === "---" || localStorage.getItem('form3XReportInfo.electionDate') === "" || localStorage.getItem('form3XReportInfo.electionDate') === null) {
-            this.coverageDateNotSelected=true;
-              } else if ((localStorage.getItem('form3XReportInfo.toDate')) === "Invalid Date" || localStorage.getItem('form3XReportInfo.toDate') === "" ) {
-                  this.coverageDateNotSelected=true;
-                  } else if ((localStorage.getItem('form3XReportInfo.fromDate')) === "Invalid Date" || localStorage.getItem('form3XReportInfo.fromDate') === "") {
-                    this.coverageDateNotSelected=true;
-                    } else {
-                      this.coverageDateNotSelected=false
-                    }
-          }
-        }
-    }
+    //   if (typeof this.reporttype !== 'undefined' && this.reporttype !== null && this.reporttype !== undefined){
+    //     if (this.reporttype.regular_special_report_ind ==="R"){
+    //       if (localStorage.getItem('form3XReportInfo.toDate') === "Invalid Date" || localStorage.getItem('form3XReportInfo.toDate') === "") {
+    //         this.coverageDateNotSelected=true;
+    //         } else if (localStorage.getItem('form3XReportInfo.fromDate') === "Invalid Date" || localStorage.getItem('form3XReportInfo.fromDate') === "" ) {
+    //           this.coverageDateNotSelected=true;
+    //           } else {
+    //             this.coverageDateNotSelected=false;
+    //             }
+    //     } else if (this.reporttype.regular_special_report_ind==="S"){
+    //       if (localStorage.getItem('form3XReportInfo.state') === "---" || localStorage.getItem('form3XReportInfo.state') === "" || localStorage.getItem('form3XReportInfo.state') === null) {
+    //         this.coverageDateNotSelected=true;
+    //       } else if (localStorage.getItem('form3XReportInfo.electionDate') === "---" || localStorage.getItem('form3XReportInfo.electionDate') === "" || localStorage.getItem('form3XReportInfo.electionDate') === null) {
+    //         this.coverageDateNotSelected=true;
+    //           } else if ((localStorage.getItem('form3XReportInfo.toDate')) === "Invalid Date" || localStorage.getItem('form3XReportInfo.toDate') === "" ) {
+    //               this.coverageDateNotSelected=true;
+    //               } else if ((localStorage.getItem('form3XReportInfo.fromDate')) === "Invalid Date" || localStorage.getItem('form3XReportInfo.fromDate') === "") {
+    //                 this.coverageDateNotSelected=true;
+    //                 } else {
+    //                   this.coverageDateNotSelected=false
+    //                 }
+    //       }
+    //     }
+    // }
 
   }
 
@@ -184,12 +180,12 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if(e.target.checked) {
-      this.typeSelected = e.target.value;
+      this.reportTypeSelected = e.target.value;
       console.log('updateTypeSelected: ');
-      console.log('this.typeSelected:', this.typeSelected);
+      console.log('this.reportTypeSelected:', this.reportTypeSelected);
       this.optionFailed = false;
     } else {
-      this.typeSelected = '';
+      this.reportTypeSelected = '';
       this.optionFailed = true;
     }
 

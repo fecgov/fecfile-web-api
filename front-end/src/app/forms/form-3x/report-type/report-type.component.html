@@ -41,7 +41,8 @@
               <input
                 type="radio"
                 name="reportTypeRadio"
-                [checked]="committee_form3x_reporttype.report_type === typeSelected"
+                [value]="committee_form3x_reporttype.report_type"
+                [checked]="committee_form3x_reporttype.report_type === reportTypeSelected"
                 (click)="updateTypeSelected($event)"
                 formControlName="reportTypeRadio"
               />
