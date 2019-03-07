@@ -70,6 +70,7 @@ import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.co
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 import { TransactionsFilterSidbarComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-sidebar.component';
+import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -118,6 +119,7 @@ import { TransactionsFilterSidbarComponent } from './forms/transactions/transact
     FinancialSummaryComponent,
     OrderByPipe,
     ZipCodePipe,
+    FilterPipe,
     IndividualReceiptComponent,
     ReportsidebarComponent,
     ReportheaderComponent,

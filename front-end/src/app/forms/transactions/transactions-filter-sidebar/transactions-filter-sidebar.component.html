@@ -5,7 +5,8 @@
   <section>
       <div class="mx-auto" style="width:97%">
         <div class="input-group py-1">
-          <input class="form-control" type="text" placeholder="Search by Name, ID or Zip" aria-label="Search">
+          <input class="form-control" [(ngModel)]="searchFilter" type="text" 
+            placeholder="Search by Name, ID or Zip" aria-label="Search">
           <div class="input-group-append">
             <span class="input-group-text">
               <i class="fas fa-search" aria-hidden="true"></i>
@@ -84,37 +85,6 @@
           <h5 class="card-title">Put Memo Code here</h5>
         </div>
       </div>                      
-
-    <!-- <ul class="form-sidebar__links" >
-      <li class="form-sidebar-item">
-        <div class="float-left transactions__filter-title">
-          Type
-        </div>  
-        <div class="input-group pl-0 transactions__filter-search">
-          <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
-        </div>    
-      </li>
-      <li class="form-sidebar-item transactions__filter-title">
-        <div class="float-left">
-          Date
-        </div>       
-      </li>
-      <li class="form-sidebar-item transactions__filter-title">
-        <div class="float-left">
-          Amount
-        </div>       
-      </li>
-      <li class="form-sidebar-item transactions__filter-title">
-        <div class="float-left">
-          State
-        </div>       
-      </li>
-      <li class="form-sidebar-item transactions__filter-title">
-        <div class="float-left">
-          Memo Code
-        </div>       
-      </li>                  
-    </ul>     -->
   </section>
   <footer>
     <div class="form-sidebar__btns">
@@ -129,6 +99,7 @@
         <button
           type="button"
           class="btn btn-secondary"
+          (click)="applyFilters()"
         >
           Apply Filters
         </button>

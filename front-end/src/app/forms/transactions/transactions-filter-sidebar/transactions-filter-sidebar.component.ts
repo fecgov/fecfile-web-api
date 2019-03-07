@@ -27,6 +27,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
   public transactionCategories: any = [];
+  public searchFilter = '';
 
   constructor(
     private _formService: FormsService,
@@ -68,7 +69,19 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     this.isHideMemoFilter = !this.isHideMemoFilter;
   }
 
+  /**
+   * Toggle the direction of the filter collapsed or expanded
+   * depending on the hidden state.
+   *
+   * @returns string of the class to apply
+   */
   public toggleFilterDirection(isHidden: boolean) {
     return isHidden ? 'fa-chevron-up' : 'fa-chevron-down';
   }
+
+  public applyFilters() {
+    const filters: any = {};
+    filters.search = this.searchFilter;
+  }
+
 }
