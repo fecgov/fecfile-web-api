@@ -12,17 +12,24 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 })
 export class TransactionsFilterSidbarComponent implements OnInit {
 
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() title = '';
+  @Input()
+  public formType: string;
+
+  @Input()
+  public title = '';
+
+  @Output()
+  public status: EventEmitter<any> = new EventEmitter<any>();
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
+  public transactionCategories: any = [];
 
   constructor(
-    private _config: NgbTooltipConfig,
+    private _formService: FormsService,
   ) {}
 
   public ngOnInit(): void {
@@ -31,6 +38,14 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     this.isHideAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
+
+    if (this.formType) {
+      this._formService
+      .getTransactionCategories(this.formType)
+        .subscribe(res => {
+          this.transactionCategories = res.data.transactionCategories;
+        });
+    }
   }
 
   public toggleTypeFilterItem() {

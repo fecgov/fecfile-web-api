@@ -4,7 +4,9 @@
       <transaction-categories-sidebar [@fadeInOut] *ngIf="!isShowFilters" title="Transaction Categories"
         (status)='onNotify($event)'>
       </transaction-categories-sidebar>
-      <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters" title="Filters">
+      <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters" 
+        title="Filters"
+        [formType]="formType">
       </app-transactions-filter-sidebar>
     </div>
   </div>

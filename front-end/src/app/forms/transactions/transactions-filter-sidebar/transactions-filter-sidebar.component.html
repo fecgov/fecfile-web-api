@@ -21,7 +21,18 @@
           </i>          
         </div>
         <div class="card-body" [hidden]="isHideTypeFilter">
-          <h5 class="card-title">Input Type here</h5>
+          <ul class="transactions__filter-type-list">
+            <li *ngFor="let categoryType of transactionCategories">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox">
+                  <span>
+                    {{ categoryType?.text }}
+                  </span>
+                </label>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
       <div class="card">
