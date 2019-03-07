@@ -6,7 +6,8 @@
       </transaction-categories-sidebar>
       <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters" 
         title="Filters"
-        [formType]="formType">
+        [formType]="formType"
+        (filterEmitter)="applyFilters($event)">
       </app-transactions-filter-sidebar>
     </div>
   </div>

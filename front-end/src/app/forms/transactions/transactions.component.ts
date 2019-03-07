@@ -116,4 +116,14 @@ export class TransactionsComponent implements OnInit {
     return this.view === this.recycleBinView ? true : false;
   }
 
+
+  /**
+   * Apply the filters against the transactions.
+   * 
+   * @param filters contains filter fileds and values
+   */
+  public applyFilters(filters: any) {
+    console.log('filter search is ' + filters.search);
+  }
+
 }

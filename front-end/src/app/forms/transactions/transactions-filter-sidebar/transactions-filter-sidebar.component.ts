@@ -19,7 +19,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public title = '';
 
   @Output()
-  public status: EventEmitter<any> = new EventEmitter<any>();
+  public filterEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
@@ -79,9 +79,15 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     return isHidden ? 'fa-chevron-up' : 'fa-chevron-down';
   }
 
+
+  /**
+   * Emit filter values to the parent to apply to the transactions.
+   */
   public applyFilters() {
     const filters: any = {};
     filters.search = this.searchFilter;
+
+    this.filterEmitter.emit(filters);
   }
 
 }
