@@ -80,7 +80,7 @@ export class ReportTypeComponent implements OnInit {
      });
 
      if (this.reporttype===null || typeof this.reporttype ==='undefined'){
-      this.reportType=this.committee_form3x_reporttypes[0].report_type;
+      this.reporttype=this.committee_form3x_reporttypes[0].report_type;
      }
 
 
@@ -96,8 +96,6 @@ export class ReportTypeComponent implements OnInit {
       this.tooltipLeft = 'auto';
     }
 
-    this._setForm();
-
     this._router
       .events
       .subscribe(e => {
@@ -107,11 +105,14 @@ export class ReportTypeComponent implements OnInit {
             this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
 
             this.reportTypeSelected = '';
-
-            this._setForm();
           }
         }
       });
+
+    this.frmReportType = this._fb.group({
+      reportTypeRadio: ['', Validators.required]
+
+    });
   }
 
   @HostListener('window:resize', ['$event'])
@@ -166,13 +167,6 @@ export class ReportTypeComponent implements OnInit {
 
   }
 
-  private _setForm(): void {
-    this.frmReportType = this._fb.group({
-      reportTypeRadio: ["", Validators.required]
-
-    });
-  }
-
   /**
    * Updates the type selected.
    *
@@ -180,18 +174,16 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if(e.target.checked) {
-      this.reportTypeSelected = e.target.value;
-      console.log('updateTypeSelected: ');
-      console.log('this.reportTypeSelected:', this.reportTypeSelected);
+      this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
+
+      this.status.emit({
+        reportTypeRadio: this.reportTypeSelected
+      });
     } else {
       this.reportTypeSelected = '';
       this.optionFailed = true;
     }
-
-    this.status.emit({
-      reportTypeRadio: e.target.id
-    });
   }
 
   /**
@@ -245,14 +237,6 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
-  public updateStatus(e): void {
-    if (e.target.checked) {
-      this.optionFailed = false;
-    } else {
-      this.optionFailed = true;
-    }
-  }
-
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
@@ -268,6 +252,7 @@ export class ReportTypeComponent implements OnInit {
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
   }
+
   public saveReport(): void {
     var date1, date2;
     date1 = new Date(localStorage.getItem('form3XReportInfo.dueDate'));

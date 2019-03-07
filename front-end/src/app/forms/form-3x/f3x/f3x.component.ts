@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { forkJoin, of, interval } from 'rxjs';
@@ -29,6 +29,7 @@ export class F3xComponent implements OnInit {
   public reportTypeIndicator: any = {};
   public reportType: any = null;
   public selectedReportType: any = {};
+  public selectedReport: any = {};
   public regularReports: boolean = false;
   public specialReports: boolean = false;
 
@@ -59,6 +60,8 @@ export class F3xComponent implements OnInit {
         if (typeof res === 'object') {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
+
+            console.log('this.reportTypes: ', this.reportTypes);
 
             this.reportsLoading = false;
 
@@ -108,6 +111,12 @@ export class F3xComponent implements OnInit {
     } // typeof this.reportType
   }
 
+  private _setCoverageDates(reportType: string): void {
+    this.selectedReport = this.reportTypes.find(e => {
+      return e.report_type === reportType;
+    });
+  }
+
   /**
    * Get's message from child components.
    *
@@ -115,17 +124,23 @@ export class F3xComponent implements OnInit {
    */
 
   public onNotify(e): void {
-    this.frm = e.form;
+    if (typeof e === 'object') {
+      if (e.frm) {
+        this.frm = e.form;
 
-    this.direction = e.direction;
+        this.direction = e.direction;
 
-    this.previousStep = e.previousStep;
+        this.previousStep = e.previousStep;
 
-    this._step = e.step;
+        this._step = e.step;
 
-    this.currentStep = e.step;
+        this.currentStep = e.step;
 
-    this.canContinue();
+        this.canContinue();
+      } else if (typeof e.reportTypeRadio === 'string') {
+        this._setCoverageDates(e.reportTypeRadio);
+      }
+    }
   }
 
   /**

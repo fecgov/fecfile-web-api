@@ -12,13 +12,12 @@ import { selectedElectionState, selectedElectionDate, selectedReportType } from 
 export class ReportTypeSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() title: string = '';
   @Input() specialReports: boolean = false;
   @Input() regularReports: boolean = false;
+  @Input() selectedReport: any = {};
   @Input() selectedreporttype:  selectedReportType;
   @Input() selectedstate:  selectedReportType;
   @Input() electiondates:  Array<selectedElectionDate> ;
-  //@Input() electiondates:  any ={};
   @Input() fromDate:  string='';
   @Input() toDate:  string='';
   @Input() electiontoDatedates: string='';
@@ -69,6 +68,10 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    if (this.selectedReport) {
+      console.log('report-type-sidebar: ');
+      console.log('selectedReport: ', this.selectedReport);
+    }
     // if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
     //   if (typeof this.selectedreporttype.regular_special_report_ind !== 'undefined'){
     //     localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
