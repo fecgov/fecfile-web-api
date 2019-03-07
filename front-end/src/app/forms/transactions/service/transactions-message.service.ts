@@ -10,7 +10,9 @@ import { Subject } from 'rxjs/Subject';
   providedIn: 'root'
 })
 export class TransactionsMessageService {
+
   private subject = new Subject<any>();
+  private applyFiltersSubject = new Subject<any>();
 
   public sendMessage(message: any) {
     this.subject.next(message);
@@ -23,4 +25,16 @@ export class TransactionsMessageService {
   public getMessage(): Observable<any> {
     return this.subject.asObservable();
   }
+
+  public sendApplyFiltersMessage(message: any) {
+    this.applyFiltersSubject.next(message);
+  }
+
+  public clearApplyFiltersMessage() {
+    this.applyFiltersSubject.next();
+  }
+
+  public getApplyFiltersMessage(): Observable<any> {
+    return this.applyFiltersSubject.asObservable();
+  }  
 }

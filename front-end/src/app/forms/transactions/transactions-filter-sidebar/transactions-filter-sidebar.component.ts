@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { TransactionsMessageService } from '../service/transactions-message.service';
 
 @Component({
   selector: 'app-transactions-filter-sidebar',
@@ -31,6 +32,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
   constructor(
     private _formService: FormsService,
+    private _transactionsMessageService: TransactionsMessageService,
   ) {}
 
   public ngOnInit(): void {
@@ -88,6 +90,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     filters.search = this.searchFilter;
 
     this.filterEmitter.emit(filters);
+    this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
 }

@@ -62,6 +62,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
+  private filters: any;
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK =
@@ -99,6 +100,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private showPinColumnsSubscription: Subscription;
 
+  /**
+   * Subscription for applying filters to the transactions obtained from
+   * the server.
+   */
+  private applyFiltersSubscription: Subscription;
+
   private columnOptionCount = 0;
   private readonly maxColumnOption = 5;
   private allTransactionsSelected: boolean;
@@ -113,6 +120,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
       message => {
         this.showPinColumns();
+      }
+    );
+    this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
+      .subscribe(
+      filters => {
+        this.filters = filters;
+        this.getPage(this.config.currentPage);
       }
     );
   }
@@ -187,11 +201,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
     this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending)
+      this.currentSortedColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
         this._transactionsService.mockApplyRestoredTransaction(res);
+        this._transactionsService.mockApplyFilters(res, this.filters);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -220,6 +235,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
+        this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
         this.transactionsModel = this._transactionsService.sortTransactions(
@@ -664,6 +680,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
   }
 
+
+  public applyFilters(filters: any) {
+    console.log('filter search is ' + filters.search);
+    this.filters = filters;
+    this.getPage(this.config.currentPage);
+  }
 
   /**
    * Get cached values from session.

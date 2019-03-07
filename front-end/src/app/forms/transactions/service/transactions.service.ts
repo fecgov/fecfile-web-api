@@ -7,6 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { TransactionModel } from '../model/transaction.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -27,7 +28,9 @@ export class TransactionsService {
   private mockTransactionIdRecycle = 'TIDRECY';
   // only for mock data - end
 
+  // May only be needed for mocking server
   private _orderByPipe: OrderByPipe;
+  private _filterPipe: FilterPipe;
 
   constructor(
     private _http: HttpClient,
@@ -52,6 +55,7 @@ export class TransactionsService {
     // }
 
     this._orderByPipe = new OrderByPipe();
+    this._filterPipe = new FilterPipe();
   }
 
 
@@ -61,8 +65,13 @@ export class TransactionsService {
    * @param      {String}   formType      The form type of the transaction to get
    * @return     {Observable}             The form being retreived.
    */
-  public getFormTransactions(formType: string, page: number, itemsPerPage: number,
-      sortColumnName: string, descending: boolean): Observable<any> {
+  public getFormTransactions(
+      formType: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean,
+      filter: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
@@ -72,6 +81,14 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     // TODO these will be used for filtering
+    // These are not yet defined in API
+    // params = params.append('page', page);
+    // params = params.append('itemsPerPage', itemsPerPage);
+    // params = params.append('sortColumnName', sortColumnName);
+    // params = params.append('descending', descending);
+    // params = params.append('search', filter.search);
+
+    // These are defined in API
     // params = params.append('report_id', '1');
     // params = params.append('line_number', '11AI');
     // params = params.append('transaction_type', '15');
@@ -150,12 +167,43 @@ export class TransactionsService {
     return serverObject;
   }
 
-
+  // TODO remove once server is ready and mock data is no longer needed
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
       response.transactions.push(trx);
       response.totalAmount += trx.transaction_amount;
       response.totalTransactionCount++;
+    }
+  }
+
+
+  public mockApplyFilters(response: any, filters: any) {
+
+    if (!filters) {
+      return;
+    }
+    if (!response.transactions) {
+      return;
+    }
+    let isFilter = false;
+    if (filters.search) {
+      if (response.transactions.length > 0) {
+        isFilter = true;
+        const obj = response.transactions[0];
+        const fields = ['name', 'zip_code', 'transaction_id'];
+        const filtered = this._filterPipe.transform(response.transactions, fields, filters.search);
+        response.transactions = filtered;
+      }
+    }
+    if (isFilter) {
+      response.totalAmount = 0;
+      response.totalTransactionCount = 0;
+      for (const trx of response.transactions) {
+        if (!trx.memo_code) {
+          response.totalAmount += trx.transaction_amount;
+        }
+        response.totalTransactionCount++;
+      }
     }
   }
 

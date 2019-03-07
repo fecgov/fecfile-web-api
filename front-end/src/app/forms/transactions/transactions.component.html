@@ -61,7 +61,10 @@
           </div>
         </div>
       </div>
-      <app-transactions-table forType="3X" tableType="{{transactionsView}}">
+      <app-transactions-table 
+        forType="3X" 
+        tableType="{{transactionsView}}"
+        (filterEmitter)="applyFilters($event)">
       </app-transactions-table>
     </div>
     <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
