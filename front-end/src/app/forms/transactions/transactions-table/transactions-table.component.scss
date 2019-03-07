@@ -1,3 +1,5 @@
+@import '../../../shared/scss/global';
+
 .transactions__table-container {
 
   .transactions__page-item-range {
@@ -27,6 +29,11 @@
 
   .bulk_action {
     text-align: left;
+  }
+
+  .transactions__bulk_action_btn[disabled] {
+    background:#6c757d;
+    border-color: #6c757d;
   }
 
   .dropdown-menu {
@@ -71,8 +78,8 @@
 
   .column-options-modal {
 
-    #btn-cancel {
-      background-color: #cccccc;
+    #transactions__pin-modal-header {
+      background-color: $crusta;
     }
 
     .btn-modal-footer {
