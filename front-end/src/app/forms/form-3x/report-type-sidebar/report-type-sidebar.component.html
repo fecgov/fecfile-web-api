@@ -27,10 +27,9 @@
           <input
             type="date"
             name="txtfromdate"
-            value={{fromDate}}
-            (change)="fromDateChange($event.target.value)"
             class="form-control"
-            aria-label="Contribution Date"
+            [value]="fromDate"
+            (change)="fromDateChange($event)"
           />
         </div>
         <div class="form-row">
@@ -53,10 +52,9 @@
           <input
             type="date"
             name="txttodate"
-            (change)="fromDateChange($event.target.value)"
-            value={{toDate}}
             class="form-control"
-            aria-label="Contribution Date"
+            [value]="toDate"
+            (change)="fromDateChange($event)"
           >
         </div>
       </ng-container> <!-- regular reports -->
@@ -82,7 +80,7 @@
             [(ngModel)]="selectedElectionState"
             name="state"
             class="form-control"
-            #electionState (change)="selectStateChange($event.target.value)"
+            #electionState (change)="selectStateChange($event)"
             >
             <option value="---">--- </option>
             <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
@@ -107,12 +105,12 @@
         </div>
          <div class="form-row">
             <select
-            id="electiondate"
-            [(ngModel)]="selectedElectionDate"
-            name="electiondate"
-            [disabled]="isDisabled"
-            class="form-control"
-            #electionDate (change)="ElectionDateChange($event.target.value)"
+              id="electiondate"
+              [(ngModel)]="selectedElectionDate"
+              name="electiondate"
+              [disabled]="isDisabled"
+              class="form-control"
+              #electionDate (change)="ElectionDateChange($event)"
             >
                <option ngvalue="---">--- </option>
                <option *ngFor='let dateSelected of electiondates' [value]="dateSelected.election_date">{{dateSelected.election_date | date: 'MM/dd/yyyy'}}</option>
@@ -139,10 +137,9 @@
         <input
           type="date"
           name="txtfromdate"
-          value={{fromDate}}
-          (change)="fromDateChange($event.target.value)"
           class="form-control"
-          aria-label="Contribution Date"
+          [value]="fromDate"
+          (change)="fromDateChange($event.target.value)"
         />
         </div>
         <div class="form-row">
@@ -165,10 +162,9 @@
         <input
           type="date"
           name="txttodate"
-          (change)="toDateChange($event.target.value)"
-          value={{toDate}}
           class="form-control"
-          aria-label="Contribution Date"
+          [value]="toDate"
+          (change)="toDateChange($event.target.value)"
         />
         </div>
       </ng-container>

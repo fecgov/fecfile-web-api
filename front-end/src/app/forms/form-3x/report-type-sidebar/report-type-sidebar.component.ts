@@ -14,12 +14,10 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() specialReports: boolean = false;
   @Input() regularReports: boolean = false;
-  @Input() selectedReport: any = {};
+  @Input() selectedReport: any = null;
   @Input() selectedreporttype:  selectedReportType;
   @Input() selectedstate:  selectedReportType;
   @Input() electiondates:  Array<selectedElectionDate> ;
-  @Input() fromDate:  string='';
-  @Input() toDate:  string='';
   @Input() electiontoDatedates: string='';
   @Input() cashOnHand: any = {};
 
@@ -45,10 +43,9 @@ export class ReportTypeSidebarComponent implements OnInit {
   //public cashOnHand: any = {};
   public currentStep: string = 'step_2';
   public step: string = '';
-  public fromdate: string = '';
-  public todate: string = '';
+  public fromDate: string = '';
+  public toDate: string = '';
   public reporttypes: any = {};
-  public selectedReportType: any = {};
   public selectedState: string='';
   public electionDate: selectedElectionDate = {};
   public isDisabled: boolean=true;
@@ -61,22 +58,22 @@ export class ReportTypeSidebarComponent implements OnInit {
     this._config.triggers = 'click';
   }
 
-  ngOnInit(): void {
-    console.log('reportTypeSideBar: ');
-    console.log('this.specialReports: ', this.specialReports);
-    console.log('this.regularReports: ', this.regularReports);
-  }
+  ngOnInit(): void {}
 
   ngDoCheck(): void {
-    if (this.selectedReport) {
-      console.log('report-type-sidebar: ');
-      console.log('selectedReport: ', this.selectedReport);
+    if (typeof this.selectedReport !== null) {
+      if (Array.isArray(this.selectedReport.election_state)) {
+        let dates: any = this.selectedReport.election_state[0].dates;
+
+        if (Array.isArray(dates)) {
+          this.fromDate = dates[0].cvg_start_date;
+          this.toDate = dates[0].cvg_end_date;
+
+          console.log('this.fromdate: ', this.fromDate);
+          console.log('this.todate: ', this.toDate);
+        }
+      }
     }
-    // if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
-    //   if (typeof this.selectedreporttype.regular_special_report_ind !== 'undefined'){
-    //     localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
-    //   }
-    // }
   }
 
   public selectItem(item): void {
