@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { TransactionsMessageService } from '../service/transactions-message.service';
@@ -9,7 +8,31 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
   selector: 'app-transactions-filter-sidebar',
   templateUrl: './transactions-filter-sidebar.component.html',
   styleUrls: ['./transactions-filter-sidebar.component.scss'],
-  providers: [NgbTooltipConfig]
+  providers: [NgbTooltipConfig],
+  animations: [
+    trigger('openClose', [
+      state('open', style({
+        'max-height': '500px', // Set high to handle multiple scenarios.
+        // height: 'auto',
+        // opacity: 1,
+        backgroundColor: 'white',
+      })),
+      state('closed', style({
+        'max-height': '0',
+        overflow: 'hidden',
+        // height: '0',
+        display: 'none',
+        // opacity: 0.5,
+        backgroundColor: '#AEB0B5'
+      })),
+      transition('open => closed', [
+        animate('.25s')
+      ]),
+      transition('closed => open', [
+        animate('.5s')
+      ]),
+    ]),
+  ]
 })
 export class TransactionsFilterSidbarComponent implements OnInit {
 
@@ -19,8 +42,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   @Input()
   public title = '';
 
-  @Output()
-  public filterEmitter: EventEmitter<any> = new EventEmitter<any>();
+  public flyIn = false;
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
@@ -28,6 +50,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
   public transactionCategories: any = [];
+  public states: any = [];
   public searchFilter = '';
 
   constructor(
@@ -48,6 +71,15 @@ export class TransactionsFilterSidbarComponent implements OnInit {
         .subscribe(res => {
           this.transactionCategories = res.data.transactionCategories;
         });
+
+      // TODO need to pass in the dynamic transaction type.
+      // Using default for dev purposes
+      this._formService
+        .getDynamicFormFields(this.formType, 'Individual Receipt')
+          .subscribe(res => {
+            this.states = res.data.states;
+            this.transactionCategories = res.data.transactionCategories;
+          });
     }
   }
 
@@ -83,14 +115,20 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
 
   /**
-   * Emit filter values to the parent to apply to the transactions.
+   * Send filter values to the table transactions component.
    */
   public applyFilters() {
     const filters: any = {};
     filters.search = this.searchFilter;
-
-    this.filterEmitter.emit(filters);
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
+  }
+
+
+  /**
+   * Clear filters currently set.
+   */
+  public clearFilters() {
+    this.searchFilter = '';
   }
 
 }

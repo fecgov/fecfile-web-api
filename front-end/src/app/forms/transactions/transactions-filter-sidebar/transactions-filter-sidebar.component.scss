@@ -28,6 +28,17 @@
     .transactions__search-filter {
       width: 97%;
     }
+    // .transactions__filter-sidebar-set .card-body {
+    //   z-index: 1;
+    // }
+    .transactions__filter-sidebar-set {
+      .card-body {
+          z-index: 1;
+      }
+      .transactions__filter-multi-input {
+        padding-bottom: 3px;
+      }
+    }    
     .card-header {
       background-color: $bombay;
       // border-bottom: 3px solid rgba(0, 0, 0, 0.125);
@@ -39,6 +50,7 @@
     .transactions__filter-type-list {
       list-style-type: none;
     }
+    
   }
   footer {
     background-color: $mineShaft;

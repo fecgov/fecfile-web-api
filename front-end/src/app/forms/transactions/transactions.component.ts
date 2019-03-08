@@ -31,9 +31,6 @@ export enum ActiveView {
 })
 export class TransactionsComponent implements OnInit {
 
-  @Output()
-  public filterEmitter: EventEmitter<any> = new EventEmitter<any>();
-
   public formType = '';
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
@@ -117,23 +114,6 @@ export class TransactionsComponent implements OnInit {
    */
   public isRecycleBinViewActive() {
     return this.view === this.recycleBinView ? true : false;
-  }
-
-
-  /**
-   * Apply the filters against the transactions.
-   * This parent class acts as a controller between the
-   * child components, the TransactionsFilterSidebarComponent
-   * and the TransactionsTableComponent.  It receives events emitted
-   * from the filter and emits a message to the table to
-   * apply the filter. It is a 1-way communication channel.
-   * TODO consider replacing with a messaging service.
-   * 
-   * @param filters contains filter fileds and values
-   */
-  public applyFilters(filters: any) {
-    console.log('filter search is ' + filters.search);
-    this.filterEmitter.emit(filters);
   }
 
 }

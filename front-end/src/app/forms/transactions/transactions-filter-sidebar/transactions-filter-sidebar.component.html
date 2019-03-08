@@ -14,77 +14,142 @@
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
-          Type
-          <i class="fas float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideTypeFilter)">
-          </i>          
+      <div class="transactions__filter-sidebar-set">
+        <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
+            Type
+            <i class="fas float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideTypeFilter)">
+            </i>          
+          </div>
+          <!-- [hidden]="isHideTypeFilter"  -->
+          <div class="card-body" [@openClose]="!isHideTypeFilter ? 'open' : 'closed'">
+            <ul class="transactions__filter-type-list">
+              <li *ngFor="let categoryType of transactionCategories">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox">
+                    <span>
+                      {{ categoryType?.text }}
+                    </span>
+                  </label>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="card-body" [hidden]="isHideTypeFilter">
-          <ul class="transactions__filter-type-list">
-            <li *ngFor="let categoryType of transactionCategories">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox">
-                  <span>
-                    {{ categoryType?.text }}
-                  </span>
-                </label>
+        <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
+            Date
+            <i class="fas float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideDateFilter)">
+            </i>
+          </div>
+          <div class="card-body" [@openClose]="!isHideDateFilter ? 'open' : 'closed'">
+            <label for="basic-url">From</label>
+            <div class="input-group transactions__filter-multi-input">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="filter-from-date">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
               </div>
-            </li>
-          </ul>
+              <input
+                type="date"
+                name="txtfromdate"
+
+                class="form-control"
+                aria-label="Filter From Date"
+                aria-describedby="filter-from-date"
+              >                        
+            </div>
+            <label for="basic-url">To</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="filter-to-date">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                type="date"
+                name="txttodate"
+
+                class="form-control"
+                aria-label="Filter To Date"
+                aria-describedby="filter-to-date"
+              >                        
+            </div>          
+          </div>
+        </div> 
+        <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
+            Amount
+            <i class="fas float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideAmountFilter)">
+            </i>
+          </div>
+          <div class="card-body" [@openClose]="!isHideAmountFilter ? 'open' : 'closed'">
+            <label for="basic-url">Minimum</label>
+            <div class="input-group transactions__filter-multi-input">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="filter-min-amount">
+                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                type="number"
+                name="minamount"
+
+                class="form-control"
+                aria-label="Filter Min Amount"
+                aria-describedby="filter-min-amount"
+              >                        
+            </div>
+            <label for="basic-url">Maximum</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="filter-max-amount">
+                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                type="number"
+                name="maxamount"
+
+                class="form-control"
+                aria-label="Filter Max Amount"
+                aria-describedby="filter-max-amount"
+              >                        
+            </div>          
+          </div>
+        </div> 
+        <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
+            State
+            <i class="fas float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideStateFilter)">
+            </i>          
+          </div>
+          <div class="card-body" [hidden]="isHideStateFilter">
+            <h5 class="card-title">Put State here</h5>
+          </div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
-          Date
-          <i class="fas float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideDateFilter)">
-          </i>
-        </div>
-        <div class="card-body" [hidden]="isHideDateFilter">
-          <h5 class="card-title">Put Dates here</h5>
-        </div>
-      </div> 
-      <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
-          Amount
-          <i class="fas float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideAmountFilter)">
-          </i>
-        </div>
-        <div class="card-body" [hidden]="isHideAmountFilter">
-          <h5 class="card-title">Put Amount here</h5>
-        </div>
-      </div> 
-      <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
-          State
-          <i class="fas float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideStateFilter)">
-          </i>          
-        </div>
-        <div class="card-body" [hidden]="isHideStateFilter">
-          <h5 class="card-title">Put State here</h5>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleMemoFilterItem()">
-          Memo Code
-          <i class="fas float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideMemoFilter)">
-          </i>           
-        </div>
-        <div class="card-body" [hidden]="isHideMemoFilter">
-          <h5 class="card-title">Put Memo Code here</h5>
-          <h5 class="card-title">Put Memo Code here</h5>
-          <h5 class="card-title">Put Memo Code here</h5>
-          <h5 class="card-title">Put Memo Code here</h5>
-          <h5 class="card-title">Put Memo Code here</h5>
-          <h5 class="card-title">Put Memo Code here</h5>
-        </div>
-      </div>                      
+        <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleMemoFilterItem()">
+            Memo Code
+            <i class="fas float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideMemoFilter)">
+            </i>           
+          </div>
+          <div class="card-body" [hidden]="isHideMemoFilter">
+            <h5 class="card-title">Put Memo Code here</h5>
+            <h5 class="card-title">Put Memo Code here</h5>
+            <h5 class="card-title">Put Memo Code here</h5>
+            <h5 class="card-title">Put Memo Code here</h5>
+            <h5 class="card-title">Put Memo Code here</h5>
+            <h5 class="card-title">Put Memo Code here</h5>
+          </div>
+        </div> 
+      </div>  
   </section>
   <footer>
     <div class="form-sidebar__btns">

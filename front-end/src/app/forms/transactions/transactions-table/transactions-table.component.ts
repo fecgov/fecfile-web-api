@@ -162,6 +162,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
+    this.applyFiltersSubscription.unsubscribe();
   }
 
 
@@ -679,13 +680,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     console.log('this.bulkActionCounter = ' + this.bulkActionCounter);
     this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
   }
-
-
-  public applyFilters(filters: any) {
-    console.log('filter search is ' + filters.search);
-    this.filters = filters;
-    this.getPage(this.config.currentPage);
-  }
+  
 
   /**
    * Get cached values from session.
