@@ -115,6 +115,8 @@ export class F3xComponent implements OnInit {
     this.selectedReport = this.reportTypes.find(e => {
       return e.report_type === reportType;
     });
+
+    console.log('this.selectedReport:', this.selectedReport);
   }
 
   /**
@@ -125,6 +127,10 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
+      /**
+       * This block indicates a user can move to the next
+       * step or previous step in a form.
+       */
       if (e.frm) {
         this.frm = e.form;
 

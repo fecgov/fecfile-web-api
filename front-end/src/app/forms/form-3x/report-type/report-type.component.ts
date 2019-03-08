@@ -128,6 +128,11 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
+  /**
+   * TODO:
+   * Get the regularReport and specialReport variables working.
+   */
+
   ngDoCheck(): void {
     // this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
     // this.reportType = localStorage.getItem('form3XReportInfo.reportType');

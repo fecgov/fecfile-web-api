@@ -31,7 +31,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   //public electionDates1: any = [];
   @Input() electiondates1:  Array<selectedElectionDate> ;
 
-  public electionStates: Array<selectedElectionState> ;
+  public electionStates: any = [];
   public stateSelectedElectionDates: any = {};;
   private _indexOfItemSelected: number = null;
   private _currentReportType: string ='';
@@ -62,17 +62,25 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (typeof this.selectedReport !== null) {
-      if (Array.isArray(this.selectedReport.election_state)) {
-        let dates: any = this.selectedReport.election_state[0].dates;
+      if (this.selectedReport.hasOwnProperty('election_state')) {
+        if (Array.isArray(this.selectedReport.election_state)) {
+          if (this.selectedReport.election_state.length === 1) {
+            if (this.selectedReport.election_state[0]['dates']) {
+              if (Array.isArray(this.selectedReport.election_state[0].dates)) {
+                let dates: any = this.selectedReport.election_state[0].dates;
 
-        if (Array.isArray(dates)) {
-          this.fromDate = dates[0].cvg_start_date;
-          this.toDate = dates[0].cvg_end_date;
-
-          console.log('this.fromdate: ', this.fromDate);
-          console.log('this.todate: ', this.toDate);
-        }
-      }
+                if (Array.isArray(dates)) {
+                  this.fromDate = dates[0].cvg_start_date;
+                  this.toDate = dates[0].cvg_end_date;
+                }
+              }
+            }
+          } else {
+            this.fromDate = '';
+            this.toDate = '';
+          }
+        } // isArray(this.selectedReport.election_state)
+      } // hasOwnProperty('election_state')
     }
   }
 

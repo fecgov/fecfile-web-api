@@ -76,11 +76,11 @@
         </div>
         <div class="form-row">
             <select
-            id="state"
-            [(ngModel)]="selectedElectionState"
-            name="state"
-            class="form-control"
-            #electionState (change)="selectStateChange($event)"
+              id="state"
+              [(ngModel)]="selectedElectionState"
+              name="state"
+              class="form-control"
+              #electionState (change)="selectStateChange($event)"
             >
             <option value="---">--- </option>
             <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
