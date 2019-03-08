@@ -61,7 +61,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   ngOnInit(): void {}
 
   ngDoCheck(): void {
-    if (typeof this.selectedReport !== null) {
+    if (this.selectedReport !== null) {
       if (this.selectedReport.hasOwnProperty('election_state')) {
         if (Array.isArray(this.selectedReport.election_state)) {
           if (this.selectedReport.election_state.length === 1) {
@@ -78,44 +78,17 @@ export class ReportTypeSidebarComponent implements OnInit {
           } else {
             this.fromDate = '';
             this.toDate = '';
+            console.log('this.selectedReport: ', this.selectedReport);
+
+            if (this.selectedReport.hasOwnProperty('election_state')) {
+              this.electionStates =  this.selectedReport.election_state;
+            }
           }
         } // isArray(this.selectedReport.election_state)
       } // hasOwnProperty('election_state')
     }
   }
 
-  public selectItem(item): void {
-    this.itemSelected = item.getAttribute('value');
-
-    this.additionalOptions = [];
-
-    this.sidebarLinks.findIndex((el, index) => {
-      if (el.value === this.itemSelected) {
-        this._indexOfItemSelected = index;
-      }
-    });
-
-    this.status.emit({
-      additionalOptions: this.additionalOptions
-    });
-  }
-
-  public selectedAdditionalOption(additionalItem): void {
-    let additionalItemIndex: number = null;
-
-    this.additionalItemSelected = additionalItem.getAttribute('value');
-    this.sidebarLinks[this._indexOfItemSelected].options.findIndex((el, index) => {
-      if (this.additionalItemSelected === el.value) {
-        additionalItemIndex = index;
-      }
-    });
-
-    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
-
-    this.status.emit({
-      additionalOptions: this.additionalOptions
-    });
-  }
 
   public selectStateChange(value: string): void {
     console.log(" ReportTypeSidebarComponent selectStateChange state =", value);
@@ -162,54 +135,5 @@ export class ReportTypeSidebarComponent implements OnInit {
     this.status.emit({
       electiondates: this.electiondates
     });
-  }
-
-  ElectionDateChange(value: string): void
-  {
-    if ( typeof this.electiondates !== "undefined" &&  this.electiondates !== null)
-    {
-      if (value !== "---"){
-        for(var prop in this.electiondates) {
-           if (this.electiondates[prop]["election_date"] === value ){
-              this.fromDate = this.electiondates[prop]["cvg_start_date"];
-              this.toDate = this.electiondates[prop]["cvg_end_date"];
-              let eletionDateString = this.electiondates[prop]["election_date"];
-              let electionDateObject = new Date(eletionDateString);
-              eletionDateString = electionDateObject.toLocaleDateString();
-              localStorage.setItem('form3XReportInfo.dueDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["due_date"]));
-              localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_end_date"]));
-              localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_start_date"]));
-              localStorage.setItem('form3XReportInfo.electionDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["election_date"]));
-            }
-        }
-      }
-      else {
-        localStorage.setItem('form3XReportInfo.electionDate', "---")
-        localStorage.removeItem('form3XReportInfo.dueDate');
-        localStorage.removeItem('form3XReportInfo.toDate');
-        localStorage.removeItem('form3XReportInfo.fromDate');
-      }
-   }
-
-      this.status.emit({
-        electiondates: this.electiondates
-      });
-  }
-
-  toDateChange(value: string): void{
-    console.log("toDate ",value)
-    localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(value));
-  }
-
-  fromDateChange(value: string): void{
-    console.log("fromDate ",value);
-    localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(value));
-  }
-
-  getDateInMMDDYYYYFormat(value: string):string {
-    let DateString = value;
-    let DateObject = new Date(DateString);
-    DateString = DateObject.toLocaleDateString();
-    return DateString;
   }
 }

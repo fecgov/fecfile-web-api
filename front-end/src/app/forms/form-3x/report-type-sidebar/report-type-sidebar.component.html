@@ -6,7 +6,8 @@
   </header>
   <section><!-- Start: Wizard Sidebar Report Coverage Dates -->
     <form class="sidebar-form-content">
-      <ng-container *ngIf="regularReports===true">
+      <ng-container *ngIf="(regularReports===true)">
+        <div>Inside here:</div>
         <div class="form-row">
           <label for="dateFrom">
             Date From*
@@ -83,7 +84,7 @@
               #electionState (change)="selectStateChange($event)"
             >
             <option value="---">--- </option>
-            <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
+            <option *ngFor='let state of electionStates' [value]="state.state">{{state.state_description}}</option>
            </select>
         </div>
 
