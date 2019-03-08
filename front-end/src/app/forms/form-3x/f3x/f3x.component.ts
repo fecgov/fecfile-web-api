@@ -117,34 +117,19 @@ export class F3xComponent implements OnInit {
   }
 
   private _setCoverageDates(reportType: string): void {
-    console.log('_setCoverageDates:');
-    console.log('reportType: ', reportType);
     this.selectedReport = this.reportTypes.find(e => {
       return e.report_type === reportType;
     });
 
-    console.log('this.selectedReport:', this.selectedReport);
-
     if (typeof this.selectedReport === 'object') {
       this.reportTypeIndicator = this.selectedReport.regular_special_report_ind;
-      console.log('this.reportTypeIndicator: ', this.reportTypeIndicator);
       if (typeof this.reportTypeIndicator === 'string') {
-        console.log('regular_special_report_ind === string:');
-        console.log("this.reportTypeIndicator.regular_special_report_ind === 'S': ", this.reportTypeIndicator.regular_special_report_ind === 'S');
         if (this.reportTypeIndicator === 'S') {
-            console.log('equal to S: ');
            this.specialReports=true;
            this.regularReports=false;
-
-          console.log('this.regularReports: ', this.regularReports);
-          console.log('this.specialReports: ', this.specialReports);
         } else {
-          console.log('Not equal to S:');
           this.regularReports=true;
           this.specialReports=false;
-
-          console.log('this.regularReports: ', this.regularReports);
-          console.log('this.specialReports: ', this.specialReports);
         }
       }
     }
@@ -175,8 +160,6 @@ export class F3xComponent implements OnInit {
 
         this.canContinue();
       } else if (typeof e.reportTypeRadio === 'string') {
-        console.log('onNotify: ');
-        console.log('e: ', e);
         this._setCoverageDates(e.reportTypeRadio);
       }
     }

@@ -16,40 +16,14 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() regularReports: boolean = false;
   @Input() selectedReport: any = null;
   @Input() selectedreporttype:  selectedReportType;
-  @Input() selectedstate:  selectedReportType;
-  @Input() electiondates:  Array<selectedElectionDate> ;
-  @Input() electiontoDatedates: string='';
-  @Input() cashOnHand: any = {};
 
-  public itemSelected: string = '';
-  public additionalItemSelected: string = '';
-  public additionalOptions: Array<any> = [];
-  //public electionState:string ='';
-  //public electionDates: Array<eleectionStateDate> = [];
-  public electionDates: selectedElectionState = {};
-  public electionDates1: selectedElectionState = {};
-  //public electionDates1: any = [];
-  @Input() electiondates1:  Array<selectedElectionDate> ;
+  public electionStates: any = null;
+  public electionDates: any = null;
+  public fromDate: string = null;
+  public toDate: string = null;
 
-  public electionStates: any = [];
-  public stateSelectedElectionDates: any = {};;
-  private _indexOfItemSelected: number = null;
-  private _currentReportType: string ='';
-  public loadingData: boolean = true;
-  public steps: any = {};
-  public sidebarLinks: any = {};
-  public selectedOptions: any = [];
-  public searchField: any = {};
-  //public cashOnHand: any = {};
-  public currentStep: string = 'step_2';
-  public step: string = '';
-  public fromDate: string = '';
-  public toDate: string = '';
-  public reporttypes: any = {};
-  public selectedState: string='';
-  public electionDate: selectedElectionDate = {};
-  public isDisabled: boolean=true;
-  public electiondatesTmp: Array<selectedElectionDate> ;
+  private _selectedElectionDates: any = null;
+
   constructor(
     private _config: NgbTooltipConfig,
     private _formService: FormsService
@@ -65,6 +39,9 @@ export class ReportTypeSidebarComponent implements OnInit {
       if (this.selectedReport.hasOwnProperty('election_state')) {
         if (Array.isArray(this.selectedReport.election_state)) {
           if (this.selectedReport.election_state.length === 1) {
+            this.fromDate = '';
+            this.toDate = '';
+            this._selectedElectionDates = null;
             if (this.selectedReport.election_state[0]['dates']) {
               if (Array.isArray(this.selectedReport.election_state[0].dates)) {
                 let dates: any = this.selectedReport.election_state[0].dates;
@@ -78,10 +55,13 @@ export class ReportTypeSidebarComponent implements OnInit {
           } else {
             this.fromDate = '';
             this.toDate = '';
-            console.log('this.selectedReport: ', this.selectedReport);
-
             if (this.selectedReport.hasOwnProperty('election_state')) {
               this.electionStates =  this.selectedReport.election_state;
+            }
+
+            if (this._selectedElectionDates !== null) {
+              this.fromDate = this._selectedElectionDates.fromDate;
+              this.toDate = this._selectedElectionDates.toDate;
             }
           }
         } // isArray(this.selectedReport.election_state)
@@ -90,50 +70,35 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
 
-  public selectStateChange(value: string): void {
-    console.log(" ReportTypeSidebarComponent selectStateChange state =", value);
-    localStorage.setItem('form3XReportInfo.state', value);
+  public selectStateChange(e): void {
+    console.log('selectedStateChange: ');
+    let selectedVal: string = e.target.value;
+    let selectedState: any = null;
 
-    if (value !== "---"){
-      for(var item in this.selectedreporttype) {
-        if (item==="election_state"){
-          for (var electionstate in this.selectedreporttype[item]){
-            if (this.selectedreporttype[item][electionstate]["state"]===value) {
-              this.electiondates= this.selectedreporttype[item][electionstate].dates;
-              localStorage.removeItem('form3XReportInfo.electionDate');
-              localStorage.removeItem('form3XReportInfo.dueDate');
-              localStorage.removeItem('form3XReportInfo.toDate');
-              localStorage.removeItem('form3XReportInfo.fromDate');
-              this.isDisabled=false;
-            }
+    if (selectedVal !== '0') {
+      if (this.selectedReport.hasOwnProperty('election_state')) {
+        selectedState = this.selectedReport.election_state.find(el => {
+          return el.state === selectedVal;
+        });
+
+        if (selectedState.hasOwnProperty('dates')) {
+          if (Array.isArray(selectedState.dates)) {
+            this.electionDates = selectedState.dates;
           }
-         }
-      }
 
-    /*  for (var item  in this.electiondates){
-        if (item !== "election_date"){
-          this.electiondatesTmp[item]["cvg_start_date"]  =  this.electiondates[item]["cvg_start_date"]
-          this.electiondatesTmp[item]["cvg_end_date"]  =  this.electiondates[item]["cvg_end_date"]
-          this.electiondatesTmp[item]["due_date"]  =  this.electiondates[item]["due_date"]
-        } else {
-          this.electiondatesTmp[item]["election_date"]  =  this.electiondates[item]["election_date"]
+          console.log('selectedState: ', selectedState);
         }
-      }*/
+      }
     }
-    else {
-      localStorage.removeItem('form3XReportInfo.electionDate');
-      localStorage.removeItem('form3XReportInfo.dueDate');
-      localStorage.removeItem('form3XReportInfo.toDate');
-      localStorage.removeItem('form3XReportInfo.fromDate');
-    }
+  }
 
-    this.fromDate = "";
-    this.toDate = "";
+  public electionDateChange(e): void {
+    let selectedIndex: number = e.target.selectedIndex;
+    let selectedOption: any = e.target[e.target.selectedIndex];
 
-
-
-    this.status.emit({
-      electiondates: this.electiondates
-    });
+    this._selectedElectionDates = {
+      'fromDate': selectedOption.getAttribute('data-startdate'),
+      'toDate': selectedOption.getAttribute('data-enddate')
+    };
   }
 }
