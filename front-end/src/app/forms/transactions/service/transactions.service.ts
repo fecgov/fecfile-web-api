@@ -200,12 +200,12 @@ export class TransactionsService {
       if (filters.filterStates.length > 0) {
         isFilter = true;
         const fields = ['state'];
-        let filteredArray = [];
+        let filteredStateArray = [];
         for (const state of filters.filterStates) {
           const filtered = this._filterPipe.transform(response.transactions, fields, state);
-          filteredArray = filteredArray.concat(filtered);
+          filteredStateArray = filteredStateArray.concat(filtered);
         }
-        response.transactions = filteredArray;
+        response.transactions = filteredStateArray;
       }
     }
 
@@ -213,12 +213,29 @@ export class TransactionsService {
       if (filters.filterCategories.length > 0) {
         isFilter = true;
         const fields = ['transaction_type_desc'];
-        let filteredArray = [];
+        let filteredCategoryArray = [];
         for (const category of filters.filterCategories) {
           const filtered = this._filterPipe.transform(response.transactions, fields, category);
-          filteredArray = filteredArray.concat(filtered);
+          filteredCategoryArray = filteredCategoryArray.concat(filtered);
         }
-        response.transactions = filteredArray;
+        response.transactions = filteredCategoryArray;
+      }
+    }
+
+    if (filters.filterAmountMin && filters.filterAmountMax) {
+      if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
+          filters.filterAmountMin <= filters.filterAmountMax) {
+        const filteredAmountArray = [];
+        for (const trx of response.transactions) {
+          if (trx.transaction_amount) {
+            if (trx.transaction_amount >= filters.filterAmountMin &&
+              trx.transaction_amount <= filters.filterAmountMax) {
+                isFilter = true;
+                filteredAmountArray.push(trx);
+            }
+          }
+        }
+        response.transactions = filteredAmountArray;
       }
     }
 

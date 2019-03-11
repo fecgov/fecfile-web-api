@@ -48,7 +48,7 @@ import { filter } from 'rxjs/operators';
       transition('closed => open', [
         animate('.5s ease')
       ]),
-    ]),    
+    ]),
   ]
 })
 export class TransactionsFilterSidbarComponent implements OnInit {
@@ -59,8 +59,6 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   @Input()
   public title = '';
 
-  public flyIn = false;
-
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideAmountFilter: boolean;
@@ -69,6 +67,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public transactionCategories: any = [];
   public states: any = [];
   public searchFilter = '';
+  public filterAmountMin = 0;
+  public filterAmountMax = 0;
 
   constructor(
     private _formService: FormsService,
@@ -188,6 +188,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     filters.filterCategories = filterCategories;
 
+    filters.filterAmountMin = this.filterAmountMin;
+    filters.filterAmountMax = this.filterAmountMax;
+
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
@@ -203,6 +206,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     for (const t of this.transactionCategories) {
       t.selected = false;
     }
+    this.filterAmountMin = 0;
+    this.filterAmountMax = 0;
   }
 
 }
