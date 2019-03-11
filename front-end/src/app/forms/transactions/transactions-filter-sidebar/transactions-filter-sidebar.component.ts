@@ -69,6 +69,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public searchFilter = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
+  public filterDateFrom = new Date();
+  public filterDateTo = new Date();
 
   constructor(
     private _formService: FormsService,
@@ -191,6 +193,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
 
+    filters.filterDateFrom = this.filterDateFrom;
+    filters.filterDateTo = this.filterDateTo;
+
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
@@ -208,6 +213,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     this.filterAmountMin = 0;
     this.filterAmountMax = 0;
+    this.filterDateFrom = new Date();
+    this.filterDateTo = new Date();
   }
 
 }

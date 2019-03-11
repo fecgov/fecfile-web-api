@@ -47,7 +47,7 @@
             </i>
           </div>
           <div class="card-body" [@openClose]="!isHideDateFilter ? 'open' : 'closed'">
-            <label for="basic-url">From</label>
+            <label for="filter-date-from">From</label>
             <div class="input-group transactions__filter-multi-input">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="filter-from-date">
@@ -57,13 +57,14 @@
               <input
                 type="date"
                 name="txtfromdate"
-
+                [(ngModel)]="filterDateFrom"
                 class="form-control"
+                id="filter-date-from"
                 aria-label="Filter From Date"
                 aria-describedby="filter-from-date"
               >                        
             </div>
-            <label for="basic-url">To</label>
+            <label for="filter-date-to">To</label>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="filter-to-date">
@@ -73,8 +74,9 @@
               <input
                 type="date"
                 name="txttodate"
-
+                [(ngModel)]="filterDateTo"
                 class="form-control"
+                id="filter-date-to"
                 aria-label="Filter To Date"
                 aria-describedby="filter-to-date"
               >                        
@@ -89,7 +91,7 @@
             </i>
           </div>
           <div class="card-body" [@openClose]="!isHideAmountFilter ? 'open' : 'closed'">
-            <label for="basic-url">Minimum</label>
+            <label for="filter-amount-min">Minimum</label>
             <div class="input-group transactions__filter-multi-input">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="filter-min-amount">
@@ -101,11 +103,12 @@
                 name="minamount"
                 [(ngModel)]="filterAmountMin"
                 class="form-control"
+                id="filter-amount-min"
                 aria-label="Filter Min Amount"
                 aria-describedby="filter-min-amount"
               >                        
             </div>
-            <label for="basic-url">Maximum</label>
+            <label for="filter-amount-max">Maximum</label>
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="filter-max-amount">
@@ -117,6 +120,7 @@
                 name="maxamount"
                 [(ngModel)]="filterAmountMax"
                 class="form-control"
+                id="filter-amount-max"
                 aria-label="Filter Max Amount"
                 aria-describedby="filter-max-amount"
               >                        

@@ -239,6 +239,25 @@ export class TransactionsService {
       }
     }
 
+    if (filters.filterDateFrom && filters.filterDateTo) {
+      const filterDateFromDate = new Date(filters.filterDateFrom);
+      const filterDateToDate = new Date(filters.filterDateTo);
+      const filteredDateArray = [];
+      for (const trx of response.transactions) {
+        if (trx.transaction_date) {
+          const trxDate = new Date(trx.transaction_date);
+          if (trxDate >= filterDateFromDate &&
+              trxDate <= filterDateToDate) {
+            isFilter = true;
+             filteredDateArray.push(trx);
+          }
+        }
+      }
+      response.transactions = filteredDateArray;
+    }
+
+    // var d = new Date("2015-03-25");
+
     if (isFilter) {
       response.totalAmount = 0;
       response.totalTransactionCount = 0;
