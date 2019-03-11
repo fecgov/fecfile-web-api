@@ -3,36 +3,52 @@ import { style, animate, transition, trigger, state } from '@angular/animations'
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { TransactionsMessageService } from '../service/transactions-message.service';
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-transactions-filter-sidebar',
   templateUrl: './transactions-filter-sidebar.component.html',
   styleUrls: ['./transactions-filter-sidebar.component.scss'],
-  providers: [NgbTooltipConfig],
+  providers: [NgbTooltipConfig, OrderByPipe],
   animations: [
     trigger('openClose', [
       state('open', style({
         'max-height': '500px', // Set high to handle multiple scenarios.
-        // height: 'auto',
-        // opacity: 1,
+        backgroundColor: 'white',
+      })),
+      state('closed', style({
+        'max-height': '0',
+        overflow: 'hidden',
+        display: 'none',
+        backgroundColor: '#AEB0B5'
+      })),
+      transition('open => closed', [
+        animate('.25s ease')
+      ]),
+      transition('closed => open', [
+        animate('.5s ease')
+      ]),
+    ]),
+    trigger('openCloseScroll', [
+      state('open', style({
+        'max-height': '500px', // Set high to handle multiple scenarios.
         backgroundColor: 'white',
         'overflow-y': 'scroll'
       })),
       state('closed', style({
         'max-height': '0',
         overflow: 'hidden',
-        // height: '0',
         display: 'none',
-        // opacity: 0.5,
         backgroundColor: '#AEB0B5'
       })),
       transition('open => closed', [
-        animate('.25s')
+        animate('.25s ease')
       ]),
       transition('closed => open', [
-        animate('.5s')
+        animate('.5s ease')
       ]),
-    ]),
+    ]),    
   ]
 })
 export class TransactionsFilterSidbarComponent implements OnInit {
@@ -57,7 +73,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   constructor(
     private _formService: FormsService,
     private _transactionsMessageService: TransactionsMessageService,
-  ) {}
+    private _orderByPipe: OrderByPipe
+  ) {
+    // this._orderByPipe = new OrderByPipe();
+  }
 
   public ngOnInit(): void {
     this.isHideTypeFilter = true;
@@ -67,19 +86,50 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     this.isHideMemoFilter = true;
 
     if (this.formType) {
-      this._formService
-      .getTransactionCategories(this.formType)
-        .subscribe(res => {
-          this.transactionCategories = res.data.transactionCategories;
-        });
+
+      // this._formService
+      //   .getTransactionCategories(this.formType)
+      //     .subscribe(res => {
+      //       this.transactionCategories = this._orderByPipe.transform(
+      //         res.transactionCategories, {property: 'text', direction: 1});
+      //     });
 
       // TODO need to pass in the dynamic transaction type.
       // Using default for dev purposes
       this._formService
         .getDynamicFormFields(this.formType, 'Individual Receipt')
           .subscribe(res => {
-            this.states = res.data.states;
-            this.transactionCategories = res.data.transactionCategories;
+
+            let statesExist = false;
+            if (res.data) {
+              if (res.data.states) {
+                statesExist = true;
+                for (const s of res.data.states) {
+                  s.selected = false;
+                }
+              }
+            }
+            if (statesExist) {
+              this.states = res.data.states;
+            } else {
+              this.states = [];
+            }
+
+            let categoriesExist = false;
+            if (res.data) {
+              if (res.data.transactionCategories) {
+                categoriesExist = true;
+                for (const s of res.data.transactionCategories) {
+                  s.selected = false;
+                }
+              }
+            }
+            if (categoriesExist) {
+              this.transactionCategories = this._orderByPipe.transform(
+                res.data.transactionCategories, {property: 'text', direction: 1});
+            } else {
+              this.transactionCategories = [];
+            }
           });
     }
   }
@@ -111,7 +161,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * @returns string of the class to apply
    */
   public toggleFilterDirection(isHidden: boolean) {
-    return isHidden ? 'fa-chevron-up' : 'fa-chevron-down';
+    return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
   }
 
 
@@ -121,6 +171,23 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public applyFilters() {
     const filters: any = {};
     filters.search = this.searchFilter;
+
+    const filterStates = [];
+    for (const s of this.states) {
+      if (s.selected) {
+        filterStates.push(s.code);
+      }
+    }
+    filters.filterStates = filterStates;
+
+    const filterCategories = [];
+    for (const c of this.transactionCategories) {
+      if (c.selected) {
+        filterCategories.push(c.text); // TODO use c.code with backend
+      }
+    }
+    filters.filterCategories = filterCategories;
+
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
@@ -130,6 +197,12 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public clearFilters() {
     this.searchFilter = '';
+    for (const s of this.states) {
+      s.selected = false;
+    }
+    for (const t of this.transactionCategories) {
+      t.selected = false;
+    }
   }
 
 }

@@ -19,7 +19,7 @@
         <div class="float-left">
           <h1>Transactions / Form {{formType}}
             <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
-              <span class="fas fa-trash"></span>
+              <span class="trash-icon"></span>
             </span>
           </h1>
         </div>
@@ -37,26 +37,26 @@
         <div class="grid-row__col grid-row__col--12">
           <div class="transactions__btn-container">
             <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showPinColumns()">
-              <i class="fas fa-thumbtack"></i>
+              <i class="thumbtack-icon"></i>
               Pin Columns
             </button>
             <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showRecycleBin()">
-              <i class="fas fa-trash"></i>
+              <i class="trash-icon"></i>
               Recycle Bin
             </button>
             <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="doImport()">
-              <i class="fas fa-file-import"></i>
+              <i class="file-import-icon"></i>
               Import
             </button>
             <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
-              <i class="fas fa-filter"></i>
+              <i class="filter-icon"></i>
               Filter
             </button>
             <div class="input-group pl-0 transactions__trx-search">
               <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
               <div class="input-group-append">
                 <span class="input-group-text" id="">
-                  <i class="fas fa-search text-grey" aria-hidden="true"></i>
+                  <i class="search-icon text-grey" aria-hidden="true"></i>
                 </span>
               </div>
             </div>
@@ -73,7 +73,7 @@
         <div class="grid-row__col grid-row__col--12">
           <div class="transactions__btn-container">
             <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showTransactions()">
-              <i class="fas fa-table"></i>
+              <i class="table-icon"></i>
               Transactions
             </button>
           </div>

@@ -1,6 +1,6 @@
 <div class="form-sidebar">
   <header>
-    <h3 class="text-center">{{ title }}</h3>
+    <h3 class="text-center">Filters</h3>
   </header>
   <section>
       <div class="mx-auto" style="width:97%">
@@ -9,7 +9,7 @@
             placeholder="Search by Name, ID or Zip" aria-label="Search">
           <div class="input-group-append">
             <span class="input-group-text">
-              <i class="fas fa-search" aria-hidden="true"></i>
+              <i class="search-icon" aria-hidden="true"></i>
             </span>
           </div>
         </div>
@@ -18,19 +18,19 @@
         <div class="card">
           <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
             Type
-            <i class="fas float-right" aria-hidden="true" 
+            <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideTypeFilter)">
             </i>          
           </div>
           <!-- [hidden]="isHideTypeFilter"  -->
           <div class="card-body" 
-              [@openClose]="!isHideTypeFilter ? 'open' : 'closed'">
+              [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
             <div class="transactions__filter-type-list-body">
               <ul class="transactions__filter-type-list">
                 <li *ngFor="let categoryType of transactionCategories">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                      value="categoryType?.value">
+                      [(ngModel)]="categoryType.selected">
                     <label class="form-check-label" for="{{ categoryType?.value }}">
                         {{ categoryType?.text }}</label>
                   </div>
@@ -42,7 +42,7 @@
         <div class="card">
           <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
             Date
-            <i class="fas float-right" aria-hidden="true" 
+            <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideDateFilter)">
             </i>
           </div>
@@ -84,7 +84,7 @@
         <div class="card">
           <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
             Amount
-            <i class="fas float-right" aria-hidden="true" 
+            <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideAmountFilter)">
             </i>
           </div>
@@ -126,17 +126,17 @@
         <div class="card">
           <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
             State
-            <i class="fas float-right" aria-hidden="true" 
+            <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideStateFilter)">
             </i>          
           </div>
-          <div class="card-body" [@openClose]="!isHideStateFilter ? 'open' : 'closed'">
+          <div class="card-body" [@openCloseScroll]="!isHideStateFilter ? 'open' : 'closed'">
             <div class="transactions__filter-type-list-body">
               <ul class="transactions__filter-type-list">
                 <li *ngFor="let state of states">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="{{ state?.code }}" 
-                      value="{{ state?.code }}">
+                      [(ngModel)]="state.selected">
                     <label class="form-check-label" for="{{ state?.code }}">
                       {{ state?.name }}</label>
                   </div>
@@ -148,17 +148,18 @@
         <div class="card">
           <div class="card-header transactions__filter-title" (click)="toggleMemoFilterItem()">
             Memo Code
-            <i class="fas float-right" aria-hidden="true" 
+            <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideMemoFilter)">
             </i>           
           </div>
-          <div class="card-body" [hidden]="isHideMemoFilter">
-            <h5 class="card-title">Put Memo Code here</h5>
-            <h5 class="card-title">Put Memo Code here</h5>
-            <h5 class="card-title">Put Memo Code here</h5>
-            <h5 class="card-title">Put Memo Code here</h5>
-            <h5 class="card-title">Put Memo Code here</h5>
-            <h5 class="card-title">Put Memo Code here</h5>
+          <div class="card-body" [@openClose]="!isHideMemoFilter ? 'open' : 'closed'">
+              <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="memo_code" 
+                    value="">
+                  <label class="form-check-label" for="memo_code">
+                    Check to filter Transactions with Memo Code
+                  </label>
+                </div>
           </div>
         </div> 
       </div>  
@@ -168,6 +169,7 @@
       <div class="btn-row">
         <a
           class="btn btn-secondary-gray"
+          (click)="clearFilters()"
         >
           Clear Filters
         </a>

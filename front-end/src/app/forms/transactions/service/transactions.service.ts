@@ -185,16 +185,43 @@ export class TransactionsService {
     if (!response.transactions) {
       return;
     }
+
     let isFilter = false;
     if (filters.search) {
       if (response.transactions.length > 0) {
         isFilter = true;
-        const obj = response.transactions[0];
         const fields = ['name', 'zip_code', 'transaction_id'];
         const filtered = this._filterPipe.transform(response.transactions, fields, filters.search);
         response.transactions = filtered;
       }
     }
+
+    if (filters.filterStates) {
+      if (filters.filterStates.length > 0) {
+        isFilter = true;
+        const fields = ['state'];
+        let filteredArray = [];
+        for (const state of filters.filterStates) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, state);
+          filteredArray = filteredArray.concat(filtered);
+        }
+        response.transactions = filteredArray;
+      }
+    }
+
+    if (filters.filterCategories) {
+      if (filters.filterCategories.length > 0) {
+        isFilter = true;
+        const fields = ['transaction_type_desc'];
+        let filteredArray = [];
+        for (const category of filters.filterCategories) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, category);
+          filteredArray = filteredArray.concat(filtered);
+        }
+        response.transactions = filteredArray;
+      }
+    }
+
     if (isFilter) {
       response.totalAmount = 0;
       response.totalTransactionCount = 0;
