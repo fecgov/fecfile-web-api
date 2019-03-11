@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
@@ -19,20 +21,30 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   public electionStates: any = null;
   public electionDates: any = null;
+  public frmReportSidebar: FormGroup;
   public fromDate: string = null;
   public toDate: string = null;
 
   private _selectedElectionDates: any = null;
+  private _selectedState: string = null;
+  private _selectedElectionDate: string = null;
 
   constructor(
+    private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
-    private _formService: FormsService
+    private _formService: FormsService,
+    private _messageService: MessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.frmReportSidebar = this._fb.group({
+      // txtToDate: ['', Validators.required],
+      // txtFromDate: ['', Validators.required]
+    });
+  }
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
@@ -65,15 +77,44 @@ export class ReportTypeSidebarComponent implements OnInit {
             }
           }
         } // isArray(this.selectedReport.election_state)
+        if (this.fromDate && this.toDate) {
+          let message: any = null;
+
+          if (this._selectedState && this.specialReports) {
+            message = {
+              'form': '3x',
+              'selectedState': this._selectedState,
+              'selectedElectionDate': this._selectedElectionDate,
+              'toDate': this.toDate,
+              'fromDate': this.fromDate
+            }
+          } else {
+            message = {
+              'form': '3x',
+              'toDate': this.toDate,
+              'fromDate': this.fromDate
+            }
+          }
+          this._messageService
+            .sendMessage(message);
+        } else {
+          this._messageService
+            .sendMessage({
+              'form': '3x',
+              'toDate': '',
+              'fromDate': ''
+            });
+        }
       } // hasOwnProperty('election_state')
-    }
+    } // selectedReport !== null
   }
 
 
   public selectStateChange(e): void {
-    console.log('selectedStateChange: ');
     let selectedVal: string = e.target.value;
     let selectedState: any = null;
+
+    this._selectedState = selectedVal;
 
     if (selectedVal !== '0') {
       if (this.selectedReport.hasOwnProperty('election_state')) {
@@ -85,8 +126,6 @@ export class ReportTypeSidebarComponent implements OnInit {
           if (Array.isArray(selectedState.dates)) {
             this.electionDates = selectedState.dates;
           }
-
-          console.log('selectedState: ', selectedState);
         }
       }
     }
@@ -96,9 +135,21 @@ export class ReportTypeSidebarComponent implements OnInit {
     let selectedIndex: number = e.target.selectedIndex;
     let selectedOption: any = e.target[e.target.selectedIndex];
 
+    this._selectedElectionDate =  e.target.value;
+
     this._selectedElectionDates = {
       'fromDate': selectedOption.getAttribute('data-startdate'),
       'toDate': selectedOption.getAttribute('data-enddate')
     };
+  }
+
+  public fromDateChange(e): void {
+    console.log('fromDateChange: ');
+    console.log('value: ', e.target.getAttribute('value'));
+  }
+
+  public toDateChange(e): void {
+    console.log('toDateChange: ');
+    console.log('value: ', e.target.getAttribute('value'));
   }
 }

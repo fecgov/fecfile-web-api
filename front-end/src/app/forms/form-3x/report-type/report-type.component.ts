@@ -21,11 +21,13 @@ export class ReportTypeComponent implements OnInit {
 
   public committeeReportTypes: any = null;
   public frmReportType: FormGroup;
+  public fromDateSelected: boolean = false;
   public reportTypeSelected: string = '';
   public isValidType: boolean = false;
   public optionFailed: boolean = false;
   public screenWidth: number = 0;
   public reportType: string = null;
+  public toDateSelected: boolean = false;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
 
@@ -54,6 +56,8 @@ export class ReportTypeComponent implements OnInit {
         }
       });
 
+    this._messageService
+      .clearMessage();
 
     this.screenWidth = window.innerWidth;
 
@@ -67,8 +71,45 @@ export class ReportTypeComponent implements OnInit {
 
     this.frmReportType = this._fb.group({
       reportTypeRadio: ['', Validators.required]
-
     });
+
+    this._form3xDetails = {
+      cmteId: '',
+      reportId: '',
+      formType: '3x',
+      electionCode: '',
+      reportType: '',
+      regularSpecialReportInd: '',
+      stateOfElection: '',
+      electionDate: '',
+      cvgStartDate: '',
+      cvgEndDate: '',
+      dueDate: '',
+      amend_Indicator: '',
+      coh_bop: '0'
+    };
+  }
+
+  ngDoCheck(): void {
+    this._messageService
+      .getMessage()
+      .subscribe(res => {
+        if (typeof res.form === 'string') {
+          if (res.form === '3x') {
+            console.log('res: ', res);
+            if (typeof res.toDate === 'string') {
+              if (res.toDate.length >= 1) {
+                this.toDateSelected = true;
+              }
+            }
+            if (typeof res.fromDate === 'string') {
+              if (res.fromDate.length >= 1) {
+                this.fromDateSelected = true;
+              }
+            }
+          }
+        }
+      });
   }
 
   @HostListener('window:resize', ['$event'])
@@ -117,13 +158,6 @@ export class ReportTypeComponent implements OnInit {
     if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
-        // this._form_3x_details = JSON.parse(localStorage.getItem('form_3x_details'));
-
-        //this._form_3x_details.reason = this.frmType.get('reportTypeRadio').value;
-
-        // setTimeout(() => {
-        //   localStorage.setItem('form_3x_details', JSON.stringify(this._form_3x_details));
-        // }, 100);
 
         this.status.emit({
           form: this.frmReportType,

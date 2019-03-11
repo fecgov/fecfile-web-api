@@ -5,7 +5,10 @@
     <hr />
   </header>
   <section>
-    <form class="sidebar-form-content">
+    <form
+      class="sidebar-form-content"
+      [formGroup]="frmReportSidebar"
+    >
       <ng-container *ngIf="specialReports===true">
         <div class="form-row">
           <label for="State">
@@ -31,7 +34,10 @@
               (change)="selectStateChange($event)"
             >
             <option value="0">---</option>
-            <option *ngFor='let state of electionStates' [value]="state.state">
+            <option
+              *ngFor='let state of electionStates'
+              [value]="state.state"
+            >
               {{state.state_description}}
             </option>
            </select>
@@ -90,10 +96,10 @@
           <i class="calendar-icon" aria-hidden="true"></i>
           <input
             type="date"
-            name="txtfromdate"
+            name="txtFromDate"
             class="form-control"
             [value]="fromDate"
-            (change)="fromDateChange($event)"
+            (change)="fromDateChange($event.target.value)"
           />
         </div>
         <div class="form-row">
@@ -115,10 +121,10 @@
           <i class="calendar-icon" aria-hidden="true"></i>
           <input
             type="date"
-            name="txttodate"
+            name="txtToDate"
             class="form-control"
             [value]="toDate"
-            (change)="fromDateChange($event)"
+            (change)="toDateChange($event.target.value)"
           >
         </div>
     </form>
