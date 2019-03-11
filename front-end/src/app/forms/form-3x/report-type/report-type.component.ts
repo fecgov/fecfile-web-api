@@ -6,6 +6,7 @@ import { form3x } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { ReportTypeService } from './report-type.service';
 import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
 
 
@@ -32,13 +33,18 @@ export class ReportTypeComponent implements OnInit {
   public tooltipLeft: string = 'auto';
 
   private _formType: string = null;
-  private _form3xDetails: any = null;
+  private _form3xReportTypeDetails: any = null;
+  private _fromDateSelected: string = null;
+  private _selectedElectionState: string = null;
+  private _selectedElectionDate: string = null;
+  private _toDateSelected: string = null;
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _formService:FormsService,
+    private _formService: FormsService,
+    private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._messageService.clearMessage();
@@ -73,7 +79,7 @@ export class ReportTypeComponent implements OnInit {
       reportTypeRadio: ['', Validators.required]
     });
 
-    this._form3xDetails = {
+    this._form3xReportTypeDetails = {
       cmteId: '',
       reportId: '',
       formType: '3x',
@@ -96,7 +102,6 @@ export class ReportTypeComponent implements OnInit {
       .subscribe(res => {
         if (typeof res.form === 'string') {
           if (res.form === '3x') {
-            console.log('res: ', res);
             if (typeof res.toDate === 'string') {
               if (res.toDate.length >= 1) {
                 this.toDateSelected = true;
@@ -106,6 +111,22 @@ export class ReportTypeComponent implements OnInit {
               if (res.fromDate.length >= 1) {
                 this.fromDateSelected = true;
               }
+            }
+
+            if (typeof res.selectedState === 'string') {
+              if (res.selectedState.length >= 1) {
+                this._selectedElectionState = res.selectedState;
+              }
+            } else {
+              this._selectedElectionState = null;
+            }
+
+            if (typeof res.selectedElectionDate === 'string') {
+              if (res.selectedElectionDate.length >= 1) {
+                this._selectedElectionDate = res.selectedElectionDate;
+              }
+            } else {
+              this._selectedElectionDate = null;
             }
           }
         }
@@ -158,6 +179,39 @@ export class ReportTypeComponent implements OnInit {
     if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
+
+        console.log('this._selectedElectionState: ', this._selectedElectionState);
+        console.log('this._selectedElectionDate: ', this._selectedElectionDate);
+
+        this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
+
+        if (this._selectedElectionState !== null) {
+          this._form3xReportTypeDetails.stateOfElection = this._selectedElectionState;
+        }
+
+        this._form3xReportTypeDetails.cvgStartDate = this.fromDateSelected;
+        this._form3xReportTypeDetails.cvgEndDate = this.toDateSelected;
+
+        localStorage.setItem('form3xReportType', JSON.stringify(this._form3xReportTypeDetails));
+
+        // this._formService
+        //  .saveReport(this._formType)
+        //  .subscribe(res => {
+        //   if(res) {
+        //     console.log(' saveReport res: ', res);
+        //   }
+        // },
+        // (error) => {
+        //   console.log('saveReport error: ', error);
+        // });
+
+        // this.status.next([]);
+
+        this._reportTypeService
+          .saveReport(this._formType)
+          .subscribe(res => {
+            console.log('Report type saved:');
+          });
 
         this.status.emit({
           form: this.frmReportType,
