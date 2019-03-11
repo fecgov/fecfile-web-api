@@ -99,11 +99,8 @@ export class F3xComponent implements OnInit {
           }
         }
         if (typeof this.selectedReportType === 'object') {
-
-          console.log('inside Here: ');
           if (typeof this.selectedReportType.regular_special_report_ind === 'string') {
             if (this.selectedReportType.regular_special_report_ind === 'S') {
-              console.log('special report = S:');
               this.regularReports = false;
               this.specialReports = true;
             } else {

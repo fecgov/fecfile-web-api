@@ -1,10 +1,10 @@
 
 <div class="report-type-sidebar">
   <header>
-    <h3 class="text-center">{{ title }}</h3>
+    <h3 class="text-center">Report Coverage Dates</h3>
     <hr />
   </header>
-  <section><!-- Start: Wizard Sidebar Report Coverage Dates -->
+  <section>
     <form class="sidebar-form-content">
       <ng-container *ngIf="specialReports===true">
         <div class="form-row">
@@ -53,8 +53,8 @@
         </div>
          <div class="form-row">
             <select
-              id="electiondate"
-              name="electiondate"
+              id="electionDate"
+              name="electionDate"
               class="form-control"
               (change)="electionDateChange($event)"
             >
