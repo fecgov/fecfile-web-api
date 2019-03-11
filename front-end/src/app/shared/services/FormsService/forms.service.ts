@@ -14,41 +14,6 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 
-/*export class TransactionsService {
-
-  // only for mock data
-  private restoreTrxArray = [];
-  private trxArray = [];
-  private transactionId = 'TID12345';
-  private transactionIdRecycle = 'TIDRECY';
-  private _orderByPipe: OrderByPipe;
-
-  constructor(
-    private _http: HttpClient,
-    private _cookieService: CookieService,
-  ) {
-    // mock out the recycle trx
-    let t1: any = this.createMockTrx();
-    for (let i = 0; i < 13; i++) {
-      t1.transactionId = this.transactionIdRecycle + i;
-      this.restoreTrxArray.push(new TransactionModel(t1));
-    }
-
-    // mock out the trx
-    const count = 17;
-    t1 = this.createMockTrx();
-
-    this.trxArray = [];
-    for (let i = 0; i < count; i++) {
-      t1.transactionId = this.transactionId + i;
-      t1.amount = 1500 + i;
-      this.trxArray.push(new TransactionModel(t1));
-    }
-
-    this._orderByPipe = new OrderByPipe();
-  }
-}*/
-
 export class FormsService {
 
   constructor(
@@ -800,7 +765,7 @@ export class FormsService {
   const token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
   let params = new HttpParams();
-  const url = '/core/get_all_transactions';
+  const url ='/f99/get_form99list';   
 
   httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -813,12 +778,14 @@ export class FormsService {
   // params = params.append('transaction_id', 'VVBSTFQ9Z78');
   // params = params.append('transaction_date', '2018-10-18');
 
+  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+  
   return this._http
   .get(
       `${environment.apiUrl}${url}`,
       {
         headers: httpOptions,
-        params
+        params 
       }
     );
   
@@ -854,6 +821,7 @@ export class FormsService {
    */
   public mapFromServerFields(serverData: any, modelArray: reportModel[]) {
     if (!serverData || !Array.isArray(serverData)) {
+      console.log(" no server data mapFromServerFields  modelArray", modelArray);
       return;
     }
     if (!modelArray) {
@@ -871,6 +839,7 @@ export class FormsService {
       model.filed_date = row.filed_date;
       modelArray.push(model);
     }
+    console.log(" mapFromServerFields  modelArray", modelArray);
     return modelArray;
   }
 
@@ -883,7 +852,9 @@ export class FormsService {
   public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
     const direction = descending ? -1 : 1;
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    console.log("sortTransactions array= ", array);
     return array;
+      
   }
 
 }

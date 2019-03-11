@@ -273,9 +273,21 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetReportsResponse) => {
+        console.log("getReportsPage res", res);
+        
+        console.log("getReportsPage res.reports", res.reports);
+        
         this.reportsModel = [];
-        const reportsModel = this._formsService.mapFromServerFields(res.reports,
-          this.reportsModel);
+        //const reportsModel = this._formsService.mapFromServerFields(res.reports,
+          //this.reportsModel);
+
+        const reportsModel = this._formsService.mapFromServerFields(res,
+            this.reportsModel);
+
+        console.log("getReportsPage reportsModel", reportsModel);
+
+        this.config.totalItems = reportsModel.length;
+
         this.reportsModel = this._formsService.sortTransactions(
           reportsModel, this.currentSortedColumnName, sortedCol.descending);
       

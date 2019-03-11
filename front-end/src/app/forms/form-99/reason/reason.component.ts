@@ -44,11 +44,11 @@ export class ReasonComponent implements OnInit {
   public closeResult: string = '';
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
+  public editorMax: number = 20000;
 
   private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
-  private _editorMax: number = 20000;
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
@@ -80,7 +80,8 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            htmlLength(this._editorMax)
+            Validators.maxLength(this.editorMax),
+            Validators.pattern(/^$|\s+/)
           ]],
           file: ['']
         });
@@ -88,7 +89,8 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            htmlLength(this._editorMax)
+            Validators.maxLength(this.editorMax),
+            Validators.pattern(/^$|\s+/)
           ]],
           file: ['']
         });
@@ -97,7 +99,8 @@ export class ReasonComponent implements OnInit {
       this.frmReason = this._fb.group({
         reasonText: ['', [
           Validators.required,
-          htmlLength(this._editorMax)
+          Validators.maxLength(this.editorMax),
+          Validators.pattern(/^$|\s+/)
         ]],
         file: ['']
       });
@@ -124,6 +127,13 @@ export class ReasonComponent implements OnInit {
 
       this.characterCount = text.length;
     }
+  }
+
+  public reasonTextEmpty(): boolean {
+    if (!this.frmReason.controls.reasonText.value.replace(/(\s)/g, '').length) {
+      return true;
+    }
+    return false;
   }
 
 
@@ -180,7 +190,9 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    if (this.frmReason.get('reasonText').value.length >= 1) {
+    let reasonText: string = this.frmReason.get('reasonText').value.trim();
+
+    if (reasonText.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved
         };
