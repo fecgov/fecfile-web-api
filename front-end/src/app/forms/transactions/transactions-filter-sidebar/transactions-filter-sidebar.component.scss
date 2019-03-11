@@ -28,9 +28,6 @@
     .transactions__search-filter {
       width: 97%;
     }
-    // .transactions__filter-sidebar-set .card-body {
-    //   z-index: 1;
-    // }
     .transactions__filter-sidebar-set {
       .card-body {
           z-index: 1;
@@ -41,16 +38,20 @@
     }    
     .card-header {
       background-color: $bombay;
-      // border-bottom: 3px solid rgba(0, 0, 0, 0.125);
       cursor: pointer;
       .fa-chevron-up:before, .fa-chevron-down:before{
         color: $white;
       } 
     }
-    .transactions__filter-type-list {
-      list-style-type: none;
+    .transactions__filter-type-list-body {
+      max-height: 150px !important; // override the amination 
+      .transactions__filter-type-list {
+        list-style-type: none;
+        .form-check {
+          padding-bottom: 15px;
+        }
+      }
     }
-    
   }
   footer {
     background-color: $mineShaft;

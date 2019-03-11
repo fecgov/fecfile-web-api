@@ -16,6 +16,7 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
         // height: 'auto',
         // opacity: 1,
         backgroundColor: 'white',
+        'overflow-y': 'scroll'
       })),
       state('closed', style({
         'max-height': '0',

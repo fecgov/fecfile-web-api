@@ -17,40 +17,13 @@
     }
     @include media(mediumDesktop) {
       display: table-cell;
-      width: 400px;
+      width: 20%;
     }
     @include media(largeDesktop) {
       display: table-cell;
-      width: 400px;
-    }    
-    // .transactions__sidebar_categories {
-    //   @include media(tablet) {
-    //     display: none;
-    //   }
-    //   @include media(mediumDesktop) {
-    //     display: table-cell;
-    //     width: 250px;
-    //   }
-    //   @include media(largeDesktop) {
-    //     display: table-cell;
-    //     width: 250px;
-    //   }
-    // }
-    // .transactions__sidebar_filters {
-    //   @include media(tablet) {
-    //     display: none;
-    //   }
-    //   @include media(mediumDesktop) {
-    //     display: table-cell;
-    //     width: 400px;
-    //   }
-    //   @include media(largeDesktop) {
-    //     display: table-cell;
-    //     width: 400px;
-    //   }
-    // }        
+      width: 20%;
+    }           
   }
-
 
   .transactions__container {
     .grid-row {

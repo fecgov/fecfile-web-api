@@ -23,19 +23,20 @@
             </i>          
           </div>
           <!-- [hidden]="isHideTypeFilter"  -->
-          <div class="card-body" [@openClose]="!isHideTypeFilter ? 'open' : 'closed'">
-            <ul class="transactions__filter-type-list">
-              <li *ngFor="let categoryType of transactionCategories">
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox">
-                    <span>
-                      {{ categoryType?.text }}
-                    </span>
-                  </label>
-                </div>
-              </li>
-            </ul>
+          <div class="card-body" 
+              [@openClose]="!isHideTypeFilter ? 'open' : 'closed'">
+            <div class="transactions__filter-type-list-body">
+              <ul class="transactions__filter-type-list">
+                <li *ngFor="let categoryType of transactionCategories">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
+                      value="categoryType?.value">
+                    <label class="form-check-label" for="{{ categoryType?.value }}">
+                        {{ categoryType?.text }}</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="card">
@@ -129,8 +130,19 @@
               [ngClass]="toggleFilterDirection(isHideStateFilter)">
             </i>          
           </div>
-          <div class="card-body" [hidden]="isHideStateFilter">
-            <h5 class="card-title">Put State here</h5>
+          <div class="card-body" [@openClose]="!isHideStateFilter ? 'open' : 'closed'">
+            <div class="transactions__filter-type-list-body">
+              <ul class="transactions__filter-type-list">
+                <li *ngFor="let state of states">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="{{ state?.code }}" 
+                      value="{{ state?.code }}">
+                    <label class="form-check-label" for="{{ state?.code }}">
+                      {{ state?.name }}</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="card">
