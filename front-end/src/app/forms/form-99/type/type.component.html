@@ -25,7 +25,7 @@
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
                 *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
-                You must select a type for filing.
+                Select a reason type.
               </div>
             </div>
           </div>
@@ -217,7 +217,6 @@
                 <button
                   class="btn btn-primary btn-right"
                   type="submit"
-                  [disabled]="frmType.controls.reasonTypeRadio.status === 'INVALID'"
                 >
                   Next
                 </button>
