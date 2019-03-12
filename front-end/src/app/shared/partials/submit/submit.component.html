@@ -5,11 +5,40 @@
   </header>
   <section>
     <div class="content">
-      <div class="validate__form show-alerts">
-        <app-validate></app-validate>
+      <div class="grid-row">
+       <div class="validate__form show-alerts">
+        <div class="grid-row__col grid-row__col--12">
+          <app-validate></app-validate>
+        </div>
+       </div>
       </div>
-      The form has been successfully filed. You will receive an email confirmation shortly. 
-      If you don't receive a confirmation email, please contact the Electronic Filing Office at (202) 694-1307.        
-    </div>
+      <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">    
+              The form has been successfully filed. You will receive an email confirmation shortly. 
+              If you don't receive a confirmation email, please contact the Electronic Filing Office at (202) 694-1307.        
+        </div>
+      </div>
+      <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+              <br />
+            Your filling ID is FEC-{{FEC_Id}}
+            <br />
+          </div>
+      </div>     
+      
+      <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <br />
+              <button
+              type="button"
+              class="btn btn-previous btn-left"
+              (click)="goToDashboard()"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+      </div>
+
+   </div> 
   </section>
 </div>
