@@ -395,7 +395,7 @@ export class TransactionsService {
     t1.name = 'Mr. John Doe';
     t1.purpose_description = 'The purpose of this is to...';
     t1.selected = false;
-    t1.state = 'New York';
+    t1.state = 'NY';
     t1.street_1 = '7th Avenue';
     t1.transaction_id = this.mockTransactionId;
     t1.transaction_type_desc = 'Individual';

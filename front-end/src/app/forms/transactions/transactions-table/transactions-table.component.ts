@@ -59,10 +59,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
+  public filters: any;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
-  private filters: any;
+
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK =
@@ -77,6 +78,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     'transactions.trx.page';
   private readonly recyclePageLSK =
     'transactions.recycle.page';
+  private readonly filtersLSK =
+   'transactions.filters';
 
   /**.
 	 * Array of columns to be made sortable.
@@ -687,6 +690,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Get cached values from session.
    */
   private getCachedValues() {
+    this.applyFiltersCache();
     switch (this.tableType) {
       case this.transactionsView:
         this.applyColCache(this.transactionSortableColumnsLSK);
@@ -718,6 +722,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this._tableService.getColumnByName(col.colName,
           this.sortableColumns).visible = col.visible;
       }
+    }
+  }
+
+
+  /**
+   * Apply the filters from the cache.
+   */
+  private applyFiltersCache() {
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    if (filtersJson != null) {
+      this.filters = JSON.parse(filtersJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.filters = [];
     }
   }
 
@@ -777,6 +795,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * component's class variables.
    */
   private setCachedValues() {
+
     switch (this.tableType) {
       case this.transactionsView:
         this.setCacheValuesforView(this.transactionSortableColumnsLSK,
@@ -805,6 +824,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // shared between trx and recycle tables
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
+
+    // shared between trx and recycle tables
+    localStorage.setItem(this.filtersLSK,
+      JSON.stringify(this.filters));
 
     const currentSortedCol = this._tableService.getColumnByName(
       this.currentSortedColumnName, this.sortableColumns);

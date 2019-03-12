@@ -72,17 +72,18 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public searchFilter = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
-  public filterDateFrom = new Date();
-  public filterDateTo = new Date();
+  public filterDateFrom: Date;
+  public filterDateTo: Date;
   public filterMemoCode = false;
+
+  private readonly filtersLSK = 'transactions.filters';
+  private cachedFilters: any = [];
 
   constructor(
     private _formService: FormsService,
     private _transactionsMessageService: TransactionsMessageService,
     private _orderByPipe: OrderByPipe
-  ) {
-    // this._orderByPipe = new OrderByPipe();
-  }
+  ) {}
 
 
   /**
@@ -97,6 +98,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     if (this.formType) {
 
+      this.applyFiltersCache();
       this.getCategoryTypes();
 
       // TODO using this service to get states until available in another API.
@@ -109,7 +111,11 @@ export class TransactionsFilterSidbarComponent implements OnInit {
               if (res.data.states) {
                 statesExist = true;
                 for (const s of res.data.states) {
-                  s.selected = false;
+                  // check for states selected in the filter cache
+                  if (this.cachedFilters.filterStates) {
+                    s.selected = (this.cachedFilters.filterStates.includes(s.code)) ? true : false;
+                    this.isHideStateFilter = false;
+                  }
                 }
               }
             }
@@ -179,6 +185,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public applyFilters() {
     const filters: any = {};
+    // filters.show = true;
     filters.formType = this.formType;
     filters.search = this.searchFilter;
 
@@ -191,9 +198,13 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     filters.filterStates = filterStates;
 
     const filterCategories = [];
-    for (const c of this.transactionCategories) {
-      if (c.selected) {
-        filterCategories.push(c.text); // TODO use c.code with backend
+    for (const category of this.transactionCategories) {
+      if (category.options) {
+        for (const option of category.options) {
+          if (option.selected) {
+            filterCategories.push(option.text); // TODO use code with backend
+          }
+        }
       }
     }
     filters.filterCategories = filterCategories;
@@ -220,8 +231,12 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     for (const s of this.states) {
       s.selected = false;
     }
-    for (const t of this.transactionCategories) {
-      t.selected = false;
+    for (const category of this.transactionCategories) {
+      if (category.options) {
+        for (const option of category.options) {
+          option.selected = false;
+        }
+      }
     }
     this.filterAmountMin = 0;
     this.filterAmountMax = 0;
@@ -256,7 +271,11 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
               for (const node2 of node1.options) {
                 for (const option of node2.options) {
-                  option.selected = false;
+                  if (this.cachedFilters.filterCategories) {
+                    // check for categories selected in the filter cache
+                    option.selected = (this.cachedFilters.filterCategories.includes(option.text)) ? true : false;
+                    this.isHideTypeFilter = false;
+                  }
                   categoryGroup.options.push(option);
                 }
               }
@@ -274,6 +293,20 @@ export class TransactionsFilterSidbarComponent implements OnInit {
           this.transactionCategories = [];
         }
     });
+  }
+
+
+  /**
+   * Get the filters from the cache.
+   */
+  private applyFiltersCache() {
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    if (filtersJson != null) {
+      this.cachedFilters = JSON.parse(filtersJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.cachedFilters = [];
+    }
   }
 
 }
