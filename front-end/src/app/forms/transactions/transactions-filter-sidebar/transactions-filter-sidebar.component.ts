@@ -112,6 +112,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
                 statesExist = true;
                 for (const s of res.data.states) {
                   // check for states selected in the filter cache
+                  // TODO scroll to first check item
                   if (this.cachedFilters.filterStates) {
                     s.selected = (this.cachedFilters.filterStates.includes(s.code)) ? true : false;
                     this.isHideStateFilter = false;
@@ -185,14 +186,16 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public applyFilters() {
     const filters: any = {};
-    // filters.show = true;
+    let modified = false;
     filters.formType = this.formType;
     filters.search = this.searchFilter;
+    modified = this.searchFilter.length > 0;
 
     const filterStates = [];
     for (const s of this.states) {
       if (s.selected) {
         filterStates.push(s.code);
+        modified = true;
       }
     }
     filters.filterStates = filterStates;
@@ -202,6 +205,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       if (category.options) {
         for (const option of category.options) {
           if (option.selected) {
+            modified = true;
             filterCategories.push(option.text); // TODO use code with backend
           }
         }
@@ -211,14 +215,20 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
+    modified = this.filterAmountMin > 0;
+    modified = this.filterAmountMax > 0;
 
     filters.filterDateFrom = this.filterDateFrom;
     filters.filterDateTo = this.filterDateTo;
+    modified = (this.filterDateFrom !== null);
+    modified = (this.filterDateTo !== null);
 
     if (this.filterMemoCode) {
       filters.filterMemoCode = this.filterMemoCode;
+      modified = true;
     }
 
+    filters.show = modified;
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
@@ -273,6 +283,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
                 for (const option of node2.options) {
                   if (this.cachedFilters.filterCategories) {
                     // check for categories selected in the filter cache
+                    // TODO scroll to first check item
                     option.selected = (this.cachedFilters.filterCategories.includes(option.text)) ? true : false;
                     this.isHideTypeFilter = false;
                   }

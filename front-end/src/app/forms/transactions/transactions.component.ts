@@ -37,6 +37,7 @@ export class TransactionsComponent implements OnInit {
   public recycleBinView = ActiveView.recycleBin;
   public isShowFilters = false;
 
+  private readonly filtersLSK = 'transactions.filters';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -49,6 +50,17 @@ export class TransactionsComponent implements OnInit {
    */
   public ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    let filters: any;
+    if (filtersJson != null) {
+      filters = JSON.parse(filtersJson);
+    } else {
+      filters = [];
+    }
+    if (filters.show === true) {
+      this.isShowFilters = true;
+    }
   }
 
 
