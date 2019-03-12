@@ -140,13 +140,12 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
-      console.log('onNotify: ');
-      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
        */
-      if (e.frm) {
+      if (e.form) {
+
         this.frm = e.form;
 
         this.direction = e.direction;

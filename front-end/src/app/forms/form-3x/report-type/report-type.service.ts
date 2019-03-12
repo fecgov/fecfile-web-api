@@ -24,7 +24,7 @@ export class ReportTypeService {
   let params = new HttpParams();
   let formData: FormData = new FormData();
 
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  // `httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
   const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`form3xReportType`));

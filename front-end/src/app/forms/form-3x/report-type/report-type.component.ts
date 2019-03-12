@@ -105,11 +105,17 @@ export class ReportTypeComponent implements OnInit {
             if (typeof res.toDate === 'string') {
               if (res.toDate.length >= 1) {
                 this.toDateSelected = true;
+                this._toDateSelected = res.toDate;
+              } else {
+                this.toDateSelected = false;
               }
             }
             if (typeof res.fromDate === 'string') {
               if (res.fromDate.length >= 1) {
+                this._fromDateSelected = res.fromDate;
                 this.fromDateSelected = true;
+              } else {
+                this.fromDateSelected = false;
               }
             }
 
@@ -189,38 +195,25 @@ export class ReportTypeComponent implements OnInit {
           this._form3xReportTypeDetails.stateOfElection = this._selectedElectionState;
         }
 
-        this._form3xReportTypeDetails.cvgStartDate = this.fromDateSelected;
-        this._form3xReportTypeDetails.cvgEndDate = this.toDateSelected;
+        this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
+        this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
 
         localStorage.setItem('form3xReportType', JSON.stringify(this._form3xReportTypeDetails));
-
-        // this._formService
-        //  .saveReport(this._formType)
-        //  .subscribe(res => {
-        //   if(res) {
-        //     console.log(' saveReport res: ', res);
-        //   }
-        // },
-        // (error) => {
-        //   console.log('saveReport error: ', error);
-        // });
-
-        // this.status.next([]);
 
         this._reportTypeService
           .saveReport(this._formType)
           .subscribe(res => {
-            console.log('Report type saved:');
+            if (res) {
+              console.log('Report type saved: ');
+              this.status.emit({
+                form: this.frmReportType,
+                direction: 'next',
+                step: 'step_2',
+                previousStep: 'step_1'
+              });
+            }
           });
 
-        this.status.emit({
-          form: this.frmReportType,
-          direction: 'next',
-          step: 'step_2',
-          previousStep: 'step_1'
-        });
-
-        //this.saveReport();
         return 1;
     } else {
       this.optionFailed = true;
@@ -237,6 +230,11 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
+  /**
+   * Toggles the tooltip.
+   *
+   * @param      {Element}  tooltip  The tooltip
+   */
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
@@ -245,8 +243,27 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
+  /**
+   * Cancels form 3x.
+   */
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
+  }
+
+
+  /**
+   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  private _formatDate(date: string): string {
+    const today = new Date(date);
+    const year: number = today.getFullYear();
+    const month: string = (1 + today.getMonth()).toString().padStart(2, '0');
+    const day: string = today.getDate().toString().padStart(2, '0')
+
+    return `${year}-${month}-${day}`;
   }
 
 }
