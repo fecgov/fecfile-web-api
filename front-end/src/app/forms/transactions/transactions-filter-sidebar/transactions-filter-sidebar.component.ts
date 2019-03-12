@@ -122,25 +122,46 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
   }
 
+
+  /**
+   * Toggle visibility of the Type filter
+   */
   public toggleTypeFilterItem() {
     this.isHideTypeFilter = !this.isHideTypeFilter;
   }
 
+
+  /**
+   * Toggle visibility of the Date filter
+   */
   public toggleDateFilterItem() {
     this.isHideDateFilter = !this.isHideDateFilter;
   }
 
+
+  /**
+   * Toggle visibility of the Amount filter
+   */
   public toggleAmountFilterItem() {
     this.isHideAmountFilter = !this.isHideAmountFilter;
   }
 
+
+  /**
+   * Toggle visibility of the State filter
+   */
   public toggleStateFilterItem() {
     this.isHideStateFilter = !this.isHideStateFilter;
   }
 
+
+  /**
+   * Toggle visibility of the Memo filter
+   */
   public toggleMemoFilterItem() {
     this.isHideMemoFilter = !this.isHideMemoFilter;
   }
+
 
   /**
    * Toggle the direction of the filter collapsed or expanded
@@ -225,8 +246,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
           if (res.data.transactionCategories) {
             categoriesExist = true;
 
-            // First node is the group or types (not checkable)
-            // 3rd node is the type checkable
+            // 1st node is the group of types (not checkable).
+            // 2nd node is ignored.
+            // 3rd node is the type checkable.
             for (const node1 of res.data.transactionCategories) {
               const categoryGroup: any = {};
               categoryGroup.text = node1.text;
