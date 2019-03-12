@@ -177,6 +177,10 @@ export class TransactionsService {
   }
 
 
+  /**
+   * This method handles filtering the transactions array and will be replaced
+   * by a backend API.
+   */
   public mockApplyFilters(response: any, filters: any) {
 
     if (!filters) {
@@ -186,13 +190,24 @@ export class TransactionsService {
       return;
     }
 
+    // This is for filtering where filters are OR conditions not AND.
+    // add a unique id to each transactions before filtering
+    // let i = 0;
+    // for (const trx of response.transactions) {
+    //   trx.id = i;
+    //   i++;
+    // }
+
+    // let combinedFilterArray = [];
+
     let isFilter = false;
     if (filters.search) {
       if (response.transactions.length > 0) {
         isFilter = true;
         const fields = ['name', 'zip_code', 'transaction_id'];
-        const filtered = this._filterPipe.transform(response.transactions, fields, filters.search);
-        response.transactions = filtered;
+        const filteredSearchArray = this._filterPipe.transform(response.transactions, fields, filters.search);
+        response.transactions = filteredSearchArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredSearchArray);
       }
     }
 
@@ -206,6 +221,7 @@ export class TransactionsService {
           filteredStateArray = filteredStateArray.concat(filtered);
         }
         response.transactions = filteredStateArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredStateArray);
       }
     }
 
@@ -219,6 +235,7 @@ export class TransactionsService {
           filteredCategoryArray = filteredCategoryArray.concat(filtered);
         }
         response.transactions = filteredCategoryArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredCategoryArray);
       }
     }
 
@@ -236,6 +253,7 @@ export class TransactionsService {
           }
         }
         response.transactions = filteredAmountArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredAmountArray);
       }
     }
 
@@ -249,14 +267,39 @@ export class TransactionsService {
           if (trxDate >= filterDateFromDate &&
               trxDate <= filterDateToDate) {
             isFilter = true;
-             filteredDateArray.push(trx);
+            filteredDateArray.push(trx);
           }
         }
       }
       response.transactions = filteredDateArray;
+      // combinedFilterArray = combinedFilterArray.concat(filteredDateArray);
     }
 
-    // var d = new Date("2015-03-25");
+    if (filters.filterMemoCode === true) {
+      isFilter = true;
+      const filteredMemoCodeArray = [];
+      for (const trx of response.transactions) {
+        if (trx.memo_code) {
+          if (trx.memo_code.length > 0) {
+            filteredMemoCodeArray.push(trx);
+          }
+        }
+      }
+      response.transactions = filteredMemoCodeArray;
+      // combinedFilterArray = combinedFilterArray.concat(filteredMemoCodeArray);
+    }
+
+    // // sort the combined filter array by id
+    // combinedFilterArray = this.sortTransactions(combinedFilterArray, 'id', false);
+    // const finalFilteredArray = [];
+    // let prevId = null;
+    // for (const trx of combinedFilterArray) {
+    //   if (trx.id !== prevId) {
+    //     finalFilteredArray.push(trx);
+    //   }
+    //   prevId = trx.id;
+    // }
+    // response.transactions = finalFilteredArray;
 
     if (isFilter) {
       response.totalAmount = 0;

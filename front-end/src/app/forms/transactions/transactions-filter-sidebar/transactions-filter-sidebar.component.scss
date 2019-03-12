@@ -47,6 +47,10 @@
       max-height: 150px !important; // override the amination 
       .transactions__filter-type-list {
         list-style-type: none;
+        .transactions__filter-type-group {
+          padding: 15px 0;
+          font-weight: bold;
+        }
         .form-check {
           padding-bottom: 15px;
         }

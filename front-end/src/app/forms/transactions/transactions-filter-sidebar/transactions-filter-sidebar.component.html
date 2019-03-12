@@ -26,15 +26,16 @@
           <div class="card-body" 
               [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
             <div class="transactions__filter-type-list-body">
-              <ul class="transactions__filter-type-list">
-                <li *ngFor="let categoryType of transactionCategories">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                      [(ngModel)]="categoryType.selected">
-                    <label class="form-check-label" for="{{ categoryType?.value }}">
+                <ul *ngFor="let categoryGroup of transactionCategories" class="transactions__filter-type-list">
+                  <li class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
+                  <li *ngFor="let categoryType of categoryGroup.options">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
+                        [(ngModel)]="categoryType.selected">
+                      <label class="form-check-label" for="{{ categoryType?.value }}">
                         {{ categoryType?.text }}</label>
-                  </div>
-                </li>
+                    </div>
+                  </li>                    
               </ul>
             </div>
           </div>
@@ -159,7 +160,7 @@
           <div class="card-body" [@openClose]="!isHideMemoFilter ? 'open' : 'closed'">
               <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="memo_code" 
-                    value="">
+                    [(ngModel)]="filterMemoCode">
                   <label class="form-check-label" for="memo_code">
                     Check to filter Transactions with Memo Code
                   </label>

@@ -126,6 +126,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe(
       filters => {
         this.filters = filters;
+        this.formType = filters.formType;
         this.getPage(this.config.currentPage);
       }
     );

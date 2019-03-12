@@ -6,6 +6,9 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
 
+/**
+ * A component for filtering transactions located in the sidebar.
+ */
 @Component({
   selector: 'app-transactions-filter-sidebar',
   templateUrl: './transactions-filter-sidebar.component.html',
@@ -71,6 +74,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public filterAmountMax = 0;
   public filterDateFrom = new Date();
   public filterDateTo = new Date();
+  public filterMemoCode = false;
 
   constructor(
     private _formService: FormsService,
@@ -80,6 +84,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     // this._orderByPipe = new OrderByPipe();
   }
 
+
+  /**
+   * Initialize the component.
+   */
   public ngOnInit(): void {
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -89,15 +97,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     if (this.formType) {
 
-      // this._formService
-      //   .getTransactionCategories(this.formType)
-      //     .subscribe(res => {
-      //       this.transactionCategories = this._orderByPipe.transform(
-      //         res.transactionCategories, {property: 'text', direction: 1});
-      //     });
+      this.getCategoryTypes();
 
-      // TODO need to pass in the dynamic transaction type.
-      // Using default for dev purposes
+      // TODO using this service to get states until available in another API.
       this._formService
         .getDynamicFormFields(this.formType, 'Individual Receipt')
           .subscribe(res => {
@@ -115,22 +117,6 @@ export class TransactionsFilterSidbarComponent implements OnInit {
               this.states = res.data.states;
             } else {
               this.states = [];
-            }
-
-            let categoriesExist = false;
-            if (res.data) {
-              if (res.data.transactionCategories) {
-                categoriesExist = true;
-                for (const s of res.data.transactionCategories) {
-                  s.selected = false;
-                }
-              }
-            }
-            if (categoriesExist) {
-              this.transactionCategories = this._orderByPipe.transform(
-                res.data.transactionCategories, {property: 'text', direction: 1});
-            } else {
-              this.transactionCategories = [];
             }
           });
     }
@@ -172,6 +158,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public applyFilters() {
     const filters: any = {};
+    filters.formType = this.formType;
     filters.search = this.searchFilter;
 
     const filterStates = [];
@@ -196,12 +183,16 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     filters.filterDateFrom = this.filterDateFrom;
     filters.filterDateTo = this.filterDateTo;
 
+    if (this.filterMemoCode) {
+      filters.filterMemoCode = this.filterMemoCode;
+    }
+
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
   }
 
 
   /**
-   * Clear filters currently set.
+   * Clear all filter values.
    */
   public clearFilters() {
     this.searchFilter = '';
@@ -213,8 +204,54 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     this.filterAmountMin = 0;
     this.filterAmountMax = 0;
-    this.filterDateFrom = new Date();
-    this.filterDateTo = new Date();
+    this.filterDateFrom = null;
+    this.filterDateTo = null;
+    this.filterMemoCode = false;
+  }
+
+
+  /**
+   * Get the Category Types from the server for populating
+   * filter options on Type.
+   */
+  private getCategoryTypes() {
+    this._formService
+    .getTransactionCategories(this.formType)
+      .subscribe(res => {
+
+        let categoriesExist = false;
+        const categoriesGroupArray = [];
+        if (res.data) {
+          if (res.data.transactionCategories) {
+            categoriesExist = true;
+
+            // First node is the group or types (not checkable)
+            // 3rd node is the type checkable
+            for (const node1 of res.data.transactionCategories) {
+              const categoryGroup: any = {};
+              categoryGroup.text = node1.text;
+              categoryGroup.options = [];
+
+              for (const node2 of node1.options) {
+                for (const option of node2.options) {
+                  option.selected = false;
+                  categoryGroup.options.push(option);
+                }
+              }
+              if (categoryGroup.options.length > 0) {
+                categoriesGroupArray.push(categoryGroup);
+              }
+            }
+          }
+        }
+        if (categoriesExist) {
+          this.transactionCategories = categoriesGroupArray;
+          // this.transactionCategories = this._orderByPipe.transform(
+          //   res.data.transactionCategories, {property: 'text', direction: 1});
+        } else {
+          this.transactionCategories = [];
+        }
+    });
   }
 
 }

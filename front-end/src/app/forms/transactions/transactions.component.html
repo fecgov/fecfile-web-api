@@ -1,13 +1,15 @@
 <div class="transactions__main-container">
   <div class="transactions__sidebar">
     <div class="transactions__sidebar_categories">
-      <transaction-categories-sidebar [@fadeInOut] *ngIf="!isShowFilters" 
+      <!-- <transaction-categories-sidebar [@fadeInOut] *ngIf="!isShowFilters"  -->
+      <transaction-categories-sidebar [hidden]="isShowFilters"
         title="Transaction Categories"
         (status)='onNotify($event)'>
       </transaction-categories-sidebar>
     </div>
     <div class="transactions__sidebar_filters">
-      <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters" 
+      <!-- <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters"  -->
+      <app-transactions-filter-sidebar [hidden]="!isShowFilters" 
         title="Filters"
         [formType]="formType">
       </app-transactions-filter-sidebar>
@@ -33,6 +35,7 @@
       <hr />
     </header>
     <div [@fadeInOut] *ngIf="isTransactionViewActive()">
+    <!-- <div [@fadeInOut] [hidden]="!isTransactionViewActive()"> -->
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="transactions__btn-container">
@@ -69,6 +72,7 @@
       </app-transactions-table>
     </div>
     <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+    <!-- <div [@fadeInOut] [hidden]="!isRecycleBinViewActive()"> -->
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="transactions__btn-container">
