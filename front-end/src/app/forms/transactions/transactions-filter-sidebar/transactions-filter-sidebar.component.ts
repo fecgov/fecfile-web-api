@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
@@ -6,6 +6,8 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
+import { ValidationErrorModel } from '../model/validation-error.model';
+
 
 /**
  * A component for filtering transactions located in the sidebar.
@@ -63,6 +65,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   @Input()
   public title = '';
 
+
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideAmountFilter: boolean;
@@ -76,6 +79,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
   public filterMemoCode = false;
+  public dateFilterValidation: ValidationErrorModel;
+  public amountFilterValidation: ValidationErrorModel;
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
@@ -92,11 +97,16 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * Initialize the component.
    */
   public ngOnInit(): void {
+
+
+
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
     this.isHideAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
+
+    this.initValidationErrors();
 
     if (this.formType) {
       this.applyFiltersCache();
@@ -162,7 +172,11 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * Set the filters.show to true indicating the filters have been altered.
    */
   public applyFilters() {
-    // TODO make filters a ts class model since it's used in transactionsComponent
+
+    if (!this.validateFilters()) {
+      return;
+    }
+
     const filters = new TransactionFilterModel();
     let modified = false;
     filters.formType = this.formType;
@@ -223,6 +237,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * Clear all filter values.
    */
   public clearFilters() {
+
+    this.initValidationErrors();
+
     this.searchFilter = '';
     for (const s of this.states) {
       s.selected = false;
@@ -360,6 +377,65 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       // Just in case cache has an unexpected issue, use default.
       this.cachedFilters = new TransactionFilterModel();
     }
+  }
+
+
+  /**
+   * Initialize validation errors to their defaults.
+   */
+  private initValidationErrors() {
+    this.dateFilterValidation = new ValidationErrorModel(null, false);
+    this.amountFilterValidation = new ValidationErrorModel(null, false);
+  }
+
+
+  /**
+   * Validate the filter settings.  Set the the validation error model
+   * to true with a message if invalid.
+   * 
+   * @returns true if valid.
+   */
+  private validateFilters(): boolean {
+    this.initValidationErrors();
+    if (this.filterDateFrom !== null && this.filterDateTo === null) {
+      this.dateFilterValidation.isError = true;
+      this.dateFilterValidation.message = 'To Date is required';
+      this.isHideDateFilter = false;
+      return false;
+    }
+    if (this.filterDateTo !== null && this.filterDateFrom === null) {
+      this.dateFilterValidation.isError = true;
+      this.dateFilterValidation.message = 'From Date is required';
+      this.isHideDateFilter = false;
+      return false;
+    }
+    if (this.filterDateFrom > this.filterDateTo) {
+      this.dateFilterValidation.isError = true;
+      this.dateFilterValidation.message = 'From Date must preceed To Date';
+      this.isHideDateFilter = false;
+      return false;
+    }
+
+    if (this.filterAmountMin > 0 && this.filterAmountMax === 0) {
+      this.amountFilterValidation.isError = true;
+      this.amountFilterValidation.message = 'Maximum Amount is required';
+      this.isHideAmountFilter = false;
+      return false;
+    }
+    if (this.filterAmountMax > 0 && this.filterAmountMin === 0) {
+      this.amountFilterValidation.isError = true;
+      this.amountFilterValidation.message = 'Minimum Amount is required';
+      this.isHideAmountFilter = false;
+      return false;
+    }
+    if (this.filterAmountMin > this.filterAmountMax) {
+      this.amountFilterValidation.isError = true;
+      this.amountFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideAmountFilter = false;
+      return false;
+    }
+
+    return true;
   }
 
 }
