@@ -74,7 +74,7 @@ export class ReportTypeComponent implements OnInit {
     this._form3xReportTypeDetails = {
       cmteId: '',
       reportId: '',
-      formType: '3x',
+      formType: '3X',
       electionCode: '',
       reportType: '',
       regularSpecialReportInd: '',
@@ -143,11 +143,6 @@ export class ReportTypeComponent implements OnInit {
       this.tooltipLeft = 'auto';
     }
   }
-
-  /**
-   * TODO:
-   * Get the regularReport and specialReport variables working.
-   */
 
   /**
    * Updates the type selected.

@@ -1,6 +1,8 @@
 @import '../../../shared/scss/global';
 
 .transaction-type-container {
+  min-height: 100vh;
+  position: relative;
   header {
     .header-content {
       display: block;
@@ -20,9 +22,18 @@
       @include clearfix();
     }
   }
-  .forms__btn-container {
-    height: 100%;
-    margin-bottom: 10px;
-    padding-left: 20px;
+  form {
+    min-height: 90vh;
+    position: relative;
+    footer {
+      bottom: 0;
+      position: absolute;
+      .forms__btn-container {
+        height: 100%;
+        margin-bottom: 10px;
+        padding-left: 20px;
+      }
+    }
   }
+
 }
