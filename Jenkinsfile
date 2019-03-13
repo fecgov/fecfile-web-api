@@ -1,9 +1,9 @@
 pipeline {
   agent any
   stages {
-    stage('Prepare Build') {
+    stage('Prepare Build'){
       steps {
-        script {
+        script{
           hash = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
           VERSION = hash.take(7)
           currentBuild.displayName = "#${BUILD_ID}-${VERSION}"
@@ -12,95 +12,111 @@ pipeline {
         }
       }
     }
-    stage('Build backend') {
-      steps {
-        script {
-
-          def backendImage = docker.build("fecnxg-django-backend:${VERSION}", 'django-backend/')
-
-          docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-django-backend') {
-            backendImage.push()
-          }
-        }
-      }
-    }
-
-    stage('Build frontend') {
-      steps {
-        script {
-          sh "sed -i 's/local/awsdev/g' front-end/Dockerfile"
-          def frontendImage = docker.build("fecnxg-frontend:${VERSION}", 'front-end/')
-
-          docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend') {
-            frontendImage.push()
-          }
-
-          sh "sed -i 's/awsdev/awsuat/g' front-end/Dockerfile"
-          def frontendImageUAT = docker.build("fecnxg-frontend:${VERSION}uat", 'front-end/')
-
-          docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend') {
-            frontendImageUAT.push()
-          }
-
-          sh "sed -i 's/awsuat/awsqa/g' front-end/Dockerfile"
-          def frontendImageQA = docker.build("fecnxg-frontend:${VERSION}qa", 'front-end/')
-
-          docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend') {
-            frontendImageQA.push()
-          }
-        }
-      }
-
-    }
-
-    stage('Build Flywaydb') {
-      when { branch "develop" }
-        steps { 
-            script {
-              sh("sed -i '11d' data/flyway_migration.sh")
-              def flywayImage = docker.build("fecfile-flyway-db:${VERSION}", 'data/')
-              
-              docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db') {
-                  flywayImage.push()
-              }
-              sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
-            }
-        }    
-    }
-    stage ('Deployments'){
-      when { branch "develop" }
-      parallel {
-        stage('Deploy backend-api to DEV environment'){
-          steps {
-            sh "kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=dev set image deployment/fecfile-backend-api fecfile-backend-api=813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-django-backend:${VERSION}"
-          }
-        }
-        stage('Deploy front-end to DEV environment'){
+    // Deploy to develop branch
+    stage('Development') {
+      when { branch 'develop'}
+      stages {
+        stage("Build Images"){
           steps{
-            sh "kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=dev set image deployment/fecfile-frontend fecfile-frontend=813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-frontend:${VERSION}"
+            // Build backend for dev environment
+            imageBuild("${VERSION}","django-backend","fecnxg-django-backend",false)
+            //Build frontEnd
+            imageBuild("${VERSION}","front-end","fecnxg-frontend", "awsdev")
+            //Build flyway Image 
+            build_flyway("${VERSION}", "data","fecfile-flyway-db")
+          }
+        }
+       
+        stage("Deploy App"){
+          steps{
+            //Deploy flyway
+            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
+            //deployToK8s(String version, String environment, String deployment, String repo)
+            //Deploy backend
+            deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
+            //Deploy frontend
+            deployToK8s("${VERSION}", "dev", "fecfile-frontend","fecnxg-frontend")
+          }
+        }
+        stage('Code Quality') {
+          steps {
+            code_quality()
           }
         }
       }
     }
-    stage('Code Quality') {
-      steps {
-        code_quality()
+    //End of developent stage 
+    stage('QA'){
+      when { branch 'release'}
+      stages {
+        stage("Build Images"){
+          steps{
+            // Build backend for dev environment
+            imageBuild("${VERSION}","django-backend","fecnxg-django-backend",false)
+            //Build frontEnd
+            imageBuild("${VERSION}","front-end","fecnxg-frontend", "awsqa")
+            //Build flyway Image 
+            build_flyway("${VERSION}", "data","fecfile-flyway-db")
+          }
+        }
+       
+        stage("Deploy App"){
+          steps{
+            //Deploy flyway
+            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
+            //deployToK8s(String version, String environment, String deployment, String repo)
+            //Deploy backend
+            deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
+            //Deploy frontend
+            deployToK8s("${VERSION}", "qa", "fecfile-frontend","fecnxg-frontend")
+          }
+        }
       }
     }
+    //End of qa stage 
+    stage('UAT'){
+      when { branch 'master'}
+      stages {
+        stage("Build Images"){
+          steps{
+            // Build backend for dev environment
+            imageBuild("${VERSION}","django-backend","fecnxg-django-backend",false)
+            //Build frontEnd
+            imageBuild("${VERSION}","front-end","fecnxg-frontend", "awsuat")
+            //Build flyway Image 
+            build_flyway("${VERSION}", "data","fecfile-flyway-db")
+          }
+        }
+       
+        stage("Deploy App"){
+          steps{
+            //Deploy flyway
+            sh("bash data/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
+            //deployToK8s(String version, String environment, String deployment, String repo)
+            //Deploy backend
+            deployToK8s("${VERSION}", "uat","fecfile-backend-api","fecnxg-django-backend")
+            //Deploy frontend
+            deployToK8s("${VERSION}", "uat", "fecfile-frontend","fecnxg-frontend")
+          }
+        }
+      }
+    }
+    //end of UAT stage
   }
+
   post {
     success {
-
-      message_on_dev("good", ": Deployed ${VERSION} to k8s https://dev-fecfile.efdev.fec.gov/") 
+      message_on_dev("good", ": Deployed ${VERSION} to https://fecfile.efdev.fec.gov/") 
     }
     failure {
-      message_on_dev("danger", ": Deployement of ${VERSION} failed!")
+      message_on_dev("danger", ": Deployement of ${VERSION} to https://fecfile.efdev.fec.gov/ failed!")
     }
   }
+
 }
 
 def message_on_dev(String col, String mess){
-  if( env.BRANCH_NAME == 'develop'){
+  if( env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release' || env.BRANCH_NAME == 'master'){
     slackSend color: col, message: env.BRANCH_NAME + mess
   }
 }
@@ -118,4 +134,34 @@ def code_quality() {
       rm -fr .venv
     """
     junit '**/reports/*.xml'
+}
+
+def imageBuild(String version, String location, String repo, Boolean frontend_env) {
+  if(frontend_env == "awsdev"){
+    sh("sed -i 's/local/${fronend_env}/g ${location}/Dockerfile'")
+  }
+  if (frontend_env == "awsqa") {
+    sh("sed -i 's/local/${fronend_env}/g ${location}/Dockerfile'")
+    sh("sed -i 's/awsdev/${fronend_env}/g ${location}/Dockerfile'")
+  }
+
+  if (frontend_env == "awsuat") {
+    sh("sed -i 's/local/${fronend_env}/g ${location}/Dockerfile'")
+    sh("sed -i 's/awsdev/${fronend_env}/g ${location}/Dockerfile'")
+    sh("sed -i 's/awsqa/${fronend_env}/g ${location}/Dockerfile'")
+  }
+ 
+  def imageB = docker.build("${repo}:${version}", "${location}")
+  docker.withRegistry("https://813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}") {
+    imageB.push();
+  }
+}
+
+def build_flyway(String versin, String location, String repo) {
+  sh("sed -i '11d' ${location}/flyway_migration.sh")
+  imageBuild("${version}", "data", "fecfile-flyway-db", False )
+}
+
+def deployToK8s(String version, String environment, String deployment, String repo) {
+  sh("kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile --namespace=${environment} set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version} --dry-run=True")
 }
