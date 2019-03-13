@@ -11,11 +11,12 @@
       </report-type-sidebar>
     </div>
     <div *ngIf="step==='step_2' || step==='step_3'">
-      <transaction-categories-sidebar
+      <transaction-sidebar
         title="Transaction Categories"
+        [transactionCategories]="parentTransactionCategories"
         (status)='onNotify($event)'
       >
-      </transaction-categories-sidebar>
+      </transaction-sidebar>
     </div>
   </div>
   <div
@@ -29,10 +30,11 @@
       <app-steps
         [steps]="[
           {text: 'Report<br/>type', step: 'step_1'},
-          {text: 'Form', step: 'step_2'},
-          {text: 'Preview', step: 'step_4'},
-          {text: 'Sign', step: 'step_5'},
-          {text: 'Submit', step: 'step_6'}
+          {text: 'Transaction<br/>type', step: 'step_2' || 'step_3'},
+          {text: 'Form', step: 'step_4'},
+          {text: 'Preview', step: 'step_5'},
+          {text: 'Sign', step: 'step_6'},
+          {text: 'Submit', step: 'step_7'}
         ]"
         [current_step]="currentStep"
       >
@@ -57,12 +59,17 @@
           [coverageDateNotSelected]="coverageDateNotSelected"
           [committeeReportTypes]="reportTypes"
         >
-      </f3x-report-type>
+        </f3x-report-type>
       </div>
 
       <div
         class="form__step"
-        [hidden]="step!=='step_2'"
+        [hidden]="step!=='step_3'"
+      ></div>
+
+      <div
+        class="form__step"
+        [hidden]="step!=='step_3'"
       >
         <f3x-individual-receipt
           [formOptionsVisible]="formOptionsVisible"

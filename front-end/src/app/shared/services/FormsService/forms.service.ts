@@ -551,32 +551,6 @@ export class FormsService {
       );
   }
 
-  public getTransactionCategories( form_type: string): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    let url: string = '';
-    let params = new HttpParams();
-
-
-    //url = '/f3x/get_transaction_categories?form_type=F3X';
-    url = '/core/get_transaction_categories?form_type=F3X';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    params = params.append('form_type', "F3X");
-
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-           /* headers: httpOptions,
-            params*/
-            headers: httpOptions/*  */
-          }
-       );
-  }
-
  public formHasUnsavedData(formType: string): boolean {
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
 

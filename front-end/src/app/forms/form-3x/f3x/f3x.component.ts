@@ -4,6 +4,7 @@ import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportTypeService } from '../report-type/report-type.service';
+import { TransactionTypeService } from '../transaction-type/transaction-type.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
@@ -24,6 +25,7 @@ export class F3xComponent implements OnInit {
   public frm: any;
   public direction: string;
   public previousStep: string = '';
+  public parentTransactionCategories: any = [];
   public reportsLoading: boolean = true;
   public reportTypes: any = [];
   public reportTypeIndicator: any = {};
@@ -32,12 +34,14 @@ export class F3xComponent implements OnInit {
   public selectedReport: any = null;
   public regularReports: boolean = false;
   public specialReports: boolean = false;
+  public transactionCategories: any = [];
 
   private _step: string = '';
   private _formType: string = '';
 
   constructor(
     private _reportTypeService: ReportTypeService,
+    private _transactionTypeService: TransactionTypeService,
     private _formService: FormsService,
     private _http: HttpClient,
     private _fb: FormBuilder,
@@ -69,7 +73,26 @@ export class F3xComponent implements OnInit {
             this._setReports();
           }
         }
-    });
+      });
+
+    this._transactionTypeService
+      .getTransactionCategories(this._formType)
+      .subscribe(res => {
+        if (typeof res === 'object') {
+          if (Array.isArray(res.data)) {
+            if (Array.isArray(res.data.transactionCategories)) {
+              res.data.transactionCategories.forEach(el => {
+                if (typeof el.text === 'string' && el.value === 'string') {
+                  this.parentTransactionCategories.push({
+                    'text': el.text,
+                    'value': el.value
+                  });
+                }
+              });
+            }
+          }
+        }
+      });
   }
 
   ngDoCheck(): void {

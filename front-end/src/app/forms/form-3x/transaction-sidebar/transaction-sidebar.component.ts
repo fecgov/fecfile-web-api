@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
   selector: 'transaction-sidebar',
@@ -13,6 +12,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 export class TransactionSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Input() transactionCategories: any = [];
   @Input() title: string = '';
 
   public additionalItemSelected: string = '';
@@ -24,14 +24,13 @@ export class TransactionSidebarComponent implements OnInit {
   public searchField: any = {};
   public steps: any = {};
   public step: string = '';
-  public transactionCategories: any = [];
+  // public transactionCategories: any = [];
 
   private _formType: string = '';
   private _indexOfItemSelected: number = null;
 
   constructor(
     private _config: NgbTooltipConfig,
-    private _formService: FormsService,
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute
   ) {
@@ -42,15 +41,17 @@ export class TransactionSidebarComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this._formService
-      .getTransactionCategories(this._formType)
-      .subscribe(res => {
-        this.cashOnHand = res.data.cashOnHand;
+    console.log('transactionCategories: ', this.transactionCategories);
 
-        this.transactionCategories = res.data.transactionCategories;
+    // this._formService
+    //   .getTransactionCategories(this._formType)
+    //   .subscribe(res => {
+    //     this.cashOnHand = res.data.cashOnHand;
 
-        this.searchField = res.data.transactionSearchField;
-      });
+    //     this.transactionCategories = res.data.transactionCategories;
+
+    //     this.searchField = res.data.transactionSearchField;
+    //   });
   }
 
   public selectItem(e): void {
