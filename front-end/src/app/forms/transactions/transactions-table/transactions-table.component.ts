@@ -12,6 +12,7 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
 
 
 
@@ -59,9 +60,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
+  public filters: TransactionFilterModel;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
+
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK =
@@ -76,6 +79,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     'transactions.trx.page';
   private readonly recyclePageLSK =
     'transactions.recycle.page';
+  private readonly filtersLSK =
+   'transactions.filters';
 
   /**.
 	 * Array of columns to be made sortable.
@@ -99,6 +104,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private showPinColumnsSubscription: Subscription;
 
+  /**
+   * Subscription for applying filters to the transactions obtained from
+   * the server.
+   */
+  private applyFiltersSubscription: Subscription;
+
   private columnOptionCount = 0;
   private readonly maxColumnOption = 5;
   private allTransactionsSelected: boolean;
@@ -113,6 +124,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
       message => {
         this.showPinColumns();
+      }
+    );
+    this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
+      .subscribe(
+      (filters: TransactionFilterModel) => {
+        this.filters = filters;
+        this.formType = filters.formType;
+        this.getPage(this.config.currentPage);
       }
     );
   }
@@ -148,6 +167,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
+    this.applyFiltersSubscription.unsubscribe();
   }
 
 
@@ -187,11 +207,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
     this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending)
+      this.currentSortedColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
         this._transactionsService.mockApplyRestoredTransaction(res);
+        this._transactionsService.mockApplyFilters(res, this.filters);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -220,6 +241,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
+        this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
         this.transactionsModel = this._transactionsService.sortTransactions(
@@ -663,12 +685,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     console.log('this.bulkActionCounter = ' + this.bulkActionCounter);
     this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
   }
-
+  
 
   /**
    * Get cached values from session.
    */
   private getCachedValues() {
+    this.applyFiltersCache();
     switch (this.tableType) {
       case this.transactionsView:
         this.applyColCache(this.transactionSortableColumnsLSK);
@@ -700,6 +723,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this._tableService.getColumnByName(col.colName,
           this.sortableColumns).visible = col.visible;
       }
+    }
+  }
+
+
+  /**
+   * Apply the filters from the cache.
+   */
+  private applyFiltersCache() {
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    if (filtersJson != null) {
+      this.filters = JSON.parse(filtersJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.filters = null;
     }
   }
 
@@ -759,6 +796,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * component's class variables.
    */
   private setCachedValues() {
+
     switch (this.tableType) {
       case this.transactionsView:
         this.setCacheValuesforView(this.transactionSortableColumnsLSK,
@@ -787,6 +825,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // shared between trx and recycle tables
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
+
+    // shared between trx and recycle tables
+    localStorage.setItem(this.filtersLSK,
+      JSON.stringify(this.filters));
 
     const currentSortedCol = this._tableService.getColumnByName(
       this.currentSortedColumnName, this.sortableColumns);

@@ -1,108 +1,90 @@
-<div class="forms__wizard">
-    <div class="form__sidebar">
-        <div>
-            <transaction-categories-sidebar title="Transaction Categories" 
-                (status)='onNotify($event)'>
-            </transaction-categories-sidebar>
-        </div>
+<div class="transactions__main-container">
+  <div class="transactions__sidebar">
+    <div class="transactions__sidebar_categories">
+      <!-- <transaction-categories-sidebar [@fadeInOut] *ngIf="!isShowFilters"  -->
+      <transaction-categories-sidebar [hidden]="isShowFilters"
+        title="Transaction Categories"
+        (status)='onNotify($event)'>
+      </transaction-categories-sidebar>
     </div>
-    <div class="transactions-container">
-        <header>
-            <div class="header-content">
-                <div class="float-left">
-                    <h1>Transactions / Form {{formType}}
-                        <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
-                            <span class="fas fa-trash"></span>
-                        </span>
-                    </h1>
-                </div>
-                <div class="float-right">
-                    <button class="btn btn-primary btn-right" type="submit"
-                        (click)="navigateToCategories()">
-                        Return to Transaction Categories
-                    </button>
-                </div>
-            </div>
-            <hr />
-        </header>
-        <div [@fadeInOut] *ngIf="isTransactionViewActive()">
-            <div class="grid-row">
-                <div class="grid-row__col grid-row__col--12">
-                    <div class="forms__btn-container">
-                        <button
-                            class="btn btn-primary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showPinColumns()">
-                            <i class="fas fa-thumbtack"></i>
-                            Pin Columns
-                        </button>
-                        <button
-                            class="btn btn-primary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showRecycleBin()">
-                            <i class="fas fa-trash"></i>
-                            Recycle Bin
-                        </button>
-                        <button
-                            class="btn btn-primary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="doImport()">
-                            <i class="fas fa-file-import"></i>
-                            Import
-                        </button>    
-                        <button
-                            class="btn btn-primary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showFilters()">
-                            <i class="fas fa-filter"></i>
-                            Filter
-                        </button>
-                        <div class="input-group pl-0 forms__trx-search">
-                            <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="">
-                                    <i class="fas fa-search text-grey" aria-hidden="true"></i>
-                                </span>
-                            </div>
-                        </div> 
-                    </div>
-                </div>
-            </div> 
-            <div class="grid-row forms__trx-applied-filter-row">
-                <div class="forms__btn-container">
-                    <button
-                        class="btn btn-primary btn-left forms__trx-btn"
-                        type="button"
-                        (click)="toogleAppliedFilter()"
-                    >
-                        <i class="fas fa-times"></i>
-                        {{appliedFilterNames[0]}}
-                    </button>                    
-                </div> 
-            </div>
-            <app-transactions-table
-                forType="3X"
-                tableType="{{transactionsView}}">
-            </app-transactions-table>
-        </div>
-        <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">   
-            <div class="grid-row">
-                <div class="grid-row__col grid-row__col--12">
-                    <div class="forms__btn-container">    
-                        <button
-                            class="btn btn-primary btn-left forms__trx-btn"
-                            type="button"
-                            (click)="showTransactions()">
-                            <i class="fas fa-table"></i>
-                            Transactions
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <app-transactions-table
-                forType="3X"
-                tableType="{{recycleBinView}}">
-            </app-transactions-table>            
-        </div>                     
+    <div class="transactions__sidebar_filters">
+      <!-- <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters"  -->
+      <app-transactions-filter-sidebar [hidden]="!isShowFilters" 
+        title="Filters"
+        [formType]="formType">
+      </app-transactions-filter-sidebar>
     </div>
-</div> 
+  </div>
+  <div class="transactions__container">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h1>Transactions / Form {{formType}}
+            <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
+              <span class="trash-icon"></span>
+            </span>
+          </h1>
+        </div>
+        <div class="float-right">
+          <button [@fadeInOut] *ngIf="isShowFilters" class="btn btn-primary btn-right" type="submit"
+            (click)="showCategories()">
+            Return to Transaction Categories
+          </button>
+        </div>
+      </div>
+      <hr />
+    </header>
+    <div [@fadeInOut] *ngIf="isTransactionViewActive()">
+    <!-- <div [@fadeInOut] [hidden]="!isTransactionViewActive()"> -->
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="transactions__btn-container">
+            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showPinColumns()">
+              <i class="thumbtack-icon"></i>
+              Pin Columns
+            </button>
+            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showRecycleBin()">
+              <i class="trash-icon"></i>
+              Recycle Bin
+            </button>
+            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="doImport()">
+              <i class="file-import-icon"></i>
+              Import
+            </button>
+            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
+              <i class="filter-icon"></i>
+              Filter
+            </button>
+            <div class="input-group pl-0 transactions__trx-search">
+              <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
+              <div class="input-group-append">
+                <span class="input-group-text" id="">
+                  <i class="search-icon text-grey" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-transactions-table 
+        forType="3X" 
+        tableType="{{transactionsView}}">
+      </app-transactions-table>
+    </div>
+    <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+    <!-- <div [@fadeInOut] [hidden]="!isRecycleBinViewActive()"> -->
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="transactions__btn-container">
+            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showTransactions()">
+              <i class="table-icon"></i>
+              Transactions
+            </button>
+          </div>
+        </div>
+      </div>
+      <app-transactions-table forType="3X" tableType="{{recycleBinView}}">
+      </app-transactions-table>
+    </div>
+  </div>
+</div>

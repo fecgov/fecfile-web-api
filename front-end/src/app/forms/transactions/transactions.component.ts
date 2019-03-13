@@ -1,8 +1,9 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 import { TransactionsMessageService } from './service/transactions-message.service';
+import { TransactionFilterModel } from './model/transaction-filter.model';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -32,11 +33,12 @@ export enum ActiveView {
 export class TransactionsComponent implements OnInit {
 
   public formType = '';
-  public appliedFilterNames: Array<string> = [];
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
+  public isShowFilters = false;
 
+  private readonly filtersLSK = 'transactions.filters';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -48,12 +50,19 @@ export class TransactionsComponent implements OnInit {
    * Initialize the component.
    */
   public ngOnInit(): void {
-
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    console.log('transactions for form ' + this.formType);
 
-    // push an applied filter for test
-    this.appliedFilterNames.push('Filter ' + this.appliedFilterNames.length + 1);
+    // If the filter was open on the last visit in the user session, open it.
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    let filters: TransactionFilterModel;
+    if (filtersJson != null) {
+      filters = JSON.parse(filtersJson);
+    } else {
+      filters = new TransactionFilterModel();
+    }
+    if (filters.show === true) {
+      this.showFilters();
+    }
   }
 
 
@@ -94,15 +103,15 @@ export class TransactionsComponent implements OnInit {
    * Show filter options for transactions.
    */
   public showFilters() {
-    alert('Transaction filters are not yet supported');
+    this.isShowFilters = true;
   }
 
 
   /**
-   * Navigate to the Categories component.
+   * Show the categories and hide the filters.
    */
-  public navigateToCategories() {
-    alert('Return to Categories is not yet supported');
+  public showCategories() {
+    this.isShowFilters = false;
   }
 
 

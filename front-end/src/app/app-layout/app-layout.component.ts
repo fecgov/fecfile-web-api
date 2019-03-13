@@ -140,6 +140,10 @@ export class AppLayoutComponent implements OnInit {
     let route: string = this._router.url;
     this.showSideBar = e.showSidebar;
 
+    // if(route.indexOf('/transactions')) {
+    //   this.showSideBar = false;
+    // }
+
     if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
       this.showForm3XDashBoard = true;
       this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');

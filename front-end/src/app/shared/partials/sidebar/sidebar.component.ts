@@ -49,7 +49,10 @@ export class SidebarComponent implements OnInit {
       .subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
-            if(val.url.indexOf('/forms/form/') === 0) {
+            if(
+              val.url.indexOf('/forms/form/') === 0 ||
+              val.url.indexOf('/forms/transactions/') === 0
+            ) {
               this._closeNavBar();
             } else if(
               val.url.indexOf('/dashboard') === 0 ||
