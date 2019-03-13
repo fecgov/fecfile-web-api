@@ -19,8 +19,8 @@ import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../..
 export class ReportTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Input() committeeReportTypes: any = [];
 
-  public committeeReportTypes: any = null;
   public frmReportType: FormGroup;
   public fromDateSelected: boolean = false;
   public reportTypeSelected: string = '';
@@ -53,14 +53,6 @@ export class ReportTypeComponent implements OnInit {
   ngOnInit(): void {
 
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
-    this._formService
-      .getreporttypes(this._formType)
-      .subscribe(res => {
-        if (res) {
-         this.committeeReportTypes = res.report_type;
-        }
-      });
 
     this._messageService
       .clearMessage();

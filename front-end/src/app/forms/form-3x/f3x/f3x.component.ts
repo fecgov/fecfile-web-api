@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { ReportTypeService } from '../report-type/report-type.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
@@ -24,7 +25,7 @@ export class F3xComponent implements OnInit {
   public direction: string;
   public previousStep: string = '';
   public reportsLoading: boolean = true;
-  public reportTypes: any = {};
+  public reportTypes: any = [];
   public reportTypeIndicator: any = {};
   public reportType: any = null;
   public selectedReportType: any = {};
@@ -36,6 +37,7 @@ export class F3xComponent implements OnInit {
   private _formType: string = '';
 
   constructor(
+    private _reportTypeService: ReportTypeService,
     private _formService: FormsService,
     private _http: HttpClient,
     private _fb: FormBuilder,
@@ -53,8 +55,8 @@ export class F3xComponent implements OnInit {
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    this._formService
-      .getreporttypes(this._formType)
+    this._reportTypeService
+      .getReportTypes(this._formType)
       .subscribe(res => {
         if (typeof res === 'object') {
           if (Array.isArray(res.report_type)) {
