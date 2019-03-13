@@ -7,8 +7,29 @@
     .grid-row__col {
       padding-left: 0;
       padding-right: 0;
+
+      input[type='text'],
+          input[type='date'],
+          input[type='number']
+          input[type='email']
+           {
+            &.form-control {
+              height: 30px;
+              padding-left: 5px;
+              padding-right: 5px;
+              padding-top: 1px;
+              padding-bottom: 1px;
+            }
+            
+          }
+    }
+
+    input[type='email'] {
+      @include make-text-input(180px, 30px, 1em, 1em);
     }
   }
+
+
   header {
     .header-container {
       display: block;
@@ -121,7 +142,7 @@
             margin-bottom: 0;
           }
           input[type='email'] {
-            @include make-text-input(250px, 1.5em, 1em, 1em);
+            @include make-text-input(300px, 1.5em, 1em, 1em);
           }
           .error {
             margin-top: 5px;
