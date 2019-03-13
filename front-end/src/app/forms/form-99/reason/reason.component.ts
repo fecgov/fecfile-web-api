@@ -80,8 +80,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            Validators.maxLength(this.editorMax),
-            Validators.pattern(/^$|\s+/)
+            Validators.maxLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -89,8 +88,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            Validators.maxLength(this.editorMax),
-            Validators.pattern(/^$|\s+/)
+            Validators.maxLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -147,9 +145,7 @@ export class ReasonComponent implements OnInit {
 
          if (this.file.size > 33554432) {
           this.notCorrectPdfSize=true;
-         }
-         else
-         {
+         } else {
           this.notCorrectPdfSize=false;
          }
 
@@ -160,9 +156,7 @@ export class ReasonComponent implements OnInit {
          this._form99Details.filename = this.file.name;
          this.PdfUploaded=true;
          this.PdfDeleted=false;
-      }
-      else
-      {
+      } else {
         this.notValidPdf=true;
         this.validFile=false;
         this.file=null;
@@ -170,18 +164,18 @@ export class ReasonComponent implements OnInit {
         this.PdfUploaded=false;
       }
     } else {
-         let fileNameObj: any = {
-           'fileName': ''
-         };
-         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
-        this.notValidPdf=true;
-        this.validFile=false;
-        this.file=null;
-        this.showFileDeleteButton=false;
-        this.fileInput.nativeElement.value = '';
-        this._form99Details.filename = '';
-        this.PdfUploaded = false;
-        localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+      let fileNameObj: any = {
+       'fileName': ''
+      };
+      localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+      this.notValidPdf=true;
+      this.validFile=false;
+      this.file=null;
+      this.showFileDeleteButton=false;
+      this.fileInput.nativeElement.value = '';
+      this._form99Details.filename = '';
+      this.PdfUploaded = false;
+      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
   }
 
@@ -190,8 +184,11 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
+    console.log('doValidateReason: ');
     let reasonText: string = this.frmReason.get('reasonText').value.trim();
 
+    console.log('reasonText: ', reasonText);
+    console.log('reasonText.length: ', reasonText.length);
     if (reasonText.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved
@@ -294,8 +291,10 @@ export class ReasonComponent implements OnInit {
    *
    */
   public saveForm () {
+    console.log("this.frmReason.get('reasonText'): ", this.frmReason.get('reasonText'));
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
+        console.log('inside here: ');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -339,6 +338,7 @@ export class ReasonComponent implements OnInit {
           });
       }
       else {
+        console.log('if file === null');
         this._formsService
         .saveForm({}, {}, this._formType)
         .subscribe(res => {
