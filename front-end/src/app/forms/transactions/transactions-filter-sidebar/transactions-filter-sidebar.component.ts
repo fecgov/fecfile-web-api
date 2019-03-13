@@ -5,6 +5,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
 
 /**
  * A component for filtering transactions located in the sidebar.
@@ -72,12 +73,13 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public searchFilter = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
-  public filterDateFrom: Date;
-  public filterDateTo: Date;
+  public filterDateFrom: Date = null;
+  public filterDateTo: Date = null;
   public filterMemoCode = false;
 
+  // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
-  private cachedFilters: any = [];
+  private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
 
   constructor(
     private _formService: FormsService,
@@ -97,35 +99,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     this.isHideMemoFilter = true;
 
     if (this.formType) {
-
       this.applyFiltersCache();
       this.getCategoryTypes();
-
-      // TODO using this service to get states until available in another API.
-      this._formService
-        .getDynamicFormFields(this.formType, 'Individual Receipt')
-          .subscribe(res => {
-
-            let statesExist = false;
-            if (res.data) {
-              if (res.data.states) {
-                statesExist = true;
-                for (const s of res.data.states) {
-                  // check for states selected in the filter cache
-                  // TODO scroll to first check item
-                  if (this.cachedFilters.filterStates) {
-                    s.selected = (this.cachedFilters.filterStates.includes(s.code)) ? true : false;
-                    this.isHideStateFilter = false;
-                  }
-                }
-              }
-            }
-            if (statesExist) {
-              this.states = res.data.states;
-            } else {
-              this.states = [];
-            }
-          });
+      this.getStates();
     }
   }
 
@@ -183,12 +159,14 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
   /**
    * Send filter values to the table transactions component.
+   * Set the filters.show to true indicating the filters have been altered.
    */
   public applyFilters() {
-    const filters: any = {};
+    // TODO make filters a ts class model since it's used in transactionsComponent
+    const filters = new TransactionFilterModel();
     let modified = false;
     filters.formType = this.formType;
-    filters.search = this.searchFilter;
+    filters.searchFilter = this.searchFilter;
     modified = this.searchFilter.length > 0;
 
     const filterStates = [];
@@ -215,13 +193,21 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
-    modified = this.filterAmountMin > 0;
-    modified = this.filterAmountMax > 0;
+    if (this.filterAmountMin > 0) {
+      modified = true;
+    }
+    if (this.filterAmountMax > 0) {
+      modified = true;
+    }
 
     filters.filterDateFrom = this.filterDateFrom;
     filters.filterDateTo = this.filterDateTo;
-    modified = (this.filterDateFrom !== null);
-    modified = (this.filterDateTo !== null);
+    if (this.filterDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDateTo !== null) {
+      modified = true;
+    }
 
     if (this.filterMemoCode) {
       filters.filterMemoCode = this.filterMemoCode;
@@ -284,8 +270,12 @@ export class TransactionsFilterSidbarComponent implements OnInit {
                   if (this.cachedFilters.filterCategories) {
                     // check for categories selected in the filter cache
                     // TODO scroll to first check item
-                    option.selected = (this.cachedFilters.filterCategories.includes(option.text)) ? true : false;
-                    this.isHideTypeFilter = false;
+                    if (this.cachedFilters.filterCategories.includes(option.text)) {
+                      option.selected = true;
+                      this.isHideTypeFilter = false;
+                    } else {
+                      option.selected = false;
+                    }
                   }
                   categoryGroup.options.push(option);
                 }
@@ -308,15 +298,67 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
 
   /**
+   * Get US State Codes and Values.
+   */
+  private getStates() {
+    // TODO using this service to get states until available in another API.
+    this._formService
+      .getDynamicFormFields(this.formType, 'Individual Receipt')
+        .subscribe(res => {
+
+          let statesExist = false;
+          if (res.data) {
+            if (res.data.states) {
+              statesExist = true;
+              for (const s of res.data.states) {
+                // check for states selected in the filter cache
+                // TODO scroll to first check item
+                if (this.cachedFilters.filterStates) {
+                  if (this.cachedFilters.filterStates.includes(s.code)) {
+                    s.selected = true;
+                    this.isHideStateFilter = false;
+                  } else {
+                    s.selected = false;
+                  }
+                }
+              }
+            }
+          }
+          if (statesExist) {
+            this.states = res.data.states;
+          } else {
+            this.states = [];
+          }
+        });
+  }
+
+
+  /**
    * Get the filters from the cache.
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
+      if (this.cachedFilters) {
+        this.searchFilter = this.cachedFilters.searchFilter;
+
+        this.filterAmountMin = this.cachedFilters.filterAmountMin;
+        this.filterAmountMax = this.cachedFilters.filterAmountMax;
+        this.isHideAmountFilter = !(this.filterAmountMin > 0 && this.filterAmountMax > 0);
+
+        this.filterDateFrom = this.cachedFilters.filterDateFrom;
+        this.filterDateTo = this.cachedFilters.filterDateTo;
+        this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+
+        this.filterMemoCode = this.cachedFilters.filterMemoCode;
+        this.isHideMemoFilter = !this.filterMemoCode;
+        // Note state and type apply filters are handled after server call to get values.
+
+      }
     } else {
       // Just in case cache has an unexpected issue, use default.
-      this.cachedFilters = [];
+      this.cachedFilters = new TransactionFilterModel();
     }
   }
 

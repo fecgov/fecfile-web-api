@@ -12,6 +12,7 @@ import { TransactionsMessageService } from '../service/transactions-message.serv
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
 
 
 
@@ -59,7 +60,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
-  public filters: any;
+  public filters: TransactionFilterModel;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
@@ -127,7 +128,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     );
     this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
       .subscribe(
-      filters => {
+      (filters: TransactionFilterModel) => {
         this.filters = filters;
         this.formType = filters.formType;
         this.getPage(this.config.currentPage);
@@ -735,7 +736,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.filters = JSON.parse(filtersJson);
     } else {
       // Just in case cache has an unexpected issue, use default.
-      this.filters = [];
+      this.filters = null;
     }
   }
 

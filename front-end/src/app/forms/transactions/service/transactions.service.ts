@@ -8,6 +8,7 @@ import { environment } from '../../../../environments/environment';
 import { TransactionModel } from '../model/transaction.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -71,7 +72,7 @@ export class TransactionsService {
       itemsPerPage: number,
       sortColumnName: string,
       descending: boolean,
-      filter: any): Observable<any> {
+      filter: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
@@ -181,7 +182,7 @@ export class TransactionsService {
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
    */
-  public mockApplyFilters(response: any, filters: any) {
+  public mockApplyFilters(response: any, filters: TransactionFilterModel) {
 
     if (!filters) {
       return;
@@ -201,11 +202,12 @@ export class TransactionsService {
     // let combinedFilterArray = [];
 
     let isFilter = false;
-    if (filters.search) {
+    if (filters.searchFilter) {
       if (response.transactions.length > 0) {
         isFilter = true;
         const fields = ['name', 'zip_code', 'transaction_id'];
-        const filteredSearchArray = this._filterPipe.transform(response.transactions, fields, filters.search);
+        const filteredSearchArray = 
+          this._filterPipe.transform(response.transactions, fields, filters.searchFilter);
         response.transactions = filteredSearchArray;
         // combinedFilterArray = combinedFilterArray.concat(filteredSearchArray);
       }

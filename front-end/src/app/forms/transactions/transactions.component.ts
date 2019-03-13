@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild, ViewEncapsulation, Output, EventEmitter }
 import { ActivatedRoute } from '@angular/router';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 import { TransactionsMessageService } from './service/transactions-message.service';
+import { TransactionFilterModel } from './model/transaction-filter.model';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -51,15 +52,16 @@ export class TransactionsComponent implements OnInit {
   public ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    // If the filter was open on the last visit in the user session, open it.
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
-    let filters: any;
+    let filters: TransactionFilterModel;
     if (filtersJson != null) {
       filters = JSON.parse(filtersJson);
     } else {
-      filters = [];
+      filters = new TransactionFilterModel();
     }
     if (filters.show === true) {
-      this.isShowFilters = true;
+      this.showFilters();
     }
   }
 
