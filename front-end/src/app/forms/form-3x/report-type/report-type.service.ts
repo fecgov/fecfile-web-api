@@ -24,16 +24,13 @@ export class ReportTypeService {
   public getReportTypes(formType: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    let url: string = '';
+    let url: string = '/core/get_report_types?form_type=F3X';
     let params = new HttpParams();
-
-    //url = '/f3x/get_report_types?form_type=F3X';
-    url = '/core/get_report_types?form_type=F3X';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('form_type', "F3X");
+    params = params.append('form_type', 'F3X');
 
     return this._http
        .get(
@@ -57,10 +54,9 @@ export class ReportTypeService {
     let params = new HttpParams();
     let formData: FormData = new FormData();
 
-    // `httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`form3xReportType`));
+    const form3xReportType: form3XReport = JSON.parse(sessionStorage.getItem(`form_3X_Report_Type`));
 
     console.log('form3xReportType: ', form3xReportType);
 
@@ -88,8 +84,8 @@ export class ReportTypeService {
         )
         .pipe(map(res => {
             if (res) {
-              localStorage.setItem('`form_${form_type}_ReportInfo_Res', JSON.stringify(res));
-              let form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
+              localStorage.setItem(`form_${form_type}_Report_Info_Res`, JSON.stringify(res));
+              const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
               return res;
             }
             return false;

@@ -89,13 +89,14 @@ export class TransactionTypeComponent implements OnInit {
    * Goes to the previous step.
    */
   public previousStep(): void {
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false
-        }
-      });
+    console.log('previousStep: ');
+    // this._messageService
+    //   .sendMessage({
+    //     'validateMessage': {
+    //       'validate': {},
+    //       'showValidateBar': false
+    //     }
+    //   });
 
     this.status.emit({
       form: {},

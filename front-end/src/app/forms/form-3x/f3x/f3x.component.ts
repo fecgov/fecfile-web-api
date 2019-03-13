@@ -66,8 +66,6 @@ export class F3xComponent implements OnInit {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
 
-            console.log('this.reportTypes: ', this.reportTypes);
-
             this.reportsLoading = false;
 
             this._setReports();
@@ -79,10 +77,11 @@ export class F3xComponent implements OnInit {
       .getTransactionCategories(this._formType)
       .subscribe(res => {
         if (typeof res === 'object') {
-          if (Array.isArray(res.data)) {
-            if (Array.isArray(res.data.transactionCategories)) {
-              res.data.transactionCategories.forEach(el => {
-                if (typeof el.text === 'string' && el.value === 'string') {
+          if (typeof res.data === 'object') {
+            this.transactionCategories = res.data;
+            if (Array.isArray(this.transactionCategories.transactionCategories)) {
+              this.transactionCategories.transactionCategories.forEach(el => {
+                if (typeof el.text === 'string' && typeof el.value === 'string') {
                   this.parentTransactionCategories.push({
                     'text': el.text,
                     'value': el.value
@@ -181,6 +180,12 @@ export class F3xComponent implements OnInit {
         this.currentStep = e.step;
 
         this.canContinue();
+      } else if (e.direction === 'previous') {
+        this.direction = e.direction;
+
+        this.previousStep = e.previousStep;
+
+        this._step = e.step;
       } else if (typeof e.reportTypeRadio === 'string') {
         this._setCoverageDates(e.reportTypeRadio);
       }

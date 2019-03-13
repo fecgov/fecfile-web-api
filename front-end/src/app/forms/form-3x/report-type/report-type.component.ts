@@ -190,13 +190,12 @@ export class ReportTypeComponent implements OnInit {
         this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
         this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
 
-        localStorage.setItem('form3xReportType', JSON.stringify(this._form3xReportTypeDetails));
+        sessionStorage.setItem('form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
           .saveReport(this._formType)
           .subscribe(res => {
             if (res) {
-              console.log('Report type saved: ');
               this.status.emit({
                 form: this.frmReportType,
                 direction: 'next',
