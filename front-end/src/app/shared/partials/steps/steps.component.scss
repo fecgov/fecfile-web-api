@@ -53,19 +53,54 @@
       &:after {
         background-color: $dustyGray;
       }
+      .step-text {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        @include media(tablet) {
+
+        }
+        @include media(mediumDesktop) {
+
+        }
+        @include media(largeDesktop) {
+
+        }
+      }
     }
     display: inline-block;
     position: relative;
     padding: 10px 0 0;
     width: 15%;
-    div {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      // font-family: $mainFontFamily;
+    .step-text {
+      display: none;
+      @include media(tablet) {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      @include media(mediumDesktop) {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      @include media(largeDesktop) {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
     }
   }
 }
