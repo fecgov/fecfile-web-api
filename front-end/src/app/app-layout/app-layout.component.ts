@@ -18,18 +18,18 @@ export class AppLayoutComponent implements OnInit {
 
   @Input() status: any;
 
-	public showSideBar: boolean = true;
-  public sideBarClass: string = '';
-  public toggleMenu: boolean = false;
-  public committeeName: string = '';
-  public committeeId: string = '';
-  public closeResult: string = '';
-  public dashboardClass: string = '';
-  public showLegalDisclaimer: boolean = false;
-  public showForm3XDashBoard: boolean = false;
-  public form3XReportDashBoardLine1: string = '';
-  public form3XReportDashBoardLine2: string = '';
+  public committeeName: string = null;
+  public committeeId: string = null;
+  public closeResult: string = null;
+  public dashboardClass: string = null;
+  public form3XDueDate: string = null;
+  public form3XDueInDays: string = null;
   public radAnalystInfo: any = {};
+  public showLegalDisclaimer: boolean = false;
+  public showForm3XDashboard: boolean = false;
+  public showSideBar: boolean = true;
+  public sideBarClass: string = null;
+  public toggleMenu: boolean = false;
 
 	constructor(
     private _apiService: ApiService,
@@ -85,38 +85,17 @@ export class AppLayoutComponent implements OnInit {
       });
   }
 
-  ngDoCheck(): void {
-    let route: string = this._router.url;
-
-    if (route === '/dashboard') {
-      this.sideBarClass = 'dashboard active';
-    }
-
-    if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
-      this.showForm3XDashBoard = true;
-      this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
-      this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {
-        this.showForm3XDashBoard = false;
-        this.form3XReportDashBoardLine1 = "";
-        this.form3XReportDashBoardLine2 = ""}
-  }
-
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     localStorage.clear();
   }
 
-  ngOnChanges(): void{
-    console.log("AppLayoutComponent ngOnChanges ...");
-    if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
-      this.showForm3XDashBoard = true;
-      this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
-      this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {
-        this.showForm3XDashBoard = false;
-        this.form3XReportDashBoardLine1 = "";
-        this.form3XReportDashBoardLine2 = ""}
+  ngDoCheck(): void {
+    const route: string = this._router.url;
+
+    if (route === '/dashboard') {
+      this.sideBarClass = 'dashboard active';
+    }
   }
 
   /**
@@ -139,18 +118,8 @@ export class AppLayoutComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public onNotify(e): void {
-    let route: string = this._router.url;
+    const route: string = this._router.url;
     this.showSideBar = e.showSidebar;
-
-    if( typeof localStorage.getItem('form3XReportInfo.showDashBoard') !== 'undefined' && localStorage.getItem('form3XReportInfo.showDashBoard') !== null &&  localStorage.getItem('form3XReportInfo.showDashBoard') !== ""){
-      this.showForm3XDashBoard = true;
-      this.form3XReportDashBoardLine1 = localStorage.getItem('form3XReportInfo.DashBoardLine1');
-      this.form3XReportDashBoardLine2 = localStorage.getItem('form3XReportInfo.DashBoardLine2');
-    } else {
-        this.showForm3XDashBoard = false;
-        this.form3XReportDashBoardLine1 = "";
-        this.form3XReportDashBoardLine2 = "";
-      }
 
     if(this.showSideBar) {
       if(route) {

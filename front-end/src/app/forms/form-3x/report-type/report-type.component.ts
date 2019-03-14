@@ -32,9 +32,11 @@ export class ReportTypeComponent implements OnInit {
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
 
+  private _dueDate: string = null;
   private _formType: string = null;
   private _form3xReportTypeDetails: any = null;
   private _fromDateSelected: string = null;
+  private _reportTypeDescripton: string = null;
   private _selectedElectionState: string = null;
   private _selectedElectionDate: string = null;
   private _toDateSelected: string = null;
@@ -77,6 +79,7 @@ export class ReportTypeComponent implements OnInit {
       formType: '3X',
       electionCode: '',
       reportType: '',
+      reportTypeDescription: '',
       regularSpecialReportInd: '',
       stateOfElection: '',
       electionDate: '',
@@ -126,6 +129,22 @@ export class ReportTypeComponent implements OnInit {
             } else {
               this._selectedElectionDate = null;
             }
+
+            if (typeof res.dueDate === 'string') {
+              if (res.dueDate.length >= 1) {
+                this._dueDate = res.dueDate;
+              }
+            } else {
+              this._dueDate = null;
+            }
+
+            if (typeof res.reportTypeDescription === 'string') {
+              if (res.reportTypeDescription.length >= 1) {
+                this._reportTypeDescripton = res.reportTypeDescription;
+              }
+            } else {
+              this._reportTypeDescripton = null;
+            }
           }
         }
       });
@@ -173,9 +192,6 @@ export class ReportTypeComponent implements OnInit {
         this.optionFailed = false;
         this.isValidType = true;
 
-        console.log('this._selectedElectionState: ', this._selectedElectionState);
-        console.log('this._selectedElectionDate: ', this._selectedElectionDate);
-
         this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
         if (this._selectedElectionState !== null) {
@@ -184,8 +200,11 @@ export class ReportTypeComponent implements OnInit {
 
         this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
         this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
+        this._form3xReportTypeDetails.dueDate = this._dueDate;
+        console.log('this._reportTypeDescripton: ', this._reportTypeDescripton);
+        this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
 
-        sessionStorage.setItem('form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
+        localStorage.setItem('Form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
           .saveReport(this._formType)

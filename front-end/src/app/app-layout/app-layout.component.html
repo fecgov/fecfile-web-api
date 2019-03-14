@@ -45,12 +45,9 @@
             {{ committeeName }}
           </div>
         </div>
-        <div class="float-right" *ngIf="(showForm3XDashBoard===true)">
-          <ng-container *ngIf="form3XReportDashBoardLine1">
-            {{ form3XReportDashBoardLine1 }}<br />
-          </ng-container>
-          <ng-container *ngIf="form3XReportDashBoardLine2">
-            {{ form3XReportDashBoardLine2 }}
+        <div class="float-right">
+          <div class="float-right" *ngIf="showForm3XDashBoard===true">
+            <div>{{form3XDueDate}}</div>
             <button
               type="button"
               class="btn btn-link btn-edit"
@@ -58,7 +55,7 @@
               <i class="edit-icon" aria-hidden="true"></i>
               <span class="sr-only">Click to edit date.</span>
             </button>
-          </ng-container>
+          </div>
         </div>
       </div>
       <div class="app__content">

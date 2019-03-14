@@ -19,12 +19,14 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() selectedReport: any = null;
   @Input() selectedreporttype:  selectedReportType;
 
+  public dueDate: string = null;
   public electionStates: any = null;
   public electionDates: any = null;
   public frmReportSidebar: FormGroup;
   public fromDate: string = null;
   public toDate: string = null;
 
+  private _reportTypeDescription: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -48,6 +50,11 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
+      if (this.selectedReport.hasOwnProperty('report_type_desciption')) {
+        if (typeof this.selectedReport.report_type_desciption === 'string') {
+          this._reportTypeDescription = this.selectedReport.report_type_desciption;
+        }
+      }
       if (this.selectedReport.hasOwnProperty('election_state')) {
         if (Array.isArray(this.selectedReport.election_state)) {
           if (this.selectedReport.election_state.length === 1) {
@@ -61,6 +68,7 @@ export class ReportTypeSidebarComponent implements OnInit {
                 if (Array.isArray(dates)) {
                   this.fromDate = dates[0].cvg_start_date;
                   this.toDate = dates[0].cvg_end_date;
+                  this.dueDate = dates[0].due_date;
                 }
               }
             }
@@ -86,13 +94,17 @@ export class ReportTypeSidebarComponent implements OnInit {
               'selectedState': this._selectedState,
               'selectedElectionDate': this._selectedElectionDate,
               'toDate': this.toDate,
-              'fromDate': this.fromDate
+              'fromDate': this.fromDate,
+              'dueDate': this.dueDate,
+              'reportTypeDescription': this._reportTypeDescription
             }
           } else {
             message = {
               'form': '3x',
               'toDate': this.toDate,
-              'fromDate': this.fromDate
+              'fromDate': this.fromDate,
+              'dueDate': this.dueDate,
+              'reportTypeDescription': this._reportTypeDescription
             }
           }
           this._messageService
@@ -102,7 +114,9 @@ export class ReportTypeSidebarComponent implements OnInit {
             .sendMessage({
               'form': '3x',
               'toDate': '',
-              'fromDate': ''
+              'fromDate': '',
+              'dueDate': '',
+              'reportTypeDescription': ''
             });
         }
       } // hasOwnProperty('election_state')
