@@ -184,10 +184,11 @@ export class TransactionsService {
    */
   public mockApplyFilters(response: any, filters: TransactionFilterModel) {
 
-    if (!filters) {
+    if (!response.transactions) {
       return;
     }
-    if (!response.transactions) {
+
+    if (!filters) {
       return;
     }
 
@@ -202,16 +203,44 @@ export class TransactionsService {
     // let combinedFilterArray = [];
 
     let isFilter = false;
-    if (filters.searchFilter) {
-      if (response.transactions.length > 0) {
+
+    if (filters.keywords) {
+      if (response.transactions.length > 0 && filters.keywords.length > 0) {
         isFilter = true;
-        const fields = ['name', 'zip_code', 'transaction_id'];
-        const filteredSearchArray = 
-          this._filterPipe.transform(response.transactions, fields, filters.searchFilter);
-        response.transactions = filteredSearchArray;
-        // combinedFilterArray = combinedFilterArray.concat(filteredSearchArray);
+
+        // TODO make sure numbers and dates work otherwise create properties with string representations of them.
+        // non string properties: 'transaction_date', 'aggregate', 'transaction_amount',
+        const fields = [ 'city', 'employer', 'occupation',
+          'memo_code', 'memo_text', 'name', 'purpose_description', 'state',
+          'street_1', 'transaction_id', 'transaction_type_desc', 'zip_code'];
+
+        // let filteredKeywordArray = [];
+        for (const keyword of filters.keywords) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, keyword);
+          // filteredKeywordArray = filteredKeywordArray.concat(filtered);
+
+          // NOTE: In keyword search, every transaction must have all keywords - AND boolean search.
+          // The filters are a subset of the keyword search. Any transaction with the given value for the specific
+          // field should be included in the final result. So if more than 1 state is checked, it should
+          // be treated as an OR condition.  State is NY or NJ.  If date range is x, amount is Y and state = z,
+          // then final result set has rows with either x, y or z.  All are not required.
+
+          // Therfore, response.transactions is set to the result of each keyword pass through the pipe.
+          response.transactions = filtered;
+        }
       }
     }
+
+    // no longer needing search combined field - changed to type input text
+    // if (filters.searchFilter) {
+    //   if (response.transactions.length > 0) {
+    //     isFilter = true;
+    //     const fields = ['name', 'zip_code', 'transaction_id'];
+    //     const filteredSearchArray = 
+    //       this._filterPipe.transform(response.transactions, fields, filters.searchFilter);
+    //     response.transactions = filteredSearchArray;
+    //   }
+    // }
 
     if (filters.filterStates) {
       if (filters.filterStates.length > 0) {

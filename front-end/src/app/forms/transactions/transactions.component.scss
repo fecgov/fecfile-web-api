@@ -62,6 +62,12 @@
       padding: 1em;
     }
 
+    .transactions__btn-search-filter {
+      margin: 0 3px;
+      background-color: $shuttleGray;
+      color: $white;
+    }
+
     .transactions__trx-btn {
       margin: 5px;
       width: 10em;

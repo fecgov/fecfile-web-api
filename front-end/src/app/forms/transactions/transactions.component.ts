@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
+import { Subscription } from 'rxjs/Subscription';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -40,12 +41,27 @@ export class TransactionsComponent implements OnInit {
   public searchText = '';
   public searchTextArray = [];
 
+  /**
+   * Subscription for applying filters to the transactions obtained from
+   * the server.
+   */
+  private applyFiltersSubscription: Subscription;
+
+  private filters: TransactionFilterModel = new TransactionFilterModel();
   private readonly filtersLSK = 'transactions.filters';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
-  ) { }
+  ) {
+    this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
+      .subscribe(
+        (filters: TransactionFilterModel) => {
+          this.filters = filters;
+          this.doSearch();
+        }
+      );
+  }
 
 
   /**
@@ -81,7 +97,19 @@ export class TransactionsComponent implements OnInit {
     // TODO emit search message to the table transactions component
     if (this.searchText) {
       this.searchTextArray.push(this.searchText);
+      this.searchText = '';
     }
+    this.doSearch();
+  }
+
+
+  /**
+   * Clear the search filters
+   */
+  public clearSearch() {
+    this.searchTextArray = [];
+    this.searchText = '';
+    this.doSearch();
   }
 
 
@@ -92,6 +120,7 @@ export class TransactionsComponent implements OnInit {
    */
   public removeSearchText(index: number) {
     this.searchTextArray.splice(index, 1);
+    this.doSearch();
   }
 
 
@@ -116,7 +145,7 @@ export class TransactionsComponent implements OnInit {
    */
   public showPinColumns() {
     this.showTransactions();
-    this._transactionsMessageService.sendMessage('show the Pin Col');
+    this._transactionsMessageService.sendShowPinColumnMessage('show the Pin Col');
   }
 
 
@@ -157,6 +186,15 @@ export class TransactionsComponent implements OnInit {
    */
   public isRecycleBinViewActive() {
     return this.view === this.recycleBinView ? true : false;
+  }
+
+
+  /**
+   * The subscriber to run the search.
+   */
+  private doSearch() {
+    this.filters.keywords = this.searchTextArray;
+    this._transactionsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
   }
 
 }

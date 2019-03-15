@@ -122,7 +122,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _formsService: FormsService,
 
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
+    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(
 			message => { 
         this.showPinColumns();
 			}

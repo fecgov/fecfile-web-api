@@ -168,30 +168,30 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
   }
 
-  public typeClick(event: any) {
-    if (event.currentTarget.checked) {
-      this.filterTypeScrollTarget = event.currentTarget;
-    }
-  }
+  // public typeClick(event: any) {
+  //   if (event.currentTarget.checked) {
+  //     this.filterTypeScrollTarget = event.currentTarget;
+  //   }
+  // }
 
-  public stateClick(event: any) {
-    if (event.currentTarget.checked) {
-      this.filterStateScrollTarget = event.currentTarget;
-    }
-  }
+  // public stateClick(event: any) {
+  //   if (event.currentTarget.checked) {
+  //     this.filterStateScrollTarget = event.currentTarget;
+  //   }
+  // }
 
-  public scroll() {
+  // public scroll() {
 
-    // TODO need to support scroll to multiple elements.
-    if (this.filterTypeScrollTarget &&  this.filterStateScrollTarget) {
-      this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    } else if (this.filterTypeScrollTarget) {
-      this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    } else if (this.filterStateScrollTarget) {
-      this.filterStateScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    } else {
-    }
-  }
+  //   // TODO need to support scroll to multiple elements.
+  //   if (this.filterTypeScrollTarget &&  this.filterStateScrollTarget) {
+  //     this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  //   } else if (this.filterTypeScrollTarget) {
+  //     this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  //   } else if (this.filterStateScrollTarget) {
+  //     this.filterStateScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  //   } else {
+  //   }
+  // }
 
 
   /**
@@ -207,9 +207,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     const filters = new TransactionFilterModel();
     let modified = false;
     filters.formType = this.formType;
-    filters.searchFilter = this.searchFilter;
-    modified = this.searchFilter.length > 0;
 
+    // states
     const filterStates = [];
     for (const s of this.states) {
       if (s.selected) {
@@ -219,7 +218,14 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     filters.filterStates = filterStates;
 
+    // type/category
     const filterCategories = [];
+    // type input can be checkbox or input text
+    if (this.searchFilter.length > 0) {
+      // filters.searchFilter = this.searchFilter;
+      modified = true;
+      filterCategories.push(this.searchFilter); // TODO use code with backend
+    }
     for (const category of this.transactionCategories) {
       if (category.options) {
         for (const option of category.options) {

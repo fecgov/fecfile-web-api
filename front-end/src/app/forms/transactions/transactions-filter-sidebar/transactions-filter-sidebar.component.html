@@ -1,184 +1,172 @@
 <div class="form-sidebar">
   <header>
-    <h3 class="text-center">{{ title }}</h3>
+    <h3 class="text-center transactions__filter-header">{{ title }}</h3>
   </header>
   <section>
-
-
-      <button (click)="scroll()">Click to scroll</button>
-
-
-      <div class="mx-auto" style="width:97%">
-        <div class="input-group py-1">
-          <input class="form-control" [(ngModel)]="searchFilter" type="text" 
-            placeholder="Search by Name, ID or Zip" aria-label="Search">
-          <div class="input-group-append">
-            <span class="input-group-text">
-              <i class="search-icon" aria-hidden="true"></i>
-            </span>
+    <div class="transactions__filter-sidebar-set">
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
+          Type
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideTypeFilter)">
+          </i>          
+        </div>
+        <!-- [hidden]="isHideTypeFilter"  -->
+        <div class="card-body" 
+            [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
+          <div class="input-group py-1">
+            <input class="form-control" [(ngModel)]="searchFilter" type="text" 
+              placeholder="Search Type" aria-label="Search">
+          </div>            
+          <div class="transactions__filter-type-list-body">
+              <ul *ngFor="let categoryGroup of transactionCategories" class="transactions__filter-type-list">
+                <li class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
+                <li *ngFor="let categoryType of categoryGroup.options">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
+                      [(ngModel)]="categoryType.selected">
+                    <label class="form-check-label" for="{{ categoryType?.value }}">
+                      {{ categoryType?.text }}</label>
+                  </div>
+                </li>                    
+            </ul>
           </div>
         </div>
       </div>
-      <div class="transactions__filter-sidebar-set">
-        <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
-            Type
-            <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideTypeFilter)">
-            </i>          
-          </div>
-          <!-- [hidden]="isHideTypeFilter"  -->
-          <div class="card-body" 
-              [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
-            <div #filterType class="transactions__filter-type-list-body">
-                <ul *ngFor="let categoryGroup of transactionCategories" class="transactions__filter-type-list">
-                  <li class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
-                  <li *ngFor="let categoryType of categoryGroup.options">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                        [(ngModel)]="categoryType.selected" (click)="typeClick($event)">
-                      <label class="form-check-label" for="{{ categoryType?.value }}">
-                        {{ categoryType?.text }}</label>
-                    </div>
-                  </li>                    
-              </ul>
-            </div>
-          </div>
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
+          Date
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideDateFilter)">
+          </i>
         </div>
-        <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
-            Date
-            <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideDateFilter)">
-            </i>
+        <div class="card-body" [@openClose]="!isHideDateFilter ? 'open' : 'closed'">
+          <div *ngIf="dateFilterValidation.isError" class="text-error text-center">
+            {{ dateFilterValidation.message }}
           </div>
-          <div class="card-body" [@openClose]="!isHideDateFilter ? 'open' : 'closed'">
-            <div *ngIf="dateFilterValidation.isError" class="text-error text-center">
-              {{ dateFilterValidation.message }}
+          <label for="filter-date-from">From</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-from-date">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+              </span>
             </div>
-            <label for="filter-date-from">From</label>
-            <div class="input-group transactions__filter-multi-input">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="filter-from-date">
-                    <i class="calendar-icon" aria-hidden="true"></i>
-                </span>
-              </div>
-              <input
-                type="date"
-                name="txtfromdate"
-                [(ngModel)]="filterDateFrom"
-                class="form-control"
-                id="filter-date-from"
-                aria-label="Filter From Date"
-                aria-describedby="filter-from-date"
-              >                        
+            <input
+              type="date"
+              name="txtfromdate"
+              [(ngModel)]="filterDateFrom"
+              class="form-control"
+              id="filter-date-from"
+              aria-label="Filter From Date"
+              aria-describedby="filter-from-date"
+            >                        
+          </div>
+          <label for="filter-date-to">To</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-to-date">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+              </span>
             </div>
-            <label for="filter-date-to">To</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="filter-to-date">
-                    <i class="calendar-icon" aria-hidden="true"></i>
-                </span>
-              </div>
-              <input
-                type="date"
-                name="txttodate"
-                [(ngModel)]="filterDateTo"
-                class="form-control"
-                id="filter-date-to"
-                aria-label="Filter To Date"
-                aria-describedby="filter-to-date"
-              >                        
-            </div>          
-          </div>
-        </div> 
-        <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
-            Amount
-            <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideAmountFilter)">
-            </i>
-          </div>
-          <div class="card-body" [@openClose]="!isHideAmountFilter ? 'open' : 'closed'">
-            <div *ngIf="amountFilterValidation.isError" class="text-error text-center">
-              {{ amountFilterValidation.message }}
-            </div>            
-            <label for="filter-amount-min">Minimum</label>
-            <div class="input-group transactions__filter-multi-input">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="filter-min-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                </span>
-              </div>
-              <input
-                type="number"
-                name="minamount"
-                [(ngModel)]="filterAmountMin"
-                class="form-control"
-                id="filter-amount-min"
-                aria-label="Filter Min Amount"
-                aria-describedby="filter-min-amount"
-              >                        
-            </div>
-            <label for="filter-amount-max">Maximum</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                </span>
-              </div>
-              <input
-                type="number"
-                name="maxamount"
-                [(ngModel)]="filterAmountMax"
-                class="form-control"
-                id="filter-amount-max"
-                aria-label="Filter Max Amount"
-                aria-describedby="filter-max-amount"
-              >                        
-            </div>          
-          </div>
-        </div> 
-        <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
-            State
-            <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideStateFilter)">
-            </i>          
-          </div>
-          <div class="card-body" [@openCloseScroll]="!isHideStateFilter ? 'open' : 'closed'">
-            <div class="transactions__filter-type-list-body">
-              <ul class="transactions__filter-type-list">
-                <li *ngFor="let state of states">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="{{ state?.code }}" 
-                      [(ngModel)]="state.selected" (click)="stateClick($event)">
-                    <label class="form-check-label" for="{{ state?.code }}">
-                      {{ state?.code }} - {{ state?.name}}</label>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
+            <input
+              type="date"
+              name="txttodate"
+              [(ngModel)]="filterDateTo"
+              class="form-control"
+              id="filter-date-to"
+              aria-label="Filter To Date"
+              aria-describedby="filter-to-date"
+            >                        
+          </div>          
         </div>
-        <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleMemoFilterItem()">
-            Memo Code
-            <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideMemoFilter)">
-            </i>           
-          </div>
-          <div class="card-body" [@openClose]="!isHideMemoFilter ? 'open' : 'closed'">
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="memo_code" 
-                    [(ngModel)]="filterMemoCode">
-                  <label class="form-check-label" for="memo_code">
-                    Check to filter Transactions with Memo Code
-                  </label>
-                </div>
-          </div>
-        </div> 
       </div> 
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
+          Amount
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideAmountFilter)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideAmountFilter ? 'open' : 'closed'">
+          <div *ngIf="amountFilterValidation.isError" class="text-error text-center">
+            {{ amountFilterValidation.message }}
+          </div>            
+          <label for="filter-amount-min">Minimum</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-min-amount">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              name="minamount"
+              [(ngModel)]="filterAmountMin"
+              class="form-control"
+              id="filter-amount-min"
+              aria-label="Filter Min Amount"
+              aria-describedby="filter-min-amount"
+            >                        
+          </div>
+          <label for="filter-amount-max">Maximum</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-max-amount">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              name="maxamount"
+              [(ngModel)]="filterAmountMax"
+              class="form-control"
+              id="filter-amount-max"
+              aria-label="Filter Max Amount"
+              aria-describedby="filter-max-amount"
+            >                        
+          </div>          
+        </div>
+      </div> 
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
+          State
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideStateFilter)">
+          </i>          
+        </div>
+        <div class="card-body" [@openCloseScroll]="!isHideStateFilter ? 'open' : 'closed'">
+          <div class="transactions__filter-type-list-body">
+            <ul class="transactions__filter-type-list">
+              <li *ngFor="let state of states">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="{{ state?.code }}" 
+                    [(ngModel)]="state.selected">
+                  <label class="form-check-label" for="{{ state?.code }}">
+                    {{ state?.code }} - {{ state?.name}}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleMemoFilterItem()">
+          Memo Code
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideMemoFilter)">
+          </i>           
+        </div>
+        <div class="card-body" [@openClose]="!isHideMemoFilter ? 'open' : 'closed'">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="memo_code" 
+                  [(ngModel)]="filterMemoCode">
+                <label class="form-check-label" for="memo_code">
+                  Check to filter Transactions with Memo Code
+                </label>
+              </div>
+        </div>
+      </div> 
+    </div> 
   </section>
   <footer>
     <div class="form-sidebar__btns">
