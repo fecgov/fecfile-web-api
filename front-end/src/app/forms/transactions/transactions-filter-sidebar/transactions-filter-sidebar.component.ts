@@ -7,6 +7,10 @@ import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
+import { Subject, Observable } from 'rxjs';
+
+import { of, merge } from 'rxjs';
+import { mapTo, delay } from 'rxjs/operators';
 
 
 /**
@@ -85,6 +89,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
+  private filterTypeScrollTarget: any;
+  private filterStateScrollTarget: any;
 
   constructor(
     private _formService: FormsService,
@@ -164,6 +170,31 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public toggleFilterDirection(isHidden: boolean) {
     return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
+  }
+
+  public typeClick(event: any) {
+    if (event.currentTarget.checked) {
+      this.filterTypeScrollTarget = event.currentTarget;
+    }
+  }
+
+  public stateClick(event: any) {
+    if (event.currentTarget.checked) {
+      this.filterStateScrollTarget = event.currentTarget;
+    }
+  }
+
+  public scroll() {
+
+    // TODO need to support scroll to multiple elements.
+    if (this.filterTypeScrollTarget &&  this.filterStateScrollTarget) {
+      this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    } else if (this.filterTypeScrollTarget) {
+      this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    } else if (this.filterStateScrollTarget) {
+      this.filterStateScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    } else {
+    }
   }
 
 

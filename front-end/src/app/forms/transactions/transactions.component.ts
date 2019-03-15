@@ -37,6 +37,8 @@ export class TransactionsComponent implements OnInit {
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
   public isShowFilters = false;
+  public searchText = '';
+  public searchTextArray = [];
 
   private readonly filtersLSK = 'transactions.filters';
 
@@ -63,6 +65,33 @@ export class TransactionsComponent implements OnInit {
     if (filters.show === true) {
       this.showFilters();
     }
+  }
+
+
+  /**
+   * Search transactions.
+   */
+  public search() {
+
+    // Don't allow more than 12 filters
+    if (this.searchTextArray.length > 12) {
+      return;
+    }
+
+    // TODO emit search message to the table transactions component
+    if (this.searchText) {
+      this.searchTextArray.push(this.searchText);
+    }
+  }
+
+
+  /**
+   * Remove the search text from the array.
+   * 
+   * @param index index in the array
+   */
+  public removeSearchText(index: number) {
+    this.searchTextArray.splice(index, 1);
   }
 
 

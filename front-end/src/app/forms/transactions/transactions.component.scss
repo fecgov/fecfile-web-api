@@ -12,6 +12,8 @@
     flex-grow: 1;
     display: none;
     padding-left: 0;
+    vertical-align: top;
+    padding-top: 1.5em;
     @include media(tablet) {
       display: none;
     }

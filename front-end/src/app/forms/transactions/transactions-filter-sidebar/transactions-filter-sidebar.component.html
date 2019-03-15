@@ -3,6 +3,11 @@
     <h3 class="text-center">{{ title }}</h3>
   </header>
   <section>
+
+
+      <button (click)="scroll()">Click to scroll</button>
+
+
       <div class="mx-auto" style="width:97%">
         <div class="input-group py-1">
           <input class="form-control" [(ngModel)]="searchFilter" type="text" 
@@ -31,7 +36,7 @@
                   <li *ngFor="let categoryType of categoryGroup.options">
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                        [(ngModel)]="categoryType.selected">
+                        [(ngModel)]="categoryType.selected" (click)="typeClick($event)">
                       <label class="form-check-label" for="{{ categoryType?.value }}">
                         {{ categoryType?.text }}</label>
                     </div>
@@ -147,7 +152,7 @@
                 <li *ngFor="let state of states">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="{{ state?.code }}" 
-                      [(ngModel)]="state.selected">
+                      [(ngModel)]="state.selected" (click)="stateClick($event)">
                     <label class="form-check-label" for="{{ state?.code }}">
                       {{ state?.code }} - {{ state?.name}}</label>
                   </div>
