@@ -20,7 +20,7 @@
               type="button"
               class="btn btn-validate"
               (click)="printPreview()"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (!validFile)"
+              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
             >
               Print Preview
             </button> &nbsp;
@@ -47,7 +47,7 @@
             <div class="grid-row__col grid-row__col--12"
               *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
               <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-                You must enter a reason.
+                Enter text for the reason selected.
               </div>
               <div class="text-error text-center" *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
                 Enter text for the reason selected.
@@ -180,8 +180,8 @@
               <div class="file-attached-container" *ngIf="file !== null">
                 <div class="grid-row">
                   <div class="grid-row__col grid-row__col--12">
-                    {{ file.name }}
-
+                    <h5>
+                    {{ file.name }} 
                     <button
                     type="button"
                     class="btn btn-link"
@@ -189,9 +189,9 @@
                   >
                       <span vertical-align="top" class="close-icon"></span>
                   </button>
-
+                    </h5>
                   </div>
-
+                 
                   <ng-template #deletePDF let-d="dismiss">
                     <div class="modal-header">
                       <h2 class="modal-title">
@@ -249,7 +249,7 @@
           <div class="grid-row__col grid-row__col--12">
           <h4>* = Required</h4>
           </div>
-      </div>
+      </div>     
       </footer>
     </form>
   </div> <!-- ./reason-container -->

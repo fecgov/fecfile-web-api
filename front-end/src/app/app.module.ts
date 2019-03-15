@@ -69,6 +69,8 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
+import { TransactionsFilterSidbarComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-sidebar.component';
+import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -91,6 +93,7 @@ import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.co
     ToolsComponent,
     TransactionsComponent,
     TransactionsTableComponent,
+    TransactionsFilterSidbarComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,
@@ -117,6 +120,8 @@ import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.co
     FinancialSummaryComponent,
     OrderByPipe,
     ZipCodePipe,
+    FilterPipe,
+    IndividualReceiptComponent,
     ReportsidebarComponent,
     ReportheaderComponent,
     ReportdetailsComponent

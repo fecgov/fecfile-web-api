@@ -7,6 +7,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { TransactionModel } from '../model/transaction.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -27,7 +29,9 @@ export class TransactionsService {
   private mockTransactionIdRecycle = 'TIDRECY';
   // only for mock data - end
 
+  // May only be needed for mocking server
   private _orderByPipe: OrderByPipe;
+  private _filterPipe: FilterPipe;
 
   constructor(
     private _http: HttpClient,
@@ -52,6 +56,7 @@ export class TransactionsService {
     // }
 
     this._orderByPipe = new OrderByPipe();
+    this._filterPipe = new FilterPipe();
   }
 
 
@@ -61,8 +66,13 @@ export class TransactionsService {
    * @param      {String}   formType      The form type of the transaction to get
    * @return     {Observable}             The form being retreived.
    */
-  public getFormTransactions(formType: string, page: number, itemsPerPage: number,
-      sortColumnName: string, descending: boolean): Observable<any> {
+  public getFormTransactions(
+      formType: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean,
+      filter: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
@@ -72,6 +82,14 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     // TODO these will be used for filtering
+    // These are not yet defined in API
+    // params = params.append('page', page);
+    // params = params.append('itemsPerPage', itemsPerPage);
+    // params = params.append('sortColumnName', sortColumnName);
+    // params = params.append('descending', descending);
+    // params = params.append('search', filter.search);
+
+    // These are defined in API
     // params = params.append('report_id', '1');
     // params = params.append('line_number', '11AI');
     // params = params.append('transaction_type', '15');
@@ -150,12 +168,150 @@ export class TransactionsService {
     return serverObject;
   }
 
-
+  // TODO remove once server is ready and mock data is no longer needed
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
       response.transactions.push(trx);
       response.totalAmount += trx.transaction_amount;
       response.totalTransactionCount++;
+    }
+  }
+
+
+  /**
+   * This method handles filtering the transactions array and will be replaced
+   * by a backend API.
+   */
+  public mockApplyFilters(response: any, filters: TransactionFilterModel) {
+
+    if (!filters) {
+      return;
+    }
+    if (!response.transactions) {
+      return;
+    }
+
+    // This is for filtering where filters are OR conditions not AND.
+    // add a unique id to each transactions before filtering
+    // let i = 0;
+    // for (const trx of response.transactions) {
+    //   trx.id = i;
+    //   i++;
+    // }
+
+    // let combinedFilterArray = [];
+
+    let isFilter = false;
+    if (filters.searchFilter) {
+      if (response.transactions.length > 0) {
+        isFilter = true;
+        const fields = ['name', 'zip_code', 'transaction_id'];
+        const filteredSearchArray = 
+          this._filterPipe.transform(response.transactions, fields, filters.searchFilter);
+        response.transactions = filteredSearchArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredSearchArray);
+      }
+    }
+
+    if (filters.filterStates) {
+      if (filters.filterStates.length > 0) {
+        isFilter = true;
+        const fields = ['state'];
+        let filteredStateArray = [];
+        for (const state of filters.filterStates) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, state);
+          filteredStateArray = filteredStateArray.concat(filtered);
+        }
+        response.transactions = filteredStateArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredStateArray);
+      }
+    }
+
+    if (filters.filterCategories) {
+      if (filters.filterCategories.length > 0) {
+        isFilter = true;
+        const fields = ['transaction_type_desc'];
+        let filteredCategoryArray = [];
+        for (const category of filters.filterCategories) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, category);
+          filteredCategoryArray = filteredCategoryArray.concat(filtered);
+        }
+        response.transactions = filteredCategoryArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredCategoryArray);
+      }
+    }
+
+    if (filters.filterAmountMin && filters.filterAmountMax) {
+      if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
+          filters.filterAmountMin <= filters.filterAmountMax) {
+        const filteredAmountArray = [];
+        for (const trx of response.transactions) {
+          if (trx.transaction_amount) {
+            if (trx.transaction_amount >= filters.filterAmountMin &&
+              trx.transaction_amount <= filters.filterAmountMax) {
+                isFilter = true;
+                filteredAmountArray.push(trx);
+            }
+          }
+        }
+        response.transactions = filteredAmountArray;
+        // combinedFilterArray = combinedFilterArray.concat(filteredAmountArray);
+      }
+    }
+
+    if (filters.filterDateFrom && filters.filterDateTo) {
+      const filterDateFromDate = new Date(filters.filterDateFrom);
+      const filterDateToDate = new Date(filters.filterDateTo);
+      const filteredDateArray = [];
+      for (const trx of response.transactions) {
+        if (trx.transaction_date) {
+          const trxDate = new Date(trx.transaction_date);
+          if (trxDate >= filterDateFromDate &&
+              trxDate <= filterDateToDate) {
+            isFilter = true;
+            filteredDateArray.push(trx);
+          }
+        }
+      }
+      response.transactions = filteredDateArray;
+      // combinedFilterArray = combinedFilterArray.concat(filteredDateArray);
+    }
+
+    if (filters.filterMemoCode === true) {
+      isFilter = true;
+      const filteredMemoCodeArray = [];
+      for (const trx of response.transactions) {
+        if (trx.memo_code) {
+          if (trx.memo_code.length > 0) {
+            filteredMemoCodeArray.push(trx);
+          }
+        }
+      }
+      response.transactions = filteredMemoCodeArray;
+      // combinedFilterArray = combinedFilterArray.concat(filteredMemoCodeArray);
+    }
+
+    // // sort the combined filter array by id
+    // combinedFilterArray = this.sortTransactions(combinedFilterArray, 'id', false);
+    // const finalFilteredArray = [];
+    // let prevId = null;
+    // for (const trx of combinedFilterArray) {
+    //   if (trx.id !== prevId) {
+    //     finalFilteredArray.push(trx);
+    //   }
+    //   prevId = trx.id;
+    // }
+    // response.transactions = finalFilteredArray;
+
+    if (isFilter) {
+      response.totalAmount = 0;
+      response.totalTransactionCount = 0;
+      for (const trx of response.transactions) {
+        if (!trx.memo_code) {
+          response.totalAmount += trx.transaction_amount;
+        }
+        response.totalTransactionCount++;
+      }
     }
   }
 
@@ -241,7 +397,7 @@ export class TransactionsService {
     t1.name = 'Mr. John Doe';
     t1.purpose_description = 'The purpose of this is to...';
     t1.selected = false;
-    t1.state = 'New York';
+    t1.state = 'NY';
     t1.street_1 = '7th Avenue';
     t1.transaction_id = this.mockTransactionId;
     t1.transaction_type_desc = 'Individual';

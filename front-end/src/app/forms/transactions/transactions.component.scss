@@ -1,13 +1,13 @@
 @import '../../shared/scss/global';
 
-.forms__wizard {
+.transactions__main-container {
   display: table;
   table-layout: fixed;
   min-height: $mainContentHeight;
   margin: 0;
   padding: 0;
   width: 100%;
-  .form__sidebar {
+  .transactions__sidebar {
     background-color: $bombay;
     flex-grow: 1;
     display: none;
@@ -17,16 +17,15 @@
     }
     @include media(mediumDesktop) {
       display: table-cell;
-      width: 250px;
+      width: 20%;
     }
     @include media(largeDesktop) {
       display: table-cell;
-      width: 250px;
-    }
+      width: 20%;
+    }           
   }
 
-
-  .transactions-container {
+  .transactions__container {
     .grid-row {
       margin-left: 0;
       margin-right: 0;
@@ -56,23 +55,23 @@
       }
     }
 
-    .forms__btn-container {
+    .transactions__btn-container {
       height: 100%;
-      margin-bottom: 10px;
+      padding: 1em;
     }
 
-    .forms__trx-btn {
+    .transactions__trx-btn {
       margin: 5px;
       width: 10em;
     }
 
-    .forms__trx-search {
+    .transactions__trx-search {
       width: 27%;
       float: right;
       margin-right: 5px;
     }
 
-    .forms__trx-applied-filter-row {
+    .transactions__trx-applied-filter-row {
       min-height: 48px;
     }
 
