@@ -264,53 +264,53 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * filter options on Type.
    */
   private getCategoryTypes() {
-    this._formService
-    .getTransactionCategories(this.formType)
-      .subscribe(res => {
+    // this._formService
+    // .getTransactionCategories(this.formType)
+    //   .subscribe(res => {
 
-        let categoriesExist = false;
-        const categoriesGroupArray = [];
-        if (res.data) {
-          if (res.data.transactionCategories) {
-            categoriesExist = true;
+    //     let categoriesExist = false;
+    //     const categoriesGroupArray = [];
+    //     if (res.data) {
+    //       if (res.data.transactionCategories) {
+    //         categoriesExist = true;
 
-            // 1st node is the group of types (not checkable).
-            // 2nd node is ignored.
-            // 3rd node is the type checkable.
-            for (const node1 of res.data.transactionCategories) {
-              const categoryGroup: any = {};
-              categoryGroup.text = node1.text;
-              categoryGroup.options = [];
+    //         // 1st node is the group of types (not checkable).
+    //         // 2nd node is ignored.
+    //         // 3rd node is the type checkable.
+    //         for (const node1 of res.data.transactionCategories) {
+    //           const categoryGroup: any = {};
+    //           categoryGroup.text = node1.text;
+    //           categoryGroup.options = [];
 
-              for (const node2 of node1.options) {
-                for (const option of node2.options) {
-                  if (this.cachedFilters.filterCategories) {
-                    // check for categories selected in the filter cache
-                    // TODO scroll to first check item
-                    if (this.cachedFilters.filterCategories.includes(option.text)) {
-                      option.selected = true;
-                      this.isHideTypeFilter = false;
-                    } else {
-                      option.selected = false;
-                    }
-                  }
-                  categoryGroup.options.push(option);
-                }
-              }
-              if (categoryGroup.options.length > 0) {
-                categoriesGroupArray.push(categoryGroup);
-              }
-            }
-          }
-        }
-        if (categoriesExist) {
-          this.transactionCategories = categoriesGroupArray;
-          // this.transactionCategories = this._orderByPipe.transform(
-          //   res.data.transactionCategories, {property: 'text', direction: 1});
-        } else {
-          this.transactionCategories = [];
-        }
-    });
+    //           for (const node2 of node1.options) {
+    //             for (const option of node2.options) {
+    //               if (this.cachedFilters.filterCategories) {
+    //                 // check for categories selected in the filter cache
+    //                 // TODO scroll to first check item
+    //                 if (this.cachedFilters.filterCategories.includes(option.text)) {
+    //                   option.selected = true;
+    //                   this.isHideTypeFilter = false;
+    //                 } else {
+    //                   option.selected = false;
+    //                 }
+    //               }
+    //               categoryGroup.options.push(option);
+    //             }
+    //           }
+    //           if (categoryGroup.options.length > 0) {
+    //             categoriesGroupArray.push(categoryGroup);
+    //           }
+    //         }
+    //       }
+    //     }
+    //     if (categoriesExist) {
+    //       this.transactionCategories = categoriesGroupArray;
+    //       // this.transactionCategories = this._orderByPipe.transform(
+    //       //   res.data.transactionCategories, {property: 'text', direction: 1});
+    //     } else {
+    //       this.transactionCategories = [];
+    //     }
+    // });
   }
 
 
