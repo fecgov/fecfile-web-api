@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
+import { TransactionsService } from '../service/transactions.service';
 
 
 /**
@@ -87,7 +87,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
 
   constructor(
-    private _formService: FormsService,
+    private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
     private _orderByPipe: OrderByPipe
   ) {}
@@ -264,7 +264,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * filter options on Type.
    */
   private getCategoryTypes() {
-    this._formService
+    this._transactionsService
     .getTransactionCategories(this.formType)
       .subscribe(res => {
 
@@ -319,8 +319,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   private getStates() {
     // TODO using this service to get states until available in another API.
-    this._formService
-      .getDynamicFormFields(this.formType, 'Individual Receipt')
+    this._transactionsService
+      .getStates(this.formType, 'Individual Receipt')
         .subscribe(res => {
 
           let statesExist = false;

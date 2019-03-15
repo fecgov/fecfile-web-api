@@ -382,6 +382,63 @@ export class TransactionsService {
   }
 
 
+  /**
+   * Get US States.
+   *
+   * TODO replace with the appropriate API call when it is available.
+   */
+  public getStates(formType: string, transactionType: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/get_dynamic_forms_fields';
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('form_type', `F${formType}`);
+    params = params.append('transaction_type', transactionType);
+
+    return this._http
+        .get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions,
+            params
+          }
+        );
+   }
+
+
+  /**
+   * Get trans
+   * @param form_type
+   */
+  public getTransactionCategories( form_type: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url = '';
+    let params = new HttpParams();
+
+    url = '/core/get_transaction_categories?form_type=F3X';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('form_type', 'F3X');
+
+    return this._http
+       .get(
+          `${environment.apiUrl}${url}`,
+          {
+           /* headers: httpOptions,
+            params*/
+            headers: httpOptions/*  */
+          }
+       );
+  }
+
+
   private createMockTrx() {
     const t1: any = {};
     t1.aggregate = 1000;
