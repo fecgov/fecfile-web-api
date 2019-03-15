@@ -519,6 +519,7 @@ def delete_reports(data):
     except:
         raise
 
+
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
@@ -536,9 +537,6 @@ def reports(request):
                 election_code = request.data.get('election_code')
             else:
                 election_code = None
-
-            date_of_election = check_form_data('date_of_election', request.data)
-            state_of_election = check_form_data('state_of_election', request.data)     
             
             datum = {
                 'cmte_id': request.user.username,
@@ -546,8 +544,8 @@ def reports(request):
                 'amend_ind': amend_ind,
                 'report_type': request.data.get('report_type'),
                 'election_code': election_code,
-                'date_of_election': date_format(date_of_election),
-                'state_of_election': state_of_election,
+                'date_of_election': date_format(request.data.get('date_of_election')),
+                'state_of_election': request.data.get('state_of_election'),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
@@ -591,16 +589,14 @@ def reports(request):
     if request.method == 'PUT':
 
         try:
-            date_of_election = check_form_data('date_of_election', request.data)
-            state_of_election = check_form_data('state_of_election', request.data)
-             
+            
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'report_type': request.data.get('report_type'),
-                'date_of_election': date_format(date_of_election),
-                'state_of_election': state_of_election,
+                'date_of_election': date_format(request.data.get('date_of_election')),
+                'state_of_election': request.data.get('state_of_election'),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
@@ -643,6 +639,7 @@ def reports(request):
 END - REPORTS API - CORE APP
 ******************************************************************************************************************************
 """
+        
 """
 ******************************************************************************************************************************
 ENTITIES API- CORE APP - SPRINT 7 - FNE 553 - BY PRAVEEN JINKA
