@@ -14,11 +14,11 @@
                 </th> -->
                 <th 
                     [class]="getSortClass('form_type')" 
-                    (click)="changeSortDirection('Form')">Form
+                    (click)="changeSortDirection('form_type')">Form
                 </th>
                 <th
                     [class]="getSortClass('Status')" 
-                    (click)="changeSortDirection('Status')">Status
+                    (click)="changeSortDirection('status')">Status
                 </th>
                 <th 
                     [class]="getSortClass('fec_id')" 
@@ -34,18 +34,17 @@
                 </th>                              
                 <th 
                     [class]="getSortClass('report_type_desc')" 
-                    [class]="getSortClass('report_type_desc')" 
-                    (click)="changeSortDirection('state')">Report
+                    (click)="changeSortDirection('report_type_desc')">Report
                 </th>
                 <th 
                     [class]="getSortClass('filed_date')" 
                     (click)="changeSortDirection('filed_date')">Filed/Saved Date
                 </th>                        
                                                                     
-                <th class="bulk_action">
+               <!-- <th class="bulk_action">
                     <div *ngIf="isTransactionViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                        <button class="btn btn-sm btn-primary reports__bulk_action_btn">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -60,7 +59,7 @@
                             </button>
                         </div>
                     </div>                        
-                </th>
+                </th>  -->
             </tr>
         </thead>
         <tbody>
@@ -78,24 +77,75 @@
                 <td *ngIf="isColumnVisible('filed_date')">{{report.filed_date | date: 'MM/dd/yyyy'}}</td>
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
-                        <button class="btn btn-sm btn-secondary" 
+                        <button class="btn btn-sm btn-primary" 
                             (click)="restoreTransaction(report)">
                             <i class="fas fa-trash-restore"></i>
                         </button>                     
                     </div>
                     <div *ngIf="isTransactionViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-secondary" ngbDropdownToggle>
+                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="viewTransaction(report)">
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
-                            <button class="dropdown-item" (click)="editTransaction(report)">
+                            <button class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i>Edit
                             </button>
-                            <button class="dropdown-item" (click)="trashTransaction(report)">
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                            <button class="dropdown-item" (click)="trashReport(report)">
+                                <i class="fas fa-trash"></i>Trash
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="amendReport(report)">
+                                <i class="fas fa-edit"></i>Amend
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="editReport(report)">
+                                <i class="fas fa-edit"></i>Edit
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                            <button class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i>Trash
                             </button>
                         </div>

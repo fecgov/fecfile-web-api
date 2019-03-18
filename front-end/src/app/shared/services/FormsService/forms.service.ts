@@ -16,12 +16,16 @@ export interface GetReportsResponse {
 
 export class FormsService {
 
+  private _orderByPipe: OrderByPipe;
+  
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
-  ) { }
+  ) { 
+    this._orderByPipe = new OrderByPipe();
+  }
 
-  private _orderByPipe: OrderByPipe;
+  
 
 
  /**
@@ -733,6 +737,7 @@ export class FormsService {
    * Map server fields from the response to the model.
    */
   public mapFromServerFields(serverData: any, modelArray: reportModel[]) {
+
     if (!serverData || !Array.isArray(serverData)) {
       console.log(" no server data mapFromServerFields  modelArray", modelArray);
       return;
@@ -763,6 +768,10 @@ export class FormsService {
    * @param descending
    */
   public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
+
+    console.log("sortTransactions array =", array);
+    console.log("sortTransactions sortColumnName =", sortColumnName);
+    console.log("sortTransactions descending =", descending);
     const direction = descending ? -1 : 1;
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
     console.log("sortTransactions array= ", array);
