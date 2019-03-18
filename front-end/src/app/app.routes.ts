@@ -1,7 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-// import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -46,7 +45,7 @@ export const AppRoutes: Routes = [
 			   { path: 'reports/reportdetails', component: ReportdetailsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService], }/*  */
 			]
 		  },
-  
+
 			{ path: 'account', component: AccountComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_transactions', component: ToolsImportTransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_names', component: ToolsImportNamesComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },

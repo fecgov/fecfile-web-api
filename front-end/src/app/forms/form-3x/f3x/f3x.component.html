@@ -13,7 +13,7 @@
     <div *ngIf="step==='step_2'">
       <transaction-sidebar
         title="Transaction Categories"
-        [transactionCategories]="parentTransactionCategories"
+        [transactionCategories]="transactionCategories"
         (status)='onNotify($event)'
       >
       </transaction-sidebar>
@@ -66,7 +66,11 @@
         class="form__step"
         [hidden]="step!=='step_2'"
       >
-        <f3x-transaction-type (status)='onNotify($event)'>
+        <f3x-transaction-type
+          (status)='onNotify($event)'
+          [transactionType]="transactionType"
+          [transactionCategories]="transactionCategories"
+        >
         </f3x-transaction-type>
       </div>
 

@@ -35,6 +35,7 @@ export class F3xComponent implements OnInit {
   public regularReports: boolean = false;
   public specialReports: boolean = false;
   public transactionCategories: any = [];
+  public transactionType: string = '';
 
   private _step: string = '';
   private _formType: string = '';
@@ -66,8 +67,6 @@ export class F3xComponent implements OnInit {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
 
-            console.log('this.reportTypes: ', this.reportTypes);
-
             this.reportsLoading = false;
 
             this._setReports();
@@ -78,20 +77,10 @@ export class F3xComponent implements OnInit {
     this._transactionTypeService
       .getTransactionCategories(this._formType)
       .subscribe(res => {
-        if (typeof res === 'object') {
-          if (typeof res.data === 'object') {
-            this.transactionCategories = res.data;
-            if (Array.isArray(this.transactionCategories.transactionCategories)) {
-              this.transactionCategories.transactionCategories.forEach(el => {
-                if (typeof el.text === 'string' && typeof el.value === 'string') {
-                  this.parentTransactionCategories.push({
-                    'text': el.text,
-                    'value': el.value
-                  });
-                }
-              });
-            }
-          }
+        if (res) {
+          this.transactionCategories = res.data.transactionCategories;
+
+          console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
   }
@@ -100,6 +89,10 @@ export class F3xComponent implements OnInit {
     if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
+    }
+
+    if (this.transactionType) {
+      console.log('transactionType: ', this.transactionType);
     }
   }
 
@@ -165,11 +158,12 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
+      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
        */
-      if (e.form) {
+      if (typeof e.form === 'object') {
 
         this.frm = e.form;
 
@@ -190,6 +184,13 @@ export class F3xComponent implements OnInit {
         this._step = e.step;
       } else if (typeof e.reportTypeRadio === 'string') {
         this._setCoverageDates(e.reportTypeRadio);
+      } else if (typeof e.form === 'string') {
+        if (e.form === '3x') {
+          console.log('e:', e);
+          this.transactionType = e.transactionType;
+
+          console.log('this.transactionType: ', this.transactionType);
+        }
       }
     }
   }

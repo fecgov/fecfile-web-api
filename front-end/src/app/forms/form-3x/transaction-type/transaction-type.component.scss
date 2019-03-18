@@ -1,39 +1,47 @@
 @import '../../../shared/scss/global';
 
 .transaction-type-container {
-  min-height: 100vh;
+  min-height: 75vh;
   position: relative;
-  header {
-    .header-content {
-      display: block;
-      margin: 0 auto;
-      width: 96%;
-      @include clearfix();
-      .btn-options {
-        color: $shuttleGray;
-        text-decoration: none;
-        &:hover,
-        &:visited,
-        &:active {
+  form {
+    header {
+      .header-content {
+        display: block;
+        margin: 0 auto;
+        width: 96%;
+        @include clearfix();
+        .btn-options {
           color: $shuttleGray;
           text-decoration: none;
+          &:hover,
+          &:visited,
+          &:active {
+            color: $shuttleGray;
+            text-decoration: none;
+          }
+        }
+        @include clearfix();
+      }
+    }
+    section {
+      .content {
+        min-height: 70vh;
+        position: relative;
+        .grid-row {
+          margin-bottom: 20px;
         }
       }
-      @include clearfix();
     }
-  }
-  form {
-    min-height: 90vh;
-    position: relative;
     footer {
       bottom: 0;
       position: absolute;
+      width: 100%;
       .forms__btn-container {
         height: 100%;
         margin-bottom: 10px;
         padding-left: 20px;
       }
+      @include clearfix();
     }
   }
-
 }

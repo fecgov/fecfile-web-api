@@ -16,6 +16,8 @@ export class MessageService {
    * @param      {Any}  message  The message
    */
   public sendMessage(message: any) {
+      // console.log('sendMessage: ');
+      // console.log('message: ', message);
       this._subject.next(message);
   }
 

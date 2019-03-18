@@ -201,8 +201,9 @@ export class ReportTypeComponent implements OnInit {
         this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
         this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
         this._form3xReportTypeDetails.dueDate = this._dueDate;
-        console.log('this._reportTypeDescripton: ', this._reportTypeDescripton);
         this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+
+        console.log('this._form3xReportTypeDetails: ', this._form3xReportTypeDetails);
 
         localStorage.setItem('Form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
 

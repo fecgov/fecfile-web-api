@@ -19,17 +19,16 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() selectedReport: any = null;
   @Input() selectedreporttype:  selectedReportType;
 
-  public dueDate: string = null;
-  public electionStates: any = null;
-  public electionDates: any = null;
+  public electionStates: any = [];
+  public electionDates: any = [];
   public frmReportSidebar: FormGroup;
-  public fromDate: string = null;
-  public toDate: string = null;
+  public fromDate: string = '';
+  public toDate: string = '';
 
-  private _reportTypeDescription: string = null;
   private _selectedElectionDates: any = null;
-  private _selectedState: string = null;
-  private _selectedElectionDate: string = null;
+  private _selectedState: string = '';
+  private _selectedElectionDate: string = '';
+  private _selectedReportType: string = '';
 
   constructor(
     private _fb: FormBuilder,
@@ -50,77 +49,82 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
-      if (this.selectedReport.hasOwnProperty('report_type_desciption')) {
-        if (typeof this.selectedReport.report_type_desciption === 'string') {
-          this._reportTypeDescription = this.selectedReport.report_type_desciption;
-        }
-      }
-      if (this.selectedReport.hasOwnProperty('election_state')) {
-        if (Array.isArray(this.selectedReport.election_state)) {
-          if (this.selectedReport.election_state.length === 1) {
-            this.fromDate = '';
-            this.toDate = '';
-            this._selectedElectionDates = null;
-            if (this.selectedReport.election_state[0]['dates']) {
-              if (Array.isArray(this.selectedReport.election_state[0].dates)) {
-                let dates: any = this.selectedReport.election_state[0].dates;
+      if (typeof this.selectedReport === 'object') {
+        if (typeof this.selectedReport.report_type === 'string') {
+          if (this._selectedReportType !== this.selectedReport.report_type) {
+            this._selectedReportType = this.selectedReport.report_type;
 
-                if (Array.isArray(dates)) {
-                  this.fromDate = dates[0].cvg_start_date;
-                  this.toDate = dates[0].cvg_end_date;
-                  this.dueDate = dates[0].due_date;
+            if (this._selectedReportType !== '') {
+              // Resets the date fields if there already filled in from a previous selection.
+              if (typeof this.fromDate === 'string' && typeof this.toDate === 'string') {
+                if ((this.fromDate.length >= 1 && this.toDate.length >= 1)) {
+                  this.fromDate = '';
+                  this.toDate = '';
+                  this.electionDates = null;
                 }
               }
             }
-          } else {
-            this.fromDate = '';
-            this.toDate = '';
-            if (this.selectedReport.hasOwnProperty('election_state')) {
-              this.electionStates =  this.selectedReport.election_state;
-            }
-
-            if (this._selectedElectionDates !== null) {
-              this.fromDate = this._selectedElectionDates.fromDate;
-              this.toDate = this._selectedElectionDates.toDate;
-            }
           }
-        } // isArray(this.selectedReport.election_state)
-        if (this.fromDate && this.toDate) {
-          let message: any = null;
-
-          if (this._selectedState && this.specialReports) {
-            message = {
-              'form': '3x',
-              'selectedState': this._selectedState,
-              'selectedElectionDate': this._selectedElectionDate,
-              'toDate': this.toDate,
-              'fromDate': this.fromDate,
-              'dueDate': this.dueDate,
-              'reportTypeDescription': this._reportTypeDescription
-            }
-          } else {
-            message = {
-              'form': '3x',
-              'toDate': this.toDate,
-              'fromDate': this.fromDate,
-              'dueDate': this.dueDate,
-              'reportTypeDescription': this._reportTypeDescription
-            }
-          }
-          this._messageService
-            .sendMessage(message);
-        } else {
-          this._messageService
-            .sendMessage({
-              'form': '3x',
-              'toDate': '',
-              'fromDate': '',
-              'dueDate': '',
-              'reportTypeDescription': ''
-            });
         }
-      } // hasOwnProperty('election_state')
+        if (typeof this.selectedReport.regular_special_report_ind === 'string') {
+          if (this.selectedReport.regular_special_report_ind === 'R') {
+            if (this.selectedReport.hasOwnProperty('election_state')) {
+              if (Array.isArray(this.selectedReport.election_state)) {
+                if (Array.isArray(this.selectedReport.election_state[0].dates)) {
+                  const dates: any = this.selectedReport.election_state[0].dates;
+
+                  if (Array.isArray(dates)) {
+                    this.fromDate = dates[0].cvg_start_date;
+                    this.toDate = dates[0].cvg_end_date;
+                  } else {
+                    this.fromDate = '';
+                    this.toDate = '';
+                  }
+                }
+              }
+            } else {
+              this.fromDate = '';
+              this.toDate = '';
+            } // selectedReport.hasOwnProperty('election_state')
+          } else {
+            if (this.selectedReport.hasOwnProperty('election_state')) {
+              if (Array.isArray(this.selectedReport.election_state)) {
+                this.electionStates =  this.selectedReport.election_state;
+              }
+            }
+          } // selectedReport.regular_special_report_ind !== 'S'
+        } // selectedReport.regular_special_report_ind === 'string'
+      } // typeof this.selectedReport
     } // selectedReport !== null
+
+    if (this.fromDate && this.toDate) {
+      let message: any = null;
+
+      if (this._selectedState && this.specialReports) {
+        message = {
+          'form': '3x',
+          'selectedState': this._selectedState,
+          'selectedElectionDate': this._selectedElectionDate,
+          'toDate': this.toDate,
+          'fromDate': this.fromDate
+        }
+      } else {
+        message = {
+          'form': '3x',
+          'toDate': this.toDate,
+          'fromDate': this.fromDate
+        }
+      }
+      this._messageService
+        .sendMessage(message);
+    } else {
+      this._messageService
+        .sendMessage({
+          'form': '3x',
+          'toDate': '',
+          'fromDate': ''
+        });
+    }
   }
 
 
@@ -141,15 +145,27 @@ export class ReportTypeSidebarComponent implements OnInit {
             this.electionDates = selectedState.dates;
           }
         }
+
+        this.fromDate = '';
+        this.toDate = '';
       }
     }
   }
 
   public electionDateChange(e): void {
+    console.log('electionDateChange: ');
     let selectedIndex: number = e.target.selectedIndex;
     let selectedOption: any = e.target[e.target.selectedIndex];
 
+    console.log('selectedOption: ', selectedOption);
+
     this._selectedElectionDate =  e.target.value;
+
+    console.log('fromDate: ', selectedOption.getAttribute('data-startdate'));
+    console.log('toDate: ', selectedOption.getAttribute('data-enddate'));
+
+    this.fromDate = selectedOption.getAttribute('data-startdate');
+    this.toDate = selectedOption.getAttribute('data-enddate');
 
     this._selectedElectionDates = {
       'fromDate': selectedOption.getAttribute('data-startdate'),

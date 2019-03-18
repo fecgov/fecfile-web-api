@@ -97,7 +97,6 @@ export class AppLayoutComponent implements OnInit {
       this.sideBarClass = 'dashboard active';
     }
   }
-
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.
    */
