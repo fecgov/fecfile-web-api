@@ -24,6 +24,7 @@ export class TransactionTypeComponent implements OnInit {
   @Input() transactionCategories: any = [];
 
   public frmOption: FormGroup;
+  public frmSubmitted: boolean = false;
   public optionFailed: boolean = false;
   public parentOptionFailed: boolean = false;
   public showForm: boolean = false;
@@ -53,25 +54,6 @@ export class TransactionTypeComponent implements OnInit {
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
     });
-
-    // this._messageService
-    //   .getMessage()
-    //   .subscribe(res => {
-    //     console.log('transaction-component res: ', res);
-    //     if (res) {
-
-    //       if (typeof res === 'object') {
-    //         if (typeof res.form === 'string') {
-    //           if (res.form === '3x') {
-
-    //             // console.log('res: ', res);
-    //             this._transactionCategory = res.transactionType;
-    //             this._setTransactionCategories();
-    //           }
-    //         }
-    //       }
-    //     }
-    //   });
   }
 
   ngDoCheck(): void {
@@ -81,8 +63,6 @@ export class TransactionTypeComponent implements OnInit {
       }
     }
     if (this.transactionType) {
-      console.log('transactionType: ', this.transactionType);
-
       this._setTransactionCategories();
     }
   }
@@ -92,10 +72,12 @@ export class TransactionTypeComponent implements OnInit {
    * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
   public doValidateOption(): boolean {
-    console.log('doValidateOptions: ');
+    console.log('doValidateOption: ');
+    console.log('this.frmOption: ', this.frmOption);
+    this.frmSubmitted = true;
+    console.log('this.frmSubmitted: ', this.frmSubmitted);
     if (this.childOptions.length >= 1) {
       this.parentOptionFailed = false;
-      console.log('this.parentOptionFailed: ', this.parentOptionFailed);
       if (this.frmOption.invalid) {
         this.optionFailed = true;
         return false;

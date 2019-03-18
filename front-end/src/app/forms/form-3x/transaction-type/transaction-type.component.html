@@ -28,6 +28,11 @@
             You must select a transaction category first.
           </div>
         </div>
+        <div class="grid-row" *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (frmOption.invalid && frmSubmitted) || (optionFailed)">
+          <div class="grid-row__col grid-row__col--12 text-center text-error">
+            You must select a transaction type first.
+          </div>
+        </div>
         <div
           class="grid-row"
           *ngFor="let option of childOptions"
@@ -35,10 +40,12 @@
           <div class="grid-row__col grid-row__col--12">
             <input
               type="radio"
-              name="option"
+              name="optionRadio"
               [value]="option?.text"
+              (change)="updateStatus($event)"
+              formControlName="optionRadio"
             />
-            <label for="option">
+            <label for="optionRadio">
               {{option?.text}}
             </label>
           </div>

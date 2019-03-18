@@ -79,8 +79,6 @@ export class F3xComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.transactionCategories = res.data.transactionCategories;
-
-          console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
   }
@@ -89,10 +87,6 @@ export class F3xComponent implements OnInit {
     if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
-    }
-
-    if (this.transactionType) {
-      console.log('transactionType: ', this.transactionType);
     }
   }
 
@@ -158,7 +152,6 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
-      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
@@ -186,10 +179,9 @@ export class F3xComponent implements OnInit {
         this._setCoverageDates(e.reportTypeRadio);
       } else if (typeof e.form === 'string') {
         if (e.form === '3x') {
-          console.log('e:', e);
-          this.transactionType = e.transactionType;
-
-          console.log('this.transactionType: ', this.transactionType);
+          if (typeof e.transactionType === 'string') {
+            this.transactionType = e.transactionType;
+          }
         }
       }
     }
