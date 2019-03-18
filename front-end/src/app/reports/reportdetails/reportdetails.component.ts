@@ -55,11 +55,15 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
   @Input()
   public formType: string;
-  
   @Input()
   public tableType: string;  
+  @Input()
+  public view: string; 
+  @Input()
+  public accesslevel: string;
 
   public reportsModel: Array<reportModel>;
+  public filterReportsModel: Array<reportModel>;
   public totalAmount: number;
   public reportsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
@@ -259,37 +263,28 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("this.currentSortedColumnName", this.currentSortedColumnName);
     console.log("sortedCol", sortedCol);
     
-
-    /*this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending)
-        .subscribe( (res:GetReportsResponse) => {
-      this.reportsModel = res.reports;
-      //this.totalAmount = res.totalAmount;
-      //this.config.totalItems = res.totalTransactionCount;
-      this.allTransactionsSelected = false;
-    });  */
-
-
-    this._formsService.getReports(this.formType, page, this.config.itemsPerPage,
+    console.log ("view",this.view);
+    this._formsService.getReports(this.formType, this.view, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetReportsResponse) => {
         console.log("getReportsPage res", res);
         
         console.log("getReportsPage res.reports", res.reports);
-        
+
         this.reportsModel = [];
         //const reportsModel = this._formsService.mapFromServerFields(res.reports,
           //this.reportsModel);
 
         const reportsModel = this._formsService.mapFromServerFields(res,
-            this.reportsModel);
+           this.reportsModel);
 
-        console.log("getReportsPage reportsModel", reportsModel);
 
-        this.config.totalItems = reportsModel.length;
+        console.log("getReportsPage reportsModel", this.reportsModel);
+
+        this.config.totalItems = this.reportsModel.length;
 
         this.reportsModel = this._formsService.sortTransactions(
-          reportsModel, this.currentSortedColumnName, sortedCol.descending);
+          this.reportsModel, this.currentSortedColumnName, sortedCol.descending);
       
         this.allTransactionsSelected = false;
       });
@@ -544,7 +539,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * View all transactions selected by the user.
    */
   public viewAllSelected() : void {
-    alert("View all transactions is not yet supported");
+    alert("View all reports is not yet supported");
   } 
 
 
@@ -552,7 +547,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Print all transactions selected by the user.
    */
   public printAllSelected() : void {
-    alert("Print all transactions is not yet supported");
+    alert("Print all reports is not yet supported");
   }  
 
 
@@ -561,7 +556,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Trash all transactions selected by the user.
    */
   public trashAllSelected() : void {
-    alert("Trash all transactions is not yet supported");
+    alert("Trash all reports is not yet supported");
   }  
 
 
@@ -572,7 +567,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to view
    */
   public viewTransaction() : void {
-    alert("View transaction is not yet supported");
+    alert("View reports is not yet supported");
   } 
 
 
@@ -582,7 +577,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to edit
    */
   public editTransaction() : void {
-    alert("Edit transaction is not yet supported");
+    alert("Edit reports is not yet supported");
   }  
 
 
@@ -592,7 +587,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to trash
    */
   public trashTransaction() : void {
-    alert("Trash transaction is not yet supported");
+    alert("Trash reports is not yet supported");
   }  
 
 

@@ -777,26 +777,45 @@ def get_rad_analyst_info(request):
 @api_view(['GET'])
 def get_form99list(request):
     """
-    API that provides all the reports for a specific committee. FNE-608 SPRINT 8
+    API that provides all the reports for a specific committee
     """
     if request.method == 'GET':
         try:
             cmte_id = request.user.username
+            viewtype = request.query_params.get('view')
+            print ("[cmte_id]", cmte_id)
+            print ("[viewtype]", viewtype)
+
             forms_obj = None
             with connection.cursor() as cursor:
 
+                query_string =  """SELECT json_agg(t) FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
+                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                        END AS viewtype
+                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                    ) t1
+                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+
+                #print("query_string = ", query_string)
                 # Pull reports from reports_view
-                cursor.execute("""SELECT json_agg(t) FROM (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date
-                                    FROM public.reports_view WHERE cmte_id = %s) t; """, [cmte_id])
+                #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
+            
+                cursor.execute(query_string, [cmte_id, viewtype])
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj=data_row[0]
             if forms_obj is None:
                 forms_obj = []
         except Exception as e:
+            print (str(e))
             return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
         return Response(forms_obj, status=status.HTTP_200_OK)
+
 
 #API to delete saved forms
 @api_view(['POST'])
