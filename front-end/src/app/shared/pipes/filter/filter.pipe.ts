@@ -3,6 +3,7 @@ import { Pipe, PipeTransform, Injectable } from '@angular/core';
 export enum FilterTypeEnum {
     contains = 'contains',
     startswith = 'startsWith',
+    exact = 'exact',
     empty = ''
 }
 
@@ -135,6 +136,12 @@ export class FilterPipe implements PipeTransform {
                 } else {
                     return false;
                 }
+            case FilterTypeEnum.exact:
+                if (this.isMatchedExact(itemNode, value)) {
+                    return true;
+                } else {
+                    return false;
+                }
             default:
                 return false;
         }
@@ -189,6 +196,36 @@ export class FilterPipe implements PipeTransform {
                 }
             case 'number':
                 if (itemNode.toString().startsWith(value)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            // TODO add support for date and/or timestamp
+            default:
+                return false;
+        }
+    }
+
+
+    /**
+     * Determine if there the array node is an exact match of the search string.
+     *
+     * @param itemNode node from item in the array to compare with the value
+     * @param value the search string
+     * @returns true if the itemNode is an exact match
+     */
+    private isMatchedExact(itemNode: any, value: string): boolean {
+        const itemType: string = this.determineObjectType(itemNode);
+        switch (itemType) {
+            case 'string':
+
+                if (itemNode.toLowerCase() === value.toLowerCase()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            case 'number':
+                if (itemNode.toString() === value.toLowerCase().valueOf()) {
                     return true;
                 } else {
                     return false;

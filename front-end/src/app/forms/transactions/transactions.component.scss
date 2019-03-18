@@ -12,6 +12,8 @@
     flex-grow: 1;
     display: none;
     padding-left: 0;
+    vertical-align: top;
+    padding-top: 1.5em;
     @include media(tablet) {
       display: none;
     }
@@ -58,6 +60,12 @@
     .transactions__btn-container {
       height: 100%;
       padding: 1em;
+    }
+
+    .transactions__btn-search-filter {
+      margin: 0 3px;
+      background-color: $shuttleGray;
+      color: $white;
     }
 
     .transactions__trx-btn {

@@ -20,7 +20,7 @@ import { TransactionFilterModel } from '../model/transaction-filter.model';
   selector: 'app-transactions-table',
   templateUrl: './transactions-table.component.html',
   styleUrls: [
-    './transactions-table.component.scss', 
+    './transactions-table.component.scss',
     '../../../shared/partials/confirm-modal/confirm-modal.component.scss'
   ],
   encapsulation: ViewEncapsulation.None,
@@ -60,8 +60,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
-  public filters: TransactionFilterModel;
 
+  private filters: TransactionFilterModel;
+  // private keywords = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
@@ -80,7 +81,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private readonly recyclePageLSK =
     'transactions.recycle.page';
   private readonly filtersLSK =
-   'transactions.filters';
+    'transactions.filters';
 
   /**.
 	 * Array of columns to be made sortable.
@@ -104,11 +105,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private showPinColumnsSubscription: Subscription;
 
+
   /**
-   * Subscription for applying filters to the transactions obtained from
-   * the server.
+   * Subscription for running the keyword and filter search
+   * to the transactions obtained from the server.
    */
-  private applyFiltersSubscription: Subscription;
+  private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
   private readonly maxColumnOption = 5;
@@ -121,19 +123,26 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
-      message => {
-        this.showPinColumns();
-      }
-    );
-    this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
+    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage()
       .subscribe(
-      (filters: TransactionFilterModel) => {
-        this.filters = filters;
-        this.formType = filters.formType;
-        this.getPage(this.config.currentPage);
-      }
-    );
+        message => {
+          this.showPinColumns();
+        }
+      );
+
+    this.keywordFilterSearchSubscription = this._transactionsMessageService.getDoKeywordFilterSearchMessage()
+      .subscribe(
+        (filters: TransactionFilterModel) => {
+
+          if (filters) {
+            this.filters = filters;
+            if (filters.formType) {
+              this.formType = filters.formType;
+            }
+          }
+          this.getPage(this.config.currentPage);
+        }
+      );
   }
 
 
@@ -162,12 +171,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * When component is destroyed, save off user column options to be applied upon return.
+   * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
-    this.applyFiltersSubscription.unsubscribe();
+    this.keywordFilterSearchSubscription.unsubscribe();
   }
 
 
@@ -211,13 +220,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
+        this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyRestoredTransaction(res);
         this._transactionsService.mockApplyFilters(res, this.filters);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
         this.transactionsModel = this._transactionsService.sortTransactions(
-            transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
 
         this.totalAmount = res.totalAmount;
         this.config.totalItems = res.totalTransactionCount;
@@ -241,6 +251,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
+        this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -556,15 +567,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     this._dialogService
       .confirm('You are about to restore transaction ' + trx.transactionId + '.',
-          ConfirmModalComponent,
-          'Caution!')
+        ConfirmModalComponent,
+        'Caution!')
       .then(res => {
         if (res === 'okay') {
           this._transactionsService.restoreTransaction(trx)
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService
-              .confirm('Transaction ' + trx.transactionId + ' has been restored!',
+                .confirm('Transaction ' + trx.transactionId + ' has been restored!',
                   ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
             });
         } else if (res === 'cancel') {
@@ -685,7 +696,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     console.log('this.bulkActionCounter = ' + this.bulkActionCounter);
     this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
   }
-  
+
 
   /**
    * Get cached values from session.
@@ -820,7 +831,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param pageKey current page key from the cache
    */
   private setCacheValuesforView(columnsKey: string, sortedColKey: string,
-      pageKey: string) {
+    pageKey: string) {
 
     // shared between trx and recycle tables
     localStorage.setItem(columnsKey,

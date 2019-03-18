@@ -73,7 +73,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public isHideMemoFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
-  public searchFilter = '';
+  public filterCategoriesText = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
   public filterDateFrom: Date = null;
@@ -88,8 +88,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
   constructor(
     private _transactionsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService,
-    private _orderByPipe: OrderByPipe
+    private _transactionsMessageService: TransactionsMessageService
   ) {}
 
 
@@ -98,7 +97,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public ngOnInit(): void {
 
-
+    this.filterDateFrom = null;
+    this.filterDateTo = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -180,9 +180,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     const filters = new TransactionFilterModel();
     let modified = false;
     filters.formType = this.formType;
-    filters.searchFilter = this.searchFilter;
-    modified = this.searchFilter.length > 0;
 
+    // states
     const filterStates = [];
     for (const s of this.states) {
       if (s.selected) {
@@ -192,7 +191,13 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     filters.filterStates = filterStates;
 
+    // type/category
     const filterCategories = [];
+    // type input can be checkbox or input text
+    if (this.filterCategoriesText.length > 0) {
+      modified = true;
+      filterCategories.push(this.filterCategoriesText); // TODO use code with backend
+    }
     for (const category of this.transactionCategories) {
       if (category.options) {
         for (const option of category.options) {
@@ -204,6 +209,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       }
     }
     filters.filterCategories = filterCategories;
+    filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
@@ -240,7 +246,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     this.initValidationErrors();
 
-    this.searchFilter = '';
+    this.filterCategoriesText = '';
     for (const s of this.states) {
       s.selected = false;
     }
@@ -358,7 +364,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {
-        this.searchFilter = this.cachedFilters.searchFilter;
+        this.filterCategoriesText = this.cachedFilters.filterCategoriesText;
+        if (this.filterCategoriesText) {
+          this.isHideTypeFilter = !(this.filterCategoriesText.length > 0);
+        }
 
         this.filterAmountMin = this.cachedFilters.filterAmountMin;
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
@@ -366,7 +375,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;

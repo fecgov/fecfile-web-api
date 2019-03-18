@@ -1,14 +1,12 @@
 <div class="transactions__main-container">
   <div class="transactions__sidebar">
     <div class="transactions__sidebar_categories">
-      <!-- <transaction-categories-sidebar [@fadeInOut] *ngIf="!isShowFilters"  -->
       <transaction-categories-sidebar [hidden]="isShowFilters"
         title="Transaction Categories"
         (status)='onNotify($event)'>
       </transaction-categories-sidebar>
     </div>
     <div class="transactions__sidebar_filters">
-      <!-- <app-transactions-filter-sidebar [@fadeInOut] *ngIf="isShowFilters"  -->
       <app-transactions-filter-sidebar [hidden]="!isShowFilters" 
         title="Filters"
         [formType]="formType">
@@ -34,57 +32,81 @@
       </div>
       <hr />
     </header>
-    <div [@fadeInOut] *ngIf="isTransactionViewActive()">
-    <!-- <div [@fadeInOut] [hidden]="!isTransactionViewActive()"> -->
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <div class="transactions__btn-container">
-            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showPinColumns()">
-              <i class="thumbtack-icon"></i>
-              Pin Columns
-            </button>
-            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showRecycleBin()">
-              <i class="trash-icon"></i>
-              Recycle Bin
-            </button>
-            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="doImport()">
-              <i class="file-import-icon"></i>
-              Import
-            </button>
-            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
-              <i class="filter-icon"></i>
-              Filter
-            </button>
-            <div class="input-group pl-0 transactions__trx-search">
-              <input class="form-control py-1" type="text" placeholder="Search by Transaction" aria-label="Search">
-              <div class="input-group-append">
-                <span class="input-group-text" id="">
-                  <i class="search-icon text-grey" aria-hidden="true"></i>
-                </span>
-              </div>
+    <div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="transactions__btn-container">
+              <button [@fadeInOut] *ngIf="isTransactionViewActive()"
+                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showPinColumns()">
+                <i class="thumbtack-icon"></i>
+                Pin Columns
+              </button>
+              <button [@fadeInOut] *ngIf="isTransactionViewActive()"
+                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showRecycleBin()">
+                <i class="trash-icon"></i>
+                Recycle Bin
+              </button>
+              <button [@fadeInOut] *ngIf="isTransactionViewActive()"
+                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="doImport()">
+                <i class="file-import-icon"></i>
+                Import
+              </button>
+              <button [@fadeInOut] *ngIf="isTransactionViewActive()"
+                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
+                <i class="filter-icon"></i>
+                Filter
+              </button>
+              <button [@fadeInOut] *ngIf="isRecycleBinViewActive()"
+                  class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showTransactions()">
+                  <i class="table-icon"></i>
+                  Transactions
+              </button>
+              <button [@fadeInOut] *ngIf="isRecycleBinViewActive()"
+                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
+                <i class="filter-icon"></i>
+                Filter
+              </button>               
+              <div class="input-group pl-0 transactions__trx-search">
+                <div class="input-group-append" (click)="clearSearch()" 
+                    ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
+                  <span class="input-group-text" id="">
+                    <i class="fas fa-eraser text-grey" aria-hidden="true"></i>
+                  </span>
+                </div>                
+                <input class="form-control py-1" type="text" placeholder="Search All" 
+                  [(ngModel)]="searchText" aria-label="Search">
+                <div class="input-group-append" (click)="search()"
+                    ngbTooltip="Search All" tooltipClass="form-tooltip">
+                  <span class="input-group-text" id="">
+                    <i class="search-icon text-grey" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>              
             </div>
           </div>
         </div>
-      </div>
-      <app-transactions-table 
-        forType="3X" 
-        tableType="{{transactionsView}}">
-      </app-transactions-table>
-    </div>
-    <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
-    <!-- <div [@fadeInOut] [hidden]="!isRecycleBinViewActive()"> -->
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <div class="transactions__btn-container">
-            <button class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showTransactions()">
-              <i class="table-icon"></i>
-              Transactions
-            </button>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="transactions__btn-container">
+              <button *ngFor="let searchTextItem of searchTextArray; let i = index" 
+                class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                (click)="removeSearchText(i)">
+                <i class="fas fa-window-close"></i>
+                {{ searchTextItem }}
+              </button>
+            </div>          
           </div>
         </div>
+        <app-transactions-table 
+          *ngIf="isTransactionViewActive()"
+          formType="{{formType}}" 
+          tableType="{{transactionsView}}">
+        </app-transactions-table>
+        <app-transactions-table
+          *ngIf="isRecycleBinViewActive()"
+          formType="{{formType}}" 
+          tableType="{{recycleBinView}}">
+        </app-transactions-table>                
       </div>
-      <app-transactions-table forType="3X" tableType="{{recycleBinView}}">
-      </app-transactions-table>
-    </div>
   </div>
 </div>

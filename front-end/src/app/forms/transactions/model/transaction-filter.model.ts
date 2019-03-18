@@ -5,14 +5,15 @@ export class TransactionFilterModel {
 
     show: boolean;
     formType: string;
-    searchFilter: string;
     filterStates: string[];
+    filterCategoriesText: string;
     filterCategories: string[];
     filterAmountMin: number;
     filterAmountMax: number;
     filterDateFrom: Date;
     filterDateTo: Date;
     filterMemoCode: boolean;
+    keywords: string[] = [];
 
     constructor() {
     }
