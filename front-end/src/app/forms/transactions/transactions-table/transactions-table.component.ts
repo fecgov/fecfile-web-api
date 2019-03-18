@@ -251,6 +251,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
+        this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 

@@ -97,6 +97,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public ngOnInit(): void {
 
+    this.filterDateFrom = null;
+    this.filterDateTo = null;
+
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
     this.isHideAmountFilter = true;
@@ -372,7 +375,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;

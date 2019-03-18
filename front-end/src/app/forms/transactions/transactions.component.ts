@@ -77,6 +77,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       if (filters.keywords) {
         if (filters.keywords.length > 0) {
           this.searchTextArray = filters.keywords;
+          filters.show = true;
         }
       }
     } else {
@@ -112,6 +113,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.searchText = '';
     }
     this.doSearch();
+    this.showFilters();
   }
 
 

@@ -13,7 +13,7 @@ export class TransactionFilterModel {
     filterDateFrom: Date;
     filterDateTo: Date;
     filterMemoCode: boolean;
-    keywords = [];
+    keywords: string[] = [];
 
     constructor() {
     }
