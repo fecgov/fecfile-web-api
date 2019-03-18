@@ -15,7 +15,7 @@
         <div class="card-body" 
             [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
           <div class="input-group py-1">
-            <input class="form-control" [(ngModel)]="searchFilter" type="text" 
+            <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
               placeholder="Search Type" aria-label="Search">
           </div>            
           <div class="transactions__filter-type-list-body">

@@ -1,7 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewChild, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TransactionsTableComponent } from './transactions-table/transactions-table.component';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
 import { Subscription } from 'rxjs/Subscription';
@@ -31,7 +30,7 @@ export enum ActiveView {
     ])
   ]
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent implements OnInit, OnDestroy {
 
   public formType = '';
   public view: string = ActiveView.transactions;
@@ -75,12 +74,25 @@ export class TransactionsComponent implements OnInit {
     let filters: TransactionFilterModel;
     if (filtersJson != null) {
       filters = JSON.parse(filtersJson);
+      if (filters.keywords) {
+        if (filters.keywords.length > 0) {
+          this.searchTextArray = filters.keywords;
+        }
+      }
     } else {
       filters = new TransactionFilterModel();
     }
     if (filters.show === true) {
       this.showFilters();
     }
+  }
+
+
+  /**
+   * A method to run when component is destroyed.
+   */
+  public ngOnDestroy(): void {
+    this.applyFiltersSubscription.unsubscribe();
   }
 
 
@@ -190,7 +202,7 @@ export class TransactionsComponent implements OnInit {
 
 
   /**
-   * The subscriber to run the search.
+   * Send a message to the subscriber to run the search.
    */
   private doSearch() {
     this.filters.keywords = this.searchTextArray;

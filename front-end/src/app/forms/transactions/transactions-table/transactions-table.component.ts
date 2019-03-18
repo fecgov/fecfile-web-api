@@ -105,11 +105,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private showPinColumnsSubscription: Subscription;
 
-  /**
-   * Subscription for applying filters to the transactions obtained from
-   * the server.
-   */
-  private applyFiltersSubscription: Subscription;
 
   /**
    * Subscription for running the keyword and filter search
@@ -134,15 +129,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.showPinColumns();
         }
       );
-      
-    // this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
-    //   .subscribe(
-    //     (filters: TransactionFilterModel) => {
-    //       this.filters = filters;
-    //       this.formType = filters.formType;
-    //       this.getPage(this.config.currentPage);
-    //     }
-    //   );
 
     this.keywordFilterSearchSubscription = this._transactionsMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
@@ -185,12 +171,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * When component is destroyed, save off user column options to be applied upon return.
+   * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
-    this.applyFiltersSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
   }
 
@@ -235,6 +220,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
+        this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyRestoredTransaction(res);
         this._transactionsService.mockApplyFilters(res, this.filters);
 

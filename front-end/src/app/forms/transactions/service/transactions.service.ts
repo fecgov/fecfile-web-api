@@ -9,6 +9,7 @@ import { TransactionModel } from '../model/transaction.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
+import { DatePipe } from '@angular/common';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -178,6 +179,14 @@ export class TransactionsService {
   }
 
 
+  public mockAddUIFileds(response: any) {
+    for (const trx of response.transactions) {
+      trx.transaction_amount_ui = `$${trx.transaction_amount}`;
+      trx.transaction_date_ui = new DatePipe('en-US').transform(trx.transaction_date, 'MM/dd/yyyy');
+    }
+  }
+
+
   /**
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
@@ -212,12 +221,11 @@ export class TransactionsService {
         // non string properties: 'transaction_date', 'aggregate', 'transaction_amount',
         const fields = [ 'city', 'employer', 'occupation',
           'memo_code', 'memo_text', 'name', 'purpose_description', 'state',
-          'street_1', 'transaction_id', 'transaction_type_desc', 'zip_code'];
+          'street_1', 'transaction_id', 'transaction_type_desc', 'zip_code', 
+          'transaction_amount_ui', 'transaction_date_ui'];
 
-        // let filteredKeywordArray = [];
         for (const keyword of filters.keywords) {
           const filtered = this._filterPipe.transform(response.transactions, fields, keyword);
-          // filteredKeywordArray = filteredKeywordArray.concat(filtered);
 
           // NOTE: In keyword search, every transaction must have all keywords - AND boolean search.
           // The filters are a subset of the keyword search. Any transaction with the given value for the specific
@@ -440,29 +448,29 @@ export class TransactionsService {
 
 
   /**
-   * Get trans
-   * @param form_type
+   * Get transaction category types
+   * 
+   * @param formType
    */
-  public getTransactionCategories( form_type: string): Observable<any> {
+  public getTransactionCategories(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
-    url = '/core/get_transaction_categories?form_type=F3X';
+    url = '/core/get_transaction_categories';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('form_type', 'F3X');
+    params = params.append('form_type', `F${formType}`);
 
     return this._http
        .get(
           `${environment.apiUrl}${url}`,
           {
-           /* headers: httpOptions,
-            params*/
-            headers: httpOptions/*  */
+            params,
+            headers: httpOptions
           }
        );
   }

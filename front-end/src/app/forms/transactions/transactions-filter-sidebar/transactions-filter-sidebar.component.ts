@@ -73,7 +73,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public isHideMemoFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
-  public searchFilter = '';
+  public filterCategoriesText = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
   public filterDateFrom: Date = null;
@@ -85,13 +85,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
-  private filterTypeScrollTarget: any;
-  private filterStateScrollTarget: any;
 
   constructor(
     private _transactionsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService,
-    private _orderByPipe: OrderByPipe
+    private _transactionsMessageService: TransactionsMessageService
   ) {}
 
 
@@ -99,8 +96,6 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * Initialize the component.
    */
   public ngOnInit(): void {
-
-
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -168,31 +163,6 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
   }
 
-  // public typeClick(event: any) {
-  //   if (event.currentTarget.checked) {
-  //     this.filterTypeScrollTarget = event.currentTarget;
-  //   }
-  // }
-
-  // public stateClick(event: any) {
-  //   if (event.currentTarget.checked) {
-  //     this.filterStateScrollTarget = event.currentTarget;
-  //   }
-  // }
-
-  // public scroll() {
-
-  //   // TODO need to support scroll to multiple elements.
-  //   if (this.filterTypeScrollTarget &&  this.filterStateScrollTarget) {
-  //     this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-  //   } else if (this.filterTypeScrollTarget) {
-  //     this.filterTypeScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-  //   } else if (this.filterStateScrollTarget) {
-  //     this.filterStateScrollTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-  //   } else {
-  //   }
-  // }
-
 
   /**
    * Send filter values to the table transactions component.
@@ -221,10 +191,9 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     // type/category
     const filterCategories = [];
     // type input can be checkbox or input text
-    if (this.searchFilter.length > 0) {
-      // filters.searchFilter = this.searchFilter;
+    if (this.filterCategoriesText.length > 0) {
       modified = true;
-      filterCategories.push(this.searchFilter); // TODO use code with backend
+      filterCategories.push(this.filterCategoriesText); // TODO use code with backend
     }
     for (const category of this.transactionCategories) {
       if (category.options) {
@@ -237,6 +206,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       }
     }
     filters.filterCategories = filterCategories;
+    filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
@@ -273,7 +243,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     this.initValidationErrors();
 
-    this.searchFilter = '';
+    this.filterCategoriesText = '';
     for (const s of this.states) {
       s.selected = false;
     }
@@ -391,7 +361,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {
-        this.searchFilter = this.cachedFilters.searchFilter;
+        this.filterCategoriesText = this.cachedFilters.filterCategoriesText;
+        if (this.filterCategoriesText) {
+          this.isHideTypeFilter = !(this.filterCategoriesText.length > 0);
+        }
 
         this.filterAmountMin = this.cachedFilters.filterAmountMin;
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
