@@ -72,10 +72,7 @@ export class TransactionTypeComponent implements OnInit {
    * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
   public doValidateOption(): boolean {
-    console.log('doValidateOption: ');
-    console.log('this.frmOption: ', this.frmOption);
     this.frmSubmitted = true;
-    console.log('this.frmSubmitted: ', this.frmSubmitted);
     if (this.childOptions.length >= 1) {
       this.parentOptionFailed = false;
       if (this.frmOption.invalid) {
