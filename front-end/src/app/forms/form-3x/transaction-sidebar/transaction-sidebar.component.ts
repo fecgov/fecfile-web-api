@@ -17,6 +17,7 @@ export class TransactionSidebarComponent implements OnInit {
   @Input() transactionCategories: any = [];
 
 
+
   private _formType: string = '';
 
   constructor(

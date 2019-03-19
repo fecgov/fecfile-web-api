@@ -58,9 +58,6 @@ export class ReportTypeService {
 
     const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`Form_3X_Report_Type`));
 
-    console.log('form3xReportType: ', form3xReportType);
-
-    console.log("Save Report form3xReportType ", form3xReportType);
     formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F3X`);
     formData.append('amend_ind', form3xReportType.amend_Indicator);
@@ -71,8 +68,6 @@ export class ReportTypeService {
     formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
     formData.append('coh_bop', form3xReportType.coh_bop);
-
-    console.log(" saveReport formData ",formData );
 
     return this._http
         .post(

@@ -38,7 +38,7 @@
                 You must select a report type for filing.
               </div>
               <div class="text-error text-center"
-                *ngIf="((frmReportType.dity || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected)">
+                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected)">
                 You must select coverage dates.
               </div>
 
@@ -53,6 +53,7 @@
                 type="radio"
                 name="reportTypeRadio"
                 [value]="committeeReportType.report_type"
+                [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
                 [checked]="committeeReportType.report_type === reportTypeSelected"
                 (change)="updateTypeSelected($event)"
                 formControlName="reportTypeRadio"
@@ -98,4 +99,3 @@
       </footer>
     </form>
   </div>
-

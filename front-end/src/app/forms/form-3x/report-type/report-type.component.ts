@@ -20,6 +20,7 @@ export class ReportTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
+  @Input() selectedReportInfo: any = {};
 
   public frmReportType: FormGroup;
   public fromDateSelected: boolean = false;
@@ -92,62 +93,61 @@ export class ReportTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    this._messageService
-      .getMessage()
-      .subscribe(res => {
-        if (typeof res.form === 'string') {
-          if (res.form === '3x') {
-            if (typeof res.toDate === 'string') {
-              if (res.toDate.length >= 1) {
-                this.toDateSelected = true;
-                this._toDateSelected = res.toDate;
-              } else {
-                this.toDateSelected = false;
-              }
-            }
-            if (typeof res.fromDate === 'string') {
-              if (res.fromDate.length >= 1) {
-                this._fromDateSelected = res.fromDate;
-                this.fromDateSelected = true;
-              } else {
-                this.fromDateSelected = false;
-              }
-            }
-
-            if (typeof res.selectedState === 'string') {
-              if (res.selectedState.length >= 1) {
-                this._selectedElectionState = res.selectedState;
-              }
-            } else {
-              this._selectedElectionState = null;
-            }
-
-            if (typeof res.selectedElectionDate === 'string') {
-              if (res.selectedElectionDate.length >= 1) {
-                this._selectedElectionDate = res.selectedElectionDate;
-              }
-            } else {
-              this._selectedElectionDate = null;
-            }
-
-            if (typeof res.dueDate === 'string') {
-              if (res.dueDate.length >= 1) {
-                this._dueDate = res.dueDate;
-              }
-            } else {
-              this._dueDate = null;
-            }
-
-            if (typeof res.reportTypeDescription === 'string') {
-              if (res.reportTypeDescription.length >= 1) {
-                this._reportTypeDescripton = res.reportTypeDescription;
-              }
-            } else {
-              this._reportTypeDescripton = null;
-            }
+    if (this.selectedReportInfo) {
+      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
+        if (typeof this.selectedReportInfo.toDate === 'string') {
+          if (this.selectedReportInfo.toDate.length >= 1) {
+            this._toDateSelected = this.selectedReportInfo.toDate;
+            this.toDateSelected = true;
+          } else {
+            this.toDateSelected = false;
           }
+        } else {
+          this.toDateSelected = false;
         }
-      });
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
+        if (typeof this.selectedReportInfo.fromDate === 'string') {
+          if (this.selectedReportInfo.fromDate.length >= 1) {
+            this._fromDateSelected = this.selectedReportInfo.fromDate;
+            this.fromDateSelected = true;
+          } else {
+            this.fromDateSelected = false;
+          }
+        } else {
+          this.fromDateSelected = false;
+        }
+      }
+
+      if (typeof this.selectedReportInfo.selectedState === 'string') {
+        this._selectedElectionState = this.selectedReportInfo.selectedState;
+      } else {
+        this._selectedElectionState = null;
+      }
+
+      if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
+        this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
+      } else {
+        this._selectedElectionDate = null;
+      }
+
+      if (typeof this.selectedReportInfo.dueDate === 'string') {
+        if (this.selectedReportInfo.dueDate.length >= 1) {
+          this._dueDate = this.selectedReportInfo.dueDate;
+        }
+      } else {
+        this._dueDate = null;
+      }
+
+      if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
+        if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
+          this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+        }
+      } else {
+        this._reportTypeDescripton = null;
+      }
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -173,9 +173,19 @@ export class ReportTypeComponent implements OnInit {
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
+      let dataReportType: string = e.target.getAttribute('data-report-type');
+
+      if (dataReportType !== 'S') {
+        this.toDateSelected = true;
+        this.fromDateSelected = true;
+      } else {
+        this.toDateSelected = false;
+        this.fromDateSelected = false;
+      }
 
       this.status.emit({
-        reportTypeRadio: this.reportTypeSelected
+        'form': '3x',
+        'reportTypeRadio': this.reportTypeSelected
       });
     } else {
       this.reportTypeSelected = '';
@@ -191,6 +201,9 @@ export class ReportTypeComponent implements OnInit {
     if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
+        console.log('((frmReportType.dity || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected): ', ((this.frmReportType.dirty || this.frmReportType.touched) && !this.optionFailed && !this.fromDateSelected && !this.toDateSelected));
+
+        // if ()
 
         this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
@@ -202,8 +215,6 @@ export class ReportTypeComponent implements OnInit {
         this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
         this._form3xReportTypeDetails.dueDate = this._dueDate;
         this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
-
-        console.log('this._form3xReportTypeDetails: ', this._form3xReportTypeDetails);
 
         localStorage.setItem('Form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
 

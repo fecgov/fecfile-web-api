@@ -34,6 +34,7 @@ export class F3xComponent implements OnInit {
   public selectedReport: any = null;
   public regularReports: boolean = false;
   public specialReports: boolean = false;
+  public selectedReportInfo: any = {};
   public transactionCategories: any = [];
   public transactionType: string = '';
 
@@ -156,34 +157,45 @@ export class F3xComponent implements OnInit {
        * This block indicates a user can move to the next
        * step or previous step in a form.
        */
-      if (typeof e.form === 'object') {
+       if (e.hasOwnProperty('form')) {
+         if (typeof e.form === 'object') {
+          this.frm = e.form;
 
-        this.frm = e.form;
+          this.direction = e.direction;
 
-        this.direction = e.direction;
+          this.previousStep = e.previousStep;
 
-        this.previousStep = e.previousStep;
+          this._step = e.step;
 
-        this._step = e.step;
+          this.currentStep = e.step;
 
-        this.currentStep = e.step;
+          this.canContinue();
+         } else if (typeof e.form === 'string') {
+           if (e.form === '3x') {
+            if (e.hasOwnProperty('reportTypeRadio')) {
+              if (typeof e.reportTypeRadio === 'string') {
+               this._setCoverageDates(e.reportTypeRadio);
+              }
+            } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
+               this.selectedReportInfo = e;
+            } else if (e.hasOwnProperty('transactionType')) {
+              if (typeof e.transactionType === 'string') {
+                this.transactionType = e.transactionType;
+              }
+            }
+           }
+         }
+       } else if (e.hasOwnProperty('direction')) {
+         if (typeof e.direction === 'string') {
+            if (e.direction === 'previous') {
+              this.direction = e.direction;
 
-        this.canContinue();
-      } else if (e.direction === 'previous') {
-        this.direction = e.direction;
+              this.previousStep = e.previousStep;
 
-        this.previousStep = e.previousStep;
-
-        this._step = e.step;
-      } else if (typeof e.reportTypeRadio === 'string') {
-        this._setCoverageDates(e.reportTypeRadio);
-      } else if (typeof e.form === 'string') {
-        if (e.form === '3x') {
-          if (typeof e.transactionType === 'string') {
-            this.transactionType = e.transactionType;
-          }
-        }
-      }
+              this._step = e.step;
+            }
+         }
+       }
     }
   }
 

@@ -112,6 +112,7 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   private _setTransactionCategories(): void {
+    console.log('_setTransactionCategories: ');
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
 
     this.childOptions = this.mainTransactionCategory[0].options;
