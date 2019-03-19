@@ -44,15 +44,16 @@ import { TransactionsService } from '../service/transactions.service';
       })),
       state('closed', style({
         'max-height': '0',
-        overflow: 'hidden',
+        // overflow: 'hidden',
+        'overflow-y': 'scroll',
         display: 'none',
         backgroundColor: '#AEB0B5'
       })),
       transition('open => closed', [
-        animate('.25s ease')
+        animate('.25s ease') // not working in Edge
       ]),
       transition('closed => open', [
-        animate('.5s ease')
+        animate('.5s ease') // not working in Edge
       ]),
     ]),
   ]

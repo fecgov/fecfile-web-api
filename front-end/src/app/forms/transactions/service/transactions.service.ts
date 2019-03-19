@@ -127,6 +127,7 @@ export class TransactionsService {
       model.contributorOccupation = row.occupation;
       model.memoCode = row.memo_code;
       model.memoText = row.memo_text;
+      model.deletedDate = row.deleted_date ? row.deleted_date : null;
       modelArray.push(model);
     }
     return modelArray;
@@ -446,7 +447,8 @@ export class TransactionsService {
     t1.occupation = 'Lawyer';
     const date = new Date('2019-01-01');
     t1.transaction_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    t1.deleted_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    const deletedDate = new Date('2019-03-15');
+    t1.deleted_date = deletedDate.getFullYear() + '-' + (deletedDate.getMonth() + 1) + '-' + deletedDate.getDate();
     t1.memo_code = 'Memo Code';
     t1.memo_text = 'The memo text';
     t1.name = 'Mr. John Doe';
