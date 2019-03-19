@@ -1,6 +1,6 @@
 <div class="forms__wizard" >
  
-  <div class="form__sidebar" >
+  <div class="form__sidebar" *ngIf="showSideBar">
      <app-reportsidebar
           title="Report Coverage Dates"
           (status)='onNotify($event)'
@@ -15,8 +15,14 @@
                    <h2 class="pb-3 pt-3 border-bottom"><B>Reports</B>
                       <span class="float-right">
 
-                    <button type="button" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button> &nbsp;&nbsp;&nbsp;
-                      <button type="button" class="btn btn-primary"><i class="fas fa-recycle"></i> Recycle</button>                    
+                    <button  class="btn btn-primary" (click)="showFilter()">
+                    <i class="fas fa-filter"></i> Filter
+                    </button> &nbsp;&nbsp;&nbsp;
+
+                    <button class="btn btn-primary" (click)="recycleReports()">
+                    <i class="fas fa-recycle"></i> Recycle
+                    </button>      
+
                     </span>
                     </h2>
                     <ngb-tabset type="pills" width=200px>
