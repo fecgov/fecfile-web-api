@@ -68,6 +68,8 @@ export class F3xComponent implements OnInit {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
 
+            console.log('this.reportType: ', this.reportTypes);
+
             this.reportsLoading = false;
 
             this._setReports();

@@ -94,6 +94,8 @@ export class ReportTypeComponent implements OnInit {
       amend_Indicator: '',
       coh_bop: '0'
     };
+
+    console.log('this.frmReportType: ', this.frmReportType);
   }
 
   ngDoCheck(): void {
@@ -154,6 +156,7 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
+
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.screenWidth = event.target.innerWidth;
@@ -173,7 +176,11 @@ export class ReportTypeComponent implements OnInit {
    * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
+    console.log('updateTypeSelected: ');
+    console.log('e: ', e);
+    console.log("this.frmReportType.get('reportTypeRadio').value: ", this.frmReportType.get('reportTypeRadio').value);
     if(e.target.checked) {
+      console.log('checked: ');
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
@@ -250,6 +257,8 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
+
+
   /**
    * Toggles the tooltip.
    *
@@ -261,6 +270,10 @@ export class ReportTypeComponent implements OnInit {
     } else {
       tooltip.open();
     }
+  }
+
+  public log(val) {
+    console.log('val: ', val);
   }
 
   /**

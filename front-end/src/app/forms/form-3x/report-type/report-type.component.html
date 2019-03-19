@@ -47,14 +47,14 @@
             <ul class="options-list">
               <li
                 class="options-list__item"
-                *ngFor="let committeeReportType of committeeReportTypes || async"
+                *ngFor="let committeeReportType of committeeReportTypes  || async"
               >
               <input
                 type="radio"
                 name="reportTypeRadio"
                 [value]="committeeReportType.report_type"
                 [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
-                [checked]="committeeReportType.report_type === reportTypeSelected"
+                [attr.checked]="committeeReportType.report_type === reportTypeSelected"
                 (change)="updateTypeSelected($event)"
                 formControlName="reportTypeRadio"
               />

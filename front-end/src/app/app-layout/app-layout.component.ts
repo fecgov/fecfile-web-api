@@ -105,16 +105,23 @@ export class AppLayoutComponent implements OnInit {
     } else if (route.indexOf('/forms/form/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-        const dueDate: any = new Date(formInfo.dueDate);
         const oneDay: number = 24*60*60*1000;
         const today: any = new Date();
+        const dueDateArr = formInfo.dueDate.split('-');
+        let dueDate: any = '';
+
+        if (formInfo.dueDate.indexOf('2018') === 0) {
+          dueDate = new Date(2019, dueDateArr[1], dueDateArr[2]);
+        } else {
+          dueDate = new Date(dueDateArr[0], dueDateArr[1], dueDateArr[2])
+        }
 
         this.showFormDueDate = true;
         this.formType = formInfo.formType;
         this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
         this.formDescription = formInfo.reportTypeDescription;
-        this.formStartDate = formInfo.cvgStartDate;
-        this.formEndDate = formInfo.cvgEndDate;
+        this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
+        this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
       }
     } else {
         this.showFormDueDate = false;
