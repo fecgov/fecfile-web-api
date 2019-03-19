@@ -227,7 +227,7 @@ def date_format(cvg_date):
     try:
         if cvg_date == None:
             return None
-        cvg_dt = datetime.strptime(cvg_date, '%Y-%m-%d').date()
+        cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
         return cvg_dt
     except:
         raise
