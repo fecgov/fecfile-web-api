@@ -22,11 +22,14 @@ export class AppLayoutComponent implements OnInit {
   public committeeId: string = null;
   public closeResult: string = null;
   public dashboardClass: string = null;
-  public form3XDueDate: string = null;
-  public form3XDueInDays: string = null;
+  public formDueDate: number = null;
+  public formDescription: string = null;
+  public formType: string = null;
+  public formStartDate: string = null;
+  public formEndDate: string = null;
   public radAnalystInfo: any = {};
   public showLegalDisclaimer: boolean = false;
-  public showForm3XDashboard: boolean = false;
+  public showFormDueDate: boolean = false
   public showSideBar: boolean = true;
   public sideBarClass: string = null;
   public toggleMenu: boolean = false;
@@ -85,16 +88,36 @@ export class AppLayoutComponent implements OnInit {
       });
   }
 
-  @HostListener('window:beforeunload', ['$event'])
-  unloadNotification($event: any) {
-    localStorage.clear();
-  }
+  /**
+   * TODO: Figure out why this was placed here.
+   */
+  // @HostListener('window:beforeunload', ['$event'])
+  // unloadNotification($event: any) {
+  //   localStorage.clear();
+  // }
 
   ngDoCheck(): void {
     const route: string = this._router.url;
 
     if (route === '/dashboard') {
       this.sideBarClass = 'dashboard active';
+      this.showFormDueDate = false;
+    } else if (route.indexOf('/forms/form/3X') === 0) {
+      if (localStorage.getItem('form_3X_report_type') !== null) {
+        const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+        const dueDate: any = new Date(formInfo.dueDate);
+        const oneDay: number = 24*60*60*1000;
+        const today: any = new Date();
+
+        this.showFormDueDate = true;
+        this.formType = formInfo.formType;
+        this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
+        this.formDescription = formInfo.reportTypeDescription;
+        this.formStartDate = formInfo.cvgStartDate;
+        this.formEndDate = formInfo.cvgEndDate;
+      }
+    } else {
+        this.showFormDueDate = false;
     }
   }
   /**

@@ -56,7 +56,7 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`Form_3X_Report_Type`));
+    const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_report_type`));
 
     formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F3X`);
@@ -79,8 +79,8 @@ export class ReportTypeService {
         )
         .pipe(map(res => {
             if (res) {
-              localStorage.setItem(`form_${form_type}_Report_Info_Res`, JSON.stringify(res));
-              const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
+              localStorage.setItem(`form_${form_type}_report_info_res`, JSON.stringify(res));
+              const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_reportInfo_res`));
               return res;
             }
             return false;

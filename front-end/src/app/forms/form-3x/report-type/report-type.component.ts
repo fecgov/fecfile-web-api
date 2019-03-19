@@ -57,6 +57,10 @@ export class ReportTypeComponent implements OnInit {
 
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
+      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
+    }
+
     this._messageService
       .clearMessage();
 
@@ -201,9 +205,6 @@ export class ReportTypeComponent implements OnInit {
     if (this.frmReportType.get('reportTypeRadio').value) {
         this.optionFailed = false;
         this.isValidType = true;
-        console.log('((frmReportType.dity || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected): ', ((this.frmReportType.dirty || this.frmReportType.touched) && !this.optionFailed && !this.fromDateSelected && !this.toDateSelected));
-
-        // if ()
 
         this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
@@ -216,7 +217,9 @@ export class ReportTypeComponent implements OnInit {
         this._form3xReportTypeDetails.dueDate = this._dueDate;
         this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
 
-        localStorage.setItem('Form_3X_Report_Type', JSON.stringify(this._form3xReportTypeDetails));
+        console.log('this._form3xReportTypeDetails.dueDate: ', this._form3xReportTypeDetails.dueDate);
+
+        localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
           .saveReport(this._formType)
