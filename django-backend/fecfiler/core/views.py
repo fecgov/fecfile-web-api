@@ -227,7 +227,7 @@ def date_format(cvg_date):
     try:
         if cvg_date == None:
             return None
-        cvg_dt = datetime.strptime(cvg_date, '%Y-%m-%d').date()
+        cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
         return cvg_dt
     except:
         raise
@@ -265,13 +265,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status])                                          
     except Exception:
         raise
 
@@ -420,7 +420,7 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'))
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -519,6 +519,7 @@ def delete_reports(data):
     except:
         raise
 
+
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
@@ -537,8 +538,10 @@ def reports(request):
             else:
                 election_code = None
 
-            date_of_election = check_form_data('date_of_election', request.data)
-            state_of_election = check_form_data('state_of_election', request.data)     
+            if 'status' in request.data:
+                f_status = request.data.get('status')
+            else:
+                f_status = "Saved"
             
             datum = {
                 'cmte_id': request.user.username,
@@ -546,11 +549,12 @@ def reports(request):
                 'amend_ind': amend_ind,
                 'report_type': request.data.get('report_type'),
                 'election_code': election_code,
-                'date_of_election': date_format(date_of_election),
-                'state_of_election': state_of_election,
+                'date_of_election': date_format(request.data.get('date_of_election')),
+                'state_of_election': request.data.get('state_of_election'),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
+                'status': f_status,
             }    
             data = post_reports(datum)
             if type(data) is dict:
@@ -591,16 +595,14 @@ def reports(request):
     if request.method == 'PUT':
 
         try:
-            date_of_election = check_form_data('date_of_election', request.data)
-            state_of_election = check_form_data('state_of_election', request.data)
-             
+            
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
                 'form_type': request.data.get('form_type'),
                 'report_type': request.data.get('report_type'),
-                'date_of_election': date_format(date_of_election),
-                'state_of_election': state_of_election,
+                'date_of_election': date_format(request.data.get('date_of_election')),
+                'state_of_election': request.data.get('state_of_election'),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
@@ -643,6 +645,7 @@ def reports(request):
 END - REPORTS API - CORE APP
 ******************************************************************************************************************************
 """
+        
 """
 ******************************************************************************************************************************
 ENTITIES API- CORE APP - SPRINT 7 - FNE 553 - BY PRAVEEN JINKA

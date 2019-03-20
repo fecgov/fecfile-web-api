@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
+import { TransactionsService } from '../service/transactions.service';
 
 
 /**
@@ -44,15 +44,16 @@ import { ValidationErrorModel } from '../model/validation-error.model';
       })),
       state('closed', style({
         'max-height': '0',
-        overflow: 'hidden',
+        // overflow: 'hidden',
+        'overflow-y': 'scroll',
         display: 'none',
         backgroundColor: '#AEB0B5'
       })),
       transition('open => closed', [
-        animate('.25s ease')
+        animate('.25s ease') // not working in Edge
       ]),
       transition('closed => open', [
-        animate('.5s ease')
+        animate('.5s ease') // not working in Edge
       ]),
     ]),
   ]
@@ -73,7 +74,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public isHideMemoFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
-  public searchFilter = '';
+  public filterCategoriesText = '';
   public filterAmountMin = 0;
   public filterAmountMax = 0;
   public filterDateFrom: Date = null;
@@ -87,9 +88,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
 
   constructor(
-    private _formService: FormsService,
-    private _transactionsMessageService: TransactionsMessageService,
-    private _orderByPipe: OrderByPipe
+    private _transactionsService: TransactionsService,
+    private _transactionsMessageService: TransactionsMessageService
   ) {}
 
 
@@ -98,7 +98,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   public ngOnInit(): void {
 
-
+    this.filterDateFrom = null;
+    this.filterDateTo = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -180,9 +181,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     const filters = new TransactionFilterModel();
     let modified = false;
     filters.formType = this.formType;
-    filters.searchFilter = this.searchFilter;
-    modified = this.searchFilter.length > 0;
 
+    // states
     const filterStates = [];
     for (const s of this.states) {
       if (s.selected) {
@@ -192,7 +192,13 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     }
     filters.filterStates = filterStates;
 
+    // type/category
     const filterCategories = [];
+    // type input can be checkbox or input text
+    if (this.filterCategoriesText.length > 0) {
+      modified = true;
+      filterCategories.push(this.filterCategoriesText); // TODO use code with backend
+    }
     for (const category of this.transactionCategories) {
       if (category.options) {
         for (const option of category.options) {
@@ -204,6 +210,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       }
     }
     filters.filterCategories = filterCategories;
+    filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
@@ -240,7 +247,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     this.initValidationErrors();
 
-    this.searchFilter = '';
+    this.filterCategoriesText = '';
     for (const s of this.states) {
       s.selected = false;
     }
@@ -264,53 +271,53 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * filter options on Type.
    */
   private getCategoryTypes() {
-    // this._formService
-    // .getTransactionCategories(this.formType)
-    //   .subscribe(res => {
+    this._transactionsService
+    .getTransactionCategories(this.formType)
+      .subscribe(res => {
 
-    //     let categoriesExist = false;
-    //     const categoriesGroupArray = [];
-    //     if (res.data) {
-    //       if (res.data.transactionCategories) {
-    //         categoriesExist = true;
+        let categoriesExist = false;
+        const categoriesGroupArray = [];
+        if (res.data) {
+          if (res.data.transactionCategories) {
+            categoriesExist = true;
 
-    //         // 1st node is the group of types (not checkable).
-    //         // 2nd node is ignored.
-    //         // 3rd node is the type checkable.
-    //         for (const node1 of res.data.transactionCategories) {
-    //           const categoryGroup: any = {};
-    //           categoryGroup.text = node1.text;
-    //           categoryGroup.options = [];
+            // 1st node is the group of types (not checkable).
+            // 2nd node is ignored.
+            // 3rd node is the type checkable.
+            for (const node1 of res.data.transactionCategories) {
+              const categoryGroup: any = {};
+              categoryGroup.text = node1.text;
+              categoryGroup.options = [];
 
-    //           for (const node2 of node1.options) {
-    //             for (const option of node2.options) {
-    //               if (this.cachedFilters.filterCategories) {
-    //                 // check for categories selected in the filter cache
-    //                 // TODO scroll to first check item
-    //                 if (this.cachedFilters.filterCategories.includes(option.text)) {
-    //                   option.selected = true;
-    //                   this.isHideTypeFilter = false;
-    //                 } else {
-    //                   option.selected = false;
-    //                 }
-    //               }
-    //               categoryGroup.options.push(option);
-    //             }
-    //           }
-    //           if (categoryGroup.options.length > 0) {
-    //             categoriesGroupArray.push(categoryGroup);
-    //           }
-    //         }
-    //       }
-    //     }
-    //     if (categoriesExist) {
-    //       this.transactionCategories = categoriesGroupArray;
-    //       // this.transactionCategories = this._orderByPipe.transform(
-    //       //   res.data.transactionCategories, {property: 'text', direction: 1});
-    //     } else {
-    //       this.transactionCategories = [];
-    //     }
-    // });
+              for (const node2 of node1.options) {
+                for (const option of node2.options) {
+                  if (this.cachedFilters.filterCategories) {
+                    // check for categories selected in the filter cache
+                    // TODO scroll to first check item
+                    if (this.cachedFilters.filterCategories.includes(option.text)) {
+                      option.selected = true;
+                      this.isHideTypeFilter = false;
+                    } else {
+                      option.selected = false;
+                    }
+                  }
+                  categoryGroup.options.push(option);
+                }
+              }
+              if (categoryGroup.options.length > 0) {
+                categoriesGroupArray.push(categoryGroup);
+              }
+            }
+          }
+        }
+        if (categoriesExist) {
+          this.transactionCategories = categoriesGroupArray;
+          // this.transactionCategories = this._orderByPipe.transform(
+          //   res.data.transactionCategories, {property: 'text', direction: 1});
+        } else {
+          this.transactionCategories = [];
+        }
+    });
   }
 
 
@@ -319,8 +326,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    */
   private getStates() {
     // TODO using this service to get states until available in another API.
-    this._formService
-      .getDynamicFormFields(this.formType, 'Individual Receipt')
+    this._transactionsService
+      .getStates(this.formType, 'Individual Receipt')
         .subscribe(res => {
 
           let statesExist = false;
@@ -358,7 +365,10 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {
-        this.searchFilter = this.cachedFilters.searchFilter;
+        this.filterCategoriesText = this.cachedFilters.filterCategoriesText;
+        if (this.filterCategoriesText) {
+          this.isHideTypeFilter = !(this.filterCategoriesText.length > 0);
+        }
 
         this.filterAmountMin = this.cachedFilters.filterAmountMin;
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
@@ -366,7 +376,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
+        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
