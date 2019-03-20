@@ -94,8 +94,6 @@ export class ReportTypeComponent implements OnInit {
       amend_Indicator: '',
       coh_bop: '0'
     };
-
-    console.log('this.frmReportType: ', this.frmReportType);
   }
 
   ngDoCheck(): void {
@@ -126,32 +124,41 @@ export class ReportTypeComponent implements OnInit {
         }
       }
 
-      if (typeof this.selectedReportInfo.selectedState === 'string') {
-        this._selectedElectionState = this.selectedReportInfo.selectedState;
-      } else {
-        this._selectedElectionState = null;
-      }
-
-      if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
-        this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
-      } else {
-        this._selectedElectionDate = null;
-      }
-
-      if (typeof this.selectedReportInfo.dueDate === 'string') {
-        if (this.selectedReportInfo.dueDate.length >= 1) {
-          this._dueDate = this.selectedReportInfo.dueDate;
+      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
+        if (typeof this.selectedReportInfo.selectedState === 'string') {
+          console.log('this.selectedReportInfo.selectedState:', this.selectedReportInfo.selectedState);
+          this._selectedElectionState = this.selectedReportInfo.selectedState;
+        } else {
+          this._selectedElectionState = null;
         }
-      } else {
-        this._dueDate = null;
       }
 
-      if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
-        if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
-          this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
+        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
+          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
+        } else {
+          this._selectedElectionDate = null;
         }
-      } else {
-        this._reportTypeDescripton = null;
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
+        if (typeof this.selectedReportInfo.dueDate === 'string') {
+          if (this.selectedReportInfo.dueDate.length >= 1) {
+            this._dueDate = this.selectedReportInfo.dueDate;
+          }
+        } else {
+          this._dueDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
+        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
+          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
+            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+          }
+        } else {
+          this._reportTypeDescripton = null;
+        }
       }
     }
   }
@@ -176,11 +183,7 @@ export class ReportTypeComponent implements OnInit {
    * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
-    console.log('updateTypeSelected: ');
-    console.log('e: ', e);
-    console.log("this.frmReportType.get('reportTypeRadio').value: ", this.frmReportType.get('reportTypeRadio').value);
     if(e.target.checked) {
-      console.log('checked: ');
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
@@ -209,22 +212,21 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidateReportType() {
-    if (this.frmReportType.get('reportTypeRadio').value) {
+    if (this.frmReportType.valid) {
         this.optionFailed = false;
         this.isValidType = true;
 
         this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
-        if (this._selectedElectionState !== null) {
-          this._form3xReportTypeDetails.stateOfElection = this._selectedElectionState;
-        }
-
         this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
         this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
-        this._form3xReportTypeDetails.dueDate = this._dueDate;
+        this._form3xReportTypeDetails.dueDate = this._formatDate(this._dueDate);
         this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+        this._form3xReportTypeDetails.election_state = this._selectedElectionState;
+        this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
+        this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
 
-        console.log('this._form3xReportTypeDetails.dueDate: ', this._form3xReportTypeDetails.dueDate);
+        console.log('this._form3xReportTypeDetails: ', this._form3xReportTypeDetails);
 
         localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
@@ -291,12 +293,15 @@ export class ReportTypeComponent implements OnInit {
    * @return     {string}  The new formatted date.
    */
   private _formatDate(date: string): string {
-    const today = new Date(date);
-    const year: number = today.getFullYear();
-    const month: string = (1 + today.getMonth()).toString().padStart(2, '0');
-    const day: string = today.getDate().toString().padStart(2, '0')
+    try {
+      const dateArr = date.split('-');
+      const month: string = dateArr[1];
+      const day: string = dateArr[2];
+      const year: string = dateArr[0].replace('2018', '2019');
 
-    return `${year}-${month}-${day}`;
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      return '';
+    }
   }
-
 }

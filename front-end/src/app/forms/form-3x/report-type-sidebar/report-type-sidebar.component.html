@@ -36,6 +36,7 @@
             <option value="0">---</option>
             <option
               *ngFor='let state of electionStates'
+              [selected]="selectedElectionState === state.state"
               [value]="state.state"
             >
               {{state.state_description}}
@@ -62,7 +63,7 @@
               id="electionDate"
               name="electionDate"
               class="form-control"
-              (change)="electionDateChange($event)"
+              (change)="selectElectionDateChange($event)"
             >
                <option ngvalue="0">---</option>
                <option
@@ -70,6 +71,7 @@
                 [attr.data-startDate]="dateSelected.cvg_start_date"
                 [attr.data-endDate]="dateSelected.cvg_end_date"
                 [attr.data-dueDate]="dateSelected.due_date"
+                [selected]="selectedElectionDate === dateSelected.election_date"
                 [value]="dateSelected.election_date"
               >
                 {{dateSelected.election_date | date: 'MM/dd/yyyy'}}

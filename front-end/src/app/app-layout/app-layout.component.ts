@@ -113,7 +113,7 @@ export class AppLayoutComponent implements OnInit {
         if (formInfo.dueDate.indexOf('2018') === 0) {
           dueDate = new Date(2019, dueDateArr[1], dueDateArr[2]);
         } else {
-          dueDate = new Date(dueDateArr[0], dueDateArr[1], dueDateArr[2])
+          dueDate = new Date(dueDateArr[2], dueDateArr[1], dueDateArr[2]);
         }
 
         this.showFormDueDate = true;

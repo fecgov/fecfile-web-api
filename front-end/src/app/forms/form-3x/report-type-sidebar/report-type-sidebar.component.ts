@@ -25,6 +25,8 @@ export class ReportTypeSidebarComponent implements OnInit {
   public frmReportSidebar: FormGroup;
   public fromDate: string = null;
   public toDate: string = null;
+  public selectedElectionState: string = null;
+  public selectedElecetionDate: string = null;
 
   private _reportTypeDescription: string = null;
   private _selectedElectionDates: any = null;
@@ -85,7 +87,7 @@ export class ReportTypeSidebarComponent implements OnInit {
         if (this.fromDate && this.toDate) {
           let message: any = null;
 
-          if (this._selectedState && this.specialReports) {
+          if (this._selectedState && this._selectedElectionDate) {
             message = {
               'form': '3x',
               'selectedState': this._selectedState,
@@ -93,15 +95,22 @@ export class ReportTypeSidebarComponent implements OnInit {
               'toDate': this.toDate,
               'fromDate': this.fromDate,
               'dueDate': this.dueDate,
-              'reportTypeDescription': this._reportTypeDescription
+              'reportTypeDescription': this._reportTypeDescription,
+              'regular_special_report_ind': this.selectedReport.regular_special_report_ind
             }
-          } else {
+
+            setTimeout(() => {
+              this.status.emit(message);
+            }, 100);
+
+          } else if (!this._selectedState && !this._selectedElectionDate) {
             message = {
               'form': '3x',
               'toDate': this.toDate,
               'fromDate': this.fromDate,
               'dueDate': this.dueDate,
-              'reportTypeDescription': this._reportTypeDescription
+              'reportTypeDescription': this._reportTypeDescription,
+              'regular_special_report_ind': this.selectedReport.regular_special_report_ind
             }
           }
           this.status.emit(message);
@@ -111,13 +120,77 @@ export class ReportTypeSidebarComponent implements OnInit {
               'toDate': '',
               'fromDate': '',
               'dueDate': '',
-              'reportTypeDescription': ''
+              'reportTypeDescription': '',
+              'regular_special_report_ind': ''
           });
         }
       } // hasOwnProperty('election_state')
+
+      if (localStorage.getItem('form_3X_report_type') !== null) {
+        const form3xReportType: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+
+        console.log('form3xReportType: ', form3xReportType);
+
+        if (form3xReportType.hasOwnProperty('regular_special_report_ind')) {
+          if (typeof form3xReportType.regular_special_report_ind === 'string') {
+            if (form3xReportType.regular_special_report_ind === 'S') {
+              console.log('special report selected: ');
+              let selectedState: any = null;
+
+              selectedState = this.selectedReport.election_state.find(el => {
+                return el.state === form3xReportType.election_state;
+              });
+
+              if (selectedState.hasOwnProperty('dates')) {
+                if (Array.isArray(selectedState.dates)) {
+                  this.electionDates = selectedState.dates;
+                }
+              }
+
+              this.electionDates.forEach(el => {
+                console.log('el: ', el);
+                el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+
+                el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
+
+                el.due_date = el.due_date.replace('2018', '2019');
+
+
+                el.election_date = el.election_date.replace('2018', '2019');
+
+              });
+
+              this.fromDate = form3xReportType.cvgStartDate;
+              this.toDate = form3xReportType.cvgEndDate;
+              this.selectedElectionState = form3xReportType.election_state;
+              this.selectedElecetionDate = form3xReportType.election_date;
+            }
+          }
+        }
+      }
     } // selectedReport !== null
   }
 
+  /**
+   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  private _formatDate(date: string): string {
+    console.log('_formatDate: ');
+    console.log('date: ', date);
+    try {
+      const dateArr = date.split('-');
+      const month: string = dateArr[1];
+      const day: string = dateArr[2];
+      const year: string = dateArr[0].replace('2018', '2019');
+
+      return `${month}/${day}/${year}`;
+    } catch (e) {
+      return '';
+    }
+  }
 
   public selectStateChange(e): void {
     let selectedVal: string = e.target.value;
@@ -140,7 +213,8 @@ export class ReportTypeSidebarComponent implements OnInit {
     }
   }
 
-  public electionDateChange(e): void {
+  public selectElectionDateChange(e): void {
+    console.log('selectElectionDateChange: ');
     let selectedIndex: number = e.target.selectedIndex;
     let selectedOption: any = e.target[e.target.selectedIndex];
 
@@ -150,5 +224,10 @@ export class ReportTypeSidebarComponent implements OnInit {
       'fromDate': selectedOption.getAttribute('data-startdate'),
       'toDate': selectedOption.getAttribute('data-enddate')
     };
+
+    this.fromDate = selectedOption.getAttribute('data-startdate');
+    this.toDate = selectedOption.getAttribute('data-enddate');
+
+    this._selectedElectionDate = e.target.value;
   }
 }

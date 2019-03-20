@@ -79,8 +79,8 @@ export class ReportTypeService {
         )
         .pipe(map(res => {
             if (res) {
-              localStorage.setItem(`form_${form_type}_report_info_res`, JSON.stringify(res));
-              const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_reportInfo_res`));
+              // localStorage.setItem(`form_${form_type}_report_info_res`, JSON.stringify(res));
+              // const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_reportInfo_res`));
               return res;
             }
             return false;

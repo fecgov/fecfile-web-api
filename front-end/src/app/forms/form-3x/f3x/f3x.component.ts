@@ -179,6 +179,7 @@ export class F3xComponent implements OnInit {
                this._setCoverageDates(e.reportTypeRadio);
               }
             } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
+              console.log('e: ', e);
                this.selectedReportInfo = e;
             } else if (e.hasOwnProperty('transactionType')) {
               if (typeof e.transactionType === 'string') {
