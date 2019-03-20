@@ -17,15 +17,15 @@ export interface GetReportsResponse {
 export class FormsService {
 
   private _orderByPipe: OrderByPipe;
-  
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
-  ) { 
+  ) {
     this._orderByPipe = new OrderByPipe();
   }
 
-  
+
 
 
  /**
@@ -42,7 +42,7 @@ export class FormsService {
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
-    
+
     if(form_type === '99') {
       url = '/f99/fetch_f99_info';
     }
@@ -638,7 +638,7 @@ export class FormsService {
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
-  
+
   console.log(" saveReport formF3X_ReportInfo ",formF3X_ReportInfo );
 
 
@@ -652,8 +652,8 @@ export class FormsService {
   formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
   formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
-  
+
+
   return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -671,7 +671,7 @@ export class FormsService {
           return false;
       }));
  }
-  
+
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   const url: string = '/core/get_dynamic_forms_fields';
@@ -704,35 +704,35 @@ export class FormsService {
    }
  }
 
-  
+
   public getReports(formType: string, view: string, page: number, itemsPerPage: number,
     sortColumnName: string, descending: boolean): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
   let params = new HttpParams();
-  const url ='/f99/get_form99list';   
+  const url ='/f99/get_form99list';
 
   httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  
+
   params = params.append('view', view);
 
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
   console.log("httpOptions",httpOptions)
   console.log("params",params);
-  
+
   return this._http
   .get(
       `${environment.apiUrl}${url}`,
       {
         headers: httpOptions,
-        params 
+        params
       }
     );
-  
+
   }
 
-  
+
   /**
    * Map server fields from the response to the model.
    */
@@ -776,7 +776,7 @@ export class FormsService {
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
     console.log("sortTransactions array= ", array);
     return array;
-      
+
   }
 
 }

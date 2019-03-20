@@ -403,7 +403,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   /**
    * Validate the filter settings.  Set the the validation error model
    * to true with a message if invalid.
-   * 
+   *
    * @returns true if valid.
    */
   private validateFilters(): boolean {

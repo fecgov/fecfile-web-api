@@ -52,7 +52,8 @@ import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-b
 
 import { AppConfigService } from './app-config.service';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transaction-categories-sidebar/transaction-categories-sidebar.component';
+import { TransactionSidebarComponent } from './forms/form-3x/transaction-sidebar/transaction-sidebar.component';
+import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
@@ -61,7 +62,6 @@ import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
-import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { ModalModule } from 'ngx-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -111,11 +111,12 @@ import { FilterPipe } from './shared/pipes/filter/filter.pipe';
     ToolsMergeNamesComponent,
     ToolsCreateBackupComponent,
     ConfirmModalComponent,
-    TransactionCategoriesSidbarComponent,
+    TransactionSidebarComponent,
     F3xComponent,
     TransactionTypeComponent,
     ReportTypeComponent,
     ReportTypeSidebarComponent,
+    IndividualReceiptComponent,
     FinancialSummaryComponent,
     OrderByPipe,
     ZipCodePipe,
@@ -145,7 +146,7 @@ import { FilterPipe } from './shared/pipes/filter/filter.pipe';
     QuillModule,
     AngularEditorModule,
     NgbModule.forRoot(),
-    ModalModule.forRoot(), 
+    ModalModule.forRoot(),
     NgxPaginationModule
   ],
   providers: [

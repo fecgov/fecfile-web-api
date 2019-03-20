@@ -1,212 +1,162 @@
 
-  <div class="report-type-sidebar">
-      <header>
-        <h3 class="text-center">{{ title }}</h3>
-        <hr />
-      </header>
-      <section><!-- Start: Wizard Sidebar Report Coverage Dates -->
-        <form class="sidebar-form-content">
-          <ng-container *ngIf="(regularreports===true)">
-            <div class="form-row">
-              <br />
-              <label for="dateFrom">
-                Date From*
-                <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-            <div class="form-row">
-              <i class="calendar-icon" aria-hidden="true"></i>
-              <input
-                type="date"
-                name="txtfromdate"
-                value={{fromDate}}
-                (change)="fromDateChange($event.target.value)"
-                class="form-control"
-                aria-label="Contribution Date"
-              />
-            </div>
-            <div class="form-row">
-                <br />
-              <label for="dateTo">
-                Date To*
-                <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-            <div class="form-row">
-              <i class="calendar-icon" aria-hidden="true"></i>
-              <input
-                type="date"
-                name="txttodate"
-                (change)="fromDateChange($event.target.value)"
-                value={{toDate}}
-                class="form-control"
-                aria-label="Contribution Date"
-              >
-            </div>
-          </ng-container> <!-- regular reports -->
-          <ng-container *ngIf="specialreports===true">
-            <div class="form-row">
-                <br />
-              <label for="State">
-                State*
-                <button
-                  type="button"
-                  class="btn-info"
-                  ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-            <div class="form-row">
-                <select
-                id="state"
-                [(ngModel)]="selectedElectionState"
-                name="state"
-                class="form-control"
-                #electionState (change)="selectStateChange($event.target.value)"
-                >
-                <option value="---">--- </option>
-                <option *ngFor='let state of selectedreporttype.election_state' [value]="state.state">{{state.state_description}}</option>
-               </select>
-            </div>
-
-
-            <div class="form-row">
-                <br />
-              <label for="electionDate">
-                Election Date
-                <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-             <div class="form-row">
-                <select
-                id="electiondate"
-                [(ngModel)]="selectedElectionDate"
-                name="electiondate"
-                [disabled]="isDisabled"
-                class="form-control"
-                #electionDate (change)="ElectionDateChange($event.target.value)"
-                >
-                   <option ngvalue="---">--- </option>
-                   <option *ngFor='let dateSelected of electiondates' [value]="dateSelected.election_date">{{dateSelected.election_date | date: 'MM/dd/yyyy'}}</option>
-               </select>
-
-           </div>
-            <div class="form-row">
-                <br />
-              <label for="dateFrom">
-                Date From*
-                <button
-                type="button"
-                class="btn-info"
-                ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-            <div class="form-row">
-            <i class="calendar-icon" aria-hidden="true"></i>
-            <input
-              type="date"
-              name="txtfromdate"
-              value={{fromDate}}
-              (change)="fromDateChange($event.target.value)"
+<div class="report-type-sidebar">
+  <header>
+    <h3 class="text-center">Report Coverage Dates</h3>
+    <hr />
+  </header>
+  <section>
+    <form
+      class="sidebar-form-content"
+      [formGroup]="frmReportSidebar"
+    >
+      <ng-container *ngIf="specialReports===true">
+        <div class="form-row">
+          <label for="State">
+            State*
+            <button
+              type="button"
+              class="btn-info"
+              ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+            <select
+              id="state"
+              name="state"
               class="form-control"
-              aria-label="Contribution Date"
-            />
-            </div>
-            <div class="form-row">
-                <br />
-              <label for="dateTo">
-                Date To*
-                <button
-                  type="button"
-                  class="btn-info"
-                  ngbTooltip="Language will be provided by RAD"
-                >
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">
-                  Click for more information
-                  </span>
-                </button>
-              </label>
-            </div>
-            <div class="form-row">
-            <i class="calendar-icon"></i>
-            <input
-              type="date"
-              name="txttodate"
-              (change)="toDateChange($event.target.value)"
-              value={{toDate}}
+              #electionStateSelect
+              (change)="selectStateChange($event)"
+            >
+            <option value="0">---</option>
+            <option
+              *ngFor='let state of electionStates'
+              [selected]="selectedElectionState === state.state"
+              [value]="state.state"
+            >
+              {{state.state_description}}
+            </option>
+           </select>
+        </div>
+        <div class="form-row">
+          <label for="electionDate">
+            Election Date
+            <button
+            type="button"
+            class="btn-info"
+            ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+         <div class="form-row">
+            <select
+              id="electionDate"
+              name="electionDate"
               class="form-control"
-              aria-label="Contribution Date"
-            />
-            </div>
-          </ng-container>
-        </form>
-        </section>
-        <footer>
-          <div class="form-sidebar__item">
-            <div class="form-sidebar-item__text">
-              Cash On Hand
-            </div>
-            <div class="form-sidebar-item__value">
-              $0
-            </div>
-          </div>
-          <div class="form-sidebar__btns">
-            <div class="btn-row">
-              <button
-                type="button"
-                class="btn btn-secondary-gray"
+              (change)="selectElectionDateChange($event)"
+            >
+               <option ngvalue="0">---</option>
+               <option
+                *ngFor="let dateSelected of electionDates"
+                [attr.data-startDate]="dateSelected.cvg_start_date"
+                [attr.data-endDate]="dateSelected.cvg_end_date"
+                [attr.data-dueDate]="dateSelected.due_date"
+                [selected]="selectedElectionDate === dateSelected.election_date"
+                [value]="dateSelected.election_date"
               >
-                Summary
-              </button>
-            </div>
-            <div class="btn-row">
-              <button
-                type="button"
-                class="btn btn-secondary"
-              >
-                Sign &amp; Submit
-              </button>
-            </div>
-          </div>
-        </footer>
+                {{dateSelected.election_date | date: 'MM/dd/yyyy'}}
+               </option>
+           </select>
+       </div>
+      </ng-container>
+        <div class="form-row">
+          <label for="dateFrom">
+            Date From*
+            <button
+            type="button"
+            class="btn-info"
+            ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+          <i class="calendar-icon" aria-hidden="true"></i>
+          <input
+            type="date"
+            name="txtFromDate"
+            class="form-control"
+            [value]="fromDate"
+            (change)="fromDateChange($event.target.value)"
+          />
+        </div>
+        <div class="form-row">
+          <label for="dateTo">
+            Date To*
+            <button
+            type="button"
+            class="btn-info"
+            ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+              Click for more information
+              </span>
+            </button>
+          </label>
+        </div>
+        <div class="form-row">
+          <i class="calendar-icon" aria-hidden="true"></i>
+          <input
+            type="date"
+            name="txtToDate"
+            class="form-control"
+            [value]="toDate"
+            (change)="toDateChange($event.target.value)"
+          >
+        </div>
+    </form>
+  </section>
+  <footer>
+    <div class="form-sidebar__item">
+      <div class="form-sidebar-item__text">
+        Cash On Hand
       </div>
-
+      <div class="form-sidebar-item__value">
+        $0
+      </div>
+    </div>
+    <div class="form-sidebar__btns">
+      <div class="btn-row">
+        <button
+          type="button"
+          class="btn btn-secondary-gray"
+        >
+          Summary
+        </button>
+      </div>
+      <div class="btn-row">
+        <button
+          type="button"
+          class="btn btn-secondary"
+        >
+          Sign &amp; Submit
+        </button>
+      </div>
+    </div>
+  </footer>
+</div>
