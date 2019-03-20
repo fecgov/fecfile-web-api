@@ -299,7 +299,9 @@ export class ReportTypeComponent implements OnInit {
       const day: string = dateArr[2];
       const year: string = dateArr[0].replace('2018', '2019');
 
-      return `${year}-${month}-${day}`;
+      /// return `${year}-${month}-${day}`;
+
+      return `${month}/${day}/${year}`;
     } catch (e) {
       return '';
     }

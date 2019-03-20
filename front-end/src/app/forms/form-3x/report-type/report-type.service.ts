@@ -56,15 +56,19 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const form3xReportType: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_report_type`));
+    const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${form_type}_report_type`));
+
+    console.log('form3xReportType: ', form3xReportType);
 
     formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F3X`);
     formData.append('amend_ind', form3xReportType.amend_Indicator);
     formData.append('report_type', form3xReportType.reportType);
     formData.append('election_code', form3xReportType.electionCode);
-    formData.append('date_of_election', form3xReportType.electionDate);
-    formData.append('state_of_election', form3xReportType.stateOfElection);
+    if (form3xReportType.election_date.length >= 1) {
+      formData.append('date_of_election', form3xReportType.election_date);
+    }
+    formData.append('state_of_election', form3xReportType.election_state);
     formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
     formData.append('coh_bop', form3xReportType.coh_bop);
