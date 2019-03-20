@@ -161,10 +161,10 @@
               &:visited {
                 color: $white;
               }
+              margin-top: -10px;
             }
             .sidebar-tooltip {
               top: 0;
-              margin-top: -10px;
               width: 300px;
               .tooltip-inner {
                 max-width: 300px;
