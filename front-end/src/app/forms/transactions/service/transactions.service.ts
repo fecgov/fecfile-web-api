@@ -255,7 +255,8 @@ export class TransactionsService {
       }
     }
 
-    if (filters.filterAmountMin && filters.filterAmountMax) {
+    if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
+      isFilter = true;
       if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
           filters.filterAmountMin <= filters.filterAmountMax) {
         const filteredAmountArray = [];
@@ -263,7 +264,6 @@ export class TransactionsService {
           if (trx.transaction_amount) {
             if (trx.transaction_amount >= filters.filterAmountMin &&
               trx.transaction_amount <= filters.filterAmountMax) {
-                isFilter = true;
                 filteredAmountArray.push(trx);
             }
           }

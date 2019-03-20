@@ -44,16 +44,15 @@ import { TransactionsService } from '../service/transactions.service';
       })),
       state('closed', style({
         'max-height': '0',
-        // overflow: 'hidden',
-        'overflow-y': 'scroll',
+        overflow: 'hidden',
         display: 'none',
         backgroundColor: '#AEB0B5'
       })),
       transition('open => closed', [
-        animate('.25s ease') // not working in Edge
+        // animate('.25s ease') // not working in Edge
       ]),
       transition('closed => open', [
-        animate('.5s ease') // not working in Edge
+        // animate('.5s ease') // not working in Edge
       ]),
     ]),
   ]
@@ -75,8 +74,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   public transactionCategories: any = [];
   public states: any = [];
   public filterCategoriesText = '';
-  public filterAmountMin = 0;
-  public filterAmountMax = 0;
+  public filterAmountMin: number;
+  public filterAmountMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
   public filterMemoCode = false;
@@ -100,6 +99,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
+    this.filterAmountMin = null;
+    this.filterAmountMax = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -214,10 +215,16 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
-    if (this.filterAmountMin > 0) {
+    // if (this.filterAmountMin > 0) {
+    //   modified = true;
+    // }
+    // if (this.filterAmountMax > 0) {
+    //   modified = true;
+    // }
+    if (this.filterAmountMin !== null) {
       modified = true;
     }
-    if (this.filterAmountMax > 0) {
+    if (this.filterAmountMax !== null) {
       modified = true;
     }
 
@@ -258,8 +265,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
         }
       }
     }
-    this.filterAmountMin = 0;
-    this.filterAmountMax = 0;
+    this.filterAmountMin = null;
+    this.filterAmountMax = null;
     this.filterDateFrom = null;
     this.filterDateTo = null;
     this.filterMemoCode = false;
@@ -427,13 +434,13 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       return false;
     }
 
-    if (this.filterAmountMin > 0 && this.filterAmountMax === 0) {
+    if (this.filterAmountMin !== null && this.filterAmountMax === null) {
       this.amountFilterValidation.isError = true;
       this.amountFilterValidation.message = 'Maximum Amount is required';
       this.isHideAmountFilter = false;
       return false;
     }
-    if (this.filterAmountMax > 0 && this.filterAmountMin === 0) {
+    if (this.filterAmountMax !== null && this.filterAmountMin === null) {
       this.amountFilterValidation.isError = true;
       this.amountFilterValidation.message = 'Minimum Amount is required';
       this.isHideAmountFilter = false;

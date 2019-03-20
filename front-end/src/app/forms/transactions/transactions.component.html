@@ -88,12 +88,18 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="transactions__btn-container">
-              <button *ngFor="let searchTextItem of searchTextArray; let i = index" 
-                class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                (click)="removeSearchText(i)">
-                <i class="fas fa-window-close"></i>
-                {{ searchTextItem }}
-              </button>
+              <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+                <button
+                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                  (click)="removeSearchText(i)">
+                  <i class="fas fa-window-close"></i>
+                  {{ searchTextItem }}
+                </button>
+                <span class="transactions__btn-search-filter-join" 
+                  *ngIf="i < (searchTextArray.length -1 )">
+                    AND
+                </span>
+              </div>
             </div>          
           </div>
         </div>

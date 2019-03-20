@@ -100,6 +100,7 @@
             </div>
             <input
               type="number"
+              min="0" value="0"
               name="minamount"
               [(ngModel)]="filterAmountMin"
               class="form-control"
@@ -118,6 +119,7 @@
             <input
               type="number"
               name="maxamount"
+              min="0" value="0"
               [(ngModel)]="filterAmountMax"
               class="form-control"
               id="filter-amount-max"
