@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 import maya
-
+import pytz
 #from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -1040,6 +1040,7 @@ def save_print_f99(request):
     #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     # #try:
     # create_json_data = json.loads(createresp.text)
+    est = pytz.timezone('US/Eastern')
 
     comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
@@ -1058,16 +1059,16 @@ def save_print_f99(request):
         if not comm_info.treasurersuffix is None:
             treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
         if comm_info.updated_at is None:
-            date_signed_mm = comm_info.created_at.strftime('%m')
-            date_signed_dd = comm_info.created_at.strftime('%d')
-            date_signed_yy = comm_info.created_at.strftime('%Y')
+            date_signed_mm = comm_info.created_at.astimezone(est).strftime('%m')
+            date_signed_dd = comm_info.created_at.astimezone(est).strftime('%d')
+            date_signed_yy = comm_info.created_at.astimezone(est).strftime('%Y')
             # filing_timestamp = comm_info.created_at.strftime('%m/%d/%Y %H:%M:%S')
             # print(comm_info.created_at)
             # print(filing_timestamp)
         else:
-            date_signed_mm = comm_info.updated_at.strftime('%m')
-            date_signed_dd = comm_info.updated_at.strftime('%d')
-            date_signed_yy = comm_info.updated_at.strftime('%Y')
+            date_signed_mm = comm_info.updated_at.astimezone(est).strftime('%m')
+            date_signed_dd = comm_info.updated_at.astimezone(est).strftime('%d')
+            date_signed_yy = comm_info.updated_at.astimezone(est).strftime('%Y')
             # filing_timestamp = comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S')
             # print(comm_info.updated_at)
             # print(filing_timestamp)
@@ -1186,6 +1187,8 @@ def update_print_f99(request):
         #print(updateresp.content)
         update_json_data = json.loads(updateresp.content.decode("utf-8"))
 
+    est = pytz.timezone('US/Eastern')
+
     #try:
     comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
@@ -1214,9 +1217,9 @@ def update_print_f99(request):
             'STATE': comm_info.state,
             'ZIP': comm_info.zipcode,
             'REASON_TYPE': comm_info.reason,
-            'DATE_SIGNED_MM':comm_info.updated_at.strftime('%m'),
-            'DATE_SIGNED_DD':comm_info.updated_at.strftime('%d'),
-            'DATE_SIGNED_YY':comm_info.updated_at.strftime('%Y'),
+            'DATE_SIGNED_MM':comm_info.updated_at.astimezone(est).strftime('%m'),
+            'DATE_SIGNED_DD':comm_info.updated_at.astimezone(est).strftime('%d'),
+            'DATE_SIGNED_YY':comm_info.updated_at.astimezone(est).strftime('%Y'),
             'TREASURER_FULL_NAME': treasurer_name,
             'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
             'EF_STAMP':"[Electronically Filed]",
