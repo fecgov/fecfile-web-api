@@ -207,6 +207,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     if (this.filterCategoriesText === undefined ||
       this.filterCategoriesText === null ||
       this.filterCategoriesText === '') {
+        this.clearHighlightedTypes();
         return;
     }
     const scrollEl = this.categoryElements.find(el => {
@@ -321,11 +322,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     // clear the scroll to input
     this.filterCategoriesText = '';
+    this.clearHighlightedTypes();
 
-    // clear any hightlighted types as result of the scroll to input
-    for (const el of this.categoryElements.toArray()) {
-      el.categoryType.highlight = '';
-    }
 
     for (const s of this.states) {
       s.selected = false;
@@ -342,6 +340,16 @@ export class TransactionsFilterSidbarComponent implements OnInit {
     this.filterDateFrom = null;
     this.filterDateTo = null;
     this.filterMemoCode = false;
+  }
+
+
+  /**
+   * Clear any hightlighted types as result of the scroll to input.
+   */
+  private clearHighlightedTypes() {
+    for (const el of this.categoryElements.toArray()) {
+      el.categoryType.highlight = '';
+    }
   }
 
 

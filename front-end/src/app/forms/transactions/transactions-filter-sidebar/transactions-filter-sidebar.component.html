@@ -15,11 +15,11 @@
             [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'"> -->
         <div class="card-body" 
           [@openCloseScroll]="determineScrollState()">            
-          <div class="input-group py-1">
+          <div class="input-group py-1 transacions__filter-scroll-to-input">
             <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
               placeholder="Search Type" aria-label="Search">
-            <div class="input-group-append" (click)="scrollToType()"
-              ngbTooltip="Scroll to Type" tooltipClass="form-tooltip">
+            <div class="input-group-append" (click)="scrollToType()">
+                <!-- ngbTooltip="Scroll to Type" tooltipClass="form-tooltip" -->
               <span class="input-group-text">
                 <i class="search-icon text-grey" aria-hidden="true"></i>
               </span>
