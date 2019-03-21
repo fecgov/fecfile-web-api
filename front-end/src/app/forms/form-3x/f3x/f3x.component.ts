@@ -82,6 +82,8 @@ export class F3xComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.transactionCategories = res.data.transactionCategories;
+
+          console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
   }

@@ -1,7 +1,7 @@
 @import '../../../shared/scss/global';
 
 .transaction-type-container {
-  min-height: 75vh;
+  min-height: 100vh;
   position: relative;
   form {
     header {
@@ -25,7 +25,7 @@
     }
     section {
       .content {
-        min-height: 70vh;
+        min-height: 100vh;
         position: relative;
         .grid-row {
           margin-bottom: 20px;
@@ -34,7 +34,7 @@
     }
     footer {
       bottom: 0;
-      position: absolute;
+      position: relative;
       width: 100%;
       .forms__btn-container {
         height: 100%;

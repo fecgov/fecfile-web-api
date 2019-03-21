@@ -4,6 +4,7 @@ import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { ApiService } from '../shared/services/APIService/api.service';
+import { UtilService } from '../shared/utils/util.service';
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
@@ -38,6 +39,7 @@ export class AppLayoutComponent implements OnInit {
     private _apiService: ApiService,
 		private _sessionService: SessionService,
     private _messageService: MessageService,
+    private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal
 	) { }
@@ -78,11 +80,14 @@ export class AppLayoutComponent implements OnInit {
           if(val.url.indexOf('/dashboard') === 0) {
             this.sideBarClass = 'dashboard active';
             this.showSideBar = true;
+            this._utilService.removeLocalItems('form_', 5);
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
               this.showSideBar = true;
               this.sideBarClass = 'active';
             }
+          } else if (val.url.indexOf('/forms') !== 0 || val.url.indexOf('/dashboard') !== 0) {
+            this._utilService.removeLocalItems('form_', 5);
           }
         }
       });
