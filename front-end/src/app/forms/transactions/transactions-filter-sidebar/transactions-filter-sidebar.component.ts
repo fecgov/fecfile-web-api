@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionsMessageService } from '../service/transactions-message.service';
@@ -7,6 +7,7 @@ import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
+import { TransactionsFilterTypeComponent } from './transactions-filter-type/transactions-filter-type.component';
 
 
 /**
@@ -65,6 +66,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   @Input()
   public title = '';
 
+  @ViewChildren('categoryElements')
+  private categoryElements: QueryList<TransactionsFilterTypeComponent>;
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
@@ -170,6 +173,40 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
 
   /**
+   * Scroll to the Category Type in the list that contains the
+   * value from the category search input.
+   */
+  public scrollToType(): void {
+    const scrollEl = this.categoryElements.find(el => {
+      return el.categoryType.text.toString().toLowerCase()
+        .includes(this.filterCategoriesText.toLowerCase());
+    });
+    if (this.isEdge()) {
+      scrollEl.elRef.nativeElement.scrollIntoView();
+    } else {
+      scrollEl.elRef.nativeElement.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
+    }
+  }
+
+
+  /**
+   * Determine if the browser is MS Edge.
+   *
+   * TODO put in util service
+   */
+  private isEdge(): boolean {
+    const ua = window.navigator.userAgent;
+    const edge = ua.indexOf('Edge/');
+    if (edge > 0) {
+      // Edge (IE 12+) => return version number
+      // return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+      return true;
+    }
+    return false;
+  }
+
+
+  /**
    * Send filter values to the table transactions component.
    * Set the filters.show to true indicating the filters have been altered.
    */
@@ -195,32 +232,27 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     // type/category
     const filterCategories = [];
-    // type input can be checkbox or input text
-    if (this.filterCategoriesText.length > 0) {
-      modified = true;
-      filterCategories.push(this.filterCategoriesText); // TODO use code with backend
-    }
+    // if (this.filterCategoriesText.length > 0) {
+    //   modified = true;
+    //   filterCategories.push(this.filterCategoriesText);
+    // }
     for (const category of this.transactionCategories) {
       if (category.options) {
         for (const option of category.options) {
           if (option.selected) {
             modified = true;
-            filterCategories.push(option.text); // TODO use code with backend
+            // TODO use code with backend
+            filterCategories.push(option.text);
           }
         }
       }
     }
     filters.filterCategories = filterCategories;
-    filters.filterCategoriesText = this.filterCategoriesText;
+    // filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
-    // if (this.filterAmountMin > 0) {
-    //   modified = true;
-    // }
-    // if (this.filterAmountMax > 0) {
-    //   modified = true;
-    // }
+
     if (this.filterAmountMin !== null) {
       modified = true;
     }

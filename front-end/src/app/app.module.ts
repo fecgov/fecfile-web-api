@@ -71,6 +71,7 @@ import { ReportheaderComponent } from './reports/reportheader/reportheader.compo
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 import { TransactionsFilterSidbarComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-sidebar.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
+import { TransactionsFilterTypeComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-type/transactions-filter-type.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -94,6 +95,7 @@ import { FilterPipe } from './shared/pipes/filter/filter.pipe';
     TransactionsComponent,
     TransactionsTableComponent,
     TransactionsFilterSidbarComponent,
+    TransactionsFilterTypeComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,
