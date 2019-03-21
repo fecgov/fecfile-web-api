@@ -191,8 +191,8 @@ export class TransactionTypeComponent implements OnInit {
 
       this.transactionType = null;
     //}
-    this.secondaryTransactionType = '';
-    this.secondaryOptions = '';
+    // this.secondaryTransactionType = '';
+    // this.secondaryOptions = '';
     this.childOptionType = '';
 
     this.secondaryOptions = this.mainTransactionCategory[0].options;
