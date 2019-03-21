@@ -127,6 +127,7 @@ export class TransactionTypeComponent implements OnInit {
 
     if (secondaryTransactionType) {
       this.secondaryTransactionType = secondaryTransactionType;
+
       this.secondaryTransactionTypeFailed =  false;
       const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === secondaryTransactionType));
 
@@ -168,9 +169,12 @@ export class TransactionTypeComponent implements OnInit {
    * Sets the parent transaction categories.
    */
   private _setParentTransactionCategories(): void {
+    console.log('_setParentTransactionCategories: ');
+
+
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
 
-    if (localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
+    //if (localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
       const parentTransactionTypeText: string = this.mainTransactionCategory[0].text;
       const parentTransactionTypeValue: string = this.mainTransactionCategory[0].value;
       const transactionObj: any = {
@@ -178,10 +182,15 @@ export class TransactionTypeComponent implements OnInit {
         parentTransactionTypeValue
       };
 
+      //console.log('inside here');
+
       localStorage.setItem(`form_${this._formType}_transaction_type`, JSON.stringify(transactionObj));
 
       this.transactionType = null;
-    }
+    //}
+    this.secondaryTransactionType = '';
+    this.secondaryOptions = '';
+    this.childOptionType = '';
 
     this.secondaryOptions = this.mainTransactionCategory[0].options;
 
