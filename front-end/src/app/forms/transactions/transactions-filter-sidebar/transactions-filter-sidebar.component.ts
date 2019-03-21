@@ -49,11 +49,22 @@ import { TransactionsFilterTypeComponent } from './transactions-filter-type/tran
         display: 'none',
         backgroundColor: '#AEB0B5'
       })),
+      state('openNoAnimation', style({
+        'max-height': '500px',
+        backgroundColor: 'white',
+        'overflow-y': 'scroll'
+      })),
+      state('closedNoAnimation', style({
+        'max-height': '0',
+        overflow: 'hidden',
+        display: 'none',
+        backgroundColor: '#AEB0B5'
+      })),
       transition('open => closed', [
-        // animate('.25s ease') // not working in Edge
+        animate('.25s ease')
       ]),
       transition('closed => open', [
-        // animate('.5s ease') // not working in Edge
+        animate('.5s ease')
       ]),
     ]),
   ]
@@ -88,6 +99,7 @@ export class TransactionsFilterSidbarComponent implements OnInit {
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
+  private msEdge = true;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -99,6 +111,8 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * Initialize the component.
    */
   public ngOnInit(): void {
+
+    this.msEdge = this.isEdge();
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
@@ -173,18 +187,37 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
 
   /**
+   * Determine the state for scrolling.  The category tye wasn't displaying 
+   * properly in edge with animation.  If edge, don't apply the state with animation.
+   */
+  public determineScrollState() {
+    if (this.msEdge) {
+      return !this.isHideTypeFilter ? 'openNoAnimate' : 'closedNoAnimate';
+    } else {
+      return !this.isHideTypeFilter ? 'open' : 'closed';
+    }
+  }
+
+
+  /**
    * Scroll to the Category Type in the list that contains the
    * value from the category search input.
    */
   public scrollToType(): void {
+    if (this.filterCategoriesText === undefined ||
+      this.filterCategoriesText === null ||
+      this.filterCategoriesText === '') {
+        return;
+    }
     const scrollEl = this.categoryElements.find(el => {
       return el.categoryType.text.toString().toLowerCase()
         .includes(this.filterCategoriesText.toLowerCase());
     });
-    if (this.isEdge()) {
+    scrollEl.categoryType.highlight = 'selected_row';
+    if (this.msEdge) {
       scrollEl.elRef.nativeElement.scrollIntoView();
     } else {
-      scrollEl.elRef.nativeElement.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
+      scrollEl.elRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
     }
   }
 
@@ -286,7 +319,14 @@ export class TransactionsFilterSidbarComponent implements OnInit {
 
     this.initValidationErrors();
 
+    // clear the scroll to input
     this.filterCategoriesText = '';
+
+    // clear any hightlighted types as result of the scroll to input
+    for (const el of this.categoryElements.toArray()) {
+      el.categoryType.highlight = '';
+    }
+
     for (const s of this.states) {
       s.selected = false;
     }

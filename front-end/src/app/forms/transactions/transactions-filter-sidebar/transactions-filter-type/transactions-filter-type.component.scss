@@ -1,3 +1,14 @@
-.form-check {
-  padding-bottom: 15px;
+// .form-check {
+//   padding-bottom: 15px;
+// }
+
+.transactions__filter-type-option {
+  margin: 15px 0;
+  padding: 4px;
+}
+
+.selected_row {
+	background-color: whitesmoke;
+	border-color: #FF0000;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);		
 }

@@ -11,8 +11,10 @@
             [ngClass]="toggleFilterDirection(isHideTypeFilter)">
           </i>          
         </div>
+        <!-- <div class="card-body" 
+            [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'"> -->
         <div class="card-body" 
-            [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
+          [@openCloseScroll]="determineScrollState()">            
           <div class="input-group py-1">
             <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
               placeholder="Search Type" aria-label="Search">
@@ -30,14 +32,6 @@
                   [categoryType]="categoryType"
                   #categoryElements *ngFor="let categoryType of categoryGroup.options">
                 </app-transactions-filter-type>
-                <!-- <li #categoryElements *ngFor="let categoryType of categoryGroup.options">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                      [(ngModel)]="categoryType.selected">
-                    <label class="form-check-label" for="{{ categoryType?.value }}">
-                      {{ categoryType?.text }}</label>
-                  </div>
-                </li>                     -->
             </ul>
           </div>
         </div>
