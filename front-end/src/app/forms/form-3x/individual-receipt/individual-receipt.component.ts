@@ -51,23 +51,23 @@ export class IndividualReceiptComponent implements OnInit {
   ngOnInit(): void {
    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-   this._formService
-     .getDynamicFormFields(this._formType, 'Individual Receipt')
-     .subscribe(res => {
-        this.formFields = res.data.formFields;
+   // this._formService
+   //   .getDynamicFormFields(this._formType, 'Individual Receipt')
+   //   .subscribe(res => {
+   //      this.formFields = res.data.formFields;
 
-        this._setForm(this.formFields);
+   //      this._setForm(this.formFields);
 
-        this.states = res.data.states;
+   //      this.states = res.data.states;
 
-        this.transactionCategories = res.data.transactionCategories;
-     });
+   //      this.transactionCategories = res.data.transactionCategories;
+   //   });
 
-    this._formService
-      .getTransactionCategories(this._formType)
-      .subscribe(res => {
-        this._types = res.data.transactionCategories;
-      });
+    // this._formService
+    //   .getTransactionCategories(this._formType)
+    //   .subscribe(res => {
+    //     this._types = res.data.transactionCategories;
+    //   });
 
     this.frmIndividualReceipt = this._fb.group({
       transactionCategory: [null, [
@@ -202,9 +202,9 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public viewTransactions() {
-    //this._router.navigate(['/forms/transactions', this._formType], { queryParams: { step: this.step } }); 
+    //this._router.navigate(['/forms/transactions', this._formType], { queryParams: { step: this.step } });
 
     //let form_id = this._formType;
-    this._router.navigate(['/forms/transactions', this._formType]); 
+    this._router.navigate(['/forms/transactions', this._formType]);
   }
 }

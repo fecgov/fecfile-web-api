@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
-import { forkJoin, of, interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { TransactionTypeService } from './transaction-type.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -19,24 +19,30 @@ export class TransactionTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
+  @Input() transactionType: string = '';
   @Input() formOptionsVisible: boolean = false;
+  @Input() transactionCategories: any = [];
 
-  public cashOnHand: any = {};
   public frmOption: FormGroup;
+  public frmSubmitted: boolean = false;
   public optionFailed: boolean = false;
+  public parentOptionFailed: boolean = false;
   public showForm: boolean = false;
   public searchField: any = {};
-  public transActionCategories: any = {};
-
+  public childOptions: any = [];
+  public mainTransactionCategory: any = [];
 
   private _formType: string = '';
+  private _transactionCategory: string = '';
+  private _transactionCategories: any = [];
 
   constructor(
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _transactionTypeService: TransactionTypeService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -44,7 +50,6 @@ export class TransactionTypeComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
 
     this.frmOption = this._fb.group({
       optionRadio: ['', Validators.required]
@@ -57,6 +62,9 @@ export class TransactionTypeComponent implements OnInit {
         this.showForm = true;
       }
     }
+    if (this.transactionType) {
+      this._setTransactionCategories();
+    }
   }
   /**
    * Validates the form on submit.
@@ -64,12 +72,18 @@ export class TransactionTypeComponent implements OnInit {
    * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
   public doValidateOption(): boolean {
-    if (this.frmOption.invalid) {
-      this.optionFailed = true;
-      return false;
+    this.frmSubmitted = true;
+    if (this.childOptions.length >= 1) {
+      this.parentOptionFailed = false;
+      if (this.frmOption.invalid) {
+        this.optionFailed = true;
+        return false;
+      } else {
+        this.optionFailed = false;
+        return true;
+      }
     } else {
-      this.optionFailed = false;
-      return true;
+      this.parentOptionFailed = true;
     }
   }
 
@@ -90,18 +104,20 @@ export class TransactionTypeComponent implements OnInit {
    * Goes to the previous step.
    */
   public previousStep(): void {
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false
-        }
-      });
-
     this.status.emit({
       form: {},
       direction: 'previous',
       step: 'step_1'
     });
+  }
+
+  private _setTransactionCategories(): void {
+    console.log('_setTransactionCategories: ');
+    this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
+
+    this.childOptions = this.mainTransactionCategory[0].options;
+
+    this.parentOptionFailed = false;
+    this.optionFailed = false;
   }
 }

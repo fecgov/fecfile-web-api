@@ -45,13 +45,23 @@
             {{ committeeName }}
           </div>
         </div>
-        <div class="float-right" *ngIf="(showForm3XDashBoard===true)">
-          <ng-container *ngIf="form3XReportDashBoardLine1">
-            {{ form3XReportDashBoardLine1 }}<br />
-          </ng-container>
-          <ng-container *ngIf="form3XReportDashBoardLine2">
-            <p >{{ form3XReportDashBoardLine2 }} <A href="/forms/form/3X?step=step_1"><i class="edit-icon"></i></A></p>
-          </ng-container>
+        <div class="float-right">
+          <div class="float-right" *ngIf="showFormDueDate">
+            <div>
+              Form {{formType}} |  {{formDescription}} |
+              {{formStartDate | date: 'MM/dd/yyyy'}} - {{formEndDate | date: 'MM/dd/yyyy'}}
+            </div>
+            <div>
+              Due in {{formDueDate}} days.
+              <button
+                type="button"
+                class="btn btn-link btn-edit"
+              >
+                <i class="edit-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click to edit date.</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="app__content">

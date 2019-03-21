@@ -265,13 +265,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status])                                          
     except Exception:
         raise
 
@@ -420,7 +420,7 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'))
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -537,6 +537,11 @@ def reports(request):
                 election_code = request.data.get('election_code')
             else:
                 election_code = None
+
+            if 'status' in request.data:
+                f_status = request.data.get('status')
+            else:
+                f_status = "Saved"
             
             datum = {
                 'cmte_id': request.user.username,
@@ -549,6 +554,7 @@ def reports(request):
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
+                'status': f_status,
             }    
             data = post_reports(datum)
             if type(data) is dict:

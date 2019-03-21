@@ -1,4 +1,9 @@
 <div class="transaction-type-container">
+  <form
+    [formGroup]="frmOption"
+    (ngSubmit)="doValidateOption()"
+    (blur)="doValidateOption()"
+  >
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -16,11 +21,37 @@
       </div>
       <hr />
     </header>
-    <form
-      [formGroup]="frmOption"
-      (ngSubmit)="doValidateOption()"
-      (blur)="doValidateOption()"
-    >
+    <section>
+      <div class="content">
+        <div class="grid-row" *ngIf="parentOptionFailed">
+          <div class="grid-row__col grid-row__col--12 text-center text-error">
+            You must select a transaction category first.
+          </div>
+        </div>
+        <div class="grid-row" *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (frmOption.invalid && frmSubmitted) || (optionFailed)">
+          <div class="grid-row__col grid-row__col--12 text-center text-error">
+            You must select a transaction type first.
+          </div>
+        </div>
+        <div
+          class="grid-row"
+          *ngFor="let option of childOptions"
+        >
+          <div class="grid-row__col grid-row__col--12">
+            <input
+              type="radio"
+              name="optionRadio"
+              [value]="option?.text"
+              (change)="updateStatus($event)"
+              formControlName="optionRadio"
+            />
+            <label for="optionRadio">
+              {{option?.text}}
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
     <footer>
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--11 forms__btn-container">
@@ -34,7 +65,6 @@
           <button
             class="btn btn-primary btn-right"
             type="submit"
-             *ngIf="formOptionsVisible"
           >
             Next
           </button>

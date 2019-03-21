@@ -184,11 +184,7 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    console.log('doValidateReason: ');
     let reasonText: string = this.frmReason.get('reasonText').value.trim();
-
-    console.log('reasonText: ', reasonText);
-    console.log('reasonText.length: ', reasonText.length);
     if (reasonText.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved

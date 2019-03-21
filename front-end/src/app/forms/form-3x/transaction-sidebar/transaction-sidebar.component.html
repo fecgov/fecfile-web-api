@@ -1,6 +1,6 @@
 <div class="form-sidebar">
   <header>
-    <h3 class="text-center">{{ title }}</h3>
+    <h3 class="text-center">Transaction Categories</h3>
   </header>
   <section>
     <ul class="form-sidebar__links" >
@@ -9,7 +9,15 @@
         *ngFor="let categoryType of transactionCategories"
       >
         <div class="float-left">
-          {{ categoryType?.text }}
+          <button
+            type="button"
+            class="btn btn-link"
+            value="{{ categoryType?.value }}"
+            (click)="selectItem($event)"
+          >
+            <i class="plus-icon" aria-hidden="true"></i>
+           {{ categoryType?.text }}
+          </button>
         </div>
         <div class="float-right amount">
           $0
@@ -31,13 +39,12 @@
     </div>
     <div class="form-sidebar__btns">
       <div class="btn-row">
-        <a
+        <button
+          type="button"
           class="btn btn-secondary-gray"
-          [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'financial_summary' }"
         >
           Summary
-        </a>
+        </button>
       </div>
       <div class="btn-row">
         <button

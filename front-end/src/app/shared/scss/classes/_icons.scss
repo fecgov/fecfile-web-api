@@ -10,9 +10,14 @@
 	//color: $white;
 }
 
-.plus-icon {
+.plus-icon-circle {
 	@extend .fas;
 	@extend .fa-plus-circle;
+}
+
+.plus-icon {
+  @extend .fas;
+  @extend .fa-plus;
 }
 
 .notifications-icon {

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
@@ -12,198 +14,220 @@ import { selectedElectionState, selectedElectionDate, selectedReportType } from 
 export class ReportTypeSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() title: string = '';
-  @Input() specialreports: boolean = false;
-  @Input() regularreports: boolean = false;
+  @Input() specialReports: boolean = false;
+  @Input() regularReports: boolean = false;
+  @Input() selectedReport: any = null;
   @Input() selectedreporttype:  selectedReportType;
-  @Input() selectedstate:  selectedReportType;
-  @Input() electiondates:  Array<selectedElectionDate> ;
-  //@Input() electiondates:  any ={};
-  @Input() fromDate:  string='';
-  @Input() toDate:  string='';
-  @Input() electiontoDatedates: string='';
-  @Input() cashOnHand: any = {};
 
-  public itemSelected: string = '';
-  public additionalItemSelected: string = '';
-  public additionalOptions: Array<any> = [];
-  //public electionState:string ='';
-  //public electionDates: Array<eleectionStateDate> = [];
-  public electionDates: selectedElectionState = {};
-  public electionDates1: selectedElectionState = {};
-  //public electionDates1: any = [];
-  @Input() electiondates1:  Array<selectedElectionDate> ; 
+  public dueDate: string = null;
+  public electionStates: any = null;
+  public electionDates: any = null;
+  public frmReportSidebar: FormGroup;
+  public fromDate: string = null;
+  public toDate: string = null;
+  public selectedElectionState: string = null;
+  public selectedElecetionDate: string = null;
 
-  public electionStates: Array<selectedElectionState> ;
-  public stateSelectedElectionDates: any = {};;
-  private _indexOfItemSelected: number = null;
-  private _currentReportType: string ='';
-  public loadingData: boolean = true;
-  public steps: any = {};
-  public sidebarLinks: any = {};
-  public selectedOptions: any = [];
-  public searchField: any = {};
-  //public cashOnHand: any = {};
-  public currentStep: string = 'step_2';
-  public step: string = '';
-  public fromdate: string = '';
-  public todate: string = '';
-  public reporttypes: any = {};
-  public selectedReportType: any = {};
-  public selectedState: string='';
-  public electionDate: selectedElectionDate = {};
-  public isDisabled: boolean=true;
-  public electiondatesTmp: Array<selectedElectionDate> ;
+  private _reportTypeDescription: string = null;
+  private _selectedElectionDates: any = null;
+  private _selectedState: string = null;
+  private _selectedElectionDate: string = null;
+
   constructor(
+    private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
-    private _formService: FormsService
+    private _formService: FormsService,
+    private _messageService: MessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-    
-  }
-
-  public selectItem(item): void {
-    this.itemSelected = item.getAttribute('value');
-
-    this.additionalOptions = [];
-
-    this.sidebarLinks.findIndex((el, index) => {
-      if (el.value === this.itemSelected) {
-        this._indexOfItemSelected = index;
-      }
-    });
-
-    this.status.emit({
-      additionalOptions: this.additionalOptions
-    });
-  }
-
-  public selectedAdditionalOption(additionalItem): void {
-    let additionalItemIndex: number = null;
-
-    this.additionalItemSelected = additionalItem.getAttribute('value');
-    this.sidebarLinks[this._indexOfItemSelected].options.findIndex((el, index) => {
-      if (this.additionalItemSelected === el.value) {
-        additionalItemIndex = index;
-      }
-    });
-
-    this.additionalOptions = this.sidebarLinks[this._indexOfItemSelected].options[additionalItemIndex].options;
-
-    this.status.emit({
-      additionalOptions: this.additionalOptions
-    });
+    this.frmReportSidebar = this._fb.group({});
   }
 
   ngDoCheck(): void {
-    if (typeof this.selectedreporttype !== null && this.selectedreporttype !== null){
-      localStorage.setItem('form3XReportInfo.regularSpecialReportInd', this.selectedreporttype.regular_special_report_ind);
-    }
-    
-  }
+    if (this.selectedReport !== null) {
+      if (this.selectedReport.hasOwnProperty('report_type_desciption')) {
+        if (typeof this.selectedReport.report_type_desciption === 'string') {
+          this._reportTypeDescription = this.selectedReport.report_type_desciption;
+        }
+      }
+      if (this.selectedReport.hasOwnProperty('election_state')) {
+        if (Array.isArray(this.selectedReport.election_state)) {
+          if (this.selectedReport.election_state.length === 1) {
+            this.fromDate = '';
+            this.toDate = '';
+            this._selectedElectionDates = null;
+            if (this.selectedReport.election_state[0]['dates']) {
+              if (Array.isArray(this.selectedReport.election_state[0].dates)) {
+                let dates: any = this.selectedReport.election_state[0].dates;
 
-  ngOnChanges(): void {
-    
+                if (Array.isArray(dates)) {
+                  this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
+                  this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
+                  this.dueDate = dates[0].due_date;
+                }
+              }
+            }
+          } else {
+            this.fromDate = '';
+            this.toDate = '';
+            if (this.selectedReport.hasOwnProperty('election_state')) {
+              this.electionStates =  this.selectedReport.election_state;
+            }
 
-  }
-
-  selectStateChange(value: string): void {
-    console.log(" ReportTypeSidebarComponent selectStateChange state =", value);
-    localStorage.setItem('form3XReportInfo.state', value);
-    
-    if (value !== "---"){
-      for(var item in this.selectedreporttype) {
-        if (item==="election_state"){
-          for (var electionstate in this.selectedreporttype[item]){
-            if (this.selectedreporttype[item][electionstate]["state"]===value) {
-              this.electiondates= this.selectedreporttype[item][electionstate].dates;
-              localStorage.removeItem('form3XReportInfo.electionDate');
-              localStorage.removeItem('form3XReportInfo.dueDate');
-              localStorage.removeItem('form3XReportInfo.toDate');
-              localStorage.removeItem('form3XReportInfo.fromDate');
-              this.isDisabled=false;
+            if (this._selectedElectionDates !== null) {
+              this.fromDate = this._selectedElectionDates.fromDate;
+              this.toDate = this._selectedElectionDates.toDate;
             }
           }
-         }
-      }
+        } // isArray(this.selectedReport.election_state)
+        if (this.fromDate && this.toDate) {
+          let message: any = null;
 
-    /*  for (var item  in this.electiondates){
-        if (item !== "election_date"){
-          this.electiondatesTmp[item]["cvg_start_date"]  =  this.electiondates[item]["cvg_start_date"]
-          this.electiondatesTmp[item]["cvg_end_date"]  =  this.electiondates[item]["cvg_end_date"]
-          this.electiondatesTmp[item]["due_date"]  =  this.electiondates[item]["due_date"]
-        } else {
-          this.electiondatesTmp[item]["election_date"]  =  this.electiondates[item]["election_date"]
-        }
-      }*/
-    }
-    else {
-      localStorage.removeItem('form3XReportInfo.electionDate');
-      localStorage.removeItem('form3XReportInfo.dueDate');
-      localStorage.removeItem('form3XReportInfo.toDate');
-      localStorage.removeItem('form3XReportInfo.fromDate');
-    }
-    
-    this.fromDate = "";
-    this.toDate = "";
-    
-
-    
-    this.status.emit({
-      electiondates: this.electiondates
-    });
-  }
-
-  ElectionDateChange(value: string): void
-  {
-    if ( typeof this.electiondates !== "undefined" &&  this.electiondates !== null)
-    {
-      if (value !== "---"){
-        for(var prop in this.electiondates) {
-           if (this.electiondates[prop]["election_date"] === value ){
-              this.fromDate = this.electiondates[prop]["cvg_start_date"];
-              this.toDate = this.electiondates[prop]["cvg_end_date"];
-              let eletionDateString = this.electiondates[prop]["election_date"];
-              let electionDateObject = new Date(eletionDateString);
-              eletionDateString = electionDateObject.toLocaleDateString();
-              localStorage.setItem('form3XReportInfo.dueDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["due_date"]));
-              localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_end_date"]));
-              localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["cvg_start_date"]));
-              localStorage.setItem('form3XReportInfo.electionDate', this.getDateInMMDDYYYYFormat(this.electiondates[prop]["election_date"]));
+          if (this._selectedState && this._selectedElectionDate) {
+            message = {
+              'form': '3x',
+              'selectedState': this._selectedState,
+              'selectedElectionDate': this._selectedElectionDate,
+              'toDate': this.toDate,
+              'fromDate': this.fromDate,
+              'dueDate': this.dueDate,
+              'reportTypeDescription': this._reportTypeDescription,
+              'regular_special_report_ind': this.selectedReport.regular_special_report_ind
             }
+
+            setTimeout(() => {
+              this.status.emit(message);
+            }, 100);
+
+          } else if (!this._selectedState && !this._selectedElectionDate) {
+            message = {
+              'form': '3x',
+              'toDate': this.toDate,
+              'fromDate': this.fromDate,
+              'dueDate': this.dueDate,
+              'reportTypeDescription': this._reportTypeDescription,
+              'regular_special_report_ind': this.selectedReport.regular_special_report_ind
+            }
+          }
+          this.status.emit(message);
+        } else {
+          this.status.emit({
+              'form': '3x',
+              'toDate': '',
+              'fromDate': '',
+              'dueDate': '',
+              'reportTypeDescription': '',
+              'regular_special_report_ind': ''
+          });
+        }
+      } // hasOwnProperty('election_state')
+
+      if (localStorage.getItem('form_3X_report_type') !== null) {
+        const form3xReportType: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+
+        console.log('form3xReportType: ', form3xReportType);
+
+        if (form3xReportType.hasOwnProperty('regular_special_report_ind')) {
+          if (typeof form3xReportType.regular_special_report_ind === 'string') {
+            if (form3xReportType.regular_special_report_ind === 'S') {
+              console.log('special report selected: ');
+              let selectedState: any = null;
+
+              selectedState = this.selectedReport.election_state.find(el => {
+                return el.state === form3xReportType.election_state;
+              });
+
+              if (selectedState.hasOwnProperty('dates')) {
+                if (Array.isArray(selectedState.dates)) {
+                  this.electionDates = selectedState.dates;
+                }
+              }
+
+              this.electionDates.forEach(el => {
+                console.log('el: ', el);
+                el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+
+                el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
+
+                el.due_date = el.due_date.replace('2018', '2019');
+
+
+                el.election_date = el.election_date.replace('2018', '2019');
+
+              });
+
+              this.fromDate = form3xReportType.cvgStartDate;
+              this.toDate = form3xReportType.cvgEndDate;
+              this.selectedElectionState = form3xReportType.election_state;
+              this.selectedElecetionDate = form3xReportType.election_date;
+            }
+          }
         }
       }
-      else {
-        localStorage.setItem('form3XReportInfo.electionDate', "---")
-        localStorage.removeItem('form3XReportInfo.dueDate');
-        localStorage.removeItem('form3XReportInfo.toDate');
-        localStorage.removeItem('form3XReportInfo.fromDate');        
+    } // selectedReport !== null
+  }
+
+  /**
+   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  private _formatDate(date: string): string {
+    console.log('_formatDate: ');
+    console.log('date: ', date);
+    try {
+      const dateArr = date.split('-');
+      const month: string = dateArr[1];
+      const day: string = dateArr[2];
+      const year: string = dateArr[0].replace('2018', '2019');
+
+      return `${month}/${day}/${year}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  public selectStateChange(e): void {
+    let selectedVal: string = e.target.value;
+    let selectedState: any = null;
+
+    this._selectedState = selectedVal;
+
+    if (selectedVal !== '0') {
+      if (this.selectedReport.hasOwnProperty('election_state')) {
+        selectedState = this.selectedReport.election_state.find(el => {
+          return el.state === selectedVal;
+        });
+
+        if (selectedState.hasOwnProperty('dates')) {
+          if (Array.isArray(selectedState.dates)) {
+            this.electionDates = selectedState.dates;
+          }
+        }
       }
-   }
-  
-      this.status.emit({
-        electiondates: this.electiondates
-      });
+    }
   }
 
-  toDateChange(value: string): void{
-    console.log("toDate ",value)
-    localStorage.setItem('form3XReportInfo.toDate', this.getDateInMMDDYYYYFormat(value));
-  }
-  
-  fromDateChange(value: string): void{
-    console.log("fromDate ",value);
-    localStorage.setItem('form3XReportInfo.fromDate', this.getDateInMMDDYYYYFormat(value));
-  }
+  public selectElectionDateChange(e): void {
+    console.log('selectElectionDateChange: ');
+    let selectedIndex: number = e.target.selectedIndex;
+    let selectedOption: any = e.target[e.target.selectedIndex];
 
-  getDateInMMDDYYYYFormat(value: string):string {
-    let DateString = value;
-    let DateObject = new Date(DateString);
-    DateString = DateObject.toLocaleDateString();
-    return DateString;
+    this._selectedElectionDate =  e.target.value;
+
+    this._selectedElectionDates = {
+      'fromDate': selectedOption.getAttribute('data-startdate'),
+      'toDate': selectedOption.getAttribute('data-enddate')
+    };
+
+    this.fromDate = selectedOption.getAttribute('data-startdate');
+    this.toDate = selectedOption.getAttribute('data-enddate');
+
+    this._selectedElectionDate = e.target.value;
   }
 }
