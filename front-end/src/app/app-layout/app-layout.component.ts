@@ -105,23 +105,30 @@ export class AppLayoutComponent implements OnInit {
     } else if (route.indexOf('/forms/form/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-        const oneDay: number = 24*60*60*1000;
-        const today: any = new Date();
-        const dueDateArr = formInfo.dueDate.split('-');
-        let dueDate: any = '';
+        if (formInfo.hasOwnProperty('dueDate')) {
+          if (typeof formInfo.dueDate === 'string') {
+            if (formInfo.dueDate.length > 1) {
+              const oneDay: number = 24*60*60*1000;
+              const today: any = new Date();
+              const dueDateArr = formInfo.dueDate.split('/');
+              let dueDate: any = '';
 
-        if (formInfo.dueDate.indexOf('2018') === 0) {
-          dueDate = new Date(2019, dueDateArr[1], dueDateArr[2]);
-        } else {
-          dueDate = new Date(dueDateArr[2], dueDateArr[1], dueDateArr[2]);
+              if (formInfo.dueDate.indexOf('2018') === 0) {
+                dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
+              } else {
+                dueDate = new Date(dueDateArr[2], dueDateArr[0], dueDateArr[1]);
+              }
+
+              this.showFormDueDate = true;
+              this.formType = formInfo.formType;
+              this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
+
+              this.formDescription = formInfo.reportTypeDescription;
+              this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
+              this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
+            }
+          }
         }
-
-        this.showFormDueDate = true;
-        this.formType = formInfo.formType;
-        this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
-        this.formDescription = formInfo.reportTypeDescription;
-        this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
-        this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
       }
     } else {
         this.showFormDueDate = false;
