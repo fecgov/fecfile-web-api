@@ -40,6 +40,11 @@
   @extend .fa-info-circle;
 }
 
+.view-icon {
+  @extend .fas;
+  @extend .fa-eye;
+}
+
 .close-icon {
   @extend .fas;
   @extend .fa-times-circle;
@@ -48,6 +53,11 @@
 .external-link-icon {
   @extend .fas;
   @extend .fa-external-link-alt;
+}
+
+.link-icon {
+  @extend .fas;
+  @extend .fa-link;
 }
 
 .file-alt-icon {
@@ -130,7 +140,22 @@
   @extend .fa-file-import;
 }
 
+.file-export-icon {
+  @extend .fas;
+  @extend .fa-file-export;
+}
+
+.print-icon {
+  @extend .fas;
+  @extend .fa-print;
+}
+
 .table-icon {
   @extend .fas;
   @extend .fa-table;
+}
+
+.undo-icon {
+  @extend .fas;
+  @extend .fa-undo;
 }

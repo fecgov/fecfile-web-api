@@ -585,6 +585,69 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
+   * Delete selected transactions from the the recyle bin.
+   *
+   * @param trx the Transaction to delete
+   */
+  public deleteRecyleBin(): void {
+
+    let beforeMessage = '';
+    // if (this.bulkActionCounter === 1) {
+    //   let id = '';
+    //   for (const trx of this.transactionsModel) {
+    //     if (trx.selected) {
+    //       id = trx.transactionId;
+    //     }
+    //   }
+    //   beforeMessage = (id !== '') ?
+    //     'Are you sure you want to permanently delete Transaction ' + id + '?' :
+    //     'Are you sure you want to permanently delete this Transaction?';
+    // } else {
+    //   beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+    // }
+
+    const selectedTransactions: Array<TransactionModel> = [];
+    for (const trx of this.transactionsModel) {
+      if (trx.selected) {
+        selectedTransactions.push(trx);
+      }
+    }
+
+    if (selectedTransactions.length === 1) {
+      beforeMessage = 'Are you sure you want to permanently delete Transaction ' +
+        selectedTransactions[0].transactionId + '?';
+    } else {
+      beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+    }
+
+    this._dialogService
+      .confirm(beforeMessage,
+        ConfirmModalComponent,
+        'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService.deleteRecycleBinTransaction(selectedTransactions)
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getRecyclingPage(this.config.currentPage);
+
+              let afterMessage = '';
+              if (selectedTransactions.length === 1) {
+                  afterMessage = `Transaction ${selectedTransactions[0].transactionId} has been successfully deleted`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted.';
+              }
+              this._dialogService
+                .confirm(afterMessage,
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+           });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+
+
+  /**
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
@@ -631,7 +694,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public changeAllTransactionsSelected() {
 
-    // TODO Iterating over the trsnactionsModel and setting the slected prop
+    // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
     // transactions for the current page.
 
@@ -648,14 +711,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     //   }
     // }
 
-    // TODO replace this with the commented code above when server paginatin is ready.
+    // TODO replace this with the commented code above when server pagination is ready.
     for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
       this.transactionsModel[i].selected = this.allTransactionsSelected;
       if (this.allTransactionsSelected) {
         this.bulkActionCounter++;
       }
     }
-    console.log('this.bulkActionCounter multi = ' + this.bulkActionCounter);
     this.bulkActionDisabled = !this.allTransactionsSelected;
   }
 
@@ -693,8 +755,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.bulkActionCounter--;
       }
     }
-    console.log('this.bulkActionCounter = ' + this.bulkActionCounter);
-    this.bulkActionDisabled = (this.bulkActionCounter > 1) ? false : true;
+
+    // Transaction View shows bulk action when more than 1 checked
+    // Recycle Bin shows delete action when 1 or more checked.
+    const count = this.isTransactionViewActive() ? 1 : 0;
+    this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
   }
 
 
