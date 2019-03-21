@@ -68,7 +68,26 @@ export class TransactionTypeComponent implements OnInit {
       }
     }
 
-    console.log('this.transactionType: ', this.transactionType);
+    if (localStorage.getItem(`form_${this._formType}_transaction_type`) !== null) {
+      const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
+
+      if (transactionObj.hasOwnProperty('parentTransactionTypeValue')) {
+        if (typeof transactionObj.parentTransactionTypeValue === 'string') {
+          this.transactionType = transactionObj.parentTransactionTypeValue;
+        }
+      }
+
+      if (transactionObj.hasOwnProperty('secondaryTransactionType')) {
+        if (typeof transactionObj.secondaryTransactionType === 'string') {
+          this.secondaryTransactionType = transactionObj.secondaryTransactionType;
+        }
+      }
+
+      if (this.transactionType) {
+        this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
+        const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === this.secondaryTransactionType));
+      }
+    }
 
     if (this.transactionType) {
       this._setParentTransactionCategories();
@@ -84,6 +103,14 @@ export class TransactionTypeComponent implements OnInit {
     if (this.frmOption.valid) {
       this.secondaryTransactionTypeFailed = false;
       this.childOptionFailed = false;
+
+      this.status.emit({
+        form: this.frmOption,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2'
+      });
+
       return true;
     } else {
       return false;
@@ -159,7 +186,6 @@ export class TransactionTypeComponent implements OnInit {
     this.secondaryOptions = this.mainTransactionCategory[0].options;
 
     this.parentOptionFailed = false;
-    this.optionFailed = false;
   }
 
   /**

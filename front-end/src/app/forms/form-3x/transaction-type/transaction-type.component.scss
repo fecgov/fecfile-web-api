@@ -20,6 +20,30 @@
             text-decoration: none;
           }
         }
+        .dropdown-toggle {
+          &:after {
+            display:none;
+          }
+        }
+        .dropdown-menu {
+          &.show {
+            left: -80px !important;
+            .dropdown-item {
+              &:focus,
+              &:hover,
+              &:active,
+              &:visited {
+                background-color: $white;
+                color: $black;
+                cursor: pointer;
+                outline: none;
+              }
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
         @include clearfix();
       }
     }
