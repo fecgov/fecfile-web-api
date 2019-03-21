@@ -1,137 +1,135 @@
 <div class="header">
-  <div class="header__nav">
-    <div class="header__search">
-      <i class="search-icon" aria-hidden="true"></i>
-      <input
-        type="text"
-        name="search"
-        class="search-input"
-        placeholder="Search for..."
-      />
-    </div>
-    <div class="header__links">
-      <ul class="nav navbar-nav nav-links">
-        <li class="nav-item">
-          <a [routerLink]="['/dashboard']">
-            Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a [routerLink]="['/reports']">
-            Reports
-          </a>
-        </li>
-        <li class="nav-item">
-          <a [routerLink]="['/contributors']">
-            Contributors
-          </a>
-        </li>
-        <li class="nav-item">
-          <div
-            class="d-inline-block"
-            ngbDropdown
-            placement="bottom-left"
-          >
-            <button
-              type="button"
-              class="btn btn-link dropdown-toggle"
-              id="dropdownMenu"
-              [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
-              (click)="toggleMenu()"
-              ngbDropdownToggle
-            >
-            Tools
-            </button>
+    <div class="header__nav">
+      <div class="header__search mr-5">
+        <i class="search-icon" aria-hidden="true"></i>
+        <input
+          type="text"
+          name="search"
+          class="search-input"
+          placeholder="Search for..."
+        />
+      </div>
+      <div class="header__links">
+        <ul class="nav navbar-nav nav-links">
+          <li class="nav-item">
+            <a [routerLink]="['/dashboard']">
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a [routerLink]="['/reports']">
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a [routerLink]="['/contributors']">
+              Contributors
+            </a>
+          </li>
+          <li class="nav-item">
             <div
-              class="secondary-dropdown-menu tools"
-              aria-labelledby="dropdownMenu"
-              ngbDropdownMenu
+              class="d-inline-block"
+              ngbDropdown
+              placement="bottom-left"
             >
-              <div>
-                <a [routerLink]="['/tools_import_transactions']">
-                  Import Transactions
-                </a>
-              </div>
-              <div>
-                <a [routerLink]="['/tools_import_names']">
-                  Import Names
-                </a>
-              </div>
-              <div>
-                <a [routerLink]="['/tools_export_names']">
-                  Export Names
-                </a>
-              </div>
-              <div>
-                  <a [routerLink]="['/tools_merge_names']">
-                  Merge Names
-                </a>
-              </div>
-              <div>
-                  <a [routerLink]="['/tools_create_backup']">
-                  Create Backup
+              <button
+                type="button"
+                class="btn btn-link dropdown-toggle"
+                id="dropdownMenu"
+                [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
+                (click)="toggleMenu()"
+                ngbDropdownToggle
+              >
+              Tools
+              </button>
+              <div
+                class="secondary-dropdown-menu tools"
+                aria-labelledby="dropdownMenu"
+                ngbDropdownMenu
+              >
+                <div>
+                  <a [routerLink]="['/tools_import_transactions']">
+                    Import Transactions
                   </a>
+                </div>
+                <div>
+                  <a [routerLink]="['/tools_import_names']">
+                    Import Names
+                  </a>
+                </div>
+                <div>
+                  <a [routerLink]="['/tools_export_names']">
+                    Export Names
+                  </a>
+                </div>
+                <div>
+                    <a [routerLink]="['/tools_merge_names']">
+                    Merge Names
+                  </a>
+                </div>
+                <div>
+                    <a [routerLink]="['/tools_create_backup']">
+                    Create Backup
+                    </a>
+                </div>
               </div>
             </div>
-          </div>
-        </li>
-        <li class="nav-item">
-          Help
-        </li>
-        <li class="nav-item">
-          <a class="icon-link" role="button">
-            <i class="notifications-icon icon" aria-hidden="true"></i>
-            <span class="ico n-link-text">Notifications</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <div
-            class="d-inline-block"
-            ngbDropdown
-            placement="bottom-left"
-          >
-            <button
-              type="button"
-              class="btn btn-link dropdown-toggle"
-              id="dropdownMenu"
-              [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
-              (click)="toggleMenu()"
-              ngbDropdownToggle
-            >
-              <i class="profile-icon icon" aria-hidden="true"></i>
-              Profile
-            </button>
+          </li>
+          <li class="nav-item">
+            Help
+          </li>
+          <li class="nav-item">
+            <a class="icon-link" role="button">
+              <i class="notifications-icon icon" aria-hidden="true"></i>
+              <span class="ico n-link-text">Notifications</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <div
-              class="secondary-dropdown-menu profile"
-              aria-labelledby="dropdownMenu"
-              ngbDropdownMenu
+              class="d-inline-block"
+              ngbDropdown
+              placement="bottom-left"
             >
-              <div>
-                <a [routerLink]="['/account']">
-                  Account
-                </a>
-              </div>
-              <div>
-                <a [routerLink]="['/users']">
-                  Users
-                </a>
-              </div>
-              <div>
-                <a [routerLink]="['/settings']">
-                  Settings
-                </a>
-              </div>
-              <div>
-                <a [routerLink]="['/logout']">
-                  Logout
-                </a>
+              <button
+                type="button"
+                class="btn btn-link dropdown-toggle"
+                id="dropdownMenu"
+                [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
+                (click)="toggleMenu()"
+                ngbDropdownToggle
+              >
+                <i class="profile-icon icon" aria-hidden="true"></i>
+                Profile
+              </button>
+              <div
+                class="secondary-dropdown-menu profile"
+                aria-labelledby="dropdownMenu"
+                ngbDropdownMenu
+              >
+                <div>
+                  <a [routerLink]="['/account']">
+                    Account
+                  </a>
+                </div>
+                <div>
+                  <a [routerLink]="['/users']">
+                    Users
+                  </a>
+                </div>
+                <div>
+                  <a [routerLink]="['/settings']">
+                    Settings
+                  </a>
+                </div>
+                <div>
+                  <a [routerLink]="['/logout']">
+                    Logout
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        </li>
-      </ul> <!-- ./nav-links -->
-    </div> <!-- ./header__links -->
-  </div> <!-- ./header__nav -->
-</div> <!-- ./header -->
-
-
+          </li>
+        </ul> <!-- ./nav-links -->
+      </div> <!-- ./header__links -->
+    </div> <!-- ./header__nav -->
+  </div> <!-- ./header -->

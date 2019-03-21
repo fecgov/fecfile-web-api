@@ -108,7 +108,7 @@
       @include media(largeDesktop) {
         float: left;
         padding-top: 10px;
-        width: 805px;
+        width: 757px;
       }
       .nav-links {
         list-style-type: none;
@@ -160,6 +160,7 @@
             &[aria-expanded='true'] {
               background-color: $iron;
             }
+            margin-top: -4px; /* should only target nav dropdown li */
           }
           .dropdown {
             .dropdown-menu {
