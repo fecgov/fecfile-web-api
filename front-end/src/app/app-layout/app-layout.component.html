@@ -45,13 +45,23 @@
             {{ committeeName }}
           </div>
         </div>
-        <div class="float-right" *ngIf="(showForm3XDashBoard===true)">
-          <ng-container *ngIf="form3XReportDashBoardLine1">
-            {{ form3XReportDashBoardLine1 }}<br />
-          </ng-container>
-          <ng-container *ngIf="form3XReportDashBoardLine2">
-            {{ form3XReportDashBoardLine2 }}
-          </ng-container>
+        <div class="float-right">
+          <div class="float-right" *ngIf="showFormDueDate">
+            <div>
+              Form {{formType}} |  {{formDescription}} |
+              {{formStartDate | date: 'MM/dd/yyyy'}} - {{formEndDate | date: 'MM/dd/yyyy'}}
+            </div>
+            <div>
+              Due in {{formDueDate}} days.
+              <button
+                type="button"
+                class="btn btn-link btn-edit"
+              >
+                <i class="edit-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click to edit date.</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="app__content">
@@ -61,8 +71,8 @@
   </main>
   <footer>
     <div class="app__footer">
-      <div class="row">
-        <div class="col-sm-2">
+      <div class="contact-info">
+        <div class="contact-info__item">
           <h6>
             <strong>Federal Election Commission</strong>
             <br>
@@ -72,65 +82,80 @@
             </address>
           </h6>
         </div>
-        <div class="col-sm-1">
+        <div class="contact-info__item">
           <h6>
             <strong>Main Office</strong>
             <br>
-            <address>(202) 694-1000
+            <address>
+              (202) 694-1000
             </address>
+            <br>
           </h6>
         </div>
-        <div class="col-sm-2">
-          <h6><strong>RAD Analyst, Chami Mukerjee</strong>
+        <div class="contact-info__item">
+          <h6>
+            <strong>
+              RAD Analyst,
+              {{ radAnalystInfo?.first_name }}
+              {{ radAnalystInfo?.last_name }}
+            </strong>
             <br>
-            <address>(202) 694-1001
-            <br>
-            <a href="#" target="_blank">Find & contact your committee's analyst</a>
+            <address>
+              <ng-container *ngIf="radAnalystInfo">
+                (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }}
+              </ng-container>
+              <ng-container *ngIf="!radAnalystInfo">
+                <a href="https://www.fec.gov/help-candidates-and-committees/question-rad/" target="_blank">
+                  Find & contact your committee's analyst
+                </a>
+              </ng-container>
             </address>
+            <br>
           </h6>
         </div>
-        <div class="col-sm-1">
-          <h6><strong>Tech Support</strong>
+        <div class="contact-info__item">
+          <h6>
+            <strong>Tech Support</strong>
             <br>
-            <address>(202) 694-1002
-            <br>
-            <a href="mailto:tech@fec.gov" target="_blank">tech@fec.gov</a>
+            <address>
+              (202) 694-1002
             </address>
+            <a href="mailto:tech@fec.gov">
+              tech@fec.gov
+            </a>
           </h6>
         </div>
-         <div class="col-sm-4">
-            <div class="legal-disclaimer">
-                <button
-                  type="button"
-                  class="btn btn-link"
-                  (click)="open(legalDisclaimer)"
-                >
-                  Legal Disclaimer
-                </button>
-              </div>
+      </div> <!-- ./contact-info -->
+      <div class="legal-disclaimer">
+        <button
+          type="button"
+          class="btn btn-link"
+          (click)="open(legalDisclaimer)"
+        >
+          Legal Disclaimer
+        </button>
+        <ng-template #legalDisclaimer let-d="dismiss">
+          <div class="modal-header">
+            <h4 class="modal-title">
+              Legal Disclaimer
+            </h4>
           </div>
-          <ng-template #legalDisclaimer let-d="dismiss">
-            <div class="modal-header">
-              <h4 class="modal-title">
-                Legal Disclaimer
-              </h4>
-            </div>
-            <div class="modal-body">
-              <p>
-                Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-                government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-                apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-outline-dark"
-                (click)="d('Close click')"
-              >Close</button>
-            </div>
-          </ng-template>
+          <div class="modal-body">
+            <p>
+              Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
+              government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
+              apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-dark"
+              (click)="d('Close click')"
+            >Close</button>
+          </div>
+        </ng-template>
       </div>
-    </div>
+    </div> <!-- ./app__footer -->
   </footer>
 </div>

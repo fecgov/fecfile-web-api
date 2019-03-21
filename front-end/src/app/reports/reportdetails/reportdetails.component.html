@@ -1,121 +1,394 @@
-<div class="preview-container">
-  <section>
-    <div class="content">
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--4">
-          <p>
-            <b>Name of Committee in Full</b>
-          </p>
-          <p>
-            {{ committee_details?.committeename }}
-          </p>
+<div class="report-table-container">
+    <div class="grid-row float-right">
+        <div class="float-right forms__trx-item-range">
+            {{determineItemRange()}} of {{config.totalItems}}
         </div>
-        <div class="grid-row__col grid-row__col--4">
-          <p><b>Address</b></p>
-          <p>
-            {{ committee_details?.street1 }}<br/>
-            {{ committee_details?.street2 }}
-          </p>
+    </div>            
+    <table class="table table-striped table-hover table__sortable forms__trx-table">
+        <thead>
+            <tr>
+                <!--<th class="forms__trx-table-checkbox">
+                    <input *ngIf="isTransactionViewActive()"
+                        [(ngModel)]="allTransactionsSelected"
+                        type="checkbox" (change)="changeAllTransactionsSelected()">
+                </th> -->
+                <th 
+                    [class]="getSortClass('form_type')" 
+                    (click)="changeSortDirection('form_type')">Form
+                </th>
+                <th
+                    [class]="getSortClass('Status')" 
+                    (click)="changeSortDirection('status')">Status
+                </th>
+                <th 
+                    [class]="getSortClass('fec_id')" 
+                    (click)="changeSortDirection('fec_id')">FEC ID
+                </th>
+                <th 
+                    [class]="getSortClass('amend_ind')" 
+                    (click)="changeSortDirection('amend_ind')">Amendment Indicator
+                </th>
+                <th 
+                    [class]="getSortClass('cvg_start_date')" 
+                    (click)="changeSortDirection('cvg_start_date')">Coverage Date Cycle
+                </th>                              
+                <th 
+                    [class]="getSortClass('report_type_desc')" 
+                    (click)="changeSortDirection('report_type_desc')">Report
+                </th>
+                <th 
+                    [class]="getSortClass('filed_date')" 
+                    (click)="changeSortDirection('filed_date')">Filed/Saved Date
+                </th>                        
+                                                                    
+               <!-- <th class="bulk_action">
+                    <div *ngIf="isTransactionViewActive()" class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-primary reports__bulk_action_btn">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewAllSelected()">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="printAllSelected()">
+                                <i class="fas fa-print"></i>Print
+                            </button>
+                            <button class="dropdown-item" (click)="trashAllSelected()">
+                                <i class="fas fa-trash"></i>Trash
+                            </button>
+                        </div>
+                    </div>                        
+                </th>  -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let report of reportsModel | paginate: config; let i = index">
+                <!--<td>
+                    <input [(ngModel)]="report.selected"
+                            type="checkbox">
+                </td>-->
+                <td *ngIf="isColumnVisible('form_type')">{{report.form_type}}</td>
+                <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
+                <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Submitted' ? report.fec_id : '' }}</td>
+                <td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>
+                <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? (report.cvg_start_date | date: 'MM/dd/yyyy'- report.cvg_end_date | date: 'MM/dd/yyyy') : '' }}</td>
+                <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">{{report.filed_date | date: 'MM/dd/yyyy'}}</td>
+                <td>
+                    <div *ngIf="isRecycleBinViewActive()">
+                        <button class="btn btn-sm btn-primary" 
+                            (click)="restoreTransaction(report)">
+                            <i class="fas fa-trash-restore"></i>
+                        </button>                     
+                    </div>
+                    <div *ngIf="isTransactionViewActive()" class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="editReport(report)">
+                                <i class="fas fa-edit"></i>Edit
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                            <button class="dropdown-item" (click)="trashReport(report)">
+                                <i class="fas fa-trash"></i>Trash
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="amendReport(report)">
+                                <i class="fas fa-edit"></i>Amend
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                        </div>
+
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i>View
+                            </button>
+                            <button class="dropdown-item" (click)="editReport(report)">
+                                <i class="fas fa-edit"></i>Edit
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
+                                <i class="fa fa-file-text"></i>Download JSON
+                            </button>
+                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
+                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            </button>
+                            <button class="dropdown-item" (click)="trashReport(report)">
+                                <i class="fas fa-trash"></i>Trash
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <hr/> 
+    <div *ngIf="showPagination()" 
+        class="d-flex justify-content-center Report-table-pagination-container">
+        <pagination-controls [id]="config.id"
+            (pageChange)="getPage($event)">
+        </pagination-controls>	
+    </div>
+    <!--
+    <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+                    <button aria-label="Close" class="close btn btn-link" type="button" 
+                            (click)="cancelColumnOptions()">
+                        <span aria-hidden="true">×</span>
+                    </button>                
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('type').checked"
+                                        (change)="toggleVisibility('type', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('type').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('type').disabled}">
+                                            Type
+                                        </span>                                         
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('state').checked"
+                                            (change)="toggleVisibility('state', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('state').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('state').disabled}">
+                                            State
+                                        </span>                                          
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
+                                            (change)="toggleVisibility('purposeDescription', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('purposeDescription').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
+                                            Purpose Description
+                                        </span>                                         
+                                    </label>
+                                </div>
+                            </div>                                   
+                        </div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('transactionId').checked"
+                                        (change)="toggleVisibility('transactionId', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('transactionId').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('transactionId').disabled}">
+                                            Transaction ID
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('zip').checked"
+                                            (change)="toggleVisibility('zip', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('zip').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('zip').disabled}">
+                                            Zip
+                                        </span>   
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('contributorEmployer').checked"
+                                            (change)="toggleVisibility('contributorEmployer', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('contributorEmployer').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('contributorEmployer').disabled}">
+                                            Contributor Employer
+                                        </span>          
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('name').checked"
+                                            (change)="toggleVisibility('name', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('name').disabled">
+                                        <span [ngClass]="{'disabled-column-option':getSortableColumn('name').disabled}">
+                                            Name
+                                        </span>                                        
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('date').checked"
+                                            (change)="toggleVisibility('date', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('date').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('date').disabled}">
+                                            Date
+                                        </span>                                       
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('contributorOccupation').checked"
+                                            (change)="toggleVisibility('contributorOccupation', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('contributorOccupation').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('contributorOccupation').disabled}">
+                                            Contributor Occupation
+                                        </span>                                        
+                                    </label>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('street').checked"
+                                            (change)="toggleVisibility('street', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('street').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('street').disabled}">
+                                            Street
+                                        </span>   
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('amount').checked"
+                                        (change)="toggleVisibility('amount', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('amount').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('amount').disabled}">
+                                            Amount
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('memoCode').checked"
+                                            (change)="toggleVisibility('memoCode', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('memoCode').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('memoCode').disabled}">
+                                            Memo Code
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('city').checked"
+                                            (change)="toggleVisibility('city', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                                        <span [ngClass]=
+                                            "{'disabled-column-option':getSortableColumn('city').disabled}">
+                                            City
+                                        </span>          
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('aggregate').checked"
+                                            (change)="toggleVisibility('aggregate', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('aggregate').disabled">
+                                        <span [ngClass]="{'disabled-column-option':getSortableColumn('aggregate').disabled}">
+                                            Aggregate
+                                        </span>                                        
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('memoText').checked"
+                                            (change)="toggleVisibility('memoText', $event)"
+                                            type="checkbox" [disabled]="getSortableColumn('memoText').disabled">
+                                        <span [ngClass]="{'disabled-column-option':getSortableColumn('memoText').disabled}">
+                                            Memo Text/Description
+                                        </span>                                         
+                                    </label>
+                                </div>
+                            </div>                                    
+                        </div>                                                                                                              
+                    </div>
+                </div> 
+                <div class="modal-footer">
+                    <button type="button" id="btn-cancel" class="btn btn-modal-footer btn-right"
+                        (click)="cancelColumnOptions()">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveColumnOptions()">
+                        Save
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--3">
-        <p>
-          <b>City</b>
-        </p>
-        <p>
-          {{ committee_details?.city }}
-        </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>State</b>
-          </p>
-          <p>
-            {{ committee_details?.state }}
-          </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Zip Code</b>
-          </p>
-          <p>
-            {{ committee_details?.zipcode }}
-          </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Treasurer Last Name</b>
-          </p>
-          <p>
-            {{ committee_details?.treasurerlastname }}
-          </p>
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Treasurer First Name</b>
-          </p>
-          <p>
-           {{ committee_details?.treasurerfirstname }}
-          </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Treasurer Middle Name</b>
-          </p>
-          <p>
-           {{ committee_details?.treasurermiddlename }}
-          </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Treasurer Prefix</b>
-          </p>
-          <p>
-           {{ committee_details?.treasurerprefix }}
-          </p>
-        </div>
-        <div class="grid-row__col grid-row__col--3">
-          <p>
-            <b>Treasurer Sufix</b>
-          </p>
-          <p>
-           {{ committee_details?.treasurersuffix }}
-          </p>
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <hr />
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--6 text-left">
-          <h4>Text</h4>
-        </div>
-        <div class="grid-row__col grid-row__col--6 text-right">
-          <button
-            type="button"
-            class="btn btn-edit"
-            (click)="goToPreviousStep()"
-          >
-              Edit
-            </button>
-        </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12" [innerHtml]="form_details?.text"></div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row-col grid-row__col--12">
-          <hr />
-          <h4>Attachments</h4>
-          <hr />
-          <br />
-        </div>
-      </div>      
-    </div> <!-- ./content -->
-  </section>
- </div>
+    </div> 
+    -->
+</div>

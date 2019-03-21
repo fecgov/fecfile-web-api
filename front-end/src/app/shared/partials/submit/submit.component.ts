@@ -12,7 +12,7 @@ import { MessageService } from '../../services/MessageService/message.service'
 export class SubmitComponent implements OnInit {
 
   public form_type: string = '';
-
+  public FEC_Id: string = '#####';
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
@@ -48,6 +48,10 @@ export class SubmitComponent implements OnInit {
           }
         }
       });           
+  }
+
+  public goToDashboard(): void {
+    this._router.navigateByUrl('dashboard');
   }
 
 }

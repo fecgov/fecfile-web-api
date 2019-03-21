@@ -65,12 +65,12 @@
         @include media(mediumDesktop) {
           float: left;
           text-align: right;
-          width: 50%;
+          width: 47%;
         }
         @include media(largeDesktop) {
           float: left;
           text-align: right;
-          width: 50%;
+          width: 47%;
         }
         .btn-print-preview {
           @extend .btn-secondary-gray;
@@ -153,7 +153,6 @@
 
       .file-attached-container {
         .close-icon {
-          // @extend .close-icon;
           color: $red;
           vertical-align: top
         }

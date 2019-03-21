@@ -4,11 +4,13 @@ import { CanDeactivate, CanComponentDeactivate } from '../../interfaces/CanDeact
 import { FormsComponent } from '../../../forms/forms.component';
 import { PreviewComponent } from '../../partials/preview/preview.component';
 import { SignComponent } from '../../partials/sign/sign.component';
+import { TransactionsComponent } from 'src/app/forms/transactions/transactions.component';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CanDeactivateGuardService implements CanDeactivate<FormsComponent | PreviewComponent | SignComponent> {
+export class CanDeactivateGuardService implements CanDeactivate<FormsComponent | PreviewComponent |
+    SignComponent | TransactionsComponent> {
 
   constructor() { }
 

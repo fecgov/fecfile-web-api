@@ -10,9 +10,14 @@
 	//color: $white;
 }
 
-.plus-icon {
+.plus-icon-circle {
 	@extend .fas;
 	@extend .fa-plus-circle;
+}
+
+.plus-icon {
+  @extend .fas;
+  @extend .fa-plus;
 }
 
 .notifications-icon {
@@ -98,4 +103,39 @@
 .calendar-icon {
   @extend .fas;
   @extend .fa-calendar-alt;
+}
+
+.edit-icon {
+    @extend .fas;
+    @extend .fa-pencil-alt;
+}
+
+.dollar-sign-icon {
+  @extend .fas;
+  @extend .fa-dollar-sign;
+}
+
+.trash-icon {
+  @extend .fas;
+  @extend .fa-trash;
+}
+
+.filter-icon {
+  @extend .fas;
+  @extend .fa-filter;
+}
+
+.thumbtack-icon {
+  @extend .fas;
+  @extend .fa-thumbtack;
+}
+
+.file-import-icon {
+  @extend .fas;
+  @extend .fa-file-import;
+}
+
+.table-icon {
+  @extend .fas;
+  @extend .fa-table;
 }

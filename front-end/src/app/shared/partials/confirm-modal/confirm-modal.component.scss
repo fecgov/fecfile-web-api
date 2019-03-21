@@ -16,7 +16,7 @@
         width: 100%;
       }       
       .modal-header {
-        background-color: $crusta;
+        // background-color: $crusta; 
         color: $white;
         .btn-link {
           color: $white;
@@ -28,6 +28,18 @@
           }
         }
       }
+      .warning-header {
+        background-color: $crusta;
+      }      
+      .success-header {
+        background-color: #99cc63;
+      }
+      .error-header {
+        background-color: #b52b27;
+      }
+      .info-header {
+        background-color: $dodgerBlue;
+      }            
       .modal-body {
         color: $black;
       }

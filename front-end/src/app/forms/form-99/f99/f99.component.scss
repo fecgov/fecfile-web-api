@@ -7,7 +7,7 @@
   min-height: $mainContentHeight;
   margin: 0;
   padding: 0;
-  width: 100%;  
+  width: 100%;
   @include firefoxOnly() {
     height: $mainContentHeight;
   }
@@ -22,16 +22,16 @@
       }
       @include media(mediumDesktop) {
         display: table-cell;
-        width: 250px;         
-      }         
+        width: 250px;
+      }
       @include media(largeDesktop) {
         display: table-cell;
-        width: 250px; 
-      }         
+        width: 250px;
+      }
     }
     &.hide-alerts {
       display: none;
-    }    
+    }
     @include media(tablet) {
       display: none;
     }
@@ -40,17 +40,17 @@
       //height: 120vh;
       min-height: 120vh;
       position: relative;
-      width: 100px;      
-    }         
+      width: 100px;
+    }
     @include media(largeDesktop) {
       display: table-cell;
       //height: 120vh;
       min-height: 120vh;
       position: relative;
-      width: 100px;      
-    }    
-    @include clearfix();         
-  }  
+      width: 100px;
+    }
+    @include clearfix();
+  }
   .form__steps {
     display: block;
     margin: 0 auto;
@@ -59,9 +59,7 @@
   }
   .form__container {
     display: table-cell;
-    //height: 100vh;
     min-height: 100vh;
-    width: 99%;
     &.show-alerts {
       padding-left: 0;
       @include media(tablet) {
@@ -69,57 +67,50 @@
       }
       @include media(mediumDesktop) {
         margin-left: 5px;
-        width: 70%;         
-      }         
+        width: 80%;
+      }
       @include media(largeDesktop) {
         margin-left: 5px;
-        width: 76%; 
-      }         
-    } 
-    &.hide-alerts { 
+        width: 86%;
+      }
+    }
+    &.hide-alerts {
       width: 100%;
       @include media(tablet) {
         width: 100%;
       }
       @include media(mediumDesktop) {
         width: 100%;
-      }         
+      }
       @include media(largeDesktop) {
         width: 100%;
-      }       
-    }    
+      }
+    }
     @include media(tablet) {
-      //height: 100vh;
       min-height: 100vh;
       width: 99%;
     }
     @include media(mediumDesktop) {
-      //height: 100vh;
       min-height: 100vh;
-      width: 85%;
-    }         
+      width: 900px;
+    }
     @include media(largeDesktop) {
-      //height: 100vh;
       min-height: 100vh;
-      width: 90%;
-    }          
+      width: 1060px;
+    }
     .form__content {
       height: 100%;
       width: 100%;
       padding-left: 2px;
-/*       &.preview {
-        display: table-cell;
-      } */
-      //&.preview {
       @include media(tablet) {
         padding-left: 2px;
       }
       @include media(mediumDesktop) {
         padding-left: 0;
-      }         
+      }
       @include media(largeDesktop) {
         padding-left: 0;
-      }        
+      }
       &.hide-alerts {
         .form__step {
           padding-left: 0 !important;
@@ -129,17 +120,17 @@
       }
       .form__step {
         padding-left: 0;
-        width: 100%; 
+        width: 100%;
         @include media(tablet) {
           padding-left: 0;
         }
         @include media(mediumDesktop) {
           padding-left: 5px;
-        }         
+        }
         @include media(largeDesktop) {
           padding-left: 5px;
-        }             
-      }   
+        }
+      }
     }
     @include clearfix();
   } // .form__container

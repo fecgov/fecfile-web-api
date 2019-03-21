@@ -3,6 +3,9 @@
     *ngFor="let step of steps"
     [ngClass]="(step.step === current_step)? 'current ' + step.step : step.step"
   >
-    <div [innerHTML]="step.text"></div>
+    <div
+      class="step-text"
+      [innerHTML]="step.text"
+    ></div>
   </li>
 </ul>

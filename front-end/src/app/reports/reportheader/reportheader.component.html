@@ -1,0 +1,60 @@
+<div class="forms__wizard" >
+ 
+  <div class="form__sidebar" *ngIf="showSideBar">
+     <app-reportsidebar
+          title="Report Coverage Dates"
+          (status)='onNotify($event)'
+          [specialreports]="specialreports"
+     >
+      </app-reportsidebar>
+  </div>
+ 
+  <div class="form__container">
+      <div class="form__content" >
+        <div class="card pl-3 pr-3">
+                   <h2 class="pb-3 pt-3 border-bottom"><B>Reports</B>
+                      <span class="float-right">
+
+                    <button  class="btn btn-primary" (click)="showFilter()">
+                    <i class="fas fa-filter"></i> Filter
+                    </button> &nbsp;&nbsp;&nbsp;
+
+                    <button class="btn btn-primary" (click)="recycleReports()">
+                    <i class="fas fa-recycle"></i> Recycle
+                    </button>      
+
+                    </span>
+                    </h2>
+                    <ngb-tabset type="pills" width=200px>
+                       <ngb-tab>
+                         <!--<ngb-tab title="Current Year ({{currentYear}})">-->
+                          <ng-template ngbTabTitle><b>Current Year ({{currentYear}})</b></ng-template> 
+                          <ng-template ngbTabContent>
+                              <app-reportdetails
+                              title="Report for Archives"
+                              (status)='onNotify($event)'
+                              [reports]="reports"
+                              tableType="{{reportsView}}"
+                              view="current"
+                            ></app-reportdetails>
+                          </ng-template>
+                        </ngb-tab>
+                        <ngb-tab>
+                          <ng-template ngbTabTitle><b>Archives</b></ng-template>
+                          <ng-template ngbTabContent> 
+                            <app-reportdetails
+                            title="Report for Archives"
+                            (status)='onNotify($event)'
+                            [reports]="reports"
+                            tableType="{{reportsView}}"
+                            view="archieve"
+                          ></app-reportdetails>
+                          </ng-template>
+                        </ngb-tab>
+                       
+                    </ngb-tabset>
+              </div>  
+      <div>         
+  </div> <!-- ./form__container -->
+
+</div> <!-- ./forms__wizard -->

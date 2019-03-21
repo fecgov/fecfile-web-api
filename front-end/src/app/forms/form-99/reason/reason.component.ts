@@ -44,11 +44,11 @@ export class ReasonComponent implements OnInit {
   public closeResult: string = '';
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
-  
+  public editorMax: number = 20000;
+
   private _printPriviewPdfFileLink: string ='';
 
   private _form99Details: any = {}
-  private _editorMax: number = 20000;
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
@@ -80,7 +80,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            htmlLength(this._editorMax)
+            Validators.maxLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -88,7 +88,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            htmlLength(this._editorMax)
+            Validators.maxLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -97,7 +97,8 @@ export class ReasonComponent implements OnInit {
       this.frmReason = this._fb.group({
         reasonText: ['', [
           Validators.required,
-          htmlLength(this._editorMax)
+          Validators.maxLength(this.editorMax),
+          Validators.pattern(/^$|\s+/)
         ]],
         file: ['']
       });
@@ -126,6 +127,13 @@ export class ReasonComponent implements OnInit {
     }
   }
 
+  public reasonTextEmpty(): boolean {
+    if (!this.frmReason.controls.reasonText.value.replace(/(\s)/g, '').length) {
+      return true;
+    }
+    return false;
+  }
+
 
   public setFile(e): void {
     if(e.target.files.length === 1) {
@@ -137,9 +145,7 @@ export class ReasonComponent implements OnInit {
 
          if (this.file.size > 33554432) {
           this.notCorrectPdfSize=true;
-         }
-         else
-         {
+         } else {
           this.notCorrectPdfSize=false;
          }
 
@@ -150,9 +156,7 @@ export class ReasonComponent implements OnInit {
          this._form99Details.filename = this.file.name;
          this.PdfUploaded=true;
          this.PdfDeleted=false;
-      }
-      else
-      {
+      } else {
         this.notValidPdf=true;
         this.validFile=false;
         this.file=null;
@@ -160,18 +164,18 @@ export class ReasonComponent implements OnInit {
         this.PdfUploaded=false;
       }
     } else {
-         let fileNameObj: any = {
-           'fileName': ''
-         };
-         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
-        this.notValidPdf=true;
-        this.validFile=false;
-        this.file=null;
-        this.showFileDeleteButton=false;
-        this.fileInput.nativeElement.value = '';
-        this._form99Details.filename = '';
-        this.PdfUploaded = false;
-        localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+      let fileNameObj: any = {
+       'fileName': ''
+      };
+      localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+      this.notValidPdf=true;
+      this.validFile=false;
+      this.file=null;
+      this.showFileDeleteButton=false;
+      this.fileInput.nativeElement.value = '';
+      this._form99Details.filename = '';
+      this.PdfUploaded = false;
+      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
   }
 
@@ -180,8 +184,8 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    console.log('doValidateReason: ');
-    if (this.frmReason.get('reasonText').value.length >= 1) {
+    let reasonText: string = this.frmReason.get('reasonText').value.trim();
+    if (reasonText.length >= 1) {
         let formSaved: any = {
           'form_saved': this.formSaved
         };
@@ -192,12 +196,6 @@ export class ReasonComponent implements OnInit {
 
         this.reasonText = this.frmReason.get('reasonText').value;
         this._form99Details.text = this.frmReason.get('reasonText').value;
-
-        /*if (this.frmReason.get('file').value){
-          this._form99Details.file=this.frmReason.get('file').value;
-        }*/
-
-        console.log('this._form99Details: ', this._form99Details);
 
         setTimeout(() => {
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
@@ -257,9 +255,7 @@ export class ReasonComponent implements OnInit {
 
 
   public removeFile(modalId: string): void {
-    console.log("modalId =", modalId);
     this._modalService.open(modalId);
-    
   }
 
   /**
@@ -291,9 +287,10 @@ export class ReasonComponent implements OnInit {
    *
    */
   public saveForm () {
-    console.log('saveForm: ');
+    console.log("this.frmReason.get('reasonText'): ", this.frmReason.get('reasonText'));
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
+        console.log('inside here: ');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -311,7 +308,6 @@ export class ReasonComponent implements OnInit {
         this.hideText = true;
 
         this.showValidateBar = false;
-        console.log('this.file: ',this.file);
 
         if (this.file !== null){
           this._form99Details.file=this.file;
@@ -319,11 +315,8 @@ export class ReasonComponent implements OnInit {
           .saveForm({}, this.file, this._formType)
           .subscribe(res => {
             if(res) {
-              console.log('res: ', res);
-
               this._form99Details.id = res.id;
               this._form99Details.org_fileurl = res.file;
-              console.log('res.file: ', res.file);
 
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
@@ -341,11 +334,11 @@ export class ReasonComponent implements OnInit {
           });
       }
       else {
+        console.log('if file === null');
         this._formsService
         .saveForm({}, {}, this._formType)
         .subscribe(res => {
           if(res) {
-            console.log('res: ', res);
 
             this._form99Details.id = res.id;
 
@@ -424,30 +417,12 @@ export class ReasonComponent implements OnInit {
       });
   }
 
-
-
-  /*public printPreview(): void {
-    this.status.emit({
-      form: {},
-      direction: 'next',
-      step: 'step_3'
-    });
-  }*/
-
-  /*public canDeactivate(): Observable<boolean> | boolean {
-      if (!this.formSaved && this.frmReason.dirty) {
-
-          return this._dialogService.confirm('Discard changes for this form?');
-      }
-      return true;
-  }*/
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
     if(this.frmReason.valid) {
        console.log('Reason screen printPreview: step -II');
 
       if (this.frmReason.get('reasonText').value.length >= 1) {
-        console.log('Reason screen printPreview: step -III');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
@@ -466,7 +441,6 @@ export class ReasonComponent implements OnInit {
         this.hideText = true;
 
         this.showValidateBar = false;
-        console.log('Reason screen printPreview: this.file: ',this.file);
 
 
         if (this.file !== null){
@@ -498,7 +472,6 @@ export class ReasonComponent implements OnInit {
           .PreviewForm_ReasonScreen({}, {}, this._formType)
           .subscribe(res => {
             if(res) {
-              console.log('Reason screen printPreview: res: ', res);
               this._form99Details.id = res.id;
               localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
               // success
@@ -520,7 +493,6 @@ export class ReasonComponent implements OnInit {
     }
   }
   public deletePDF( message: string,  modalId:string): void {
-    console.log("deletePDF message", message);
     if (message==="Yes"){
       this.file = null;
       this.notValidPdf=false;
@@ -543,8 +515,6 @@ export class ReasonComponent implements OnInit {
 }
 
  private _getDismissReason(reason: any): string {
-  console.log(" ReasonComponent _getDismissReason reason", reason);
-  
   if (reason === "Yes click") {
     this.PdfDeleted=true;
     this.file = null;

@@ -6,9 +6,8 @@ import { form3x } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { ReportTypeService } from './report-type.service';
 import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
-import { forkJoin, of, interval } from 'rxjs';
-import { CompileShallowModuleMetadata, ConditionalExpr } from '@angular/compiler';
 
 
 @Component({
@@ -20,55 +19,35 @@ import { CompileShallowModuleMetadata, ConditionalExpr } from '@angular/compiler
 export class ReportTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @ViewChild('mswCollapse') mswCollapse;
-  @Input() formRadioOptionsVisible: boolean = false;
-  @Input() reportType:string ='';
-  
-  //@Input() reportTypeRadio: string ='';
+  @Input() committeeReportTypes: any = [];
+  @Input() selectedReportInfo: any = {};
 
   public frmReportType: FormGroup;
-  public typeSelected: string = '';
+  public fromDateSelected: boolean = false;
+  public reportTypeSelected: string = '';
   public isValidType: boolean = false;
   public optionFailed: boolean = false;
   public screenWidth: number = 0;
+  public reportType: string = null;
+  public toDateSelected: boolean = false;
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
 
-  private _form_3x_details: form3x;
-  private _newForm: boolean = false;
-  private _previousUrl: string = null;
-
-  //public committee_form3x_reporttypes: Icommittee_form3x_reporttype[];
-  public committee_form3x_reporttypes: any = [];
-
-  public sidebarLinks: any = {};
-  public selectedOptions: any = [];
-  public searchField: any = {};
-  public cashOnHand: any = {};
-  public typeSelectedId: string='';
-  public reportTypeRadio: string ='';
-
-  public frm: any;
-  public direction: string;
-  public previousStep: string = '';
-  public reporttypes: any = [];
-  public reporttype: any = {};
-  public coverageDateNotSelected: boolean = true;
-
-  private _step: string = '';
-  private _form_type: string = '';
-  private step: string = "";
-  private next_step: string = "Step-2";
-  private _form3XReportDetails:  form3XReport={};
-  private _form3XReportInfo:  form3XReport={};
-
-  public showForm: boolean = true;
+  private _dueDate: string = null;
+  private _formType: string = null;
+  private _form3xReportTypeDetails: any = null;
+  private _fromDateSelected: string = null;
+  private _reportTypeDescripton: string = null;
+  private _selectedElectionState: string = null;
+  private _selectedElectionDate: string = null;
+  private _toDateSelected: string = null;
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _formService:FormsService,
+    private _formService: FormsService,
+    private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._messageService.clearMessage();
@@ -76,20 +55,14 @@ export class ReportTypeComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this._form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-   this._formService
-     .getreporttypes(this._form_type)
-     .subscribe(res => {
-      this.committee_form3x_reporttypes = res.report_type;
-     });
+    if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
+      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
+    }
 
-     if (this.reporttype===null || typeof this.reporttype ==='undefined'){
-      this.reportType=this.committee_form3x_reporttypes[0].report_type;
-     }
-
-  
-    this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
+    this._messageService
+      .clearMessage();
 
     this.screenWidth = window.innerWidth;
 
@@ -101,23 +74,95 @@ export class ReportTypeComponent implements OnInit {
       this.tooltipLeft = 'auto';
     }
 
-    this._setForm();
+    this.frmReportType = this._fb.group({
+      reportTypeRadio: ['', Validators.required]
+    });
 
-    this._router
-      .events
-      .subscribe(e => {
-        if(e instanceof NavigationEnd) {
-          this._previousUrl = e.url;
-          if(this._previousUrl === '/forms/form/3X?step=step_5') {
-            this._form_3x_details = JSON.parse(localStorage.getItem('form_3X_details'));
-
-            this.typeSelected = '';
-
-            this._setForm();
-          }
-        }
-      });
+    this._form3xReportTypeDetails = {
+      cmteId: '',
+      reportId: '',
+      formType: '3X',
+      electionCode: '',
+      reportType: '',
+      reportTypeDescription: '',
+      regularSpecialReportInd: '',
+      stateOfElection: '',
+      electionDate: '',
+      cvgStartDate: '',
+      cvgEndDate: '',
+      dueDate: '',
+      amend_Indicator: '',
+      coh_bop: '0'
+    };
   }
+
+  ngDoCheck(): void {
+    if (this.selectedReportInfo) {
+      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
+        if (typeof this.selectedReportInfo.toDate === 'string') {
+          if (this.selectedReportInfo.toDate.length >= 1) {
+            this._toDateSelected = this.selectedReportInfo.toDate;
+            this.toDateSelected = true;
+          } else {
+            this.toDateSelected = false;
+          }
+        } else {
+          this.toDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
+        if (typeof this.selectedReportInfo.fromDate === 'string') {
+          if (this.selectedReportInfo.fromDate.length >= 1) {
+            this._fromDateSelected = this.selectedReportInfo.fromDate;
+            this.fromDateSelected = true;
+          } else {
+            this.fromDateSelected = false;
+          }
+        } else {
+          this.fromDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
+        if (typeof this.selectedReportInfo.selectedState === 'string') {
+          console.log('this.selectedReportInfo.selectedState:', this.selectedReportInfo.selectedState);
+          this._selectedElectionState = this.selectedReportInfo.selectedState;
+        } else {
+          this._selectedElectionState = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
+        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
+          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
+        } else {
+          this._selectedElectionDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
+        if (typeof this.selectedReportInfo.dueDate === 'string') {
+          if (this.selectedReportInfo.dueDate.length >= 1) {
+            this._dueDate = this.selectedReportInfo.dueDate;
+          }
+        } else {
+          this._dueDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
+        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
+          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
+            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+          }
+        } else {
+          this._reportTypeDescripton = null;
+        }
+      }
+    }
+  }
+
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -132,88 +177,72 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
-  ngDoCheck(): void {
-    if (localStorage.getItem('form3XReportInfo.fromDate') !== null && localStorage.getItem('form3XReportInfo.fromDate') !== null){
-      this.coverageDateNotSelected=false;
-    }
-    
-  }
-
-  private _setForm(): void {
-    this.frmReportType = this._fb.group({
-      reportTypeRadio: ["", Validators.required]
-
-    });
-  }
-
   /**
    * Updates the type selected.
    *
-   * @param      {<type>}  val     The value
+   * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
-    console.log("updateTypeSelected");
     if(e.target.checked) {
-      this.typeSelected = e.target.value;
-      this.typeSelectedId = e.target.id;
-      this.reportTypeRadio = e.target.id;
+      this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
+      this.reportType = this.reportTypeSelected;
+      let dataReportType: string = e.target.getAttribute('data-report-type');
+
+      if (dataReportType !== 'S') {
+        this.toDateSelected = true;
+        this.fromDateSelected = true;
+      } else {
+        this.toDateSelected = false;
+        this.fromDateSelected = false;
+      }
+
+      this.status.emit({
+        'form': '3x',
+        'reportTypeRadio': this.reportTypeSelected
+      });
     } else {
-      this.typeSelected = '';
+      this.reportTypeSelected = '';
       this.optionFailed = true;
-      this.reportTypeRadio = '';
     }
-    
-    //this.reporttype=e.target.id;
-
-    localStorage.setItem('form3XReportInfo.reportType', e.target.id);
-    this.reporttype = localStorage.getItem('form3XReportInfo.reportType');
-    this.reportType = localStorage.getItem('form3XReportInfo.reportType');
-    
-  
-    this.reporttypes=JSON.parse(localStorage.getItem('form3xReportTypes'));
-  
-    if (this.reporttypes !== null && this.reporttypes !== undefined)
-    {
-      this.reporttype  = this.reporttypes.find( x => x.report_type === e.target.id);
-      localStorage.setItem('form3xSelectedReportType', JSON.stringify(this.reporttype));
-      localStorage.setItem('form3XReportInfo.reportDescription', this.reporttype.report_type_desciption);
-      localStorage.removeItem('form3XReportInfo.state');
-    }
-
-
-    this.status.emit({
-      reportTypeRadio: e.target.id
-    });
-    // this.frmType.controls['reportTypeRadio'].setValue(val);
   }
 
   /**
    * Validates the type selected form.
    *
    */
-  public doValidatereportType() {
-    if (this.frmReportType.get('reportTypeRadio').value) {
+  public doValidateReportType() {
+    if (this.frmReportType.valid) {
         this.optionFailed = false;
         this.isValidType = true;
-        this._form_3x_details = JSON.parse(localStorage.getItem('form_3x_details'));
 
-        //this._form_3x_details.reason = this.frmType.get('reportTypeRadio').value;
+        this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
-        setTimeout(() => {
-          localStorage.setItem('form_3x_details', JSON.stringify(this._form_3x_details));
-        }, 100);
+        this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
+        this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
+        this._form3xReportTypeDetails.dueDate = this._formatDate(this._dueDate);
+        this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+        this._form3xReportTypeDetails.election_state = this._selectedElectionState;
+        this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
+        this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
 
-        console.log(" report-type.component doValidateType");
+        console.log('this._form3xReportTypeDetails: ', this._form3xReportTypeDetails);
 
-        this.status.emit({
-          form: this.frmReportType,
-          direction: 'next',
-          step: 'step_2',
-          previousStep: 'step_1'
-        });
+        localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
-        console.log(" report-type.component After status.emit");
+        this._reportTypeService
+          .saveReport(this._formType)
+          .subscribe(res => {
+            if (res) {
+              this.status.emit({
+                form: this.frmReportType,
+                direction: 'next',
+                step: 'step_2',
+                previousStep: 'step_1'
+              });
+            }
+          });
+
         return 1;
     } else {
       this.optionFailed = true;
@@ -230,24 +259,13 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
-  public doValidateOption(): boolean {
-    if (this.frmReportType.invalid) {
-      this.optionFailed = true;
-      return false;
-    } else {
-      this.optionFailed = false;
-      return true;
-    }
-  }
 
-  public updateStatus(e): void {
-    if (e.target.checked) {
-      this.optionFailed = false;
-    } else {
-      this.optionFailed = true;
-    }
-  }
 
+  /**
+   * Toggles the tooltip.
+   *
+   * @param      {Element}  tooltip  The tooltip
+   */
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();
@@ -256,90 +274,36 @@ export class ReportTypeComponent implements OnInit {
     }
   }
 
-  public frmTypeValid() {
-    return this.isValidType;
+  public log(val) {
+    console.log('val: ', val);
   }
 
+  /**
+   * Cancels form 3x.
+   */
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
   }
-  public saveReport(): void {
-  
-    console.log ("saveReport...");
-    this._form3XReportInfo.cmteId='';
-    this._form3XReportInfo.reportId='';
-    this._form3XReportInfo.formType= "3X";
-    this._form3XReportInfo.electionCode='';
-    this._form3XReportInfo.reportType=localStorage.getItem('form3XReportInfo.reportType');
-    this._form3XReportInfo.regularSpecialReportInd=localStorage.getItem('form3XReportInfo.rgularSpecialReportInd');
-    this._form3XReportInfo.stateOfElection=localStorage.getItem('form3XReportInfo.state');
-    this._form3XReportInfo.electionDate=localStorage.getItem('form3XReportInfo.electionDate');
-    this._form3XReportInfo.cvgStartDate=localStorage.getItem('form3XReportInfo.fromDate');
-    this._form3XReportInfo.cvgEndDate=localStorage.getItem('form3XReportInfo.toDate');
-    this._form3XReportInfo.dueDate=localStorage.getItem('form3XReportInfo.dueDate');
-    this._form3XReportInfo.amend_Indicator='';
-    this._form3XReportInfo.coh_bop="0";
-   
-    localStorage.setItem('form_3X_ReportInfo', JSON.stringify(this._form3XReportInfo));
-    console.log ("form_3X_ReportInfo =...", JSON.parse(localStorage.getItem('form_3X_ReportInfo')));
 
-    this._formService
-     .saveReport(this._form_type)
-     .subscribe(res => {
-      if(res) {
-        console.log(' saveReport res: ', res);
-      }
-    },
-    (error) => {
-      console.log('saveReport error: ', error);
-    });
 
-    var date1, date2;
-    date1 = new Date(localStorage.getItem('form3XReportInfo.dueDate'));
-    date2 = Date.now(); 
-    var res = Math.abs(date1 - date2) / 1000;
-    var days = Math.floor(res / 86400);
-    
-    let fromDateString: string ="";
-    let toDateString: string ="";
-    let dueDateString: string ="";
+  /**
+   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  private _formatDate(date: string): string {
+    try {
+      const dateArr = date.split('-');
+      const month: string = dateArr[1];
+      const day: string = dateArr[2];
+      const year: string = dateArr[0].replace('2018', '2019');
 
-    if (typeof localStorage.getItem('form3XReportInfo.fromDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.fromDate') !== null ){
-      fromDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.fromDate'));
+      /// return `${year}-${month}-${day}`;
+
+      return `${month}/${day}/${year}`;
+    } catch (e) {
+      return '';
     }
-    else{
-      fromDateString="";
-    }
-
-
-    if (typeof localStorage.getItem('form3XReportInfo.toDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.toDate') !== null ){
-      toDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.toDate'));
-    }
-    else{
-      toDateString="";
-    }
-    
-
-    if (typeof localStorage.getItem('form3XReportInfo.dueDate') !== 'undefined' &&  localStorage.getItem('form3XReportInfo.dueDate') !== null ){
-      dueDateString = this.getDateInMMDDYYYYFormat(localStorage.getItem('form3XReportInfo.dueDate'));
-    }
-    else{
-      dueDateString="";
-    }
-    
-    localStorage.setItem('form3XReportInfo.showDashBoard',"Y");
-    localStorage.setItem('form3XReportInfo.DashBoardLine1',"Form 3X | " + localStorage.getItem('form3XReportInfo.reportDescription') + " | " + fromDateString+ " - " + toDateString);
-    localStorage.setItem('form3XReportInfo.DashBoardLine2',"due in " + days + " days | " + dueDateString);
-    
-    this._router.navigateByUrl('/forms/form/3X?step=step_2');
-
   }
-  getDateInMMDDYYYYFormat(value: string):string {
-    let DateString = value;
-    let DateObject = new Date(DateString);
-    DateString = DateObject.toLocaleDateString();
-    return DateString;
-  }
-  
-    
 }

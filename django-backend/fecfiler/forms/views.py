@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 import maya
-
+import pytz
 #from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -28,7 +28,7 @@ import PyPDF2
 from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
 from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 import urllib
-
+from django.db import connection
 
 
 # API view functionality for GET DELETE and PUT
@@ -777,20 +777,45 @@ def get_rad_analyst_info(request):
 @api_view(['GET'])
 def get_form99list(request):
     """
-    fields for auto populating the form 99 reports data
+    API that provides all the reports for a specific committee
     """
-    try:
-
-        comm = CommitteeInfo.objects.filter(committeeid=request.user.username).order_by('id').reverse()
-
-    except CommitteeInfo.DoesNotExist:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
-
-    # get details of a form 99 records
     if request.method == 'GET':
+        try:
+            cmte_id = request.user.username
+            viewtype = request.query_params.get('view')
+            print ("[cmte_id]", cmte_id)
+            print ("[viewtype]", viewtype)
 
-        serializer = CommitteeInfoListSerializer(comm)
-        return Response(serializer.data)
+            forms_obj = None
+            with connection.cursor() as cursor:
+
+                query_string =  """SELECT json_agg(t) FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
+                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                        END AS viewtype
+                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                    ) t1
+                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+
+                #print("query_string = ", query_string)
+                # Pull reports from reports_view
+                #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
+            
+                cursor.execute(query_string, [cmte_id, viewtype])
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj=data_row[0]
+            if forms_obj is None:
+                forms_obj = []
+        except Exception as e:
+            print (str(e))
+            return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+
 
 #API to delete saved forms
 @api_view(['POST'])
@@ -1015,6 +1040,7 @@ def save_print_f99(request):
     #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
     # #try:
     # create_json_data = json.loads(createresp.text)
+    est = pytz.timezone('US/Eastern')
 
     comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
@@ -1033,16 +1059,16 @@ def save_print_f99(request):
         if not comm_info.treasurersuffix is None:
             treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
         if comm_info.updated_at is None:
-            date_signed_mm = comm_info.created_at.strftime('%m')
-            date_signed_dd = comm_info.created_at.strftime('%d')
-            date_signed_yy = comm_info.created_at.strftime('%Y')
+            date_signed_mm = comm_info.created_at.astimezone(est).strftime('%m')
+            date_signed_dd = comm_info.created_at.astimezone(est).strftime('%d')
+            date_signed_yy = comm_info.created_at.astimezone(est).strftime('%Y')
             # filing_timestamp = comm_info.created_at.strftime('%m/%d/%Y %H:%M:%S')
             # print(comm_info.created_at)
             # print(filing_timestamp)
         else:
-            date_signed_mm = comm_info.updated_at.strftime('%m')
-            date_signed_dd = comm_info.updated_at.strftime('%d')
-            date_signed_yy = comm_info.updated_at.strftime('%Y')
+            date_signed_mm = comm_info.updated_at.astimezone(est).strftime('%m')
+            date_signed_dd = comm_info.updated_at.astimezone(est).strftime('%d')
+            date_signed_yy = comm_info.updated_at.astimezone(est).strftime('%Y')
             # filing_timestamp = comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S')
             # print(comm_info.updated_at)
             # print(filing_timestamp)
@@ -1161,6 +1187,8 @@ def update_print_f99(request):
         #print(updateresp.content)
         update_json_data = json.loads(updateresp.content.decode("utf-8"))
 
+    est = pytz.timezone('US/Eastern')
+
     #try:
     comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
@@ -1189,9 +1217,9 @@ def update_print_f99(request):
             'STATE': comm_info.state,
             'ZIP': comm_info.zipcode,
             'REASON_TYPE': comm_info.reason,
-            'DATE_SIGNED_MM':comm_info.updated_at.strftime('%m'),
-            'DATE_SIGNED_DD':comm_info.updated_at.strftime('%d'),
-            'DATE_SIGNED_YY':comm_info.updated_at.strftime('%Y'),
+            'DATE_SIGNED_MM':comm_info.updated_at.astimezone(est).strftime('%m'),
+            'DATE_SIGNED_DD':comm_info.updated_at.astimezone(est).strftime('%d'),
+            'DATE_SIGNED_YY':comm_info.updated_at.astimezone(est).strftime('%Y'),
             'TREASURER_FULL_NAME': treasurer_name,
             'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
             'EF_STAMP':"[Electronically Filed]",

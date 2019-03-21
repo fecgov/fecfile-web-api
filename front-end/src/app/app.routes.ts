@@ -1,7 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-// import { CanDeactivateGuard } from './shared/utils/can-deactivate/can-deactivate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -20,6 +19,12 @@ import { ToolsImportNamesComponent } from './tools-import-names/tools-import-nam
 import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
 import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
 import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
+import { TransactionsComponent } from './forms/transactions/transactions.component';
+
+import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
+
 
 export const AppRoutes: Routes = [
 	{
@@ -34,7 +39,13 @@ export const AppRoutes: Routes = [
 		  { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'profile', component: ProfileComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'tools', component: ToolsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
-		  { path: 'reports', component: ReportsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+			{ path: 'reports', component: ReportheaderComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
+			/*{ path: 'reports', component: ReportsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], */
+		    children: [
+			   { path: 'reports/reportdetails', component: ReportdetailsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService], }/*  */
+			]
+		  },
+
 			{ path: 'account', component: AccountComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_transactions', component: ToolsImportTransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_names', component: ToolsImportNamesComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
@@ -49,7 +60,8 @@ export const AppRoutes: Routes = [
         children: [
           { path: ':form_step', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService] }
         ]
-      }
+			},
+			{ path: 'forms/transactions/:form_id', component: TransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		]
     },
     { path: '**', redirectTo: '' }

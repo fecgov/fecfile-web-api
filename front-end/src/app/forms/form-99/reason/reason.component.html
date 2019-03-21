@@ -6,11 +6,13 @@
       <header>
         <div class="header-container">
           <div class="header__text">
-            <h1 class="text-left" *ngIf="!typeSelected">
-              Form 99
-            </h1>
-            <h1 class="text-left" *ngIf="typeSelected">
-              Form 99 / {{ typeSelected }}
+            <h1 class="text-left">
+              <ng-container *ngIf="!typeSelected">
+                Form 99
+              </ng-container>
+              <ng-container  *ngIf="typeSelected">
+                Form 99 / {{ typeSelected }}
+              </ng-container>
             </h1>
           </div>
           <div class="header__btns">
@@ -28,7 +30,7 @@
               (click)="validateForm()"
             >
                 Validate
-              </button>
+            </button>
           </div>
         </div>
       </header>
@@ -45,13 +47,16 @@
             <div class="grid-row__col grid-row__col--12"
               *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
               <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-                You must enter a reason.
+                Enter text for the reason selected.
+              </div>
+              <div class="text-error text-center" *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
+                Enter text for the reason selected.
               </div>
             </div>
           </div>
           <div class="grid-row info-row">
-            <div class="grid-row__col grid-row__col--6 text-left">
-              <b>Enter your text*</b>
+            <div class="grid-row__col grid-row__col--9 text-left">
+              <b>Text*</b>
               <ng-template #tipContent1>
                   Please note that if you copy and paste text into the text box the formatting may be lost.
                   The text box is only for composing a message or letter. The text box does feature basic formatting.
@@ -71,10 +76,7 @@
                   <span class="sr-only">Click here for more information</span>
                 </button>
             </div>
-            <div  class="grid-row__col grid-row__col--6 text-right">
-              *=Required
             </div>
-          </div>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12"
               *ngIf="notValidPdf">
@@ -99,7 +101,7 @@
               </div>
             </div>
           </div>
-            
+
           <div class="grid-row">
               <div class="grid-row__col grid-row__col--12"
                 *ngIf="PdfDeleted">
@@ -114,6 +116,7 @@
                 <textarea
                   placeholder="Enter text here..."
                   (keyup)="updateValidation()"
+                  [maxLength]="editorMax"
                   formControlName="reasonText"
                 ></textarea>
               </div>
@@ -176,18 +179,19 @@
               </div>
               <div class="file-attached-container" *ngIf="file !== null">
                 <div class="grid-row">
-                  <div class="grid-row__col--2">
-                    {{ file.name }}
-                  </div>
-                  <div class="grid-row__col--2 text-left">
+                  <div class="grid-row__col grid-row__col--12">
+                    <h5>
+                    {{ file.name }} 
                     <button
-                      type="button"
-                      class="btn btn-link"
-                      (click)="open(deletePDF)"
-                    >
-                        <span vertical-align="top" class="close-icon"></span>
-                      </button>
+                    type="button"
+                    class="btn btn-link"
+                    (click)="open(deletePDF)"
+                  >
+                      <span vertical-align="top" class="close-icon"></span>
+                  </button>
+                    </h5>
                   </div>
+                 
                   <ng-template #deletePDF let-d="dismiss">
                     <div class="modal-header">
                       <h2 class="modal-title">
@@ -203,7 +207,7 @@
                         class="btn btn-outline-dark"
                         (click)="d('Yes click')"
                       >Yes</button> &nbsp;
-        
+
                       <button
                       type="button"
                       class="btn btn-outline-dark"
@@ -235,13 +239,18 @@
                 type="submit"
                 [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
               >
-                  
+
                Save & Continue
               </button>
             </div>
           </div>
         </div>
+        <div  class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+          <h4>* = Required</h4>
+          </div>
+      </div>     
       </footer>
     </form>
   </div> <!-- ./reason-container -->
-  
+

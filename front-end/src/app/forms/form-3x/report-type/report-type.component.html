@@ -1,75 +1,73 @@
 
-<div class="report-type-container" *ngIf="showForm">
+<div class="report-type-container" *ngIf="!reportsLoading">
+    <form
+    [formGroup]="frmReportType"
+    (ngSubmit)="doValidateReportType()"
+    (blur)="doValidateReportType()"
+  >
     <header>
       <div class="header-content">
         <div class="float-left">
-          <h1>Report Type:&nbsp;&nbsp;{{reportType}}&nbsp;
+          <h1>
+            <ng-container *ngIf="!reportType">
+              Report Type
+            </ng-container>
+            <ng-container *ngIf="reportType">
+              Report Type: {{reportType}}
+            </ng-container>
             <button
-            type="button"
-            class="btn-info"
-            ngbTooltip="Language will be provided by RAD"
-          >
-            <i class="info-icon" aria-hidden="true"></i>
-            <span class="sr-only">
-              Click for more information
-            </span>
-          </button> </h1>
-          
-        </div>
-        
-        <div class="float-right">
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-          >
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
+              type="button"
+              class="btn-info"
+              ngbTooltip="Language will be provided by RAD"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+                Click for more information
+              </span>
+            </button>
+          </h1>
         </div>
       </div>
-      <hr />
     </header>
-    <form
-      [formGroup]="frmReportType"
-      (ngSubmit)="doValidateOption()"
-      (blur)="doValidateOption()"
-    >
       <section>
         <div class="form-content">
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
-                *ngIf="(frmReportType.invalid && (frmReportType.dirty || frmReportType.touched)) ">
+                *ngIf="(frmReportType.invalid && (optionFailed)) ">
                 You must select a report type for filing.
               </div>
+              <div class="text-error text-center"
+                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected)">
+                You must select coverage dates.
+              </div>
+
             </div>
           </div>
             <ul class="options-list">
               <li
                 class="options-list__item"
-                *ngFor="let committee_form3x_reporttype of committee_form3x_reporttypes || async"
+                *ngFor="let committeeReportType of committeeReportTypes  || async"
               >
               <input
-              type="radio"
-              name="reportTypeRadio"
-              id="{{committee_form3x_reporttype.report_type}}"
-              [checked]="committee_form3x_reporttype.report_type === reportType"
-              class="option-radio"
-              value="{{committee_form3x_reporttype.report_type}}"
-              (click)="updateTypeSelected($event)"
-              formControlName="reportTypeRadio"
-              
-            />
+                type="radio"
+                name="reportTypeRadio"
+                [value]="committeeReportType.report_type"
+                [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
+                [attr.checked]="committeeReportType.report_type === reportTypeSelected"
+                (change)="updateTypeSelected($event)"
+                formControlName="reportTypeRadio"
+              />
                 <label
-                  for="{{committee_form3x_reporttype.report_type_desciption}}"
+                  for="{{committeeReportType.report_type_desciption}}"
                 >
-                {{committee_form3x_reporttype.report_type_desciption}}
+                {{committeeReportType.report_type_desciption}}
                 </label>
                 <button
                   type="button"
                   class="btn-info"
-                  ngbTooltip=" {{committee_form3x_reporttype.report_type_info}}"
-  
+                  ngbTooltip=" {{committeeReportType.report_type_info}}"
+
                 >
                   <i class="info-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -93,8 +91,6 @@
             <button
               class="btn btn-primary btn-right"
               type="submit"
-              [disabled]="(frmReportType.invalid && (frmReportType.dirty || frmReportType.touched)) || (coverageDateNotSelected)"
-              (click)="saveReport()"
             >
               Next
             </button>
@@ -103,4 +99,3 @@
       </footer>
     </form>
   </div>
-  

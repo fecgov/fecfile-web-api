@@ -3,21 +3,32 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse, reportModel} from '../../interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
-
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+export interface GetReportsResponse {
+  reports: reportModel[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class FormsService {
+
+  private _orderByPipe: OrderByPipe;
 
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
-  ) { }
+  ) {
+    this._orderByPipe = new OrderByPipe();
+  }
 
-  /**
+
+
+
+ /**
    * Gets the form.
    *
    * @param      {String}   committee_id  The committee identifier.
@@ -83,7 +94,7 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
 
     return this._http
       .post<form99>(
@@ -198,8 +209,7 @@ export class FormsService {
 
           /*data['id']="0";*/
           formData.append('id', "0");
-        }
-        else
+        } else
         {
           formData.append('id', form99_details.id.toString());
         }
@@ -207,11 +217,7 @@ export class FormsService {
       }
 
       data=formData;
-
-
     }
-
-    console.log ('Formed Data: ',data);
 
    new Response(data).text().then(console.log)
 
@@ -284,9 +290,6 @@ export class FormsService {
       data = form99_details;
 
        data['form_type'] = 'F99';
-
-       console.log('F99 Submit form99_details',form99_details);
-       console.log('F99 Submit Data',data);
     }
     return this._http
       .post(
@@ -636,19 +639,20 @@ export class FormsService {
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
 
-  console.log("Save Report formF3X_ReportInfo ", formF3X_ReportInfo);
+  console.log(" saveReport formF3X_ReportInfo ",formF3X_ReportInfo );
+
+
   formData.append('report_id', formF3X_ReportInfo.reportId);
-  formData.append('form_type', formF3X_ReportInfo.formType);
+  formData.append('form_type', `F${formF3X_ReportInfo.formType}`);
   formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
   formData.append('report_type', formF3X_ReportInfo.reportType);
   formData.append('election_code', formF3X_ReportInfo.electionCode);
   formData.append('date_of_election', formF3X_ReportInfo.electionDate);
   formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
-  formData.append('cvg_start_date', formF3X_ReportInfo.cvgStartDate);
-  formData.append('cvg_end_date', formF3X_ReportInfo.cvgEndDate);
+  formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
+  formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
-  
-  console.log(" saveReport formData ",formData );
+
 
   return this._http
       .post(
@@ -669,9 +673,9 @@ export class FormsService {
  }
 
  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
-  let token: string = JSON.parse(this._cookieService.get('user'));
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  const url: string = '/core/get_dynamic_forms_fields';
   let httpOptions =  new HttpHeaders();
-  let url: string = '/core/get_dynamic_forms_fields';
   let params = new HttpParams();
   let formData: FormData = new FormData();
 
@@ -699,4 +703,80 @@ export class FormsService {
       localStorage.removeItem('form3XReportInfo.DashBoardLine2');
    }
  }
+
+
+  public getReports(formType: string, view: string, page: number, itemsPerPage: number,
+    sortColumnName: string, descending: boolean): Observable<any> {
+  const token: string = JSON.parse(this._cookieService.get('user'));
+  let httpOptions =  new HttpHeaders();
+  let params = new HttpParams();
+  const url ='/f99/get_form99list';
+
+  httpOptions = httpOptions.append('Content-Type', 'application/json');
+  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  params = params.append('view', view);
+
+  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+  console.log("httpOptions",httpOptions)
+  console.log("params",params);
+
+  return this._http
+  .get(
+      `${environment.apiUrl}${url}`,
+      {
+        headers: httpOptions,
+        params
+      }
+    );
+
+  }
+
+
+  /**
+   * Map server fields from the response to the model.
+   */
+  public mapFromServerFields(serverData: any, modelArray: reportModel[]) {
+
+    if (!serverData || !Array.isArray(serverData)) {
+      console.log(" no server data mapFromServerFields  modelArray", modelArray);
+      return;
+    }
+    if (!modelArray) {
+      modelArray = [];
+    }
+
+    for (const row of serverData) {
+      const model = new reportModel({});
+      model.form_type = row.form_type;
+      model.status = row.status;
+      model.fec_id = row.fec_id;
+      model.amend_ind = row.amend_ind;
+      model.cvg_start_date = row.cvg_start_date;
+      model.report_type_desc = row.report_type_desc;
+      model.filed_date = row.filed_date;
+      modelArray.push(model);
+    }
+    console.log(" mapFromServerFields  modelArray", modelArray);
+    return modelArray;
+  }
+
+  /**
+   *
+   * @param array
+   * @param sortColumnName
+   * @param descending
+   */
+  public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
+
+    console.log("sortTransactions array =", array);
+    console.log("sortTransactions sortColumnName =", sortColumnName);
+    console.log("sortTransactions descending =", descending);
+    const direction = descending ? -1 : 1;
+    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    console.log("sortTransactions array= ", array);
+    return array;
+
+  }
+
 }

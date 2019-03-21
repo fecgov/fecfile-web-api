@@ -5,6 +5,7 @@
   color: $black;
   font-family: $mainFontFamily;
   min-height: 100vh;
+  overflow-y: hidden;
   transition: all 0.4s ease 0s;
   &.active {
     padding-left: 0;
@@ -26,7 +27,7 @@
       .app__content-wrapper {
         padding-left: 10px;
         .app__content {
-          margin-left: 60px;
+          margin-left: 50px;
           width: 95%;
         }
       }
@@ -38,10 +39,10 @@
           padding-left: 100px;
         }
         @include media(mediumDesktop) {
-          padding-left: 130px;
+          padding-left: 80px;
         }
         @include media(largeDesktop) {
-          padding-left: 130px;
+          padding-left: 80px;
         }
       }
     }
@@ -60,18 +61,25 @@
     .app__side-nav {
       left: 0;
     }
+    main {
+      .app__content-wrapper {
+        padding-right: 20px;
+      }
+    }
     footer {
       .app__footer {
         font-family: $mainFontFamily;
-        padding-left: 80px;
-        @include media(tablet) {
-          padding-left: 100px;
-        }
         @include media(mediumDesktop) {
-          padding-left: 130px;
+          padding-left: 75px;
         }
         @include media(largeDesktop) {
-          padding-left: 130px;
+          padding-left: 75px;
+        }
+        .contact-info {
+          width: $footerContactInfoWidth;
+        }
+        .legal-disclaimer {
+          width: $footerLegalDisclaimerWidth;
         }
       }
     }
@@ -181,13 +189,12 @@
       margin: 0 auto;
       min-height: $mainContentHeight;
       padding-left: 40px;
-      padding-right: 30px;
       padding-top: 60px;
       transition: all 0.4s ease 0s;
       z-index: 0;
       .app__committee-info {
         background-color: $mercury;
-        height: 90px;
+        height: 120px;
         padding-left: 60px;
         padding-right: 60px;
         padding-top: 35px;
@@ -219,6 +226,16 @@
           font-size: 1em;
           font-family: $committeeInfoFontFamily;
         }
+        .btn-edit {
+          color: $black;
+          text-decoration: none;
+          &:hover,
+          &:visited,
+          &:active {
+            color: black;
+            text-decoration: none;
+          }
+        }
         @include clearfix();
       }
       .app__content {
@@ -232,31 +249,69 @@
   .app__footer {
     background-color: $mercury;
     color: $black;
+    height: $footerMobileHeight;
     margin-top: 5px;
+    overflow-y: hidden;
     padding-left: 80px;
     @include media(tablet) {
+      height: $footerMobileHeight;
       padding-left: 100px;
     }
     @include media(mediumDesktop) {
-      padding-left: 130px;
+      height: $footerDesktopHeight;
+      padding-left: 70px;
     }
     @include media(largeDesktop) {
-      padding-left: 130px;
+      height: $footerDesktopHeight;
+      padding-left: 70px;
     }
-    .row {
-      margin-left: 0;
-      margin-right: 0;
-      div[class^="col-sm"] {
+    .contact-info {
+      float:left;
+      width: $footerContactInfoWidth;
+      .contact-info__item {
+        display: block;
+        @include media(tablet) {
+          display: block;
+        }
+        @include media(mediumDesktop) {
+          display: inline-block;
+        }
+        @include media(largeDesktop) {
+          display: inline-block;
+        }
+        padding-right: 10px;
+        &:last-child {
+          padding-right: 0;
+        }
         a {
-          color: $dodgerBlue;
+          color: $pictonBlue;
+          text-decoration: none;
           &:hover,
           &:active,
           &:visited {
-            color: $dodgerBlue;
+            color: $pictonBlue;
+          }
+          &:hover,
+          &:active {
+            text-decoration: underline;
           }
         }
       }
     }
+    .legal-disclaimer {
+      float: left;
+      text-align: right;
+      width: $footerLegalDisclaimerWidth;
+      .btn-link {
+        color: $pictonBlue;
+        &:hover,
+        &:active,
+        &:visited {
+          color: $pictonBlue;
+        }
+      }
+    }
+    @include clearfix();
   }
 } // .app-container
 .modal-dialog {

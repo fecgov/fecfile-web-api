@@ -66,4 +66,27 @@ export class ApiService {
         }
       )
   }
+
+  /**
+   * Gets the rad analyst.
+   *
+   * @return     {Observable}  The rad analyst.
+   */
+  public getRadAnalyst(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = '/f99/get_rad_analyst_info'; // This needs to be updated to /core/ on the server side.
+    let httpOptions =  new HttpHeaders();
+    let formData: FormData = new FormData();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions
+        }
+      );
+  }
 }
