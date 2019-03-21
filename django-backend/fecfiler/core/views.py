@@ -225,10 +225,19 @@ def check_list_cvg_dates(args):
 
 def date_format(cvg_date):
     try:
-        if cvg_date == None:
+        if cvg_date == None or cvg_date in ["none", "null", " ", ""]:
             return None
         cvg_dt = datetime.strptime(cvg_date, '%m/%d/%Y').date()
         return cvg_dt
+    except:
+        raise
+
+def check_null_value(check_value):
+    try:
+        if check_value in ["none", "null", " ", ""]:
+            return None
+        else:
+            return check_value
     except:
         raise
 
@@ -529,28 +538,28 @@ def reports(request):
     if request.method == 'POST':
         try:
             if 'amend_ind' in request.data:
-                amend_ind = request.data.get('amend_ind')
+                amend_ind = check_null_value(request.data.get('amend_ind'))
             else:
                 amend_ind = "N"
 
             if 'election_code' in request.data:
-                election_code = request.data.get('election_code')
+                election_code = check_null_value(request.data.get('election_code'))
             else:
                 election_code = None
 
             if 'status' in request.data:
-                f_status = request.data.get('status')
+                f_status = check_null_value(request.data.get('status'))
             else:
                 f_status = "Saved"
             
             datum = {
                 'cmte_id': request.user.username,
-                'form_type': request.data.get('form_type'),
+                'form_type': check_null_value(request.data.get('form_type')),
                 'amend_ind': amend_ind,
-                'report_type': request.data.get('report_type'),
+                'report_type': check_null_value(request.data.get('report_type')),
                 'election_code': election_code,
                 'date_of_election': date_format(request.data.get('date_of_election')),
-                'state_of_election': request.data.get('state_of_election'),
+                'state_of_election': check_null_value(request.data.get('state_of_election')),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
