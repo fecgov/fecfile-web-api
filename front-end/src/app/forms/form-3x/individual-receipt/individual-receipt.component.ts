@@ -113,6 +113,36 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
+   * Removes fields.
+   * Removes the following fields if found:
+   * LineNumber, TransactionId, TransactionTypeCode, BackReferenceTranIdNumber, BackReferenceSchedName
+   *
+   * @param      {number}  i       { parameter_description }
+   * @param      {any}     item    The item
+   */
+  public removeFields(i: number, item: any): void {
+    let skipRow: any = null;
+    if (item.hasOwnProperty('cols')) {
+      if (Array.isArray(item.cols)) {
+        skipRow = item.cols.findIndex(el => (
+            el.name === 'LineNumber' ||
+            el.name === 'TransactionId' ||
+            el.name === 'TransactionTypeCode' ||
+            el.name === 'BackReferenceTranIdNumber' ||
+            el.name === 'BackReferenceSchedName'
+        ));
+
+        if (skipRow === 0) {
+          item['skipRow'] = true;
+        } else {
+          item['skipRow'] = false;
+        }
+
+        return item;
+      }
+    }
+  }
+  /**
    * Determines if element passed in from template is an array.
    *
    * @param      {<Array>}   item    The item

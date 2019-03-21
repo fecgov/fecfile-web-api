@@ -85,7 +85,11 @@ export class TransactionTypeComponent implements OnInit {
 
       if (this.transactionType) {
         this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
-        const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === this.secondaryTransactionType));
+        if (Array.isArray(this.mainTransactionCategory)) {
+          if (Array.isArray(this.mainTransactionCategory[0].options)) {
+            const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === this.secondaryTransactionType));
+          }
+        }
       }
     }
 
@@ -169,8 +173,7 @@ export class TransactionTypeComponent implements OnInit {
    * Sets the parent transaction categories.
    */
   private _setParentTransactionCategories(): void {
-    console.log('_setParentTransactionCategories: ');
-
+    //console.log('_setParentTransactionCategories: ');
 
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
 
