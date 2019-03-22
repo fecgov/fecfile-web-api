@@ -58,11 +58,22 @@ export class ReportTypeService {
 
     const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    formData.append('report_id', form3xReportType.reportId);
+    // formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F${formType}`);
-    formData.append('amend_ind', form3xReportType.amend_Indicator);
     formData.append('report_type', form3xReportType.reportType);
-    formData.append('election_code', form3xReportType.electionCode);
+    formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
+    formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
+    formData.append('coh_bop', form3xReportType.coh_bop);
+    if (typeof form3xReportType.amend_Indicator === 'string') {
+      if (form3xReportType.amend_Indicator.length >= 1) {
+        formData.append('amend_ind', form3xReportType.amend_Indicator);
+      }
+    }
+    if (typeof form3xReportType.electionCode === 'string') {
+      if (form3xReportType.electionCode.length >= 1) {
+        formData.append('election_code', form3xReportType.electionCode);
+      }
+    }
     if (form3xReportType.election_date.length >= 1) {
       formData.append('date_of_election', form3xReportType.election_date);
     }
@@ -73,9 +84,6 @@ export class ReportTypeService {
         }
       }
     }
-    formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
-    formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
-    formData.append('coh_bop', form3xReportType.coh_bop);
 
     return this._http
         .post(

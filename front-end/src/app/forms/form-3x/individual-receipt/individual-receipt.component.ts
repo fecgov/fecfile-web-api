@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angula
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
@@ -40,6 +41,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
+    private _utilService: UtilService
   ) {
     this._config.placement = 'right'
     this._config.triggers = 'click';
@@ -171,14 +173,26 @@ export class IndividualReceiptComponent implements OnInit {
       for (const field in this.frmIndividualReceipt.controls) {
         // console.log('field value: ', this.frmIndividualReceipt.get(field).value);
 
-        receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+        if (field === 'ContributionDate') {
+          receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+        } else {
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+        }
+
       }
 
       console.log('receiptObj: ', receiptObj);
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
+
+      this._individualReceiptService
+        .saveScheduleA(this._formType)
+        .subscribe(res => {
+          if (res) {
+            console.log('res: ',  res);
+          }
+        });
     }
-    return;
   }
 
   /**
