@@ -78,7 +78,15 @@ export class IndividualReceiptComponent implements OnInit {
 
     fields.forEach((el) => {
       el.cols.forEach((e) => {
-        formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+        if (
+          e.name !== 'LineNumber' &&
+          e.name !== 'TransactionId' &&
+          e.name !== 'TransactionTypeCode' &&
+          e.name !== 'BackReferenceTranIdNumber' &&
+          e.name !== 'BackReferenceSchedName'
+        ) {
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+        }
       });
     });
 
@@ -153,8 +161,22 @@ export class IndividualReceiptComponent implements OnInit {
   public doValidateReceipt() {
     this.formSubmitted = true;
 
+    console.log('doValidateReceipt: ');
+    console.log('this.frmIndividualReceipt:', this.frmIndividualReceipt);
+
     if(this.frmIndividualReceipt.valid) {
       this.formSubmitted = false;
+      let receiptObj: any = {};
+
+      for (const field in this.frmIndividualReceipt.controls) {
+        // console.log('field value: ', this.frmIndividualReceipt.get(field).value);
+
+        receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+      }
+
+      console.log('receiptObj: ', receiptObj);
+
+      localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
     }
     return;
   }
