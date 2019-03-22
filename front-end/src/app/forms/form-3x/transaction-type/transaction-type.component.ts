@@ -62,142 +62,137 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    if (Array.isArray(this.selectedOptions)) {
-      if (this.selectedOptions.length >= 1) {
-        this.showForm = true;
-      }
-    }
-
-    if (localStorage.getItem(`form_${this._formType}_transaction_type`) !== null) {
-      const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
-
-      if (transactionObj.hasOwnProperty('parentTransactionTypeValue')) {
-        if (typeof transactionObj.parentTransactionTypeValue === 'string') {
-          this.transactionType = transactionObj.parentTransactionTypeValue;
-        }
-      }
-
-      if (transactionObj.hasOwnProperty('secondaryTransactionType')) {
-        if (typeof transactionObj.secondaryTransactionType === 'string') {
-          this.secondaryTransactionType = transactionObj.secondaryTransactionType;
-        }
-      }
-
-      if (this.transactionType) {
-        this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
-        if (Array.isArray(this.mainTransactionCategory)) {
-          if (Array.isArray(this.mainTransactionCategory[0].options)) {
-            const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === this.secondaryTransactionType));
-          }
-        }
-      }
-    }
-
     if (this.transactionType) {
-      this._setParentTransactionCategories();
+      this.parentOptionFailed = false;
+    }
+
+    if (this.secondaryTransactionType) {
+      this.secondaryTransactionTypeFailed = false;
+    }
+
+    if (this.childOptionType) {
+      this.childOptionFailed = false;
+    }
+
+    if (this.transactionType && localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
+      this._setSecondaryTransactionCategories();
+    }
+
+    if (this.secondaryTransactionType) {
+      this._setChildTransactionCategories();
     }
   }
+
   /**
    * Validates the form on submit.
-   *
-   * @return     {Boolean}  A boolean indicating weather or not the form can be submitted.
    */
-  public doValidateOption(): boolean {
-    this.frmSubmitted = true;
+  public doValidateOption() {
     if (this.frmOption.valid) {
-      this.secondaryTransactionTypeFailed = false;
-      this.childOptionFailed = false;
-
-      this.status.emit({
-        form: this.frmOption,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2'
-      });
-
-      return true;
+      return 1;
     } else {
-      return false;
+      if (!this.transactionType) {
+        this.parentOptionFailed = true;
+      } else {
+        this.parentOptionFailed = false;
+      }
+
+      if (!this.secondaryTransactionType) {
+        this.secondaryTransactionTypeFailed = true;
+      } else {
+        this.secondaryTransactionTypeFailed = false;
+      }
+
+      if (this.childOptions.length >= 1) {
+        if (!this.childOptionType) {
+          this.childOptionFailed = true;
+        } else {
+          this.childOptionFailed = false;
+        }
+      }
+
+      return 0;
     }
   }
 
   /**
-   * Sets the secondary transaction type.
-   *
-   * @param      {Object} The event object.
-   */
-  public setSecondaryTransactionType(e): void {
-    const secondaryTransactionType: string = e.target.getAttribute('data-value');
-
-    if (secondaryTransactionType) {
-      this.secondaryTransactionType = secondaryTransactionType;
-
-      this.secondaryTransactionTypeFailed =  false;
-      const childItem: any = this.mainTransactionCategory[0].options.filter(el => (el.value === secondaryTransactionType));
-
-      if (childItem) {
-        this.childOptions = childItem[0].options;
-      }
-
-      if (localStorage.getItem(`form_${this._formType}_transaction_type`) !== null) {
-        let trasnsactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
-
-        trasnsactionObj['secondaryTransactionType'] = secondaryTransactionType;
-
-        localStorage.setItem(`form_${this._formType}_transaction_type`, JSON.stringify(trasnsactionObj));
-      }
-    }
-  }
-
-  /**
-   * Sets the child transaction type.
+   * Updates the type selected when radio button clicked.
    *
    * @param      {Object}  e       The event object.
    */
-  public setChildTransactionType(e): void {
-    const childTransactionType: string = e.target.getAttribute('data-value');
+  public updateTypeSelected(e): void {
+    console.log('updateTypeSelected: ');
 
-    if (childTransactionType) {
+    const type: string = e.target.getAttribute('data-type');
+
+    if (type === 'secondaryTransactionType') {
+      const val: string = this.frmOption.controls['secondaryTransactionType'].value;
+
+      this.secondaryTransactionType = val;
+
+      this.secondaryTransactionTypeFailed = true;
+
+      if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+        const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
+
+        localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+
+        tempObj.secondaryTransactionType = val;
+
+        localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
+      }
+    } else if (type === 'childTransactionType') {
+      console.log('childTransactionType: ');
+      const val: string = this.frmOption.controls['childTransactionType'].value;
+
+      this.childOptionType = val;
+
       this.childOptionFailed = false;
-      if (localStorage.getItem(`form_${this._formType}_transaction_type`) !== null) {
-        let trasnsactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
 
-        trasnsactionObj['childTransactionType'] = childTransactionType;
+      if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+        const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-        localStorage.setItem(`form_${this._formType}_transaction_type`, JSON.stringify(trasnsactionObj));
+        localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+
+        tempObj.childTransactionType = val;
+
+        localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
       }
     }
   }
 
   /**
-   * Sets the parent transaction categories.
+   * Sets the secondary transaction categories.
    */
-  private _setParentTransactionCategories(): void {
-    //console.log('_setParentTransactionCategories: ');
-
+  private _setSecondaryTransactionCategories(): void {
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
 
-    //if (localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
-      const parentTransactionTypeText: string = this.mainTransactionCategory[0].text;
-      const parentTransactionTypeValue: string = this.mainTransactionCategory[0].value;
-      const transactionObj: any = {
-        parentTransactionTypeText,
-        parentTransactionTypeValue
-      };
+    const mainTransactionTypeText: string = this.mainTransactionCategory[0].text;
+    const mainTransactionTypeValue: string = this.mainTransactionCategory[0].value;
+    const transactionObj: any = {
+      mainTransactionTypeText,
+      mainTransactionTypeValue,
+      'secondaryTransactionType': '',
+      'childTransactionType': ''
+    };
 
-      //console.log('inside here');
-
-      localStorage.setItem(`form_${this._formType}_transaction_type`, JSON.stringify(transactionObj));
-
-      this.transactionType = null;
-    //}
-    // this.secondaryTransactionType = '';
-    // this.secondaryOptions = '';
-    this.childOptionType = '';
+    localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this.mainTransactionCategory[0].options;
+  }
 
-    this.parentOptionFailed = false;
+  /**
+   * Sets the child transaction categories.
+   */
+  private _setChildTransactionCategories(): void {
+    const childOptionObj: any = this.secondaryOptions.filter(el => (this.secondaryTransactionType === el.value));
+
+    if (typeof childOptionObj === 'object') {
+      if (childOptionObj[0].hasOwnProperty('options')) {
+        if (Array.isArray(childOptionObj[0].options)) {
+          this.childOptions = childOptionObj[0].options;
+        }
+      }
+    }
   }
 
   /**

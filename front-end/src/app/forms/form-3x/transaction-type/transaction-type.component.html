@@ -30,17 +30,21 @@
     </header>
     <section>
       <div class="content">
-        <ng-container *ngIf="!secondaryTransactionType">
-          <div class="grid-row" *ngIf="parentOptionFailed">
+        <ng-container *ngIf="parentOptionFailed">
+          <div class="grid-row">
             <div class="grid-row__col grid-row__col--12 text-center text-error">
               You must select a transaction category first.
             </div>
           </div>
-          <div class="grid-row" *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (frmOption.invalid && frmSubmitted) || (secondaryTransactionTypeFailed)">
-            <div class="grid-row__col grid-row__col--12 text-center text-error">
-              You must select a transaction type first.
+        </ng-container>
+        <ng-container *ngIf="!secondaryTransactionType">
+          <ng-container *ngIf="secondaryTransactionTypeFailed">
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12 text-center text-error">
+                You must select a transaction type first.
+              </div>
             </div>
-          </div>
+          </ng-container>
           <div
             class="grid-row"
             *ngFor="let option of secondaryOptions"
@@ -49,9 +53,10 @@
               <input
                 type="radio"
                 name="secondaryTransactionType"
+                data-type="secondaryTransactionType"
                 [value]="option?.value"
                 [attr.data-value]="option?.value"
-                (change)="setSecondaryTransactionType($event)"
+                (change)="updateTypeSelected($event)"
                 formControlName="secondaryTransactionType"
               />
               <label for="secondaryTransactionType">
@@ -61,11 +66,13 @@
           </div>
         </ng-container>
         <ng-container *ngIf="!childOptionType">
-          <div class="grid-row" *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (frmOption.invalid && frmSubmitted) || (childOptionFailed)">
-            <div class="grid-row__col grid-row__col--12 text-center text-error">
-              You must select a child option.
+          <ng-container *ngIf="childOptionFailed">
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12 text-center text-error">
+                You must select a child transaction type first.
+              </div>
             </div>
-          </div>
+          </ng-container>
           <div
           class="grid-row"
           *ngFor="let option of childOptions"
@@ -74,9 +81,10 @@
               <input
                 type="radio"
                 name="childTransactionType"
+                data-type="childTransactionType"
                 [value]="option?.value"
                 [attr.data-value]="option?.value"
-                (change)="setChildTransactionType($event)"
+                (change)="updateTypeSelected($event)"
                 formControlName="childTransactionType"
               />
               <label for="childTransactionType">
@@ -85,7 +93,7 @@
             </div>
           </div>
         </ng-container>
-      </div>
+      </div> <!-- ./content -->
     </section>
     <footer>
       <div class="grid-row">

@@ -68,7 +68,13 @@ export class ReportTypeService {
     if (form3xReportType.election_date.length >= 1) {
       formData.append('date_of_election', form3xReportType.election_date);
     }
-    formData.append('state_of_election', form3xReportType.election_state);
+    if (form3xReportType.election_state !== null) {
+      if (typeof form3xReportType.election_state === 'string') {
+        if (form3xReportType.election_state.length >= 1) {
+          formData.append('state_of_election', form3xReportType.election_state);
+        }
+      }
+    }
     formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
     formData.append('coh_bop', form3xReportType.coh_bop);
