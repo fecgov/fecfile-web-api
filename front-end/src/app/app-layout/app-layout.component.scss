@@ -99,7 +99,7 @@
       margin: 0 !important;
       padding: 0 !important;
       .navbar-toggler {
-        padding-right: 20px;
+        margin-left: auto;
         @include media(tablet) {
           padding-right: 10px;
         }

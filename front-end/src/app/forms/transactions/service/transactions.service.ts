@@ -255,7 +255,8 @@ export class TransactionsService {
       }
     }
 
-    if (filters.filterAmountMin && filters.filterAmountMax) {
+    if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
+      isFilter = true;
       if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
           filters.filterAmountMin <= filters.filterAmountMax) {
         const filteredAmountArray = [];
@@ -263,7 +264,6 @@ export class TransactionsService {
           if (trx.transaction_amount) {
             if (trx.transaction_amount >= filters.filterAmountMin &&
               trx.transaction_amount <= filters.filterAmountMax) {
-                isFilter = true;
                 filteredAmountArray.push(trx);
             }
           }
@@ -364,10 +364,14 @@ export class TransactionsService {
 
 
   /**
+   * Restore the transaction from the Recyling Bin back to the Transactions Table.
    *
-   * @param trx
+   * @param trx the transaction to restore
    */
   public restoreTransaction(trx: TransactionModel): Observable<any> {
+
+
+    // mocking the server API until it is ready.
 
     const index = this.mockRestoreTrxArray.findIndex(
       item => item.transaction_id === trx.transactionId);
@@ -375,6 +379,29 @@ export class TransactionsService {
     if (index !== -1) {
       this.mockRestoreTrxArray.splice(index, 1);
       this.mockRecycleBinArray.push(this.mapToServerFields(trx));
+    }
+
+    return Observable.of('');
+  }
+
+
+  /**
+   * Delete transactions from the Recyling Bin.
+   *
+   * @param transactions the transactions to delete
+   */
+  public deleteRecycleBinTransaction(transactions: Array<TransactionModel>): Observable<any> {
+
+
+    // mocking the server API until it is ready.
+
+    for (const trx of transactions) {
+      const index = this.mockRestoreTrxArray.findIndex(
+        item => item.transaction_id === trx.transactionId);
+
+      if (index !== -1) {
+        this.mockRestoreTrxArray.splice(index, 1);
+      }
     }
 
     return Observable.of('');

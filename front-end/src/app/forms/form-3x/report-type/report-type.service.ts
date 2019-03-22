@@ -30,7 +30,7 @@ export class ReportTypeService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('form_type', 'F3X');
+    params = params.append('form_type', `${formType}`);
 
     return this._http
        .get(
@@ -46,7 +46,7 @@ export class ReportTypeService {
    *
    * @param      {string}  form_type  The form type
    */
-  public saveReport(form_type: string): Observable<any> {
+  public saveReport(formType: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '/core/reports';
@@ -56,12 +56,10 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${form_type}_report_type`));
-
-    console.log('form3xReportType: ', form3xReportType);
+    const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
     formData.append('report_id', form3xReportType.reportId);
-    formData.append('form_type', `F3X`);
+    formData.append('form_type', `F${formType}`);
     formData.append('amend_ind', form3xReportType.amend_Indicator);
     formData.append('report_type', form3xReportType.reportType);
     formData.append('election_code', form3xReportType.electionCode);
