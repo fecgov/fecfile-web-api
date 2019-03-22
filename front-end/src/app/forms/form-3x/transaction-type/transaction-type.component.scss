@@ -1,7 +1,7 @@
 @import '../../../shared/scss/global';
 
 .transaction-type-container {
-  min-height: 75vh;
+  min-height: 100vh;
   position: relative;
   form {
     header {
@@ -20,12 +20,36 @@
             text-decoration: none;
           }
         }
+        .dropdown-toggle {
+          &:after {
+            display:none;
+          }
+        }
+        .dropdown-menu {
+          &.show {
+            left: -80px !important;
+            .dropdown-item {
+              &:focus,
+              &:hover,
+              &:active,
+              &:visited {
+                background-color: $white;
+                color: $black;
+                cursor: pointer;
+                outline: none;
+              }
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
         @include clearfix();
       }
     }
     section {
       .content {
-        min-height: 70vh;
+        min-height: 100vh;
         position: relative;
         .grid-row {
           margin-bottom: 20px;
@@ -34,7 +58,7 @@
     }
     footer {
       bottom: 0;
-      position: absolute;
+      position: relative;
       width: 100%;
       .forms__btn-container {
         height: 100%;

@@ -126,7 +126,6 @@ export class ReportTypeComponent implements OnInit {
 
       if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
         if (typeof this.selectedReportInfo.selectedState === 'string') {
-          console.log('this.selectedReportInfo.selectedState:', this.selectedReportInfo.selectedState);
           this._selectedElectionState = this.selectedReportInfo.selectedState;
         } else {
           this._selectedElectionState = null;
