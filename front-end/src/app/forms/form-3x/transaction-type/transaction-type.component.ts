@@ -88,6 +88,12 @@ export class TransactionTypeComponent implements OnInit {
    */
   public doValidateOption() {
     if (this.frmOption.valid) {
+      this.status.emit({
+        form: this.frmOption,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2'
+      });
       return 1;
     } else {
       if (!this.transactionType) {
