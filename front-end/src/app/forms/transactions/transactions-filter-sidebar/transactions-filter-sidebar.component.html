@@ -11,24 +11,27 @@
             [ngClass]="toggleFilterDirection(isHideTypeFilter)">
           </i>          
         </div>
-        <!-- [hidden]="isHideTypeFilter"  -->
+        <!-- <div class="card-body" 
+            [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'"> -->
         <div class="card-body" 
-            [@openCloseScroll]="!isHideTypeFilter ? 'open' : 'closed'">
-          <div class="input-group py-1">
+          [@openCloseScroll]="determineScrollState()">            
+          <div class="input-group py-1 transacions__filter-scroll-to-input">
             <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
               placeholder="Search Type" aria-label="Search">
+            <div class="input-group-append" (click)="scrollToType()">
+                <!-- ngbTooltip="Scroll to Type" tooltipClass="form-tooltip" -->
+              <span class="input-group-text">
+                <i class="search-icon text-grey" aria-hidden="true"></i>
+              </span>
+            </div>              
           </div>            
           <div class="transactions__filter-type-list-body">
               <ul *ngFor="let categoryGroup of transactionCategories" class="transactions__filter-type-list">
                 <li class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
-                <li *ngFor="let categoryType of categoryGroup.options">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="{{ categoryType?.value }}" 
-                      [(ngModel)]="categoryType.selected">
-                    <label class="form-check-label" for="{{ categoryType?.value }}">
-                      {{ categoryType?.text }}</label>
-                  </div>
-                </li>                    
+                <app-transactions-filter-type
+                  [categoryType]="categoryType"
+                  #categoryElements *ngFor="let categoryType of categoryGroup.options">
+                </app-transactions-filter-type>
             </ul>
           </div>
         </div>
@@ -100,6 +103,7 @@
             </div>
             <input
               type="number"
+              min="0" value="0"
               name="minamount"
               [(ngModel)]="filterAmountMin"
               class="form-control"
@@ -118,6 +122,7 @@
             <input
               type="number"
               name="maxamount"
+              min="0" value="0"
               [(ngModel)]="filterAmountMax"
               class="form-control"
               id="filter-amount-max"

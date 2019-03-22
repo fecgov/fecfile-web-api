@@ -8,7 +8,8 @@
     <thead>
       <tr>
         <th class="transactions__table-checkbox">
-          <input [@fadeInOut] *ngIf="isTransactionViewActive()" [(ngModel)]="allTransactionsSelected" type="checkbox"
+            <!-- *ngIf="isTransactionViewActive()" -->
+          <input [@fadeInOut]  [(ngModel)]="allTransactionsSelected" type="checkbox"
             (change)="changeAllTransactionsSelected()">
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
@@ -59,26 +60,33 @@
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
               ngbDropdownToggle [disabled]="bulkActionDisabled">
-              <i class="fas fa-ellipsis-h"></i>
+              <i class="ellipsis-icon"></i>
             </button>
             <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
               <button class="dropdown-item" (click)="viewAllSelected()">
-                <i class="fas fa-eye"></i>View
+                <i class="view-icon"></i>View
               </button>
               <button class="dropdown-item" (click)="printAllSelected()">
-                <i class="fas fa-print"></i>Print
+                <i class="print-icon"></i>Print
               </button>
               <button class="dropdown-item" (click)="exportAllSelected()">
-                <i class="fas fa-file-export"></i>Export
+                <i class="file-export-icon"></i>Export
               </button>
               <button class="dropdown-item" (click)="linkAllSelected()">
-                <i class="fas fa-link"></i>Link
+                <i class="link-icon"></i>Link
               </button>
               <button class="dropdown-item" (click)="trashAllSelected()">
-                <i class="fas fa-trash"></i>Trash
+                <i class="trash-icon"></i>Trash
               </button>
             </div>
           </div>
+          <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+            <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
+              (click)="deleteRecyleBin()"
+              [disabled]="bulkActionDisabled">
+              <i class="trash-icon"></i>
+            </button>
+          </div>          
         </th>
       </tr>
     </thead>
@@ -106,29 +114,29 @@
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
-              <i class="fas fa-trash-restore"></i>
+              <i class="undo-icon"></i>
             </button>
           </div>
           <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-              <i class="fas fa-ellipsis-h"></i>
+              <i class="ellipsis-icon"></i>
             </button>
             <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
               <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                <i class="fas fa-copy"></i>Clone
+                <i class="copy-icon"></i>Clone
               </button>
               <button class="dropdown-item" (click)="linkTransaction(trx)">
-                <i class="fas fa-link"></i>Link
+                <i class="link-icon"></i>Link
               </button>
               <button class="dropdown-item" (click)="viewTransaction(trx)">
-                <i class="fas fa-eye"></i>View
+                <i class="view-icon"></i>View
               </button>
               <button class="dropdown-item" (click)="editTransaction(trx)">
-                <i class="fas fa-edit"></i>Edit
+                <i class="edit-icon"></i>Edit
               </button>
               <button class="dropdown-item" (click)="trashTransaction(trx)">
-                <i class="fas fa-trash"></i>Trash
+                <i class="trash-icon"></i>Trash
               </button>
             </div>
           </div>
@@ -140,7 +148,7 @@
     <div class="row justify-content-end transactions__total-amount-container">
       <div class="transactions__total-amount">
         <b>Total Amount</b>
-        <i class="fas fa-info-circle transactions__total-amount" ngbTooltip="Represents the total amount of transactions entered on the report. 
+        <i class="info-icon transactions__total-amount" ngbTooltip="Represents the total amount of transactions entered on the report. 
                       Those transactions that are memo entries are not added into the total amount."
           tooltipClass="form-tooltip">
         </i>
