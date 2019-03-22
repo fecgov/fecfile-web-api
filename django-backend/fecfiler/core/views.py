@@ -991,7 +991,7 @@ def search_entities(request):
     except Exception as e:
         return Response("The search_entities API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
-******************************************************************************************************************************
+************************* *****************************************************************************************************
 END - SEARCH ENTITIES API - CORE APP
 ******************************************************************************************************************************
 """
@@ -1002,18 +1002,38 @@ def create_json_file(request):
 
         
     try:
+        
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, id=request.data['id'])
 
         if comm_info:
+            header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+
             serializer = CommitteeInfoSerializer(comm_info)
             conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
             k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(serializer.data))
+            data_obj = {}
+            data_obj['header'] = header
+            data_obj['data'] = serializer.data
+            k.set_contents_from_string(json.dumps(data_obj))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            return Response(url, status=status.HTTP_200_OK)
+            tmp_filename = '/tmp/' + comm_info.committeeid + '_f99.json'
+            vdata = {}
+            vdata['form_type'] = "F99"
+            vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            import ipdb; ipdb.set_trace()
+            return Response(res.text, status=status.HTTP_200_OK)
             
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
