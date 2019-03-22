@@ -27,11 +27,6 @@ export class IndividualReceiptComponent implements OnInit {
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
-  public transactionCategories: any = null;
-  public transactionCategoryInfo: string = null;
-  public transactionType: string = null;
-  public transactionTypeInfo: string = null;
-  public transactionTypes: any = null;
 
   private _formType: string = '';
   private _types: any = [];
@@ -153,51 +148,8 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Sets the transaction category when selected and sets the child items for transaction type.
-   *
-   * @param      {Object}  e       { parameter_description }
+   * Vaidates the form on submit.
    */
-  public transactionCategorySelected(e): void {
-    if(typeof e !== 'undefined') {
-      const selectedValue: string = e.value;
-      const selectedType: string = e.type;
-      let selectedIndex: number = 0;
-      let childIndex: number = 0;
-
-      this.transactionCategoryInfo = e.info;
-
-      this._types['transactionCategory'] = selectedValue;
-
-      this._types.findIndex((el, index) => {
-        if(el.text === selectedType) {
-          selectedIndex = index;
-        }
-      });
-      this._types[selectedIndex].options.findIndex((el, index) => {
-        if(el.value === selectedValue) {
-          childIndex = index;
-        }
-      });
-
-      this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
-    } else {
-      this.transactionCategoryInfo = null;
-      this.frmIndividualReceipt.controls['transactionType'].setValue(null);
-    }
-  }
-  /**
-   * @param  {} e
-   */
-  public transactionTypeSelected(e): void {
-    if(typeof e !== 'undefined') {
-      this.transactionType = e.text;
-      this.transactionTypeInfo = e.info;
-    } else {
-      this.transactionType = null;
-      this.transactionTypeInfo = null;
-    }
-  }
-
   public doValidateReceipt() {
     this.formSubmitted = true;
 
@@ -205,13 +157,6 @@ export class IndividualReceiptComponent implements OnInit {
       this.formSubmitted = false;
     }
     return;
-  }
-
-  public viewTransactions() {
-    //this._router.navigate(['/forms/transactions', this._formType], { queryParams: { step: this.step } });
-
-    //let form_id = this._formType;
-    this._router.navigate(['/forms/transactions', this._formType]);
   }
 
   /**

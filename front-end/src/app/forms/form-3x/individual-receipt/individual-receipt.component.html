@@ -63,6 +63,18 @@
                     class="form-control"
                     [formControlName]="col.name"
                   />
+
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea
@@ -84,6 +96,18 @@
                       {{ item.name }}
                     </ng-option>
                   </ng-select>
+
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
                 </ng-container>
               </div>
             </div>

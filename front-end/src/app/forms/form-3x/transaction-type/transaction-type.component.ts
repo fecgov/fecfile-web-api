@@ -74,12 +74,14 @@ export class TransactionTypeComponent implements OnInit {
       this.childOptionFailed = false;
     }
 
-    if (this.transactionType && localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
+    if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
       this._setSecondaryTransactionCategories();
-    }
+    } else if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+      const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-    if (this.secondaryTransactionType) {
-      this._setChildTransactionCategories();
+      if (transactionObj.mainTransactionTypeText !== this.transactionType) {
+        this._setSecondaryTransactionCategories();
+      }
     }
   }
 
@@ -130,6 +132,8 @@ export class TransactionTypeComponent implements OnInit {
 
     const type: string = e.target.getAttribute('data-type');
 
+    console.log("`form_${this._formType}_temp_transaction_type` !== null: ", `form_${this._formType}_temp_transaction_type` !== null);
+
     if (type === 'secondaryTransactionType') {
       const val: string = this.frmOption.controls['secondaryTransactionType'].value;
 
@@ -145,6 +149,8 @@ export class TransactionTypeComponent implements OnInit {
         tempObj.secondaryTransactionType = val;
 
         localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
+
+        this._setChildTransactionCategories();
       }
     } else if (type === 'childTransactionType') {
       console.log('childTransactionType: ');
@@ -171,7 +177,6 @@ export class TransactionTypeComponent implements OnInit {
    */
   private _setSecondaryTransactionCategories(): void {
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
-
     const mainTransactionTypeText: string = this.mainTransactionCategory[0].text;
     const mainTransactionTypeValue: string = this.mainTransactionCategory[0].value;
     const transactionObj: any = {
@@ -184,18 +189,34 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this.mainTransactionCategory[0].options;
+
+    this.transactionType = null;
+
+    if (this.childOptionType) {
+      this.childOptionType = '';
+      this.childOptions = [];
+    }
+
+    if (this.secondaryTransactionType) {
+      this.secondaryTransactionType = '';
+    }
   }
 
   /**
    * Sets the child transaction categories.
    */
   private _setChildTransactionCategories(): void {
+    console.log('_setChildTransactionCategories: ');
+
+    console.log('this.secondaryTransactionType: ', this.secondaryTransactionType);
     const childOptionObj: any = this.secondaryOptions.filter(el => (this.secondaryTransactionType === el.value));
 
     if (typeof childOptionObj === 'object') {
       if (childOptionObj[0].hasOwnProperty('options')) {
         if (Array.isArray(childOptionObj[0].options)) {
           this.childOptions = childOptionObj[0].options;
+
+          console.log('this.childOptions: ', this.childOptions);
         }
       }
     }
