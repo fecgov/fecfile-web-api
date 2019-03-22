@@ -35,6 +35,8 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public selectItem(e): void {
+    console.log('selectItem: ');
+    console.log('e: ', e.target.value);
     this.status.emit({
       'form': '3x',
       'transactionType': e.target.value

@@ -9,48 +9,91 @@
         <div class="float-left">
           <h1>Transaction Type</h1>
         </div>
-        <div class="float-right">
+        <div class="float-right" ngbDropdown>
           <button
             type="button"
             class="btn btn-link btn-options"
+            id="dropdownBasic2"
+            ngbDropdownToggle
           >
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
           </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item">View</button>
+            <button class="dropdown-item">Print</button>
+            <button class="dropdown-item">Import</button>
+          </div>
         </div>
       </div>
       <hr />
     </header>
     <section>
       <div class="content">
-        <div class="grid-row" *ngIf="parentOptionFailed">
-          <div class="grid-row__col grid-row__col--12 text-center text-error">
-            You must select a transaction category first.
+        <ng-container *ngIf="parentOptionFailed">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12 text-center text-error">
+              You must select a transaction category first.
+            </div>
           </div>
-        </div>
-        <div class="grid-row" *ngIf="(frmOption.invalid && (frmOption.dirty || frmOption.touched)) || (frmOption.invalid && frmSubmitted) || (optionFailed)">
-          <div class="grid-row__col grid-row__col--12 text-center text-error">
-            You must select a transaction type first.
+        </ng-container>
+        <ng-container *ngIf="!secondaryTransactionType">
+          <ng-container *ngIf="secondaryTransactionTypeFailed">
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12 text-center text-error">
+                You must select a transaction type first.
+              </div>
+            </div>
+          </ng-container>
+          <div
+            class="grid-row"
+            *ngFor="let option of secondaryOptions"
+          >
+            <div class="grid-row__col grid-row__col--12">
+              <input
+                type="radio"
+                name="secondaryTransactionType"
+                data-type="secondaryTransactionType"
+                [value]="option?.value"
+                [attr.data-value]="option?.value"
+                (change)="updateTypeSelected($event)"
+                formControlName="secondaryTransactionType"
+              />
+              <label for="secondaryTransactionType">
+                {{option?.text}}
+              </label>
+            </div>
           </div>
-        </div>
-        <div
+        </ng-container>
+        <ng-container *ngIf="secondaryTransactionType">
+          <ng-container *ngIf="childOptionFailed">
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12 text-center text-error">
+                You must select a child transaction type first.
+              </div>
+            </div>
+          </ng-container>
+          <div
           class="grid-row"
           *ngFor="let option of childOptions"
-        >
-          <div class="grid-row__col grid-row__col--12">
-            <input
-              type="radio"
-              name="optionRadio"
-              [value]="option?.text"
-              (change)="updateStatus($event)"
-              formControlName="optionRadio"
-            />
-            <label for="optionRadio">
-              {{option?.text}}
-            </label>
+          >
+            <div class="grid-row__col grid-row__col--12">
+              <input
+                type="radio"
+                name="childTransactionType"
+                data-type="childTransactionType"
+                [value]="option?.value"
+                [attr.data-value]="option?.value"
+                (change)="updateTypeSelected($event)"
+                formControlName="childTransactionType"
+              />
+              <label for="childTransactionType">
+                {{option?.text}}
+              </label>
+            </div>
           </div>
-        </div>
-      </div>
+        </ng-container>
+      </div> <!-- ./content -->
     </section>
     <footer>
       <div class="grid-row">

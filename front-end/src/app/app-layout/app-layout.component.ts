@@ -4,6 +4,7 @@ import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { ApiService } from '../shared/services/APIService/api.service';
+import { UtilService } from '../shared/utils/util.service';
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
@@ -38,6 +39,7 @@ export class AppLayoutComponent implements OnInit {
     private _apiService: ApiService,
 		private _sessionService: SessionService,
     private _messageService: MessageService,
+    private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal
 	) { }
@@ -78,11 +80,14 @@ export class AppLayoutComponent implements OnInit {
           if(val.url.indexOf('/dashboard') === 0) {
             this.sideBarClass = 'dashboard active';
             this.showSideBar = true;
+            this._utilService.removeLocalItems('form_', 5);
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
               this.showSideBar = true;
               this.sideBarClass = 'active';
             }
+          } else if (val.url.indexOf('/forms') !== 0 || val.url.indexOf('/dashboard') !== 0) {
+            this._utilService.removeLocalItems('form_', 5);
           }
         }
       });
@@ -105,23 +110,30 @@ export class AppLayoutComponent implements OnInit {
     } else if (route.indexOf('/forms/form/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-        const oneDay: number = 24*60*60*1000;
-        const today: any = new Date();
-        const dueDateArr = formInfo.dueDate.split('-');
-        let dueDate: any = '';
+        if (formInfo.hasOwnProperty('dueDate')) {
+          if (typeof formInfo.dueDate === 'string') {
+            if (formInfo.dueDate.length > 1) {
+              const oneDay: number = 24*60*60*1000;
+              const today: any = new Date();
+              const dueDateArr = formInfo.dueDate.split('/');
+              let dueDate: any = '';
 
-        if (formInfo.dueDate.indexOf('2018') === 0) {
-          dueDate = new Date(2019, dueDateArr[1], dueDateArr[2]);
-        } else {
-          dueDate = new Date(dueDateArr[2], dueDateArr[1], dueDateArr[2]);
+              if (formInfo.dueDate.indexOf('2018') === 0) {
+                dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
+              } else {
+                dueDate = new Date(dueDateArr[2], dueDateArr[0], dueDateArr[1]);
+              }
+
+              this.showFormDueDate = true;
+              this.formType = formInfo.formType;
+              this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
+
+              this.formDescription = formInfo.reportTypeDescription;
+              this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
+              this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
+            }
+          }
         }
-
-        this.showFormDueDate = true;
-        this.formType = formInfo.formType;
-        this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
-        this.formDescription = formInfo.reportTypeDescription;
-        this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
-        this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
       }
     } else {
         this.showFormDueDate = false;

@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angula
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
 @Component({
@@ -40,6 +41,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _http: HttpClient,
     private _fb: FormBuilder,
     private _formService: FormsService,
+    private _individualReceiptService :IndividualReceiptService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
@@ -51,32 +53,16 @@ export class IndividualReceiptComponent implements OnInit {
   ngOnInit(): void {
    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-   // this._formService
-   //   .getDynamicFormFields(this._formType, 'Individual Receipt')
-   //   .subscribe(res => {
-   //      this.formFields = res.data.formFields;
+    this.frmIndividualReceipt = this._fb.group({});
 
-   //      this._setForm(this.formFields);
-
-   //      this.states = res.data.states;
-
-   //      this.transactionCategories = res.data.transactionCategories;
-   //   });
-
-    // this._formService
-    //   .getTransactionCategories(this._formType)
-    //   .subscribe(res => {
-    //     this._types = res.data.transactionCategories;
-    //   });
-
-    this.frmIndividualReceipt = this._fb.group({
-      transactionCategory: [null, [
-        Validators.required
-      ]],
-      transactionType: [null, [
-        Validators.required
-      ]]
-    });
+    this._individualReceiptService
+      .getDynamicFormFields(this._formType, 'Individual Receipt')
+      .subscribe(res => {
+        console.log('res: ', res);
+        this.formFields = res.data.formFields;
+        this._setForm(this.formFields);
+        this.states = res.data.states;
+      });
   }
 
   ngDoCheck(): void {
@@ -100,16 +86,6 @@ export class IndividualReceiptComponent implements OnInit {
         formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
       });
     });
-
-    formGroup['transactionCategory'] = new FormControl(
-       this._types['transactionCategory'] || null,
-       [Validators.required]
-    );
-
-    formGroup['transactionType'] = new FormControl(
-      this._types['transactionType'] || null,
-      [Validators.required]
-    );
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
   }
@@ -136,6 +112,36 @@ export class IndividualReceiptComponent implements OnInit {
     return formValidators;
   }
 
+  /**
+   * Removes fields.
+   * Removes the following fields if found:
+   * LineNumber, TransactionId, TransactionTypeCode, BackReferenceTranIdNumber, BackReferenceSchedName
+   *
+   * @param      {number}  i       { parameter_description }
+   * @param      {any}     item    The item
+   */
+  public removeFields(i: number, item: any): void {
+    let skipRow: any = null;
+    if (item.hasOwnProperty('cols')) {
+      if (Array.isArray(item.cols)) {
+        skipRow = item.cols.findIndex(el => (
+            el.name === 'LineNumber' ||
+            el.name === 'TransactionId' ||
+            el.name === 'TransactionTypeCode' ||
+            el.name === 'BackReferenceTranIdNumber' ||
+            el.name === 'BackReferenceSchedName'
+        ));
+
+        if (skipRow === 0) {
+          item['skipRow'] = true;
+        } else {
+          item['skipRow'] = false;
+        }
+
+        return item;
+      }
+    }
+  }
   /**
    * Determines if element passed in from template is an array.
    *
@@ -206,5 +212,16 @@ export class IndividualReceiptComponent implements OnInit {
 
     //let form_id = this._formType;
     this._router.navigate(['/forms/transactions', this._formType]);
+  }
+
+  /**
+   * Goes to the previous step.
+   */
+  public previousStep(): void {
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2'
+    });
   }
 }
