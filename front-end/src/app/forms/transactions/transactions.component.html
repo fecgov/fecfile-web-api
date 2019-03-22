@@ -1,16 +1,16 @@
 <div class="transactions__main-container">
   <div class="transactions__sidebar">
     <div class="transactions__sidebar_categories">
-      <transaction-categories-sidebar [hidden]="isShowFilters"
+      <app-transaction-categories [hidden]="isShowFilters"
         title="Transaction Categories"
         (status)='onNotify($event)'>
-      </transaction-categories-sidebar>
+      </app-transaction-categories>
     </div>
     <div class="transactions__sidebar_filters">
-      <app-transactions-filter-sidebar [hidden]="!isShowFilters" 
+      <app-transactions-filter [hidden]="!isShowFilters" 
         title="Filters"
         [formType]="formType">
-      </app-transactions-filter-sidebar>
+      </app-transactions-filter>
     </div>
   </div>
   <div class="transactions__container">

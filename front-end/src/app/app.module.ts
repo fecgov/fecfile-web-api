@@ -69,10 +69,10 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
-import { TransactionsFilterSidbarComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-sidebar.component';
+import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
-import { TransactionsFilterTypeComponent } from './forms/transactions/transactions-filter-sidebar/transactions-filter-type/transactions-filter-type.component';
-import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transaction-categories-sidebar/transaction-categories-sidebar.component';
+import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
+import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -95,9 +95,9 @@ import { TransactionCategoriesSidbarComponent } from './forms/form-3x/transactio
     ToolsComponent,
     TransactionsComponent,
     TransactionsTableComponent,
-    TransactionsFilterSidbarComponent,
+    TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
-    TransactionCategoriesSidbarComponent,
+    TransactionCategoriesComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,

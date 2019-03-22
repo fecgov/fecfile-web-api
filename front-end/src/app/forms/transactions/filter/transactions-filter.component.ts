@@ -7,16 +7,16 @@ import { filter } from 'rxjs/operators';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
-import { TransactionsFilterTypeComponent } from './transactions-filter-type/transactions-filter-type.component';
+import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 
 
 /**
  * A component for filtering transactions located in the sidebar.
  */
 @Component({
-  selector: 'app-transactions-filter-sidebar',
-  templateUrl: './transactions-filter-sidebar.component.html',
-  styleUrls: ['./transactions-filter-sidebar.component.scss'],
+  selector: 'app-transactions-filter',
+  templateUrl: './transactions-filter.component.html',
+  styleUrls: ['./transactions-filter.component.scss'],
   providers: [NgbTooltipConfig, OrderByPipe],
   animations: [
     trigger('openClose', [
@@ -49,12 +49,12 @@ import { TransactionsFilterTypeComponent } from './transactions-filter-type/tran
         display: 'none',
         backgroundColor: '#AEB0B5'
       })),
-      state('openNoAnimation', style({
+      state('openNoAnimate', style({
         'max-height': '500px',
         backgroundColor: 'white',
         'overflow-y': 'scroll'
       })),
-      state('closedNoAnimation', style({
+      state('closedNoAnimate', style({
         'max-height': '0',
         overflow: 'hidden',
         display: 'none',
@@ -69,7 +69,7 @@ import { TransactionsFilterTypeComponent } from './transactions-filter-type/tran
     ]),
   ]
 })
-export class TransactionsFilterSidbarComponent implements OnInit {
+export class TransactionsFilterComponent implements OnInit {
 
   @Input()
   public formType: string;
@@ -212,15 +212,27 @@ export class TransactionsFilterSidbarComponent implements OnInit {
       this.filterCategoriesText === '') {
         return;
     }
-    const scrollEl = this.categoryElements.find(el => {
-      return el.categoryType.text.toString().toLowerCase()
-        .includes(this.filterCategoriesText.toLowerCase());
-    });
-    scrollEl.categoryType.highlight = 'selected_row';
-    if (this.msEdge) {
-      scrollEl.elRef.nativeElement.scrollIntoView();
-    } else {
-      scrollEl.elRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
+
+    const typeMatches: Array<TransactionsFilterTypeComponent> =
+      this.categoryElements.filter(el => {
+        return el.categoryType.text.toString().toLowerCase()
+          .includes(this.filterCategoriesText.toLowerCase());
+      });
+
+    if (typeMatches.length > 0) {
+      const scrollEl = typeMatches[0];
+      if (this.msEdge) {
+        scrollEl.elRef.nativeElement.scrollIntoView();
+      } else {
+        scrollEl.elRef.nativeElement.scrollIntoView(
+          { behavior: 'smooth', block: 'center', inline: 'start' }
+        );
+      }
+    }
+
+    // TODO check if sequence is guaranteed to be preserved.
+    for (const type of typeMatches) {
+      type.categoryType.highlight = 'selected_row';
     }
   }
 

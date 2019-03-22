@@ -5,28 +5,28 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 
 @Component({
-  selector: 'transaction-categories-sidebar',
-  templateUrl: './transaction-categories-sidebar.component.html',
-  styleUrls: ['./transaction-categories-sidebar.component.scss'],
+  selector: 'app-transaction-categories',
+  templateUrl: './transaction-categories.component.html',
+  styleUrls: ['./transaction-categories.component.scss'],
   providers: [NgbTooltipConfig]
 })
-export class TransactionCategoriesSidbarComponent implements OnInit {
+export class TransactionCategoriesComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() title: string = '';
+  @Input() title = '';
 
-  public additionalItemSelected: string = '';
+  public additionalItemSelected = '';
   public additionalOptions: Array<any> = [];
   public cashOnHand: any = {};
-  public currentStep: string = 'step_2';
-  public itemSelected: string = '';
-  public loadingData: boolean = true;
+  public currentStep = 'step_2';
+  public itemSelected = '';
+  public loadingData = true;
   public searchField: any = {};
   public steps: any = {};
-  public step: string = '';
+  public step = '';
   public transactionCategories: any = [];
 
-  private _formType: string = '';
+  private _formType = '';
   private _indexOfItemSelected: number = null;
 
   constructor(
@@ -65,7 +65,7 @@ export class TransactionCategoriesSidbarComponent implements OnInit {
       }
     });
 
-    if(localStorage.getItem(`form_${this._formType}_transactionType`) === null) {
+    if (localStorage.getItem(`form_${this._formType}_transactionType`) === null) {
       localStorage.setItem(`form_${this._formType}_transactionType`, JSON.stringify({
         'category': this.itemSelected,
         'type': ''
