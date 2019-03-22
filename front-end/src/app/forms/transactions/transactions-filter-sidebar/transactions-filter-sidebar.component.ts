@@ -204,10 +204,12 @@ export class TransactionsFilterSidbarComponent implements OnInit {
    * value from the category search input.
    */
   public scrollToType(): void {
+
+    this.clearHighlightedTypes();
+
     if (this.filterCategoriesText === undefined ||
       this.filterCategoriesText === null ||
       this.filterCategoriesText === '') {
-        this.clearHighlightedTypes();
         return;
     }
     const scrollEl = this.categoryElements.find(el => {
