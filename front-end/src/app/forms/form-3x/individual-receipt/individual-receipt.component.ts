@@ -138,9 +138,9 @@ export class IndividualReceiptComponent implements OnInit {
         ));
 
         if (skipRow === 0) {
-          item['skipRow'] = true;
+          item['hiddenFields'] = true;
         } else {
-          item['skipRow'] = false;
+          item['hiddenFields'] = false;
         }
 
         return item;

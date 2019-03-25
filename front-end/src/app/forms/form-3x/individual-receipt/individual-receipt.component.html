@@ -34,7 +34,12 @@
     </header>
     <section>
       <ng-container *ngFor="let row of formFields; trackBy: removeFields">
-        <div class="row" *ngIf="!row.skipRow">
+        <ng-container *ngIf="row.hiddenFields">
+          <ng-container *ngFor="let col of row.cols">
+            <input type="hidden" name="{{ col.name }}" value="">
+          </ng-container>
+        </ng-container>
+        <div class="row" *ngIf="!row.hiddenFields">
           <ng-container *ngIf="isArray(row.cols)">
             <div class="col" *ngFor="let col of row.cols">
               <div class="form-group">

@@ -67,9 +67,17 @@ export class IndividualReceiptService {
 
     formData.append('cmte_id', committeeDetails.committeeid);
     formData.append('report_id', reportType.reportId);
-    formData.append('transaction_type', transactionType.childTransactionType);
+    formData.append('transaction_type', transactionType.childTransactionType.slice(0, 1));
     formData.append('first_name', receipt.ContributorFirstName);
     formData.append('last_name', receipt.ContributorFirstName);
+    formData.append('state', receipt.ContributorState);
+    formData.append('city', receipt.ContributorCity);
+    formData.append('zip_code', receipt.ContributorZip);
+    formData.append('occupation', receipt.ContributorOccupation);
+    formData.append('employer', receipt.ContributorEmployer);
+    formData.append('contribution_amount', receipt.ContributionAmount);
+    formData.append('contribution_date', receipt.ContributionDate);
+    formData.append('entity_type', receipt.EntityType);
     if (receipt.ContributorMiddleName !== null) {
       if (typeof receipt.ContributorMiddleName === 'string') {
         formData.append('middle_name', receipt.ContributorMiddleName);
@@ -91,13 +99,6 @@ export class IndividualReceiptService {
         formData.append('street_2', receipt.ContributorStreet2);
       }
     }
-    formData.append('state', receipt.ContributorCity);
-    formData.append('city', receipt.ContributorState);
-    formData.append('zip_code', receipt.ContributorZip);
-    formData.append('occupation', receipt.ContributorOccupation);
-    formData.append('employer', receipt.ContributorEmployer);
-    formData.append('contribution_amount', receipt.ContributionAmount);
-    formData.append('contribution_date', receipt.ContributionDate);
     if (receipt.MemoText !== null) {
       if (typeof receipt.MemoText === 'string') {
         formData.append('memo_text', receipt.MemoText);
@@ -111,7 +112,7 @@ export class IndividualReceiptService {
     if (receipt.ContributionPurposeDescription !== null) {
       if (typeof receipt.ContributionPurposeDescription === 'string') {
         formData.append('purpose_description', receipt.ContributionPurposeDescription);
-      }
+      }I
     }
 
     return this._http
