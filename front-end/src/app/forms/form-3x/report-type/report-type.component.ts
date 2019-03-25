@@ -97,6 +97,23 @@ export class ReportTypeComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    if (window.localStorage.getItem(`form_${this._formType}_reset_form`) !== null) {
+      const resetForm: boolean = JSON.parse(window.localStorage.getItem(`form_${this._formType}_reset_form`));
+
+      if(resetForm) {
+        // this.frmReportType.reset();
+
+        // this.status.emit({
+        //   'form': '3x',
+        //   'reportTypeRadio': null
+        // });
+
+        window.location.reload();
+
+        window.localStorage.removeItem(`form_${this._formType}_reset_form`);
+      }
+    }
+
     if (this.selectedReportInfo) {
       if (this.selectedReportInfo.hasOwnProperty('toDate')) {
         if (typeof this.selectedReportInfo.toDate === 'string') {

@@ -67,7 +67,8 @@ export class IndividualReceiptService {
 
     formData.append('cmte_id', committeeDetails.committeeid);
     formData.append('report_id', reportType.reportId);
-    formData.append('transaction_type', transactionType.childTransactionType.slice(0, 1));
+    formData.append('transaction_type', '15');
+    formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);
     formData.append('last_name', receipt.ContributorFirstName);
     formData.append('state', receipt.ContributorState);

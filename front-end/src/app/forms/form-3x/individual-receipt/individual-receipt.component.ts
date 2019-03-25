@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -55,7 +55,6 @@ export class IndividualReceiptComponent implements OnInit {
     this._individualReceiptService
       .getDynamicFormFields(this._formType, 'Individual Receipt')
       .subscribe(res => {
-        console.log('res: ', res);
         this.formFields = res.data.formFields;
         this._setForm(this.formFields);
         this.states = res.data.states;
@@ -160,17 +159,11 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public doValidateReceipt() {
     this.formSubmitted = true;
-
-    console.log('doValidateReceipt: ');
-    console.log('this.frmIndividualReceipt:', this.frmIndividualReceipt);
-
     if(this.frmIndividualReceipt.valid) {
       this.formSubmitted = false;
       let receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
-        // console.log('field value: ', this.frmIndividualReceipt.get(field).value);
-
         if (field === 'ContributionDate') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
@@ -179,15 +172,15 @@ export class IndividualReceiptComponent implements OnInit {
 
       }
 
-      console.log('receiptObj: ', receiptObj);
-
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
       this._individualReceiptService
         .saveScheduleA(this._formType)
         .subscribe(res => {
           if (res) {
-            console.log('res: ',  res);
+            this.frmIndividualReceipt.reset();
+            this.formSubmitted = false;
+            window.scrollTo(0,0);
           }
         });
     }

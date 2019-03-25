@@ -225,6 +225,14 @@ export class F3xComponent implements OnInit {
         this.step = this._step;
 
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+      } else if (this.direction === 'new') {
+          window.localStorage.removeItem(`form_${this._formType}_receipt`);
+          window.localStorage.removeItem(`form_${this._formType}_report_type`);
+          window.localStorage.removeItem(`form_${this._formType}_transaction_type`);
+          window.localStorage.setItem(`form_${this._formType}_reset_form`, 'true');
+          this.step = this._step;
+
+          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
     }
   }
