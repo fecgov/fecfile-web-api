@@ -20,6 +20,7 @@ from botocore.exceptions import ClientError
 import boto
 from boto.s3.key import Key
 from django.conf import settings
+import re
 
 # Create your views here.
 
@@ -241,6 +242,19 @@ def check_null_value(check_value):
     except:
         raise
 
+def check_email(email):
+    try:
+        pattern = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+        if not check_null_value(email):
+            return None
+        if re.fullmatch(pattern, email):
+            return email
+        else:
+            raise Exception('Email entered is in an invalid format. Input received is: {}. Expected: abc@def.xyz or abc@def.wxy.xyz'.format(email))
+    except:
+        raise
+
+
 """
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
 """
@@ -274,13 +288,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2])                                          
     except Exception:
         raise
 
@@ -289,7 +303,7 @@ def get_list_all_report(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from Reports table
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
+            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
                                                     FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
            
@@ -308,7 +322,7 @@ def get_list_report(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from Reports table
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date 
+            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date 
                                             FROM public.reports WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND report_id = %s"""
             
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
@@ -429,7 +443,7 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'), data.get('email_1'), data.get('email_2'))
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -551,6 +565,16 @@ def reports(request):
                 f_status = check_null_value(request.data.get('status'))
             else:
                 f_status = "Saved"
+
+            if 'email_1' in request.data:
+                email_1 = check_email(request.data.get('email_1'))
+            else:
+                email_1 = None
+
+            if 'email_2' in request.data:
+                email_2 = check_email(request.data.get('email_2'))
+            else:
+                email_2 = None
             
             datum = {
                 'cmte_id': request.user.username,
@@ -564,6 +588,8 @@ def reports(request):
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
                 'status': f_status,
+                'email_1': email_1,
+                'email_2': email_2,
             }    
             data = post_reports(datum)
             if type(data) is dict:

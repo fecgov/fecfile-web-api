@@ -74,12 +74,14 @@ export class TransactionTypeComponent implements OnInit {
       this.childOptionFailed = false;
     }
 
-    if (this.transactionType && localStorage.getItem(`form_${this._formType}_transaction_type`) === null) {
+    if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
       this._setSecondaryTransactionCategories();
-    }
+    } else if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+      const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-    if (this.secondaryTransactionType) {
-      this._setChildTransactionCategories();
+      if (transactionObj.mainTransactionTypeText !== this.transactionType) {
+        this._setSecondaryTransactionCategories();
+      }
     }
   }
 
@@ -88,6 +90,15 @@ export class TransactionTypeComponent implements OnInit {
    */
   public doValidateOption() {
     if (this.frmOption.valid) {
+
+      if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+        const transObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
+
+        window.localStorage.setItem(`form_${this._formType}_transaction_type`, JSON.stringify(transObj));
+
+        window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+      }
+
       this.status.emit({
         form: this.frmOption,
         direction: 'next',
@@ -126,8 +137,6 @@ export class TransactionTypeComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public updateTypeSelected(e): void {
-    console.log('updateTypeSelected: ');
-
     const type: string = e.target.getAttribute('data-type');
 
     if (type === 'secondaryTransactionType') {
@@ -140,14 +149,15 @@ export class TransactionTypeComponent implements OnInit {
       if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
         const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-        localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+        window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
 
         tempObj.secondaryTransactionType = val;
 
-        localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
+        window.localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
+
+        this._setChildTransactionCategories();
       }
     } else if (type === 'childTransactionType') {
-      console.log('childTransactionType: ');
       const val: string = this.frmOption.controls['childTransactionType'].value;
 
       this.childOptionType = val;
@@ -157,11 +167,11 @@ export class TransactionTypeComponent implements OnInit {
       if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
         const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-        localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+        window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
 
         tempObj.childTransactionType = val;
 
-        localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
+        window.localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
       }
     }
   }
@@ -171,7 +181,6 @@ export class TransactionTypeComponent implements OnInit {
    */
   private _setSecondaryTransactionCategories(): void {
     this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
-
     const mainTransactionTypeText: string = this.mainTransactionCategory[0].text;
     const mainTransactionTypeValue: string = this.mainTransactionCategory[0].value;
     const transactionObj: any = {
@@ -184,6 +193,17 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this.mainTransactionCategory[0].options;
+
+    this.transactionType = null;
+
+    if (this.childOptionType) {
+      this.childOptionType = '';
+      this.childOptions = [];
+    }
+
+    if (this.secondaryTransactionType) {
+      this.secondaryTransactionType = '';
+    }
   }
 
   /**

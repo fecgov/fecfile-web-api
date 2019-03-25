@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -44,12 +43,13 @@ export class ReportTypeService {
   /**
    * Saves a report.
    *
-   * @param      {string}  form_type  The form type
+   * @param      {string}  formType  The form type
    */
   public saveReport(formType: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '/core/reports';
+
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -58,11 +58,22 @@ export class ReportTypeService {
 
     const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    formData.append('report_id', form3xReportType.reportId);
+    // formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F${formType}`);
-    formData.append('amend_ind', form3xReportType.amend_Indicator);
     formData.append('report_type', form3xReportType.reportType);
-    formData.append('election_code', form3xReportType.electionCode);
+    formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
+    formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
+    formData.append('coh_bop', form3xReportType.coh_bop);
+    if (typeof form3xReportType.amend_Indicator === 'string') {
+      if (form3xReportType.amend_Indicator.length >= 1) {
+        formData.append('amend_ind', form3xReportType.amend_Indicator);
+      }
+    }
+    if (typeof form3xReportType.electionCode === 'string') {
+      if (form3xReportType.electionCode.length >= 1) {
+        formData.append('election_code', form3xReportType.electionCode);
+      }
+    }
     if (form3xReportType.election_date.length >= 1) {
       formData.append('date_of_election', form3xReportType.election_date);
     }
@@ -73,9 +84,6 @@ export class ReportTypeService {
         }
       }
     }
-    formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
-    formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
-    formData.append('coh_bop', form3xReportType.coh_bop);
 
     return this._http
         .post(
@@ -87,8 +95,14 @@ export class ReportTypeService {
         )
         .pipe(map(res => {
             if (res) {
-              // localStorage.setItem(`form_${form_type}_report_info_res`, JSON.stringify(res));
-              // const form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_reportInfo_res`));
+              if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
+                const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
+
+                reportObj.reportId = res[0].report_id;
+
+                window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+              }
+
               return res;
             }
             return false;

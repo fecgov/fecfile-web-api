@@ -33,8 +33,13 @@
       <hr />
     </header>
     <section>
-      <ng-container *ngFor="let row of formFields; trackBy: removeFields">
-        <div class="row" *ngIf="!row.skipRow">
+      <ng-container *ngFor="let row of formFields; trackBy: hasHiddenFields">
+        <ng-container *ngIf="row.hiddenFields">
+          <ng-container *ngFor="let col of row.cols">
+            <input type="hidden" name="{{ col.name }}" value="">
+          </ng-container>
+        </ng-container>
+        <div class="row" *ngIf="!row.hiddenFields">
           <ng-container *ngIf="isArray(row.cols)">
             <div class="col" *ngFor="let col of row.cols">
               <div class="form-group">
@@ -63,6 +68,18 @@
                     class="form-control"
                     [formControlName]="col.name"
                   />
+
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea
@@ -84,6 +101,18 @@
                       {{ item.name }}
                     </ng-option>
                   </ng-select>
+
+                  <div
+                    class="error-text"
+                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                  >
+                    <div
+                      class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
+                    >
+                      {{ col.text }} is required.
+                    </div>
+                  </div>
                 </ng-container>
               </div>
             </div>
