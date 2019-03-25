@@ -112,7 +112,7 @@ export class IndividualReceiptService {
     if (receipt.ContributionPurposeDescription !== null) {
       if (typeof receipt.ContributionPurposeDescription === 'string') {
         formData.append('purpose_description', receipt.ContributionPurposeDescription);
-      }I
+      }
     }
 
     return this._http

@@ -118,14 +118,12 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Removes fields.
-   * Removes the following fields if found:
-   * LineNumber, TransactionId, TransactionTypeCode, BackReferenceTranIdNumber, BackReferenceSchedName
+   * Checks for hidden fields.
    *
-   * @param      {number}  i       { parameter_description }
-   * @param      {any}     item    The item
+   * @param      {number}  i       The current index for the item.
+   * @param      {any}     item    The item.
    */
-  public removeFields(i: number, item: any): void {
+  public hasHiddenFields(i: number, item: any): void {
     let skipRow: any = null;
     if (item.hasOwnProperty('cols')) {
       if (Array.isArray(item.cols)) {

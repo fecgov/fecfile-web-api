@@ -33,7 +33,7 @@
       <hr />
     </header>
     <section>
-      <ng-container *ngFor="let row of formFields; trackBy: removeFields">
+      <ng-container *ngFor="let row of formFields; trackBy: hasHiddenFields">
         <ng-container *ngIf="row.hiddenFields">
           <ng-container *ngFor="let col of row.cols">
             <input type="hidden" name="{{ col.name }}" value="">
