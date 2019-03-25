@@ -62,4 +62,23 @@ export class UtilService {
       localStorage.removeItem(arr[i]);
     }
   }
+
+  /**
+   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  public formatDate(date: string): string {
+    try {
+      const dateArr = date.split('-');
+      const month: string = dateArr[1];
+      const day: string = dateArr[2];
+      const year: string = dateArr[0].replace('2018', '2019');
+
+      return `${month}/${day}/${year}`;
+    } catch (e) {
+      return '';
+    }
+  }
 }

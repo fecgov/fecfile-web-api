@@ -30,13 +30,6 @@
     </header>
     <section>
       <div class="content">
-        <ng-container *ngIf="parentOptionFailed">
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12 text-center text-error">
-              You must select a transaction category first.
-            </div>
-          </div>
-        </ng-container>
         <ng-container *ngIf="!secondaryTransactionType">
           <ng-container *ngIf="secondaryTransactionTypeFailed">
             <div class="grid-row">

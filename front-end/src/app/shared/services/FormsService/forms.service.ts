@@ -25,6 +25,11 @@ export class FormsService {
     this._orderByPipe = new OrderByPipe();
   }
 
+  /**
+   * TODO:  This file is going to be removed soon
+   * in favor of individual services for each form.
+   * Please stop adding things for forms to this file now.
+   */
 
 
 
@@ -557,60 +562,6 @@ export class FormsService {
       );
   }
 
-  public getTransactionCategories( form_type: string): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    let url: string = '';
-    let params = new HttpParams();
-
-
-    //url = '/f3x/get_transaction_categories?form_type=F3X';
-    url = '/core/get_transaction_categories?form_type=F3X';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-
-    params = params.append('form_type', "F3X");
-
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-           /* headers: httpOptions,
-            params*/
-            headers: httpOptions/*  */
-          }
-       );
-  }
-
-
-  public getreporttypes( form_type: string): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    let url: string = '';
-    let params = new HttpParams();
-
-    //url = '/f3x/get_report_types?form_type=F3X';
-    url = '/core/get_report_types?form_type=F3X';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-
-    params = params.append('form_type', "F3X");
-
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-           /* headers: httpOptions,
-            params*/
-            headers: httpOptions
-          }
-         );
-     //return this._http.get('./assets/196.json')
- }
  public formHasUnsavedData(formType: string): boolean {
     let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
 
@@ -672,28 +623,6 @@ export class FormsService {
       }));
  }
 
- public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
-  const token: string = JSON.parse(this._cookieService.get('user'));
-  const url: string = '/core/get_dynamic_forms_fields';
-  let httpOptions =  new HttpHeaders();
-  let params = new HttpParams();
-  let formData: FormData = new FormData();
-
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-  params = params.append('form_type', `F${formType}`);
-  params = params.append('transaction_type', transactionType);
-
-  return this._http
-      .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions,
-          params
-        }
-      );
- }
 
  public removeFormDashBoard(formType: string): void {
    if (formType === "3X") {
@@ -779,4 +708,30 @@ export class FormsService {
 
   }
 
+public getTransactionCategories( form_type: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '';
+    let params = new HttpParams();
+
+
+    //url = '/f3x/get_transaction_categories?form_type=F3X';
+    url = '/core/get_transaction_categories?form_type=F3X';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+
+    params = params.append('form_type', "F3X");
+
+    return this._http
+       .get(
+          `${environment.apiUrl}${url}`,
+          {
+           /* headers: httpOptions,
+            params*/
+            headers: httpOptions/*  */
+          }
+       );
+  }
 }

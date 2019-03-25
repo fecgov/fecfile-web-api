@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 
@@ -27,11 +28,6 @@ export class IndividualReceiptComponent implements OnInit {
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
-  public transactionCategories: any = null;
-  public transactionCategoryInfo: string = null;
-  public transactionType: string = null;
-  public transactionTypeInfo: string = null;
-  public transactionTypes: any = null;
 
   private _formType: string = '';
   private _types: any = [];
@@ -45,6 +41,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
+    private _utilService: UtilService
   ) {
     this._config.placement = 'right'
     this._config.triggers = 'click';
@@ -58,7 +55,6 @@ export class IndividualReceiptComponent implements OnInit {
     this._individualReceiptService
       .getDynamicFormFields(this._formType, 'Individual Receipt')
       .subscribe(res => {
-        console.log('res: ', res);
         this.formFields = res.data.formFields;
         this._setForm(this.formFields);
         this.states = res.data.states;
@@ -83,7 +79,15 @@ export class IndividualReceiptComponent implements OnInit {
 
     fields.forEach((el) => {
       el.cols.forEach((e) => {
-        formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+        if (
+          e.name !== 'LineNumber' &&
+          e.name !== 'TransactionId' &&
+          e.name !== 'TransactionTypeCode' &&
+          e.name !== 'BackReferenceTranIdNumber' &&
+          e.name !== 'BackReferenceSchedName'
+        ) {
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+        }
       });
     });
 
@@ -113,14 +117,12 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Removes fields.
-   * Removes the following fields if found:
-   * LineNumber, TransactionId, TransactionTypeCode, BackReferenceTranIdNumber, BackReferenceSchedName
+   * Checks for hidden fields.
    *
-   * @param      {number}  i       { parameter_description }
-   * @param      {any}     item    The item
+   * @param      {number}  i       The current index for the item.
+   * @param      {any}     item    The item.
    */
-  public removeFields(i: number, item: any): void {
+  public hasHiddenFields(i: number, item: any): void {
     let skipRow: any = null;
     if (item.hasOwnProperty('cols')) {
       if (Array.isArray(item.cols)) {
@@ -133,9 +135,9 @@ export class IndividualReceiptComponent implements OnInit {
         ));
 
         if (skipRow === 0) {
-          item['skipRow'] = true;
+          item['hiddenFields'] = true;
         } else {
-          item['skipRow'] = false;
+          item['hiddenFields'] = false;
         }
 
         return item;
@@ -153,65 +155,35 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Sets the transaction category when selected and sets the child items for transaction type.
-   *
-   * @param      {Object}  e       { parameter_description }
+   * Vaidates the form on submit.
    */
-  public transactionCategorySelected(e): void {
-    if(typeof e !== 'undefined') {
-      const selectedValue: string = e.value;
-      const selectedType: string = e.type;
-      let selectedIndex: number = 0;
-      let childIndex: number = 0;
-
-      this.transactionCategoryInfo = e.info;
-
-      this._types['transactionCategory'] = selectedValue;
-
-      this._types.findIndex((el, index) => {
-        if(el.text === selectedType) {
-          selectedIndex = index;
-        }
-      });
-      this._types[selectedIndex].options.findIndex((el, index) => {
-        if(el.value === selectedValue) {
-          childIndex = index;
-        }
-      });
-
-      this.transactionTypes = this._types[selectedIndex].options[childIndex].options;
-    } else {
-      this.transactionCategoryInfo = null;
-      this.frmIndividualReceipt.controls['transactionType'].setValue(null);
-    }
-  }
-  /**
-   * @param  {} e
-   */
-  public transactionTypeSelected(e): void {
-    if(typeof e !== 'undefined') {
-      this.transactionType = e.text;
-      this.transactionTypeInfo = e.info;
-    } else {
-      this.transactionType = null;
-      this.transactionTypeInfo = null;
-    }
-  }
-
   public doValidateReceipt() {
     this.formSubmitted = true;
-
     if(this.frmIndividualReceipt.valid) {
       this.formSubmitted = false;
+      let receiptObj: any = {};
+
+      for (const field in this.frmIndividualReceipt.controls) {
+        if (field === 'ContributionDate') {
+          receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+        } else {
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+        }
+
+      }
+
+      localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
+
+      this._individualReceiptService
+        .saveScheduleA(this._formType)
+        .subscribe(res => {
+          if (res) {
+            this.frmIndividualReceipt.reset();
+            this.formSubmitted = false;
+            window.scrollTo(0,0);
+          }
+        });
     }
-    return;
-  }
-
-  public viewTransactions() {
-    //this._router.navigate(['/forms/transactions', this._formType], { queryParams: { step: this.step } });
-
-    //let form_id = this._formType;
-    this._router.navigate(['/forms/transactions', this._formType]);
   }
 
   /**
