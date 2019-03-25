@@ -28,6 +28,7 @@ export class TransactionsService {
   private mockRecycleBinArray = [];
   private mockTransactionId = 'TID12345';
   private mockTransactionIdRecycle = 'TIDRECY';
+  private mockDeletedDate = new Date('2019-1-15');
   // only for mock data - end
 
   // May only be needed for mocking server
@@ -289,6 +290,23 @@ export class TransactionsService {
       response.transactions = filteredDateArray;
     }
 
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      isFilter = true;
+      const filterDeletedDateFromDate = new Date(filters.filterDeletedDateFrom + ' EST');
+      const filterDeletedDateToDate = new Date(filters.filterDeletedDateTo + ' EST');
+      const filteredDeletedDateArray = [];
+      for (const trx of response.transactions) {
+        if (trx.deleted_date) {
+          const trxDelDate = new Date(trx.deleted_date);
+          if (trxDelDate >= filterDeletedDateFromDate &&
+              trxDelDate <= filterDeletedDateToDate) {
+            filteredDeletedDateArray.push(trx);
+          }
+        }
+      }
+      response.transactions = filteredDeletedDateArray;
+    }
+
     if (filters.filterMemoCode === true) {
       isFilter = true;
       const filteredMemoCodeArray = [];
@@ -472,10 +490,16 @@ export class TransactionsService {
     t1.city = 'New York';
     t1.employer = 'Exxon';
     t1.occupation = 'Lawyer';
-    const date = new Date('2019-01-01');
+
+    const now = new Date();
+
+    const date = new Date('2019-01-01 EDT');
     t1.transaction_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-    const deletedDate = new Date('2019-03-15');
-    t1.deleted_date = deletedDate.getFullYear() + '-' + (deletedDate.getMonth() + 1) + '-' + deletedDate.getDate();
+
+    const deletedDate = new Date('2019-03-01 EDT');
+    deletedDate.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
+    t1.deleted_date = deletedDate.getFullYear() + '-' + (now.getMonth() + 1) + '-' + deletedDate.getDate();
+
     t1.memo_code = 'Memo Code';
     t1.memo_text = 'The memo text';
     t1.name = 'Mr. John Doe';

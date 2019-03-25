@@ -592,20 +592,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public deleteRecyleBin(): void {
 
     let beforeMessage = '';
-    // if (this.bulkActionCounter === 1) {
-    //   let id = '';
-    //   for (const trx of this.transactionsModel) {
-    //     if (trx.selected) {
-    //       id = trx.transactionId;
-    //     }
-    //   }
-    //   beforeMessage = (id !== '') ?
-    //     'Are you sure you want to permanently delete Transaction ' + id + '?' :
-    //     'Are you sure you want to permanently delete this Transaction?';
-    // } else {
-    //   beforeMessage = 'Are you sure you want to permanently delete these transactions?';
-    // }
-
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
