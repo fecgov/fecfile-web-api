@@ -8,10 +8,10 @@
         [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
       >
-        <div class="float-left">
+        <div class="float-left form-sidebar-item__text">
           {{ categoryType?.text }}
         </div>
-        <div class="float-right amount">
+        <div class="float-right amount form-sidebar-item__value">
           $0
         </div>
       </li>
