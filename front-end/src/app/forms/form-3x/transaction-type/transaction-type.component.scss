@@ -61,28 +61,39 @@
             .secondary-options {
               .card {
                 .card-header {
-                  h5 {
-                    .btn-link {
-                      color: $black;
-                      display: block;
-                      text-align: left;
-                      text-decoration: none;
-                      width: 100%;
-                      &:hover,
-                      &:active,
-                      &:visited,
-                      &:focus {
+                  .panel-header {
+                    display: block;
+                    width: 100%;
+                    .option-header-text {
+                      float: left;
+                      width: 95%;
+                      .btn-link {
                         color: $black;
                         text-decoration: none;
+                        &:hover,
+                        &:visited,
+                        &:active,
+                        &:focus {
+                          color: $black;
+                        }
+                        &:hover {
+                          text-decoration: underline;
+                        }
                       }
-                      .option-header-text {
-                        float: left;
-                        width: 95%;
-                      }
-                      .option-header-icon {
-                        float: right;
-                        text-align: right;
-                        width: 15%;
+                    }
+                    .option-header-icon {
+                      float: right;
+                      text-align: right;
+                      width: 5%;
+                      .btn-link {
+                        color: $black;
+                        text-decoration: none;
+                        &:hover,
+                        &:visited,
+                        &:active,
+                        &:focus {
+                          color: $black;
+                        }
                       }
                     }
                   }

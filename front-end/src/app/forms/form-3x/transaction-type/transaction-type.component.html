@@ -44,14 +44,51 @@
           </ng-container>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <ngb-accordion (panelChange)="collapse=!collapse" class="secondary-options">
+              <ngb-accordion class="secondary-options">
                 <ngb-panel
                   class="secondary-options__item"
                   *ngFor="let option of secondaryOptions; index as i"
                 >
-                  <ng-template ngbPanelTitle let-opened="opened">
-                    {{option?.text}}
-                    {{opened}}
+                  <ng-template
+                    ngbPanelHeader
+                    let-opened="opened"
+                  >
+                    <div class="panel-header">
+                      <div class="option-header-text">
+                        <button
+                          class="btn btn-link"
+                          ngbPanelToggle
+                        >
+                          {{option?.text}}
+                        </button>
+                        <ng-container *ngIf="option?.infoIcon">
+                          <button
+                            type="button"
+                            class="btn-info"
+                            ngbTooltip=" {{option?.info}}"
+
+                          >
+                            <i class="info-icon" aria-hidden="true"></i>
+                            <span class="sr-only">
+                              Click for more information
+                            </span>
+                          </button>
+                        </ng-container>
+                      </div>
+                      <div class="option-header-icon">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          ngbPanelToggle
+                        >
+                          <i
+                            [ngClass]="{'down-arrow-icon': opened,'up-arrow-icon': !opened}"
+                            aria-hidden="true"
+                          >
+                          </i>
+                        </button>
+                      </div>
+                    </div>
                   </ng-template>
                   <ng-template ngbPanelContent>
                     <ul class="child-options">
