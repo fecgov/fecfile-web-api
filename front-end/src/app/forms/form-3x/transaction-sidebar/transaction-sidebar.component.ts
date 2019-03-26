@@ -15,6 +15,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() transactionCategories: any = [];
+  @Input() step: string = '';
 
   public itemSelected: string = null;
 

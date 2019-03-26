@@ -12,6 +12,7 @@
     </div>
     <div *ngIf="step==='step_2' || step==='step_3'">
       <transaction-sidebar
+        step="step"
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"
         (status)='onNotify($event)'
