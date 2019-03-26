@@ -8,12 +8,13 @@
   .search-field {
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
     position: relative;
     text-align: center;
     .search-icon {
       color: $shuttleGray;
       position: absolute;
-      right: 30px;
+      right: 35px;
       top: 10px;
       z-index: 1;
     }
@@ -30,11 +31,26 @@
       margin-top: 15px;
       position: relative;
       .form-sidebar-item {
+        &:first-child {
+          border-top: 1px solid $white;
+        }
         border-bottom: 1px solid $white;
         display: block;
         padding-bottom: 15px;
         padding-top: 15px;
         vertical-align: middle;
+        &.selected {
+          background-color: $shuttleGray;
+          color: $white;
+          .btn-link {
+            color: $white;
+            &:hover,
+            &:active,
+            &:visited {
+              color: $white;
+            }
+          }
+        }
         .btn-link {
           color: $black;
           text-decoration: none;
