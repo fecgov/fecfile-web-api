@@ -98,9 +98,15 @@ export class ReportTypeService {
               if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
                 const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
 
-                reportObj.reportId = res[0].report_id;
+                if (Array.isArray(res)) {
+                  if (res[0].hasOwnProperty('report_id')) {
+                    if (typeof res[0].report_id) {
+                      reportObj.reportId = res[0].report_id;
 
-                window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                      window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                    }
+                  }
+                }
               }
 
               return res;

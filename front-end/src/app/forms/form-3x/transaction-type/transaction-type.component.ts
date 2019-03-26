@@ -84,8 +84,6 @@ export class TransactionTypeComponent implements OnInit {
   public doValidateOption() {
     this.frmSubmitted = true;
 
-    console.log('this.frmOption: ', this.frmOption);
-
     if (this.frmOption.valid) {
 
       if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
@@ -112,11 +110,12 @@ export class TransactionTypeComponent implements OnInit {
       }
 
       if (!this.transactionType && this.tranasctionCategoryVal) {
-        console.log('transaction type failed: ');
         this.transactionTypeFailed = true;
       } else {
         this.transactionTypeFailed = false;
       }
+
+      window.scrollTo(0, 0);
 
       return 0;
     }
