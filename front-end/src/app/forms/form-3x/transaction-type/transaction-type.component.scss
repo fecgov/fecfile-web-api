@@ -53,6 +53,57 @@
         position: relative;
         .grid-row {
           margin-bottom: 20px;
+          margin-left: 0;
+          margin-right: 0;
+          .grid-row__col {
+            padding-left: 0;
+            padding-right: 0;
+            .secondary-options {
+              .card {
+                .card-header {
+                  h5 {
+                    .btn-link {
+                      color: $black;
+                      display: block;
+                      text-align: left;
+                      text-decoration: none;
+                      width: 100%;
+                      &:hover,
+                      &:active,
+                      &:visited,
+                      &:focus {
+                        color: $black;
+                        text-decoration: none;
+                      }
+                      .option-header-text {
+                        float: left;
+                        width: 95%;
+                      }
+                      .option-header-icon {
+                        float: right;
+                        text-align: right;
+                        width: 15%;
+                      }
+                    }
+                  }
+                  @include clearfix();
+                }
+              }
+              .collapse {
+                .card-body {
+                  .child-options {
+                    list-style-type: none;
+                    .child-options__item {
+                      height: 50px;
+                      .child-options-label {
+                        padding-left: 10px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

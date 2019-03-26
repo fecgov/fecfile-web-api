@@ -157,7 +157,6 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
-      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
@@ -186,8 +185,6 @@ export class F3xComponent implements OnInit {
             } else if (e.hasOwnProperty('transactionType')) {
               if (typeof e.transactionType === 'string') {
                 this.transactionType = e.transactionType;
-
-                console.log('this.transctionType: ', this.transactionType);
               }
             }
           }
@@ -225,14 +222,6 @@ export class F3xComponent implements OnInit {
         this.step = this._step;
 
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
-      } else if (this.direction === 'new') {
-          window.localStorage.removeItem(`form_${this._formType}_receipt`);
-          window.localStorage.removeItem(`form_${this._formType}_report_type`);
-          window.localStorage.removeItem(`form_${this._formType}_transaction_type`);
-          window.localStorage.setItem(`form_${this._formType}_reset_form`, 'true');
-          this.step = this._step;
-
-          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
     }
   }
