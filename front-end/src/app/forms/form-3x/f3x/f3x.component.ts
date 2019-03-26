@@ -36,7 +36,7 @@ export class F3xComponent implements OnInit {
   public specialReports: boolean = false;
   public selectedReportInfo: any = {};
   public transactionCategories: any = [];
-  public transactionType: string = '';
+  public transactionCategory: string = '';
 
   private _step: string = '';
   private _formType: string = '';
@@ -182,9 +182,9 @@ export class F3xComponent implements OnInit {
               }
             } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
                this.selectedReportInfo = e;
-            } else if (e.hasOwnProperty('transactionType')) {
-              if (typeof e.transactionType === 'string') {
-                this.transactionType = e.transactionType;
+            } else if (e.hasOwnProperty('transactionCategory')) {
+              if (typeof e.transactionCategory === 'string') {
+                this.transactionCategory = e.transactionCategory;
               }
             }
           }

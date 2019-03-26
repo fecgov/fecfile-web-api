@@ -7,7 +7,7 @@
     <header>
       <div class="header-content">
         <div class="float-left">
-          <ng-container *ngIf="mainTransactionTypeSelected">
+          <ng-container *ngIf="transactionCategorySelected">
             <h1>Transaction Type</h1>
           </ng-container>
         </div>
@@ -28,14 +28,21 @@
           </div>
         </div>
       </div>
-      <ng-container *ngIf="mainTransactionTypeSelected">
+      <ng-container *ngIf="transactionCategorySelected">
         <hr />
       </ng-container>
     </header>
     <section>
       <div class="content">
-        <ng-container *ngIf="mainTransactionTypeSelected">
-          <ng-container *ngIf="secondaryTransactionTypeFailed">
+        <ng-container *ngIf="!transactionCategorySelected && frmSubmitted">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12 text-center text-error">
+              You must select a transaction category first.
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="transactionCategorySelected">
+          <ng-container *ngIf="transactionTypeFailed">
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12 text-center text-error">
                 You must select a transaction type first.
@@ -98,8 +105,9 @@
                       >
                         <input
                           [type]="childOption.type"
-                          [name]="childOption.name"
+                          [name]="secondaryOption"
                           [value]="childOption.value"
+                          (change)="updateTypeSelected($event)"
                         />
                         <label
                           for="{{childOption.name}}"
@@ -107,6 +115,19 @@
                         >
                           {{childOption.text}}
                         </label>
+                        <ng-container *ngIf="childOption?.infoIcon">
+                          <button
+                            type="button"
+                            class="btn-info"
+                            ngbTooltip=" {{childOption?.info}}"
+
+                          >
+                            <i class="info-icon" aria-hidden="true"></i>
+                            <span class="sr-only">
+                              Click for more information
+                            </span>
+                          </button>
+                        </ng-container>
                       </li>
                     </ul>
                   </ng-template>

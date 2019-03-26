@@ -19,26 +19,22 @@ export class TransactionTypeComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
-  @Input() transactionType: string = '';
+  @Input() transactionCategory: string = null;
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionCategories: any = [];
 
-  public childOptions: any = [];
-  public childOptionType: string = '';
-  public childOptionFailed: boolean = false;
   public frmOption: FormGroup;
   public frmSubmitted: boolean = false;
-  public iconClass: string = 'up-arrow-icon';
-  public mainTransactionCategory: any = [];
-  public mainTransactionTypeSelected: boolean = false;
-  public parentOptionFailed: boolean = false;
   public showForm: boolean = false;
   public searchField: any = {};
   public secondaryOptions: any = [];
-  public secondaryTransactionType: string = null;
-  public secondaryTransactionTypeFailed : boolean = false;
+  public transactionType: string = null;
+  public transactionTypeFailed : boolean = false;
+  public transactionCategorySelected: boolean = false;
+  public tranasctionCategoryVal: string = '';
 
   private _formType: string = '';
+  private _mainTransactionCategory: any = [];
   private _transactionCategory: string = '';
   private _transactionCategories: any = [];
 
@@ -58,30 +54,25 @@ export class TransactionTypeComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.frmOption = this._fb.group({
-      secondaryTransactionType: ['', Validators.required],
-      childTransactionType: ['', Validators.required]
+      secondaryOption: ['', Validators.required]
     });
   }
 
   ngDoCheck(): void {
+    if (this.transactionCategory) {
+      this.transactionCategorySelected = false;
+    }
+
     if (this.transactionType) {
-      this.parentOptionFailed = false;
+      this.transactionTypeFailed = false;
     }
 
-    if (this.secondaryTransactionType) {
-      this.secondaryTransactionTypeFailed = false;
-    }
-
-    if (this.childOptionType) {
-      this.childOptionFailed = false;
-    }
-
-    if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
+    if (this.transactionCategory && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
       this._setSecondaryTransactionCategories();
-    } else if (this.transactionType && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+    } else if (this.transactionCategory && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
       const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
-      if (transactionObj.mainTransactionTypeText !== this.transactionType) {
+      if (transactionObj.mainTransactionTypeText !== this.transactionCategory) {
         this._setSecondaryTransactionCategories();
       }
     }
@@ -91,6 +82,10 @@ export class TransactionTypeComponent implements OnInit {
    * Validates the form on submit.
    */
   public doValidateOption() {
+    this.frmSubmitted = true;
+
+    console.log('this.frmOption: ', this.frmOption);
+
     if (this.frmOption.valid) {
 
       if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
@@ -109,24 +104,18 @@ export class TransactionTypeComponent implements OnInit {
       });
       return 1;
     } else {
-      if (!this.transactionType) {
-        this.parentOptionFailed = true;
+
+      if (!this.tranasctionCategoryVal) {
+        this.transactionCategorySelected = false;
       } else {
-        this.parentOptionFailed = false;
+        this.transactionCategorySelected = true;
       }
 
-      if (!this.secondaryTransactionType) {
-        this.secondaryTransactionTypeFailed = true;
+      if (!this.transactionType && this.tranasctionCategoryVal) {
+        console.log('transaction type failed: ');
+        this.transactionTypeFailed = true;
       } else {
-        this.secondaryTransactionTypeFailed = false;
-      }
-
-      if (this.childOptions.length >= 1) {
-        if (!this.childOptionType) {
-          this.childOptionFailed = true;
-        } else {
-          this.childOptionFailed = false;
-        }
+        this.transactionTypeFailed = false;
       }
 
       return 0;
@@ -139,102 +128,50 @@ export class TransactionTypeComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public updateTypeSelected(e): void {
-    // const type: string = e.target.getAttribute('data-type');
-
-    // if (type === 'secondaryTransactionType') {
-    //   const val: string = this.frmOption.controls['secondaryTransactionType'].value;
-
-    //   this.secondaryTransactionType = val;
-
-    //   this.secondaryTransactionTypeFailed = true;
-
-    //   if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
-    //     const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
-
-    //     window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
-
-    //     tempObj.secondaryTransactionType = val;
-
-    //     window.localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
-
-    //     this._setChildTransactionCategories();
-    //   }
-    // } else if (type === 'childTransactionType') {
-    //   const val: string = this.frmOption.controls['childTransactionType'].value;
-
-    //   this.childOptionType = val;
-
-    //   this.childOptionFailed = false;
-
-    //   if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
-    //     const tempObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
-
-    //     window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
-
-    //     tempObj.childTransactionType = val;
-
-    //     window.localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(tempObj));
-    //   }
-    // }
-  }
-
-  public beforePanelChange(e): void {
-    console.log('beforePanelChange: ');
-
+    console.log('updateTypeSelected: ');
     console.log('e: ', e);
-    if (e.nextState) {
-      this.iconClass = 'down-arrow-icon'
-    } else {
-      this.iconClass = 'up-arrow-icon';
-    }
+    console.log('val: ', e.target.value);
+
+    const val: string = e.target.value;
+
+    this.transactionType = val;
+
+    this.frmOption.controls['secondaryOption'].setValue(val);
+
+    this.transactionTypeFailed = false;
   }
+
 
   /**
    * Sets the secondary transaction categories.
    */
   private _setSecondaryTransactionCategories(): void {
-    console.log('setSecondaryTransactionCategories: ');
-    this.mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionType));
-    const mainTransactionTypeText: string = this.mainTransactionCategory[0].text;
-    const mainTransactionTypeValue: string = this.mainTransactionCategory[0].value;
+    this._mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionCategory));
+    const mainTransactionTypeText: string = this._mainTransactionCategory[0].text;
+    const mainTransactionTypeValue: string = this._mainTransactionCategory[0].value;
     const transactionObj: any = {
       mainTransactionTypeText,
       mainTransactionTypeValue,
-      'secondaryTransactionType': '',
+      'transactionType': '',
       'childTransactionType': ''
     };
 
+    console.log('this._mainTransactionCategory: ', this._mainTransactionCategory);
+
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
-    this.secondaryOptions = this.mainTransactionCategory[0].options;
+    this.secondaryOptions = this._mainTransactionCategory[0].options;
 
-    console.log('this.secondaryOptions: ', this.secondaryOptions);
+    this.transactionCategorySelected = true;
 
-    this.transactionType = null;
-    this.mainTransactionTypeSelected = true;
+    this.transactionTypeFailed = false;
 
-    if (this.childOptionType) {
-      this.childOptionType = '';
-      this.childOptions = [];
-    }
+    // console.log('this.secondaryOptions: ', this.secondaryOptions);
 
-    if (this.secondaryTransactionType) {
-      this.secondaryTransactionType = '';
-    }
-  }
+    if (this.transactionCategory) {
+      this.tranasctionCategoryVal = this.transactionCategory;
 
-  /**
-   * Sets the child transaction categories.
-   */
-  private _setChildTransactionCategories(): void {
-    const childOptionObj: any = this.secondaryOptions.filter(el => (this.secondaryTransactionType === el.value));
-
-    if (typeof childOptionObj === 'object') {
-      if (childOptionObj[0].hasOwnProperty('options')) {
-        if (Array.isArray(childOptionObj[0].options)) {
-          this.childOptions = childOptionObj[0].options;
-        }
-      }
+      this.transactionCategory = '';
     }
   }
 
