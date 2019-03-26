@@ -222,7 +222,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyRestoredTransaction(res);
-        this._transactionsService.mockApplyFilters(res, this.filters);
+        this._transactionsService.mockApplyFilters(res, this.filters, this.transactionsView);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -252,7 +252,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
 
         this._transactionsService.mockAddUIFileds(res);
-        this._transactionsService.mockApplyFilters(res, this.filters);
+        this._transactionsService.mockApplyFilters(res, this.filters, this.recycleBinView);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
         this.transactionsModel = this._transactionsService.sortTransactions(

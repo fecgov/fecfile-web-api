@@ -10,6 +10,7 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { ActiveView } from '../transactions.component';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -195,7 +196,7 @@ export class TransactionsService {
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
    */
-  public mockApplyFilters(response: any, filters: TransactionFilterModel) {
+  public mockApplyFilters(response: any, filters: TransactionFilterModel, view: ActiveView) {
 
     if (!response.transactions) {
       return;
@@ -274,6 +275,7 @@ export class TransactionsService {
     }
 
     if (filters.filterDateFrom && filters.filterDateTo) {
+      isFilter = true;
       const filterDateFromDate = new Date(filters.filterDateFrom);
       const filterDateToDate = new Date(filters.filterDateTo);
       const filteredDateArray = [];
@@ -282,7 +284,6 @@ export class TransactionsService {
           const trxDate = new Date(trx.transaction_date);
           if (trxDate >= filterDateFromDate &&
               trxDate <= filterDateToDate) {
-            isFilter = true;
             filteredDateArray.push(trx);
           }
         }
@@ -290,21 +291,24 @@ export class TransactionsService {
       response.transactions = filteredDateArray;
     }
 
-    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
-      isFilter = true;
-      const filterDeletedDateFromDate = new Date(filters.filterDeletedDateFrom + ' EST');
-      const filterDeletedDateToDate = new Date(filters.filterDeletedDateTo + ' EST');
-      const filteredDeletedDateArray = [];
-      for (const trx of response.transactions) {
-        if (trx.deleted_date) {
-          const trxDelDate = new Date(trx.deleted_date);
-          if (trxDelDate >= filterDeletedDateFromDate &&
-              trxDelDate <= filterDeletedDateToDate) {
-            filteredDeletedDateArray.push(trx);
+    // only if view is recycle
+    if (view === ActiveView.recycleBin) {
+      if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+        isFilter = true;
+        const filterDeletedDateFromDate = new Date(filters.filterDeletedDateFrom + ' EST');
+        const filterDeletedDateToDate = new Date(filters.filterDeletedDateTo + ' EST');
+        const filteredDeletedDateArray = [];
+        for (const trx of response.transactions) {
+          if (trx.deleted_date) {
+            const trxDelDate = new Date(trx.deleted_date);
+            if (trxDelDate >= filterDeletedDateFromDate &&
+                trxDelDate <= filterDeletedDateToDate) {
+              filteredDeletedDateArray.push(trx);
+            }
           }
         }
+        response.transactions = filteredDeletedDateArray;
       }
-      response.transactions = filteredDeletedDateArray;
     }
 
     if (filters.filterMemoCode === true) {
@@ -492,13 +496,18 @@ export class TransactionsService {
     t1.occupation = 'Lawyer';
 
     const now = new Date();
+    const previousMonth = `${now.getMonth()}`.padStart(2, '0');
+    const month = `${now.getMonth() + 1}`.padStart(2, '0');
 
     const date = new Date('2019-01-01 EDT');
-    t1.transaction_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    date.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
+    t1.transaction_date = date.getFullYear() + '-' + previousMonth + '-' + `${date.getDate()}`.padStart(2, '0');
+    // t1.transaction_date = `${date.getFullYear()}-${month}-${date.getDate()}`;
 
     const deletedDate = new Date('2019-03-01 EDT');
     deletedDate.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
-    t1.deleted_date = deletedDate.getFullYear() + '-' + (now.getMonth() + 1) + '-' + deletedDate.getDate();
+    t1.deleted_date = deletedDate.getFullYear() + '-' + month + '-' + `${deletedDate.getDate()}`.padStart(2, '0');
+    // t1.deleted_date = `${deletedDate.getFullYear()}-${month}-${deletedDate.getDate()}`;
 
     t1.memo_code = 'Memo Code';
     t1.memo_text = 'The memo text';
