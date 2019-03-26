@@ -57,19 +57,6 @@
     }
     section {
       .form-content {
-        .options-list {
-          list-style-type: none;
-          .options-list__item {
-            border-bottom: 1px solid $iron;
-            border-top: 1px solid $iron;
-            padding-bottom: 20px;
-            padding-left: 10px;
-            padding-top: 20px;
-            &:nth-child(even) {
-              background-color: $seaShell;
-            }
-          }
-        }
       }
     }
     footer {

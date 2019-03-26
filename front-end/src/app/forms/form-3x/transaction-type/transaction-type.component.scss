@@ -60,6 +60,9 @@
             padding-right: 0;
             .secondary-options {
               .card {
+                &:nth-child(even) {
+                  background-color: $seaShell;
+                }
                 .card-header {
                   .panel-header {
                     display: block;
@@ -106,7 +109,12 @@
                   .child-options {
                     list-style-type: none;
                     .child-options__item {
+                      display: block;
                       height: 50px;
+                      width: 100%;
+                      &:nth-child(even) {
+                        background-color: $seaShell;
+                      }
                       .child-options-label {
                         padding-left: 10px;
                       }
