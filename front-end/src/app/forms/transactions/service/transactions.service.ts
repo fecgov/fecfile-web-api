@@ -300,7 +300,8 @@ export class TransactionsService {
         const filteredDeletedDateArray = [];
         for (const trx of response.transactions) {
           if (trx.deleted_date) {
-            const trxDelDate = new Date(trx.deleted_date);
+            const trxDelDate = new Date(trx.deleted_date + ' EST');
+            // trxDelDate.setDate(trxDelDate.getDate() + 1);
             if (trxDelDate >= filterDeletedDateFromDate &&
                 trxDelDate <= filterDeletedDateToDate) {
               filteredDeletedDateArray.push(trx);
