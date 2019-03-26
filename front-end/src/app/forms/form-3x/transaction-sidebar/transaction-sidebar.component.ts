@@ -15,8 +15,9 @@ export class TransactionSidebarComponent implements OnInit {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() transactionCategories: any = [];
+  @Input() step: string = '';
 
-
+  public itemSelected: string = null;
 
   private _formType: string = '';
 
@@ -35,19 +36,17 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public selectItem(e): void {
-    console.log('selectItem: ');
-    console.log('e: ', e.target.value);
+    this.itemSelected = e.target.value;
+
     this.status.emit({
       'form': '3x',
-      'transactionType': e.target.value
+      'transactionCategory': e.target.value
     });
 
    this._messageService
      .sendMessage({
        'form': '3x',
-       'transactionType': e.target.value,
+       'transactionCategory': e.target.value,
      });
   }
-
-  public on
 }

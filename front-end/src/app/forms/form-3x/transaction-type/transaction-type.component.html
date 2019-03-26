@@ -7,82 +7,132 @@
     <header>
       <div class="header-content">
         <div class="float-left">
-          <h1>Transaction Type</h1>
+          <ng-container *ngIf="transactionCategorySelected">
+            <h1>Transaction Type</h1>
+          </ng-container>
         </div>
         <div class="float-right" ngbDropdown>
           <button
             type="button"
             class="btn btn-link btn-options"
-            id="dropdownBasic2"
+            id="actionsMenu"
             ngbDropdownToggle
           >
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
           </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <div ngbDropdownMenu aria-labelledby="actionsMenu">
             <button class="dropdown-item">View</button>
             <button class="dropdown-item">Print</button>
             <button class="dropdown-item">Import</button>
           </div>
         </div>
       </div>
-      <hr />
+      <ng-container *ngIf="transactionCategorySelected">
+        <hr />
+      </ng-container>
     </header>
     <section>
       <div class="content">
-        <ng-container *ngIf="!secondaryTransactionType">
-          <ng-container *ngIf="secondaryTransactionTypeFailed">
+        <ng-container *ngIf="!transactionCategorySelected && frmSubmitted">
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12 text-center text-error">
+              You must select a transaction category first.
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="transactionCategorySelected">
+          <ng-container *ngIf="transactionTypeFailed">
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12 text-center text-error">
                 You must select a transaction type first.
               </div>
             </div>
           </ng-container>
-          <div
-            class="grid-row"
-            *ngFor="let option of secondaryOptions"
-          >
+          <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <input
-                type="radio"
-                name="secondaryTransactionType"
-                data-type="secondaryTransactionType"
-                [value]="option?.value"
-                [attr.data-value]="option?.value"
-                (change)="updateTypeSelected($event)"
-                formControlName="secondaryTransactionType"
-              />
-              <label for="secondaryTransactionType">
-                {{option?.text}}
-              </label>
-            </div>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="secondaryTransactionType">
-          <ng-container *ngIf="childOptionFailed">
-            <div class="grid-row">
-              <div class="grid-row__col grid-row__col--12 text-center text-error">
-                You must select a child transaction type first.
-              </div>
-            </div>
-          </ng-container>
-          <div
-          class="grid-row"
-          *ngFor="let option of childOptions"
-          >
-            <div class="grid-row__col grid-row__col--12">
-              <input
-                type="radio"
-                name="childTransactionType"
-                data-type="childTransactionType"
-                [value]="option?.value"
-                [attr.data-value]="option?.value"
-                (change)="updateTypeSelected($event)"
-                formControlName="childTransactionType"
-              />
-              <label for="childTransactionType">
-                {{option?.text}}
-              </label>
+              <ngb-accordion class="secondary-options">
+                <ngb-panel
+                  class="secondary-options__item"
+                  *ngFor="let option of secondaryOptions; index as i"
+                >
+                  <ng-template
+                    ngbPanelHeader
+                    let-opened="opened"
+                  >
+                    <div class="panel-header">
+                      <div class="option-header-text">
+                        <button
+                          class="btn btn-link"
+                          ngbPanelToggle
+                        >
+                          {{option?.text}}
+                        </button>
+                        <ng-container *ngIf="option?.infoIcon">
+                          <button
+                            type="button"
+                            class="btn-info"
+                            ngbTooltip=" {{option?.info}}"
+
+                          >
+                            <i class="info-icon" aria-hidden="true"></i>
+                            <span class="sr-only">
+                              Click for more information
+                            </span>
+                          </button>
+                        </ng-container>
+                      </div>
+                      <div class="option-header-icon">
+                        <button
+                          type="button"
+                          class="btn btn-link"
+                          ngbPanelToggle
+                        >
+                          <i
+                            [ngClass]="{'down-arrow-icon': opened,'up-arrow-icon': !opened}"
+                            aria-hidden="true"
+                          >
+                          </i>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-template>
+                  <ng-template ngbPanelContent>
+                    <ul class="child-options">
+                      <li
+                        class="child-options__item"
+                        *ngFor="let childOption of option.options"
+                      >
+                        <input
+                          [type]="childOption.type"
+                          [name]="secondaryOption"
+                          [value]="childOption.value"
+                          (change)="updateTypeSelected($event)"
+                        />
+                        <label
+                          for="{{childOption.name}}"
+                          class="child-options-label"
+                        >
+                          {{childOption.text}}
+                        </label>
+                        <ng-container *ngIf="childOption?.infoIcon">
+                          <button
+                            type="button"
+                            class="btn-info"
+                            ngbTooltip=" {{childOption?.info}}"
+
+                          >
+                            <i class="info-icon" aria-hidden="true"></i>
+                            <span class="sr-only">
+                              Click for more information
+                            </span>
+                          </button>
+                        </ng-container>
+                      </li>
+                    </ul>
+                  </ng-template>
+                </ngb-panel>
+              </ngb-accordion>
             </div>
           </div>
         </ng-container>

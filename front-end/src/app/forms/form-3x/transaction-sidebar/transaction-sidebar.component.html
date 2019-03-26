@@ -1,6 +1,16 @@
 <div class="form-sidebar">
   <header>
     <h3 class="text-center">Transaction Categories</h3>
+    <hr/>
+    <div class="search-field">
+      <i class="search-icon" aria-hidden="true"></i>
+      <input
+        type="text"
+        name="search"
+        class="search-input"
+        placeholder="Search by Type"
+      />
+    </div>
   </header>
   <section>
     <ul class="form-sidebar__links" >
@@ -9,6 +19,17 @@
         *ngFor="let categoryType of transactionCategories"
       >
         <div class="float-left">
+          <ng-container *ngIf="step==='step_2'">
+            <button
+              type="button"
+              class="btn btn-link"
+              value="{{ categoryType?.value }}"
+              (click)="selectItem($event)"
+            >
+              <i class="plus-icon" aria-hidden="true"></i>
+             {{ categoryType?.text }}
+            </button>
+          </ng-container>
           <button
             type="button"
             class="btn btn-link"

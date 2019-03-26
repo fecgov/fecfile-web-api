@@ -36,7 +36,7 @@ export class F3xComponent implements OnInit {
   public specialReports: boolean = false;
   public selectedReportInfo: any = {};
   public transactionCategories: any = [];
-  public transactionType: string = '';
+  public transactionCategory: string = '';
 
   private _step: string = '';
   private _formType: string = '';
@@ -86,6 +86,27 @@ export class F3xComponent implements OnInit {
           console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
+
+      this._router
+        .events
+        .subscribe(val => {
+          if(val) {
+            if(val instanceof NavigationEnd) {
+              if(val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
+                localStorage.removeItem(`form_${this._formType}_report_type`);
+                localStorage.removeItem(`form_${this._formType}_transaction_type`);
+                localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+                localStorage.removeItem(`form_${this._formType}_saved`);
+              }
+            } else {
+              if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+                this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+                this.step = this._activatedRoute.snapshot.queryParams.step;
+              }
+              window.scrollTo(0, 0);
+            }
+          }
+        });
   }
 
   ngDoCheck(): void {
@@ -157,7 +178,6 @@ export class F3xComponent implements OnInit {
 
   public onNotify(e): void {
     if (typeof e === 'object') {
-      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
@@ -183,11 +203,9 @@ export class F3xComponent implements OnInit {
               }
             } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
                this.selectedReportInfo = e;
-            } else if (e.hasOwnProperty('transactionType')) {
-              if (typeof e.transactionType === 'string') {
-                this.transactionType = e.transactionType;
-
-                console.log('this.transctionType: ', this.transactionType);
+            } else if (e.hasOwnProperty('transactionCategory')) {
+              if (typeof e.transactionCategory === 'string') {
+                this.transactionCategory = e.transactionCategory;
               }
             }
           }
@@ -225,14 +243,6 @@ export class F3xComponent implements OnInit {
         this.step = this._step;
 
         this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
-      } else if (this.direction === 'new') {
-          window.localStorage.removeItem(`form_${this._formType}_receipt`);
-          window.localStorage.removeItem(`form_${this._formType}_report_type`);
-          window.localStorage.removeItem(`form_${this._formType}_transaction_type`);
-          window.localStorage.setItem(`form_${this._formType}_reset_form`, 'true');
-          this.step = this._step;
-
-          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
       }
     }
   }
