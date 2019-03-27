@@ -257,8 +257,10 @@ def schedA(request):
 
     if request.method == 'POST':
         try:
+            if request.data.get('report_id') in ['',""," ", 'None', 'null']:
+                report_id = 0
             datum = {
-                'report_id': request.data.get('report_id'),
+                'report_id': report_id,
                 'line_number': request.data.get('line_number'),
                 'transaction_type': request.data.get('transaction_type'),
                 'back_ref_transaction_id': request.data.get('back_ref_transaction_id'),
