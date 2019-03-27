@@ -229,8 +229,6 @@ export class ReportTypeComponent implements OnInit {
         this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
         this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
 
-        console.log('this._form3xReportTypeDetails: ', this._form3xReportTypeDetails);
-
         localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
@@ -250,13 +248,7 @@ export class ReportTypeComponent implements OnInit {
     } else {
       this.optionFailed = true;
       this.isValidType = false;
-
-      this.status.emit({
-        form: this.frmReportType,
-        direction: 'next',
-        step: 'step_2',
-        previousStep: ''
-      });
+      window.scrollTo(0, 0);
 
       return 0;
     }

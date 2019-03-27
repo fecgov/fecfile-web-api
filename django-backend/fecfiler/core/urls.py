@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'^core/entities$', views.entities, name='entities'),
     url(r'^core/search_entities$', views.search_entities, name='search_entities'),
     url(r'^core/get_all_transactions$', views.get_all_transactions, name='get_all_transactions'),
+    url(r'^core/state$', views.state, name='state'),
+    url(r'^core/get_all_deleted_transactions$', views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
 ]
