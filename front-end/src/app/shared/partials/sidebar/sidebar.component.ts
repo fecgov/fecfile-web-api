@@ -139,6 +139,18 @@ export class SidebarComponent implements OnInit {
                 this._formService.removeFormDashBoard('3X');
               }
             }
+            else if (form === '3X'){
+              localStorage.removeItem("form3XReportInfo.dueDate");
+              localStorage.removeItem("form3XReportInfo.electionDate");
+              localStorage.removeItem("form3XReportInfo.fromDate");
+              localStorage.removeItem("form3XReportInfo.regularSpecialReportInd");
+              localStorage.removeItem("form3XReportInfo.reportDescription");
+              localStorage.removeItem("form3XReportInfo.reportType");
+              localStorage.removeItem("form3XReportInfo.toDate");
+              localStorage.removeItem("form3xReportTypes");
+              localStorage.removeItem("form3xSelectedReportType");
+              localStorage.removeItem("form_3X_ReportInfo");
+            }
 
             this.formType = form;
           }
