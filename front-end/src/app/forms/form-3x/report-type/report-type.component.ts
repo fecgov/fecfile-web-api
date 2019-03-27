@@ -101,6 +101,28 @@ export class ReportTypeComponent implements OnInit {
       const resetForm: boolean = JSON.parse(window.localStorage.getItem(`form_${this._formType}_reset_form`));
     }
 
+    if (Array.isArray(this.committeeReportTypes)) {
+      if (this.committeeReportTypes.length >= 1) {
+        if (!this.reportTypeSelected) {
+          console.log('this.committeeReportTypes: ',this.committeeReportTypes);
+          this.frmReportType.controls['reportTypeRadio'].setValue(this.committeeReportTypes[0].report_type);
+
+          this.reportTypeSelected = this.committeeReportTypes[0].report_type;
+
+          this.reportType = this.reportTypeSelected;
+
+          console.log('this.reportTypeSelected: ', this.reportTypeSelected);
+
+          this.status.emit({
+            'form': '3x',
+            'reportTypeRadio': this.reportTypeSelected
+          });
+
+          this.optionFailed = false;
+        }
+      }
+    }
+
     if (this.selectedReportInfo) {
       if (this.selectedReportInfo.hasOwnProperty('toDate')) {
         if (typeof this.selectedReportInfo.toDate === 'string') {
