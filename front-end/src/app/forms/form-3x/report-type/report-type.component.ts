@@ -104,14 +104,19 @@ export class ReportTypeComponent implements OnInit {
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
         if (!this.reportTypeSelected) {
-          console.log('this.committeeReportTypes: ',this.committeeReportTypes);
           this.frmReportType.controls['reportTypeRadio'].setValue(this.committeeReportTypes[0].report_type);
 
           this.reportTypeSelected = this.committeeReportTypes[0].report_type;
 
           this.reportType = this.reportTypeSelected;
 
-          console.log('this.reportTypeSelected: ', this.reportTypeSelected);
+          if (this.committeeReportTypes.hasOwnProperty('dates')) {
+            this._dueDate = this.committeeReportTypes[0].dates[0].due_date;
+            this._fromDateSelected = this.committeeReportTypes[0].dates[0].cvg_start_date;
+            this.fromDateSelected = true;
+            this._toDateSelected = this.committeeReportTypes[0].dates[0].cvg_end_date;
+            this.toDateSelected = true;
+          }
 
           this.status.emit({
             'form': '3x',
