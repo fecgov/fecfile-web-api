@@ -183,7 +183,7 @@ export interface Icommittee_form3x_reporttype {
   regular_special_report_ind?: string,
   rpt_type_info?: string,
   cvg_start_date?: string,
-  cvg_end_date?:string,
+  cvg_end_date?: string,
   due_date?:string
 }
 

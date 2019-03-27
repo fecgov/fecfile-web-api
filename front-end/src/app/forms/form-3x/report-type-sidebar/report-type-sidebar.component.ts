@@ -148,7 +148,6 @@ export class ReportTypeSidebarComponent implements OnInit {
               }
 
               this.electionDates.forEach(el => {
-                console.log('el: ', el);
                 el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
 
                 el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');

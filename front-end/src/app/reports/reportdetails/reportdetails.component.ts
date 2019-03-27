@@ -59,8 +59,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public tableType: string;  
   @Input()
   public view: string; 
-  @Input()
-  public accesslevel: string;
 
   public reportsModel: Array<reportModel>;
   public filterReportsModel: Array<reportModel>;
@@ -69,18 +67,18 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
 
  // Local Storage Keys
- private readonly transactionSortableColumnsLSK =
- 'transactions.trx.sortableColumn';
+ private readonly reportSortableColumnsLSK =
+ 'reports.rpt.sortableColumn';
  private readonly recycleSortableColumnsLSK =
- 'transactions.recycle.sortableColumn';
- private readonly transactionCurrentSortedColLSK =
- 'transactions.trx.currentSortedColumn';
+ 'reports.recycle.sortableColumn';
+ private readonly reportCurrentSortedColLSK =
+ 'reports.rpt.currentSortedColumn';
  private readonly recycleCurrentSortedColLSK =
- 'transactions.recycle.currentSortedColumn';
+ 'reports.recycle.currentSortedColumn';
  private readonly transactionPageLSK =
- 'transactions.trx.page';
+ 'reports.rpt.page';
  private readonly recyclePageLSK =
- 'transactions.recycle.page';
+ 'reports.recycle.page';
 
 
 
@@ -126,11 +124,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _formsService: FormsService,
 
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(
+    this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
 			message => { 
         this.showPinColumns();
 			}
-		);
+    );
+    // commeented by Mahendra on 03/26/2019
   }
 
 
@@ -139,56 +138,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
-		/*let paginateConfig: PaginationInstance = {
-			id: 'Report-table-pagination',
-			itemsPerPage: 5,
-			currentPage: 1
-		};	
-    this.config = paginateConfig; 
-    
-    // If cached sortableColumns settings in local storage, use it.
-    // And get other cached values.
-    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnsLSK);
-    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
-      console.log("this.applyCachedValues()... ");
-      this.applyCachedValues();  
-    }
-    else {
-      console.log("ngOnInit this.sortableColumns ...");
-      this.setSortableColumns();
-
-      const paginateConfig: PaginationInstance = {
-        id: 'forms__trx-table-pagination',
-        itemsPerPage: 5,
-        currentPage: 1
-      };
-      this.config = paginateConfig;
-  
-      this.getCachedValues();
-      this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
-  
-      for (const col of this.sortableColumns) {
-        if (col.checked) {
-          this.columnOptionCount++;
-        }
-      }
-      this.getPage(this.config.currentPage);
-    }
-
-    
-
-    this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
-
-    for (let col of this.sortableColumns) {
-      if(col.checked) {
-        this.columnOptionCount++;
-      }
-    }
-
-    this.setSortDefault();
-    this.getPage(this.config.currentPage);   */
-
-    const paginateConfig: PaginationInstance = {
+		const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
       itemsPerPage: 5,
       currentPage: 1
@@ -250,9 +200,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
     this.config.currentPage = page;
 
-    /*let sortedCol: SortableColumnModel = 
-    this._tableService.findCurrentSortedColumn(this.currentSortedColumnName, this.sortableColumns); */
-    
     const sortedCol: SortableColumnModel =
     this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
@@ -262,8 +209,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("this.config.itemsPerPage", this.config.itemsPerPage);
     console.log("this.currentSortedColumnName", this.currentSortedColumnName);
     console.log("sortedCol", sortedCol);
-    
+    console.log("SortableColumnModel", SortableColumnModel);
     console.log ("view",this.view);
+    
     this._formsService.getReports(this.formType, this.view, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending)
       .subscribe((res: GetReportsResponse) => {
@@ -272,12 +220,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         console.log("getReportsPage res.reports", res.reports);
 
         this.reportsModel = [];
-        //const reportsModel = this._formsService.mapFromServerFields(res.reports,
-          //this.reportsModel);
-
         const reportsModel = this._formsService.mapFromServerFields(res,
            this.reportsModel);
-
 
         console.log("getReportsPage reportsModel", this.reportsModel);
 
@@ -291,46 +235,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
   }  
 
-  /*public getTransactionsPage(page: number): void {
-
-    this.config.currentPage = page;
-
-    const sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-
-    this._formsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending)
-      .subscribe((res: GetTransactionsResponse) => {
-        this.transactionsModel = [];
-        const transactionsModelL = this._formsService.mapFromServerFields(res.transactions,
-          this.transactionsModel);
-        this.transactionsModel = this._formsService.sortTransactions(
-            transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
-        this.totalAmount = res.totalAmount;
-        this.config.totalItems = res.totalTransactionCount;
-        this.allTransactionsSelected = false;
-      });
-  }*/
-
-  /**
-	 * The Transactions for the recycling bin.
-	 * 
-	 * @param page the page containing the transactions to get
-	 */
-	/*public getRecyclingPage(page: number) : void {
-    this.calculateNumberOfPages();
-    this._formsService.getUserDeletedTransactions(this.formType)
-        .subscribe( (res:GetTransactionsResponse) => {
-      this.reportsModel = res.transactions;
-      this.config.totalItems = res.totalTransactionCount;
-
-      // If a row was deleted, the current page may be greated than the last page
-      // as result of the delete.
-      this.config.currentPage = (page > this.numberOfPages && this.numberOfPages != 0) 
-        ? this.numberOfPages : page;
-    });  
-  }  */
-
+  
 
 	/**
 	 * Wrapper method for the table service to set the class for sort column styling.
@@ -536,60 +441,50 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
 
   /**
-   * View all transactions selected by the user.
+   * Edit report selected by the user.
    */
-  public viewAllSelected() : void {
-    alert("View all reports is not yet supported");
+  public viewReport(report: string) : void {
+    alert("View report is not yet supported");
+  } 
+
+ /**
+   * Edit report selected by the user.
+   */
+  public editReport(report: string) : void {
+    alert("Edit report is not yet supported");
+  } 
+
+  /**
+   * Amend report selected by the user.
+   */
+  public amendReport(report: string) : void {
+    alert("Amend report is not yet supported");
+  }  
+
+  /**
+   * Download report as PDF selected by the user.
+   */
+  public downloadReportAsJSON(report: string) : void {
+    alert("Download report as JSON is not yet supported");
+  } 
+
+  /**
+   * Download report as PDF selected by the user.
+   */
+  public downloadReportAsPDF(report: string) : void {
+    alert("Download report as PDF is not yet supported");
+  } 
+
+  /**
+   * Delete report selected by the user.
+   */
+  public trashReport(report: string) : void {
+    alert("Delete report is not yet supported");
   } 
 
 
-  /**
-   * Print all transactions selected by the user.
-   */
-  public printAllSelected() : void {
-    alert("Print all reports is not yet supported");
-  }  
-
-
+   
   
-  /**
-   * Trash all transactions selected by the user.
-   */
-  public trashAllSelected() : void {
-    alert("Trash all reports is not yet supported");
-  }  
-
-
-    
-  /**
-   * View the transaction selected by the user.
-   * 
-   * @param trx the Transaction to view
-   */
-  public viewTransaction() : void {
-    alert("View reports is not yet supported");
-  } 
-
-
-  /**
-   * Edit the transaction selected by the user.
-   * 
-   * @param trx the Transaction to edit
-   */
-  public editTransaction() : void {
-    alert("Edit reports is not yet supported");
-  }  
-
-
-  /**
-   * Trash the transaction selected by the user.
-   * 
-   * @param trx the Transaction to trash
-   */
-  public trashTransaction() : void {
-    alert("Trash reports is not yet supported");
-  }  
-
 
   /**
    * Restore a trashed transaction from the recyle bin.
@@ -682,48 +577,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Apply cached values in local storage to the component's class variables.
-   */
-  
-  /* private applyCachedValues() : void {
-    let sortableColumnsJson: string|null = localStorage.getItem(this.sortableColumnsLSK);
-    if (localStorage.getItem(this.sortableColumnsLSK) != null) {
-      this.sortableColumns = JSON.parse(sortableColumnsJson);
-    }
-    else {
-      // Just in case cache has an unexpected issue, use default.
-      this.setSortableColumns();
-    }
-
-    if (this.isTransactionViewActive()) {
-
-      let currentSortedColumnJson: string|null = 
-        localStorage.getItem(this.transactionCurrentSortedColLSK);
-      let currentSortedColumnL: SortableColumnModel = null;
-      if (currentSortedColumnJson) {
-        currentSortedColumnL = JSON.parse(currentSortedColumnJson);
-        
-        // sort by the column direction previously set
-        this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName, 
-          this.sortableColumns, currentSortedColumnL.descending);
-      }
-      else {
-        this.setSortDefault();
-      }
-      this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
-      this.applyCurrentPageCache(this.transactionPageLSK);
-
-    }
-    else if (this.isRecycleBinViewActive()) {
-      this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
-      this.applyCurrentPageCache(this.recyclePageLSK);
-    }
-    else {
-    }
-  }*/
-
-
-  /**
    * Get the current sorted column from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
@@ -759,46 +612,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Retrieve the cahce values from local storage and set the
-   * component's class variables.
-   */
   
-  /* private setCachedValues() {
-
-    // shared between trx and recycle tables
-    localStorage.setItem(this.sortableColumnsLSK, 
-      JSON.stringify(this.sortableColumns));
-
-    let currentSortedCol = this._tableService.findCurrentSortedColumn(
-      this.currentSortedColumnName, this.sortableColumns);
-
-    if (this.isTransactionViewActive()) {
-
-      if (currentSortedCol) {
-        localStorage.setItem(this.transactionCurrentSortedColLSK, 
-          JSON.stringify(currentSortedCol));
-      }
-
-      localStorage.setItem(this.transactionPageLSK, this.config.currentPage.toString());
-    }
-    else if (this.isRecycleBinViewActive()) {
-
-      if (currentSortedCol) {
-        localStorage.setItem(this.recycleCurrentSortedColLSK, 
-          JSON.stringify(currentSortedCol));
-      }
-      localStorage.setItem(this.recyclePageLSK, this.config.currentPage.toString());
-    }
-    else {
-    }
-  } */
-
   private setCachedValues() {
     switch (this.tableType) {
       case this.reportsView:
-        this.setCacheValuesforView(this.transactionSortableColumnsLSK,
-          this.transactionCurrentSortedColLSK, this.transactionPageLSK);
+        this.setCacheValuesforView(this.reportSortableColumnsLSK,
+          this.reportCurrentSortedColLSK, this.transactionPageLSK);
         break;
      /* case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
@@ -832,8 +651,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns() : void {
     // sort column names must match the domain model names
-    let defaultSortColumns = ['form_type', 'status', 'fec_id', 'amend_ind', 'cvg_start_date', 'report_type_desc', 'filed_date'];
-  
+    let defaultSortColumns = ['form_type', 'status', 'fec_id', 'amend_ind', 'cvg_start_date', 'cvg_end_date', 'report_type_desc','filed_date', 'last_update_date'];
+
     /*let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
       'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];*/
 
@@ -871,16 +690,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private getCachedValues() {
     switch (this.tableType) {
       case this.reportsView:
-        this.applyColCache(this.transactionSortableColumnsLSK);
-        this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
+        this.applyColCache(this.reportSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.reportCurrentSortedColLSK);
         this.applyCurrentPageCache(this.transactionPageLSK);
         break;
-      /*case this.recycleBinView:
-        this.applyColCache(this.recycleSortableColumnsLSK);
-        this.applyColumnsSelected();
-        this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.recyclePageLSK);
-        break;*/
       default:
         break;
     }

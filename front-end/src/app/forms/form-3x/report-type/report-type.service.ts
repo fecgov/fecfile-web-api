@@ -45,7 +45,7 @@ export class ReportTypeService {
    *
    * @param      {string}  formType  The form type
    */
-  public saveReport(formType: string): Observable<any> {
+  public saveReport(formType: string, access_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '/core/reports';
@@ -64,11 +64,11 @@ export class ReportTypeService {
     formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
     formData.append('coh_bop', form3xReportType.coh_bop);
-    if (typeof form3xReportType.amend_Indicator === 'string') {
+    /*if (typeof form3xReportType.amend_Indicator === 'string') {
       if (form3xReportType.amend_Indicator.length >= 1) {
         formData.append('amend_ind', form3xReportType.amend_Indicator);
       }
-    }
+    }*/
     if (typeof form3xReportType.electionCode === 'string') {
       if (form3xReportType.electionCode.length >= 1) {
         formData.append('election_code', form3xReportType.electionCode);
@@ -83,6 +83,21 @@ export class ReportTypeService {
           formData.append('state_of_election', form3xReportType.election_state);
         }
       }
+    }
+
+    if (form3xReportType.amend_Indicator===null || form3xReportType.amend_Indicator===''){
+      formData.append('amend_ind', 'N');
+    }
+    else
+    {
+      formData.append('amend_ind', form3xReportType.amend_Indicator);
+    }
+
+    if (access_type==='Saved'){
+      formData.append('status', 'Saved');
+    }
+    else if (access_type==='Submitted'){
+      formData.append('status', 'Submitted');
     }
 
     return this._http

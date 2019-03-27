@@ -42,6 +42,41 @@
       min-height: 100vh;
       width: 76%;
     }
+
+    .header__btns {
+      display: block;
+      float: none;
+      padding-top: 15px;
+      text-align: left;
+      width: 100%;
+      @include media(tablet) {
+        display: block;
+        float: none;
+        text-align: left;
+        width: 100%;
+      }
+      @include media(mediumDesktop) {
+        float: left;
+        text-align: right;
+        width: 47%;
+      }
+      @include media(largeDesktop) {
+        float: left;
+        text-align: right;
+        width: 47%;
+      }
+      .btn-print-preview {
+        @extend .btn-secondary-gray;
+        margin-right: 5px;
+      }
+      .btn-validate {
+        @extend .btn-primary;
+      }
+      .btn {
+        padding-top: 10px;
+      }
+    }
+    
     section {
       .form-content {
         .options-list {
@@ -65,4 +100,19 @@
       }
     }
   } // .form__container
+  ::ng-deep a {
+     color:#007dc3;
+  }
+
+
+  ::ng-deep a:hover {
+    color:#0169a4;
+  }
+
+
+  ::ng-deep .nav-pills a.nav-link.active,
+  ::ng-deep .nav-pills .show > a.nav-link {
+    color: #fff;
+    background-color:$blueZodiac;
+  }
 }

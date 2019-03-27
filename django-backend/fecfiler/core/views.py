@@ -1138,3 +1138,83 @@ def get_all_transactions(request):
 END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
+"""
+********************************************************************************************************************************
+STATE API- CORE APP - SPRINT 9 - FNE ??? - BY PRAVEEN JINKA 
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def state(request):
+
+    try:
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            cursor.execute("SELECT json_agg(t) FROM (SELECT state_code, state_description, st_number FROM public.ref_states order by st_number) t")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+                
+        if forms_obj is None:
+            return Response("The ref_states table is empty", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The states API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+"""
+******************************************************************************************************************************
+END - STATE API - CORE APP
+******************************************************************************************************************************
+"""
+"""
+******************************************************************************************************************************
+GET ALL DELETED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_all_deleted_transactions(request):
+    try:
+        cmte_id = request.user.username
+        param_string = ""
+        for key, value in request.query_params.items():
+            try:
+                check_value = int(value)
+                param_string = param_string + " AND " + key + "=" + str(value)
+            except Exception as e:
+                if key == 'transaction_date':
+                    transaction_date = date_format(request.query_params.get('transaction_date'))
+                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+                else:
+                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
+        #                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
+        # with connection.cursor() as cursor:
+        #     cursor.execute(query_string)
+        #     result = cursor.fetchone()
+        #     count = result[0]
+        #     sum_trans = result[1]
+            
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
+        # print(trans_query_string)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        status_value = status.HTTP_200_OK
+        if forms_obj is None:
+            forms_obj =[]
+            status_value = status.HTTP_204_NO_CONTENT
+
+        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+        json_result = { 'transactions': forms_obj}
+        return Response(json_result, status=status_value)
+
+    except Exception as e:
+        return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+"""
+******************************************************************************************************************************
+END - GET ALL DELETED TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
