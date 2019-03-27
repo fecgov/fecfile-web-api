@@ -53,13 +53,14 @@
             </div>
             <div>
               Due in {{formDueDate}} days.
-              <button
-                type="button"
+              <a
                 class="btn btn-link btn-edit"
+                [routerLink]="['/forms/form', '3X']"
+                [queryParams]="{step: 'step_1'}"
               >
                 <i class="edit-icon" aria-hidden="true"></i>
                 <span class="sr-only">Click to edit date.</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>

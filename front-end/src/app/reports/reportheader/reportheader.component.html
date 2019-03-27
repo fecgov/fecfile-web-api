@@ -12,7 +12,7 @@
   <div class="form__container">
       <div class="form__content" >
         <div class="card pl-3 pr-3">
-                   <h2 class="pb-3 pt-3 border-bottom"><B>Reports</B>
+                   <h1 class="pb-3 pt-3 border-bottom"><B>Reports</B>
                       <span class="float-right">
 
                     <button  class="btn btn-primary" (click)="showFilter()">
@@ -24,11 +24,11 @@
                     </button>      
 
                     </span>
-                    </h2>
-                    <ngb-tabset type="pills" width=200px>
-                       <ngb-tab>
+                    </h1>
+                    <ngb-tabset  type="pills" width=400px>
+                       <ngb-tab >
                          <!--<ngb-tab title="Current Year ({{currentYear}})">-->
-                          <ng-template ngbTabTitle><b>Current Year ({{currentYear}})</b></ng-template> 
+                          <ng-template ngbTabTitle><b>Reporting Year ({{currentYear}})</b></ng-template> 
                           <ng-template ngbTabContent>
                               <app-reportdetails
                               title="Report for Archives"

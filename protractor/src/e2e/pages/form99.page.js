@@ -1,5 +1,7 @@
 module.exports = {
-    form99menuitem: element(by.xpath("//div[@class='sidebar__nav--header']//button[@type='button']")),
+    //form99menuitem: element(by.xpath("//div[@class='sidebar__nav--header']//button[@type='button']")),
+   //form99menuitem: element(by.xpath("//div[@class='sidebar__nav--header']//button[@type='button']")),
+    form99menuitem: element(by.xpath("//i[@class='up-arrow-icon']")),
     form99: element(by.xpath("//a[contains(text(),'Miscellaneous Report to the FEC (F99)')]")),
     form99RadioButton: element(by.xpath("//input[@id='msm-radio']")), 
     from99ReasonRadioNext: element(by.xpath("//div[@class='forms__btn-container']//button[@type='submit'][contains(text(),'Next')]")),

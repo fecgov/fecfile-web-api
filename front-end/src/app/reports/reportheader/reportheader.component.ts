@@ -1,5 +1,6 @@
 import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ReportdetailsComponent } from '../reportdetails/reportdetails.component';
+import { FormsService } from '../../shared/services/FormsService/forms.service';
 
 export enum ActiveView {
   transactions = "transactions",
@@ -19,12 +20,18 @@ export class ReportheaderComponent implements OnInit {
 public currentYear:number =0;
 public reportsView = ActiveView.transactions;
 public showSideBar: boolean = false;
-  constructor() { }
+  constructor(
+    private _formService: FormsService
+  ) { }
 
   ngOnInit() {
 
     var dateObj = new Date();
     this.currentYear = dateObj.getUTCFullYear();
+
+    if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
+      this._formService.removeFormDashBoard("3X");
+    }
   }
 
   private showFilter() : void {
