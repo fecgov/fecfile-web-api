@@ -187,6 +187,20 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
+   * Allows a user to view transactions.
+   */
+
+   /**
+    * Figure this Out!
+    */
+  public viewTransactions(): void {
+    console.log('viewTransactions: ');
+    console.log('this._formType: ', this._formType);
+    console.log('url: /forms/transactions/3X: ');
+    // this._router.navigate(['transactions/', {queryParameters: { form_id: this._formType }}]);
+  }
+
+  /**
    * Goes to the previous step.
    */
   public previousStep(): void {

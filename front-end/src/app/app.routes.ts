@@ -40,12 +40,10 @@ export const AppRoutes: Routes = [
 		  { path: 'profile', component: ProfileComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'tools', component: ToolsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'reports', component: ReportheaderComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
-			/*{ path: 'reports', component: ReportsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], */
 		    children: [
 			   { path: 'reports/reportdetails', component: ReportdetailsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService], }/*  */
 			]
 		  },
-
 			{ path: 'account', component: AccountComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_transactions', component: ToolsImportTransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 			{ path: 'tools_import_names', component: ToolsImportNamesComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
