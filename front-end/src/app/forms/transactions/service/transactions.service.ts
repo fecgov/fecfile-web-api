@@ -497,18 +497,29 @@ export class TransactionsService {
     t1.occupation = 'Lawyer';
 
     const now = new Date();
+    console.log('now full year is = ' + now.getFullYear());
     const previousMonth = `${now.getMonth()}`.padStart(2, '0');
     const month = `${now.getMonth() + 1}`.padStart(2, '0');
 
-    const date = new Date('2019-01-01 EDT');
-    date.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
-    t1.transaction_date = date.getFullYear() + '-' + previousMonth + '-' + `${date.getDate()}`.padStart(2, '0');
-    // t1.transaction_date = `${date.getFullYear()}-${month}-${date.getDate()}`;
+    // const date = new Date('2019-01-01 EDT');
+    // console.log('date full year is = ' + date.getFullYear());
+    // const randomDay = Math.floor(Math.random() * (28 - 1 + 1));
+    // console.log('random day = ' + randomDay);
+    // // date.setDate(randomDay + 1);
+    // console.log('date full year2 is = ' + date.getFullYear());
+    // t1.transaction_date = date.getFullYear() + '-' + previousMonth + '-' + `${randomDay}`.padStart(2, '0');
+    // // t1.transaction_date = `${date.getFullYear()}-${month}-${date.getDate()}`;
 
-    const deletedDate = new Date('2019-03-01 EDT');
-    deletedDate.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
-    t1.deleted_date = deletedDate.getFullYear() + '-' + month + '-' + `${deletedDate.getDate()}`.padStart(2, '0');
-    // t1.deleted_date = `${deletedDate.getFullYear()}-${month}-${deletedDate.getDate()}`;
+    // const deletedDate = new Date('2019-03-01 EDT');
+    // deletedDate.setDate(Math.floor(Math.random() * (28 - 1 + 1)) + 1);
+    // t1.deleted_date = deletedDate.getFullYear() + '-' + month + '-' + `${deletedDate.getDate()}`.padStart(2, '0');
+    // // t1.deleted_date = `${deletedDate.getFullYear()}-${month}-${deletedDate.getDate()}`;
+
+    // randomize the day of month for mock data
+    const randomDay = Math.floor(Math.random() * (28 - 1 + 1)).toString().padStart(2, '0');
+    const randomDay2 = Math.floor(Math.random() * (28 - 1 + 1)).toString().padStart(2, '0');
+    t1.transaction_date = `${now.getFullYear()}-${previousMonth}-${randomDay}`.padStart(2, '0');
+    t1.deleted_date = `${now.getFullYear()}-${month}-${randomDay2}`.padStart(2, '0');
 
     t1.memo_code = 'Memo Code';
     t1.memo_text = 'The memo text';
