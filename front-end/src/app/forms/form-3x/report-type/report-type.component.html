@@ -47,17 +47,17 @@
             <ul class="options-list">
               <li
                 class="options-list__item"
-                *ngFor="let committeeReportType of committeeReportTypes  || async"
+                *ngFor="let committeeReportType of committeeReportTypes; let i = index;"
               >
-              <input
-                type="radio"
-                name="reportTypeRadio"
-                [value]="committeeReportType.report_type"
-                [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
-                [attr.checked]="committeeReportType.report_type === reportTypeSelected"
-                (change)="updateTypeSelected($event)"
-                formControlName="reportTypeRadio"
-              />
+                <input
+                  type="radio"
+                  name="reportTypeRadio"
+                  [value]="committeeReportType.report_type"
+                  [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
+                  [attr.checked]="committeeReportType.report_type === reportTypeSelected"
+                  (change)="updateTypeSelected($event)"
+                  formControlName="reportTypeRadio"
+                />
                 <label
                   for="{{committeeReportType.report_type_desciption}}"
                 >
