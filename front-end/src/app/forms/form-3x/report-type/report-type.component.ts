@@ -232,7 +232,7 @@ export class ReportTypeComponent implements OnInit {
         localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
-          .saveReport(this._formType)
+          .saveReport(this._formType, "Saved")
           .subscribe(res => {
             if (res) {
               this.status.emit({

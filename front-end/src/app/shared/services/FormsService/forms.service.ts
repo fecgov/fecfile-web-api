@@ -17,11 +17,11 @@ export interface GetReportsResponse {
 export class FormsService {
 
   private _orderByPipe: OrderByPipe;
-
+  
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
-  ) {
+  ) { 
     this._orderByPipe = new OrderByPipe();
   }
 
@@ -576,7 +576,7 @@ export class FormsService {
     return false;
  }
 
- public saveReport(form_type: string): Observable<any> {
+  public saveReport(form_type: string, access_type: string): Observable<any> {
   let token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
   let url: string = '/core/reports';
@@ -589,13 +589,20 @@ export class FormsService {
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
   let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
-
+  
   console.log(" saveReport formF3X_ReportInfo ",formF3X_ReportInfo );
 
 
   formData.append('report_id', formF3X_ReportInfo.reportId);
   formData.append('form_type', `F${formF3X_ReportInfo.formType}`);
-  formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
+  if (formF3X_ReportInfo.amend_Indicator===null || formF3X_ReportInfo.amend_Indicator===''){
+    formData.append('amend_ind', 'N');
+  }
+  else
+  {
+    formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
+  }
+  
   formData.append('report_type', formF3X_ReportInfo.reportType);
   formData.append('election_code', formF3X_ReportInfo.electionCode);
   formData.append('date_of_election', formF3X_ReportInfo.electionDate);
@@ -604,6 +611,14 @@ export class FormsService {
   formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
   formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
 
+  if (access_type==='Saved'){
+    formData.append('status', 'Saved');
+  }
+  else if (access_type==='Submitted'){
+    formData.append('status', 'Submitted');
+  }
+
+  console.log("form 3X saveReport formData",formData);
 
   return this._http
       .post(
@@ -633,35 +648,35 @@ export class FormsService {
    }
  }
 
-
+  
   public getReports(formType: string, view: string, page: number, itemsPerPage: number,
     sortColumnName: string, descending: boolean): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
   let params = new HttpParams();
-  const url ='/f99/get_form99list';
+  const url ='/f99/get_form99list';   
 
   httpOptions = httpOptions.append('Content-Type', 'application/json');
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+  
   params = params.append('view', view);
 
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
   console.log("httpOptions",httpOptions)
   console.log("params",params);
-
+  
   return this._http
   .get(
       `${environment.apiUrl}${url}`,
       {
         headers: httpOptions,
-        params
+        params 
       }
     );
-
+  
   }
 
-
+  
   /**
    * Map server fields from the response to the model.
    */
@@ -682,6 +697,8 @@ export class FormsService {
       model.fec_id = row.fec_id;
       model.amend_ind = row.amend_ind;
       model.cvg_start_date = row.cvg_start_date;
+      model.cvg_end_date = row.cvg_end_date;
+      model.last_update_date = row.last_update_date;
       model.report_type_desc = row.report_type_desc;
       model.filed_date = row.filed_date;
       modelArray.push(model);
@@ -705,7 +722,7 @@ export class FormsService {
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
     console.log("sortTransactions array= ", array);
     return array;
-
+      
   }
 
 public getTransactionCategories( form_type: string): Observable<any> {

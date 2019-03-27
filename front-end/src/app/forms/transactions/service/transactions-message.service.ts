@@ -95,4 +95,31 @@ export class TransactionsMessageService {
   public getDoKeywordFilterSearchMessage(): Observable<any> {
     return this.doKeywordFilterSearchSubject.asObservable();
   }
+
+  /*private subject = new Subject<any>();
+  private applyFiltersSubject = new Subject<any>();*/
+
+  public sendMessage(message: any) {
+    this.subject.next(message);
+  }
+
+  public clearMessage() {
+    this.subject.next();
+  }
+
+  public getMessage(): Observable<any> {
+    return this.subject.asObservable();
+  }
+
+  /*public sendApplyFiltersMessage(message: any) {
+    this.applyFiltersSubject.next(message);
+  }
+
+  public clearApplyFiltersMessage() {
+    this.applyFiltersSubject.next();
+  }
+
+  public getApplyFiltersMessage(): Observable<any> {
+    return this.applyFiltersSubject.asObservable();
+  }  */
 }
