@@ -210,7 +210,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 */
   public getTransactionsPage(page: number): void {
 
-    this.config.currentPage = page;
+    // this.config.currentPage = page;
 
     const sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -222,6 +222,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyRestoredTransaction(res);
+        this._transactionsService.mockApplyTrashedTransaction(res);
         this._transactionsService.mockApplyFilters(res, this.filters, this.transactionsView);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
@@ -232,6 +233,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.totalAmount = res.totalAmount;
         this.config.totalItems = res.totalTransactionCount;
         this.allTransactionsSelected = false;
+
+        // This is called in the template.  However, with mock data there may be a race condition
+        // where this method isn't called until after the current page logic
+        // following it is called.  So it is added here. Remove it later if not needed.
+        // Test where current page > 1.  The filter to produce a result of 1 page.
+        // Make sure the page range it for page 1 and not > 1.
+        this.determineItemRange();
+
+        // If a row was deleted, the current page may be greated than the last page
+        // as result of the delete.
+        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
+          ? this.numberOfPages : page;
       });
   }
 
@@ -252,6 +265,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
 
         this._transactionsService.mockAddUIFileds(res);
+        this._transactionsService.mockApplyTrashedRecycleBin(res);
         this._transactionsService.mockApplyFilters(res, this.filters, this.recycleBinView);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -259,6 +273,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
 
         this.config.totalItems = res.totalTransactionCount;
+
+        // This is called in the template.  However, with mock data there may be a race condition
+        // where this method isn't called until after the current page logic
+        // following it is called.  So it is added here. Remove it later if not needed.
+        // Test where current page > 1.  The filter to produce a result of 1 page.
+        // Make sure the page range it for page 1 and not > 1.
+        this.determineItemRange();
 
         // If a row was deleted, the current page may be greated than the last page
         // as result of the delete.
@@ -553,8 +574,24 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to trash
    */
-  public trashTransaction(): void {
-    alert('Trash transaction is not yet supported');
+  public trashTransaction(trx: TransactionModel): void {
+    this._dialogService
+      .confirm('You are about to trash transaction ' + trx.transactionId + '.',
+        ConfirmModalComponent,
+        'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService.trashTransaction(trx)
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getTransactionsPage(this.config.currentPage);
+              this._dialogService
+                .confirm('Transaction ' + trx.transactionId +
+                    ' has been trashed! It may be restored from the recycling bin if needed.',
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+            });
+        } else if (res === 'cancel') {
+        }
+      });
   }
 
 

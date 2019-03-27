@@ -24,13 +24,22 @@ export interface GetTransactionsResponse {
 export class TransactionsService {
 
   // only for mock data
+  // only for mock data
+  // only for mock data
+
+  /** The array of items to show in the recycle bin. TODO rename it */
   private mockRestoreTrxArray = [];
-  private mockTrxArray = [];
+  /** The array of items trashed from the transaction table to be added to the recyle bin */
+  private mockTrashedTrxArray: Array<TransactionModel> = [];
+  /** The array of items restored from the recycle bin to be readded to the transactions table. TODO rename */
   private mockRecycleBinArray = [];
   private mockTransactionId = 'TID12345';
   private mockTransactionIdRecycle = 'TIDRECY';
-  private mockDeletedDate = new Date('2019-1-15');
+
   // only for mock data - end
+  // only for mock data - end
+  // only for mock data - end
+
 
   // May only be needed for mocking server
   private _orderByPipe: OrderByPipe;
@@ -168,9 +177,69 @@ export class TransactionsService {
   // TODO remove once server is ready and mock data is no longer needed
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
-      response.transactions.push(trx);
-      response.totalAmount += trx.transaction_amount;
-      response.totalTransactionCount++;
+
+      // check and see if the trx is already in the data
+      // this could be when a real trx is trached and then restored
+      const index = response.transactions.findIndex(
+        item => item.transaction_id === trx.transaction_id);
+
+      if (index === -1) {
+        response.transactions.push(trx);
+        response.totalAmount += trx.transaction_amount;
+        response.totalTransactionCount++;
+      }
+    }
+  }
+
+
+  // TODO remove once server is ready and mock data is no longer needed
+  /**
+   * Exclude mocked trashed transactions from the transaction table
+   * @param response
+   */
+  public mockApplyTrashedTransaction(response: any) {
+    for (const trashTrx of this.mockTrashedTrxArray) {
+
+      const index = response.transactions.findIndex(
+        item => item.transaction_id === trashTrx.transactionId);
+
+      response.transactions.splice(index, 1);
+
+      // don't decrement if has memo code per business rule
+      if (!trashTrx.memoCode) {
+        response.totalAmount -= trashTrx.amount;
+      }
+      response.totalTransactionCount--;
+
+      // this.mockRestoreTrxArray.push(this.mapToServerFields(trashTrx));
+
+      // this.mockRestoreTrxArray.push(trashTrx);
+
+      // const index2 = this.mockTrashedTrxArray.findIndex(
+      //   item => item.transactionId === trashTrx.transactionId);
+      // this.mockTrashedTrxArray.splice(index2, 1);
+    }
+
+    // this.mockTrashedTrxArray = [];
+  }
+
+
+  // TODO remove once server is ready and mock data is no longer needed
+  /**
+   * Include mocked trashed transactions in the Recycle Bin
+   * @param response
+   */
+  public mockApplyTrashedRecycleBin(response: any) {
+    for (const trashTrx of this.mockTrashedTrxArray) {
+
+      const index = response.transactions.findIndex(
+        item => item.transaction_id === trashTrx.transactionId);
+
+      // if it's not there, add it.
+      if (index === -1) {
+        response.transactions.push(this.mapToServerFields(trashTrx));
+        response.totalTransactionCount++;
+      }
     }
   }
 
@@ -393,16 +462,47 @@ export class TransactionsService {
    */
   public restoreTransaction(trx: TransactionModel): Observable<any> {
 
-
     // mocking the server API until it is ready.
 
-    const index = this.mockRestoreTrxArray.findIndex(
+    let index = this.mockRestoreTrxArray.findIndex(
       item => item.transaction_id === trx.transactionId);
 
     if (index !== -1) {
+      // Delete it from the recycling bin array
       this.mockRestoreTrxArray.splice(index, 1);
+      // Add it to the restore array to be included in the trsnactions table
       this.mockRecycleBinArray.push(this.mapToServerFields(trx));
     }
+
+    // see if it's in the trashed array
+    index = this.mockTrashedTrxArray.findIndex(
+      item => item.transactionId === trx.transactionId);
+
+    if (index !== -1) {
+      // Delete it from the trashed array
+      this.mockTrashedTrxArray.splice(index, 1);
+    }
+    return Observable.of('');
+  }
+
+
+  /**
+   * Trash the transaction from the Transactin Table to the Recyling Bin.
+   *
+   * @param trx the transaction to trash
+   */
+  public trashTransaction(trx: TransactionModel): Observable<any> {
+
+    // mocking the server API until it is ready.
+    // store the deleted transaction in this service and apply it against
+    // tranactions once retrieved from the server for read post delete.
+
+    // const now = new Date();
+    // const month = `${now.getMonth() + 1}`.padStart(2, '0');
+    // const day = `${now.getDate() + 1}`.padStart(2, '0');
+    // trx.deletedDate = `${now.getFullYear()}-${month}-${day}`.toString();
+    trx.deletedDate = new Date();
+    this.mockTrashedTrxArray.push(trx);
 
     return Observable.of('');
   }
