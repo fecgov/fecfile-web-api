@@ -138,13 +138,12 @@
                 >
                   Save &amp; Add Transaction
                 </button>
-                <button
-                  class="btn btn-default btn-right"
-                  type="button"
-                  (click)="viewTransactions()"
+                <a
+                  class="btn btn-previous btn-right"
+                  [routerLink]="['/forms/transactions', '3X']"
                 >
                   View Transactions
-                </button>
+                </a>
               </div>
           </div>
         </div>
