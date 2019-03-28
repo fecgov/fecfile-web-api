@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
+import { TrashConfirmComponent } from './trash-confirm/trash-confirm.component';
 
 
 
@@ -41,11 +42,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
+  @ViewChild('trashModal')
+  public trashModal: TrashConfirmComponent;
+
   @Input()
   public formType: string;
 
   @Input()
   public tableType: string;
+
+  // @ViewChild('modalBody')
+  // public modalBody;
 
   public transactionsModel: Array<TransactionModel>;
   public totalAmount: number;
@@ -525,7 +532,40 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Trash all transactions selected by the user.
    */
   public trashAllSelected(): void {
-    alert('Trash all transactions is not yet supported');
+
+    const selectedTransactions: Array<TransactionModel> = [];
+    for (const trx of this.transactionsModel) {
+      if (trx.selected) {
+        selectedTransactions.push(trx);
+      }
+    }
+    // this.trashModal.transactions = selectedTransactions;
+    const dataMap: Map<string, any> = new Map([['transactions',selectedTransactions]]);
+
+    this._dialogService
+      .confirm('You are about to delete these transactions ',
+        TrashConfirmComponent,
+        'Caution!', null, null, dataMap)
+      .then(res => {
+        if (res === 'okay') {
+          let i = 1;
+          for (const trx of selectedTransactions) {
+            this._transactionsService.trashTransaction(trx)
+              .subscribe((res: GetTransactionsResponse) => {
+                // on last delete get page and show success
+                if (i === selectedTransactions.length) {
+                  this.getTransactionsPage(this.config.currentPage);
+                  this._dialogService
+                    .confirm('Transactions ' +
+                        ' have been successfully deleted and sent to the recycle bin',
+                      TrashConfirmComponent, 'Success!', false, ModalHeaderClassEnum.successHeader, dataMap);
+                }
+              });
+              i++;
+          }
+        } else if (res === 'cancel') {
+        }
+      });
   }
 
 
@@ -575,6 +615,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to trash
    */
   public trashTransaction(trx: TransactionModel): void {
+
     this._dialogService
       .confirm('You are about to trash transaction ' + trx.transactionId + '.',
         ConfirmModalComponent,
@@ -586,7 +627,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               this.getTransactionsPage(this.config.currentPage);
               this._dialogService
                 .confirm('Transaction ' + trx.transactionId +
-                    ' has been trashed! It may be restored from the recycling bin if needed.',
+                    ' has been successfully deleted and sent to the recycle bin',
                   ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
             });
         } else if (res === 'cancel') {

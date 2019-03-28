@@ -18,7 +18,8 @@ export class DialogService {
                   modalContent?: any,
                   modalTitle?: string,
                   isShowCancel?: boolean,
-                  headerClass?: ModalHeaderClassEnum): Promise<any> {
+                  headerClass?: ModalHeaderClassEnum,
+                  dataMap?: Map<string, any>): Promise<any> {
     const modalOptions: any = {
       'backdrop': true,
       'keyboard': false,
@@ -38,6 +39,13 @@ export class DialogService {
     }
     if (headerClass) {
       modalRef.componentInstance.headerClass = headerClass;
+    }
+    if (dataMap) {
+      dataMap.forEach((value, key) => {
+        const propName = key;
+        const propValue = value;
+        modalRef.componentInstance[propName] = propValue;
+      });
     }
     return modalRef
       .result
