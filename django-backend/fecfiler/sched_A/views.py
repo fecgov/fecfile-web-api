@@ -12,7 +12,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
 from django.conf import settings
-from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError
+from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value
 
 
 # Create your views here.
@@ -47,7 +47,22 @@ def check_transaction_id(transaction_id):
             raise Exception('The Transaction ID: {} is not in specified format'.format(transaction_id))
     except Exception:
         raise 
-        
+
+def check_mandatory_fields_schedA(data):
+    try:
+        list_mandatory_fields_schedA = ['report_id', 'cmte_id', 'line_number', 'transaction_type', 'contribution_date', 'contribution_amount']
+        error =[]
+        for field in list_mandatory_fields_schedA:
+            if not(field in data and check_null_value(data.get(field))):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception('The following mandatory fields are required in order to save data to schedA table: {}'.format(string))
+    except:
+        raise        
 """
 **************************************************** FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
@@ -151,6 +166,7 @@ def delete_sql_schedA(transaction_id, report_id, cmte_id):
 """
 def post_schedA(datum):
     try:
+        check_mandatory_fields_schedA(datum)
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
