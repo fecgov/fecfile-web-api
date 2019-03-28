@@ -387,6 +387,8 @@ export class TransactionsFilterComponent implements OnInit {
     this.filterDeletedDateFrom = null;
     this.filterDeletedDateTo = null;
     this.filterMemoCode = false;
+
+    this.applyFilters();
   }
 
 
