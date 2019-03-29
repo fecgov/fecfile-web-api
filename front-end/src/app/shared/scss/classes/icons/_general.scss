@@ -1,0 +1,166 @@
+
+.bars-icon {
+  @extend .fas;
+  @extend .fa-bars;
+}
+
+.folder-icon {
+	@extend .fas;
+	@extend .fa-folder;
+	//color: $white;
+}
+
+.plus-icon-circle {
+	@extend .fas;
+	@extend .fa-plus-circle;
+}
+
+.plus-icon {
+  @extend .fas;
+  @extend .fa-plus;
+}
+
+.notifications-icon {
+  @extend .fas;
+  @extend .fa-bell;
+}
+
+.profile-icon {
+  @extend .fas;
+  @extend .fa-user-circle;
+}
+
+.settings-icon {
+  @extend .fas;
+  @extend .fa-cog;
+}
+
+.dropdown-icon {
+  @extend .fas;
+  @extend .fa-caret-down;
+}
+
+.info-icon {
+  @extend .fas;
+  @extend .fa-info-circle;
+}
+
+.view-icon {
+  @extend .fas;
+  @extend .fa-eye;
+}
+
+.close-icon {
+  @extend .fas;
+  @extend .fa-times-circle;
+}
+
+.external-link-icon {
+  @extend .fas;
+  @extend .fa-external-link-alt;
+}
+
+.link-icon {
+  @extend .fas;
+  @extend .fa-link;
+}
+
+.file-alt-icon {
+  @extend .fas;
+  @extend .fa-file-alt;
+}
+
+.file-copy-icon {
+  @extend .fas;
+  @extend .fa-copy;
+}
+
+.down-arrow-icon {
+  @extend .fas;
+  @extend .fa-angle-down;
+}
+
+.up-arrow-icon {
+  @extend .fas;
+  @extend .fa-angle-up;
+}
+
+.search-icon {
+  @extend .fas;
+  @extend .fa-search;
+}
+
+.ellipsis-icon {
+  @extend .fas;
+  @extend .fa-ellipsis-h;
+}
+
+.sort-icon {
+  @extend .fas;
+  @extend .fa-sort;
+}
+
+.sort-icon-asc {
+  @extend .fas;
+  @extend .fa-sort-up;
+}
+
+.sort-icon-desc {
+  @extend .fas;
+  @extend .fa-sort-down;
+}
+
+.calendar-icon {
+  @extend .fas;
+  @extend .fa-calendar-alt;
+}
+
+.edit-icon {
+    @extend .fas;
+    @extend .fa-pencil-alt;
+}
+
+.dollar-sign-icon {
+  @extend .fas;
+  @extend .fa-dollar-sign;
+}
+
+.trash-icon {
+  @extend .fas;
+  @extend .fa-trash;
+}
+
+.filter-icon {
+  @extend .fas;
+  @extend .fa-filter;
+}
+
+.thumbtack-icon {
+  @extend .fas;
+  @extend .fa-thumbtack;
+}
+
+.file-import-icon {
+  @extend .fas;
+  @extend .fa-file-import;
+}
+
+.file-export-icon {
+  @extend .fas;
+  @extend .fa-file-export;
+}
+
+.print-icon {
+  @extend .fas;
+  @extend .fa-print;
+}
+
+.table-icon {
+  @extend .fas;
+  @extend .fa-table;
+}
+
+.undo-icon {
+  @extend .fas;
+  @extend .fa-undo;
+}

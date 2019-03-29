@@ -126,38 +126,29 @@
           display: none;
         }
       }
-      .text-editor {
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 20px;
-        z-index: 0;
-        textarea {
-          border-radius: 3px;
-          font-size: 1em;
-          height: 250px !important;
-          overflow: scroll;
-          padding: 10px;
-          width: 90%;
-          @include media(tablet) {
-            width: 94%;
-          }
-          @include media(mediumDesktop) {
-            width: 94%;
-          }
-          @include media(largeDesktop) {
-            width: 94%;
-          }
+      .html-editor {
+        position: relative;
+        .toolbar {
+        }
+        .editor {
+          border: 1px solid black;
+          box-shadow: 0 .1rem .4rem black;
+          font-size: 1.2rem;
+          margin-bottom: 1rem;
+          overflow: scroll; 
+          padding: 1rem;
+          position: relative;
+          width:70vw;
+          height: 50vh;
         }
         @include clearfix();
-      } // .text-editor
-
+      }
       .file-attached-container {
         .close-icon {
           color: $red;
           vertical-align: top
         }
       }
-
       .tooltip-inner {
         max-width: 300px;
         text-align: left;

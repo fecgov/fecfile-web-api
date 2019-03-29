@@ -245,6 +245,24 @@ export class ReasonComponent implements OnInit {
     }
   }
 
+  /**
+   * Inserts HTML for button clicked in the toolbar.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public insertHTML(e: any): void {
+    if (typeof e === 'object') {
+      const htmlTagType: string = e.currentTarget.getAttribute('data-type');
+      
+      window.document.execCommand(htmlTagType, true);
+    }
+  } 
+
+  /**
+   * Toggles a tooltip.
+   *
+   * @param      {<type>}  tooltip  The tooltip
+   */
   public toggleToolTip(tooltip): void {
     if (tooltip.isOpen()) {
       tooltip.close();

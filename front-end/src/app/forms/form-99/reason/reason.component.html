@@ -112,13 +112,140 @@
             </div>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <div class="text-editor">
-                <textarea
+              <div class="html-editor">
+                <div class="toolbar">
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Undo"
+                    data-type="undo"
+                    (click)="insertHTML($event)"
+                  >
+                    <i class="undo-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Undo
+                    </span>
+                  </button>   
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Redo"
+                    data-type="redo"
+                    (click)="insertHTML($event)"
+                  >
+                    <i class="redo-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Redo
+                    </span>
+                  </button>                                       
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Bold"
+                    data-type="bold"
+                    (click)="insertHTML($event)"
+                  >
+                    <i class="bold-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Bold
+                    </span>
+                  </button>                  
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Italic"
+                    data-type="italic"
+                    (click)="insertHTML($event)"                    
+                  >
+                    <i class="italic-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Italic
+                    </span>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Justify"
+                    data-type="justify"
+                    (click)="insertHTML($event)"                      
+                  >
+                    <i class="justify-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Justify
+                    </span>
+                  </button>  
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Align Center"
+                    data-type="justifyCenter"
+                    (click)="insertHTML($event)"                     
+                  >
+                    <i class="align-center-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Align Center
+                    </span>
+                  </button> 
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    data-type="justifyRight"
+                    title="Align Right"
+                    (click)="insertHTML($event)"                      
+                  >
+                    <i class="align-right-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Align Right
+                    </span>
+                  </button>   
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Align Left"
+                    data-type="justifyLeft"
+                    (click)="insertHTML($event)"                      
+                  >
+                    <i class="align-left-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Align Left
+                    </span>
+                  </button>    
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Unordered List"
+                    data-type="insertUnorderedList"
+                    (click)="insertHTML($event)"                     
+                  >
+                    <i class="ul-list-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Unordered List
+                    </span>
+                  </button>    
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Ordered List"
+                    data-type="insertOrderedList"
+                    (click)="insertHTML($event)"                     
+                  >
+                    <i class="ol-list-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Ordered List
+                    </span>
+                  </button>                                                                                                   
+                </div>
+                <div 
+                  class="editor" 
+                  contenteditable="true"
+                >
+                </div>
+                <!-- <textarea
                   placeholder="Enter text here..."
                   (keyup)="updateValidation()"
                   [maxLength]="editorMax"
                   formControlName="reasonText"
-                ></textarea>
+                ></textarea> -->
               </div>
             </div>
           </div>
