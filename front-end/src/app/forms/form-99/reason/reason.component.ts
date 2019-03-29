@@ -252,11 +252,34 @@ export class ReasonComponent implements OnInit {
    */
   public insertHTML(e: any): void {
     if (typeof e === 'object') {
-      const htmlTagType: string = e.currentTarget.getAttribute('data-type');
-      
-      window.document.execCommand(htmlTagType, true);
+      try {
+        const htmlTagType: string = e.currentTarget.getAttribute('data-type');
+
+        window.document.execCommand(htmlTagType, true);    
+      } catch(error) {
+        console.log('error: ', error);
+      }
     }
   } 
+
+  /**
+   * Removes any HTML from pasted content into editor.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public removeHTML(e: any): void {
+    e.preventDefault();
+
+    if (typeof e === 'object') {
+      try {
+        const plainText: string = e.clipboardData.getData('text/plain');
+
+        window.document.execCommand('insertHTML', false, plainText); 
+      } catch (error) {
+        console.log('error: ', error);
+      }
+    }
+  }
 
   /**
    * Toggles a tooltip.
