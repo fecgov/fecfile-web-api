@@ -211,14 +211,16 @@ def check_list_cvg_dates(args):
 
             if len(args) == 4:
                 for row in cursor.fetchall():
-                    if (row[1] <= cvg_end_dt and row[2] >= cvg_start_dt):
-                        forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
+                    if not(row[1] is None or row[2] is None):
+                        if (row[1] <= cvg_end_dt and row[2] >= cvg_start_dt):
+                            forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
 
             if len(args) == 5:
                 report_id = args[4]
                 for row in cursor.fetchall():
-                    if ((row[1] <= cvg_end_dt and row[2] >= cvg_start_dt) and row[0] != int(report_id)):
-                        forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
+                    if not(row[1] is None or row[2] is None):
+                        if ((row[1] <= cvg_end_dt and row[2] >= cvg_start_dt) and row[0] != int(report_id)):
+                            forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
 
         return forms_obj
     except Exception:
@@ -254,6 +256,37 @@ def check_email(email):
     except:
         raise
 
+def check_mandatory_fields_report(data):
+    try:
+        list_mandatory_fields_report = ['form_type', 'amend_ind', 'cmte_id']
+        error =[]
+        for field in list_mandatory_fields_report:
+            if not(field in data and check_null_value(data.get(field))):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception('The following mandatory fields are required in order to save data to Reports table: {}'.format(string))
+    except:
+        raise
+
+def check_mandatory_fields_form3x(data):
+    try:
+        list_mandatory_fields_form3x = ['form_type', 'amend_ind']
+        error =[]
+        for field in list_mandatory_fields_form3x:
+            if not(field in data and check_null_value(data.get(field))):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception('The following mandatory fields are required in order to save data to Form3x table: {}'.format(string))
+    except:
+        raise
 
 """
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
@@ -430,10 +463,15 @@ def delete_sql_form3x(report_id, cmte_id):
 """
 def post_reports(data):
     try:
+        check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')
         form_type = data.get('form_type')
         cvg_start_dt = data.get('cvg_start_dt')
         cvg_end_dt = data.get('cvg_end_dt')
+        if cvg_start_dt is None:
+            raise Exception('The cvg_start_dt is null.')
+        if cvg_end_dt is None:
+            raise Exception('The cvg_end_dt is null.')
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
         forms_obj = []
@@ -452,6 +490,7 @@ def post_reports(data):
             try:
                 #Insert data into Form 3X table
                 if data.get('form_type') == "F3X":
+                    check_mandatory_fields_form3x(data)
                     post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))                                            
                 output = get_reports(data)
             except Exception as e:
@@ -495,6 +534,10 @@ def put_reports(data):
         report_id = data.get('report_id')
         args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]
         forms_obj = []
+        if data.get('cvg_start_dt') is None:
+            raise Exception('The cvg_start_dt is null.')
+        if data.get('cvg_end_dt') is None:
+            raise Exception('The cvg_end_dt is null.')
         if not (data.get('cvg_start_dt') is None or data.get('cvg_end_dt') is None):                        
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
@@ -716,6 +759,22 @@ def check_entity_id(entity_id):
         raise Exception('The Entity ID is not in the specified format. Input received: ' + entity_id)
         
 
+def check_mandatory_fields_entity(data):
+    try:
+        list_mandatory_fields_entity = ['entity_type', 'cmte_id']
+        error =[]
+        for field in list_mandatory_fields_entity:
+            if not(field in data and check_null_value(data.get(field))):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception('The following mandatory fields are required in order to save data to Entity table: {}'.format(string))
+    except:
+        raise
+
 def post_sql_entity(entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id):
 
     try:
@@ -815,6 +874,7 @@ def remove_sql_entity(entity_id, cmte_id):
 def post_entities(data):
 
     try:
+        check_mandatory_fields_entity(data)
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)
         entity_id = get_next_entity_id(entity_type)

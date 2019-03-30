@@ -200,4 +200,9 @@ export class AppLayoutComponent implements OnInit {
       return  `with: ${reason}`;
     }
   }
+
+  public editFrom() : void {
+    alert("Feature to be implemented.");
+  } 
+
 }
