@@ -121,11 +121,11 @@ export class ReasonComponent implements OnInit {
     if (this.frmReason.get('reasonText').value.length >= 1) {
       let text: string = this.frmReason.get('reasonText').value;
 
-      this.characterCount = text.length;
+      this.characterCount = this._countCharacters(text);
     } else if(this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
 
-      this.characterCount = text.length;
+      this.characterCount = this._countCharacters(text);
     }
   }
 
@@ -320,6 +320,19 @@ export class ReasonComponent implements OnInit {
         console.log('error: ', error);
       }
     }
+  }
+
+  /**
+   * Counts the number of characters in the editor.
+   *
+   * @param      {string}  text    The text
+   * @return     {number}  Number of characters.
+   */
+  private _countCharacters(text: string): number {
+    const regex: any = /(<([^>]+)>)/ig;
+    const characterCount: number = text.replace(regex, '').length;
+
+    return characterCount;
   }
 
   /**
