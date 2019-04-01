@@ -129,28 +129,6 @@ export class ReasonComponent implements OnInit {
     }
   }
 
-  // writeValue(value: any): void {
-  //   const div = this.reasonTextArea.nativeElement;
-
-  //   this._renderer.setProperty(div, 'textContent', value);
-  // }
-
-  // registerOnChange(fn: any) : void {
-  //   this.onChange = fn;
-  // }
-
-  public editorChange(e): void {
-    console.log('editorChange: ');
-
-    console.log('text: ', e.target.textContent);
-
-    this.reasonTextArea = e.target.textContent;
-
-    console.log('this.reasonTextArea: ', this.reasonTextArea);
-
-    this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
-  }
-
   public reasonTextEmpty(): boolean {
     if (!this.frmReason.controls.reasonText.value.replace(/(\s)/g, '').length) {
       return true;
@@ -268,6 +246,40 @@ export class ReasonComponent implements OnInit {
       return;
     }
   }
+
+  /**
+   * Executed when a user types in text into the editor area.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public editorChange(e): void {
+    if (e.target.textContent.length >= 1) {
+      this.reasonTextArea = e.target.textContent;
+
+      this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+
+      this.showValidateBar = false;
+
+      this.hideText = true;
+      this.formSaved = false;
+
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': {},
+            'showValidateBar': false
+          }
+        });         
+    } else {
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': {},
+            'showValidateBar': false
+          }
+        });       
+    }
+  }  
 
   /**
    * Inserts HTML for button clicked in the toolbar.
@@ -461,24 +473,6 @@ export class ReasonComponent implements OnInit {
               'showValidateBar': true
             }
           });
-      });
-  }
-
-  /**
-   * Hides the validate bar if the textarea changed.
-   */
-  public updateValidation(): void {
-    this.showValidateBar = false;
-
-    this.hideText = true;
-    this.formSaved = false;
-
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false
-        }
       });
   }
 
