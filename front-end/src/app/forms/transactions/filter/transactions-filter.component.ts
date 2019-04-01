@@ -8,6 +8,7 @@ import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
+import { ActiveView } from '../transactions.component';
 
 
 /**
@@ -75,6 +76,9 @@ export class TransactionsFilterComponent implements OnInit {
   public formType: string;
 
   @Input()
+  public view: ActiveView;
+
+  @Input()
   public title = '';
 
   @ViewChildren('categoryElements')
@@ -82,6 +86,7 @@ export class TransactionsFilterComponent implements OnInit {
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
+  public isHideDeletedDateFilter: boolean;
   public isHideAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
@@ -92,14 +97,19 @@ export class TransactionsFilterComponent implements OnInit {
   public filterAmountMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
+  public filterDeletedDateFrom: Date = null;
+  public filterDeletedDateTo: Date = null;
   public filterMemoCode = false;
   public dateFilterValidation: ValidationErrorModel;
+  public delDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
   private msEdge = true;
+  private transactionsView = ActiveView.transactions;
+  private recycleBinView = ActiveView.recycleBin;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -116,11 +126,14 @@ export class TransactionsFilterComponent implements OnInit {
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
+    this.filterDeletedDateFrom = null;
+    this.filterDeletedDateTo = null;
     this.filterAmountMin = null;
     this.filterAmountMax = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
+    this.isHideDeletedDateFilter = true;
     this.isHideAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
@@ -148,6 +161,14 @@ export class TransactionsFilterComponent implements OnInit {
    */
   public toggleDateFilterItem() {
     this.isHideDateFilter = !this.isHideDateFilter;
+  }
+
+
+  /**
+   * Toggle visibility of the Deleted Date filter
+   */
+  public toggleDeletedDateFilterItem() {
+    this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
   }
 
 
@@ -190,11 +211,11 @@ export class TransactionsFilterComponent implements OnInit {
    * Determine the state for scrolling.  The category tye wasn't displaying 
    * properly in edge with animation.  If edge, don't apply the state with animation.
    */
-  public determineScrollState() {
+  public determineScrollState(isHide: boolean) {
     if (this.msEdge) {
-      return !this.isHideTypeFilter ? 'openNoAnimate' : 'closedNoAnimate';
+      return !isHide ? 'openNoAnimate' : 'closedNoAnimate';
     } else {
-      return !this.isHideTypeFilter ? 'open' : 'closed';
+      return !isHide ? 'open' : 'closed';
     }
   }
 
@@ -317,6 +338,16 @@ export class TransactionsFilterComponent implements OnInit {
       modified = true;
     }
 
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
     if (this.filterMemoCode) {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
@@ -353,7 +384,19 @@ export class TransactionsFilterComponent implements OnInit {
     this.filterAmountMax = null;
     this.filterDateFrom = null;
     this.filterDateTo = null;
+    this.filterDeletedDateFrom = null;
+    this.filterDeletedDateTo = null;
     this.filterMemoCode = false;
+
+    this.applyFilters();
+  }
+
+
+  /**
+   * Check if the view to show is Recycle Bin.
+   */
+  public isRecycleBinViewActive() {
+    return this.view === this.recycleBinView ? true : false;
   }
 
 
@@ -477,8 +520,12 @@ export class TransactionsFilterComponent implements OnInit {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
-        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
+        this.isHideDateFilter = (this.filterDateFrom && this.filterDateTo) ? false : true;
+
+        this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
+        this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
+        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateTo)
+          ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
@@ -497,7 +544,17 @@ export class TransactionsFilterComponent implements OnInit {
    */
   private initValidationErrors() {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
+    this.delDateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
+  }
+
+
+  /**
+   * Some browsers (Chrome) set date to "" when click x to delete input.
+   * If empty string, set to null to sinplify condition checks.
+   */
+  private handleDateAsSpaces(date: any) {
+    return date === '' ? null : date;
   }
 
 
@@ -508,8 +565,14 @@ export class TransactionsFilterComponent implements OnInit {
    * @returns true if valid.
    */
   private validateFilters(): boolean {
+
+    this.filterDateTo = this.handleDateAsSpaces(this.filterDateTo);
+    this.filterDateFrom = this.handleDateAsSpaces(this.filterDateFrom);
+    this.filterDeletedDateTo = this.handleDateAsSpaces(this.filterDeletedDateTo);
+    this.filterDeletedDateFrom = this.handleDateAsSpaces(this.filterDeletedDateFrom);
+
     this.initValidationErrors();
-    if (this.filterDateFrom !== null && this.filterDateTo === null) {
+    if (this.filterDateFrom !== null && (this.filterDateTo === null)) {
       this.dateFilterValidation.isError = true;
       this.dateFilterValidation.message = 'To Date is required';
       this.isHideDateFilter = false;
@@ -525,6 +588,25 @@ export class TransactionsFilterComponent implements OnInit {
       this.dateFilterValidation.isError = true;
       this.dateFilterValidation.message = 'From Date must preceed To Date';
       this.isHideDateFilter = false;
+      return false;
+    }
+
+    if (this.filterDeletedDateFrom !== null && this.filterDeletedDateTo === null) {
+      this.delDateFilterValidation.isError = true;
+      this.delDateFilterValidation.message = 'To Deleted Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
+      this.delDateFilterValidation.isError = true;
+      this.delDateFilterValidation.message = 'From Deleted Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
+      this.delDateFilterValidation.isError = true;
+      this.delDateFilterValidation.message = 'From Deleted Date must preceed To Deleted Date';
+      this.isHideDeletedDateFilter = false;
       return false;
     }
 
