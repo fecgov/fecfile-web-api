@@ -271,6 +271,10 @@ export class ReasonComponent implements OnInit {
           }
         });         
     } else {
+      this.reasonTextArea = e.target.textContent;
+
+      this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+
       this._messageService
         .sendMessage({
           'validateMessage': {
@@ -293,6 +297,7 @@ export class ReasonComponent implements OnInit {
 
         window.document.execCommand(htmlTagType, true);    
       } catch(error) {
+        console.log('There was an error.');
         console.log('error: ', error);
       }
     }

@@ -150,7 +150,19 @@
                     <span class="sr-only">
                       Bold
                     </span>
-                  </button>                  
+                  </button>      
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Underline"
+                    data-type="underline"
+                    (click)="insertHTML($event)"
+                  >
+                    <i class="underline-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Underline
+                    </span>
+                  </button>                                 
                   <button 
                     type="button" 
                     class="btn btn-default editor-btn"
