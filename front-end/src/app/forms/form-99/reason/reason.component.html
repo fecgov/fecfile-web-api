@@ -49,7 +49,8 @@
               <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
                 Enter text for the reason selected.
               </div>
-              <div class="text-error text-center" *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
+              <div class="text-error text-center" 
+                *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
                 Enter text for the reason selected.
               </div>
             </div>
@@ -238,6 +239,10 @@
                 <div 
                   class="editor" 
                   contenteditable="true"
+                  placeholder="Enter text here..."
+                  role="textarea"
+                  [textContent]="reasonTextArea"
+                  (input)="editorChange($event)"
                   (paste)="removeHTML($event)"
                 >
                 </div>

@@ -140,6 +140,10 @@
           position: relative;
           width:70vw;
           height: 50vh;
+          &:empty:before {
+            content: attr(placeholder);
+            color: #757575;
+          }
         }
         @include clearfix();
       }

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, ElementRef, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output, Renderer2, ViewEncapsulation, ViewChild } from '@angular/core';
+import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { QuillEditorComponent } from 'ngx-quill';
@@ -45,6 +45,7 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
+  public reasonTextArea: string = '';
 
   private _printPriviewPdfFileLink: string ='';
 
@@ -58,6 +59,7 @@ export class ReasonComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formsService: FormsService,
+    private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
     private _modalService: NgbModal
@@ -125,6 +127,28 @@ export class ReasonComponent implements OnInit {
 
       this.characterCount = text.length;
     }
+  }
+
+  // writeValue(value: any): void {
+  //   const div = this.reasonTextArea.nativeElement;
+
+  //   this._renderer.setProperty(div, 'textContent', value);
+  // }
+
+  // registerOnChange(fn: any) : void {
+  //   this.onChange = fn;
+  // }
+
+  public editorChange(e): void {
+    console.log('editorChange: ');
+
+    console.log('text: ', e.target.textContent);
+
+    this.reasonTextArea = e.target.textContent;
+
+    console.log('this.reasonTextArea: ', this.reasonTextArea);
+
+    this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
   }
 
   public reasonTextEmpty(): boolean {
