@@ -196,8 +196,10 @@ export class ReasonComponent implements OnInit {
 
         this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.frmReason.get('reasonText').value;
+        // this.reasonText = this.frmReason.get('reasonText').value;
+        this._form99Details.text = this.reasonTextArea;
+
+        console.log('this.reasonText: ', this.reasonText);
 
         setTimeout(() => {
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
@@ -254,7 +256,7 @@ export class ReasonComponent implements OnInit {
    */
   public editorChange(e): void {
     if (e.target.textContent.length >= 1) {
-      this.reasonTextArea = e.target.textContent;
+      this.reasonTextArea = e.target.innerHTML;
 
       this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
 
@@ -382,15 +384,12 @@ export class ReasonComponent implements OnInit {
    *
    */
   public saveForm () {
-    console.log("this.frmReason.get('reasonText'): ", this.frmReason.get('reasonText'));
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
-        console.log('inside here: ');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.reasonText;
+        this._form99Details.text = this.reasonTextArea;
 
         this._form99Details.file='';
 
