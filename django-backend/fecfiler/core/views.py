@@ -14,13 +14,14 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.db import connection
 from django.http import JsonResponse
-from datetime import datetime
+from datetime import datetime, date
 import boto3
 from botocore.exceptions import ClientError
 import boto
 from boto.s3.key import Key
 from django.conf import settings
 import re
+import csv
 
 # Create your views here.
 
@@ -316,7 +317,7 @@ def check_report_id(report_id):
     try:
         check_report_id = int(report_id)
     except Exception as e:
-        raise
+        raise Exception('Invalid Input: The report_id input should be an integer like 18, 24. Input received: {}'.format(report_id))
 
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
@@ -1096,9 +1097,7 @@ END - SEARCH ENTITIES API - CORE APP
 
 @api_view(["POST"])
 def create_json_file(request):
-    #creating a JSON file so that it is handy for all the public API's
-
-        
+    #creating a JSON file so that it is handy for all the public API's   
     try:
         
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
@@ -1276,5 +1275,156 @@ def get_all_deleted_transactions(request):
 """
 ******************************************************************************************************************************
 END - GET ALL DELETED TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
+"""
+******************************************************************************************************************************
+GET SUMMARY TABLE API - CORE APP - SPRINT 10 - FNE 720 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+def check_calendar_year(calendar_year):
+
+    try:
+        if not(len(calendar_year) == 4 and calendar_year.isdigit()):
+            raise Exception('Invalid Input: The calendar_year input should be a 4 digit integer like 2018, 1927. Input received: {}'.format(calendar_year))
+    except Exception as e:
+        raise
+def period_receipts_sql(cmte_id, report_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The period_receipts_sql API is throwing an error: ' + str(e))
+
+def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND contribution_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The calendar_receipts_sql API is throwing an error: ' + str(e))
+
+def summary_receipts(args):
+    try:
+        XIAI_amount = 0
+        XIAII_amount = 0
+        XIAIII_amount = 0
+        XIB_amount = 0
+        XIC_amount = 0
+        XID_amount = 0
+        XII_amount = 0
+        XIII_amount = 0
+        XIV_amount = 0
+        XV_amount = 0
+        XVI_amount = 0
+        XVII_amount = 0
+        XVIIIA_amount = 0
+        XVIIIB_amount = 0
+        XVIIIC_amount = 0
+        XIX_amount = 0
+        XX_amount = 0
+
+        if len(args) == 2:
+            cmte_id = args[0]
+            report_id = args[1]
+            sql_output = period_receipts_sql(cmte_id, report_id)
+        else:
+            cmte_id = args[0]
+            calendar_start_dt = args[1]
+            calendar_end_dt = args[2]
+            sql_output = calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt)
+
+        for row in sql_output:
+            data_row = list(row)
+            if data_row[0] == '11AI':
+                XIAI_amount = XIAI_amount + data_row[1]
+            if data_row[0] == '11AII':
+                XIAII_amount = XIAII_amount + data_row[1]
+            if data_row[0] == '11B':
+                XIB_amount = XIB_amount + data_row[1]
+            if data_row[0] == '11C':
+                XIC_amount = XIC_amount + data_row[1]
+            if data_row[0] == '12':
+                XII_amount = XII_amount + data_row[1]
+            if data_row[0] == '13':
+                XIII_amount = XIII_amount + data_row[1]
+            if data_row[0] == '14':
+                XIV_amount = XIV_amount + data_row[1]
+            if data_row[0] == '15':
+                XV_amount = XV_amount + data_row[1]
+            if data_row[0] == '16':
+                XVI_amount = XVI_amount + data_row[1]
+            if data_row[0] == '17':
+                XVII_amount = XVII_amount + data_row[1]
+            if data_row[0] == '18A':
+                XVIIIA_amount = XVIIIA_amount + data_row[1]
+            if data_row[0] == '18B':
+                XVIIIB_amount = XVIIIB_amount + data_row[1]
+
+        XIAIII_amount = XIAI_amount + XIAII_amount
+        XID_amount = XIAIII_amount + XIB_amount + XIC_amount
+        XVIIIC_amount = XVIIIA_amount + XVIIIB_amount
+        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIIIC_amount
+        XX_amount = XIX_amount - XVIIIC_amount
+
+        summary_receipts = {'11AI': XIAI_amount,
+                    '11AII': XIAII_amount,
+                    '11AIII': XIAIII_amount,
+                    '11B': XIB_amount,
+                    '11C': XIC_amount,
+                    '11D': XID_amount,
+                    '12': XII_amount,
+                    '13': XIII_amount,
+                    '14': XIV_amount,
+                    '15': XV_amount,
+                    '16': XVI_amount,
+                    '17': XVII_amount,
+                    '18A': XVIIIA_amount,
+                    '18B': XVIIIB_amount,
+                    '18C': XVIIIC_amount,
+                    '19': XIX_amount,
+                    '20': XX_amount
+                        }    
+        return summary_receipts
+    except Exception as e:
+        raise Exception('The summary_receipts API is throwing the error: ' + str(e))
+
+@api_view(['GET'])
+def summary_table(request):
+    try:
+        cmte_id = request.user.username
+
+        if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
+            raise Exception ('Missing Input: Report_id is mandatory')
+
+        if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
+            raise Exception ('Missing Input: calendar_year is mandatory')
+
+        report_id = request.query_params.get('report_id')
+        calendar_year = request.query_params.get('calendar_year')
+
+        check_report_id(report_id)
+        check_calendar_year(calendar_year)
+
+        period_args = [cmte_id, report_id]
+        period_receipt = summary_receipts(period_args)
+
+        calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
+        calendar_receipt = summary_receipts(calendar_args)
+
+        forms_obj = {'period':{'period_receipts': period_receipt,
+                                'period_disbursements': 0,
+                                'period_summary': 0},
+                    'calendar':{'calendar_receipts': calendar_receipt,
+                                'calendar_disbursements': 0,
+                                'calendar_summary': 0}}                          
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The summary_table API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+"""
+******************************************************************************************************************************
+END - GET SUMMARY TABLE API - CORE APP
 ******************************************************************************************************************************
 """

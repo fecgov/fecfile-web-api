@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^core/get_all_transactions$', views.get_all_transactions, name='get_all_transactions'),
     url(r'^core/state$', views.state, name='state'),
     url(r'^core/get_all_deleted_transactions$', views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
+    url(r'^core/summary_table$', views.summary_table, name='summary_table'),
 ]
