@@ -113,20 +113,23 @@ export class AppLayoutComponent implements OnInit {
         if (formInfo.hasOwnProperty('dueDate')) {
           if (typeof formInfo.dueDate === 'string') {
             if (formInfo.dueDate.length > 1) {
-              const oneDay: number = 24*60*60*1000;
+              const oneDay: number = 24 * 60 * 60 * 1000;
               const today: any = new Date();
               const dueDateArr = formInfo.dueDate.split('/');
               let dueDate: any = '';
 
+              const dueDateMonth = this._utilService.toInteger(dueDateArr[0]) - 1;
+              const dueDateDay = this._utilService.toInteger(dueDateArr[1]) + 1;
               if (formInfo.dueDate.indexOf('2018') === 0) {
                 dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
               } else {
-                dueDate = new Date(dueDateArr[2], dueDateArr[0], dueDateArr[1]);
+                dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
               }
 
               this.showFormDueDate = true;
               this.formType = formInfo.formType;
-              this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime())/(oneDay)));
+              this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / (oneDay)));
+
 
               this.formDescription = formInfo.reportTypeDescription;
               this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
