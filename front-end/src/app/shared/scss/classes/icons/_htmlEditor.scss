@@ -53,3 +53,13 @@
   @extend .fa-list-ol;	
 }
 
+.indent-icon {
+  @extend .fas;
+  @extend .fa-indent;    
+}
+
+.outdent-icon {
+  @extend .fas;
+  @extend .fa-outdent;
+}
+

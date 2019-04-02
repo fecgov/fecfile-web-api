@@ -295,7 +295,7 @@ export class ReasonComponent implements OnInit {
   public insertHTML(e: any): void {
     if (typeof e === 'object') {
       try {
-        const htmlTagType: string = e.currentTarget.getAttribute('data-type');
+        const htmlTagType: string = e.currentTarget.getAttribute('data-command');
 
         window.document.execCommand(htmlTagType, true);    
       } catch(error) {

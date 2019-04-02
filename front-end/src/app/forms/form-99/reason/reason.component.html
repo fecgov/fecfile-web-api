@@ -119,7 +119,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Undo"
-                    data-type="undo"
+                    data-command="undo"
                     (click)="insertHTML($event)"
                   >
                     <i class="undo-icon" aria-hidden="true"></i>
@@ -131,7 +131,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Redo"
-                    data-type="redo"
+                    data-command="redo"
                     (click)="insertHTML($event)"
                   >
                     <i class="redo-icon" aria-hidden="true"></i>
@@ -143,7 +143,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Bold"
-                    data-type="bold"
+                    data-command="bold"
                     (click)="insertHTML($event)"
                   >
                     <i class="bold-icon" aria-hidden="true"></i>
@@ -155,7 +155,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Underline"
-                    data-type="underline"
+                    data-command="underline"
                     (click)="insertHTML($event)"
                   >
                     <i class="underline-icon" aria-hidden="true"></i>
@@ -167,7 +167,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Italic"
-                    data-type="italic"
+                    data-command="italic"
                     (click)="insertHTML($event)"                    
                   >
                     <i class="italic-icon" aria-hidden="true"></i>
@@ -179,7 +179,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Align Left"
-                    data-type="justifyLeft"
+                    data-command="justifyLeft"
                     (click)="insertHTML($event)"                      
                   >
                     <i class="align-left-icon" aria-hidden="true"></i>
@@ -191,7 +191,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Align Center"
-                    data-type="justifyCenter"
+                    data-command="justifyCenter"
                     (click)="insertHTML($event)"                     
                   >
                     <i class="align-center-icon" aria-hidden="true"></i>
@@ -202,7 +202,7 @@
                   <button 
                     type="button" 
                     class="btn btn-default editor-btn"
-                    data-type="justifyRight"
+                    data-command="justifyRight"
                     title="Align Right"
                     (click)="insertHTML($event)"                      
                   >
@@ -215,7 +215,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Justify"
-                    data-type="justifyLeft"
+                    data-command="justifyLeft"
                     (click)="insertHTML($event)"                      
                   >
                     <i class="justify-icon" aria-hidden="true"></i>
@@ -227,7 +227,7 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Unordered List"
-                    data-type="insertUnorderedList"
+                    data-command="insertUnorderedList"
                     (click)="insertHTML($event)"                     
                   >
                     <i class="ul-list-icon" aria-hidden="true"></i>
@@ -239,14 +239,38 @@
                     type="button" 
                     class="btn btn-default editor-btn"
                     title="Ordered List"
-                    data-type="insertOrderedList"
+                    data-command="insertOrderedList"
                     (click)="insertHTML($event)"                     
                   >
                     <i class="ol-list-icon" aria-hidden="true"></i>
                     <span class="sr-only">
                       Ordered List
                     </span>
-                  </button>                                                                                                   
+                  </button>  
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Decrease Indent"
+                    data-command="outdent"
+                    (click)="insertHTML($event)"                     
+                  >
+                    <i class="outdent-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Decrease Indent
+                    </span>
+                  </button>   
+                  <button 
+                    type="button" 
+                    class="btn btn-default editor-btn"
+                    title="Increase Indent"
+                    data-command="indent"
+                    (click)="insertHTML($event)"                     
+                  >
+                    <i class="indent-icon" aria-hidden="true"></i>
+                    <span class="sr-only">
+                      Increase Indent
+                    </span>
+                  </button>                                                                                                                                   
                 </div>
                 <div 
                   class="editor" 
