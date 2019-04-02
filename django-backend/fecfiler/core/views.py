@@ -211,14 +211,16 @@ def check_list_cvg_dates(args):
 
             if len(args) == 4:
                 for row in cursor.fetchall():
-                    if (row[1] <= cvg_end_dt and row[2] >= cvg_start_dt):
-                        forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
+                    if not(row[1] is None or row[2] is None):
+                        if (row[1] <= cvg_end_dt and row[2] >= cvg_start_dt):
+                            forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
 
             if len(args) == 5:
                 report_id = args[4]
                 for row in cursor.fetchall():
-                    if ((row[1] <= cvg_end_dt and row[2] >= cvg_start_dt) and row[0] != int(report_id)):
-                        forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
+                    if not(row[1] is None or row[2] is None):
+                        if ((row[1] <= cvg_end_dt and row[2] >= cvg_start_dt) and row[0] != int(report_id)):
+                            forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2]})
 
         return forms_obj
     except Exception:
@@ -466,6 +468,10 @@ def post_reports(data):
         form_type = data.get('form_type')
         cvg_start_dt = data.get('cvg_start_dt')
         cvg_end_dt = data.get('cvg_end_dt')
+        if cvg_start_dt is None:
+            raise Exception('The cvg_start_dt is null.')
+        if cvg_end_dt is None:
+            raise Exception('The cvg_end_dt is null.')
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
         forms_obj = []
@@ -528,6 +534,10 @@ def put_reports(data):
         report_id = data.get('report_id')
         args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]
         forms_obj = []
+        if data.get('cvg_start_dt') is None:
+            raise Exception('The cvg_start_dt is null.')
+        if data.get('cvg_end_dt') is None:
+            raise Exception('The cvg_end_dt is null.')
         if not (data.get('cvg_start_dt') is None or data.get('cvg_end_dt') is None):                        
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
