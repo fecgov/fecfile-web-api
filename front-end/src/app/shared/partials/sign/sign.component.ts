@@ -270,8 +270,8 @@ export class SignComponent implements OnInit {
     }
 
     this.validateAdditionalEmails();
+   
     if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
-
       localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
 
       if(this.frmSignee.invalid) {
@@ -481,11 +481,13 @@ export class SignComponent implements OnInit {
     //this.frmSaved=false;
     this.showAdditionalEmail1Warn=false;
     this.showAdditionalEmail2Warn=false;
-    this.additionalEmail1Invalid = true;
-    this.additionalEmail2Invalid =true;
+    this.additionalEmail1Invalid = false;
+    this.additionalEmail2Invalid =false;
   }
 
   public validateAdditionalEmails(): void{
+    this.clearWarnMsg();
+
     if (this.frmSignee.get('additional_email_1').value !== ""){
       if (this.frmSignee.get('confirm_email_1').value === ""){
         this.additionalEmail1Invalid =true;
