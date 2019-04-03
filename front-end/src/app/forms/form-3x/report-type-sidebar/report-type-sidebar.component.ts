@@ -145,14 +145,18 @@ export class ReportTypeSidebarComponent implements OnInit {
                 return el.state === form3xReportType.election_state;
               });
 
-              if (selectedState.hasOwnProperty('dates')) {
-                if (Array.isArray(selectedState.dates)) {
-                  this.electionDates = selectedState.dates;
+              if (selectedState) {
+                if (selectedState.hasOwnProperty('dates')) {
+                  if (Array.isArray(selectedState.dates)) {
+                    this.electionDates = selectedState.dates;
+                  }
                 }
               }
 
               this.electionDates.forEach(el => {
-                el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+                if (el.cvg_start_date) {
+                  el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+                }
 
                 el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
 
