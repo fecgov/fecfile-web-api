@@ -37,7 +37,7 @@
         <ng-container *ngIf="!transactionCategorySelected && frmSubmitted">
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12 text-center text-error">
-              You must select a transaction category first.
+              Please select a transaction type.
             </div>
           </div>
         </ng-container>
@@ -45,7 +45,7 @@
           <ng-container *ngIf="transactionTypeFailed">
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12 text-center text-error">
-                You must select a transaction type first.
+                Please select a transaction type.
               </div>
             </div>
           </ng-container>
@@ -107,7 +107,7 @@
                           [type]="childOption.type"
                           [name]="secondaryOption"
                           [value]="childOption.value"
-                          (change)="updateTypeSelected($event)"
+                          (change)="updateTypeSelected($event, childOption)"
                         />
                         <label
                           for="{{childOption.name}}"

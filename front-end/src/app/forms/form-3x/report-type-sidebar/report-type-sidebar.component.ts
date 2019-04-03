@@ -84,7 +84,11 @@ export class ReportTypeSidebarComponent implements OnInit {
             }
           }
         } // isArray(this.selectedReport.election_state)
-        if (this.fromDate && this.toDate) {
+
+        // smahal: until API exists to get fromDate from the previous filing
+        // when from date is null, allow null from date to go through.
+        // if (this.fromDate && this.toDate) {
+        if ((this.fromDate && this.toDate) || (!this.fromDate && this.toDate)) {
           let message: any = null;
 
           if (this._selectedState && this._selectedElectionDate) {
@@ -141,14 +145,18 @@ export class ReportTypeSidebarComponent implements OnInit {
                 return el.state === form3xReportType.election_state;
               });
 
-              if (selectedState.hasOwnProperty('dates')) {
-                if (Array.isArray(selectedState.dates)) {
-                  this.electionDates = selectedState.dates;
+              if (selectedState) {
+                if (selectedState.hasOwnProperty('dates')) {
+                  if (Array.isArray(selectedState.dates)) {
+                    this.electionDates = selectedState.dates;
+                  }
                 }
               }
 
               this.electionDates.forEach(el => {
-                el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+                if (el.cvg_start_date) {
+                  el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+                }
 
                 el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
 
@@ -221,11 +229,13 @@ export class ReportTypeSidebarComponent implements OnInit {
 
     this._selectedElectionDates = {
       'fromDate': selectedOption.getAttribute('data-startdate'),
-      'toDate': selectedOption.getAttribute('data-enddate')
+      'toDate': selectedOption.getAttribute('data-enddate'),
+      'dueDate': selectedOption.getAttribute('data-duedate')
     };
 
     this.fromDate = selectedOption.getAttribute('data-startdate');
     this.toDate = selectedOption.getAttribute('data-enddate');
+    this.dueDate = selectedOption.getAttribute('data-duedate');
 
     this._selectedElectionDate = e.target.value;
   }

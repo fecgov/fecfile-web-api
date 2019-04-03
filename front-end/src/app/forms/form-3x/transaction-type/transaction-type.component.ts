@@ -29,6 +29,7 @@ export class TransactionTypeComponent implements OnInit {
   public searchField: any = {};
   public secondaryOptions: any = [];
   public transactionType: string = null;
+  public transactionTypeText: string = null;
   public transactionTypeFailed : boolean = false;
   public transactionCategorySelected: boolean = false;
   public tranasctionCategoryVal: string = '';
@@ -98,7 +99,8 @@ export class TransactionTypeComponent implements OnInit {
         form: this.frmOption,
         direction: 'next',
         step: 'step_3',
-        previousStep: 'step_2'
+        previousStep: 'step_2',
+        transactionTypeText: this.transactionTypeText
       });
       return 1;
     } else {
@@ -124,9 +126,11 @@ export class TransactionTypeComponent implements OnInit {
   /**
    * Updates the type selected when radio button clicked.
    *
-   * @param      {Object}  e       The event object.
+   * @param      {Object}  e            The event object.
+   * @param      {Object}  childOption  The child option selected
+   *                                    from the selectedOptions.
    */
-  public updateTypeSelected(e): void {
+  public updateTypeSelected(e, childOption): void {
     console.log('updateTypeSelected: ');
     console.log('e: ', e);
     console.log('val: ', e.target.value);
@@ -134,6 +138,7 @@ export class TransactionTypeComponent implements OnInit {
     const val: string = e.target.value;
 
     this.transactionType = val;
+    this.transactionTypeText = childOption.text;
 
     this.frmOption.controls['secondaryOption'].setValue(val);
 
@@ -158,6 +163,7 @@ export class TransactionTypeComponent implements OnInit {
     console.log('this._mainTransactionCategory: ', this._mainTransactionCategory);
 
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
+    console.log('transactionObj: ', transactionObj);
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
 
