@@ -84,7 +84,11 @@ export class ReportTypeSidebarComponent implements OnInit {
             }
           }
         } // isArray(this.selectedReport.election_state)
-        if (this.fromDate && this.toDate) {
+
+        // smahal: until API exists to get fromDate from the previous filing
+        // when from date is null, allow null from date to go through.
+        // if (this.fromDate && this.toDate) {
+        if ((this.fromDate && this.toDate) || (!this.fromDate && this.toDate)) {
           let message: any = null;
 
           if (this._selectedState && this._selectedElectionDate) {
@@ -221,11 +225,13 @@ export class ReportTypeSidebarComponent implements OnInit {
 
     this._selectedElectionDates = {
       'fromDate': selectedOption.getAttribute('data-startdate'),
-      'toDate': selectedOption.getAttribute('data-enddate')
+      'toDate': selectedOption.getAttribute('data-enddate'),
+      'dueDate': selectedOption.getAttribute('data-duedate')
     };
 
     this.fromDate = selectedOption.getAttribute('data-startdate');
     this.toDate = selectedOption.getAttribute('data-enddate');
+    this.dueDate = selectedOption.getAttribute('data-duedate');
 
     this._selectedElectionDate = e.target.value;
   }

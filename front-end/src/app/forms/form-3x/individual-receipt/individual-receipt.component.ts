@@ -21,6 +21,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
+  @Input() transactionTypeText = '';
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;

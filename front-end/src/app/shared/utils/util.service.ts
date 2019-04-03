@@ -81,4 +81,53 @@ export class UtilService {
       return '';
     }
   }
+
+  /**
+	 * Compare 2 dates and determine if date2 falls after date1.
+	 *
+	 * @param date1
+	 * @param date2
+	 * @returns true if date2 is after (more recent) than date1.  If either dates are null or undefined,
+	 *          return null.
+	 */
+  public compareDatesAfter(date1: Date, date2: Date): boolean {
+
+    if (!date1 || !date2) {
+      return null;
+    }
+    if (date2.getTime() > date1.getTime()) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+	 * Compates 2 dates for equality.  Returns true if the dates are equal by
+	 * millisecond using getTime() from the Date class, otherwise return false.
+	 * If both are null, false is returned.  If 1 is null and the other is not,
+	 * false is returned.
+	 *
+	 * @param date1
+	 * @param date2
+	 * @returns true if equal
+	 */
+  public compareDatesEqual(date1: Date, date2: Date): boolean {
+
+    if (!date1 && !date2) {
+      return true;
+    }
+    if (date1 && !date2) {
+      return false;
+    }
+    if (!date1 && date2) {
+      return false;
+    }
+    if (date1 && date2) {
+      if (date1.getTime() !== date2.getTime()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 }

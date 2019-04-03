@@ -107,7 +107,7 @@
                           [type]="childOption.type"
                           [name]="secondaryOption"
                           [value]="childOption.value"
-                          (change)="updateTypeSelected($event)"
+                          (change)="updateTypeSelected($event, childOption)"
                         />
                         <label
                           for="{{childOption.name}}"

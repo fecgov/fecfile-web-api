@@ -111,26 +111,48 @@ export class AppLayoutComponent implements OnInit {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
         if (formInfo.hasOwnProperty('dueDate')) {
+          console.log('formInfo.dueDate = ' + formInfo.dueDate);
           if (typeof formInfo.dueDate === 'string') {
             if (formInfo.dueDate.length > 1) {
               const oneDay: number = 24 * 60 * 60 * 1000;
               const today: any = new Date();
+              today.setHours(0, 0, 0, 0);
               const dueDateArr = formInfo.dueDate.split('/');
               let dueDate: any = '';
 
               const dueDateMonth = this._utilService.toInteger(dueDateArr[0]) - 1;
-              const dueDateDay = this._utilService.toInteger(dueDateArr[1]) + 1;
-              if (formInfo.dueDate.indexOf('2018') === 0) {
-                dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
+              const dueDateDay = this._utilService.toInteger(dueDateArr[1]);
+              dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
+
+              if (this._utilService.compareDatesAfter(today, dueDate)) {
+                this.showFormDueDate = true;
+                this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / (oneDay)));
+              } else if (this._utilService.compareDatesEqual(today, dueDate)) {
+                this.showFormDueDate = false;
+                console.log('Due today');
+                this.formDueDate = 0;
               } else {
-                dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
+                this.showFormDueDate = false;
+                this.formDueDate = 0;
               }
 
-              this.showFormDueDate = true;
+              if (this.showFormDueDate) {
+                console.log(' today       = ' + today);
+                console.log(' dueDate     = ' + dueDate);
+                console.log(' due in days = ' + this.formDueDate);
+              } else {
+                console.log('dont show due date');
+                console.log(' today       = ' + today);
+                console.log(' dueDate     = ' + dueDate);
+              }
+              
+              // if (formInfo.dueDate.indexOf('2018') === 0) {
+              //   dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
+              // } else {
+              //   dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
+              // }
+
               this.formType = formInfo.formType;
-              this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / (oneDay)));
-
-
               this.formDescription = formInfo.reportTypeDescription;
               this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
               this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
