@@ -46,11 +46,7 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12"
               *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
-              <div class="text-error text-center" *ngIf="frmReason.controls.reasonText.errors?.required">
-                Enter text for the reason selected.
-              </div>
-              <div class="text-error text-center" 
-                *ngIf="reasonTextEmpty() && !frmReason.controls.reasonText.errors?.required">
+              <div class="text-error text-center">
                 Enter text for the reason selected.
               </div>
             </div>
@@ -405,9 +401,7 @@
               <button
                 class="btn btn-primary btn-right"
                 type="submit"
-                [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
               >
-
                Save & Continue
               </button>
             </div>
@@ -415,9 +409,9 @@
         </div>
         <div  class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-          <h4>* = Required</h4>
+            <h4>* = Required</h4>
           </div>
-      </div>     
+        </div>     
       </footer>
     </form>
   </div> <!-- ./reason-container -->

@@ -3,7 +3,6 @@ import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Vali
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { QuillEditorComponent } from 'ngx-quill';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { environment } from '../../../../environments/environment';
 import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
@@ -45,7 +44,8 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
-  public reasonTextArea: string = '';
+  public reasonTextArea: string = ''; // text area html
+  public reasonTextContent: string = ''; // text area text only 
 
   private _printPriviewPdfFileLink: string ='';
 
@@ -62,7 +62,8 @@ export class ReasonComponent implements OnInit {
     private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    // private _sanitizeHtml: sanitizeHtml
   ) {
     this._messageService.clearMessage();
   }
@@ -186,20 +187,16 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    let reasonText: string = this.frmReason.get('reasonText').value.trim();
-    if (reasonText.length >= 1) {
+    if (this.reasonText.length >= 1) {
+      if (!this._validateForSpaces(this.reasonText)) {
         let formSaved: any = {
           'form_saved': this.formSaved
         };
         this.reasonFailed = false;
         this.isValidReason = true;
 
-        this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
-
-        // this.reasonText = this.frmReason.get('reasonText').value;
+        this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
         this._form99Details.text = this.reasonTextArea;
-
-        console.log('this.reasonText: ', this.reasonText);
 
         setTimeout(() => {
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
@@ -235,6 +232,13 @@ export class ReasonComponent implements OnInit {
           data: this._form99Details,
           previousStep: 'step_3'
         });
+      } else {
+        this.frmReason.controls['reasonText'].setValue('');
+
+        this.reasonFailed = true;
+
+        window.scrollTo(0, 0);
+      }
     } else {
       this.reasonFailed = true;
       this.isValidReason = false;
@@ -245,6 +249,8 @@ export class ReasonComponent implements OnInit {
         step: 'step_2',
         previousStep: ''
       });
+
+      window.scrollTo(0, 0);
       return;
     }
   }
@@ -255,27 +261,38 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    if (e.target.textContent.length >= 1) {
-      this.reasonTextArea = e.target.innerHTML;
+    this.reasonText = e.target.textContent;
 
-      this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+    if (this.reasonText.length >= 1) {
+      this.reasonTextArea = e.target.innerHTML; 
+      
+      if (!this._validateForSpaces(this.reasonText)) {
+        this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
 
-      this.showValidateBar = false;
+        this.showValidateBar = false;
+        this.reasonFailed = false;
 
-      this.hideText = true;
-      this.formSaved = false;
+        this.hideText = true;
+        this.formSaved = false;
 
-      this._messageService
-        .sendMessage({
-          'validateMessage': {
-            'validate': {},
-            'showValidateBar': false
-          }
-        });         
+        this._messageService
+          .sendMessage({
+            'validateMessage': {
+              'validate': {},
+              'showValidateBar': false
+            }
+          });         
+      } else {
+        this.frmReason.controls['reasonText'].setValue('');
+
+        this.reasonFailed = true;
+      }
     } else {
       this.reasonTextArea = e.target.textContent;
 
-      this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+      this.frmReason.controls['reasonText'].setValue('');
+
+      this.reasonFailed = true;
 
       this._messageService
         .sendMessage({
@@ -335,6 +352,27 @@ export class ReasonComponent implements OnInit {
     const characterCount: number = text.replace(regex, '').length;
 
     return characterCount;
+  }
+
+  /**
+   * Validates text area for just spaces or new line characters entered.
+   *
+   * @param      {string}   text    The text.
+   * @return     {boolean}  The result.
+   */
+  private _validateForSpaces(text: string): boolean {
+    const regex: any = /^\s*$/;
+
+    if (regex.test(text)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private _removeUnsupportedHTML(html: string): string {
+
+    return '';
   }
 
   /**
