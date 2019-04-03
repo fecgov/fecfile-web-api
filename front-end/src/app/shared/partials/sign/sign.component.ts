@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -13,7 +13,8 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component'
 @Component({
   selector: 'app-sign',
   templateUrl: './sign.component.html',
-  styleUrls: ['./sign.component.scss']
+  styleUrls: ['./sign.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SignComponent implements OnInit {
 
