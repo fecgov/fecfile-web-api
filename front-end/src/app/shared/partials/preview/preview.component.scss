@@ -108,11 +108,13 @@
 				.label {
 					font-family: $labelFontFamily;
 					font-weight: bold;
-					margin-bottom: 1em;
+					margin: 1em;
+					margin-left: 0;
 				}				
 				.text {
 					font-family: $mainFontFamily;
 					margin-bottom: 1em;
+					margin-right: .75em;
 				}
 			}	
 			.validate__form {
