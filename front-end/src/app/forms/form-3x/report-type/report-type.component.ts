@@ -7,7 +7,10 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { ReportTypeService } from './report-type.service';
+import { ReportTypeMessageService, ReportTypeDateEnum } from './report-type-message.service';
 import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
+import { Subscription } from 'rxjs/Subscription';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 
 @Component({
@@ -41,16 +44,37 @@ export class ReportTypeComponent implements OnInit {
   private _selectedElectionState: string = null;
   private _selectedElectionDate: string = null;
   private _toDateSelected: string = null;
+  private dateChangeSubscription: Subscription;
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
+    private _reportTypeMessageService: ReportTypeMessageService,
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._messageService.clearMessage();
+
+    this.dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+      .subscribe(
+        message => {
+          if (!message) {
+            return;
+          }
+          const dateName = message.name;
+          switch (dateName) {
+            case ReportTypeDateEnum.fromDate:
+              this._fromDateSelected = message.date;
+              break;
+            case ReportTypeDateEnum.toDate:
+              this._toDateSelected = message.date;
+              break;
+            default:
+          }
+        }
+      );
   }
 
   ngOnInit(): void {

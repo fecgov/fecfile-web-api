@@ -4,6 +4,7 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
+import { ReportTypeMessageService, ReportTypeDateEnum } from '../report-type/report-type-message.service';
 
 @Component({
   selector: 'report-type-sidebar',
@@ -38,7 +39,8 @@ export class ReportTypeSidebarComponent implements OnInit {
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
     private _formService: FormsService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _reportTypeMessageService: ReportTypeMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -251,9 +253,29 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   public fromDateChange(date: string) {
     this.fromDate = date;
+
+    // This is an undesirable way to fix a issue with timing change detection
+    setTimeout(() => {
+      this._reportTypeMessageService.sendDateChangeMessage(
+        {
+          name: ReportTypeDateEnum.fromDate,
+          date: date
+        }
+      );
+    }, 200);
   }
 
   public toDateChange(date: string) {
     this.toDate = date;
+
+    // This is an undesirable way to fix a issue with timing change detection
+    setTimeout(() => {
+      this._reportTypeMessageService.sendDateChangeMessage(
+        {
+          name: ReportTypeDateEnum.toDate,
+          date: date
+        }
+      );
+    }, 200);
   }
 }
