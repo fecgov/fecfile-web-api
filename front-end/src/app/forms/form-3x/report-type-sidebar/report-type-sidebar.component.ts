@@ -29,6 +29,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   public selectedElecetionDate: string = null;
 
   private _reportTypeDescription: string = null;
+  private _previousReportTypeDescription: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -54,20 +55,27 @@ export class ReportTypeSidebarComponent implements OnInit {
           this._reportTypeDescription = this.selectedReport.report_type_desciption;
         }
       }
+      const newReportSelected = this._previousReportTypeDescription !==
+        this._reportTypeDescription;
+
       if (this.selectedReport.hasOwnProperty('election_state')) {
         if (Array.isArray(this.selectedReport.election_state)) {
           if (this.selectedReport.election_state.length === 1) {
-            this.fromDate = '';
-            this.toDate = '';
-            this._selectedElectionDates = null;
-            if (this.selectedReport.election_state[0]['dates']) {
-              if (Array.isArray(this.selectedReport.election_state[0].dates)) {
-                let dates: any = this.selectedReport.election_state[0].dates;
+            // Apply the dates from the newly selected report
+            // Don't set the dates if the change trigger is from the date itself.
+            if (newReportSelected) {
+              this.fromDate = '';
+              this.toDate = '';
+              this._selectedElectionDates = null;
+              if (this.selectedReport.election_state[0]['dates']) {
+                if (Array.isArray(this.selectedReport.election_state[0].dates)) {
+                  let dates: any = this.selectedReport.election_state[0].dates;
 
-                if (Array.isArray(dates)) {
-                  this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
-                  this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
-                  this.dueDate = dates[0].due_date;
+                  if (Array.isArray(dates)) {
+                    this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
+                    this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
+                    this.dueDate = dates[0].due_date;
+                  }
                 }
               }
             }
@@ -85,6 +93,8 @@ export class ReportTypeSidebarComponent implements OnInit {
           }
         } // isArray(this.selectedReport.election_state)
 
+        this._previousReportTypeDescription = this._reportTypeDescription;
+
         // smahal: until API exists to get fromDate from the previous filing
         // when from date is null, allow null from date to go through.
         // if (this.fromDate && this.toDate) {
@@ -101,7 +111,7 @@ export class ReportTypeSidebarComponent implements OnInit {
               'dueDate': this.dueDate,
               'reportTypeDescription': this._reportTypeDescription,
               'regular_special_report_ind': this.selectedReport.regular_special_report_ind
-            }
+            };
 
             setTimeout(() => {
               this.status.emit(message);
@@ -115,7 +125,7 @@ export class ReportTypeSidebarComponent implements OnInit {
               'dueDate': this.dueDate,
               'reportTypeDescription': this._reportTypeDescription,
               'regular_special_report_ind': this.selectedReport.regular_special_report_ind
-            }
+            };
           }
           this.status.emit(message);
         } else {
@@ -222,8 +232,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   public selectElectionDateChange(e): void {
     console.log('selectElectionDateChange: ');
-    let selectedIndex: number = e.target.selectedIndex;
-    let selectedOption: any = e.target[e.target.selectedIndex];
+    const selectedOption: any = e.target[e.target.selectedIndex];
 
     this._selectedElectionDate =  e.target.value;
 
@@ -238,5 +247,13 @@ export class ReportTypeSidebarComponent implements OnInit {
     this.dueDate = selectedOption.getAttribute('data-duedate');
 
     this._selectedElectionDate = e.target.value;
+  }
+
+  public fromDateChange(date: string) {
+    this.fromDate = date;
+  }
+
+  public toDateChange(date: string) {
+    this.toDate = date;
   }
 }
