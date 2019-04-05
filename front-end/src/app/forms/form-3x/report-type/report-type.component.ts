@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation, OnDestroy, DoCheck } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -19,22 +19,22 @@ import { Message } from '@angular/compiler/src/i18n/i18n_ast';
   styleUrls: ['./report-type.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ReportTypeComponent implements OnInit {
+export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = {};
 
   public frmReportType: FormGroup;
-  public fromDateSelected: boolean = false;
-  public reportTypeSelected: string = '';
-  public isValidType: boolean = false;
-  public optionFailed: boolean = false;
-  public screenWidth: number = 0;
+  public fromDateSelected = false;
+  public reportTypeSelected = '';
+  public isValidType = false;
+  public optionFailed = false;
+  public screenWidth = 0;
   public reportType: string = null;
-  public toDateSelected: boolean = false;
-  public tooltipPosition: string = 'right';
-  public tooltipLeft: string = 'auto';
+  public toDateSelected = false;
+  public tooltipPosition = 'right';
+  public tooltipLeft = 'auto';
 
   private _dueDate: string = null;
   private _formType: string = null;
@@ -44,6 +44,8 @@ export class ReportTypeComponent implements OnInit {
   private _selectedElectionState: string = null;
   private _selectedElectionDate: string = null;
   private _toDateSelected: string = null;
+  private _fromDateUserModified: string = null;
+  private _toDateUserModified: string = null;
   private dateChangeSubscription: Subscription;
 
   constructor(
@@ -66,10 +68,10 @@ export class ReportTypeComponent implements OnInit {
           const dateName = message.name;
           switch (dateName) {
             case ReportTypeDateEnum.fromDate:
-              this._fromDateSelected = message.date;
+              this._fromDateUserModified = message.date;
               break;
             case ReportTypeDateEnum.toDate:
-              this._toDateSelected = message.date;
+              this._toDateUserModified = message.date;
               break;
             default:
           }
@@ -81,6 +83,8 @@ export class ReportTypeComponent implements OnInit {
 
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    this.initUserModFields();
+
     if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
     }
@@ -90,7 +94,7 @@ export class ReportTypeComponent implements OnInit {
 
     this.screenWidth = window.innerWidth;
 
-    if(this.screenWidth < 768) {
+    if (this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
       this.tooltipLeft = '0';
     } else if (this.screenWidth >= 768) {
@@ -118,6 +122,10 @@ export class ReportTypeComponent implements OnInit {
       amend_Indicator: '',
       coh_bop: '0'
     };
+  }
+
+  ngOnDestroy(): void {
+    this.dateChangeSubscription.unsubscribe();
   }
 
   ngDoCheck(): void {
@@ -154,6 +162,9 @@ export class ReportTypeComponent implements OnInit {
 
     if (this.selectedReportInfo) {
       if (this.selectedReportInfo.hasOwnProperty('toDate')) {
+        if (this._toDateUserModified) {
+          this.selectedReportInfo.toDate = this._toDateUserModified;
+        }
         if (typeof this.selectedReportInfo.toDate === 'string') {
           if (this.selectedReportInfo.toDate.length >= 1) {
             this._toDateSelected = this.selectedReportInfo.toDate;
@@ -167,6 +178,9 @@ export class ReportTypeComponent implements OnInit {
       }
 
       if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
+        if (this._fromDateUserModified) {
+          this.selectedReportInfo.fromDate = this._fromDateUserModified;
+        }
         if (typeof this.selectedReportInfo.fromDate === 'string') {
           if (this.selectedReportInfo.fromDate.length >= 1) {
             this._fromDateSelected = this.selectedReportInfo.fromDate;
@@ -222,7 +236,7 @@ export class ReportTypeComponent implements OnInit {
   onResize(event) {
     this.screenWidth = event.target.innerWidth;
 
-    if(this.screenWidth < 768) {
+    if (this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
       this.tooltipLeft = '0';
     } else if (this.screenWidth >= 768) {
@@ -237,11 +251,12 @@ export class ReportTypeComponent implements OnInit {
    * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
-    if(e.target.checked) {
+    if (e.target.checked) {
+      this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
-      let dataReportType: string = e.target.getAttribute('data-report-type');
+      const dataReportType: string = e.target.getAttribute('data-report-type');
 
       if (dataReportType !== 'S') {
         this.toDateSelected = true;
@@ -283,7 +298,7 @@ export class ReportTypeComponent implements OnInit {
         localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
         this._reportTypeService
-          .saveReport(this._formType, "Saved")
+          .saveReport(this._formType, 'Saved')
           .subscribe(res => {
             if (res) {
               this.status.emit({
@@ -351,5 +366,11 @@ export class ReportTypeComponent implements OnInit {
     } catch (e) {
       return '';
     }
+  }
+
+
+  private initUserModFields() {
+    this._fromDateUserModified = null;
+    this._toDateUserModified = null;
   }
 }

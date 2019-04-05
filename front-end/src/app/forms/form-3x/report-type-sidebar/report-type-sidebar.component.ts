@@ -5,6 +5,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 import { ReportTypeMessageService, ReportTypeDateEnum } from '../report-type/report-type-message.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'report-type-sidebar',
@@ -40,7 +41,7 @@ export class ReportTypeSidebarComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _formService: FormsService,
     private _messageService: MessageService,
-    private _reportTypeMessageService: ReportTypeMessageService
+    private _reportTypeMessageService: ReportTypeMessageService,
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -115,9 +116,11 @@ export class ReportTypeSidebarComponent implements OnInit {
               'regular_special_report_ind': this.selectedReport.regular_special_report_ind
             };
 
-            setTimeout(() => {
-              this.status.emit(message);
-            }, 100);
+            // setTimeout was causing a loop between several components.
+            // setTimeout(() => {
+              // this.status.emit(message);
+            // }, 100);
+            // this.status.emit(message);
 
           } else if (!this._selectedState && !this._selectedElectionDate) {
             message = {
@@ -147,6 +150,13 @@ export class ReportTypeSidebarComponent implements OnInit {
 
         console.log('form3xReportType: ', form3xReportType);
 
+        // The local storage report is saved when next button is clicked.
+        // If user returns to step 1 and selects a different report, do not
+        // proceed setting the fields.
+        if (!this.checkSelectedMatchesSpecial(form3xReportType)) {
+          return;
+        }
+
         if (form3xReportType.hasOwnProperty('regular_special_report_ind')) {
           if (typeof form3xReportType.regular_special_report_ind === 'string') {
             if (form3xReportType.regular_special_report_ind === 'S') {
@@ -165,47 +175,64 @@ export class ReportTypeSidebarComponent implements OnInit {
                 }
               }
 
-              this.electionDates.forEach(el => {
-                if (el.cvg_start_date) {
-                  el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
-                }
+              if (this.electionDates) {
+                this.electionDates.forEach(el => {
+                  if (el.cvg_start_date) {
+                    el.cvg_start_date = el.cvg_start_date.replace('2018', '2019');
+                  }
+                  el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
+                  el.due_date = el.due_date.replace('2018', '2019');
+                  el.election_date = el.election_date.replace('2018', '2019');
+                });
+              }
 
-                el.cvg_end_date = el.cvg_end_date.replace('2018', '2019');
+              this.fromDate = this._deFormatDate(form3xReportType.cvgStartDate);
+              this.toDate = this._deFormatDate(form3xReportType.cvgEndDate);
 
-                el.due_date = el.due_date.replace('2018', '2019');
-
-
-                el.election_date = el.election_date.replace('2018', '2019');
-
-              });
-
-              this.fromDate = form3xReportType.cvgStartDate;
-              this.toDate = form3xReportType.cvgEndDate;
               this.selectedElectionState = form3xReportType.election_state;
               this.selectedElecetionDate = form3xReportType.election_date;
             }
           }
         }
       }
-    } // selectedReport !== null
+    }
   }
 
+
   /**
-   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   * Check if the selected Report matches the Report from local storage.
+   * 
+   * @param form3xReportType the F3X Report Type from local storage.
+   * @returns true if the report type from storage matches the selected report type.
+   */
+  private checkSelectedMatchesSpecial(form3xReportType: any): boolean {
+    if (form3xReportType.hasOwnProperty('reportType')) {
+      if (typeof form3xReportType.reportType === 'string') {
+        if (form3xReportType.reportType === this.selectedReport.reportType) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
+  /**
+   * Changes format of date from yyyy-m-d to m/d/yyyy.
+   *
+   * TODO put in utilService
    *
    * @param      {string}  date    The date
    * @return     {string}  The new formatted date.
    */
-  private _formatDate(date: string): string {
-    console.log('_formatDate: ');
-    console.log('date: ', date);
+  private _deFormatDate(date: string): string {
     try {
-      const dateArr = date.split('-');
-      const month: string = dateArr[1];
-      const day: string = dateArr[2];
-      const year: string = dateArr[0].replace('2018', '2019');
+      const dateArr = date.split('/');
+      const month: string = dateArr[0];
+      const day: string = dateArr[1];
+      const year: string = dateArr[2].replace('2018', '2019');
 
-      return `${month}/${day}/${year}`;
+      return `${year}-${month}-${day}`;
     } catch (e) {
       return '';
     }

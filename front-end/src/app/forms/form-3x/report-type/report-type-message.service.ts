@@ -31,9 +31,9 @@ export class ReportTypeMessageService {
 
 
   /**
-   * Clear the Pin Column message
+   * Clear the Date Change message
    */
-  public clearShowPinColumnMessage() {
+  public clearDateChangeMessage() {
     this.dateChangeSubject.next();
   }
 
