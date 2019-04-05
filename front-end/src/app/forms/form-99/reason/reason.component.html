@@ -43,14 +43,22 @@
               </div>
             </div>
           </div>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12"
-              *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+          <div class="grid-row" 
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center">
                 Enter text for the reason selected.
               </div>
             </div>
           </div>
+          <div class="grid-row" 
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonHasInvalidHTML)">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="text-error text-center">
+                Invalid markup has been entered for reason.
+              </div>
+            </div>
+          </div>          
           <div class="grid-row info-row">
             <div class="grid-row__col grid-row__col--9 text-left">
               <b>Text*</b>

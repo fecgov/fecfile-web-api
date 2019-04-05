@@ -26,6 +26,7 @@ export class ReasonComponent implements OnInit {
   public frmReason: FormGroup;
   public reasonType: string = null;
   public reasonFailed: boolean = false;
+  public reasonHasInvalidHTML: boolean = false;
   public typeSelected: string = null;
   public lengthError: boolean = false;
   public isValidReason: boolean = false;
@@ -62,8 +63,7 @@ export class ReasonComponent implements OnInit {
     private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _modalService: NgbModal,
-    // private _sanitizeHtml: sanitizeHtml
+    private _modalService: NgbModal
   ) {
     this._messageService.clearMessage();
   }
@@ -187,6 +187,8 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
+    console.log('this._checkUnsupportedHTML(this.reasonTextArea): ', this._checkUnsupportedHTML(this.reasonTextArea));
+    
     if (this.reasonText.length >= 1) {
       if (!this._validateForSpaces(this.reasonText)) {
         let formSaved: any = {
@@ -264,8 +266,11 @@ export class ReasonComponent implements OnInit {
     this.reasonText = e.target.textContent;
 
     if (this.reasonText.length >= 1) {
-      this.reasonTextArea = e.target.innerHTML; 
-      
+
+      this.reasonTextArea = e.target.innerText; 
+
+      console.log('this._checkUnsupportedHTML(this.reasonTextArea): ', this._checkUnsupportedHTML(this.reasonTextArea));
+
       if (!this._validateForSpaces(this.reasonText)) {
         this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
 
@@ -349,7 +354,7 @@ export class ReasonComponent implements OnInit {
    */
   private _countCharacters(text: string): number {
     const regex: any = /(<([^>]+)>)/ig;
-    const characterCount: number = text.replace(regex, '').length;
+    let characterCount: number = text.replace(regex, '').length || 0;
 
     return characterCount;
   }
@@ -370,9 +375,25 @@ export class ReasonComponent implements OnInit {
     return false;
   }
 
-  private _removeUnsupportedHTML(html: string): string {
+  private _checkUnsupportedHTML(text: string): boolean {
+    const htmlTags: any = /(<(\/?|\!?)\w+>?)/g;
+    console.log('htmlTags.test(text): ', htmlTags.test(text));
+    if (htmlTags.test(text)) {
+      const htmlTagsWhitelist: any = /(<(\/?|\!?)(div|span|br|blockquote|b|u|i|ol|ul|li)+>?)/g;
+      console.log('!htmlTagsWhitelist.test(text): ', !htmlTagsWhitelist.test(text));
 
-    return '';
+      if (!htmlTagsWhitelist.test(text)) {
+        this.reasonHasInvalidHTML = true;
+
+        return true;
+      } else {
+        this.reasonHasInvalidHTML = false;
+
+        return false;
+      }
+    }
+
+    return false;
   }
 
   /**
