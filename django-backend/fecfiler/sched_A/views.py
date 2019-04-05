@@ -12,7 +12,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime
 from django.conf import settings
-from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value
+from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value, check_report_id
 
 
 # Create your views here.
@@ -137,6 +137,36 @@ def get_list_schedA(report_id, cmte_id, transaction_id):
     except Exception:
         raise
 
+def get_list_child_schedA(report_id, cmte_id, transaction_id):
+
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from Reports table
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
+            
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+
+            for row in cursor.fetchall():
+            #forms_obj.append(data_row)
+                data_row = list(row)
+                schedA_list = data_row[0]
+            merged_list= []
+            if not (schedA_list is None):
+                for dictA in schedA_list:
+                    entity_id = dictA.get('entity_id')
+                    data = {
+                        'entity_id': entity_id,
+                        'cmte_id': cmte_id
+                    }
+                    entity_list = get_entities(data)
+                    dictEntity = entity_list[0]
+                    merged_dict = {**dictA, **dictEntity}
+                    merged_list.append(merged_dict)
+        return merged_list
+    except Exception:
+        raise
+
 def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description):
 
     try:
@@ -154,11 +184,21 @@ def delete_sql_schedA(transaction_id, report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
 
-            # UPDATE delete_ind flag on a single row from Reports table
-            # cursor.execute("""UPDATE public.reports SET delete_ind = 'Y', last_update_date = %s WHERE report_id = '""" + report_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
+            # UPDATE delete_ind flag on a single row from Sched_A table
             cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y' WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception('The Transaction ID: {} is either already deleted or does not exist in Reports table'.format(transaction_id))
+    except Exception:
+        raise
+
+def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
+
+    try:
+        with connection.cursor() as cursor:
+
+            # UPDATE back_ref_transaction_id value to null in sched_a table
+            value = None
+            cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [value, transaction_id, report_id, cmte_id])
     except Exception:
         raise  
 """
@@ -176,7 +216,6 @@ def post_schedA(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
-        #print(entity_data)
         entity_id = entity_data.get('entity_id')
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -213,6 +252,9 @@ def get_schedA(data):
 
         if flag:
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
+            child_forms_obj = get_list_child_schedA(report_id, cmte_id, transaction_id)
+            if len(child_forms_obj) > 0:
+                forms_obj[0]['child'] = child_forms_obj
         else:
             forms_obj = get_list_all_schedA(report_id, cmte_id)
         return forms_obj
@@ -233,7 +275,6 @@ def put_schedA(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
-        #print(entity_data)
         entity_id = entity_data.get('entity_id')
         transaction_id = datum.get('transaction_id')
         check_transaction_id(transaction_id)
@@ -241,7 +282,6 @@ def put_schedA(datum):
             put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'))
             output = get_schedA(datum)
         except Exception as e:
-            print(datum)
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
@@ -262,9 +302,51 @@ def delete_schedA(data):
         transaction_id = data.get('transaction_id')
         check_transaction_id(transaction_id)
         delete_sql_schedA(transaction_id, report_id, cmte_id)
+        delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
     except:
         raise
 
+def check_type_list(data):
+    try:
+        if not type(data) is list:
+            raise Exception('The child transactions have to be sent in as an array or list. Input received: {}'.format(data))
+        else:
+            return data
+    except:
+        raise
+
+def schedA_sql_dict(data):
+    try:
+        datum = {
+            'line_number': data.get('line_number'),
+            'transaction_type': data.get('transaction_type'),
+            'back_ref_sched_name': data.get('back_ref_sched_name'),
+            'contribution_date': date_format(data.get('contribution_date')),
+            'contribution_amount': data.get('contribution_amount'),
+            'purpose_description': data.get('purpose_description'),
+            'memo_code': data.get('memo_code'),
+            'memo_text': data.get('memo_text'),
+            'election_code': data.get('election_code'),
+            'election_other_description': data.get('election_other_description'),
+            'entity_type': data.get('entity_type'),
+            'entity_name': data.get('entity_name'),
+            'first_name': data.get('first_name'),
+            'last_name': data.get('last_name'),
+            'middle_name': data.get('middle_name'),
+            'preffix': data.get('preffix'),
+            'suffix': data.get('suffix'),
+            'street_1': data.get('street_1'),
+            'street_2': data.get('street_2'),
+            'city': data.get('city'),
+            'state': data.get('state'),
+            'zip_code': data.get('zip_code'),
+            'occupation': data.get('occupation'),
+            'employer': data.get('employer'),
+            'ref_cand_cmte_id': data.get('ref_cand_cmte_id'),
+        }
+        return datum
+    except:
+        raise
 """
 ***************************************************** SCHED A - POST API CALL STARTS HERE **********************************************************
 """
@@ -273,43 +355,45 @@ def schedA(request):
 
     if request.method == 'POST':
         try:
-            if request.data.get('report_id') in ['',""," ", 'None', 'null']:
+            cmte_id = request.user.username
+            if not('report_id' in request.data):
+                raise Exception ('Missing Input: Report_id is mandatory')
+            if not (check_null_value(request.data.get('report_id'))):
                 report_id = 0
             else:
                 report_id = request.data.get('report_id')
-            datum = {
-                'report_id': report_id,
-                'line_number': request.data.get('line_number'),
-                'transaction_type': request.data.get('transaction_type'),
-                'back_ref_transaction_id': request.data.get('back_ref_transaction_id'),
-                'back_ref_sched_name': request.data.get('back_ref_sched_name'),
-                'contribution_date': date_format(request.data.get('contribution_date')),
-                'contribution_amount': request.data.get('contribution_amount'),
-                'purpose_description': request.data.get('purpose_description'),
-                'memo_code': request.data.get('memo_code'),
-                'memo_text': request.data.get('memo_text'),
-                'election_code': request.data.get('election_code'),
-                'election_other_description': request.data.get('election_other_description'),
-                'entity_type': request.data.get('entity_type'),
-                'cmte_id': request.user.username,
-                'entity_name': request.data.get('entity_name'),
-                'first_name': request.data.get('first_name'),
-                'last_name': request.data.get('last_name'),
-                'middle_name': request.data.get('middle_name'),
-                'preffix': request.data.get('preffix'),
-                'suffix': request.data.get('suffix'),
-                'street_1': request.data.get('street_1'),
-                'street_2': request.data.get('street_2'),
-                'city': request.data.get('city'),
-                'state': request.data.get('state'),
-                'zip_code': request.data.get('zip_code'),
-                'occupation': request.data.get('occupation'),
-                'employer': request.data.get('employer'),
-                'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
-            }
-            if 'entity_id' in request.data:
-                datum['entity_id'] = request.data.get('entity_id')  
-            data = post_schedA(datum)
+            datum = schedA_sql_dict(request.data)
+            datum['back_ref_transaction_id'] = request.data.get('back_ref_transaction_id'),
+            datum['report_id'] = report_id
+            datum['cmte_id'] = cmte_id
+            if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                datum['entity_id'] = request.data.get('entity_id')
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                datum['transaction_id'] = request.data.get('transaction_id')
+                data = put_schedA(datum)
+            else:
+                data = post_schedA(datum)
+
+            # Associating child transactions to parent and storing them to DB
+            if 'child' in request.data:
+                children = check_type_list(request.data.get('child'))
+                if len(children) > 0:
+                    child_output=[]
+                    for child in children:
+                        child_datum = schedA_sql_dict(child)
+                        child_datum['back_ref_transaction_id'] = data.get('transaction_id')
+                        child_datum['report_id'] = report_id
+                        child_datum['cmte_id'] = cmte_id
+                        if 'entity_id' in child and check_null_value(child.get('entity_id')):
+                            child_datum['entity_id'] = child.get('entity_id')
+                        if 'transaction_id' in child and check_null_value(child.get('transaction_id')):
+                            child_datum['transaction_id'] = child.get('transaction_id')
+                            child_data = put_schedA(child_datum)
+                        else:
+                            child_data = post_schedA(child_datum)
+                        child_output.append(child_data)
+                    data['child'] = child_output                   
+
             return JsonResponse(data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -322,13 +406,16 @@ def schedA(request):
 
         try:
             data = {
-            'cmte_id': request.user.username,
-            'report_id': request.query_params.get('report_id')
+            'cmte_id': request.user.username
             }
-            if 'transaction_id' in request.query_params:
-                data['transaction_id'] =  request.query_params.get('transaction_id')
-            data = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+                data['report_id'] = request.query_params.get('report_id')
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+                data['transaction_id'] = request.query_params.get('transaction_id')
+            datum = get_schedA(data)
+            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
             forms_obj = []
@@ -337,46 +424,33 @@ def schedA(request):
             logger.debug(e)
             return Response("The schedA API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-
     """
     ************************************************* SCHED A - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
 
         try:
-            datum = {
-                'transaction_id': request.data.get('transaction_id'),
-                'report_id': request.data.get('report_id'),
-                'line_number': request.data.get('line_number'),
-                'transaction_type': request.data.get('transaction_type'),
-                'back_ref_transaction_id': request.data.get('back_ref_transaction_id'),
-                'back_ref_sched_name': request.data.get('back_ref_sched_name'),
-                'contribution_date': date_format(request.data.get('contribution_date')),
-                'contribution_amount': request.data.get('contribution_amount'),
-                'purpose_description': request.data.get('purpose_description'),
-                'memo_code': request.data.get('memo_code'),
-                'memo_text': request.data.get('memo_text'),
-                'election_code': request.data.get('election_code'),
-                'election_other_description': request.data.get('election_other_description'),
-                'entity_type': request.data.get('entity_type'),
-                'cmte_id': request.user.username,
-                'entity_name': request.data.get('entity_name'),
-                'first_name': request.data.get('first_name'),
-                'last_name': request.data.get('last_name'),
-                'middle_name': request.data.get('middle_name'),
-                'preffix': request.data.get('preffix'),
-                'suffix': request.data.get('suffix'),
-                'street_1': request.data.get('street_1'),
-                'street_2': request.data.get('street_2'),
-                'city': request.data.get('city'),
-                'state': request.data.get('state'),
-                'zip_code': request.data.get('zip_code'),
-                'occupation': request.data.get('occupation'),
-                'employer': request.data.get('employer'),
-                'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
-            }
-            if 'entity_id' in request.data:
-                datum['entity_id'] = request.data.get('entity_id')  
+            datum = schedA_sql_dict(request.data)
+
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                datum['transaction_id'] = request.data.get('transaction_id')
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
+
+            if not('report_id' in request.data):
+                raise Exception ('Missing Input: Report_id is mandatory')
+            if not (check_null_value(request.data.get('report_id'))):
+                report_id = 0
+            else:
+                report_id = request.data.get('report_id')
+
+            datum['report_id'] = report_id
+            datum['back_ref_transaction_id'] = request.data.get('back_ref_transaction_id')
+            datum['cmte_id'] = request.user.username
+
+            if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                datum['entity_id'] = request.data.get('entity_id')
+
             data = put_schedA(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
             
@@ -391,10 +465,16 @@ def schedA(request):
 
         try:
             data = {
-                'transaction_id': request.query_params.get('transaction_id'),
-                'cmte_id': request.user.username,
-                'report_id': request.query_params.get('report_id')
+            'cmte_id': request.user.username
             }
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+                data['report_id'] = request.query_params.get('report_id')
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+                data['transaction_id'] = request.query_params.get('transaction_id')
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedA(data)
             return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')),status=status.HTTP_201_CREATED)
         except Exception as e:
