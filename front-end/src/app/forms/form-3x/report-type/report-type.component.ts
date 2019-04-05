@@ -8,7 +8,8 @@ import { ValidateComponent } from '../../../shared/partials/validate/validate.co
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { ReportTypeService } from './report-type.service';
 import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
-
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
   selector: 'f3x-report-type',
@@ -48,7 +49,8 @@ export class ReportTypeComponent implements OnInit {
     private _messageService: MessageService,
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _dialogService: DialogService,
   ) {
     this._messageService.clearMessage();
   }
@@ -258,10 +260,44 @@ export class ReportTypeComponent implements OnInit {
 
         localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
+        
         this._reportTypeService
           .saveReport(this._formType, "Saved")
           .subscribe(res => {
             if (res) {
+              console.log("doValidateReportType res = ",res);
+              let reportId=0;
+              if (Array.isArray(res)) {
+                 reportId=res[0].report_id
+                 this._dialogService
+                 .reportExist('The coverage dates entered overlap with '+res[0].report_type + ' [' +res[0].cvg_start_date + ' - '+ res[0].cvg_end_date + ']' , ConfirmModalComponent,'Report already exist',false,true)
+                 .then(res => {
+                   if(res === 'okay') {
+                    this.optionFailed = true;
+                    this.isValidType = false;
+                    window.scrollTo(0, 0);
+                    this.status.emit({
+                      form: {},
+                      direction: 'previous',
+                      step: 'step_1'
+                    });
+                    
+                    return 0;
+                   } 
+                   else if(res === 'ReportExist') {
+                    console.log("Report already exist Report id =",reportId);
+                    let reporturl="/reports?reportId="
+                    this._router.navigateByUrl(`${reporturl}{reportId}`);
+                   // `${environment.apiUrl}${url}`,
+                    //this._router.navigateByUrl('/reports?report_id='+res[0].report_id);
+                    localStorage.setItem('Existing_Report_id', reportId.toString());
+                    
+                  }
+                 });
+              }
+              else {
+                  console.log("New report created Report id =",reportId);   
+              }
               this.status.emit({
                 form: this.frmReportType,
                 direction: 'next',
