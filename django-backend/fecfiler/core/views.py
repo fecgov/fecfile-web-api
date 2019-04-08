@@ -530,6 +530,7 @@ def get_reports(data):
 
 def put_reports(data):
     try:
+        check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')  
         check_form_type(data.get('form_type'))
         check_report_id(data.get('report_id'))
@@ -763,7 +764,7 @@ def check_entity_id(entity_id):
 
 def check_mandatory_fields_entity(data):
     try:
-        list_mandatory_fields_entity = ['entity_type', 'cmte_id']
+        list_mandatory_fields_entity = ['entity_type', 'cmte_id', 'entity_name']
         error =[]
         for field in list_mandatory_fields_entity:
             if not(field in data and check_null_value(data.get(field))):
@@ -910,6 +911,7 @@ def get_entities(data):
 def put_entities(data):
 
     try:
+        check_mandatory_fields_entity(data)
         cmte_id = data.get('cmte_id')
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)

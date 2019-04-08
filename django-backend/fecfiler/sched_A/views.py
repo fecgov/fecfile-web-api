@@ -70,7 +70,7 @@ def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transacti
 
     try:
         with connection.cursor() as cursor:
-            # Insert data into Reports table
+            # Insert data into schedA table
             cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date)
                                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.now()])
     except Exception:
@@ -80,7 +80,7 @@ def get_list_all_schedA(report_id, cmte_id):
 
     try:
         with connection.cursor() as cursor:
-            # GET all rows from Reports table
+            # GET all rows from schedA table
             query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
@@ -110,7 +110,7 @@ def get_list_schedA(report_id, cmte_id, transaction_id):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from Reports table
+            # GET single row from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
@@ -141,7 +141,8 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from Reports table
+
+            # GET single row from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
@@ -171,11 +172,11 @@ def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transactio
 
     try:
         with connection.cursor() as cursor:
-            # Insert data into Reports table
+            # Insert data into schedA table
             cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", 
                 [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
-                raise Exception('The Transaction ID: {} does not exist in Reports table'.format(transaction_id))
+                raise Exception('The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
     except Exception:
         raise
 
@@ -187,7 +188,18 @@ def delete_sql_schedA(transaction_id, report_id, cmte_id):
             # UPDATE delete_ind flag on a single row from Sched_A table
             cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y' WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
-                raise Exception('The Transaction ID: {} is either already deleted or does not exist in Reports table'.format(transaction_id))
+                raise Exception('The Transaction ID: {} is either already deleted or does not exist in schedA table'.format(transaction_id))
+    except Exception:
+        raise
+
+def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
+
+    try:
+        with connection.cursor() as cursor:
+
+            # UPDATE back_ref_transaction_id value to null in sched_a table
+            value = None
+            cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [value, transaction_id, report_id, cmte_id])
     except Exception:
         raise
 
@@ -264,6 +276,7 @@ def get_schedA(data):
 
 def put_schedA(datum):
     try:
+        check_mandatory_fields_schedA(datum)
         flag = False
         if 'entity_id' in datum:
             flag = True
@@ -401,7 +414,7 @@ def schedA(request):
     """
     *********************************************** SCHED A - GET API CALL STARTS HERE **********************************************************
     """
-    #Get records from reports table
+    #Get records from schedA table
     if request.method == 'GET':
 
         try:
