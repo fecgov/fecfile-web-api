@@ -269,8 +269,17 @@ export class ReportTypeComponent implements OnInit {
               let reportId=0;
               if (Array.isArray(res)) {
                  reportId=res[0].report_id
+
+                 var cvgStartDate = res[0].cvg_start_date;
+                 var datearray = cvgStartDate.split("-");
+                 var newcvgStartDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+
+                 var cvgEndDate = res[0].cvg_end_date;
+                 var datearray = cvgEndDate.split("-");
+                 var newcvgEndDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+                 
                  this._dialogService
-                 .reportExist('The coverage dates entered overlap with '+res[0].report_type + ' [' +res[0].cvg_start_date + ' - '+ res[0].cvg_end_date + ']' , ConfirmModalComponent,'Report already exist',false,true)
+                 .reportExist('The coverage dates entered overlap with '+res[0].report_type + ' [' +newcvgStartDate + ' - '+ newcvgEndDate + ']' , ConfirmModalComponent,'Report already exist',false,true)
                  .then(res => {
                    if(res === 'okay') {
                     this.optionFailed = true;
