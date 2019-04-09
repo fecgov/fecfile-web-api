@@ -269,10 +269,7 @@ export class ReasonComponent implements OnInit {
 
       this.reasonTextArea = e.target.innerText; 
 
-      console.log('this.reasonTextArea: ', this.reasonTextArea);
-
       if (this._checkUnsupportedHTML(this.reasonTextArea)) {
-        console.log('textarea has unsupported HTML: ');
         this.reasonHasInvalidHTML = true;
 
         this.frmReason.controls['reasonText'].setValue('');
@@ -393,23 +390,16 @@ export class ReasonComponent implements OnInit {
    * @return     {boolean}  Indicates if there is invalid markup or not.
    */
   private _checkUnsupportedHTML(text: string): boolean {
-    const htmlTags: any = /(<(\/?|\!?)\w+>)/gm;
+    const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>)/gm;
 
-    // console.log('has html tags: ', htmlTags.test(text));
-    // console.log('text before: ', text);
-
-    if (htmlTags.test(text)) {
-      const htmlTagsWhitelist: any = new RegExp(/(<(\/?|\!?)(script|iframe|style|table|thead|tbody|th|tr|td|img|fieldset|form|input|textarea|select|option|a href="(.*?)"|a|progress|noscript|audio|video)>)/, 'gm');
-
-      console.log('text: ', text);
-      console.log('htmlTagsWhitelist: ', htmlTagsWhitelist);
-      console.log('htmlTagsWhitelist.test(text): ', htmlTagsWhitelist.test(text));
-
-      if (htmlTagsWhitelist.test(text)) {
+    if (hasHTMLTags.test(text)) {
+      const htmlTagsWhiteList: any = /(<(\/?|\!?)(script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)>)/gmi;
+      
+      if (htmlTagsWhiteList.test(text)) {
         return true;
       } else {
         return false;
-      }
+      } 
     }
 
     return false;
