@@ -186,60 +186,66 @@ export class ReasonComponent implements OnInit {
    * Validates the reason form.
    *
    */
-  public doValidateReason() {
-    console.log('this._checkUnsupportedHTML(this.reasonTextArea): ', this._checkUnsupportedHTML(this.reasonTextArea));
-    
-    if (this.reasonText.length >= 1) {
-      if (!this._validateForSpaces(this.reasonText)) {
-        let formSaved: any = {
-          'form_saved': this.formSaved
-        };
-        this.reasonFailed = false;
-        this.isValidReason = true;
+  public doValidateReason() {  
+    if (this.reasonTextArea.length >= 1) {
+      if (this._checkUnsupportedHTML(this.reasonTextArea)) {
+        if (!this._validateForSpaces(this.reasonTextArea)) {
+          let formSaved: any = {
+            'form_saved': this.formSaved
+          };
+          this.reasonFailed = false;
+          this.isValidReason = true;
 
-        this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
-        this._form99Details.text = this.reasonTextArea;
+          this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
+          this._form99Details.text = this.reasonTextArea;
 
-        setTimeout(() => {
-          localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+          setTimeout(() => {
+            localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
-          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
-        }, 100);
+            localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
+          }, 100);
 
-        this.saveForm();
+          this.saveForm();
 
-        this.hideText = true;
+          this.hideText = true;
 
-        this.showValidateBar = false;
+          this.showValidateBar = false;
 
-        this.hideText = true;
-        this.formSaved = false;
+          this.hideText = true;
+          this.formSaved = false;
 
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': '',
-              'showValidateBar': false
-            }
+          this._messageService
+            .sendMessage({
+              'validateMessage': {
+                'validate': '',
+                'showValidateBar': false
+              }
+            });
+
+          this.status.emit({
+            form: this.frmReason,
+            direction: 'next',
+            step: 'step_3',
+            previousStep: 'step_2'
           });
 
-        this.status.emit({
-          form: this.frmReason,
-          direction: 'next',
-          step: 'step_3',
-          previousStep: 'step_2'
-        });
+          this._messageService.sendMessage({
+            data: this._form99Details,
+            previousStep: 'step_3'
+          });
+        } else {
+          this.frmReason.controls['reasonText'].setValue('');
 
-        this._messageService.sendMessage({
-          data: this._form99Details,
-          previousStep: 'step_3'
-        });
+          this.reasonFailed = true;
+
+          window.scrollTo(0, 0);
+        }
       } else {
         this.frmReason.controls['reasonText'].setValue('');
 
         this.reasonFailed = true;
 
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0);        
       }
     } else {
       this.reasonFailed = true;
@@ -390,11 +396,11 @@ export class ReasonComponent implements OnInit {
    * @return     {boolean}  Indicates if there is invalid markup or not.
    */
   private _checkUnsupportedHTML(text: string): boolean {
-    const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>)/gm;
+    const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
 
     if (hasHTMLTags.test(text)) {
-      const htmlTagsWhiteList: any = /(<(\/?|\!?)(script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)>)/gmi;
-      
+      const htmlTagsWhiteList: any = /(<(\/?|\!?)(script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"|fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)(\s*\/*)>)/gm;
+
       if (htmlTagsWhiteList.test(text)) {
         return true;
       } else {
