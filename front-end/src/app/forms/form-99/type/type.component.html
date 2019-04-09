@@ -21,16 +21,16 @@
       </header>
       <section style="margin-bottom: 1em;">
         <div class="content">
-          <div class="grid-row">
+          
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
                 *ngIf="(frmType.invalid && (frmType.dirty || frmType.touched)) || (typeFailed)">
                 Select a reason type.
               </div>
             </div>
-          </div>
+          
           <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
+            <div class="grid-row__col grid-row__col--12" style="padding-left: 10px;">
               <ul class="type-list">
                 <li class="type-item"
                   [ngClass]="{'selected': typeSelected === 'mst'}"
