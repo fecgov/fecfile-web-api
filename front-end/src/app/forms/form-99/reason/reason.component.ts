@@ -269,33 +269,44 @@ export class ReasonComponent implements OnInit {
 
       this.reasonTextArea = e.target.innerText; 
 
-      console.log('this._checkUnsupportedHTML(this.reasonTextArea): ', this._checkUnsupportedHTML(this.reasonTextArea));
+      console.log('this.reasonTextArea: ', this.reasonTextArea);
 
-      if (!this._validateForSpaces(this.reasonText)) {
-        this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+      if (this._checkUnsupportedHTML(this.reasonTextArea)) {
+        console.log('textarea has unsupported HTML: ');
+        this.reasonHasInvalidHTML = true;
 
-        this.showValidateBar = false;
-        this.reasonFailed = false;
-
-        this.hideText = true;
-        this.formSaved = false;
-
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': {},
-              'showValidateBar': false
-            }
-          });         
-      } else {
         this.frmReason.controls['reasonText'].setValue('');
+      } else {
+        this.reasonHasInvalidHTML = false;
 
-        this.reasonFailed = true;
+        if (!this._validateForSpaces(this.reasonText)) {
+          this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+
+          this.showValidateBar = false;
+          this.reasonFailed = false;
+
+          this.hideText = true;
+          this.formSaved = false;
+
+          this._messageService
+            .sendMessage({
+              'validateMessage': {
+                'validate': {},
+                'showValidateBar': false
+              }
+            });         
+        } else {
+          this.frmReason.controls['reasonText'].setValue('');
+
+          this.reasonFailed = true;
+        }
       }
     } else {
       this.reasonTextArea = e.target.textContent;
 
       this.frmReason.controls['reasonText'].setValue('');
+
+      this.reasonHasInvalidHTML = false;
 
       this.reasonFailed = true;
 
@@ -362,7 +373,7 @@ export class ReasonComponent implements OnInit {
   /**
    * Validates text area for just spaces or new line characters entered.
    *
-   * @param      {string}   text    The text.
+   * @param      {string}   text    <ifrThe text.
    * @return     {boolean}  The result.
    */
   private _validateForSpaces(text: string): boolean {
@@ -375,20 +386,28 @@ export class ReasonComponent implements OnInit {
     return false;
   }
 
+  /**
+   * Checks for unsupported markup in reason text.
+   *
+   * @param      {string}   text    The text.
+   * @return     {boolean}  Indicates if there is invalid markup or not.
+   */
   private _checkUnsupportedHTML(text: string): boolean {
-    const htmlTags: any = /(<(\/?|\!?)\w+>?)/g;
-    console.log('htmlTags.test(text): ', htmlTags.test(text));
+    const htmlTags: any = /(<(\/?|\!?)\w+>)/gm;
+
+    // console.log('has html tags: ', htmlTags.test(text));
+    // console.log('text before: ', text);
+
     if (htmlTags.test(text)) {
-      const htmlTagsWhitelist: any = /(<(\/?|\!?)(div|span|br|blockquote|b|u|i|ol|ul|li)+>?)/g;
-      console.log('!htmlTagsWhitelist.test(text): ', !htmlTagsWhitelist.test(text));
+      const htmlTagsWhitelist: any = new RegExp(/(<(\/?|\!?)(script|iframe|style|table|thead|tbody|th|tr|td|img|fieldset|form|input|textarea|select|option|a href="(.*?)"|a|progress|noscript|audio|video)>)/, 'gm');
 
-      if (!htmlTagsWhitelist.test(text)) {
-        this.reasonHasInvalidHTML = true;
+      console.log('text: ', text);
+      console.log('htmlTagsWhitelist: ', htmlTagsWhitelist);
+      console.log('htmlTagsWhitelist.test(text): ', htmlTagsWhitelist.test(text));
 
+      if (htmlTagsWhitelist.test(text)) {
         return true;
       } else {
-        this.reasonHasInvalidHTML = false;
-
         return false;
       }
     }
