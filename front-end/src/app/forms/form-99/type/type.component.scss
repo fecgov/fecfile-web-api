@@ -17,6 +17,7 @@
       margin-left: auto;
       margin-right: auto;
       z-index: 0;
+      margin-top: .75em;
       .type-item {
         background-color: $white;
         color: $black;
@@ -26,6 +27,12 @@
         position: relative;
         float: left;
         width: 94%;
+        border-bottom: 1px solid $iron;
+        border-top: 1px solid $iron;
+        padding-left: .75em;
+        &:nth-child(even) {
+          background-color: $seaShell !important;
+        }
         @include media(tablet) {
           font-size: 1em;
           width: 97%;
