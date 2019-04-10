@@ -30,7 +30,6 @@ export class ReasonComponent implements OnInit {
   public typeSelected: string = null;
   public lengthError: boolean = false;
   public isValidReason: boolean = false;
-  public reasonText: string = '';
   public isFiled: boolean = false;
   public characterCount: number = 0;
   public formSaved: boolean = false;
@@ -45,8 +44,6 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
-  public reasonTextArea: string = ''; // text area html
-  public reasonTextContent: string = ''; // text area text only 
 
   private _printPriviewPdfFileLink: string ='';
 
@@ -54,6 +51,9 @@ export class ReasonComponent implements OnInit {
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
+  private _reasonInnerText: string = '';
+  private _reasonInnerHTML: string = '';
+  private _reasonTextContent: string = '';
 
   constructor(
     private _fb: FormBuilder,
@@ -187,9 +187,12 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {  
-    if (this.reasonTextArea.length >= 1) {
-      if (!this._checkUnsupportedHTML(this.reasonTextArea)) {
-        if (!this._validateForSpaces(this.reasonTextArea)) {
+    console.log('doValidateReason: ');
+    // this._reason
+    // this._reasonInnerText
+    if (this._reasonTextContent.length >= 1) {
+      if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
+        if (!this._validateForSpaces(this._reasonInnerText)) {
           let formSaved: any = {
             'form_saved': this.formSaved
           };
@@ -197,7 +200,9 @@ export class ReasonComponent implements OnInit {
           this.isValidReason = true;
 
           this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
-          this._form99Details.text = this.reasonTextArea;
+          this._form99Details.text = this._reasonInnerHTML;
+
+          console.log('this._form99Details.text: ', this._form99Details.text);
 
           window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
@@ -267,21 +272,23 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    this.reasonText = e.target.textContent;
+    console.log('editorChange: ');
+    this._reasonTextContent = e.target.textContent;
 
-    if (this.reasonText.length >= 1) {
+    if (this._reasonTextContent.length >= 1) {
+      this._reasonInnerText = e.target.innerText;
 
-      this.reasonTextArea = e.target.innerText; 
-
-      if (this._checkUnsupportedHTML(this.reasonTextArea)) {
+      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
         this.reasonHasInvalidHTML = true;
 
         this.frmReason.controls['reasonText'].setValue('');
       } else {
         this.reasonHasInvalidHTML = false;
 
-        if (!this._validateForSpaces(this.reasonText)) {
-          this.frmReason.controls['reasonText'].setValue(this.reasonTextArea);
+        if (!this._validateForSpaces(this._reasonInnerText)) {
+          this._reasonInnerHTML = e.target.innerHTML;
+
+          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
 
           this.showValidateBar = false;
           this.reasonFailed = false;
@@ -303,7 +310,7 @@ export class ReasonComponent implements OnInit {
         }
       }
     } else {
-      this.reasonTextArea = e.target.textContent;
+      // this.reasonTextArea = e.target.textContent;
 
       this.frmReason.controls['reasonText'].setValue('');
 
@@ -394,6 +401,8 @@ export class ReasonComponent implements OnInit {
    * @return     {boolean}  Indicates if there is invalid markup or not.
    */
   private _checkUnsupportedHTML(text: string): boolean {
+    console.log('_checkUnsupportedHTML: ');
+    console.log('text: ', text);
     const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
 
     if (hasHTMLTags.test(text)) {
@@ -461,7 +470,7 @@ export class ReasonComponent implements OnInit {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this._form99Details.text = this.reasonTextArea;
+        this._form99Details.text = this._reasonInnerHTML;
 
         this._form99Details.file='';
 
@@ -526,44 +535,51 @@ export class ReasonComponent implements OnInit {
     }
   }
   }
+
+  /**
+   * 
+   * Why is this here?  That's what the doValidate method is for. 
+   * Please learn the code thats in place and don't just add new functions
+   * because you don't fully understand what's going on with the code.
+   */
   /**
    * Validates the entire form.
    */
-  public validateForm(): void {
-    let type: string = localStorage.getItem('form99-type');
+  // public validateForm(): void {
+  //   let type: string = localStorage.getItem('form99-type');
 
-    this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+  //   this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-    this.reasonText = this.frmReason.get('reasonText').value;
-    this._form99Details.text = this.frmReason.get('reasonText').value;
+  //   this.reasonText = this.frmReason.get('reasonText').value;
+  //   this._form99Details.text = this.frmReason.get('reasonText').value;
 
-    localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+  //   localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
-    this.showValidateBar = true;
+  //   this.showValidateBar = true;
 
-    this._formsService
-      .validateForm({}, this._formType)
-      .subscribe(res => {
-        if(res) {
-            this._messageService
-              .sendMessage({
-                'validateMessage': {
-                  'validate': environment.validateSuccess,
-                  'showValidateBar': true
-                }
-              });
-        }
-      },
-      (error) => {
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': error.error,
-              'showValidateBar': true
-            }
-          });
-      });
-  }
+  //   this._formsService
+  //     .validateForm({}, this._formType)
+  //     .subscribe(res => {
+  //       if(res) {
+  //           this._messageService
+  //             .sendMessage({
+  //               'validateMessage': {
+  //                 'validate': environment.validateSuccess,
+  //                 'showValidateBar': true
+  //               }
+  //             });
+  //       }
+  //     },
+  //     (error) => {
+  //       this._messageService
+  //         .sendMessage({
+  //           'validateMessage': {
+  //             'validate': error.error,
+  //             'showValidateBar': true
+  //           }
+  //         });
+  //     });
+  // }
 
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
@@ -574,8 +590,8 @@ export class ReasonComponent implements OnInit {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.reasonText;
+        // this.reasonText = this.frmReason.get('reasonText').value;
+        this._form99Details.text = this._reasonInnerHTML;
 
         this._form99Details.file='';
 
