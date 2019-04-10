@@ -188,7 +188,7 @@ export class ReasonComponent implements OnInit {
    */
   public doValidateReason() {  
     if (this.reasonTextArea.length >= 1) {
-      if (this._checkUnsupportedHTML(this.reasonTextArea)) {
+      if (!this._checkUnsupportedHTML(this.reasonTextArea)) {
         if (!this._validateForSpaces(this.reasonTextArea)) {
           let formSaved: any = {
             'form_saved': this.formSaved
@@ -199,11 +199,9 @@ export class ReasonComponent implements OnInit {
           this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
           this._form99Details.text = this.reasonTextArea;
 
-          setTimeout(() => {
-            localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+          window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
-            localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
-          }, 100);
+          window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
 
           this.saveForm();
 
@@ -239,14 +237,14 @@ export class ReasonComponent implements OnInit {
           this.reasonFailed = true;
 
           window.scrollTo(0, 0);
-        }
+        } // !this._validateForSpaces
       } else {
+        this.reasonHasInvalidHTML = true;
+
         this.frmReason.controls['reasonText'].setValue('');
 
-        this.reasonFailed = true;
-
         window.scrollTo(0, 0);        
-      }
+      } // !this._checkUnsupportedHTML
     } else {
       this.reasonFailed = true;
       this.isValidReason = false;
@@ -260,7 +258,7 @@ export class ReasonComponent implements OnInit {
 
       window.scrollTo(0, 0);
       return;
-    }
+    } // this.reasonTextArea.length
   }
 
   /**

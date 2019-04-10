@@ -127,10 +127,7 @@ export class TypeComponent implements OnInit {
 
         this._form99Details.reason = this.frmType.get('reasonTypeRadio').value;
 
-        setTimeout(() => {
-          localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
-        }, 100);
-
+        window.localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
         this.status.emit({
           form: this.frmType,
