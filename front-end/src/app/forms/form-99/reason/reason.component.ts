@@ -51,9 +51,9 @@ export class ReasonComponent implements OnInit {
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
-  private _reasonInnerText: string = '';
-  private _reasonInnerHTML: string = '';
-  private _reasonTextContent: string = '';
+  private _reasonInnerText: string = ''; // 
+  private _reasonInnerHTML: string = ''; // Shows the value and applys the HTML
+  private _reasonTextContent: string = ''; // The plain text, no HTML from editor
 
   constructor(
     private _fb: FormBuilder,
@@ -330,7 +330,7 @@ export class ReasonComponent implements OnInit {
       try {
         const htmlTagType: string = e.currentTarget.getAttribute('data-command');
 
-        window.document.execCommand(htmlTagType, true);    
+        window.document.execCommand(htmlTagType, false, '');    
       } catch(error) {
         console.log('There was an error.');
         console.log('error: ', error);
@@ -393,8 +393,6 @@ export class ReasonComponent implements OnInit {
    * @return     {boolean}  Indicates if there is invalid markup or not.
    */
   private _checkUnsupportedHTML(text: string): boolean {
-    console.log('_checkUnsupportedHTML: ');
-    console.log('text: ', text);
     const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
 
     if (hasHTMLTags.test(text)) {
