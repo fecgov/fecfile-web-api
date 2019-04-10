@@ -187,9 +187,6 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {  
-    console.log('doValidateReason: ');
-    // this._reason
-    // this._reasonInnerText
     if (this._reasonTextContent.length >= 1) {
       if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
         if (!this._validateForSpaces(this._reasonInnerText)) {
@@ -201,8 +198,6 @@ export class ReasonComponent implements OnInit {
 
           this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
           this._form99Details.text = this._reasonInnerHTML;
-
-          console.log('this._form99Details.text: ', this._form99Details.text);
 
           window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
@@ -272,7 +267,6 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    console.log('editorChange: ');
     this._reasonTextContent = e.target.textContent;
 
     if (this._reasonTextContent.length >= 1) {
@@ -310,8 +304,6 @@ export class ReasonComponent implements OnInit {
         }
       }
     } else {
-      // this.reasonTextArea = e.target.textContent;
-
       this.frmReason.controls['reasonText'].setValue('');
 
       this.reasonHasInvalidHTML = false;
