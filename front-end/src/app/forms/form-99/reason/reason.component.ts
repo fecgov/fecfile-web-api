@@ -182,6 +182,10 @@ export class ReasonComponent implements OnInit {
           this.frmReason.controls['reasonText'].markAsPristine();
           this.frmReason.controls['reasonText'].markAsUntouched();
 
+          this._reasonInnerHTML = '';
+          this._reasonInnerText = '';
+          this._reasonTextContent = '';
+
           this.reasonFailed = true;
         }
       }
@@ -383,8 +387,6 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {  
-    console.log('doValidateReason: ');
-    console.log('this.frmReason: ', this.frmReason);
     if (this.frmReason.valid) {
       if (this._reasonTextContent.length >= 1) {
         if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
@@ -537,50 +539,44 @@ export class ReasonComponent implements OnInit {
   }
   }
 
-  /**
-   * 
-   * Why is this here?  That's what the doValidate method is for. 
-   * Please learn the code thats in place and don't just add new functions
-   * because you don't fully understand what's going on with the code.
-   */
+
   /**
    * Validates the entire form.
    */
-  // public validateForm(): void {
-  //   let type: string = localStorage.getItem('form99-type');
+  public validateForm(): void {
+    let type: string = localStorage.getItem('form99-type');
 
-  //   this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+    this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-  //   this.reasonText = this.frmReason.get('reasonText').value;
-  //   this._form99Details.text = this.frmReason.get('reasonText').value;
+    this._form99Details.text = this.frmReason.controls['reasonText'].value;
 
-  //   localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+    window.localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
-  //   this.showValidateBar = true;
+    this.showValidateBar = true;
 
-  //   this._formsService
-  //     .validateForm({}, this._formType)
-  //     .subscribe(res => {
-  //       if(res) {
-  //           this._messageService
-  //             .sendMessage({
-  //               'validateMessage': {
-  //                 'validate': environment.validateSuccess,
-  //                 'showValidateBar': true
-  //               }
-  //             });
-  //       }
-  //     },
-  //     (error) => {
-  //       this._messageService
-  //         .sendMessage({
-  //           'validateMessage': {
-  //             'validate': error.error,
-  //             'showValidateBar': true
-  //           }
-  //         });
-  //     });
-  // }
+    this._formsService
+      .validateForm({}, this._formType)
+      .subscribe(res => {
+        if(res) {
+            this._messageService
+              .sendMessage({
+                'validateMessage': {
+                  'validate': environment.validateSuccess,
+                  'showValidateBar': true
+                }
+              });
+        }
+      },
+      (error) => {
+        this._messageService
+          .sendMessage({
+            'validateMessage': {
+              'validate': error.error,
+              'showValidateBar': true
+            }
+          });
+      });
+  }
 
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
@@ -591,7 +587,6 @@ export class ReasonComponent implements OnInit {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        // this.reasonText = this.frmReason.get('reasonText').value;
         this._form99Details.text = this._reasonInnerHTML;
 
         this._form99Details.file='';
