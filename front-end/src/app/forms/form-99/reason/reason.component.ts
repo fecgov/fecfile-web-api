@@ -189,7 +189,7 @@ export class ReasonComponent implements OnInit {
       this.frmReason.controls['reasonText'].setValue('');
       this.frmReason.controls['reasonText'].markAsPristine();
       this.frmReason.controls['reasonText'].markAsUntouched();
-      
+
       this.reasonHasInvalidHTML = false;
 
       this.reasonFailed = true;
