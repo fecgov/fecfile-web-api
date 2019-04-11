@@ -3,13 +3,13 @@ import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Vali
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { QuillEditorComponent } from 'ngx-quill';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
-import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 
 @Component({
   selector: 'f99-reason',
@@ -51,7 +51,7 @@ export class ReasonComponent implements OnInit {
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
-  private _reasonInnerText: string = ''; // 
+  private _reasonInnerText: string = ''; // The text, plus any HTML tags
   private _reasonInnerHTML: string = ''; // Shows the value and applys the HTML
   private _reasonTextContent: string = ''; // The plain text, no HTML from editor
 
@@ -83,7 +83,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            Validators.maxLength(this.editorMax)
+            htmlLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -91,7 +91,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            Validators.maxLength(this.editorMax)
+            htmlLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -100,8 +100,7 @@ export class ReasonComponent implements OnInit {
       this.frmReason = this._fb.group({
         reasonText: ['', [
           Validators.required,
-          Validators.maxLength(this.editorMax),
-          Validators.pattern(/^$|\s+/)
+          htmlLength(this.editorMax)
         ]],
         file: ['']
       });
@@ -137,130 +136,6 @@ export class ReasonComponent implements OnInit {
     return false;
   }
 
-
-  public setFile(e): void {
-    if(e.target.files.length === 1) {
-       this.file = e.target.files[0];
-       if (this.file.name.includes('.pdf')) {
-         let fileNameObj: any = {
-           'fileName': this.file.name
-         };
-
-         if (this.file.size > 33554432) {
-          this.notCorrectPdfSize=true;
-         } else {
-          this.notCorrectPdfSize=false;
-         }
-
-         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
-         this.notValidPdf=false;
-         this.validFile=true;
-         this.showFileDeleteButton=true;
-         this._form99Details.filename = this.file.name;
-         this.PdfUploaded=true;
-         this.PdfDeleted=false;
-      } else {
-        this.notValidPdf=true;
-        this.validFile=false;
-        this.file=null;
-        this.notCorrectPdfSize=false;
-        this.PdfUploaded=false;
-      }
-    } else {
-      let fileNameObj: any = {
-       'fileName': ''
-      };
-      localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
-      this.notValidPdf=true;
-      this.validFile=false;
-      this.file=null;
-      this.showFileDeleteButton=false;
-      this.fileInput.nativeElement.value = '';
-      this._form99Details.filename = '';
-      this.PdfUploaded = false;
-      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
-    }
-  }
-
-  /**
-   * Validates the reason form.
-   *
-   */
-  public doValidateReason() {  
-    if (this._reasonTextContent.length >= 1) {
-      if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
-        if (!this._validateForSpaces(this._reasonInnerText)) {
-          let formSaved: any = {
-            'form_saved': this.formSaved
-          };
-          this.reasonFailed = false;
-          this.isValidReason = true;
-
-          this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
-          this._form99Details.text = this._reasonInnerHTML;
-
-          window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
-
-          window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
-
-          this.saveForm();
-
-          this.hideText = true;
-
-          this.showValidateBar = false;
-
-          this.hideText = true;
-          this.formSaved = false;
-
-          this._messageService
-            .sendMessage({
-              'validateMessage': {
-                'validate': '',
-                'showValidateBar': false
-              }
-            });
-
-          this.status.emit({
-            form: this.frmReason,
-            direction: 'next',
-            step: 'step_3',
-            previousStep: 'step_2'
-          });
-
-          this._messageService.sendMessage({
-            data: this._form99Details,
-            previousStep: 'step_3'
-          });
-        } else {
-          this.frmReason.controls['reasonText'].setValue('');
-
-          this.reasonFailed = true;
-
-          window.scrollTo(0, 0);
-        } // !this._validateForSpaces
-      } else {
-        this.reasonHasInvalidHTML = true;
-
-        this.frmReason.controls['reasonText'].setValue('');
-
-        window.scrollTo(0, 0);        
-      } // !this._checkUnsupportedHTML
-    } else {
-      this.reasonFailed = true;
-      this.isValidReason = false;
-
-      this.status.emit({
-        form: this.frmReason,
-        direction: 'next',
-        step: 'step_2',
-        previousStep: ''
-      });
-
-      window.scrollTo(0, 0);
-      return;
-    } // this.reasonTextArea.length
-  }
-
   /**
    * Executed when a user types in text into the editor area.
    *
@@ -276,6 +151,8 @@ export class ReasonComponent implements OnInit {
         this.reasonHasInvalidHTML = true;
 
         this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsTouched();
+        this.frmReason.controls['reasonText'].markAsDirty();
       } else {
         this.reasonHasInvalidHTML = false;
 
@@ -283,6 +160,9 @@ export class ReasonComponent implements OnInit {
           this._reasonInnerHTML = e.target.innerHTML;
 
           this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+          this.frmReason.controls['reasonText'].markAsTouched();
+          this.frmReason.controls['reasonText'].markAsDirty();
 
           this.showValidateBar = false;
           this.reasonFailed = false;
@@ -299,13 +179,17 @@ export class ReasonComponent implements OnInit {
             });         
         } else {
           this.frmReason.controls['reasonText'].setValue('');
+          this.frmReason.controls['reasonText'].markAsPristine();
+          this.frmReason.controls['reasonText'].markAsUntouched();
 
           this.reasonFailed = true;
         }
       }
     } else {
       this.frmReason.controls['reasonText'].setValue('');
-
+      this.frmReason.controls['reasonText'].markAsPristine();
+      this.frmReason.controls['reasonText'].markAsUntouched();
+      
       this.reasonHasInvalidHTML = false;
 
       this.reasonFailed = true;
@@ -364,7 +248,7 @@ export class ReasonComponent implements OnInit {
    * @return     {number}  Number of characters.
    */
   private _countCharacters(text: string): number {
-    const regex: any = /(<([^>]+)>)/ig;
+    const regex: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
     let characterCount: number = text.replace(regex, '').length || 0;
 
     return characterCount;
@@ -449,6 +333,133 @@ export class ReasonComponent implements OnInit {
       step: 'step_1'
     });
   }
+
+   public setFile(e): void {
+    if(e.target.files.length === 1) {
+       this.file = e.target.files[0];
+       if (this.file.name.includes('.pdf')) {
+         let fileNameObj: any = {
+           'fileName': this.file.name
+         };
+
+         if (this.file.size > 33554432) {
+          this.notCorrectPdfSize=true;
+         } else {
+          this.notCorrectPdfSize=false;
+         }
+
+         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+         this.notValidPdf=false;
+         this.validFile=true;
+         this.showFileDeleteButton=true;
+         this._form99Details.filename = this.file.name;
+         this.PdfUploaded=true;
+         this.PdfDeleted=false;
+      } else {
+        this.notValidPdf=true;
+        this.validFile=false;
+        this.file=null;
+        this.notCorrectPdfSize=false;
+        this.PdfUploaded=false;
+      }
+    } else {
+      let fileNameObj: any = {
+       'fileName': ''
+      };
+      localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+      this.notValidPdf=true;
+      this.validFile=false;
+      this.file=null;
+      this.showFileDeleteButton=false;
+      this.fileInput.nativeElement.value = '';
+      this._form99Details.filename = '';
+      this.PdfUploaded = false;
+      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+    }
+  }
+
+  /**
+   * Validates the reason form.
+   *
+   */
+  public doValidateReason() {  
+    console.log('doValidateReason: ');
+    console.log('this.frmReason: ', this.frmReason);
+    if (this.frmReason.valid) {
+      if (this._reasonTextContent.length >= 1) {
+        if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
+          if (!this._validateForSpaces(this._reasonInnerText)) {
+            let formSaved: any = {
+              'form_saved': this.formSaved
+            };
+            this.reasonFailed = false;
+            this.isValidReason = true;
+
+            this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
+            this._form99Details.text = this._reasonInnerHTML;
+
+            window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+
+            window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
+
+            this.saveForm();
+
+            this.hideText = true;
+
+            this.showValidateBar = false;
+
+            this.hideText = true;
+            this.formSaved = false;
+
+            this._messageService
+              .sendMessage({
+                'validateMessage': {
+                  'validate': '',
+                  'showValidateBar': false
+                }
+              });
+
+            this.status.emit({
+              form: this.frmReason,
+              direction: 'next',
+              step: 'step_3',
+              previousStep: 'step_2'
+            });
+
+            this._messageService.sendMessage({
+              data: this._form99Details,
+              previousStep: 'step_3'
+            });
+          } else {
+            this.frmReason.controls['reasonText'].setValue('');
+
+            this.reasonFailed = true;
+
+            window.scrollTo(0, 0);
+          } // !this._validateForSpaces
+        } else {
+          this.reasonHasInvalidHTML = true;
+
+          this.frmReason.controls['reasonText'].setValue('');
+
+          window.scrollTo(0, 0);        
+        } // !this._checkUnsupportedHTML
+      } else {
+        this.reasonFailed = true;
+        this.isValidReason = false;
+
+        this.status.emit({
+          form: this.frmReason,
+          direction: 'next',
+          step: 'step_2',
+          previousStep: ''
+        });
+
+        window.scrollTo(0, 0);
+        return;
+      } // this.reasonTextArea.length
+    }
+  } 
 
   /**
    * Saves the form when the save button is clicked.

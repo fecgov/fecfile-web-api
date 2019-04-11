@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="grid-row" 
-            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonFailed)">
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) && (reasonFailed)">
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center">
                 Enter text for the reason selected.
@@ -52,7 +52,7 @@
             </div>
           </div>
           <div class="grid-row" 
-            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) || (reasonHasInvalidHTML)">
+            *ngIf="(frmReason.invalid && (frmReason.dirty || frmReason.touched)) && (reasonHasInvalidHTML)">
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center">
                 Invalid markup has been entered for reason.
@@ -285,12 +285,6 @@
                   (paste)="removeHTML($event)"
                 >
                 </div>
-                <!-- <textarea
-                  placeholder="Enter text here..."
-                  (keyup)="updateValidation()"
-                  [maxLength]="editorMax"
-                  formControlName="reasonText"
-                ></textarea> -->
               </div>
             </div>
           </div>
