@@ -1,6 +1,7 @@
 import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ReportdetailsComponent } from '../reportdetails/reportdetails.component';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
+import { ActivatedRoute } from '@angular/router';
 
 export enum ActiveView {
   transactions = "transactions",
@@ -20,8 +21,10 @@ export class ReportheaderComponent implements OnInit {
 public currentYear:number =0;
 public reportsView = ActiveView.transactions;
 public showSideBar: boolean = false;
+public existingReportId: string = "";
   constructor(
-    private _formService: FormsService
+    private _formService: FormsService,
+    private _activeRoute: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -32,6 +35,16 @@ public showSideBar: boolean = false;
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");
     }
+
+    this._activeRoute
+        .params
+        .subscribe( params => {
+          this.existingReportId = params.reportId;
+          console.log("parameters found...")
+       });
+       this.existingReportId = localStorage.getItem('Existing_Report_id');
+       localStorage.removeItem('Existing_Report_id');
+    console.log(" ReportheaderComponent this.existingReportId =", this.existingReportId);    
   }
 
   private showFilter() : void {

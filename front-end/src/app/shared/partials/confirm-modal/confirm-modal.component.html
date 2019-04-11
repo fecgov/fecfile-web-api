@@ -22,5 +22,10 @@
         (click)="activeModal.close('cancel')"
         class="btn btn-secondary-gray"
       >Cancel</button>   
+      <button *ngIf="isShowReportExist"
+      type="button" 
+      (click)="activeModal.close('ReportExist')"
+      class="btn btn-secondary"
+    >Show Report</button>     
     </div>
   </div>

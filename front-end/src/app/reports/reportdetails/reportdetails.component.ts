@@ -59,6 +59,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public tableType: string;  
   @Input()
   public view: string; 
+  @Input()
+  public existingReportId: number;
 
   public reportsModel: Array<reportModel>;
   public filterReportsModel: Array<reportModel>;
@@ -140,7 +142,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
 		const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
-      itemsPerPage: 5,
+      itemsPerPage: 30,
       currentPage: 1
     };
     this.config = paginateConfig;
@@ -210,10 +212,11 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("this.currentSortedColumnName", this.currentSortedColumnName);
     console.log("sortedCol", sortedCol);
     console.log("SortableColumnModel", SortableColumnModel);
-    console.log ("view",this.view);
-    
+    console.log("view",this.view);
+    console.log("existingReportId",this.existingReportId);
+  
     this._formsService.getReports(this.formType, this.view, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending)
+      this.currentSortedColumnName, sortedCol.descending,this.existingReportId)
       .subscribe((res: GetReportsResponse) => {
         console.log("getReportsPage res", res);
         
@@ -494,7 +497,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /*public restoreTransaction(report: reportsModel) : void {
 
     this._dialogService
-      .confirm('You are about to restore report ' + report.report_id, ConfirmModalComponent)
+      .confirm('You are about to restore report ' + report.report_id, ConfirmModalComponent,'Report already exist')
       .then(res => {
         if(res === 'okay') {
           this._formsService.restoreTransaction(report)

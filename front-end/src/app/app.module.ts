@@ -12,7 +12,7 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ArchwizardModule } from 'angular-archwizard';
 import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModule, NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
 
@@ -73,6 +73,7 @@ import { TransactionsFilterComponent } from './forms/transactions/filter/transac
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
 import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
+import { TrashConfirmComponent } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -98,6 +99,7 @@ import { TransactionCategoriesComponent } from './forms/transactions/categories/
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
     TransactionCategoriesComponent,
+    TrashConfirmComponent,
     F99Component,
     TypeComponent,
     ReasonComponent,
@@ -131,7 +133,8 @@ import { TransactionCategoriesComponent } from './forms/transactions/categories/
     ReportdetailsComponent
   ],
   entryComponents: [
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    TrashConfirmComponent,
   ],
   imports: [
     BrowserModule,
@@ -159,6 +162,7 @@ import { TransactionCategoriesComponent } from './forms/transactions/categories/
     DialogService,
     CanDeactivateGuardService,
     AppConfigService,
+    NgbActiveModal,
     {
       provide: APP_INITIALIZER,
       useFactory: appInitializerFn,
