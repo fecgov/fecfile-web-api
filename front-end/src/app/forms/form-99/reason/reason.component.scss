@@ -128,6 +128,7 @@
       }
       .html-editor {
         position: relative;
+        width: 100%;
         .toolbar {
         }
         .editor {
@@ -139,7 +140,7 @@
           overflow: scroll; 
           padding: 1rem;
           position: relative;
-          width: 78vw;
+          width: 95%;
           height: 50vh;
           &:empty:before {
             content: attr(placeholder);
