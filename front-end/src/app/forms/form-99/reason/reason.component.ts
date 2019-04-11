@@ -280,7 +280,7 @@ export class ReasonComponent implements OnInit {
     const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
 
     if (hasHTMLTags.test(text)) {
-      const htmlTagsWhiteList: any = /(<(\/?|\!?)(script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"|fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)(\s*\/*)>)/gm;
+      const htmlTagsWhiteList: any = /(<(\/?|\!?)(html|head|body|script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"|fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)(\s*\/*)>)/gm;
 
       if (htmlTagsWhiteList.test(text)) {
         return true;
