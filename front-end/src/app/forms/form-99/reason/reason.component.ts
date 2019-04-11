@@ -1,16 +1,15 @@
-import { Component, EventEmitter, ElementRef, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output, Renderer2, ViewEncapsulation, ViewChild } from '@angular/core';
+import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { QuillEditorComponent } from 'ngx-quill';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
-import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 
 @Component({
   selector: 'f99-reason',
@@ -27,10 +26,10 @@ export class ReasonComponent implements OnInit {
   public frmReason: FormGroup;
   public reasonType: string = null;
   public reasonFailed: boolean = false;
+  public reasonHasInvalidHTML: boolean = false;
   public typeSelected: string = null;
   public lengthError: boolean = false;
   public isValidReason: boolean = false;
-  public reasonText: string = '';
   public isFiled: boolean = false;
   public characterCount: number = 0;
   public formSaved: boolean = false;
@@ -52,12 +51,16 @@ export class ReasonComponent implements OnInit {
   private _formType: string = '';
   private _formSaved: boolean = false;
   private _formSubmitted: boolean = false;
+  private _reasonInnerText: string = ''; // The text, plus any HTML tags
+  private _reasonInnerHTML: string = ''; // Shows the value and applys the HTML
+  private _reasonTextContent: string = ''; // The plain text, no HTML from editor
 
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formsService: FormsService,
+    private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
     private _modalService: NgbModal
@@ -80,7 +83,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [
             Validators.required,
-            Validators.maxLength(this.editorMax)
+            htmlLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -88,7 +91,7 @@ export class ReasonComponent implements OnInit {
         this.frmReason = this._fb.group({
           reasonText: ['', [
             Validators.required,
-            Validators.maxLength(this.editorMax)
+            htmlLength(this.editorMax)
           ]],
           file: ['']
         });
@@ -97,8 +100,7 @@ export class ReasonComponent implements OnInit {
       this.frmReason = this._fb.group({
         reasonText: ['', [
           Validators.required,
-          Validators.maxLength(this.editorMax),
-          Validators.pattern(/^$|\s+/)
+          htmlLength(this.editorMax)
         ]],
         file: ['']
       });
@@ -119,11 +121,11 @@ export class ReasonComponent implements OnInit {
     if (this.frmReason.get('reasonText').value.length >= 1) {
       let text: string = this.frmReason.get('reasonText').value;
 
-      this.characterCount = text.length;
+      this.characterCount = this._countCharacters(text);
     } else if(this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
 
-      this.characterCount = text.length;
+      this.characterCount = this._countCharacters(text);
     }
   }
 
@@ -134,8 +136,209 @@ export class ReasonComponent implements OnInit {
     return false;
   }
 
+  /**
+   * Executed when a user types in text into the editor area.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public editorChange(e): void {
+    this._reasonTextContent = e.target.textContent;
 
-  public setFile(e): void {
+    if (this._reasonTextContent.length >= 1) {
+      this._reasonInnerText = e.target.innerText;
+
+      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
+        this.reasonHasInvalidHTML = true;
+
+        this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsTouched();
+        this.frmReason.controls['reasonText'].markAsDirty();
+      } else {
+        this.reasonHasInvalidHTML = false;
+
+        if (!this._validateForSpaces(this._reasonInnerText)) {
+          this._reasonInnerHTML = e.target.innerHTML;
+
+          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+          this.frmReason.controls['reasonText'].markAsTouched();
+          this.frmReason.controls['reasonText'].markAsDirty();
+
+          this.showValidateBar = false;
+          this.reasonFailed = false;
+
+          this.hideText = true;
+          this.formSaved = false;
+
+          this._messageService
+            .sendMessage({
+              'validateMessage': {
+                'validate': {},
+                'showValidateBar': false
+              }
+            });         
+        } else {
+          this.frmReason.controls['reasonText'].setValue('');
+          this.frmReason.controls['reasonText'].markAsPristine();
+          this.frmReason.controls['reasonText'].markAsUntouched();
+
+          this._reasonInnerHTML = '';
+          this._reasonInnerText = '';
+          this._reasonTextContent = '';
+
+          this.reasonFailed = true;
+        }
+      }
+    } else {
+      this.frmReason.controls['reasonText'].setValue('');
+      this.frmReason.controls['reasonText'].markAsPristine();
+      this.frmReason.controls['reasonText'].markAsUntouched();
+
+      this.reasonHasInvalidHTML = false;
+
+      this.reasonFailed = true;
+
+      this._messageService
+        .sendMessage({
+          'validateMessage': {
+            'validate': {},
+            'showValidateBar': false
+          }
+        });       
+    }
+  }  
+
+  /**
+   * Inserts HTML for button clicked in the toolbar.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public insertHTML(e: any): void {
+    if (typeof e === 'object') {
+      try {
+        const htmlTagType: string = e.currentTarget.getAttribute('data-command');
+
+        window.document.execCommand(htmlTagType, false, '');    
+      } catch(error) {
+        console.log('There was an error.');
+        console.log('error: ', error);
+      }
+    }
+  } 
+
+  /**
+   * Removes any HTML from pasted content into editor.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public removeHTML(e: any): void {
+    e.preventDefault();
+
+    if (typeof e === 'object') {
+      try {
+        const plainText: string = e.clipboardData.getData('text/plain');
+
+        window.document.execCommand('insertHTML', false, plainText); 
+      } catch (error) {
+        console.log('error: ', error);
+      }
+    }
+  }
+
+  /**
+   * Counts the number of characters in the editor.
+   *
+   * @param      {string}  text    The text
+   * @return     {number}  Number of characters.
+   */
+  private _countCharacters(text: string): number {
+    const regex: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
+    let characterCount: number = text.replace(regex, '').length || 0;
+
+    return characterCount;
+  }
+
+  /**
+   * Validates text area for just spaces or new line characters entered.
+   *
+   * @param      {string}   text    <ifrThe text.
+   * @return     {boolean}  The result.
+   */
+  private _validateForSpaces(text: string): boolean {
+    const regex: any = /^\s*$/;
+
+    if (regex.test(text)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Checks for unsupported markup in reason text.
+   *
+   * @param      {string}   text    The text.
+   * @return     {boolean}  Indicates if there is invalid markup or not.
+   */
+  private _checkUnsupportedHTML(text: string): boolean {
+    const hasHTMLTags: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
+
+    if (hasHTMLTags.test(text)) {
+      const htmlTagsWhiteList: any = /(<(\/?|\!?)(html|head|body|script|script.*?src="(.*?)"|iframe|iframe.*?src="(.*?)"|link|style|table|thead|tbody|th|tr|td|img|img.*?src="(.*?)"|fieldset|form|input|textarea|select|option|a|a.*?href="(.*?)"|progress|noscript|audio|video)(\s*\/*)>)/gm;
+
+      if (htmlTagsWhiteList.test(text)) {
+        return true;
+      } else {
+        return false;
+      } 
+    }
+
+    return false;
+  }
+
+  /**
+   * Toggles a tooltip.
+   *
+   * @param      {<type>}  tooltip  The tooltip
+   */
+  public toggleToolTip(tooltip): void {
+    if (tooltip.isOpen()) {
+      tooltip.close();
+    } else {
+      tooltip.open();
+    }
+  }
+
+
+  public removeFile(modalId: string): void {
+    this._modalService.open(modalId);
+  }
+
+  /**
+   * Goes to the previous step.
+   */
+  public previousStep(): void {
+    this.hideText = true;
+    this.formSaved = false;
+
+    this.showValidateBar = false;
+
+    this._messageService
+      .sendMessage({
+        'validateMessage': {
+          'validate': {},
+          'showValidateBar': false
+        }
+      });
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_1'
+    });
+  }
+
+   public setFile(e): void {
     if(e.target.files.length === 1) {
        this.file = e.target.files[0];
        if (this.file.name.includes('.pdf')) {
@@ -183,119 +386,94 @@ export class ReasonComponent implements OnInit {
    * Validates the reason form.
    *
    */
-  public doValidateReason() {
-    let reasonText: string = this.frmReason.get('reasonText').value.trim();
-    if (reasonText.length >= 1) {
-        let formSaved: any = {
-          'form_saved': this.formSaved
-        };
-        this.reasonFailed = false;
-        this.isValidReason = true;
+  public doValidateReason() {  
+    if (this.frmReason.valid) {
+      if (this._reasonTextContent.length >= 1) {
+        if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
+          if (!this._validateForSpaces(this._reasonInnerText)) {
+            let formSaved: any = {
+              'form_saved': this.formSaved
+            };
+            this.reasonFailed = false;
+            this.isValidReason = true;
 
-        this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+            this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`)); 
+            this._form99Details.text = this._reasonInnerHTML;
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.frmReason.get('reasonText').value;
+            window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
-        setTimeout(() => {
-          localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+            window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
 
-          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
-        }, 100);
+            this.saveForm();
 
-        this.saveForm();
+            this.hideText = true;
 
-        this.hideText = true;
+            this.showValidateBar = false;
 
-        this.showValidateBar = false;
+            this.hideText = true;
+            this.formSaved = false;
 
-        this.hideText = true;
-        this.formSaved = false;
+            this._messageService
+              .sendMessage({
+                'validateMessage': {
+                  'validate': '',
+                  'showValidateBar': false
+                }
+              });
 
-        this._messageService
-          .sendMessage({
-            'validateMessage': {
-              'validate': '',
-              'showValidateBar': false
-            }
-          });
+            this.status.emit({
+              form: this.frmReason,
+              direction: 'next',
+              step: 'step_3',
+              previousStep: 'step_2'
+            });
+
+            this._messageService.sendMessage({
+              data: this._form99Details,
+              previousStep: 'step_3'
+            });
+          } else {
+            this.frmReason.controls['reasonText'].setValue('');
+
+            this.reasonFailed = true;
+
+            window.scrollTo(0, 0);
+          } // !this._validateForSpaces
+        } else {
+          this.reasonHasInvalidHTML = true;
+
+          this.frmReason.controls['reasonText'].setValue('');
+
+          window.scrollTo(0, 0);        
+        } // !this._checkUnsupportedHTML
+      } else {
+        this.reasonFailed = true;
+        this.isValidReason = false;
 
         this.status.emit({
           form: this.frmReason,
           direction: 'next',
-          step: 'step_3',
-          previousStep: 'step_2'
+          step: 'step_2',
+          previousStep: ''
         });
 
-        this._messageService.sendMessage({
-          data: this._form99Details,
-          previousStep: 'step_3'
-        });
-    } else {
-      this.reasonFailed = true;
-      this.isValidReason = false;
-
-      this.status.emit({
-        form: this.frmReason,
-        direction: 'next',
-        step: 'step_2',
-        previousStep: ''
-      });
-      return;
+        window.scrollTo(0, 0);
+        return;
+      } // this.reasonTextArea.length
     }
-  }
-
-  public toggleToolTip(tooltip): void {
-    if (tooltip.isOpen()) {
-      tooltip.close();
-    } else {
-      tooltip.open();
-    }
-  }
-
-
-  public removeFile(modalId: string): void {
-    this._modalService.open(modalId);
-  }
-
-  /**
-   * Goes to the previous step.
-   */
-  public previousStep(): void {
-    this.hideText = true;
-    this.formSaved = false;
-
-    this.showValidateBar = false;
-
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false
-        }
-      });
-
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_1'
-    });
-  }
+  } 
 
   /**
    * Saves the form when the save button is clicked.
    *
    */
   public saveForm () {
-    console.log("this.frmReason.get('reasonText'): ", this.frmReason.get('reasonText'));
     if(this.frmReason.valid) {
       if (this.frmReason.get('reasonText').value.length >= 1) {
-        console.log('inside here: ');
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.reasonText;
+        this._form99Details.text = this._reasonInnerHTML;
 
         this._form99Details.file='';
 
@@ -360,6 +538,8 @@ export class ReasonComponent implements OnInit {
     }
   }
   }
+
+
   /**
    * Validates the entire form.
    */
@@ -368,10 +548,9 @@ export class ReasonComponent implements OnInit {
 
     this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-    this.reasonText = this.frmReason.get('reasonText').value;
-    this._form99Details.text = this.frmReason.get('reasonText').value;
+    this._form99Details.text = this.frmReason.controls['reasonText'].value;
 
-    localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
+    window.localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
     this.showValidateBar = true;
 
@@ -399,24 +578,6 @@ export class ReasonComponent implements OnInit {
       });
   }
 
-  /**
-   * Hides the validate bar if the textarea changed.
-   */
-  public updateValidation(): void {
-    this.showValidateBar = false;
-
-    this.hideText = true;
-    this.formSaved = false;
-
-    this._messageService
-      .sendMessage({
-        'validateMessage': {
-          'validate': {},
-          'showValidateBar': false
-        }
-      });
-  }
-
   public printPreview () {
     console.log('Reason screen printPreview: step-I ');
     if(this.frmReason.valid) {
@@ -426,8 +587,7 @@ export class ReasonComponent implements OnInit {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this.reasonText = this.frmReason.get('reasonText').value;
-        this._form99Details.text = this.reasonText;
+        this._form99Details.text = this._reasonInnerHTML;
 
         this._form99Details.file='';
 

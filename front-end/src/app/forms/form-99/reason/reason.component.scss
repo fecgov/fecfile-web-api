@@ -126,38 +126,50 @@
           display: none;
         }
       }
-      .text-editor {
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 20px;
-        z-index: 0;
-        textarea {
-          border-radius: 3px;
-          font-size: 1em;
-          height: 250px !important;
-          overflow: scroll;
-          padding: 10px;
-          width: 90%;
-          @include media(tablet) {
-            width: 94%;
+      .html-editor {
+        position: relative;
+        width: 100%;
+        .toolbar {
+        }
+        .editor {
+          border: 1px solid black;
+          box-shadow: 0 .1rem .4rem black;
+          cursor: text;
+          font-size: 1.2rem;
+          margin-bottom: 1rem;
+          overflow: scroll; 
+          padding: 1rem;
+          position: relative;
+          width: 95%;
+          height: 50vh;
+          &:empty:before {
+            content: attr(placeholder);
+            color: #757575;
           }
-          @include media(mediumDesktop) {
-            width: 94%;
+          ol {
+            list-style-type: decimal;
           }
-          @include media(largeDesktop) {
-            width: 94%;
+          ul {
+            list-style-type: disc;
+          }
+          ol,
+          ul {
+              display: block;
+              margin-block-start: 1em;
+              margin-block-end: 1em;
+              margin-inline-start: 0px;
+              margin-inline-end: 0px;
+              padding-inline-start: 40px;            
           }
         }
         @include clearfix();
-      } // .text-editor
-
+      }
       .file-attached-container {
         .close-icon {
           color: $red;
           vertical-align: top
         }
       }
-
       .tooltip-inner {
         max-width: 300px;
         text-align: left;
