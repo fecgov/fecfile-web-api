@@ -1,6 +1,6 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <div class="form__sidebar" *ngIf="step!=='financial_summary'">
-    <div *ngIf="step==='step_1'">
+    <div [hidden]="step!=='step_1'">
      <report-type-sidebar
         title="Report Coverage Dates"
         (status)="onNotify($event)"
