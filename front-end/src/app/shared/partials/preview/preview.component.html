@@ -24,7 +24,7 @@
             (click)="validateForm()"
           >
               Validate
-            </button>
+          </button>
         </div>
       </div>
     </header>
@@ -43,7 +43,7 @@
           Committee ID
         </div>
         <div class="text">
-          {{ committee_details?.committeeid}}
+          {{ committeeDetails?.committeeid}}
         </div>
       </div>
       <div class="grid-col">
@@ -51,7 +51,7 @@
           Name of Committee in Full
         </div>
         <div class="text">
-          {{ committee_details?.committeename }}
+          {{ committeeDetails?.committeename }}
         </div>
       </div>
       <div class="grid-col">
@@ -59,19 +59,18 @@
           Address Line 1
         </div>
         <div class="text">
-          {{ committee_details?.street1 }}
+          {{ committeeDetails?.street1 }}
         </div>
       </div>
      </div>
     
       <div class="grid-row">
-   
-        <div class="grid-col">
+        <div class="grid-col" *ngIf="committeeDetails?.street2">
           <div class="label">
             Address Line 2
           </div>
           <div class="text">
-            {{ committee_details?.street2 }}
+            {{ committeeDetails?.street2 }}
           </div>
         </div>
         <div class="grid-col">
@@ -79,7 +78,7 @@
             City
           </div>
           <div class="text">
-            {{ committee_details?.city }}
+            {{ committeeDetails?.city }}
           </div>
         </div>
         <div class="grid-col">
@@ -87,26 +86,33 @@
             State
           </div>
           <div class="text">
-            {{ committee_details?.state }}
+            {{ committeeDetails?.state }}
           </div>
         </div>
-      </div>
-      <div class="grid-row">
-     
-        <div class="grid-col">
+        <div class="grid-col"  *ngIf="!committeeDetails?.street2">
           <div class="label">
             Zip Code
           </div>
           <div class="text">
-            {{ committee_details?.zipcode }}
+            {{ committeeDetails?.zipcode }}
           </div>
-        </div>
+        </div>        
+      </div>
+      <div class="grid-row">
+        <div class="grid-col"  *ngIf="committeeDetails?.street2">
+          <div class="label">
+            Zip Code
+          </div>
+          <div class="text">
+            {{ committeeDetails?.zipcode }}
+          </div>
+        </div>         
         <div class="grid-col">
           <div class="label">
             Treasurer Last Name
           </div>
           <div class="text">
-            {{ committee_details?.treasurerlastname }}
+            {{ committeeDetails?.treasurerlastname }}
           </div>
         </div>
         <div class="grid-col">
@@ -114,34 +120,34 @@
             Treasurer First Name
           </div>
           <div class="text">
-           {{ committee_details?.treasurerfirstname }}
+           {{ committeeDetails?.treasurerfirstname }}
           </div>
         </div> 
       </div>
       <div class="grid-row" 
-        *ngIf="committee_details?.treasurermiddlename || committee_details?.treasurerprefix || committee_details?.treasurersuffix">
-        <div class="grid-col"  *ngIf="committee_details?.treasurermiddlename">
+        *ngIf="committeeDetails?.treasurermiddlename || committeeDetails?.treasurerprefix || committeeDetails?.treasurersuffix">
+        <div class="grid-col"  *ngIf="committeeDetails?.treasurermiddlename">
           <div class="label">
             Treasurer Middle Name
           </div>
           <div class="text">
-           {{ committee_details?.treasurermiddlename }}
+           {{ committeeDetails?.treasurermiddlename }}
           </div>
         </div>
-        <div class="grid-col" *ngIf="committee_details?.treasurerprefix">
+        <div class="grid-col" *ngIf="committeeDetails?.treasurerprefix">
           <div class="label">
             Treasurer Prefix
           </div>
           <div class="text">
-           {{ committee_details?.treasurerprefix }}
+           {{ committeeDetails?.treasurerprefix }}
           </div>
         </div>
-        <div class="grid-col" *ngIf="committee_details?.treasurersuffix">
+        <div class="grid-col" *ngIf="committeeDetails?.treasurersuffix">
           <div class="label">
             Treasurer Suffix
           </div>
           <div class="text">
-           {{ committee_details?.treasurersuffix }}
+           {{ committeeDetails?.treasurersuffix }}
           </div>
         </div>
       </div>
@@ -166,7 +172,13 @@
         </div>
       </div>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12" [innerHtml]="form_details?.text"></div>
+        <div class="grid-row__col grid-row__col--12">
+          <div 
+            class="text-content" 
+            [innerHtml]="formDetails?.text"
+          >
+          </div>          
+        </div>
       </div>
       <div class="grid-row">
         <div class="grid-row-col grid-row__col--12">
@@ -176,10 +188,10 @@
             <span class="label">
               <b>Attachment:</b>&nbsp;
             </span>
-            <span *ngIf="org_fileurl">
-              <a href="{{ org_fileurl }}" target="_blank">{{ fileName }}</a>
+            <span *ngIf="orgFileUrl">
+              <a href="{{ orgFileUrl }}" target="_blank">{{ fileName }}</a>
             </span>
-            <span *ngIf="!org_fileurl">
+            <span *ngIf="!orgFileUrl">
               {{ fileName }}
             </span>
             <br />

@@ -116,6 +116,19 @@
 					margin-bottom: 1em;
 					margin-right: .75em;
 				}
+			} // .grid-col
+			.grid-row__col {
+				.text-content {
+		          ol,
+		          ul {
+		              display: block;
+		              margin-block-start: 1em;
+		              margin-block-end: 1em;
+		              margin-inline-start: 0px;
+		              margin-inline-end: 0px;
+		              padding-inline-start: 40px;            
+		          }					
+				}				
 			}	
 			.validate__form {
 			&.show-alerts {
