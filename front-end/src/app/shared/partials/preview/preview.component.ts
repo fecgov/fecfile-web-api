@@ -67,9 +67,9 @@ export class PreviewComponent implements OnInit {
                 }
               }
 
-              if (typeof this.formDetails.orgFileUrl !== 'undefined') {
-                if (this.formDetails.orgFileUrl !== null) {
-                  this.orgFileUrl = this.formDetails.orgFileUrl;
+              if (typeof this.formDetails.org_fileurl !== 'undefined') {
+                if (this.formDetails.org_fileurl !== null) {
+                  this.orgFileUrl = this.formDetails.org_fileurl;
                 } else {
                   this.orgFileUrl = '';
                 }
@@ -86,8 +86,8 @@ export class PreviewComponent implements OnInit {
 
   ngDoCheck(): void {
     if(this.formDetails) {
-     if(this.formDetails.orgFileUrl) {
-       this.orgFileUrl = this.formDetails.orgFileUrl;
+     if(this.formDetails.org_fileurl) {
+       this.orgFileUrl = this.formDetails.org_fileurl;
      }
     }
 
