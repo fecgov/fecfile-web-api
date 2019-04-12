@@ -38,10 +38,17 @@
                 You must select a report type for filing.
               </div>
               <div class="text-error text-center"
-                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected)">
+                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected); else nextErrors">
                 You must select coverage dates.
               </div>
-
+              <ng-template #nextErrors>
+                <div *ngIf="customFormValidation.error">
+                  <div class="text-error text-center"
+                    *ngFor="let message of customFormValidation.messages">
+                    {{ message }}
+                  </div>                 
+                </div>
+              </ng-template>
             </div>
           </div>
             <ul class="options-list">

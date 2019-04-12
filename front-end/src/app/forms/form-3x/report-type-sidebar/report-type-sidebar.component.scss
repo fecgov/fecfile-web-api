@@ -3,9 +3,9 @@
 .report-type-sidebar {
   position: relative;
   height: 500px;
-  header {
-    margin-bottom: 20px;
-  }
+  // header {
+  //   margin-bottom: 20px;
+  // }
   section {
     .sidebar-form-content {
       margin-left: auto;
@@ -15,7 +15,7 @@
         &.form-control {
         margin-left: auto;
         margin-right: auto;
-        width: 170px !important;
+        // width: 170px !important;
         }
       }
       label {
@@ -24,12 +24,15 @@
       #state,
       #electionDate {
         margin: 0 auto !important;
-        width: 200px !important;
+        // width: 200px !important;
       }
-      .calendar-icon {
-        left: 4px;
-        position: absolute;
-        padding-top: 20px;
+      // .calendar-icon {
+      //   left: 4px;
+      //   position: absolute;
+      //   padding-top: 20px;
+      // }
+      .sidebar-item {
+        padding: 5px 0 0 0;
       }
     }
   }
