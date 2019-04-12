@@ -205,7 +205,12 @@ def check_list_cvg_dates(args):
         form_type = args[1]
         cvg_start_dt = args[2]
         cvg_end_dt = args[3]
-        
+        print("cmte_id =", cmte_id)
+        print("form_type =", form_type)
+        print("cvg_start_dt =", cvg_start_dt)
+        print("cvg_end_dt =", cvg_end_dt)
+
+
         forms_obj = []
         with connection.cursor() as cursor: 
             cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' ORDER BY report_id DESC", [cmte_id, form_type])
@@ -213,14 +218,14 @@ def check_list_cvg_dates(args):
             if len(args) == 4:
                 for row in cursor.fetchall():
                     if not(row[1] is None or row[2] is None):
-                        if (row[1] <= cvg_end_dt and row[2] >= cvg_start_dt):
+                        if (row[2] <= cvg_end_dt and row[1] >= cvg_start_dt):
                             forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2],"report_type":row[3]})
 
             if len(args) == 5:
                 report_id = args[4]
                 for row in cursor.fetchall():
                     if not(row[1] is None or row[2] is None):
-                        if ((row[1] <= cvg_end_dt and row[2] >= cvg_start_dt) and row[0] != int(report_id)):
+                        if ((row[2] <= cvg_end_dt and row[1] >= cvg_start_dt) and row[0] != int(report_id)):
                             forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2],"report_type":row[3]})
 
         return forms_obj

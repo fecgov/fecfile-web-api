@@ -78,8 +78,15 @@ export class AppLayoutComponent implements OnInit {
             this.toggleMenu = false;
           }
           if(val.url.indexOf('/dashboard') === 0) {
-            this.sideBarClass = 'dashboard active';
-            this.showSideBar = true;
+            // this.sideBarClass = 'dashboard active';
+            // this.showSideBar = true;
+            if(this.toggleMenu) {
+              this.showSideBar = true;
+              this.sideBarClass = 'dashboard active';
+            } else {
+              this.showSideBar = false;
+              this.sideBarClass = 'active';              
+            }             
             this._utilService.removeLocalItems('form_', 5);
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
@@ -105,6 +112,11 @@ export class AppLayoutComponent implements OnInit {
     const route: string = this._router.url;
 
     if (route === '/dashboard') {
+      /**
+       * Fix this issue with the sidenar on the dashboard.
+       * This causes the sidebar to always show, even if the hide button is clicked.
+       */
+
       this.sideBarClass = 'dashboard active';
       this.showFormDueDate = false;
     } else if (route.indexOf('/forms/form/3X') === 0) {

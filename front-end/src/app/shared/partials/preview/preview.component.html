@@ -118,9 +118,9 @@
           </div>
         </div> 
       </div>
-      <div class="grid-row">
-
-        <div class="grid-col">
+      <div class="grid-row" 
+        *ngIf="committee_details?.treasurermiddlename || committee_details?.treasurerprefix || committee_details?.treasurersuffix">
+        <div class="grid-col"  *ngIf="committee_details?.treasurermiddlename">
           <div class="label">
             Treasurer Middle Name
           </div>
@@ -128,7 +128,7 @@
            {{ committee_details?.treasurermiddlename }}
           </div>
         </div>
-        <div class="grid-col">
+        <div class="grid-col" *ngIf="committee_details?.treasurerprefix">
           <div class="label">
             Treasurer Prefix
           </div>
@@ -136,7 +136,7 @@
            {{ committee_details?.treasurerprefix }}
           </div>
         </div>
-        <div class="grid-col">
+        <div class="grid-col" *ngIf="committee_details?.treasurersuffix">
           <div class="label">
             Treasurer Suffix
           </div>

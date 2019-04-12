@@ -9,13 +9,15 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  */
 export function htmlLength(charLength: number): ValidatorFn {
    return (control: AbstractControl): {[key: string]: any} => {
-     let text: string = control.value.replace(/<[^>]*>/g, '');
-     text = text.replace(/(&nbsp;)/g, ' ');
+  	const regex: any = /((<(\/?|\!?)\w+>)|(<\w+.*?\w="(.*?)")>|(<\w*.*\/>))/gm;
+	let text: string = control.value.replace(regex, '');
+	
+	text = text.replace(/(&nbsp;)/g, ' ');
 
-     if(text.length > charLength) {
-       return {'requiredLength': charLength, actualLength: text.length};
-     }
+	if(text.length > charLength) {
+	return {'requiredLength': charLength, actualLength: text.length};
+	}
 
-     return null;
+	return null;
    }
 }
