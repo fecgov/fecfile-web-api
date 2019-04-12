@@ -46,7 +46,6 @@ export class ReasonComponent implements OnInit {
   public editorMax: number = 20000;
 
   private _printPriviewPdfFileLink: string ='';
-
   private _form99Details: any = {}
   private _formType: string = '';
   private _formSaved: boolean = false;
