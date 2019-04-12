@@ -94,6 +94,8 @@ export class PreviewComponent implements OnInit {
     if(!this.formDetails) {
       if(localStorage.getItem(`form_${this.formType}_details`) !== null) {
         this.formDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+
+        console.log('this.formDetails: ', this.formDetails);
         if(this.formType === '99') {
           if(!this.typeSelected) {
             this.typeSelected = this.formDetails.reason;

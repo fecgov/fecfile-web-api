@@ -175,7 +175,7 @@
         <div class="grid-row__col grid-row__col--12">
           <div 
             class="text-content" 
-            [innerHtml]="formDetails?.text"
+            [innerHtml]="formDetails?.text | safeHTML"
           >
           </div>          
         </div>
