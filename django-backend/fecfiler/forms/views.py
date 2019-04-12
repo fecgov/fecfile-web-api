@@ -238,6 +238,14 @@ def create_f99_info(request):
             #return Response({"FEC Error 001":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
         
+        print("Reason text= ", request.data.get('text'))
+        strcheck_Reason=check_F99_Reason_Text(request.data.get('text'))
+
+        print ("strcheck_Reason", strcheck_Reason)
+        if strcheck_Reason != "":
+           return Response({"FEC Error 999":"The reason text is not in proper format - HTML tag violation...!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
         if 'file' in request.data:
             incoming_data['filename'] = request.data.get('file').name
 
@@ -426,6 +434,15 @@ def submit_comm_info(request):
         }
         logger.debug("Incoming parameters: submit_comm_info" + str(request.data))                
         incoming_data = data
+
+        print("Reason text= ", request.data.get('text'))
+        strcheck_Reason=check_F99_Reason_Text(request.data.get('text'))
+
+        print ("strcheck_Reason", strcheck_Reason)
+        if strcheck_Reason != "":
+           return Response({"FEC Error 999":"The reason text is not in proper format - HTML tag violation...!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
 
@@ -1456,3 +1473,39 @@ def print_pdf(request):
     }
 
     return JsonResponse(resp, status=status.HTTP_201_CREATED)
+
+
+def check_F99_Reason_Text(strReasonText):
+    print("In check_F99_Reason_Text...")
+    try:
+        """f = open(r'/home/mahendra/Downloads/test.html', 'r')
+        for line in f:
+            for word in line.split():
+                validate_HTMLtag(word)      
+        return "" 
+        """ 
+        for word in strReasonText.split():
+            validate_HTMLtag(word)      
+        return "" 
+    except Exception as e:
+        return Response("The check_F99_Reason_Text function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+def validate_HTMLtag(strWord):
+    print("validate_HTMLtag...")
+    print(" strWord = ", strWord)
+    try:
+        valideTags=['div','br','span','blockquote','ul','ol','li','b','u','i']
+        if ('</' in strWord and '>' in strWord) and ('<div' not in strWord or '<span' not in strWord ): 
+            print(" word check strWord = ", strWord)
+            intstartpos=strWord.find('</'); 
+            substr=strWord[intstartpos+2]
+            intendpos=substr.find('>'); 
+            strsearch=strWord[intstartpos+2:intendpos]
+            print(strsearch)
+            if strsearch not in valideTags:
+                print(" Wrong tag =", strsearch) 
+        return ""  
+    except Exception as e:
+        return Response("The validate_HTMLtag function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
