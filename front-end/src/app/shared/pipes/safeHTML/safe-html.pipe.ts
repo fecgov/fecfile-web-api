@@ -1,6 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
+/**
+ * Used for displaying HTML with innerHTML.
+ */
+
 @Pipe({
   name: 'safeHTML'
 })
