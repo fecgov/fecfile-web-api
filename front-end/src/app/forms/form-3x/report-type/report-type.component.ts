@@ -36,6 +36,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   public toDateSelected = false;
   public tooltipPosition = 'right';
   public tooltipLeft = 'auto';
+  public customFormValidation: any;
 
   private _dueDate: string = null;
   private _formType: string = null;
@@ -71,9 +72,13 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
           switch (dateName) {
             case ReportTypeDateEnum.fromDate:
               this._fromDateUserModified = message.date;
+              this._fromDateSelected = message.date;
+              this.fromDateSelected = false;
               break;
             case ReportTypeDateEnum.toDate:
               this._toDateUserModified = message.date;
+              this._toDateSelected = message.date;
+              this.toDateSelected = false;
               break;
             default:
           }
@@ -86,6 +91,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.initUserModFields();
+    this.initCustomFormValidation();
 
     if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
@@ -254,6 +260,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
+      this.initCustomFormValidation();
       this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
@@ -283,6 +290,15 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
    *
    */
   public doValidateReportType() {
+
+    this.initCustomFormValidation();
+    if (!this.doCustomValidation()) {
+      this.customFormValidation.error = true;
+      this.optionFailed = false;
+      window.scrollTo(0, 0);
+      return 0;
+    }
+
     if (this.frmReportType.valid) {
         this.optionFailed = false;
         this.isValidType = true;
@@ -365,7 +381,33 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
 
+  /**
+   * Perform custom validations not handled by angular's built in
+   * validation framework.
+   * 
+   * @returns true if valid
+   */
+  private doCustomValidation(): boolean {
 
+    // TODO compare dates for start <= end
+    // TODO check for valid date format
+
+    // start and end are required
+    let valid = true;
+    if (!this.fromDateSelected) {
+      valid = false;
+      this.customFormValidation.messages.push('You must select coverage dates.');
+      return;
+    }
+
+    if (!this.toDateSelected) {
+      valid = false;
+      this.customFormValidation.messages.push('You must select coverage dates.');
+      return;
+    }
+
+    return valid;
+  }
 
   /**
    * Toggles the tooltip.
@@ -417,5 +459,12 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   private initUserModFields() {
     this._fromDateUserModified = null;
     this._toDateUserModified = null;
+  }
+
+  private initCustomFormValidation() {
+    this.customFormValidation = {
+      error: false,
+      messages: []
+    };
   }
 }
