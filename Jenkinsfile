@@ -113,6 +113,9 @@ pipeline {
   }
 
   post {
+    always {
+      sh " docker image prune -a "
+    }
     success {
       message_on_dev("good", ": Deployed ${VERSION} to https://fecfile.efdev.fec.gov/") 
     }
