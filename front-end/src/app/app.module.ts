@@ -74,6 +74,7 @@ import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
 import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
 import { TrashConfirmComponent } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
+import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
 
  const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -130,7 +131,8 @@ import { TrashConfirmComponent } from './forms/transactions/transactions-table/t
     IndividualReceiptComponent,
     ReportsidebarComponent,
     ReportheaderComponent,
-    ReportdetailsComponent
+    ReportdetailsComponent,
+    SafeHTMLPipe
   ],
   entryComponents: [
     ConfirmModalComponent,
