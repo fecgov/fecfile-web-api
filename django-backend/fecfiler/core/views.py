@@ -322,6 +322,7 @@ def check_report_id(report_id):
 
     try:
         check_report_id = int(report_id)
+        return report_id
     except Exception as e:
         raise Exception('Invalid Input: The report_id input should be an integer like 18, 24. Input received: {}'.format(report_id))
 
@@ -519,8 +520,7 @@ def get_reports(data):
         report_flag = False
         if 'report_id' in data:
             try:
-                report_id = data.get('report_id')
-                check_report_id(report_id)
+                report_id = check_report_id(data.get('report_id'))
                 report_flag = True
             except Exception:
                 report_flag = False
@@ -538,8 +538,7 @@ def put_reports(data):
         check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')  
         check_form_type(data.get('form_type'))
-        check_report_id(data.get('report_id'))
-        report_id = data.get('report_id')
+        report_id = check_report_id(data.get('report_id'))
         args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]
         forms_obj = []
         if data.get('cvg_start_dt') is None:
@@ -575,9 +574,8 @@ def delete_reports(data):
     try:
         cmte_id = data.get('cmte_id')
         form_type = data.get('form_type')
-        report_id = data.get('report_id')
+        report_id = check_report_id(data.get('report_id'))
         check_form_type(form_type)
-        check_report_id(report_id)
         old_list_report = get_list_report(report_id, cmte_id)
         delete_sql_report(report_id, cmte_id)
         old_dict_report = old_list_report[0]
@@ -1295,6 +1293,7 @@ def check_calendar_year(calendar_year):
     try:
         if not(len(calendar_year) == 4 and calendar_year.isdigit()):
             raise Exception('Invalid Input: The calendar_year input should be a 4 digit integer like 2018, 1927. Input received: {}'.format(calendar_year))
+        return calendar_year
     except Exception as e:
         raise
 def period_receipts_sql(cmte_id, report_id):
@@ -1409,11 +1408,8 @@ def summary_table(request):
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
 
-        report_id = request.query_params.get('report_id')
-        calendar_year = request.query_params.get('calendar_year')
-
-        check_report_id(report_id)
-        check_calendar_year(calendar_year)
+        report_id = check_report_id(request.query_params.get('report_id'))
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
 
         period_args = [cmte_id, report_id]
         period_receipt = summary_receipts(period_args)

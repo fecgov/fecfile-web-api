@@ -41,10 +41,11 @@ def get_next_transaction_id(trans_char):
 def check_transaction_id(transaction_id):
 
     try:
-        transaction_type_list = ["SA", ]
+        transaction_type_list = ["SA", "SB", ]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
-            raise Exception('The Transaction ID: {} is not in specified format'.format(transaction_id))
+            raise Exception('The Transaction ID: {} is not in the specified format. Transaction IDs start with SA, SB characters'.format(transaction_id))
+        return transaction_id
     except Exception:
         raise 
 
@@ -142,7 +143,8 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
 
-            # GET single row from schedA table
+            # GET child rows from schedA table
+
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
@@ -200,17 +202,7 @@ def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
             # UPDATE back_ref_transaction_id value to null in sched_a table
             value = None
             cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [value, transaction_id, report_id, cmte_id])
-    except Exception:
-        raise
 
-def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
-
-    try:
-        with connection.cursor() as cursor:
-
-            # UPDATE back_ref_transaction_id value to null in sched_a table
-            value = None
-            cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [value, transaction_id, report_id, cmte_id])
     except Exception:
         raise  
 """
@@ -229,12 +221,12 @@ def post_schedA(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get('entity_id')
+        datum['entity_id'] = entity_id
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
         try:
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'))
-            output = get_schedA(datum)
         except Exception as e:
             if 'entity_id' in datum:
                 entity_data = put_entities(prev_entity_list[0])
@@ -245,7 +237,7 @@ def post_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The post_sql_schedA function is throwing an error: ' + str(e))
-        return output[0]
+        return datum
     except:
         raise
 
@@ -256,8 +248,7 @@ def get_schedA(data):
         flag = False
         if 'transaction_id' in data:
             try:
-                transaction_id = data.get('transaction_id')
-                check_transaction_id(transaction_id)
+                transaction_id = check_transaction_id(data.get('transaction_id'))
                 flag = True
             except Exception:
                 flag = False
@@ -277,6 +268,7 @@ def get_schedA(data):
 def put_schedA(datum):
     try:
         check_mandatory_fields_schedA(datum)
+        transaction_id = check_transaction_id(datum.get('transaction_id'))
         flag = False
         if 'entity_id' in datum:
             flag = True
@@ -289,11 +281,9 @@ def put_schedA(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get('entity_id')
-        transaction_id = datum.get('transaction_id')
-        check_transaction_id(transaction_id)
+        datum['entity_id'] = entity_id
         try:
             put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'))
-            output = get_schedA(datum)
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -304,7 +294,7 @@ def put_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The put_sql_schedA function is throwing an error: ' + str(e))
-        return output[0]
+        return datum
     except:
         raise
 
@@ -312,8 +302,7 @@ def delete_schedA(data):
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
-        transaction_id = data.get('transaction_id')
-        check_transaction_id(transaction_id)
+        transaction_id = check_transaction_id(data.get('transaction_id'))
         delete_sql_schedA(transaction_id, report_id, cmte_id)
         delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
     except:
@@ -356,6 +345,7 @@ def schedA_sql_dict(data):
             'occupation': data.get('occupation'),
             'employer': data.get('employer'),
             'ref_cand_cmte_id': data.get('ref_cand_cmte_id'),
+            'back_ref_transaction_id': data.get('back_ref_transaction_id'),
         }
         return datum
     except:
@@ -374,15 +364,14 @@ def schedA(request):
             if not (check_null_value(request.data.get('report_id'))):
                 report_id = 0
             else:
-                report_id = request.data.get('report_id')
+                report_id = check_report_id(request.data.get('report_id'))
             datum = schedA_sql_dict(request.data)
-            datum['back_ref_transaction_id'] = request.data.get('back_ref_transaction_id'),
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
-                datum['transaction_id'] = request.data.get('transaction_id')
+                datum['transaction_id'] = check_transaction_id(request.data.get('transaction_id'))
                 data = put_schedA(datum)
             else:
                 data = post_schedA(datum)
@@ -400,14 +389,12 @@ def schedA(request):
                         if 'entity_id' in child and check_null_value(child.get('entity_id')):
                             child_datum['entity_id'] = child.get('entity_id')
                         if 'transaction_id' in child and check_null_value(child.get('transaction_id')):
-                            child_datum['transaction_id'] = child.get('transaction_id')
+                            child_datum['transaction_id'] = check_transaction_id(child.get('transaction_id'))
                             child_data = put_schedA(child_datum)
                         else:
                             child_data = post_schedA(child_datum)
-                        child_output.append(child_data)
-                    data['child'] = child_output                   
-
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            output = get_schedA(data)                                           
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
         
@@ -422,11 +409,11 @@ def schedA(request):
             'cmte_id': request.user.username
             }
             if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
-                data['report_id'] = request.query_params.get('report_id')
+                data['report_id'] = check_report_id(request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
-                data['transaction_id'] = request.query_params.get('transaction_id')
+                data['transaction_id'] = check_transaction_id(request.query_params.get('transaction_id'))
             datum = get_schedA(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -446,7 +433,7 @@ def schedA(request):
             datum = schedA_sql_dict(request.data)
 
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
-                datum['transaction_id'] = request.data.get('transaction_id')
+                datum['transaction_id'] = check_transaction_id(request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
 
@@ -455,17 +442,17 @@ def schedA(request):
             if not (check_null_value(request.data.get('report_id'))):
                 report_id = 0
             else:
-                report_id = request.data.get('report_id')
+                report_id = check_report_id(request.data.get('report_id'))
 
             datum['report_id'] = report_id
-            datum['back_ref_transaction_id'] = request.data.get('back_ref_transaction_id')
             datum['cmte_id'] = request.user.username
 
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
 
             data = put_schedA(datum)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            output = get_schedA(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             
         except Exception as e:
             logger.debug(e)
@@ -481,11 +468,11 @@ def schedA(request):
             'cmte_id': request.user.username
             }
             if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
-                data['report_id'] = request.query_params.get('report_id')
+                data['report_id'] = check_report_id(request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
-                data['transaction_id'] = request.query_params.get('transaction_id')
+                data['transaction_id'] = check_transaction_id(request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedA(data)

@@ -68,10 +68,8 @@ INSTALLED_APPS = [
     'fecfiler.core',
     #'fecfiler.form3x',
     'fecfiler.sched_A',
+    'fecfiler.sched_B',
     'storages',
-  
-  
-
 ]
 
 
