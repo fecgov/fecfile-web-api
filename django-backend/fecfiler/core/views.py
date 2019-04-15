@@ -1432,3 +1432,132 @@ def summary_table(request):
 END - GET SUMMARY TABLE API - CORE APP
 ******************************************************************************************************************************
 """
+
+
+
+@api_view(['GET'])
+def get_ReportTypes(request):
+    """
+    Fields for identifying the committee type and committee design and filter the forms category 
+    """
+    try:
+        cmte_id = request.user.username
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select rpt_type, rpt_type_desc from public.ref_rpt_types order by rpt_type_desc) t")
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_ReportTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_ReportTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_FormTypes(request):
+    try:
+        cmte_id = request.user.username
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_FormTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_Statuss(request):
+    try:
+        cmte_id = request.user.username
+
+        data = """{
+                    "data": [{
+                            "status_cd": "S",
+                            "status_desc": "Saved"
+                        },
+                        {
+                            "status_cd": "F",
+                            "status_desc": "Filed"
+                        },
+                       {
+                            "status_cd": "X",
+                            "status_desc": "Failed"
+                        }]
+                    }
+                """
+
+        '''
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        '''
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_Statuss API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_AmendmentIndicators(request):
+    try:
+        cmte_id = request.user.username
+      
+        data = """{
+                    "data":  [{
+                            "amend_ind": "N",
+                            "amendment_desc": "New"
+                        },
+                       {
+                            "amend_ind": "A1",
+                            "amendment_desc": "Amendment 1"
+                        },    
+                        {
+                            "amend_ind": "A2",
+                            "amendment_desc": "Amendment 2"
+                        },    
+                        {
+                            "amend_ind": "A3",
+                            "amendment_desc": "Amendment 3"
+                        }]
+                  }
+                """
+        '''                
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        '''
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+        
