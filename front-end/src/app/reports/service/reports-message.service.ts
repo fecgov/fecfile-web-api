@@ -9,7 +9,7 @@ import { Subject } from 'rxjs/Subject';
 @Injectable({
   providedIn: 'root'
 })
-export class TransactionsMessageService {
+export class ReportsMessageService {
 
   private subject = new Subject<any>();
   private applyFiltersSubject = new Subject<any>();
@@ -23,7 +23,6 @@ export class TransactionsMessageService {
    * @param message any message
    */
   public sendShowPinColumnMessage(message: any) {
-    console.log("sendShowPinColumnMessage", message)
     this.subject.next(message);
   }
 
