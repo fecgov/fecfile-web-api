@@ -22,7 +22,8 @@ import { SortableColumnModel } from 'src/app/shared/services/TableService/sortab
 //import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
-import { ActiveView } from 'src/app/forms/transactions/transactions.component';
+//import { ActiveView } from 'src/app/forms/transactions/transactions.component';
+import { ActiveView } from '../reportheader/reportheader.component';
 import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
@@ -65,7 +66,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public reportsModel: Array<reportModel>;
   public filterReportsModel: Array<reportModel>;
   public totalAmount: number;
-  public reportsView = ActiveView.transactions;
+  public reportsView = ActiveView.reports;
   public recycleBinView = ActiveView.recycleBin;
 
  // Local Storage Keys
@@ -128,6 +129,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
 			message => { 
+        console.log("trying to access showPinColumns... !");
         this.showPinColumns();
 			}
     );
@@ -198,7 +200,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the transactions to get
 	 */
 	public getReportsPage(page: number) : void {
-    console.log(" accessing getReportsPage ...")
+    console.log(" accessing getReportsPage ...");
 
     this.config.currentPage = page;
 
@@ -547,6 +549,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
+    console.log("showPinColumns");
     this.applyDisabledColumnOptions();
     this.columnOptionsModal.show();
   }

@@ -322,6 +322,7 @@ def check_report_id(report_id):
 
     try:
         check_report_id = int(report_id)
+        return report_id
     except Exception as e:
         raise Exception('Invalid Input: The report_id input should be an integer like 18, 24. Input received: {}'.format(report_id))
 
@@ -519,8 +520,7 @@ def get_reports(data):
         report_flag = False
         if 'report_id' in data:
             try:
-                report_id = data.get('report_id')
-                check_report_id(report_id)
+                report_id = check_report_id(data.get('report_id'))
                 report_flag = True
             except Exception:
                 report_flag = False
@@ -538,8 +538,7 @@ def put_reports(data):
         check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')  
         check_form_type(data.get('form_type'))
-        check_report_id(data.get('report_id'))
-        report_id = data.get('report_id')
+        report_id = check_report_id(data.get('report_id'))
         args = [cmte_id, data.get('form_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('report_id')]
         forms_obj = []
         if data.get('cvg_start_dt') is None:
@@ -575,9 +574,8 @@ def delete_reports(data):
     try:
         cmte_id = data.get('cmte_id')
         form_type = data.get('form_type')
-        report_id = data.get('report_id')
+        report_id = check_report_id(data.get('report_id'))
         check_form_type(form_type)
-        check_report_id(report_id)
         old_list_report = get_list_report(report_id, cmte_id)
         delete_sql_report(report_id, cmte_id)
         old_dict_report = old_list_report[0]
@@ -1295,6 +1293,7 @@ def check_calendar_year(calendar_year):
     try:
         if not(len(calendar_year) == 4 and calendar_year.isdigit()):
             raise Exception('Invalid Input: The calendar_year input should be a 4 digit integer like 2018, 1927. Input received: {}'.format(calendar_year))
+        return calendar_year
     except Exception as e:
         raise
 def period_receipts_sql(cmte_id, report_id):
@@ -1409,11 +1408,8 @@ def summary_table(request):
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
 
-        report_id = request.query_params.get('report_id')
-        calendar_year = request.query_params.get('calendar_year')
-
-        check_report_id(report_id)
-        check_calendar_year(calendar_year)
+        report_id = check_report_id(request.query_params.get('report_id'))
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
 
         period_args = [cmte_id, report_id]
         period_receipt = summary_receipts(period_args)
@@ -1436,3 +1432,132 @@ def summary_table(request):
 END - GET SUMMARY TABLE API - CORE APP
 ******************************************************************************************************************************
 """
+
+
+
+@api_view(['GET'])
+def get_ReportTypes(request):
+    """
+    Fields for identifying the committee type and committee design and filter the forms category 
+    """
+    try:
+        cmte_id = request.user.username
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select rpt_type, rpt_type_desc from public.ref_rpt_types order by rpt_type_desc) t")
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_ReportTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_ReportTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_FormTypes(request):
+    try:
+        cmte_id = request.user.username
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_FormTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_Statuss(request):
+    try:
+        cmte_id = request.user.username
+
+        data = """{
+                    "data": [{
+                            "status_cd": "S",
+                            "status_desc": "Saved"
+                        },
+                        {
+                            "status_cd": "F",
+                            "status_desc": "Filed"
+                        },
+                       {
+                            "status_cd": "X",
+                            "status_desc": "Failed"
+                        }]
+                    }
+                """
+
+        '''
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        '''
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_Statuss API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_AmendmentIndicators(request):
+    try:
+        cmte_id = request.user.username
+      
+        data = """{
+                    "data":  [{
+                            "amend_ind": "N",
+                            "amendment_desc": "New"
+                        },
+                       {
+                            "amend_ind": "A1",
+                            "amendment_desc": "Amendment 1"
+                        },    
+                        {
+                            "amend_ind": "A2",
+                            "amendment_desc": "Amendment 2"
+                        },    
+                        {
+                            "amend_ind": "A3",
+                            "amendment_desc": "Amendment 3"
+                        }]
+                  }
+                """
+        '''                
+        forms_obj = []
+        print("cmte_id", cmte_id)
+        with connection.cursor() as cursor: 
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+
+            for row in cursor.fetchall():
+                data_row = list(row)
+            forms_obj=data_row[0]
+                
+        if not bool(forms_obj):
+            return Response("No entries were found for the get_FormTypes API for this committee", status=status.HTTP_400_BAD_REQUEST)                              
+        '''
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+        
