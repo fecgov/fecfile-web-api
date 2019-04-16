@@ -275,6 +275,7 @@ export interface f3xTransactionTypes {
     delete_ind: string,
     create_date: string,
     last_update_date: string
+    selected: string;
    }
   
    
@@ -303,6 +304,7 @@ export interface f3xTransactionTypes {
   create_date: string;
   last_update_date: string;
   viewtype: string;
+  selected; string;
 
   constructor(report: any) {
     this.id = report.id ? report.id : '';
@@ -327,7 +329,7 @@ export interface f3xTransactionTypes {
     this.create_date = report.create_date ? report.create_date : '';
     this.last_update_date = report.last_update_date ? report.last_update_date : '';
     this.viewtype = report.viewtype ? report.viewtype : '';
-    //this.selected = report.selected;
+    this.selected = report.selected;
   }
  }
  
