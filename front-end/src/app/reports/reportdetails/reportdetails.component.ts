@@ -149,6 +149,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         (filters: ReportFilterModel) => {
 
           if (filters) {
+             console.log("keywordFilterSearchSubscription filters=", filters);
             this.filters = filters;
             if (filters.formType) {
               this.formType = filters.formType;
@@ -985,6 +986,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private applyCurrentPageCache(key: string) {
     const currentPageCache: string =
       localStorage.getItem(key);
+
+      console.log("applyCurrentPageCache... key =", key);
     if (this._utilService.isNumber(currentPageCache)) {
       this.config.currentPage = this._utilService.toInteger(currentPageCache);
     } else {
@@ -1001,6 +1004,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
     switch (this.tableType) {
       case this.reportsView:
+        console.log("setCachedValues ...");
         this.setCacheValuesforView(this.reportSortableColumnsLSK,
           this.reportCurrentSortedColLSK, this.reportPageLSK);
         break;
@@ -1028,6 +1032,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
 
+    console.log("setCacheValuesforView this.filters ...", this.filters) ;
     // shared between trx and recycle tables
     localStorage.setItem(this.filtersLSK,
       JSON.stringify(this.filters));
@@ -1090,6 +1095,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private getCachedValues() {
     switch (this.tableType) {
       case this.reportsView:
+        console.log("getCachedValues...!");
         this.applyColCache(this.reportSortableColumnsLSK);
         this.applyCurrentSortedColCache(this.reportCurrentSortedColLSK);
         this.applyCurrentPageCache(this.reportPageLSK);
