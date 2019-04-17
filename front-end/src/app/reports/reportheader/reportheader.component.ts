@@ -117,6 +117,7 @@ private readonly filtersLSK = 'reports.filters';
   }
 
   private showFilter() : void {
+    console.log("In showFilter() ...!");
     if (this.showSideBar){
         this.showSideBar=false;
     } else
@@ -141,7 +142,7 @@ private readonly filtersLSK = 'reports.filters';
    * Search reports.
    */
   public search() {
-
+    console.log("in search() ...!");
     // Don't allow more than 12 filters
     if (this.searchTextArray.length > 12) {
       return;
@@ -152,8 +153,10 @@ private readonly filtersLSK = 'reports.filters';
       this.searchTextArray.push(this.searchText);
       this.searchText = '';
     }
+    //this.showFilter(); mahendra
+    this.showSideBar=true;
     this.doSearch();
-    this.showFilters();
+  
   }
 
 
