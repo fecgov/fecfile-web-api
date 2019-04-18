@@ -334,7 +334,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
                  datearray = cvgEndDate.split('-');
 
                  const newcvgEndDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-                 const alertStr: string = `The coverage dates entered overlap with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
+                 const alertStr: string = `The coverage dates entered overlap 
+                   with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
                       
                  if (environment.name !== 'local') {                
                    this._dialogService
