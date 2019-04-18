@@ -368,7 +368,20 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
           });
 
           const currentReport: any = monthlyReports.filter(el => {
+            if (el.hasOwnProperty('election_state')) {
+              if (Array.isArray(el.election_state)) {  
+                const dates: any = el.election_state[0];
 
+                if (Array.isArray(dates)) {
+                  const startDate: any = dates[0].cvg_start_date;
+                  const endDate: any = dates[0].cvg_end_date;
+                  const dueDate: any = dates[0].due_date;
+
+                  // Compare startDate, endDate, dueDate to currentDate here.
+                  // Then return this as current.
+                }
+              }              
+            }
           });
 
           console.log('monthlyReports: ', monthlyReports);
