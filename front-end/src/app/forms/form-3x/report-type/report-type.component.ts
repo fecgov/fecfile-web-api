@@ -141,102 +141,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
       const resetForm: boolean = JSON.parse(window.localStorage.getItem(`form_${this._formType}_reset_form`));
     }
 
-    if (Array.isArray(this.committeeReportTypes)) {
-      if (this.committeeReportTypes.length >= 1) {
-        if (!this.reportTypeSelected) {
-          this.frmReportType.controls['reportTypeRadio'].setValue(this.committeeReportTypes[0].report_type);
-
-          this.reportTypeSelected = this.committeeReportTypes[0].report_type;
-
-          this.reportType = this.reportTypeSelected;
-
-          if (this.committeeReportTypes.hasOwnProperty('dates')) {
-            this._dueDate = this.committeeReportTypes[0].dates[0].due_date;
-            this._fromDateSelected = this.committeeReportTypes[0].dates[0].cvg_start_date;
-            this.fromDateSelected = true;
-            this._toDateSelected = this.committeeReportTypes[0].dates[0].cvg_end_date;
-            this.toDateSelected = true;
-          }
-
-          this.status.emit({
-            'form': '3x',
-            'reportTypeRadio': this.reportTypeSelected
-          });
-
-          this.optionFailed = false;
-        }
-      }
-    }
-
-    if (this.selectedReportInfo) {
-      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
-        if (this._toDateUserModified) {
-          this.selectedReportInfo.toDate = this._toDateUserModified;
-        }
-        if (typeof this.selectedReportInfo.toDate === 'string') {
-          if (this.selectedReportInfo.toDate.length >= 1) {
-            this._toDateSelected = this.selectedReportInfo.toDate;
-            this.toDateSelected = true;
-          } else {
-            this.toDateSelected = false;
-          }
-        } else {
-          this.toDateSelected = false;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
-        if (this._fromDateUserModified) {
-          this.selectedReportInfo.fromDate = this._fromDateUserModified;
-        }
-        if (typeof this.selectedReportInfo.fromDate === 'string') {
-          if (this.selectedReportInfo.fromDate.length >= 1) {
-            this._fromDateSelected = this.selectedReportInfo.fromDate;
-            this.fromDateSelected = true;
-          } else {
-            this.fromDateSelected = false;
-          }
-        } else {
-          this.fromDateSelected = false;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
-        if (typeof this.selectedReportInfo.selectedState === 'string') {
-          this._selectedElectionState = this.selectedReportInfo.selectedState;
-        } else {
-          this._selectedElectionState = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
-        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
-          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
-        } else {
-          this._selectedElectionDate = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
-        if (typeof this.selectedReportInfo.dueDate === 'string') {
-          if (this.selectedReportInfo.dueDate.length >= 1) {
-            this._dueDate = this.selectedReportInfo.dueDate;
-          }
-        } else {
-          this._dueDate = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
-        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
-          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
-            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
-          }
-        } else {
-          this._reportTypeDescripton = null;
-        }
-      }
-    }
+    this._setReportTypes();
   }
 
 
@@ -435,6 +340,131 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
    */
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
+  }
+
+  /**
+   * Sets the report types when the screen is loaded.
+   */
+  private _setReportTypes(): void {
+    const today: Date = new Date();
+    const dd: string = String(today.getDate()).padStart(2, '0');
+    const mm: string = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy: number = today.getFullYear();
+
+    console.log('date: ', `${mm}/${dd}/${yyyy}`);
+
+    if (Array.isArray(this.committeeReportTypes)) {
+      if (this.committeeReportTypes.length >= 1) {
+        if (!this.reportTypeSelected) {
+          /**
+           * Finish by comparing current date to election_state[0].dates
+           * Compare current date to start and end date and if current date
+           * is in between or equal to those dates then select the reprort type
+           * instead of selecting the first one.
+           *
+           */
+          const monthlyReports: any = this.committeeReportTypes.filter(el => {
+            return el.regular_special_report_ind === 'R' && el.report_type !== 'TER';
+          });
+
+          const currentReport: any = monthlyReports.filter(el => {
+
+          });
+
+          console.log('monthlyReports: ', monthlyReports);
+          // this.frmReportType.controls['reportTypeRadio'].setValue(this.committeeReportTypes[0].report_type);
+
+          // this.reportTypeSelected = this.committeeReportTypes[0].report_type;
+
+          // this.reportType = this.reportTypeSelected;
+
+          // if (this.committeeReportTypes.hasOwnProperty('dates')) {
+          //   this._dueDate = this.committeeReportTypes[0].dates[0].due_date;
+          //   this._fromDateSelected = this.committeeReportTypes[0].dates[0].cvg_start_date;
+          //   this.fromDateSelected = true;
+          //   this._toDateSelected = this.committeeReportTypes[0].dates[0].cvg_end_date;
+          //   this.toDateSelected = true;
+          // }
+
+          // this.status.emit({
+          //   'form': '3x',
+          //   'reportTypeRadio': this.reportTypeSelected
+          // });
+
+          // this.optionFailed = false;
+        }
+      }
+    }
+
+    if (this.selectedReportInfo) {
+      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
+        if (this._toDateUserModified) {
+          this.selectedReportInfo.toDate = this._toDateUserModified;
+        }
+        if (typeof this.selectedReportInfo.toDate === 'string') {
+          if (this.selectedReportInfo.toDate.length >= 1) {
+            this._toDateSelected = this.selectedReportInfo.toDate;
+            this.toDateSelected = true;
+          } else {
+            this.toDateSelected = false;
+          }
+        } else {
+          this.toDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
+        if (this._fromDateUserModified) {
+          this.selectedReportInfo.fromDate = this._fromDateUserModified;
+        }
+        if (typeof this.selectedReportInfo.fromDate === 'string') {
+          if (this.selectedReportInfo.fromDate.length >= 1) {
+            this._fromDateSelected = this.selectedReportInfo.fromDate;
+            this.fromDateSelected = true;
+          } else {
+            this.fromDateSelected = false;
+          }
+        } else {
+          this.fromDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
+        if (typeof this.selectedReportInfo.selectedState === 'string') {
+          this._selectedElectionState = this.selectedReportInfo.selectedState;
+        } else {
+          this._selectedElectionState = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
+        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
+          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
+        } else {
+          this._selectedElectionDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
+        if (typeof this.selectedReportInfo.dueDate === 'string') {
+          if (this.selectedReportInfo.dueDate.length >= 1) {
+            this._dueDate = this.selectedReportInfo.dueDate;
+          }
+        } else {
+          this._dueDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
+        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
+          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
+            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+          }
+        } else {
+          this._reportTypeDescripton = null;
+        }
+      }
+    }    
   }
 
 
