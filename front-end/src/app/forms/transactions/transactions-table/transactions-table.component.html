@@ -110,7 +110,7 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
         <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
@@ -168,12 +168,11 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" id="transactions__pin-modal-header">
-          <!-- <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4> -->
-          <div class="modal-title transactions__pin-modal-title">Column Options (Select up to 5)</div>
+          <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
           <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
             <span aria-hidden="true">×</span>
           </button>
-        </div>       
+        </div>
         <div class="modal-body">
           <div class="container">
             <div class="row">
@@ -374,6 +373,4 @@
       </div>
     </div>
   </div>
-
-  <!-- <app-trash-confirm #trashModal></app-trash-confirm> -->
 </div>

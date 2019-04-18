@@ -13,7 +13,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
-import { TrashConfirmComponent } from './trash-confirm/trash-confirm.component';
 
 
 
@@ -42,17 +41,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
-  @ViewChild('trashModal')
-  public trashModal: TrashConfirmComponent;
-
   @Input()
   public formType: string;
 
   @Input()
   public tableType: string;
-
-  // @ViewChild('modalBody')
-  // public modalBody;
 
   public transactionsModel: Array<TransactionModel>;
   public totalAmount: number;
@@ -217,7 +210,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 */
   public getTransactionsPage(page: number): void {
 
-    // this.config.currentPage = page;
+    this.config.currentPage = page;
 
     const sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -229,8 +222,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this._transactionsService.mockAddUIFileds(res);
         this._transactionsService.mockApplyRestoredTransaction(res);
-        this._transactionsService.mockApplyTrashedTransaction(res);
-        this._transactionsService.mockApplyFilters(res, this.filters, this.transactionsView);
+        this._transactionsService.mockApplyFilters(res, this.filters);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -240,18 +232,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.totalAmount = res.totalAmount;
         this.config.totalItems = res.totalTransactionCount;
         this.allTransactionsSelected = false;
-
-        // This is called in the template.  However, with mock data there may be a race condition
-        // where this method isn't called until after the current page logic
-        // following it is called.  So it is added here. Remove it later if not needed.
-        // Test where current page > 1.  The filter to produce a result of 1 page.
-        // Make sure the page range it for page 1 and not > 1.
-        this.determineItemRange();
-
-        // If a row was deleted, the current page may be greated than the last page
-        // as result of the delete.
-        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
-          ? this.numberOfPages : page;
       });
   }
 
@@ -272,21 +252,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
 
         this._transactionsService.mockAddUIFileds(res);
-        this._transactionsService.mockApplyTrashedRecycleBin(res);
-        this._transactionsService.mockApplyFilters(res, this.filters, this.recycleBinView);
+        this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
         this.transactionsModel = this._transactionsService.sortTransactions(
           transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
 
         this.config.totalItems = res.totalTransactionCount;
-
-        // This is called in the template.  However, with mock data there may be a race condition
-        // where this method isn't called until after the current page logic
-        // following it is called.  So it is added here. Remove it later if not needed.
-        // Test where current page > 1.  The filter to produce a result of 1 page.
-        // Make sure the page range it for page 1 and not > 1.
-        this.determineItemRange();
 
         // If a row was deleted, the current page may be greated than the last page
         // as result of the delete.
@@ -532,40 +504,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Trash all transactions selected by the user.
    */
   public trashAllSelected(): void {
-
-    const selectedTransactions: Array<TransactionModel> = [];
-    for (const trx of this.transactionsModel) {
-      if (trx.selected) {
-        selectedTransactions.push(trx);
-      }
-    }
-    // this.trashModal.transactions = selectedTransactions;
-    const dataMap: Map<string, any> = new Map([['transactions',selectedTransactions]]);
-
-    this._dialogService
-      .confirm('You are about to delete these transactions ',
-        TrashConfirmComponent,
-        'Caution!', null, null, dataMap)
-      .then(res => {
-        if (res === 'okay') {
-          let i = 1;
-          for (const trx of selectedTransactions) {
-            this._transactionsService.trashTransaction(trx)
-              .subscribe((res: GetTransactionsResponse) => {
-                // on last delete get page and show success
-                if (i === selectedTransactions.length) {
-                  this.getTransactionsPage(this.config.currentPage);
-                  this._dialogService
-                    .confirm('Transactions ' +
-                        ' have been successfully deleted and sent to the recycle bin',
-                      TrashConfirmComponent, 'Success!', false, ModalHeaderClassEnum.successHeader, dataMap);
-                }
-              });
-              i++;
-          }
-        } else if (res === 'cancel') {
-        }
-      });
+    alert('Trash all transactions is not yet supported');
   }
 
 
@@ -614,25 +553,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to trash
    */
-  public trashTransaction(trx: TransactionModel): void {
-
-    this._dialogService
-      .confirm('You are about to trash transaction ' + trx.transactionId + '.',
-        ConfirmModalComponent,
-        'Caution!')
-      .then(res => {
-        if (res === 'okay') {
-          this._transactionsService.trashTransaction(trx)
-            .subscribe((res: GetTransactionsResponse) => {
-              this.getTransactionsPage(this.config.currentPage);
-              this._dialogService
-                .confirm('Transaction ' + trx.transactionId +
-                    ' has been successfully deleted and sent to the recycle bin',
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-            });
-        } else if (res === 'cancel') {
-        }
-      });
+  public trashTransaction(): void {
+    alert('Trash transaction is not yet supported');
   }
 
 
@@ -670,6 +592,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public deleteRecyleBin(): void {
 
     let beforeMessage = '';
+    // if (this.bulkActionCounter === 1) {
+    //   let id = '';
+    //   for (const trx of this.transactionsModel) {
+    //     if (trx.selected) {
+    //       id = trx.transactionId;
+    //     }
+    //   }
+    //   beforeMessage = (id !== '') ?
+    //     'Are you sure you want to permanently delete Transaction ' + id + '?' :
+    //     'Are you sure you want to permanently delete this Transaction?';
+    // } else {
+    //   beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+    // }
+
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {

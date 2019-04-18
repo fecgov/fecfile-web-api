@@ -1552,4 +1552,3 @@ def get_AmendmentIndicators(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-

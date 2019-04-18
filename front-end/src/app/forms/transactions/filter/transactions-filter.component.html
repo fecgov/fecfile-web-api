@@ -12,7 +12,7 @@
           </i>          
         </div>
         <div class="card-body" 
-          [@openCloseScroll]="determineScrollState(isHideTypeFilter)">            
+          [@openCloseScroll]="determineScrollState()">            
           <div class="input-group py-1 transacions__filter-scroll-to-input">
             <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
               placeholder="Search Type" aria-label="Search">
@@ -80,55 +80,6 @@
           </div>          
         </div>
       </div> 
-
-      <div *ngIf="isRecycleBinViewActive()" class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleDeletedDateFilterItem()">
-          Deleted Date
-          <i class="float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideDeletedDateFilter)">
-          </i>
-        </div>
-        <div class="card-body" [@openClose]="!isHideDeletedDateFilter ? 'open' : 'closed'">
-          <div *ngIf="delDateFilterValidation.isError" class="text-error text-center">
-            {{ delDateFilterValidation.message }}
-          </div>
-          <label for="filter-del-date-from">From</label>
-          <div class="input-group transactions__filter-multi-input">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="filter-from-del-date">
-                  <i class="calendar-icon" aria-hidden="true"></i>
-              </span>
-            </div>
-            <input
-              type="date"
-              name="txtFromDelDate"
-              [(ngModel)]="filterDeletedDateFrom"
-              class="form-control"
-              id="filter-del-date-from"
-              aria-label="Filter From Delete Date"
-              aria-describedby="filter-from-del-date"
-            >                        
-          </div>
-          <label for="filter-del-date-to">To</label>
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="filter-to-del-date">
-                  <i class="calendar-icon" aria-hidden="true"></i>
-              </span>
-            </div>
-            <input
-              type="date"
-              name="txtToDelDate"
-              [(ngModel)]="filterDeletedDateTo"
-              class="form-control"
-              id="filter-del-date-to"
-              aria-label="Filter To Delete Date"
-              aria-describedby="filter-to-del-date"
-            >                        
-          </div>          
-        </div>
-      </div> 
-
       <div class="card">
         <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
           Amount
@@ -185,7 +136,7 @@
             [ngClass]="toggleFilterDirection(isHideStateFilter)">
           </i>          
         </div>
-        <div class="card-body" [@openCloseScroll]="determineScrollState(isHideStateFilter)">
+        <div class="card-body" [@openCloseScroll]="!isHideStateFilter ? 'open' : 'closed'">
           <div class="transactions__filter-type-list-body">
             <ul class="transactions__filter-type-list">
               <li *ngFor="let state of states">

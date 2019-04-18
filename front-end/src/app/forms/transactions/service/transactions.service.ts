@@ -10,7 +10,6 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
-import { ActiveView } from '../transactions.component';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -24,22 +23,12 @@ export interface GetTransactionsResponse {
 export class TransactionsService {
 
   // only for mock data
-  // only for mock data
-  // only for mock data
-
-  /** The array of items to show in the recycle bin. TODO rename it */
   private mockRestoreTrxArray = [];
-  /** The array of items trashed from the transaction table to be added to the recyle bin */
-  private mockTrashedTrxArray: Array<TransactionModel> = [];
-  /** The array of items restored from the recycle bin to be readded to the transactions table. TODO rename */
+  private mockTrxArray = [];
   private mockRecycleBinArray = [];
   private mockTransactionId = 'TID12345';
   private mockTransactionIdRecycle = 'TIDRECY';
-
   // only for mock data - end
-  // only for mock data - end
-  // only for mock data - end
-
 
   // May only be needed for mocking server
   private _orderByPipe: OrderByPipe;
@@ -177,69 +166,9 @@ export class TransactionsService {
   // TODO remove once server is ready and mock data is no longer needed
   public mockApplyRestoredTransaction(response: any) {
     for (const trx of this.mockRecycleBinArray) {
-
-      // check and see if the trx is already in the data
-      // this could be when a real trx is trached and then restored
-      const index = response.transactions.findIndex(
-        item => item.transaction_id === trx.transaction_id);
-
-      if (index === -1) {
-        response.transactions.push(trx);
-        response.totalAmount += trx.transaction_amount;
-        response.totalTransactionCount++;
-      }
-    }
-  }
-
-
-  // TODO remove once server is ready and mock data is no longer needed
-  /**
-   * Exclude mocked trashed transactions from the transaction table
-   * @param response
-   */
-  public mockApplyTrashedTransaction(response: any) {
-    for (const trashTrx of this.mockTrashedTrxArray) {
-
-      const index = response.transactions.findIndex(
-        item => item.transaction_id === trashTrx.transactionId);
-
-      response.transactions.splice(index, 1);
-
-      // don't decrement if has memo code per business rule
-      if (!trashTrx.memoCode) {
-        response.totalAmount -= trashTrx.amount;
-      }
-      response.totalTransactionCount--;
-
-      // this.mockRestoreTrxArray.push(this.mapToServerFields(trashTrx));
-
-      // this.mockRestoreTrxArray.push(trashTrx);
-
-      // const index2 = this.mockTrashedTrxArray.findIndex(
-      //   item => item.transactionId === trashTrx.transactionId);
-      // this.mockTrashedTrxArray.splice(index2, 1);
-    }
-
-    // this.mockTrashedTrxArray = [];
-  }
-
-
-  // TODO remove once server is ready and mock data is no longer needed
-  /**
-   * Include mocked trashed transactions in the Recycle Bin
-   * @param response
-   */
-  public mockApplyTrashedRecycleBin(response: any) {
-    for (const trashTrx of this.mockTrashedTrxArray) {
-
-      const index = response.transactions.findIndex(
-        item => item.transaction_id === trashTrx.transactionId);
-
-      // if it's not there, add it.
-      if (index === -1) {
-        response.transactions.push(this.mapToServerFields(trashTrx));
-        response.totalTransactionCount++;
-      }
+      response.transactions.push(trx);
+      response.totalAmount += trx.transaction_amount;
+      response.totalTransactionCount++;
     }
   }
 
@@ -265,7 +194,7 @@ export class TransactionsService {
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
    */
-  public mockApplyFilters(response: any, filters: TransactionFilterModel, view: ActiveView) {
+  public mockApplyFilters(response: any, filters: TransactionFilterModel) {
 
     if (!response.transactions) {
       return;
@@ -344,7 +273,6 @@ export class TransactionsService {
     }
 
     if (filters.filterDateFrom && filters.filterDateTo) {
-      isFilter = true;
       const filterDateFromDate = new Date(filters.filterDateFrom);
       const filterDateToDate = new Date(filters.filterDateTo);
       const filteredDateArray = [];
@@ -353,32 +281,12 @@ export class TransactionsService {
           const trxDate = new Date(trx.transaction_date);
           if (trxDate >= filterDateFromDate &&
               trxDate <= filterDateToDate) {
+            isFilter = true;
             filteredDateArray.push(trx);
           }
         }
       }
       response.transactions = filteredDateArray;
-    }
-
-    // only if view is recycle
-    if (view === ActiveView.recycleBin) {
-      if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
-        isFilter = true;
-        const filterDeletedDateFromDate = new Date(filters.filterDeletedDateFrom + ' EST');
-        const filterDeletedDateToDate = new Date(filters.filterDeletedDateTo + ' EST');
-        const filteredDeletedDateArray = [];
-        for (const trx of response.transactions) {
-          if (trx.deleted_date) {
-            const trxDelDate = new Date(trx.deleted_date + ' EST');
-            // trxDelDate.setDate(trxDelDate.getDate() + 1);
-            if (trxDelDate >= filterDeletedDateFromDate &&
-                trxDelDate <= filterDeletedDateToDate) {
-              filteredDeletedDateArray.push(trx);
-            }
-          }
-        }
-        response.transactions = filteredDeletedDateArray;
-      }
     }
 
     if (filters.filterMemoCode === true) {
@@ -462,47 +370,16 @@ export class TransactionsService {
    */
   public restoreTransaction(trx: TransactionModel): Observable<any> {
 
+
     // mocking the server API until it is ready.
 
-    let index = this.mockRestoreTrxArray.findIndex(
+    const index = this.mockRestoreTrxArray.findIndex(
       item => item.transaction_id === trx.transactionId);
 
     if (index !== -1) {
-      // Delete it from the recycling bin array
       this.mockRestoreTrxArray.splice(index, 1);
-      // Add it to the restore array to be included in the trsnactions table
       this.mockRecycleBinArray.push(this.mapToServerFields(trx));
     }
-
-    // see if it's in the trashed array
-    index = this.mockTrashedTrxArray.findIndex(
-      item => item.transactionId === trx.transactionId);
-
-    if (index !== -1) {
-      // Delete it from the trashed array
-      this.mockTrashedTrxArray.splice(index, 1);
-    }
-    return Observable.of('');
-  }
-
-
-  /**
-   * Trash the transaction from the Transactin Table to the Recyling Bin.
-   *
-   * @param trx the transaction to trash
-   */
-  public trashTransaction(trx: TransactionModel): Observable<any> {
-
-    // mocking the server API until it is ready.
-    // store the deleted transaction in this service and apply it against
-    // tranactions once retrieved from the server for read post delete.
-
-    // const now = new Date();
-    // const month = `${now.getMonth() + 1}`.padStart(2, '0');
-    // const day = `${now.getDate() + 1}`.padStart(2, '0');
-    // trx.deletedDate = `${now.getFullYear()}-${month}-${day}`.toString();
-    trx.deletedDate = new Date();
-    this.mockTrashedTrxArray.push(trx);
 
     return Observable.of('');
   }
@@ -595,17 +472,10 @@ export class TransactionsService {
     t1.city = 'New York';
     t1.employer = 'Exxon';
     t1.occupation = 'Lawyer';
-
-    const now = new Date();
-    const previousMonth = `${now.getMonth()}`.padStart(2, '0');
-    const month = `${now.getMonth() + 1}`.padStart(2, '0');
-
-    // randomize the day of month for mock data
-    const randomDay = Math.floor(Math.random() * (28 - 1 + 1)).toString().padStart(2, '0');
-    const randomDay2 = Math.floor(Math.random() * (28 - 1 + 1)).toString().padStart(2, '0');
-    t1.transaction_date = `${now.getFullYear()}-${previousMonth}-${randomDay}`.padStart(2, '0');
-    t1.deleted_date = `${now.getFullYear()}-${month}-${randomDay2}`.padStart(2, '0');
-
+    const date = new Date('2019-01-01');
+    t1.transaction_date = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    const deletedDate = new Date('2019-03-15');
+    t1.deleted_date = deletedDate.getFullYear() + '-' + (deletedDate.getMonth() + 1) + '-' + deletedDate.getDate();
     t1.memo_code = 'Memo Code';
     t1.memo_text = 'The memo text';
     t1.name = 'Mr. John Doe';

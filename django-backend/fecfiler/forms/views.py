@@ -1508,4 +1508,3 @@ def validate_HTMLtag(strWord):
         return ""  
     except Exception as e:
         return Response("The validate_HTMLtag function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
