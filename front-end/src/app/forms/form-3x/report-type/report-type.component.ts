@@ -38,6 +38,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   public tooltipLeft = 'auto';
   public customFormValidation: any;
 
+  private _committeeDetails: any = null;
   private _dueDate: string = null;
   private _formType: string = null;
   private _form3xReportTypeDetails: any = null;
@@ -59,11 +60,39 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
-  ) {}
+  ) {
+    this._messageService
+      .clearMessage();
+
+    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+      .subscribe(
+        message => {
+          console.log('message: ', message);
+          if (!message) {
+            return;
+          }
+          const dateName = message.name;
+          switch (dateName) {
+            case ReportTypeDateEnum.fromDate:
+              this._fromDateUserModified = message.date;
+              this._fromDateSelected = message.date;
+              this.fromDateSelected = true;
+              break;
+            case ReportTypeDateEnum.toDate:
+              this._toDateUserModified = message.date;
+              this._toDateSelected = message.date;
+              this.toDateSelected = true;
+              break;
+            default:
+          }
+        }
+      );
+  }
 
   ngOnInit(): void {
-
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+
+    this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
     if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
@@ -102,29 +131,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       amend_Indicator: '',
       coh_bop: '0'
     };
-
-    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
-      .subscribe(
-        message => {
-          if (!message) {
-            return;
-          }
-          const dateName = message.name;
-          switch (dateName) {
-            case ReportTypeDateEnum.fromDate:
-              this._fromDateUserModified = message.date;
-              this._fromDateSelected = message.date;
-              this.fromDateSelected = false;
-              break;
-            case ReportTypeDateEnum.toDate:
-              this._toDateUserModified = message.date;
-              this._toDateSelected = message.date;
-              this.toDateSelected = false;
-              break;
-            default:
-          }
-        }
-      );
   }
 
   ngDoCheck(): void {

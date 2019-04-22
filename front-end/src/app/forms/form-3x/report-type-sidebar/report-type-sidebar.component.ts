@@ -75,9 +75,16 @@ export class ReportTypeSidebarComponent implements OnInit {
                   let dates: any = this.selectedReport.election_state[0].dates;
 
                   if (Array.isArray(dates)) {
-                    this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
-                    this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
-                    this.dueDate = dates[0].due_date;
+                    console.log('dates[0].cvg_start_date: ', dates[0].cvg_start_date);
+                    if (
+                      typeof dates[0].cvg_start_date === 'string' && dates[0].cvg_start_date !== null && 
+                      typeof dates[0].cvg_end_date === 'string' && dates[0].cvg_end_date !== null &&
+                      typeof dates[0].due_date === 'string' && dates[0].due_date.length !== null
+                    ) {
+                      this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
+                      this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
+                      this.dueDate = dates[0].due_date;                      
+                    }
                   }
 
                   // if (Array.isArray(dates)) {
