@@ -320,46 +320,50 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
           .saveReport(this._formType, 'Saved')
           .subscribe(res => {
             if (res) {
-              console.log("doValidateReportType res = ",res);
-              let reportId=0;
+              let reportId = 0;
               if (Array.isArray(res)) {
-                 reportId=res[0].report_id
+                 reportId = res[0].report_id;
 
-                 var cvgStartDate = res[0].cvg_start_date;
-                 var datearray = cvgStartDate.split("-");
-                 var newcvgStartDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
 
-                 var cvgEndDate = res[0].cvg_end_date;
-                 var datearray = cvgEndDate.split("-");
-                 var newcvgEndDate = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-                 
-                 this._dialogService
-                 .reportExist('The coverage dates entered overlap with '+res[0].report_type + ' [' +newcvgStartDate + ' - '+ newcvgEndDate + ']' , ConfirmModalComponent,'Report already exist',false,true)
-                 .then(res => {
-                   if(res === 'okay') {
-                    this.optionFailed = true;
-                    this.isValidType = false;
-                    window.scrollTo(0, 0);
-                    this.status.emit({
-                      form: {},
-                      direction: 'previous',
-                      step: 'step_1'
-                    });
-                    
+                 const cvgStartDate: any = res[0].cvg_start_date;
+                 let datearray: any = cvgStartDate.split('-');
+
+                 const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+
+                 const cvgEndDate: any = res[0].cvg_end_date;
+                 datearray = cvgEndDate.split('-');
+
+                 const newcvgEndDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+                 const alertStr: string = `The coverage dates entered overlap 
+                   with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
+                      
+                 if (environment.name !== 'local') {                
+                   this._dialogService
+                   .reportExist(alertStr, ConfirmModalComponent,'Report already exist' ,false, true)
+                   .then(res => {
+                     if(res === 'okay') {
+                      this.optionFailed = true;
+                      this.isValidType = false;
+                      window.scrollTo(0, 0);
+                      this.status.emit({
+                        form: {},
+                        direction: 'previous',
+                        step: 'step_1'
+                      });
+
                     return 0;
                    } 
                    else if(res === 'ReportExist') {
-                    console.log("Report already exist Report id =",reportId);
                     let reporturl="/reports?reportId="
                     this._router.navigateByUrl(`${reporturl}{reportId}`);
-                   // `${environment.apiUrl}${url}`,
-                    //this._router.navigateByUrl('/reports?report_id='+res[0].report_id);
+
                     localStorage.setItem('Existing_Report_id', reportId.toString());
                     localStorage.removeItem(`form_${this._formType}_saved`);
                     localStorage.removeItem('reports.filters');
                     localStorage.removeItem('Reports.view');
                    }
                  });
+                } 
               }
               else {
                   console.log("New report created Report id =",reportId);   
