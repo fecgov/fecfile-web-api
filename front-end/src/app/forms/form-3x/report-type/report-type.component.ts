@@ -356,7 +356,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
                     //this._router.navigateByUrl('/reports?report_id='+res[0].report_id);
                     localStorage.setItem('Existing_Report_id', reportId.toString());
                     localStorage.removeItem(`form_${this._formType}_saved`);
-                  }
+                    localStorage.removeItem('reports.filters');
+                    localStorage.removeItem('Reports.view');
+                   }
                  });
               }
               else {

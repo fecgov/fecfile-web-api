@@ -181,6 +181,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
+
+    if (this.view !== localStorage.getItem("Reports.view")){
+      localStorage.setItem("Reports.view",this.view);
+      this.config.currentPage=1;
+    }
+
     this.getPage(this.config.currentPage);
   }
 

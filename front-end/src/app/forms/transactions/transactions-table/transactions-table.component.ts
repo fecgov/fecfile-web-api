@@ -922,8 +922,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     // sort column names must match the domain model names
-    const defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-    const otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',
+    // Mahendra FNE-914
+    //const defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
+    const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
+    const otherSortColumns = ['street', 'city', 'state', 'zip', , 'purposeDescription',
       'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
 
     this.sortableColumns = [];

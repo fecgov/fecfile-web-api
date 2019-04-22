@@ -71,7 +71,7 @@ private readonly filtersLSK = 'reports.filters';
 
     var dateObj = new Date();
     this.currentYear = dateObj.getUTCFullYear();
-    
+    this.clearSearch();
     
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");
