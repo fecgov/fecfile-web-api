@@ -14,9 +14,9 @@
     <div class="modal-footer">
       <button 
         type="button" 
-        class="btn btn-secondary" 
+        class="btn btn-default" 
         (click)="activeModal.close('okay')"
-      >OK</button>     
+      >Cancel</button>     
       <button *ngIf="isShowCancel"
         type="button" 
         (click)="activeModal.close('cancel')"
@@ -25,7 +25,7 @@
       <button *ngIf="isShowReportExist"
       type="button" 
       (click)="activeModal.close('ReportExist')"
-      class="btn btn-secondary"
+      class="btn btn-primary"
     >Show Report</button>     
     </div>
   </div>
