@@ -754,4 +754,10 @@ public getTransactionCategories( form_type: string): Observable<any> {
           }
        );
   }
+
+  public clearDashBoardReportFilterOptions(): void {
+    // to refresh/clear Dash Board Filter options
+    localStorage.removeItem('reports.filters');
+    localStorage.removeItem('Reports.view');
+  }
 }
