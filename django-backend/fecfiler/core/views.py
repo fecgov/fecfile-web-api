@@ -767,7 +767,7 @@ def check_entity_id(entity_id):
 
 def check_mandatory_fields_entity(data):
     try:
-        list_mandatory_fields_entity = ['entity_type', 'cmte_id', 'entity_name']
+        list_mandatory_fields_entity = ['entity_type', 'cmte_id']
         error =[]
         for field in list_mandatory_fields_entity:
             if not(field in data and check_null_value(data.get(field))):
