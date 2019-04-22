@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation, OnDestroy, DoCheck } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, OnDestroy, ViewChild, ViewEncapsulation, DoCheck } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -20,7 +20,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   styleUrls: ['./report-type.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
+export class ReportTypeComponent implements OnInit, OnDestroy {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
@@ -48,7 +48,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   private _toDateSelected: string = null;
   private _fromDateUserModified: string = null;
   private _toDateUserModified: string = null;
-  private dateChangeSubscription: Subscription;
+  private _dateChangeSubscription: Subscription;
 
   constructor(
     private _fb: FormBuilder,
@@ -59,39 +59,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
-  ) {
-    this._messageService.clearMessage();
-
-    // this.dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
-    //   .subscribe(
-    //     message => {
-    //       if (!message) {
-    //         return;
-    //       }
-    //       const dateName = message.name;
-    //       switch (dateName) {
-    //         case ReportTypeDateEnum.fromDate:
-    //           this._fromDateUserModified = message.date;
-    //           this._fromDateSelected = message.date;
-    //           this.fromDateSelected = false;
-    //           break;
-    //         case ReportTypeDateEnum.toDate:
-    //           this._toDateUserModified = message.date;
-    //           this._toDateSelected = message.date;
-    //           this.toDateSelected = false;
-    //           break;
-    //         default:
-    //       }
-    //     }
-    //   );
-  }
+  ) {}
 
   ngOnInit(): void {
 
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
-    // this.initUserModFields();
-    // this.initCustomFormValidation();
 
     if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
@@ -130,6 +102,29 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
       amend_Indicator: '',
       coh_bop: '0'
     };
+
+    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+      .subscribe(
+        message => {
+          if (!message) {
+            return;
+          }
+          const dateName = message.name;
+          switch (dateName) {
+            case ReportTypeDateEnum.fromDate:
+              this._fromDateUserModified = message.date;
+              this._fromDateSelected = message.date;
+              this.fromDateSelected = false;
+              break;
+            case ReportTypeDateEnum.toDate:
+              this._toDateUserModified = message.date;
+              this._toDateSelected = message.date;
+              this.toDateSelected = false;
+              break;
+            default:
+          }
+        }
+      );
   }
 
   ngDoCheck(): void {
@@ -148,10 +143,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     this._setReportTypes();
   }
 
-
-  // ngOnDestroy(): void {
-  //   this.dateChangeSubscription.unsubscribe();
-  // }
+  ngOnDestroy(): void {
+    this._dateChangeSubscription.unsubscribe();
+  }  
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
