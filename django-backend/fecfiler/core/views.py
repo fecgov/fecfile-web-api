@@ -205,10 +205,10 @@ def check_list_cvg_dates(args):
         form_type = args[1]
         cvg_start_dt = args[2]
         cvg_end_dt = args[3]
-        print("cmte_id =", cmte_id)
-        print("form_type =", form_type)
-        print("cvg_start_dt =", cvg_start_dt)
-        print("cvg_end_dt =", cvg_end_dt)
+        # print("cmte_id =", cmte_id)
+        # print("form_type =", form_type)
+        # print("cvg_start_dt =", cvg_start_dt)
+        # print("cvg_end_dt =", cvg_end_dt)
 
 
         forms_obj = []
