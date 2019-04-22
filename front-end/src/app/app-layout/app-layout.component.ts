@@ -110,6 +110,9 @@ export class AppLayoutComponent implements OnInit {
 
   ngDoCheck(): void {
     const route: string = this._router.url;
+    // to refresh/clear Dash Board Filter options
+    localStorage.removeItem('reports.filters');
+    localStorage.removeItem('Reports.view');
 
     if (route === '/dashboard') {
       /**
