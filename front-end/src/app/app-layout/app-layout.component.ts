@@ -144,28 +144,11 @@ export class AppLayoutComponent implements OnInit {
                 this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / (oneDay)));
               } else if (this._utilService.compareDatesEqual(today, dueDate)) {
                 this.showFormDueDate = false;
-                console.log('Due today');
                 this.formDueDate = 0;
               } else {
                 this.showFormDueDate = false;
                 this.formDueDate = 0;
               }
-
-              if (this.showFormDueDate) {
-                console.log(' today       = ' + today);
-                console.log(' dueDate     = ' + dueDate);
-                console.log(' due in days = ' + this.formDueDate);
-              } else {
-                console.log('dont show due date');
-                console.log(' today       = ' + today);
-                console.log(' dueDate     = ' + dueDate);
-              }
-              
-              // if (formInfo.dueDate.indexOf('2018') === 0) {
-              //   dueDate = new Date(2019, dueDateArr[0], dueDateArr[1]);
-              // } else {
-              //   dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
-              // }
 
               this.formType = formInfo.formType;
               this.formDescription = formInfo.reportTypeDescription;
