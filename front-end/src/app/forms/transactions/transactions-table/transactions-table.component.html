@@ -322,31 +322,32 @@
                   </label>
                 </div>                
               </div>
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
+                        City
+                      </span>
+                    </label>
+                  </div>
+              </div>
             </div>
             <div class="row">
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
-                      type="checkbox" [disabled]="getSortableColumn('city').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
-                      City
-                    </span>
-                  </label>
+                <div class="col-md">
+                    <div class="checkbox">
+                      <label>
+                        <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
+                          (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
+                          [disabled]="getSortableColumn('purposeDescription').disabled">
+                        <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
+                          Purpose Description
+                        </span>
+                      </label>
+                    </div>                
                 </div>
-              </div>
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
-                      (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('purposeDescription').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
-                      Purpose Description
-                    </span>
-                  </label>
-                </div>                
-              </div>
+  
               <div class="col-md">
                 <div class="checkbox">
                   <label>
