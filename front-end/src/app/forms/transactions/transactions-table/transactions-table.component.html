@@ -12,7 +12,9 @@
           <input [@fadeInOut]  [(ngModel)]="allTransactionsSelected" type="checkbox"
             (change)="changeAllTransactionsSelected()">
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+         <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+        </th>
+        <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
@@ -96,7 +98,7 @@
           <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
         </td>
         <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.type}}</td>
-        <!--<td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>-->
+        <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trx.name}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
@@ -189,6 +191,17 @@
                 </div>
               </div>
               <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('transactionId').checked" (change)="toggleVisibility('transactionId', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('transactionId').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('transactionId').disabled}">
+                        Transaction Id
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              <div class="col-md">
                 <div class="checkbox">
                   <label>
                     <input [(ngModel)]="getSortableColumn('state').checked" (change)="toggleVisibility('state', $event)"
@@ -199,6 +212,8 @@
                   </label>
                 </div>
               </div>
+            </div>
+            <div class="row">              
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -211,8 +226,6 @@
                   </label>
                 </div>                
               </div>
-            </div>
-            <div class="row">
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -236,20 +249,20 @@
                   </label>
                 </div>
               </div>
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('contributorOccupation').checked"
-                      (change)="toggleVisibility('contributorOccupation', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('contributorOccupation').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('contributorOccupation').disabled}">
-                      Contributor Occupation
-                    </span>
-                  </label>
-                </div>                
-              </div>
             </div>
             <div class="row">
+              <div class="col-md">
+                    <div class="checkbox">
+                      <label>
+                        <input [(ngModel)]="getSortableColumn('contributorOccupation').checked"
+                          (change)="toggleVisibility('contributorOccupation', $event)" type="checkbox"
+                          [disabled]="getSortableColumn('contributorOccupation').disabled">
+                        <span [ngClass]="{'disabled-column-option':getSortableColumn('contributorOccupation').disabled}">
+                          Contributor Occupation
+                        </span>
+                      </label>
+                    </div>                
+              </div>
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -272,18 +285,6 @@
                   </label>
                 </div>
               </div>
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('memoCode').checked"
-                      (change)="toggleVisibility('memoCode', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('memoCode').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('memoCode').disabled}">
-                      Memo Code
-                    </span>
-                  </label>
-                </div>                
-              </div>
             </div>
             <div class="row">
               <div class="col-md">
@@ -298,6 +299,19 @@
                   </label>
                 </div>
               </div>
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('memoCode').checked"
+                        (change)="toggleVisibility('memoCode', $event)" type="checkbox"
+                        [disabled]="getSortableColumn('memoCode').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('memoCode').disabled}">
+                        Memo Code
+                      </span>
+                    </label>
+                  </div>                
+              </div>
+  
              <!-- <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -322,20 +336,20 @@
                   </label>
                 </div>                
               </div>
-              <div class="col-md">
-                  <div class="checkbox">
-                    <label>
-                      <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
-                        type="checkbox" [disabled]="getSortableColumn('city').disabled">
-                      <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
-                        City
-                      </span>
-                    </label>
-                  </div>
-              </div>
             </div>
             <div class="row">
-                <div class="col-md">
+              <div class="col-md">
+                    <div class="checkbox">
+                      <label>
+                        <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
+                          type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                        <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
+                          City
+                        </span>
+                      </label>
+                    </div>
+              </div>
+              <div class="col-md">
                     <div class="checkbox">
                       <label>
                         <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
@@ -346,8 +360,7 @@
                         </span>
                       </label>
                     </div>                
-                </div>
-  
+              </div>
               <div class="col-md">
                 <div class="checkbox">
                   <label>
