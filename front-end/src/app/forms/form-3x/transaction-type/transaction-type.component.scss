@@ -108,12 +108,13 @@
                 }
                 .collapse {
                   .card-body {
+                    padding: 0;
                     .child-options {
                       list-style-type: none;
                       .child-options__item {
                         display: block;
-                        height: 50px;
                         width: 100%;
+                        padding: 1em;
                         &:nth-child(even) {
                           background-color: $seaShell !important;
                         }

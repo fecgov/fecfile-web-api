@@ -8,41 +8,48 @@
         <thead>
             <tr>
                 <!--<th class="forms__trx-table-checkbox">
-                    <input *ngIf="isTransactionViewActive()"
+                    <input *ngIf="isReportViewActive()"
                         [(ngModel)]="allTransactionsSelected"
                         type="checkbox" (change)="changeAllTransactionsSelected()">
                 </th> -->
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('form_type')"
                     [class]="getSortClass('form_type')" 
                     (click)="changeSortDirection('form_type')">Form
                 </th>
                 <th
-                    [class]="getSortClass('Status')" 
+                    [@fadeInOut] *ngIf="isColumnVisible('status')"
+                    [class]="getSortClass('status')" 
                     (click)="changeSortDirection('status')">Status
                 </th>
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('fec_id')"
                     [class]="getSortClass('fec_id')" 
                     (click)="changeSortDirection('fec_id')">FEC ID
                 </th>
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('amend_ind')"
                     [class]="getSortClass('amend_ind')" 
                     (click)="changeSortDirection('amend_ind')">Amendment Indicator
-                </th>
+                </th>   
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')"    
                     [class]="getSortClass('cvg_start_date')" 
                     (click)="changeSortDirection('cvg_start_date')">Coverage Date Cycle
                 </th>                              
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('report_type_desc')"
                     [class]="getSortClass('report_type_desc')" 
                     (click)="changeSortDirection('report_type_desc')">Report
                 </th>
                 <th 
+                    [@fadeInOut] *ngIf="isColumnVisible('filed_date')"
                     [class]="getSortClass('filed_date')" 
                     (click)="changeSortDirection('filed_date')">Filed/Saved Date
                 </th>                        
                                                                     
                <!-- <th class="bulk_action">
-                    <div *ngIf="isTransactionViewActive()" class="btn-group" 
+                    <div *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn">
                             <i class="fas fa-ellipsis-h"></i>
@@ -84,7 +91,7 @@
                             <i class="fas fa-trash-restore"></i>
                         </button>                     
                     </div>
-                    <div *ngIf="isTransactionViewActive()" class="btn-group" 
+                    <div *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
                         <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
@@ -168,7 +175,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+                    <h4 class="modal-title pull-left">Column Options</h4>
                     <button aria-label="Close" class="close btn btn-link" type="button" 
                             (click)="cancelColumnOptions()">
                         <span aria-hidden="true">×</span>

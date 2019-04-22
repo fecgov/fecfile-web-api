@@ -14,9 +14,6 @@
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')"
-          (click)="changeSortDirection('transactionId')">Transaction ID
-        </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
@@ -31,9 +28,9 @@
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
+       <!--<th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
           (click)="changeSortDirection('aggregate')">Aggregate
-        </th>
+        </th>-->
         <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
           (click)="changeSortDirection('purposeDescription')">Purpose Description
         </th>
@@ -55,6 +52,9 @@
         <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
           Amount
         </th>        
+        <th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
+          (click)="changeSortDirection('aggregate')">Aggregate Amount
+        </th>
         <th class="bulk_action">
           <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
@@ -96,21 +96,22 @@
           <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
         </td>
         <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.type}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+        <!--<td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>-->
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trx.name}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>
+        <!--<td [@fadeInOut] *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>-->
         <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
         <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')">{{trx.aggregate | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
@@ -168,12 +169,11 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" id="transactions__pin-modal-header">
-          <!-- <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4> -->
-          <div class="modal-title transactions__pin-modal-title">Column Options (Select up to 5)</div>
+          <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
           <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
             <span aria-hidden="true">×</span>
           </button>
-        </div>       
+        </div>
         <div class="modal-body">
           <div class="container">
             <div class="row">
@@ -216,11 +216,11 @@
               <div class="col-md">
                 <div class="checkbox">
                   <label>
-                    <input [(ngModel)]="getSortableColumn('transactionId').checked"
-                      (change)="toggleVisibility('transactionId', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('transactionId').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('transactionId').disabled}">
-                      Transaction ID
+                    <input [(ngModel)]="getSortableColumn('aggregate').checked"
+                      (change)="toggleVisibility('aggregate', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('aggregate').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('aggregate').disabled}">
+                      Aggregate Amount
                     </span>
                   </label>
                 </div>
@@ -298,7 +298,7 @@
                   </label>
                 </div>
               </div>
-              <div class="col-md">
+             <!-- <div class="col-md">
                 <div class="checkbox">
                   <label>
                     <input [(ngModel)]="getSortableColumn('aggregate').checked"
@@ -309,7 +309,7 @@
                     </span>
                   </label>
                 </div>
-              </div>
+              </div>-->
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -322,31 +322,32 @@
                   </label>
                 </div>                
               </div>
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
+                        City
+                      </span>
+                    </label>
+                  </div>
+              </div>
             </div>
             <div class="row">
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
-                      type="checkbox" [disabled]="getSortableColumn('city').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
-                      City
-                    </span>
-                  </label>
+                <div class="col-md">
+                    <div class="checkbox">
+                      <label>
+                        <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
+                          (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
+                          [disabled]="getSortableColumn('purposeDescription').disabled">
+                        <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
+                          Purpose Description
+                        </span>
+                      </label>
+                    </div>                
                 </div>
-              </div>
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
-                      (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('purposeDescription').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
-                      Purpose Description
-                    </span>
-                  </label>
-                </div>                
-              </div>
+  
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -374,6 +375,4 @@
       </div>
     </div>
   </div>
-
-  <!-- <app-trash-confirm #trashModal></app-trash-confirm> -->
 </div>

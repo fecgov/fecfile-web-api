@@ -1,36 +1,18 @@
-/*import { Component, OnInit } from '@angular/core';
-
-@Component({
-  selector: 'app-reportdetails',
-  templateUrl: './reportdetails.component.html',
-  styleUrls: ['./reportdetails.component.scss']
-})
-export class ReportdetailsComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}*/
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-//import { reportModel } from '../report';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-//import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
-//import { ActiveView } from 'src/app/forms/transactions/transactions.component';
 import { ActiveView } from '../reportheader/reportheader.component';
-import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
+import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
 import { reportModel} from 'src/app/shared/interfaces/FormsService/FormsService';
-
+import { ReportFilterModel } from '../model/report-filter.model';
 
 @Component({
   selector: 'app-reportdetails',
@@ -51,89 +33,131 @@ import { reportModel} from 'src/app/shared/interfaces/FormsService/FormsService'
 })
 export class ReportdetailsComponent implements OnInit, OnDestroy {
 
+
   @ViewChild('columnOptionsModal')
-  public columnOptionsModal: ModalDirective; 
+  public columnOptionsModal: ModalDirective;
+
+  /*@ViewChild('trashModal')
+  public trashModal: TrashConfirmComponent;*/
+
+  @Input()
+  public view: string; 
 
   @Input()
   public formType: string;
+
   @Input()
-  public tableType: string;  
-  @Input()
-  public view: string; 
+  public tableType: string;
+
   @Input()
   public existingReportId: number;
+
+  // @ViewChild('modalBody')
+  // public modalBody;
+
+ 
+  
+  private filters: ReportFilterModel;
 
   public reportsModel: Array<reportModel>;
   public filterReportsModel: Array<reportModel>;
   public totalAmount: number;
   public reportsView = ActiveView.reports;
   public recycleBinView = ActiveView.recycleBin;
+  public bulkActionDisabled = true;
+  public bulkActionCounter = 0;
+  //public existingReportId: string;
 
- // Local Storage Keys
- private readonly reportSortableColumnsLSK =
- 'reports.rpt.sortableColumn';
- private readonly recycleSortableColumnsLSK =
- 'reports.recycle.sortableColumn';
- private readonly reportCurrentSortedColLSK =
- 'reports.rpt.currentSortedColumn';
- private readonly recycleCurrentSortedColLSK =
- 'reports.recycle.currentSortedColumn';
- private readonly transactionPageLSK =
- 'reports.rpt.page';
- private readonly recyclePageLSK =
- 'reports.recycle.page';
+  // ngx-pagination config
+  public maxItemsPerPage = 100;
+  public directionLinks = false;
+  public autoHide = true;
+  public config: PaginationInstance;
+  public numberOfPages = 0;
+ 
+
+  // private keywords = [];
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
 
+  // Local Storage Keys
+  private readonly reportSortableColumnsLSK =
+    'reports.rpt.sortableColumn';
+  private readonly recycleSortableColumnsLSK =
+    'reports.recycle.sortableColumn';
+  private readonly reportCurrentSortedColLSK =
+    'reports.rpt.currentSortedColumn';
+  private readonly recycleCurrentSortedColLSK =
+    'reports.recycle.currentSortedColumn';
+  private readonly reportPageLSK =
+    'reports.rpt.page';
+  private readonly recyclePageLSK =
+    'reports.recycle.page';
+  private readonly filtersLSK =
+    'reports.filters';
 
   /**.
 	 * Array of columns to be made sortable.
 	 */
   private sortableColumns: SortableColumnModel[] = [];
-  
+
   /**
 	 * A clone of the sortableColumns for reverting user
    * column options on a Cancel.
 	 */
-	private cloneSortableColumns: SortableColumnModel[] = [];  
-	
-	/**
-	 * Identifies the column currently sorted by name. 
+  private cloneSortableColumns: SortableColumnModel[] = [];
+
+  /**
+	 * Identifies the column currently sorted by name.
 	 */
   private currentSortedColumnName: string;
-  
+
   /**
    * Subscription for messags sent from the parent component to show the PIN Column
    * options.
    */
   private showPinColumnsSubscription: Subscription;
 
-  // ngx-pagination config
-  public maxItemsPerPage: number = 100;
-  public directionLinks: boolean = false;
-  public autoHide: boolean = true;	
-  public config: PaginationInstance;
-  public numberOfPages = 0;
-  
-  private columnOptionCount: number = 0;
-  private readonly maxColumnOption = 7;
-  private allTransactionsSelected: boolean;
+
+  /**
+   * Subscription for running the keyword and filter search
+   * to the reports obtained from the server.
+   */
+  private keywordFilterSearchSubscription: Subscription;
+
+  private columnOptionCount = 0;
+  private readonly maxColumnOption = 5;
+  private allReportsSelected: boolean;
 
   constructor(
-   // private _formsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService,
+    private _formsService: FormsService,
+    private _reportsMessageService: ReportsMessageService,
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _formsService: FormsService,
-
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getMessage().subscribe(
-			message => { 
-        console.log("trying to access showPinColumns... !");
-        this.showPinColumns();
-			}
-    );
-    // commeented by Mahendra on 03/26/2019
+    this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage()
+      .subscribe(
+        message => {
+          this.showPinColumns();
+        }
+      );
+
+    this.keywordFilterSearchSubscription = this._reportsMessageService.getDoKeywordFilterSearchMessage()
+      .subscribe(
+        (filters: ReportFilterModel) => {
+
+          if (filters) {
+             console.log("keywordFilterSearchSubscription filters=", filters);
+            this.filters = filters;
+            if (filters.formType) {
+              this.formType = filters.formType;
+            }
+          }
+          this.getPage(this.config.currentPage);
+        }
+      );
   }
 
 
@@ -142,7 +166,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
-		const paginateConfig: PaginationInstance = {
+    const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
       itemsPerPage: 30,
       currentPage: 1
@@ -157,47 +181,101 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
+
+    if (this.view !== localStorage.getItem("Reports.view")){
+      localStorage.setItem("Reports.view",this.view);
+      this.config.currentPage=1;
+    }
+
     this.getPage(this.config.currentPage);
   }
 
 
   /**
-   * When component is destroyed, save off user column options to be applied upon return.
+   * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
+    this.keywordFilterSearchSubscription.unsubscribe();
   }
 
 
   /**
-	 * The Transactions for a given page.
-	 * 
-	 * @param page the page containing the transactions to get
+	 * The Reports for a given page.
+	 *
+	 * @param page the page containing the reports to get
 	 */
-	public getPage(page: number) : void {
-    console.log ("getPage ...");
-    console.log ("this.tableType = ", this.tableType);
-    console.log ("this.reportsView = ", this.reportsView);
+  public getPage(page: number): void {
+
+    this.bulkActionCounter = 0;
+    this.bulkActionDisabled = true;
 
     switch (this.tableType) {
       case this.reportsView:
-        console.log (" Accessing getReportsPage ");
         this.getReportsPage(page);
         break;
       case this.recycleBinView:
-        //this.getRecyclingPage(page);
-        break;                           
+        this.getReportsPage(page);
+        break;
       default:
-        break;                            
-    }  
+        break;
+    }
   }
 
 
   /**
-	 * The Transactions for a given page.
+	 * The Reports for a given page.
+	 *
+	 * @param page the page containing the reports to get
+	 */
+  /*public getReportsPage(page: number): void {
+
+    // this.config.currentPage = page;
+
+    const sortedCol: SortableColumnModel =
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    this._reportsService.getFormReports(this.formType, page, this.config.itemsPerPage,
+      this.currentSortedColumnName, sortedCol.descending, this.filters)
+      .subscribe((res: GetReportsResponse) => {
+        this.reportsModel = [];
+
+        this._reportsService.mockAddUIFileds(res);
+        this._reportsService.mockApplyRestoredReport(res);
+        this._reportsService.mockApplyTrashedReport(res);
+        this._reportsService.mockApplyFilters(res, this.filters, this.reportsView);
+
+        const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
+
+        this.reportsModel = this._reportsService.sortReports(
+          reportsModelL, this.currentSortedColumnName, sortedCol.descending);
+
+        this.totalAmount = res.totalAmount;
+        this.config.totalItems = res.totalReportCount;
+        this.allReportsSelected = false;
+
+        // This is called in the template.  However, with mock data there may be a race condition
+        // where this method isn't called until after the current page logic
+        // following it is called.  So it is added here. Remove it later if not needed.
+        // Test where current page > 1.  The filter to produce a result of 1 page.
+        // Make sure the page range it for page 1 and not > 1.
+        this.determineItemRange();
+
+        // If a row was deleted, the current page may be greated than the last page
+        // as result of the delete.
+        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
+          ? this.numberOfPages : page;
+      });
+  }
+
+*/
+
+
+/**
+	 * The Reports for a given page.
 	 * 
-	 * @param page the page containing the transactions to get
+	 * @param page the page containing the reports to get
 	 */
 	public getReportsPage(page: number) : void {
     console.log(" accessing getReportsPage ...");
@@ -217,8 +295,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("view",this.view);
     console.log("existingReportId",this.existingReportId);
   
-    this._formsService.getReports(this.formType, this.view, page, this.config.itemsPerPage,
+    this._formsService.getReports (this.view, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending,this.existingReportId)
+      
       .subscribe((res: GetReportsResponse) => {
         console.log("getReportsPage res", res);
         
@@ -232,115 +311,154 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = this.reportsModel.length;
 
-        this.reportsModel = this._formsService.sortTransactions(
+        this.reportsModel = this._formsService.sortReports(
           this.reportsModel, this.currentSortedColumnName, sortedCol.descending);
       
-        this.allTransactionsSelected = false;
+        this.allReportsSelected = false;
       });
 
   }  
 
   
 
-	/**
+  /**
+	 * The Reports for the recycling bin.
+	 *
+	 * @param page the page containing the reports to get
+	 */
+ /* public getRecyclingPage(page: number): void {
+
+    this.calculateNumberOfPages();
+
+    const sortedCol: SortableColumnModel =
+      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    this._reportsService.getUserDeletedReports(this.formType)
+      .subscribe((res: GetReportsResponse) => {
+
+        this._reportsService.mockAddUIFileds(res);
+        this._reportsService.mockApplyTrashedRecycleBin(res);
+        this._reportsService.mockApplyFilters(res, this.filters, this.recycleBinView);
+        const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
+
+        this.reportsModel = this._reportsService.sortReports(
+          reportsModelL, this.currentSortedColumnName, sortedCol.descending);
+
+        this.config.totalItems = res.totalReportCount;
+
+        // This is called in the template.  However, with mock data there may be a race condition
+        // where this method isn't called until after the current page logic
+        // following it is called.  So it is added here. Remove it later if not needed.
+        // Test where current page > 1.  The filter to produce a result of 1 page.
+        // Make sure the page range it for page 1 and not > 1.
+        this.determineItemRange();
+
+        // If a row was deleted, the current page may be greated than the last page
+        // as result of the delete.
+        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
+          ? this.numberOfPages : page;
+      });
+  }*/
+
+
+  /**
 	 * Wrapper method for the table service to set the class for sort column styling.
-	 * 
+	 *
 	 * @param colName the column to apply the class
 	 * @returns string of classes for CSS styling sorted/unsorted classes
 	 */
   public getSortClass(colName: string): string {
-		return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
-  }  
+    return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
+  }
 
 
-	/**
+  /**
 	 * Change the sort direction of the table column.
-	 * 
+	 *
 	 * @param colName the column name of the column to sort
 	 */
-	public changeSortDirection(colName: string) : void {
-		this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
-    
+  public changeSortDirection(colName: string): void {
+    this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
+
     // TODO this could be done client side or server side.
     // call server for page data in new direction
     this.getPage(this.config.currentPage);
-  }  
-  
+  }
+
 
   /**
    * Get the SortableColumnModel by name.
-   * 
+   *
    * @param colName the column name in the SortableColumnModel.
    * @returns the SortableColumnModel matching the colName.
    */
-  public getSortableColumn(colName: string) : SortableColumnModel {
-    for (let col of this.sortableColumns) {
-			if (col.colName == colName) {
-				return col;
-			}
-		}
-		return new SortableColumnModel("", false, false, false, false);
+  public getSortableColumn(colName: string): SortableColumnModel {
+    for (const col of this.sortableColumns) {
+      if (col.colName === colName) {
+        return col;
+      }
+    }
+    return new SortableColumnModel('', false, false, false, false);
   }
 
 
   /**
    * Determine if the column is to be visible in the table.
-   * 
-   * @param colName 
+   *
+   * @param colName
    * @returns true if visible
    */
-  public isColumnVisible(colName: string) : boolean {
-    let sortableCol = this.getSortableColumn(colName);
+  public isColumnVisible(colName: string): boolean {
+    const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
       return sortableCol.visible;
-    }
-    else{
+    } else {
       return false;
     }
-  }  
+  }
 
 
   /**
    * Set the visibility of a column in the table.
-   * 
+   *
    * @param colName the name of the column to make shown
    * @param visible is true if the columns should be shown
    */
   public setColumnVisible(colName: string, visible: boolean) {
-    let sortableCol = this.getSortableColumn(colName);
+    const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
       sortableCol.visible = visible;
     }
-  }  
+  }
 
 
   /**
    * Set the checked property of a column in the table.
    * The checked is true if the column option settings
    * is checked for the column.
-   * 
+   *
    * @param colName the name of the column to make shown
    * @param checked is true if the columns should be shown
    */
   private setColumnChecked(colName: string, checked: boolean) {
-    let sortableCol = this.getSortableColumn(colName);
+    const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
       sortableCol.checked = checked;
     }
-  }  
+  }
 
 
   /**
-   * 
+   *
    * @param colName Determine if the checkbox column option should be disabled.
    */
-  public disableOption(colName: string) : boolean {
-    let sortableCol = this.getSortableColumn(colName);
+  public disableOption(colName: string): boolean {
+    const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      if(!sortableCol.checked && this.columnOptionCount > 
-          (this.maxColumnOption - 1)) {
+      if (!sortableCol.checked && this.columnOptionCount >
+        (this.maxColumnOption - 1)) {
         return true;
-      } 
+      }
     }
     return false;
   }
@@ -348,9 +466,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
   /**
    * Toggle the visibility of a column in the table.
-   * 
+   *
    * @param colName the name of the column to toggle
-   * @param e the click event 
+   * @param e the click event
    */
   public toggleVisibility(colName: string, e: any) {
 
@@ -359,9 +477,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
 
     // only permit 5 checked at a time
-    if (e.target.checked == true) {
+    if (e.target.checked === true) {
       this.columnOptionCount = 0;
-      for (let col of this.sortableColumns) {
+      for (const col of this.sortableColumns) {
         if (col.checked) {
           this.columnOptionCount++;
         }
@@ -372,13 +490,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
           return;
         }
       }
-    }
-    else {
+    } else {
       this.columnOptionCount--;
     }
 
     this.applyDisabledColumnOptions();
-  }  
+  }
 
 
   /**
@@ -386,24 +503,23 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   private applyDisabledColumnOptions() {
     if (this.columnOptionCount > (this.maxColumnOption - 1)) {
-      for (let col of this.sortableColumns) {
+      for (const col of this.sortableColumns) {
         col.disabled = !col.checked;
       }
-    }
-    else {
-      for (let col of this.sortableColumns) {
+    } else {
+      for (const col of this.sortableColumns) {
         col.disabled = false;
-      } 
+      }
     }
   }
 
 
   /**
-   * Save the columns to show selected by the user. 
+   * Save the columns to show selected by the user.
    */
   public saveColumnOptions() {
 
-    for (let col of this.sortableColumns) {
+    for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, col.checked);
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
@@ -418,110 +534,257 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.columnOptionsModal.hide();
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
   }
-  
+
 
   /**
    * Toggle checking all types.
-   * 
-   * @param e the click event 
+   *
+   * @param e the click event
    */
   public toggleAllTypes(e: any) {
-    let checked = (e.target.checked) ? true : false;
-    for (let col of this.sortableColumns) {
+    const checked = (e.target.checked) ? true : false;
+    for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, checked);
-    }    
+    }
   }
 
 
-	/**
+  /**
 	 * Determine if pagination should be shown.
 	 */
-	public showPagination() : boolean {
-		if (this.config.totalItems > this.config.itemsPerPage) {
-			return true;
-		}
-		// otherwise, no show.
-		return false;
-  }  
+  public showPagination(): boolean {
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }
 
 
   /**
-   * Edit report selected by the user.
+   * View all reports selected by the user.
    */
-  public viewReport(report: string) : void {
-    alert("View report is not yet supported");
-  } 
+  public viewAllSelected(): void {
+    alert('View all reports is not yet supported');
+  }
 
- /**
-   * Edit report selected by the user.
-   */
-  public editReport(report: string) : void {
-    alert("Edit report is not yet supported");
-  } 
 
   /**
-   * Amend report selected by the user.
+   * Print all reports selected by the user.
    */
-  public amendReport(report: string) : void {
-    alert("Amend report is not yet supported");
-  }  
+  public printAllSelected(): void {
+    alert('Print all reports is not yet supported');
+  }
+
 
   /**
-   * Download report as PDF selected by the user.
+   * Export all reports selected by the user.
    */
-  public downloadReportAsJSON(report: string) : void {
-    alert("Download report as JSON is not yet supported");
-  } 
+  public exportAllSelected(): void {
+    alert('Export all reports is not yet supported');
+  }
+
 
   /**
-   * Download report as PDF selected by the user.
+   * Link all reports selected by the user.
    */
-  public downloadReportAsPDF(report: string) : void {
-    alert("Download report as PDF is not yet supported");
-  } 
+  public linkAllSelected(): void {
+    alert('Link multiple report requirements have not been finalized');
+  }
+
 
   /**
-   * Delete report selected by the user.
+   * Trash all reports selected by the user.
    */
-  public trashReport(report: string) : void {
-    alert("Delete report is not yet supported");
-  } 
+  /*public trashAllSelected(): void {
 
-
-   
-  
-
-  /**
-   * Restore a trashed transaction from the recyle bin.
-   * 
-   * @param trx the Transaction to restore
-   */
-  /*public restoreTransaction(report: reportsModel) : void {
+    const selectedReports: Array<ReportModel> = [];
+    for (const trx of this.reportsModel) {
+      if (trx.selected) {
+        selectedReports.push(trx);
+      }
+    }
+    // this.trashModal.reports = selectedReports;
+    const dataMap: Map<string, any> = new Map([['reports.,selectedReports]]);
 
     this._dialogService
-      .confirm('You are about to restore report ' + report.report_id, ConfirmModalComponent,'Report already exist')
+      .confirm('You are about to delete these reports ',
+        TrashConfirmComponent,
+        'Caution!', null, null, dataMap)
       .then(res => {
-        if(res === 'okay') {
-          this._formsService.restoreTransaction(report)
-            .subscribe( (res:GetTransactionsResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
-          });
-        } 
-        else if(res === 'cancel') {
+        if (res === 'okay') {
+          let i = 1;
+          for (const trx of selectedReports) {
+            this._reportsService.trashReport(trx)
+              .subscribe((res: GetReportsResponse) => {
+                // on last delete get page and show success
+                if (i === selectedReports.length) {
+                  this.getReportsPage(this.config.currentPage);
+                  this._dialogService
+                    .confirm('reports.' +
+                        ' have been successfully deleted and sent to the recycle bin',
+                      TrashConfirmComponent, 'Success!', false, ModalHeaderClassEnum.successHeader, dataMap);
+                }
+              });
+              i++;
+          }
+        } else if (res === 'cancel') {
         }
       });
   }*/
 
 
   /**
+   * Clone the report selected by the user.
+   *
+   * @param trx the Report to clone
+   */
+  public cloneReport(): void {
+    alert('Clone report is not yet supported');
+  }
+
+
+  /**
+   * Link the report selected by the user.
+   *
+   * @param trx the Report to link
+   */
+  public linkReport(): void {
+    alert('Link requirements have not been finalized');
+  }
+
+
+  /**
+   * View the report selected by the user.
+   *
+   * @param trx the Report to view
+   */
+  public viewReport(): void {
+    alert('View report is not yet supported');
+  }
+
+
+  /**
+   * Edit the report selected by the user.
+   *
+   * @param trx the Report to edit
+   */
+  public editReport(): void {
+    alert('Edit report is not yet supported');
+  }
+
+
+  /**
+   * Trash the report selected by the user.
+   *
+   * @param trx the Report to trash
+   */
+  /*public trashReport(trx: ReportModel): void {
+
+    this._dialogService
+      .confirm('You are about to trash report ' + trx.reportId + '.',
+        ConfirmModalComponent,
+        'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._reportsService.trashReport(trx)
+            .subscribe((res: GetReportsResponse) => {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService
+                .confirm('Report ' + trx.reportId +
+                    ' has been successfully deleted and sent to the recycle bin',
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+*/
+
+  /**
+   * Restore a trashed report from the recyle bin.
+   *
+   * @param trx the Report to restore
+   */
+  /*public restoreReport(trx: ReportModel): void {
+
+    this._dialogService
+      .confirm('You are about to restore report ' + trx.reportId + '.',
+        ConfirmModalComponent,
+        'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._reportsService.restoreReport(trx)
+            .subscribe((res: GetReportsResponse) => {
+              this.getRecyclingPage(this.config.currentPage);
+              this._dialogService
+                .confirm('Report ' + trx.reportId + ' has been restored!',
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }*/
+
+
+  /**
+   * Delete selected reports from the the recyle bin.
+   *
+   * @param trx the Report to delete
+   */
+  /*public deleteRecyleBin(): void {
+
+    let beforeMessage = '';
+    const selectedReports: Array<ReportModel> = [];
+    for (const trx of this.reportsModel) {
+      if (trx.selected) {
+        selectedReports.push(trx);
+      }
+    }
+
+    if (selectedReports.length === 1) {
+      beforeMessage = 'Are you sure you want to permanently delete Report ' +
+        selectedReports[0].reportId + '?';
+    } else {
+      beforeMessage = 'Are you sure you want to permanently delete these reports?';
+    }
+
+    this._dialogService
+      .confirm(beforeMessage,
+        ConfirmModalComponent,
+        'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._reportsService.deleteRecycleBinReport(selectedReports)
+            .subscribe((res: GetReportsResponse) => {
+              this.getRecyclingPage(this.config.currentPage);
+
+              let afterMessage = '';
+              if (selectedReports.length === 1) {
+                  afterMessage = `Report ${selectedReports[0].reportId} has been successfully deleted`;
+              } else {
+                afterMessage = 'reports.have been successfully deleted.';
+              }
+              this._dialogService
+                .confirm(afterMessage,
+                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+           });
+        } else if (res === 'cancel') {
+        }
+      });
+  }*/
+
+
+
+  /**
    * Determine the item range shown by the server-side pagination.
    */
-  public determineItemRange() : string {
+  public determineItemRange(): string {
 
     let start = 0;
     let end = 0;
     this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? 
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
     if (!this.reportsModel) {
@@ -529,19 +792,20 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-        && this.reportsModel.length > 0) {
+      && this.reportsModel.length > 0) {
       this.calculateNumberOfPages();
 
-      if (this.config.currentPage == this.numberOfPages) {
+      if (this.config.currentPage === this.numberOfPages) {
         end = this.reportsModel.length;
-        start = (this.config.currentPage -1) * this.config.itemsPerPage + 1;
-      }
-      else {
+        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
+      } else {
         end = this.config.currentPage * this.config.itemsPerPage;
         start = (end - this.config.itemsPerPage) + 1;
       }
     }
-    return start + " - " + end;
+    this.firstItemOnPage = start;
+    this.lastItemOnPage = end;
+    return start + ' - ' + end;
   }
 
 
@@ -549,28 +813,51 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
-    console.log("showPinColumns");
     this.applyDisabledColumnOptions();
     this.columnOptionsModal.show();
   }
 
 
   /**
-   * Check/Uncheck all transactions in the table.
+   * Check/Uncheck all reports in the table.
    */
-  public changeAllTransactionsSelected() {
-    for (let t of this.reportsModel) {
-      //t.selected = this.allTransactionsSelected;
-      //MSM commented
+  public changeAllReportsSelected() {
+
+    // TODO Iterating over the trsnactionsModel and setting the selected prop
+    // works when we have server-side pagination as the model will only contain
+    // reports for the current page.
+
+    // Until the server is ready for pagination,
+    // we are getting the entire set of tranactions (> 500)
+    // and must only count and set the selected prop for the items
+    // on the current page.
+
+    this.bulkActionCounter = 0;
+    // for (const t of this.reportsModel) {
+    //   t.selected = this.allReportsSelected;
+    //   if (this.allReportsSelected) {
+    //     this.bulkActionCounter++;
+    //   }
+    // }
+
+
+    //Commented by Mahendra@04/16/2019
+    // TODO replace this with the commented code above when server pagination is ready.
+    for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
+      this.reportsModel[i].selected = this.allReportsSelected;
+      if (this.allReportsSelected) {
+        this.bulkActionCounter++;
+      }
     }
-  } 
+    this.bulkActionDisabled = !this.allReportsSelected;
+  }
 
 
   /**
-   * Check if the view to show is Transactions.
+   * Check if the view to show is Reports.
    */
-  public isTransactionViewActive() {
-    return this.tableType == this.reportsView ? true : false;
+  public isReportViewActive() {
+    return this.tableType === this.reportsView ? true : false;
   }
 
 
@@ -578,8 +865,104 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
-    return this.tableType == this.recycleBinView ? true : false;
-  }   
+    return this.tableType === this.recycleBinView ? true : false;
+  }
+
+
+  /**
+   * Check for multiple rows checked in the table
+   * and disable/enable the bulk action button
+   * accordingly.
+   *
+   * @param the event payload from the click
+   */
+  public checkForMultiChecked(e: any): void {
+
+    if (e.target.checked) {
+      this.bulkActionCounter++;
+    } else {
+      this.allReportsSelected = false;
+      if (this.bulkActionCounter > 0) {
+        this.bulkActionCounter--;
+      }
+    }
+
+    // Report View shows bulk action when more than 1 checked
+    // Recycle Bin shows delete action when 1 or more checked.
+    const count = this.isReportViewActive() ? 1 : 0;
+    this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
+  }
+
+
+  /**
+   * Get cached values from session.
+   */
+  /*private getCachedValues() {
+    this.applyFiltersCache();
+    switch (this.tableType) {
+      case this.reportsView:
+        this.applyColCache(this.reportSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.reportCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.reportPageLSK);
+        break;
+      case this.recycleBinView:
+        this.applyColCache(this.recycleSortableColumnsLSK);
+        this.applyColumnsSelected();
+        this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.recyclePageLSK);
+        break;
+      default:
+        break;
+    }
+  }*/
+
+
+  /**
+   * Columns selected in the PIN dialog from the reports view
+   * need to be applied to the Recycling Bin table.
+   */
+  private applyColumnsSelected() {
+    const key = this.reportSortableColumnsLSK;
+    const sortableColumnsJson: string | null = localStorage.getItem(key);
+    if (localStorage.getItem(key) != null) {
+      const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
+      for (const col of trxCols) {
+        this._tableService.getColumnByName(col.colName,
+          this.sortableColumns).visible = col.visible;
+      }
+    }
+  }
+
+
+  /**
+   * Apply the filters from the cache.
+   */
+  private applyFiltersCache() {
+    const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    if (filtersJson != null) {
+      this.filters = JSON.parse(filtersJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.filters = null;
+    }
+  }
+
+
+  /**
+   * Get the column and their settings from the cache and apply it to the component.
+   * @param key the key to the value in the local storage cache
+   */
+
+  /* Mahendrea
+  private applyColCache(key: string) {
+    const sortableColumnsJson: string | null = localStorage.getItem(key);
+    if (localStorage.getItem(key) != null) {
+      this.sortableColumns = JSON.parse(sortableColumnsJson);
+    } else {
+      // Just in case cache has an unexpected issue, use default.
+      this.setSortableColumns();
+    }
+  }*/
 
 
   /**
@@ -587,17 +970,16 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentSortedColCache(key: string) {
-    let currentSortedColumnJson: string|null = 
+    const currentSortedColumnJson: string | null =
       localStorage.getItem(key);
     let currentSortedColumnL: SortableColumnModel = null;
     if (currentSortedColumnJson) {
       currentSortedColumnL = JSON.parse(currentSortedColumnJson);
-      
+
       // sort by the column direction previously set
-      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName, 
+      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName,
         this.sortableColumns, currentSortedColumnL.descending);
-    }
-    else {
+    } else {
       this.setSortDefault();
     }
   }
@@ -608,51 +990,74 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentPageCache(key: string) {
-    let currentPageCache: string = 
+    const currentPageCache: string =
       localStorage.getItem(key);
+
+      console.log("applyCurrentPageCache... key =", key);
     if (this._utilService.isNumber(currentPageCache)) {
       this.config.currentPage = this._utilService.toInteger(currentPageCache);
-    }
-    else {
+    } else {
       this.config.currentPage = 1;
     }
   }
 
-  
+
+  /**
+   * Retrieve the cahce values from local storage and set the
+   * component's class variables.
+   */
   private setCachedValues() {
+
     switch (this.tableType) {
       case this.reportsView:
+        console.log("setCachedValues ...");
         this.setCacheValuesforView(this.reportSortableColumnsLSK,
-          this.reportCurrentSortedColLSK, this.transactionPageLSK);
+          this.reportCurrentSortedColLSK, this.reportPageLSK);
         break;
-     /* case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK, 
+      case this.recycleBinView:
+        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
-        break;*/
+        break;
       default:
         break;
     }
   }
 
 
+  /**
+   * Set the currently sorted column and current page in the cache.
+   *
+   * @param columnsKey the column settings key for the cache
+   * @param sortedColKey currently sorted column key for the cache
+   * @param pageKey current page key from the cache
+   */
   private setCacheValuesforView(columnsKey: string, sortedColKey: string,
     pageKey: string) {
 
-  // shared between trx and recycle tables
-  localStorage.setItem(columnsKey,
-    JSON.stringify(this.sortableColumns));
+    // shared between trx and recycle tables
+    localStorage.setItem(columnsKey,
+      JSON.stringify(this.sortableColumns));
 
-  const currentSortedCol = this._tableService.getColumnByName(
-    this.currentSortedColumnName, this.sortableColumns);
-  localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
+    console.log("setCacheValuesforView this.filters ...", this.filters) ;
+    // shared between trx and recycle tables
+    localStorage.setItem(this.filtersLSK,
+      JSON.stringify(this.filters));
 
-  if (currentSortedCol) {
-    localStorage.setItem(sortedColKey, JSON.stringify(currentSortedCol));
+    const currentSortedCol = this._tableService.getColumnByName(
+      this.currentSortedColumnName, this.sortableColumns);
+    localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
+
+    if (currentSortedCol) {
+      localStorage.setItem(sortedColKey, JSON.stringify(currentSortedCol));
+    }
+    localStorage.setItem(pageKey, this.config.currentPage.toString());
   }
-  localStorage.setItem(pageKey, this.config.currentPage.toString());
-}
+
 
   /**
+   * Set the Table Columns model.
+   */
+ /**
    * Set the Table Columns model.
    */
   private setSortableColumns() : void {
@@ -677,8 +1082,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Set the UI to show the default column sorted in the default direction.
    */
-  private setSortDefault() : void {
-    this.currentSortedColumnName = this._tableService.setSortDirection('form_type', 
+  private setSortDefault(): void {
+    this.currentSortedColumnName = this._tableService.setSortDirection('form_type',
       this.sortableColumns, false);
   }
 
@@ -696,15 +1101,17 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private getCachedValues() {
     switch (this.tableType) {
       case this.reportsView:
+        console.log("getCachedValues...!");
         this.applyColCache(this.reportSortableColumnsLSK);
         this.applyCurrentSortedColCache(this.reportCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.transactionPageLSK);
+        this.applyCurrentPageCache(this.reportPageLSK);
         break;
       default:
         break;
     }
   }
   private applyColCache(key: string) {
+    console.log("applyColCache");
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
       this.sortableColumns = JSON.parse(sortableColumnsJson);
@@ -713,4 +1120,5 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.setSortableColumns();
     }
   }
+
 }

@@ -1,7 +1,7 @@
 /**
  * A model for the transactions filter properties.
  */
-export class TransactionFilterModel {
+export class ReportFilterModel {
 
     show: boolean;
     formType: string;

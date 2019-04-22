@@ -52,7 +52,7 @@
               {{formStartDate | date: 'MM/dd/yyyy'}} - {{formEndDate | date: 'MM/dd/yyyy'}}
             </div>
             <div>
-              Due in {{formDueDate}} days.
+              Due in {{formDueDate}} days
               <a
                 class="btn btn-link btn-edit"
                 (click)="editFrom()"
@@ -95,6 +95,7 @@
         <div class="contact-info__item">
           <h6>
             <strong>
+              <br>
               RAD Analyst,
               {{ radAnalystInfo?.first_name }}
               {{ radAnalystInfo?.last_name }}
@@ -104,13 +105,13 @@
               <ng-container *ngIf="radAnalystInfo">
                 (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }}
               </ng-container>
-              <ng-container *ngIf="!radAnalystInfo">
+              <br>
+              <ng-container >
                 <a href="https://www.fec.gov/help-candidates-and-committees/question-rad/" target="_blank">
                   Find & contact your committee's analyst
                 </a>
               </ng-container>
             </address>
-            <br>
           </h6>
         </div>
         <div class="contact-info__item">
@@ -118,7 +119,7 @@
             <strong>Tech Support</strong>
             <br>
             <address>
-              (202) 694-1002
+              (202) 694-1307
             </address>
             <a href="mailto:tech@fec.gov">
               tech@fec.gov

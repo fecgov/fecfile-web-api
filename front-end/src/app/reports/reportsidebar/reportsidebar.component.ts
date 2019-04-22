@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
+import { ReportsMessageService } from '../service/reports-message.service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { filter, race } from 'rxjs/operators';
-import { TransactionFilterModel } from '../model/report-filter.model';
+import { ReportFilterModel } from '../model/report-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
-import { TransactionsService } from '../service/report.service';
+import { ReportsService } from '../service/report.service';
 import { ReportsFilterTypeComponent } from './filter-type/reports-filter-type.component';
 import { ActiveView } from '../reportheader/reportheader.component';
 
 
 /**
- * A component for filtering transactions located in the sidebar.
+ * A component for filtering Reports located in the sidebar.
  */
 @Component({
   selector: 'app-reportsidebar',
@@ -87,19 +87,10 @@ export class ReportsidebarComponent implements OnInit {
   public isHideTypeFilter: boolean;
   public isHideCvgDateFilter: boolean;
   public isHideFiledDateFilter: boolean;
-  public isHideAmountFilter: boolean;
-  public isHideStateFilter: boolean;
-  public isHideMemoFilter: boolean;
-  public transactionCategories: any = [];
-  public states: any = [];
-  public filterCategoriesText = '';
-  public filterAmountMin: number;
-  public filterAmountMax: number;
   public filterCvgDateFrom: Date = null;
   public filterCvgDateTo: Date = null;
   public filterFiledDateFrom: Date = null;
   public filterFiledDateTo: Date = null;
-  public filterMemoCode = false;
   public dateFilterValidation: ValidationErrorModel;
   public filedDateFilterValidation: ValidationErrorModel;
   public cvgDateFilterValidation: ValidationErrorModel;
@@ -114,15 +105,15 @@ export class ReportsidebarComponent implements OnInit {
   public statuss: any = [];
 
   // TODO put in a transactions constants ts file for multi component use.
-  private readonly filtersLSK = 'transactions.filters';
-  private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
+  private readonly filtersLSK = 'reports.filters';
+  private cachedFilters: ReportFilterModel = new ReportFilterModel();
   private msEdge = true;
   private reportsView = ActiveView.reports
   private recycleBinView = ActiveView.recycleBin;
 
   constructor(
-    private _transactionsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService
+    private _reportsService: ReportsService,
+    private _reportsMessageService: ReportsMessageService
   ) {}
 
 
@@ -137,15 +128,9 @@ export class ReportsidebarComponent implements OnInit {
     this.filterCvgDateTo = null;
     this.filterFiledDateFrom = null;
     this.filterFiledDateTo = null;
-    this.filterAmountMin = null;
-    this.filterAmountMax = null;
-
     this.isHideTypeFilter = true;
     this.isHideCvgDateFilter = true;
     this.isHideFiledDateFilter = true;
-    this.isHideAmountFilter = true;
-    this.isHideStateFilter = true;
-    this.isHideMemoFilter = true;
     this.isHideFormFilter = true;
     this.isHideReportFilter = true;
     this.isHideStatusFilter = true;
@@ -186,22 +171,6 @@ export class ReportsidebarComponent implements OnInit {
     this.isHideFiledDateFilter = !this.isHideFiledDateFilter;
   }
 
-
-  /**
-   * Toggle visibility of the Amount filter
-   */
-  public toggleAmountFilterItem() {
-    this.isHideAmountFilter = !this.isHideAmountFilter;
-  }
-
-
-  /**
-   * Toggle visibility of the State filter
-   */
-  public toggleStateFilterItem() {
-    this.isHideStateFilter = !this.isHideStateFilter;
-  }
-
   public toggleFormFilterItem() {
     this.isHideFormFilter = !this.isHideFormFilter;
   }
@@ -217,14 +186,6 @@ export class ReportsidebarComponent implements OnInit {
   public toggleAmendmentIndicatorFilterItem() {
     this.isHideAmendmentIndicatorFilter = !this.isHideAmendmentIndicatorFilter;
   }
-
-  /**
-   * Toggle visibility of the Memo filter
-   */
-  public toggleMemoFilterItem() {
-    this.isHideMemoFilter = !this.isHideMemoFilter;
-  }
-
 
   /**
    * Toggle the direction of the filter collapsed or expanded
@@ -258,7 +219,7 @@ export class ReportsidebarComponent implements OnInit {
 
     this.clearHighlightedTypes();
 
-    if (this.filterCategoriesText === undefined ||
+    /*if (this.filterCategoriesText === undefined ||
       this.filterCategoriesText === null ||
       this.filterCategoriesText === '') {
         return;
@@ -284,7 +245,7 @@ export class ReportsidebarComponent implements OnInit {
     // TODO check if sequence is guaranteed to be preserved.
     for (const type of typeMatches) {
       type.categoryType.highlight = 'selected_row';
-    }
+    }*/
   }
 
 
@@ -315,20 +276,11 @@ export class ReportsidebarComponent implements OnInit {
       return;
     }
 
-    const filters = new TransactionFilterModel();
+    const filters = new ReportFilterModel();
     let modified = false;
     filters.formType = this.formType;
 
-    // states
-    const filterStates = [];
-    for (const s of this.states) {
-      if (s.selected) {
-        filterStates.push(s.code);
-        modified = true;
-      }
-    }
-    filters.filterStates = filterStates;
-
+    // Form Type
     const filterForms = [];
     for (const f of this.forms) {
       if (f.selected) {
@@ -337,7 +289,8 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterForms = filterForms;
-
+   
+    // Report Typr 
     const filterReports = [];
     for (const r of this.reports) {
       if (r.selected) {
@@ -346,7 +299,8 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterReports = filterReports;
- 
+    
+    // Amendment Indicator
     const filterAmendmentIndicators = [];
     for (const a of this.amendmentindicators) {
       if (a.selected) {
@@ -356,6 +310,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterAmendmentIndicators = filterAmendmentIndicators
 
+    // Filed Status
     const filterStatuss = [];
     for (const s of this.statuss) {
       if (s.selected) {
@@ -364,36 +319,6 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterStatuss =filterStatuss;
-
-    // type/category
-    const filterCategories = [];
-    // if (this.filterCategoriesText.length > 0) {
-    //   modified = true;
-    //   filterCategories.push(this.filterCategoriesText);
-    // }
-    for (const category of this.transactionCategories) {
-      if (category.options) {
-        for (const option of category.options) {
-          if (option.selected) {
-            modified = true;
-            // TODO use code with backend
-            filterCategories.push(option.text);
-          }
-        }
-      }
-    }
-    filters.filterCategories = filterCategories;
-    // filters.filterCategoriesText = this.filterCategoriesText;
-
-    filters.filterAmountMin = this.filterAmountMin;
-    filters.filterAmountMax = this.filterAmountMax;
-
-    if (this.filterAmountMin !== null) {
-      modified = true;
-    }
-    if (this.filterAmountMax !== null) {
-      modified = true;
-    }
 
     filters.filterCvgDateFrom = this.filterCvgDateFrom;
     filters.filterCvgDateTo = this.filterCvgDateTo;
@@ -414,13 +339,8 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
 
-    if (this.filterMemoCode) {
-      filters.filterMemoCode = this.filterMemoCode;
-      modified = true;
-    }
-
     filters.show = modified;
-    this._transactionsMessageService.sendApplyFiltersMessage(filters);
+    this._reportsMessageService.sendApplyFiltersMessage(filters);
   }
 
 
@@ -432,13 +352,8 @@ export class ReportsidebarComponent implements OnInit {
     this.initValidationErrors();
 
     // clear the scroll to input
-    this.filterCategoriesText = '';
     this.clearHighlightedTypes();
 
-
-    for (const s of this.states) {
-      s.selected = false;
-    }
     for (const f of this.forms) {
       f.selected = false;
     }
@@ -451,21 +366,12 @@ export class ReportsidebarComponent implements OnInit {
     for (const a of this.amendmentindicators) {
       a.selected = false;
     }
-    for (const category of this.transactionCategories) {
-      if (category.options) {
-        for (const option of category.options) {
-          option.selected = false;
-        }
-      }
-    }
-    this.filterAmountMin = null;
-    this.filterAmountMax = null;
+    
     this.filterCvgDateFrom = null;
     this.filterCvgDateTo = null;
     this.filterFiledDateFrom = null;
     this.filterFiledDateTo = null;
-    this.filterMemoCode = false;
-
+    
     this.applyFilters();
   }
 
@@ -488,107 +394,11 @@ export class ReportsidebarComponent implements OnInit {
   }
 
 
-  /**
-   * Get the Category Types from the server for populating
-   * filter options on Type.
-   */
-
-  /*private getCategoryTypes() {
-    this._transactionsService
-    .getTransactionCategories(this.formType)
-      .subscribe(res => {
-
-        let categoriesExist = false;
-        const categoriesGroupArray = [];
-        if (res.data) {
-          if (res.data.transactionCategories) {
-            categoriesExist = true;
-
-            // 1st node is the group of types (not checkable).
-            // 2nd node is ignored.
-            // 3rd node is the type checkable.
-            for (const node1 of res.data.transactionCategories) {
-              const categoryGroup: any = {};
-              categoryGroup.text = node1.text;
-              categoryGroup.options = [];
-
-              for (const node2 of node1.options) {
-                for (const option of node2.options) {
-                  if (this.cachedFilters.filterCategories) {
-                    // check for categories selected in the filter cache
-                    // TODO scroll to first check item
-                    if (this.cachedFilters.filterCategories.includes(option.text)) {
-                      option.selected = true;
-                      this.isHideTypeFilter = false;
-                    } else {
-                      option.selected = false;
-                    }
-                  }
-                  categoryGroup.options.push(option);
-                }
-              }
-              if (categoryGroup.options.length > 0) {
-                categoriesGroupArray.push(categoryGroup);
-              }
-            }
-          }
-        }
-        if (categoriesExist) {
-          this.transactionCategories = categoriesGroupArray;
-          // this.transactionCategories = this._orderByPipe.transform(
-          //   res.data.transactionCategories, {property: 'text', direction: 1});
-        } else {
-          this.transactionCategories = [];
-        }
-    });
-  }
-
-
-  /**
-   * Get US State Codes and Values.
-   */
-
-   /*
-  private getStates() {
-    console.log(" In getStates Report Data received... !");
-    // TODO using this service to get states until available in another API.
-    this._transactionsService
-      .getStates('3X', 'Individual Receipt')
-        .subscribe(res => {
-          let statesExist = false;
-          if (res.data) {
-            console.log("Report Data received... !");
-            if (res.data.states) {
-              statesExist = true;
-              for (const s of res.data.states) {
-                // check for states selected in the filter cache
-                // TODO scroll to first check item
-                if (this.cachedFilters.filterStates) {
-                  if (this.cachedFilters.filterStates.includes(s.code)) {
-                    s.selected = true;
-                    this.isHideStateFilter = false;
-                  } else {
-                    s.selected = false;
-                  }
-                }
-              }
-            }
-          }
-          if (statesExist) {
-            this.states = res.data.states;
-            console.log("Report this.states = ", this.states);
-          } else {
-            this.states = [];
-            console.log("Report this.states = ", this.states);
-          }
-        });
-  } */
-
 
   private getForms() {
     //console.log(" In getForms Report Data received... !");
     // TODO using this service to get forms until available in another API.
-    this._transactionsService
+    this._reportsService
       .getFormTypes()
         .subscribe(res => {
           let formsExist = false;
@@ -601,7 +411,7 @@ export class ReportsidebarComponent implements OnInit {
                 if (this.cachedFilters.filterForms) {
                   if (this.cachedFilters.filterForms.includes(s.code)) {
                     s.selected = true;
-                    this.isHideStateFilter = false;
+                    this.isHideFormFilter = false;
                   } else {
                     s.selected = false;
                   }
@@ -621,7 +431,7 @@ export class ReportsidebarComponent implements OnInit {
   private getReports() {
     console.log(" In getReports Report Data received... !");
     // TODO using this service to get reports until available in another API.
-    this._transactionsService
+    this._reportsService
       .getReportTypes()
         .subscribe(res => {
           let reportsExist = false;
@@ -634,7 +444,7 @@ export class ReportsidebarComponent implements OnInit {
                 if (this.cachedFilters.filterReports) {
                   if (this.cachedFilters.filterReports.includes(s.code)) {
                     s.selected = true;
-                    this.isHideStateFilter = false;
+                    this.isHideReportFilter = false;
                   } else {
                     s.selected = false;
                   }
@@ -654,7 +464,7 @@ export class ReportsidebarComponent implements OnInit {
   private getStatuss() {
     console.log(" In getStatuss Report Data received... !");
     // TODO using this service to get reports until available in another API.
-    this._transactionsService
+    this._reportsService
       .getStatuss()
         .subscribe(res => {
           let StatussExist = false;
@@ -687,7 +497,7 @@ export class ReportsidebarComponent implements OnInit {
   private getAmendmentIndicators() {
     console.log(" In getAmendmentIndicators Report Data received... !");
     // TODO using this service to get reports until available in another API.
-    this._transactionsService
+    this._reportsService
       .getAmendmentIndicators()
         .subscribe(res => {
           let amendmentindicatorsExist = false;
@@ -700,7 +510,7 @@ export class ReportsidebarComponent implements OnInit {
                 if (this.cachedFilters.filterAmendmentIndicators) {
                   if (this.cachedFilters.filterAmendmentIndicators.includes(s.code)) {
                     s.selected = true;
-                    this.isHideStateFilter = false;
+                    this.isHideAmendmentIndicatorFilter = false;
                   } else {
                     s.selected = false;
                   }
@@ -726,28 +536,21 @@ export class ReportsidebarComponent implements OnInit {
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {
-        this.filterCategoriesText = this.cachedFilters.filterCategoriesText;
-        if (this.filterCategoriesText) {
-          this.isHideTypeFilter = !(this.filterCategoriesText.length > 0);
-        }
-
+   
         this.filterCvgDateFrom = this.cachedFilters.filterCvgDateFrom;
         this.filterCvgDateTo = this.cachedFilters.filterCvgDateTo;
         this.isHideCvgDateFilter = (this.filterCvgDateFrom && this.filterCvgDateTo) ? false : true;
 
         this.filterFiledDateFrom = this.cachedFilters.filterFiledDateFrom;
         this.filterFiledDateTo = this.cachedFilters.filterFiledDateTo;
-        this.isHideFiledDateFilter = (this.filterFiledDateFrom && this.filterFiledDateTo)
-          ? false : true;
+        this.isHideFiledDateFilter = (this.filterFiledDateFrom && this.filterFiledDateTo) ? false : true;
 
-        this.filterMemoCode = this.cachedFilters.filterMemoCode;
-        this.isHideMemoFilter = !this.filterMemoCode;
         // Note state and type apply filters are handled after server call to get values.
 
       }
     } else {
       // Just in case cache has an unexpected issue, use default.
-      this.cachedFilters = new TransactionFilterModel();
+      this.cachedFilters = new ReportFilterModel();
     }
   }
 
