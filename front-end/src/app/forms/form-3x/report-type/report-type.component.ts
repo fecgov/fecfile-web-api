@@ -339,9 +339,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
                       
                  if (environment.name !== 'local') {                
                    this._dialogService
-                   .reportExist(alertStr, ConfirmModalComponent,'Report already exist' ,false, true)
+                   .reportExist(alertStr, ConfirmModalComponent,'Report already exist' ,true,false,true)
                    .then(res => {
-                     if(res === 'okay') {
+                     if(res === 'cancel') {
                       this.optionFailed = true;
                       this.isValidType = false;
                       window.scrollTo(0, 0);
@@ -361,6 +361,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
                     localStorage.removeItem(`form_${this._formType}_saved`);
                     localStorage.removeItem('reports.filters');
                     localStorage.removeItem('Reports.view');
+                    //localStorage.setItem('isShowOK', 'No');
                    }
                  });
                 } 
