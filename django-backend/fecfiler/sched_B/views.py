@@ -419,7 +419,7 @@ def schedB(request):
                 raise Exception ('Missing Input: Report_id is mandatory')
             #handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
-                report_id = 0
+                report_id = "0"
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             #end of handling
