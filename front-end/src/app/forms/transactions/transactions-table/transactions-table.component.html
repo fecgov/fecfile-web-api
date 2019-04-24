@@ -112,8 +112,11 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
         <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">{{trx.amount | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')">{{trx.aggregate | currency:'USD':'symbol-narrow':'1.0-0'}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+          {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+        </td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
+          {{trx.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">

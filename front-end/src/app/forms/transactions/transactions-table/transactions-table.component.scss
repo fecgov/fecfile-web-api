@@ -8,6 +8,9 @@
 
   .transactions__table {
     width: 100%;
+    .transactions__amount {
+      text-align: right;
+    }
   }
 
   .transactions__table-checkbox {
