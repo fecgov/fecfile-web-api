@@ -105,7 +105,6 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-        <!--<td [@fadeInOut] *ngIf="isColumnVisible('aggregate')">{{trx.aggregate}}</td>-->
         <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
@@ -148,22 +147,41 @@
           </div>
         </td>
       </tr>
+      <tr *ngIf="isTransactionViewActive()">
+        <td></td>
+        <td *ngIf="isColumnVisible('type')"></td>
+        <td *ngIf="isColumnVisible('transactionId')"></td>
+        <td *ngIf="isColumnVisible('name')"></td>
+        <td *ngIf="isColumnVisible('street')"></td>
+        <td *ngIf="isColumnVisible('city')"></td>
+        <td *ngIf="isColumnVisible('state')"></td>
+        <td *ngIf="isColumnVisible('zip')"></td>
+        <td *ngIf="isColumnVisible('date')"></td>
+        <td *ngIf="isColumnVisible('purposeDescription')"></td>
+        <td *ngIf="isColumnVisible('contributorEmployer')"></td>
+        <td *ngIf="isColumnVisible('contributorOccupation')"></td>
+        <td *ngIf="isColumnVisible('memoCode')"></td>
+        <td *ngIf="isColumnVisible('memoText')"></td>
+        <td *ngIf="isRecycleBinViewActive()"></td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+            <div class="transactions__total-amount-container">
+              <div class="transactions__total-amount">
+                <b>Total</b>
+                <i class="info-icon transactions__total-amount" ngbTooltip="Represents the total amount of transactions entered on the report. 
+                              Those transactions that are memo entries are not added into the total amount."
+                  tooltipClass="form-tooltip">
+                </i>
+              </div>
+              <div class="transactions__total-amount-val">
+                <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
+              </div>
+            </div>
+        </td>
+        <td *ngIf="isColumnVisible('aggregate')"></td>
+        <td></td>
+      </tr>
     </tbody>
   </table>
-  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="container">
-    <div class="row justify-content-end transactions__total-amount-container">
-      <div class="transactions__total-amount">
-        <b>Total Amount</b>
-        <i class="info-icon transactions__total-amount" ngbTooltip="Represents the total amount of transactions entered on the report. 
-                      Those transactions that are memo entries are not added into the total amount."
-          tooltipClass="form-tooltip">
-        </i>
-      </div>
-      <div class="transactions__total-amount-val">
-        <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
-      </div>
-    </div>
-  </div>
   <hr/>
   <div *ngIf="showPagination()" class="d-flex justify-content-center transactions__table-pagination-container">
     <pagination-controls [id]="config.id" (pageChange)="getPage($event)">

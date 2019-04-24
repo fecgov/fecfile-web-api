@@ -50,16 +50,17 @@
   }
 
   .transactions__total-amount {
-    padding-right: 1em;
+    float: left;
   }
 
   .transactions__total-amount-val {
-    padding-right: 7em;
+    float: right;
   }
 
   .transactions__total-amount > i {
     color: #112E51;
     padding-left: 3px;
+    float: right;
   }
 
   .transactions__total-amount-container {
