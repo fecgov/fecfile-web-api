@@ -591,6 +591,44 @@ def get_f99_reasons(request):
         except:
             return Response({'error':'ERR_0001: Server Error: F99 reasons file not retrievable.'}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_committee_details(request):
+    try:
+        cmte_id = request.user.username
+        with connection.cursor() as cursor:
+            # GET all rows from committee table
+            query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix, create_date
+                                                    FROM public.committee_master WHERE cmte_id = %s ORDER BY create_date"""
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
+            for row in cursor.fetchall():
+                forms_obj=row[0][0]
+                # print(forms_obj)
+        if forms_obj is None:
+            raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
+        else:
+            modified_output = {"committeeid": forms_obj.get('cmte_id'),
+                                "committeename": forms_obj.get('cmte_name'),
+                                "street1": forms_obj.get('street_1'),
+                                "street2": forms_obj.get('street_2'),
+                                "city": forms_obj.get('city'),
+                                "state": forms_obj.get('state'),
+                                "zipcode": forms_obj.get('zip_code'),
+                                "treasurerprefix": forms_obj.get('treasurer_prefix'),
+                                "treasurerfirstname": forms_obj.get('treasurer_first_name'),
+                                "treasurermiddlename": forms_obj.get('treasurer_middle_name'),
+                                "treasurerlastname": forms_obj.get('treasurer_last_name'),
+                                "treasurersuffix": forms_obj.get('treasurer_suffix'),
+                                "email_on_file": forms_obj.get('cmte_email_1'),
+                                "email_on_file_1": forms_obj.get('cmte_email_2'),
+                                "phone_number": forms_obj.get('phone_number'),
+                                "cmte_type": forms_obj.get('cmte_type'),
+                                "cmte_dsgn": forms_obj.get('cmte_dsgn'),
+                                "cmte_filing_freq": forms_obj.get('cmte_filing_freq'),
+                                "cmte_filed_type": forms_obj.get('cmte_filed_type'),
+                                "created_at": forms_obj.get('create_date')}
+        return JsonResponse(modified_output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_committee_details API is throwing  an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_committee(request):
