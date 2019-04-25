@@ -147,10 +147,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription = this._reportsMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
         (filters: ReportFilterModel) => {
-
+          console.log("getDoKeywordFilterSearchMessage ", filters);  
           if (filters) {
-             console.log("keywordFilterSearchSubscription filters=", filters);
+            console.log("keywordFilterSearchSubscription filters=", filters);
             this.filters = filters;
+            console.log(" keywordFilterSearchSubscription this.filters = ",  this.filters);
+
             if (filters.formType) {
               this.formType = filters.formType;
             }
@@ -1121,4 +1123,14 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  public getErrors(){
+   alert('Get Errors functionality is not yet implemented.');
+  }
+
+  public isStatusFailed(status:string):boolean{
+    if (status==='Failed')
+      return true;
+    else 
+      return false;  
+  }
 }

@@ -103,6 +103,10 @@ export class ReportsidebarComponent implements OnInit {
   public reports: any = [];
   public amendmentindicators: any = [];
   public statuss: any = [];
+  public filterForms: string[] = [];
+  public filterReports:  string[] = [];
+  public filterStatuss:  string[] = [];
+  public filterAmendmentIndicators:  string[] = [];
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'reports.filters';
@@ -135,6 +139,10 @@ export class ReportsidebarComponent implements OnInit {
     this.isHideReportFilter = true;
     this.isHideStatusFilter = true;
     this.isHideAmendmentIndicatorFilter = true;
+    this.filterForms = [];
+    this.filterReports = [];
+    this.filterStatuss = [];
+    this.filterAmendmentIndicators = [];
 
     this.initValidationErrors();
 
@@ -271,6 +279,7 @@ export class ReportsidebarComponent implements OnInit {
    * Set the filters.show to true indicating the filters have been altered.
    */
   public applyFilters() {
+    console.log("applyFilters ...!");
 
     if (!this.validateFilters()) {
       return;
@@ -289,8 +298,10 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterForms = filterForms;
+
+    console.log("applyFilters filters.filterForms =", filters.filterForms[0]);
    
-    // Report Typr 
+    // Report Type
     const filterReports = [];
     for (const r of this.reports) {
       if (r.selected) {
@@ -300,6 +311,8 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterReports = filterReports;
     
+    console.log("applyFilters filters.filterReports =", filters.filterReports[0]);
+
     // Amendment Indicator
     const filterAmendmentIndicators = [];
     for (const a of this.amendmentindicators) {
@@ -309,6 +322,8 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterAmendmentIndicators = filterAmendmentIndicators
+    
+    console.log("applyFilters filters.filterAmendmentIndicators =", filters.filterAmendmentIndicators[0]);
 
     // Filed Status
     const filterStatuss = [];
@@ -319,6 +334,8 @@ export class ReportsidebarComponent implements OnInit {
       }
     }
     filters.filterStatuss =filterStatuss;
+
+    console.log("applyFilters filters.filterStatuss =", filters.filterStatuss[0]);
 
     filters.filterCvgDateFrom = this.filterCvgDateFrom;
     filters.filterCvgDateTo = this.filterCvgDateTo;
@@ -340,6 +357,7 @@ export class ReportsidebarComponent implements OnInit {
     }
 
     filters.show = modified;
+    console.log("applyFilters filters =", filters)
     this._reportsMessageService.sendApplyFiltersMessage(filters);
   }
 
@@ -371,7 +389,10 @@ export class ReportsidebarComponent implements OnInit {
     this.filterCvgDateTo = null;
     this.filterFiledDateFrom = null;
     this.filterFiledDateTo = null;
-    
+    this.filterForms = [];
+    this.filterReports = [];
+    this.filterStatuss = [];
+    this.filterAmendmentIndicators = [];
     this.applyFilters();
   }
 
@@ -546,7 +567,20 @@ export class ReportsidebarComponent implements OnInit {
         this.isHideFiledDateFilter = (this.filterFiledDateFrom && this.filterFiledDateTo) ? false : true;
 
         // Note state and type apply filters are handled after server call to get values.
+        this.filterForms = this.cachedFilters.filterForms;
+        this.filterReports =this.cachedFilters.filterReports;
+        this.filterStatuss = this.cachedFilters.filterStatuss;
+        this.filterAmendmentIndicators = this.cachedFilters.filterAmendmentIndicators;
 
+        /*this.filterForm = this.cachedFilters.filterForm;
+        this.filterReport =this.cachedFilters.filterReport;
+        this.filterStatus = this.cachedFilters.filterStatus;
+        this.filterAmendmentIndicator = this.cachedFilters.filterAmendmentIndicator;*/
+
+        console.log("applyFiltersCache this.filterForm =", this.filterForms);
+        console.log("applyFiltersCache this.filterReport =", this.filterReports);
+        console.log("applyFiltersCache this.filterStatus =", this.filterStatuss);
+        console.log("applyFiltersCache this.filterAmendmentIndicator =", this.filterAmendmentIndicators);
       }
     } else {
       // Just in case cache has an unexpected issue, use default.
