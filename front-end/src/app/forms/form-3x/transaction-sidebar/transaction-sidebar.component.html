@@ -26,17 +26,6 @@
         *ngFor="let categoryType of transactionCategories"
       >
         <div class="float-left">
-          <ng-container *ngIf="step==='step_2'">
-            <button
-              type="button"
-              class="btn btn-link"
-              value="{{ categoryType?.value }}"
-              (click)="selectItem($event)"
-            >
-              <i class="plus-icon" aria-hidden="true"></i>
-             {{ categoryType?.text }}
-            </button>
-          </ng-container>
           <button
             type="button"
             class="btn btn-link"
@@ -74,14 +63,16 @@
           Summary
         </button>
       </div>
-      <div class="btn-row">
-        <button
-          type="button"
-          class="btn btn-secondary"
-        >
-          Sign &amp; Submit
-        </button>
-      </div>
+      <ng-container *ngIf="step!=='step_3'">
+        <div class="btn-row">
+          <button
+            type="button"
+            class="btn btn-secondary"
+          >
+            Sign &amp; Submit
+          </button>
+        </div>        
+      </ng-container>
     </div>
   </footer>
 </div>

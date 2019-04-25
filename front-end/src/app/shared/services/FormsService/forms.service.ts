@@ -649,7 +649,7 @@ export class FormsService {
  }
 
   
-  public getReports(formType: string, view: string, page: number, itemsPerPage: number,
+  public getReports(view: string, page: number, itemsPerPage: number,
     sortColumnName: string, descending: boolean, reportId: number): Observable<any> {
   const token: string = JSON.parse(this._cookieService.get('user'));
   let httpOptions =  new HttpHeaders();
@@ -716,7 +716,7 @@ export class FormsService {
    * @param sortColumnName
    * @param descending
    */
-  public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
+  public sortReports(array: any, sortColumnName: string, descending: boolean) {
 
     console.log("sortTransactions array =", array);
     console.log("sortTransactions sortColumnName =", sortColumnName);
@@ -753,5 +753,11 @@ public getTransactionCategories( form_type: string): Observable<any> {
             headers: httpOptions/*  */
           }
        );
+  }
+
+  public clearDashBoardReportFilterOptions(): void {
+    // to refresh/clear Dash Board Filter options
+    localStorage.removeItem('reports.filters');
+    localStorage.removeItem('Reports.view');
   }
 }

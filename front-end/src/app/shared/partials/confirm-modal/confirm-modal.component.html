@@ -12,7 +12,7 @@
     </div>
     <div class="modal-body">{{message}}</div>
     <div class="modal-footer">
-      <button 
+      <button *ngIf="isShowOK"
         type="button" 
         class="btn btn-secondary" 
         (click)="activeModal.close('okay')"
@@ -25,7 +25,7 @@
       <button *ngIf="isShowReportExist"
       type="button" 
       (click)="activeModal.close('ReportExist')"
-      class="btn btn-secondary"
+      class="btn btn-primary btn-right"
     >Show Report</button>     
     </div>
   </div>

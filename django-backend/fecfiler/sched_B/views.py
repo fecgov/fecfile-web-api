@@ -10,10 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.db import connection
 from django.http import JsonResponse
-from datetime import datetime
 from django.conf import settings
 from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value, check_report_id
-from fecfiler.sched_A.views import get_next_transaction_id, check_transaction_id, check_type_list
+from fecfiler.sched_A.views import get_next_transaction_id, check_transaction_id, check_type_list, check_decimal
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -290,8 +289,8 @@ def schedB_sql_dict(data):
             'transaction_type': data.get('transaction_type'),
             'back_ref_sched_name': data.get('back_ref_sched_name'),
             'expenditure_date': date_format(data.get('expenditure_date')),
-            'expenditure_amount': data.get('expenditure_amount'),
-            'semi_annual_refund_bundled_amount': data.get('semi_annual_refund_bundled_amount'),
+            'expenditure_amount': check_decimal(data.get('expenditure_amount')),
+            'semi_annual_refund_bundled_amount': check_decimal(data.get('semi_annual_refund_bundled_amount')),
             'expenditure_purpose': data.get('expenditure_purpose'),
             'category_code': data.get('category_code'),
             'memo_code': data.get('memo_code'),
@@ -337,10 +336,12 @@ def schedB(request):
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception ('Missing Input: Report_id is mandatory')
+            #handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
-                report_id = 0
+                report_id = "0"
             else:
                 report_id = check_report_id(request.data.get('report_id'))
+            #end of handling
             datum = schedB_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -416,11 +417,12 @@ def schedB(request):
 
             if not('report_id' in request.data):
                 raise Exception ('Missing Input: Report_id is mandatory')
+            #handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
-                report_id = 0
+                report_id = "0"
             else:
                 report_id = check_report_id(request.data.get('report_id'))
-
+            #end of handling
             datum['report_id'] = report_id
             datum['back_ref_transaction_id'] = request.data.get('back_ref_transaction_id')
             datum['cmte_id'] = request.user.username

@@ -12,8 +12,6 @@ export class TransactionFilterModel {
     filterAmountMax: number;
     filterDateFrom: Date;
     filterDateTo: Date;
-    filterDeletedDateFrom: Date;
-    filterDeletedDateTo: Date;
     filterMemoCode: boolean;
     keywords: string[] = [];
 

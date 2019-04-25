@@ -3,15 +3,15 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import json
-import datetime
 import os
 import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.db import connection
 from django.http import JsonResponse
-from datetime import datetime
+import datetime
 from django.conf import settings
+from decimal import Decimal
 from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value, check_report_id
 
 
@@ -27,6 +27,9 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 """
 **************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
 """
+list_mandatory_fields_schedA = ['report_id', 'cmte_id', 'line_number', 'transaction_type', 'contribution_date', 'contribution_amount']
+list_mandatory_fields_aggregate = ['transaction_type']
+
 def get_next_transaction_id(trans_char):
 
     try:
@@ -49,11 +52,10 @@ def check_transaction_id(transaction_id):
     except Exception:
         raise 
 
-def check_mandatory_fields_schedA(data):
+def check_mandatory_fields(data, list_mandatory_fields):
     try:
-        list_mandatory_fields_schedA = ['report_id', 'cmte_id', 'line_number', 'transaction_type', 'contribution_date', 'contribution_amount']
         error =[]
-        for field in list_mandatory_fields_schedA:
+        for field in list_mandatory_fields:
             if not(field in data and check_null_value(data.get(field))):
                 error.append(field)
         if len(error) > 0:
@@ -63,7 +65,15 @@ def check_mandatory_fields_schedA(data):
             string = string[0:-2]
             raise Exception('The following mandatory fields are required in order to save data to schedA table: {}'.format(string))
     except:
-        raise        
+        raise
+
+def check_decimal(value):
+
+    try:
+        check_value = Decimal(value)
+        return value
+    except Exception as e:
+        raise Exception('Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}'.format(value))        
 """
 **************************************************** FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
@@ -73,7 +83,7 @@ def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transacti
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.now()])
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.datetime.now()])
     except Exception:
         raise
 
@@ -204,13 +214,69 @@ def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
             cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [value, transaction_id, report_id, cmte_id])
 
     except Exception:
-        raise  
+        raise
+
+def find_form_type(report_id, cmte_id):
+    try:
+        #handling cases where report_id is reported as 0
+        if report_id in ["0", '0', 0]:
+            return "F3X"
+        #end of error handling    
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT form_type FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [report_id, cmte_id])
+            form_types = cursor.fetchone()
+        if (cursor.rowcount == 0):
+            raise Exception('The Report ID: {} is either already deleted or does not exist in reports table'.format(report_id))
+        else:
+            return form_types[0]
+    except Exception as e:
+        raise Exception('The form_type function is throwing an error:' + str(e))
+
+def find_aggregate_start_date(form_type, contribution_date):
+    try:
+        aggregate_start_date = None
+        if form_type == "F3X":
+            year = contribution_date.year
+            aggregate_start_date = datetime.date(year, 1, 1)
+        return aggregate_start_date
+    except Exception as e:
+        raise Exception('The aggregate_start_date function is throwing an error: ' + str(e))
+
+def func_aggregate_amount(form_type, contribution_date, transaction_type, entity_id, cmte_id):
+    try:
+        aggregate_end_date = contribution_date
+        aggregate_start_date = find_aggregate_start_date(form_type, contribution_date)
+        with connection.cursor() as cursor:
+                cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date BETWEEN %s AND %s AND delete_ind is distinct FROM 'Y'""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
+                aggregate_amt = cursor.fetchone()[0]
+        return aggregate_amt
+    except Exception as  e:
+        raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
+
+def disclosure_rules(line_number, report_id, transaction_type, contribution_amount, contribution_date, entity_id, cmte_id):
+    try:
+        itemization_transaction_type_list = ["15",]
+        # itemization value above (> and not >=) which transactions become itemized for each entity
+        itemization_value = 200
+        unitemized_line_number = "11AII"
+        if transaction_type in itemization_transaction_type_list:
+            form_type = find_form_type(report_id, cmte_id)
+            aggregate_amt = func_aggregate_amount(form_type, contribution_date, transaction_type, entity_id, cmte_id)
+        else:
+            aggregate_amt = itemization_value + 1
+        total_amt = aggregate_amt + Decimal(contribution_amount)
+        if total_amt <= itemization_value:
+            return unitemized_line_number
+        else:
+            return line_number 
+    except Exception as e:
+        raise Exception('The disclosure_rules function is throwing an error: ' + str(e))
 """
 **************************************************** API FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
 def post_schedA(datum):
     try:
-        check_mandatory_fields_schedA(datum)
+        check_mandatory_fields(datum, list_mandatory_fields_schedA)
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
@@ -222,6 +288,7 @@ def post_schedA(datum):
             entity_data = post_entities(datum)
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
+        datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
@@ -267,7 +334,7 @@ def get_schedA(data):
 
 def put_schedA(datum):
     try:
-        check_mandatory_fields_schedA(datum)
+        check_mandatory_fields(datum, list_mandatory_fields_schedA)
         transaction_id = check_transaction_id(datum.get('transaction_id'))
         flag = False
         if 'entity_id' in datum:
@@ -324,7 +391,7 @@ def schedA_sql_dict(data):
             'transaction_type': data.get('transaction_type'),
             'back_ref_sched_name': data.get('back_ref_sched_name'),
             'contribution_date': date_format(data.get('contribution_date')),
-            'contribution_amount': data.get('contribution_amount'),
+            'contribution_amount': check_decimal(data.get('contribution_amount')),
             'purpose_description': data.get('purpose_description'),
             'memo_code': data.get('memo_code'),
             'memo_text': data.get('memo_text'),
@@ -361,10 +428,12 @@ def schedA(request):
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception ('Missing Input: Report_id is mandatory')
+            #handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
-                report_id = 0
+                report_id = "0"
             else:
                 report_id = check_report_id(request.data.get('report_id'))
+            #end of handling
             datum = schedA_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -439,11 +508,12 @@ def schedA(request):
 
             if not('report_id' in request.data):
                 raise Exception ('Missing Input: Report_id is mandatory')
+            #handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
-                report_id = 0
+                report_id = "0"
             else:
                 report_id = check_report_id(request.data.get('report_id'))
-
+            #end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
 
@@ -483,5 +553,50 @@ def schedA(request):
 """
 ******************************************************************************************************************************
 END - SCHEDULE A TRANSACTIONS API - SCHED_A APP
+******************************************************************************************************************************
+"""
+"""
+********************************************************************************************************************************
+AGGREGATE AMOUNT API - SCHED_A APP - SPRINT 11 - FNE 871 - BY PRAVEEN JINKA 
+********************************************************************************************************************************
+"""
+@api_view(['POST'])
+def aggregate_amount(request):
+
+    if request.method == 'POST':
+        try:
+            check_mandatory_fields(request.data, list_mandatory_fields_aggregate)
+            cmte_id = request.user.username
+            if not('report_id' in request.data):
+                raise Exception ('Missing Input: Report_id is mandatory')
+            #handling null,none value of report_id
+            if check_null_value(request.data.get('report_id')):
+                report_id = check_report_id(request.data.get('report_id'))
+            else:
+                report_id = "0"
+            #end of handling
+            if 'contribution_date' in request.data and check_null_value(request.data.get('contribution_date')):
+                contribution_date = date_format(request.data.get('contribution_date'))
+            else:
+                contribution_date = datetime.datetime.today()
+            transaction_type = request.data.get('transaction_type')
+            if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                entity_id = request.data.get('entity_id')
+            else:
+                entity_id = "0"
+            if 'contribution_amount' in request.data and check_null_value(request.data.get('contribution_amount')):
+                contribution_amount = check_decimal(request.data.get('contribution_amount'))
+            else:
+                contribution_amount = "0"
+            form_type = find_form_type(report_id, cmte_id)
+            aggregate_amt = func_aggregate_amount(form_type, contribution_date, transaction_type, entity_id, cmte_id)
+            total_amt = aggregate_amt + Decimal(contribution_amount)
+            return JsonResponse({"aggregate_amount":total_amt}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response('The aggregate_amount API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+"""
+******************************************************************************************************************************
+END - AGGREGATE AMOUNT API - SCHED_A APP
 ******************************************************************************************************************************
 """

@@ -8,6 +8,9 @@
 
   .transactions__table {
     width: 100%;
+    .transactions__amount {
+      text-align: right;
+    }
   }
 
   .transactions__table-checkbox {
@@ -47,21 +50,41 @@
   }
 
   .transactions__total-amount {
-    padding-right: 1em;
+    float: left;
   }
 
   .transactions__total-amount-val {
-    padding-right: 7em;
+    float: right;
   }
 
-  .transactions__total-amount > i {
+  .transactions__total-amount-tip {
     color: #112E51;
     padding-left: 3px;
+    float: right;
   }
 
-  .transactions__total-amount-container {
-    margin: 1.5em 0;
+  .transactions__tooltip {
+    top: 0;
+    width: 300px;
+    .tooltip-inner {
+      max-width: 300px;
+      text-align: left;
+      a {
+        color: $white;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      .external-link-icon {
+        margin-left: 5px;
+      }
+    }
   }
+
+  // .transactions__total-amount-container {
+  //   margin: 1.5em 0;
+  // }
 
 
   /* style ngx-pagination - start */
@@ -88,10 +111,6 @@
 
     #transactions__pin-modal-header {
       background-color: $crusta;
-    }
-
-    .transactions__pin-modal-title {
-      font-weight: bold;
     }
 
     .btn-modal-footer {

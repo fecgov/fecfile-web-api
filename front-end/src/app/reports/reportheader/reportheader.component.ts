@@ -2,9 +2,9 @@ import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Outpu
 import { ReportdetailsComponent } from '../reportdetails/reportdetails.component';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
 import { ActivatedRoute } from '@angular/router';
-import { TransactionsMessageService } from '../service/reports-message.service';
+import { ReportsMessageService } from '../service/reports-message.service';
 import { animate, style, transition, trigger } from '@angular/animations';
-import { TransactionFilterModel } from '../model/report-filter.model';
+import { ReportFilterModel } from '../model/report-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 
 
@@ -40,35 +40,42 @@ public reportsView = ActiveView.reports;
 public showSideBar: boolean = false;
 public existingReportId: string = "";
 public view: string = ActiveView.reports;
-public transactionsView = ActiveView.reports;
 public recycleBinView = ActiveView.recycleBin;
 public isShowFilters = false;
 public searchText = '';
 public searchTextArray = [];
 
 /**
- * Subscription for applying filters to the transactions obtained from
+ * Subscription for applying filters to the reports obtained from
  * the server.
  */
 private applyFiltersSubscription: Subscription;
 
-private filters: TransactionFilterModel = new TransactionFilterModel();
-private readonly filtersLSK = 'transactions.filters';
+private filters: ReportFilterModel = new ReportFilterModel();
+private readonly filtersLSK = 'reports.filters';
 
   constructor(
     private _formService: FormsService,
     private _activeRoute: ActivatedRoute,
-    private _transactionsMessageService: TransactionsMessageService,
-  ) { }
+    private _reportsMessageService: ReportsMessageService,
+  ) {   this.applyFiltersSubscription = this._reportsMessageService.getApplyFiltersMessage()
+    .subscribe(
+      (filters: ReportFilterModel) => {
+        this.filters = filters;
+        this.doSearch();
+      }
+    );
+   }
 
   ngOnInit() {
 
     var dateObj = new Date();
     this.currentYear = dateObj.getUTCFullYear();
-    
+    this.clearSearch();
     
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");
+      
     }
 
     this._activeRoute
@@ -77,15 +84,21 @@ private readonly filtersLSK = 'transactions.filters';
           this.existingReportId = params.reportId;
           console.log("parameters found...")
        });
-       this.existingReportId = localStorage.getItem('Existing_Report_id');
-       localStorage.removeItem('Existing_Report_id');
-    console.log(" ReportheaderComponent this.existingReportId =", this.existingReportId);    
+    this.existingReportId = localStorage.getItem('Existing_Report_id');
+    if (this.existingReportId !== "") {
+          console.log(" ReportheaderComponent this.existingReportId =", this.existingReportId);  
+          localStorage.removeItem('Existing_Report_id');
+          localStorage.setItem(`form_3X_saved`, JSON.stringify(false));
+        }
+      
 
     //this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     // If the filter was open on the last visit in the user session, open it.
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
-    let filters: TransactionFilterModel;
+
+    console.log("filtersJson =", filtersJson)
+    let filters: ReportFilterModel;
     if (filtersJson != null) {
       filters = JSON.parse(filtersJson);
       if (filters.keywords) {
@@ -95,7 +108,7 @@ private readonly filtersLSK = 'transactions.filters';
         }
       }
     } else {
-      filters = new TransactionFilterModel();
+      filters = new ReportFilterModel();
     }
     if (filters.show === true) {
       this.showFilters();
@@ -104,6 +117,7 @@ private readonly filtersLSK = 'transactions.filters';
   }
 
   private showFilter() : void {
+    console.log("In showFilter() ...!");
     if (this.showSideBar){
         this.showSideBar=false;
     } else
@@ -125,22 +139,24 @@ private readonly filtersLSK = 'transactions.filters';
 
 
   /**
-   * Search transactions.
+   * Search reports.
    */
   public search() {
-
+    console.log("in search() ...!");
     // Don't allow more than 12 filters
     if (this.searchTextArray.length > 12) {
       return;
     }
 
-    // TODO emit search message to the table transactions component
+    // TODO emit search message to the table reports component
     if (this.searchText) {
       this.searchTextArray.push(this.searchText);
       this.searchText = '';
     }
+    //this.showFilter(); mahendra
+    this.showSideBar=true;
     this.doSearch();
-    this.showFilters();
+  
   }
 
 
@@ -166,7 +182,7 @@ private readonly filtersLSK = 'transactions.filters';
 
 
   /**
-   * Show the table of transactions in the recycle bin for the user.
+   * Show the table of reports in the recycle bin for the user.
    */
   public showRecycleBin() {
     this.view = ActiveView.recycleBin;
@@ -174,9 +190,9 @@ private readonly filtersLSK = 'transactions.filters';
 
 
   /**
-   * Show the table of form transactions.
+   * Show the table of form reports.
    */
-  public showTransactions() {
+  public showreports() {
     this.view = ActiveView.reports;
   }
 
@@ -185,22 +201,22 @@ private readonly filtersLSK = 'transactions.filters';
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
-    console.log(" reort header showPinColumns ...");
-    this.showTransactions();
-    this._transactionsMessageService.sendShowPinColumnMessage('show the Pin Col');
+    console.log(" Report header showPinColumns ...");
+    this.showreports();
+    this._reportsMessageService.sendShowPinColumnMessage('show the Pin Col');
   }
 
 
   /**
-   * Import transactions from an external file.
+   * Import reports from an external file.
    */
   public doImport() {
-    alert('Import transactions is not yet supported');
+    alert('Import reports is not yet supported');
   }
 
 
   /**
-   * Show filter options for transactions.
+   * Show filter options for reports.
    */
   public showFilters() {
     this.isShowFilters = true;
@@ -216,10 +232,10 @@ private readonly filtersLSK = 'transactions.filters';
 
 
   /**
-   * Check if the view to show is Transactions.
+   * Check if the view to show is reports.
    */
-  public isTransactionViewActive() {
-    return this.view === this.transactionsView ? true : false;
+  public isReportViewActive() {
+    return this.view === this.reportsView ? true : false;
   }
 
 
@@ -236,6 +252,6 @@ private readonly filtersLSK = 'transactions.filters';
    */
   private doSearch() {
     this.filters.keywords = this.searchTextArray;
-    this._transactionsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
+    this._reportsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
   }
 }

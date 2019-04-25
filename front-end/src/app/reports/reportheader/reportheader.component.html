@@ -21,7 +21,7 @@
           <div class="grid-row">
                <div class="grid-row__col grid-row__col--12">
                  <div class="transactions__btn-container">                 
-                    <button [@fadeInOut] *ngIf="isTransactionViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
+                    <button [@fadeInOut] *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
                     <i class="thumbtack-icon"></i>Pin Columns
                     </button> &nbsp;&nbsp;&nbsp;
         
@@ -33,7 +33,7 @@
                     <i class="fas fa-recycle"></i> Recycle
                     </button>      
 
-                    <div class="input-group pl-0 transactions__trx-search">
+                    <!--<div class="input-group pl-0 transactions__trx-search">
                         <div class="input-group-append" (click)="clearSearch()" 
                             ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
                           <span class="input-group-text" id="">
@@ -48,17 +48,35 @@
                             <i class="search-icon text-grey" aria-hidden="true"></i>
                           </span>
                         </div>
-                      </div>              
-                   </div> 
-                  </div>
-          </div>      
+                     </div>              
+                   </div> -->
+                 </div>
+          </div>   
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="transactions__btn-container">
+                <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+                  <button
+                    class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                    (click)="removeSearchText(i)">
+                    <i class="fas fa-window-close"></i>
+                    {{ searchTextItem }}
+                  </button>
+                  <span class="transactions__btn-search-filter-join" 
+                    *ngIf="i < (searchTextArray.length -1 )">
+                      and
+                  </span>
+                </div>
+              </div>          
+            </div>
+          </div>             
           <div class="grid-row">
                 <div class="grid-row__col grid-row__col--12">
                     <div class="transactions__btn-container"> 
                     <ngb-tabset  type="pills" width=400px>
                        <ngb-tab class="btn btn-primary">
                          <!--<ngb-tab title="Current Year ({{currentYear}})">-->
-                          <ng-template ngbTabTitle><b>Reporting Year ({{currentYear}})</b></ng-template> 
+                          <ng-template class="btn btn-primary" ngbTabTitle><b>Reporting Year ({{currentYear}})</b></ng-template> 
                           <ng-template ngbTabContent>
                               <app-reportdetails
                               title="Report for Current Year"
@@ -71,7 +89,7 @@
                           </ng-template>
                         </ngb-tab>
                         <ngb-tab>
-                          <ng-template ngbTabTitle><b>Archives</b></ng-template>
+                          <ng-template class="btn btn-primary" ngbTabTitle><b>Archives</b></ng-template>
                           <ng-template ngbTabContent> 
                             <app-reportdetails
                             title="Report for Archives"

@@ -31,12 +31,15 @@ export class ConfirmModalComponent implements OnInit {
   public isShowCancel = true;
 
   @Input()
+  public isShowOK = true;
+  
+  @Input()
   public headerClass: string;
 
   private defaultTitle = 'Warning';
   private defaultMessage = 'You have unsaved changes! If you leave, your changes will be lost.';
   private defaultHeaderClass = ModalHeaderClassEnum.warningHeader;
-
+  
   constructor(
     private _modalService: NgbModal,
     public activeModal: NgbActiveModal
@@ -52,6 +55,7 @@ export class ConfirmModalComponent implements OnInit {
     if (!this.headerClass) {
       this.headerClass = this.defaultHeaderClass;
     }
+
   }
 
   /**

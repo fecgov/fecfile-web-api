@@ -69,6 +69,7 @@ return 'cancel';
     modalContent?: any,
     modalTitle?: string,
     isShowCancel?: boolean,
+    isShowOK?: boolean,
     isShowReportExist?: boolean,
     headerClass?: ModalHeaderClassEnum): Promise<any> {
     const modalOptions: any = {
@@ -87,6 +88,9 @@ return 'cancel';
     }
     if (isShowCancel !== undefined && isShowCancel !== null) {
       modalRef.componentInstance.isShowCancel = isShowCancel;
+    }
+    if (isShowOK !== undefined && isShowOK !== null) {
+      modalRef.componentInstance.isShowOK = isShowOK;
     }
     if (isShowReportExist !== undefined && isShowReportExist !== null) {
       modalRef.componentInstance.isShowReportExist = isShowReportExist;

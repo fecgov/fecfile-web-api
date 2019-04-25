@@ -205,10 +205,10 @@ def check_list_cvg_dates(args):
         form_type = args[1]
         cvg_start_dt = args[2]
         cvg_end_dt = args[3]
-        print("cmte_id =", cmte_id)
-        print("form_type =", form_type)
-        print("cvg_start_dt =", cvg_start_dt)
-        print("cvg_end_dt =", cvg_end_dt)
+        # print("cmte_id =", cmte_id)
+        # print("form_type =", form_type)
+        # print("cvg_start_dt =", cvg_start_dt)
+        # print("cvg_end_dt =", cvg_end_dt)
 
 
         forms_obj = []
@@ -767,7 +767,7 @@ def check_entity_id(entity_id):
 
 def check_mandatory_fields_entity(data):
     try:
-        list_mandatory_fields_entity = ['entity_type', 'cmte_id', 'entity_name']
+        list_mandatory_fields_entity = ['entity_type', 'cmte_id']
         error =[]
         for field in list_mandatory_fields_entity:
             if not(field in data and check_null_value(data.get(field))):
@@ -1461,11 +1461,9 @@ def get_ReportTypes(request):
 @api_view(['GET'])
 def get_FormTypes(request):
     try:
-        cmte_id = request.user.username
         forms_obj = []
-        print("cmte_id", cmte_id)
         with connection.cursor() as cursor: 
-            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.cmte_report_types_view where cmte_id= %s order by form_type ) t",[cmte_id])
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.ref_form_types order by form_type ) t")
 
             for row in cursor.fetchall():
                 data_row = list(row)
@@ -1528,16 +1526,12 @@ def get_AmendmentIndicators(request):
                             "amendment_desc": "New"
                         },
                        {
-                            "amend_ind": "A1",
-                            "amendment_desc": "Amendment 1"
+                            "amend_ind": "A",
+                            "amendment_desc": "Amendment"
                         },    
                         {
-                            "amend_ind": "A2",
-                            "amendment_desc": "Amendment 2"
-                        },    
-                        {
-                            "amend_ind": "A3",
-                            "amendment_desc": "Amendment 3"
+                            "amend_ind": "T",
+                            "amendment_desc": "Termination"
                         }]
                   }
                 """
@@ -1558,6 +1552,3 @@ def get_AmendmentIndicators(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-        

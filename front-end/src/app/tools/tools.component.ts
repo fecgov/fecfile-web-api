@@ -11,6 +11,9 @@ export class ToolsComponent implements OnInit {
   constructor(private _formService: FormsService) { }
 
   ngOnInit() {
+
+    this._formService.clearDashBoardReportFilterOptions();
+    
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");
     } 

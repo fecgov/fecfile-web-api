@@ -70,7 +70,7 @@ export class IndividualReceiptService {
     formData.append('transaction_type', '15');
     formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);
-    formData.append('last_name', receipt.ContributorFirstName);
+    formData.append('last_name', receipt.ContributorLastName);
     formData.append('state', receipt.ContributorState);
     formData.append('city', receipt.ContributorCity);
     formData.append('zip_code', receipt.ContributorZip);
