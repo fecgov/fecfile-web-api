@@ -167,10 +167,18 @@
             <div class="transactions__total-amount-container">
               <div class="transactions__total-amount">
                 <b>Total</b>
-                <i class="info-icon transactions__total-amount" ngbTooltip="Represents the total amount of transactions entered on the report. 
+                <!-- <i class="info-icon transactions__total-amount-tip" ngbTooltip="Represents the total amount of transactions entered on the report. 
                               Those transactions that are memo entries are not added into the total amount."
                   tooltipClass="form-tooltip">
+                </i> -->
+
+                <i class="info-icon transactions__total-amount-tip" 
+                  ngbTooltip="Represents the total amount of transactions entered on the report. 
+                    Those transactions that are memo entries are not added into the total amount."
+                  tooltipClass="transactions__tooltip"
+                  triggers="click">
                 </i>
+
               </div>
               <div class="transactions__total-amount-val">
                 <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
