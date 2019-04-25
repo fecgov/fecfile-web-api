@@ -57,10 +57,29 @@
     float: right;
   }
 
-  .transactions__total-amount > i {
+  .transactions__total-amount-tip {
     color: #112E51;
     padding-left: 3px;
     float: right;
+  }
+
+  .transactions__tooltip {
+    top: 0;
+    width: 300px;
+    .tooltip-inner {
+      max-width: 300px;
+      text-align: left;
+      a {
+        color: $white;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      .external-link-icon {
+        margin-left: 5px;
+      }
+    }
   }
 
   // .transactions__total-amount-container {
