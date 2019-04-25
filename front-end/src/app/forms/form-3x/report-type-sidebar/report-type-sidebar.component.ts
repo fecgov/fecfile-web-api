@@ -75,7 +75,6 @@ export class ReportTypeSidebarComponent implements OnInit {
                   let dates: any = this.selectedReport.election_state[0].dates;
 
                   if (Array.isArray(dates)) {
-                    console.log('dates[0].cvg_start_date: ', dates[0].cvg_start_date);
                     if (
                       typeof dates[0].cvg_start_date === 'string' && dates[0].cvg_start_date !== null && 
                       typeof dates[0].cvg_end_date === 'string' && dates[0].cvg_end_date !== null &&
@@ -127,7 +126,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
           if (this._selectedState && this._selectedElectionDate) {
             message = {
-              'form': '3x',
+              'form': '3X',
               'selectedState': this._selectedState,
               'selectedElectionDate': this._selectedElectionDate,
               'toDate': this.toDate,
@@ -145,7 +144,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
           } else if (!this._selectedState && !this._selectedElectionDate) {
             message = {
-              'form': '3x',
+              'form': '3X',
               'toDate': this.toDate,
               'fromDate': this.fromDate,
               'dueDate': this.dueDate,
@@ -156,7 +155,7 @@ export class ReportTypeSidebarComponent implements OnInit {
           this.status.emit(message);
         } else {
           this.status.emit({
-              'form': '3x',
+              'form': '3X',
               'toDate': '',
               'fromDate': '',
               'dueDate': '',
@@ -167,25 +166,25 @@ export class ReportTypeSidebarComponent implements OnInit {
       } // hasOwnProperty('election_state')
 
       if (localStorage.getItem('form_3X_report_type') !== null) {
-        const form3xReportType: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+        const form3XReportType: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
 
-        console.log('form3xReportType: ', form3xReportType);
+        console.log('form3XReportType: ', form3XReportType);
 
         // The local storage report is saved when next button is clicked.
         // If user returns to step 1 and selects a different report, do not
         // proceed setting the fields.
-        if (!this.checkSelectedMatchesSpecial(form3xReportType)) {
+        if (!this.checkSelectedMatchesSpecial(form3XReportType)) {
           return;
         }
 
-        if (form3xReportType.hasOwnProperty('regular_special_report_ind')) {
-          if (typeof form3xReportType.regular_special_report_ind === 'string') {
-            if (form3xReportType.regular_special_report_ind === 'S') {
+        if (form3XReportType.hasOwnProperty('regular_special_report_ind')) {
+          if (typeof form3XReportType.regular_special_report_ind === 'string') {
+            if (form3XReportType.regular_special_report_ind === 'S') {
               console.log('special report selected: ');
               let selectedState: any = null;
 
               selectedState = this.selectedReport.election_state.find(el => {
-                return el.state === form3xReportType.election_state;
+                return el.state === form3XReportType.election_state;
               });
 
               if (selectedState) {
@@ -207,11 +206,11 @@ export class ReportTypeSidebarComponent implements OnInit {
                 });
               }
 
-              this.fromDate = this._deFormatDate(form3xReportType.cvgStartDate);
-              this.toDate = this._deFormatDate(form3xReportType.cvgEndDate);
+              this.fromDate = this._deFormatDate(form3XReportType.cvgStartDate);
+              this.toDate = this._deFormatDate(form3XReportType.cvgEndDate);
 
-              this.selectedElectionState = form3xReportType.election_state;
-              this.selectedElecetionDate = form3xReportType.election_date;
+              this.selectedElectionState = form3XReportType.election_state;
+              this.selectedElecetionDate = form3XReportType.election_date;
             }
           }
         }
@@ -223,13 +222,13 @@ export class ReportTypeSidebarComponent implements OnInit {
   /**
    * Check if the selected Report matches the Report from local storage.
    * 
-   * @param form3xReportType the F3X Report Type from local storage.
+   * @param form3XReportType the F3X Report Type from local storage.
    * @returns true if the report type from storage matches the selected report type.
    */
-  private checkSelectedMatchesSpecial(form3xReportType: any): boolean {
-    if (form3xReportType.hasOwnProperty('reportType')) {
-      if (typeof form3xReportType.reportType === 'string') {
-        if (form3xReportType.reportType === this.selectedReport.reportType) {
+  private checkSelectedMatchesSpecial(form3XReportType: any): boolean {
+    if (form3XReportType.hasOwnProperty('reportType')) {
+      if (typeof form3XReportType.reportType === 'string') {
+        if (form3XReportType.reportType === this.selectedReport.reportType) {
           return true;
         }
       }

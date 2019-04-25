@@ -140,8 +140,15 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
-        if (!this.reportTypeSelected) {  
-          this._setSelectedReport();
+        if (!this.reportTypeSelected) { 
+          if (
+              this._committeeDetails.hasOwnProperty('cmte_filing_freq') && 
+              typeof this._committeeDetails.cmte_filing_freq === 'string'
+          ) {
+            if (this._committeeDetails.cmte_filing_freq === 'M') {
+              this._setSelectedReport();
+            }            
+          } 
         }
       }
     }    
@@ -173,6 +180,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
+
+      console.log('updateTypeSelected: ');
       this.initCustomFormValidation();
       this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
@@ -180,6 +189,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.reportType = this.reportTypeSelected;
       const dataReportType: string = e.target.getAttribute('data-report-type');
 
+      console.log('this.reportType: ', this.reportType);
       if (dataReportType !== 'S') {
         this.toDateSelected = true;
         this.fromDateSelected = true;
@@ -189,7 +199,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
 
       this.status.emit({
-        'form': '3x',
+        'form': '3X',
         'reportTypeRadio': this.reportTypeSelected
       });
     } else {
@@ -353,6 +363,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
+    console.log('_setSelectedReport:');
     const today: Date = new Date();
     const dd: string = String(today.getDate()).padStart(2, '0');
     const mm: string = String(today.getMonth() + 1).padStart(2, '0');
@@ -364,7 +375,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
         if (!this.reportTypeSelected) {
 
           const monthlyReports: any = this.committeeReportTypes.filter(el => {
-            return el.regular_special_report_ind === 'R' && el.report_type !== 'TER' && el.report_type !== 'MY';
+            return (el.regular_special_report_ind === 'R' && 
+                    el.report_type !== 'TER' && 
+                    el.report_type !== 'MY');
           });      
 
           const currentReport: any = monthlyReports.filter(el => {
@@ -385,29 +398,43 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
           });
 
           if (Array.isArray(currentReport)) {
-            this.frmReportType.controls['reportTypeRadio'].setValue(currentReport[0].report_type);
+            const selectedReport: any = currentReport[0];
+
+            console.log('Array.isArray(currentReport): ');
+            this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);
 
             this.frmReportType.controls['reportTypeRadio'].markAsTouched();
             this.frmReportType.controls['reportTypeRadio'].markAsDirty();
 
-            this.reportTypeSelected = currentReport[0].report_type;
+            this.reportTypeSelected = selectedReport.report_type;
 
             this.reportType = this.reportTypeSelected
 
             this.optionFailed = false;
 
-            if (this.committeeReportTypes.hasOwnProperty('dates')) {
-              this._dueDate = currentReport[0].dates[0].due_date;
-              this._fromDateSelected = currentReport[0].dates[0].cvg_start_date;
-              this.fromDateSelected = true;
-              this._toDateSelected = currentReport[0].dates[0].cvg_end_date;
-              this.toDateSelected = true;
+            console.log('currentReport[0]: ', selectedReport);
+
+            if (Array.isArray(selectedReport.election_state)) {
+              if (selectedReport.election_state[0].hasOwnProperty('dates')) {
+                console.log("this.committeeReportTypes.hasOwnProperty('dates'): ");
+                const electionState: any = selectedReport.election_state[0];
+                
+                this._dueDate = electionState.dates[0].due_date;
+                this._fromDateSelected = electionState.dates[0].cvg_start_date;
+                this.fromDateSelected = true;
+                this._toDateSelected = electionState.dates[0].cvg_end_date;
+                this.toDateSelected = true;
+
+                console.log('this.fromDateSelected: ', this.fromDateSelected);
+                console.log('this.toDateSelected: ', this.toDateSelected);
+              }
+
+              this.status.emit({
+                'form': '3X',
+                'reportTypeRadio': this.reportTypeSelected
+              });              
             }
 
-            this.status.emit({
-              'form': '3x',
-              'reportTypeRadio': this.reportTypeSelected
-            });
           }
         }
       }

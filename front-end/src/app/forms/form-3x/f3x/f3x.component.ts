@@ -69,8 +69,6 @@ export class F3xComponent implements OnInit {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
 
-            console.log('this.reportType: ', this.reportTypes);
-
             this.reportsLoading = false;
 
             this._setReports();
@@ -83,8 +81,6 @@ export class F3xComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.transactionCategories = res.data.transactionCategories;
-
-          console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
 
@@ -180,7 +176,6 @@ export class F3xComponent implements OnInit {
   public onNotify(e): void {
 
     if (typeof e === 'object') {
-      console.log('e: ', e);
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
@@ -204,7 +199,7 @@ export class F3xComponent implements OnInit {
 
           this.canContinue();
          } else if (typeof e.form === 'string') {
-           if (e.form === '3x') {
+           if (e.form === '3X') {
             if (e.hasOwnProperty('reportTypeRadio')) {
               if (typeof e.reportTypeRadio === 'string') {
                this._setCoverageDates(e.reportTypeRadio);
