@@ -1209,6 +1209,26 @@ END - GET ALL TRANSACTIONS API - CORE APP
 Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SPRINT 11 - FNE   - BY YESWANTH TELLA
 ******************************************************************************************************************************
 """
+def get_entity_partner_id(report_id, cmte_id):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s ORDER BY transaction_id DESC"""
+        #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id])
+            for row in cursor.fetchall():
+            #forms_obj.append(data_row)
+                data_row = list(row)
+                #schedA_list = data_row[0]
+                forms_obj = data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
 
 def get_f3x_values(cmte_id):
     try:
@@ -1227,25 +1247,7 @@ def get_f3x_values(cmte_id):
     except Exception:
         raise
 
-def get_entity_partner_id(report_id, cmte_id):
-    try:
-        # GET all rows from schedA table
-        forms_obj = None
-        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s ORDER BY transaction_id DESC"""
-        #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id])
-            for row in cursor.fetchall():
-            #forms_obj.append(data_row)
-                data_row = list(row)
-                schedA_list = data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
+
 
 
 @api_view(["POST"])
@@ -1253,13 +1255,13 @@ def create_f3x_partner_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         # import ipdb;ipdb.set_trace()
-        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        #comm_info =             .objects.filter(committeeid=request.user.username, is_submitted=True).last()
         comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
 
         if comm_info:
             comm_info = comm_info[0]
             serializer = CommitteeInfoSerializer(comm_info)
-            header = {
+            header = {    
                 "version":"8.3",
                 "softwareName":"ABC Inc",
                 "softwareVersion":"1.02 Beta",
@@ -1282,7 +1284,7 @@ def create_f3x_partner_json_file(request):
                     if not list_entity:
                         continue
                     else:
-                        list_entity = list_entity[0]
+                         list_entity = list_entity[0]
                     response_dict_receipt['FORM TYPE'] = comm_info.form_type
                     response_dict_receipt['FILER COMMITEE ID NUMBER'] = comm_info.committeeid
                     response_dict_receipt['TRANSACTION TYPE CODE'] = entity_obj['transaction_type']
@@ -1326,7 +1328,7 @@ def create_f3x_partner_json_file(request):
                     response_dict_out['CONTRIBUTION AMOUNT'] = entity_obj['contribution_amount']
                     response_dict_out['CONTRIBUTION AGGREGATE'] = entity_obj['contribution_amount']
                     response_dict_out['CONTRIBUTION PURPOSE OF DESCRIP'] = entity_obj['purpose_description']
-                    response_dict_outt['CONTRIBUTOR EMPLOYER'] = list_entity['employer']
+                    response_dict_out['CONTRIBUTOR EMPLOYER'] = list_entity['employer']
                     response_dict_out['CONTRIBUTOR OCCUPATION'] = list_entity['occupation']
                     response_dict_out['MEMO CODE'] = entity_obj['memo_code']
                     response_dict_out['MEMO TEXT/DESCRIPTION'] = entity_obj['memo_text']
@@ -1340,13 +1342,14 @@ def create_f3x_partner_json_file(request):
             conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
+            print (k)
             k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
             data_obj['PARTNERSHIP CONTRIBUTION data'] = response_inkind_receipt_list
             data_obj['PARTNERSHIP MEMO data'] = response_inkind_out_list
             # get_list_entity(entity_id, comm_info.committeeid)
-            serializer = CommitteeInfoSerializer(comm_info)
+            #serializer = CommitteeInfoSerializer(comm_info)
             k.set_contents_from_string(json.dumps(data_obj, indent=4))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
             tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x_PARTNER.json'
