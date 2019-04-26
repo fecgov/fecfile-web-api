@@ -359,14 +359,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
-    console.log('_setSelectedReport: ');
     const today: Date = new Date();
     const dd: string = String(today.getDate()).padStart(2, '0');
     const mm: string = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy: number = today.getFullYear();
     const dateToday: string = `${yyyy}-${mm}-${dd}`;
-
-    console.log('this.committeeReportTypes: ', this.committeeReportTypes);
 
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
