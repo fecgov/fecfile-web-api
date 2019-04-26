@@ -1252,7 +1252,7 @@ def get_entity_partner_id(report_id, cmte_id):
 def create_f3x_partner_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
-        import ipdb;ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
 
@@ -1334,11 +1334,10 @@ def create_f3x_partner_json_file(request):
                     response_inkind_out_list.append(response_dict_out)
                     response_inkind_receipt_list.append(response_dict_receipt)
 
-            import pdb;pdb.set_trace()
+            # import ipdb;ipdb.set_trace()
             # get_list_entity(entity_id, comm_info.committeeid)
-            keyid = ''
-            access_key = ''
-            conn = boto.connect_s3(keyid, access_key)
+            
+            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
             k.content_type = "application/json"
@@ -1348,7 +1347,7 @@ def create_f3x_partner_json_file(request):
             data_obj['PARTNERSHIP MEMO data'] = response_inkind_out_list
             # get_list_entity(entity_id, comm_info.committeeid)
             serializer = CommitteeInfoSerializer(comm_info)
-            k.set_contents_from_string(json.dumps(data_obj))            
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
             tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x_PARTNER.json'
             vdata = {}
@@ -1358,7 +1357,7 @@ def create_f3x_partner_json_file(request):
             vfiles = {}
             vfiles["json_file"] = open(tmp_filename, 'rb')
             res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
-            import ipdb; ipdb.set_trace()
+            # import ipdb; ipdb.set_trace()
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
