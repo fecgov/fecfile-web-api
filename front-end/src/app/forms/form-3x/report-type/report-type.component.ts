@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, ViewChild, ViewEncapsulation, OnDestroy, DoCheck } from '@angular/core';
+import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, OnDestroy, ViewChild, ViewEncapsulation, DoCheck } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -20,7 +20,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   styleUrls: ['./report-type.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
+export class ReportTypeComponent implements OnInit, OnDestroy {
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
@@ -38,6 +38,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   public tooltipLeft = 'auto';
   public customFormValidation: any;
 
+  private _committeeDetails: any = null;
   private _dueDate: string = null;
   private _formType: string = null;
   private _form3xReportTypeDetails: any = null;
@@ -48,7 +49,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   private _toDateSelected: string = null;
   private _fromDateUserModified: string = null;
   private _toDateUserModified: string = null;
-  private dateChangeSubscription: Subscription;
+  private _dateChangeSubscription: Subscription;
 
   constructor(
     private _fb: FormBuilder,
@@ -60,9 +61,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
   ) {
-    this._messageService.clearMessage();
+    this._messageService
+      .clearMessage();
 
-    this.dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
       .subscribe(
         message => {
           if (!message) {
@@ -70,15 +72,15 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
           }
           const dateName = message.name;
           switch (dateName) {
-            case ReportTypeDateEnum.fromDate:
+            case 'fromDate':
               this._fromDateUserModified = message.date;
               this._fromDateSelected = message.date;
-              this.fromDateSelected = false;
+              this.fromDateSelected = true;
               break;
-            case ReportTypeDateEnum.toDate:
+            case 'toDate':
               this._toDateUserModified = message.date;
               this._toDateSelected = message.date;
-              this.toDateSelected = false;
+              this.toDateSelected = true;
               break;
             default:
           }
@@ -87,11 +89,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
   }
 
   ngOnInit(): void {
-
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
-    this.initUserModFields();
-    this.initCustomFormValidation();
+    this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
     if (localStorage.getItem(`form_${this._formType}_saved`) === null) {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
@@ -132,10 +132,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     };
   }
 
-  ngOnDestroy(): void {
-    this.dateChangeSubscription.unsubscribe();
-  }
-
   ngDoCheck(): void {
     if (window.localStorage.getItem(`form_${this._formType}_reset_form`) !== null) {
       const resetForm: boolean = JSON.parse(window.localStorage.getItem(`form_${this._formType}_reset_form`));
@@ -143,102 +139,25 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
 
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
-        if (!this.reportTypeSelected) {
-          this.frmReportType.controls['reportTypeRadio'].setValue(this.committeeReportTypes[0].report_type);
-
-          this.reportTypeSelected = this.committeeReportTypes[0].report_type;
-
-          this.reportType = this.reportTypeSelected;
-
-          if (this.committeeReportTypes.hasOwnProperty('dates')) {
-            this._dueDate = this.committeeReportTypes[0].dates[0].due_date;
-            this._fromDateSelected = this.committeeReportTypes[0].dates[0].cvg_start_date;
-            this.fromDateSelected = true;
-            this._toDateSelected = this.committeeReportTypes[0].dates[0].cvg_end_date;
-            this.toDateSelected = true;
-          }
-
-          this.status.emit({
-            'form': '3x',
-            'reportTypeRadio': this.reportTypeSelected
-          });
-
-          this.optionFailed = false;
+        if (!this.reportTypeSelected) { 
+          if (
+              this._committeeDetails.hasOwnProperty('cmte_filing_freq') && 
+              typeof this._committeeDetails.cmte_filing_freq === 'string'
+          ) {
+            if (this._committeeDetails.cmte_filing_freq === 'M') {
+              this._setSelectedReport();
+            }            
+          } 
         }
       }
-    }
+    }    
 
-    if (this.selectedReportInfo) {
-      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
-        if (this._toDateUserModified) {
-          this.selectedReportInfo.toDate = this._toDateUserModified;
-        }
-        if (typeof this.selectedReportInfo.toDate === 'string') {
-          if (this.selectedReportInfo.toDate.length >= 1) {
-            this._toDateSelected = this.selectedReportInfo.toDate;
-            this.toDateSelected = true;
-          } else {
-            this.toDateSelected = false;
-          }
-        } else {
-          this.toDateSelected = false;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
-        if (this._fromDateUserModified) {
-          this.selectedReportInfo.fromDate = this._fromDateUserModified;
-        }
-        if (typeof this.selectedReportInfo.fromDate === 'string') {
-          if (this.selectedReportInfo.fromDate.length >= 1) {
-            this._fromDateSelected = this.selectedReportInfo.fromDate;
-            this.fromDateSelected = true;
-          } else {
-            this.fromDateSelected = false;
-          }
-        } else {
-          this.fromDateSelected = false;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
-        if (typeof this.selectedReportInfo.selectedState === 'string') {
-          this._selectedElectionState = this.selectedReportInfo.selectedState;
-        } else {
-          this._selectedElectionState = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
-        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
-          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
-        } else {
-          this._selectedElectionDate = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
-        if (typeof this.selectedReportInfo.dueDate === 'string') {
-          if (this.selectedReportInfo.dueDate.length >= 1) {
-            this._dueDate = this.selectedReportInfo.dueDate;
-          }
-        } else {
-          this._dueDate = null;
-        }
-      }
-
-      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
-        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
-          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
-            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
-          }
-        } else {
-          this._reportTypeDescripton = null;
-        }
-      }
-    }
+    this._setReportTypes();
   }
 
+  ngOnDestroy(): void {
+    this._dateChangeSubscription.unsubscribe();
+  }  
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -276,7 +195,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
       }
 
       this.status.emit({
-        'form': '3x',
+        'form': '3X',
         'reportTypeRadio': this.reportTypeSelected
       });
     } else {
@@ -429,15 +348,160 @@ export class ReportTypeComponent implements OnInit, OnDestroy, DoCheck {
     }
   }
 
-  public log(val) {
-    console.log('val: ', val);
-  }
-
   /**
    * Cancels form 3x.
    */
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
+  }
+
+  /**
+   * Sets the selected report when the report type screen first loads.
+   */
+  private _setSelectedReport(): void {
+    const today: Date = new Date();
+    const dd: string = String(today.getDate()).padStart(2, '0');
+    const mm: string = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy: number = today.getFullYear();
+    const dateToday: string = `${yyyy}-${mm}-${dd}`;
+
+    if (Array.isArray(this.committeeReportTypes)) {
+      if (this.committeeReportTypes.length >= 1) {
+        if (!this.reportTypeSelected) {
+
+          const monthlyReports: any = this.committeeReportTypes.filter(el => {
+            return (el.regular_special_report_ind === 'R' && 
+                    el.report_type !== 'TER' && 
+                    el.report_type !== 'MY');
+          });      
+
+          const currentReport: any = monthlyReports.filter(el => {
+            if (el.hasOwnProperty('election_state')) {
+              if (Array.isArray(el.election_state)) { 
+                const dates: any = el.election_state[0].dates; 
+                if (Array.isArray(dates)) {
+                  const startDate: any = dates[0].cvg_start_date;
+                  const endDate: any = dates[0].cvg_end_date;
+                  const dueDate: any = dates[0].due_date;
+
+                  if ((dateToday >= startDate) && (dateToday <= endDate)) {
+                    return el;
+                  }
+                }
+              }              
+            }
+          });
+
+          if (Array.isArray(currentReport)) {
+            const selectedReport: any = currentReport[0];
+
+            this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);
+
+            this.frmReportType.controls['reportTypeRadio'].markAsTouched();
+            this.frmReportType.controls['reportTypeRadio'].markAsDirty();
+
+            this.reportTypeSelected = selectedReport.report_type;
+
+            this.reportType = this.reportTypeSelected
+
+            this.optionFailed = false;
+
+            if (Array.isArray(selectedReport.election_state)) {
+              if (selectedReport.election_state[0].hasOwnProperty('dates')) {
+                const electionState: any = selectedReport.election_state[0];
+
+                this._dueDate = electionState.dates[0].due_date;
+                this._fromDateSelected = electionState.dates[0].cvg_start_date;
+                this.fromDateSelected = true;
+                this._toDateSelected = electionState.dates[0].cvg_end_date;
+                this.toDateSelected = true;
+              }
+
+              this.status.emit({
+                'form': '3X',
+                'reportTypeRadio': this.reportTypeSelected
+              });              
+            }
+
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Sets the report types when the screen is loaded.
+   */
+  private _setReportTypes(): void {
+    if (this.selectedReportInfo) {
+      if (this.selectedReportInfo.hasOwnProperty('toDate')) {
+        if (this._toDateUserModified) {
+          this.selectedReportInfo.toDate = this._toDateUserModified;
+        }
+        if (typeof this.selectedReportInfo.toDate === 'string') {
+          if (this.selectedReportInfo.toDate.length >= 1) {
+            this._toDateSelected = this.selectedReportInfo.toDate;
+            this.toDateSelected = true;
+          } else {
+            this.toDateSelected = false;
+          }
+        } else {
+          this.toDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('fromDate')) {
+        if (this._fromDateUserModified) {
+          this.selectedReportInfo.fromDate = this._fromDateUserModified;
+        }
+        if (typeof this.selectedReportInfo.fromDate === 'string') {
+          if (this.selectedReportInfo.fromDate.length >= 1) {
+            this._fromDateSelected = this.selectedReportInfo.fromDate;
+            this.fromDateSelected = true;
+          } else {
+            this.fromDateSelected = false;
+          }
+        } else {
+          this.fromDateSelected = false;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedState')) {
+        if (typeof this.selectedReportInfo.selectedState === 'string') {
+          this._selectedElectionState = this.selectedReportInfo.selectedState;
+        } else {
+          this._selectedElectionState = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('selectedElectionDate')) {
+        if (typeof this.selectedReportInfo.selectedElectionDate === 'string') {
+          this._selectedElectionDate = this.selectedReportInfo.selectedElectionDate;
+        } else {
+          this._selectedElectionDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('dueDate')) {
+        if (typeof this.selectedReportInfo.dueDate === 'string') {
+          if (this.selectedReportInfo.dueDate.length >= 1) {
+            this._dueDate = this.selectedReportInfo.dueDate;
+          }
+        } else {
+          this._dueDate = null;
+        }
+      }
+
+      if (this.selectedReportInfo.hasOwnProperty('reportTypeDescription')) {
+        if (typeof this.selectedReportInfo.reportTypeDescription === 'string') {
+          if (this.selectedReportInfo.reportTypeDescription.length >= 1) {
+            this._reportTypeDescripton = this.selectedReportInfo.reportTypeDescription;
+          }
+        } else {
+          this._reportTypeDescripton = null;
+        }
+      }
+    }    
   }
 
 

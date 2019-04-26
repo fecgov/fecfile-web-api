@@ -69,7 +69,7 @@ export class F3xComponent implements OnInit {
           if (Array.isArray(res.report_type)) {
             this.reportTypes  = res.report_type;
 
-            console.log('this.reportType: ', this.reportTypes);
+            console.log('this.reportTypes: ', this.reportTypes);
 
             this.reportsLoading = false;
 
@@ -83,8 +83,6 @@ export class F3xComponent implements OnInit {
       .subscribe(res => {
         if (res) {
           this.transactionCategories = res.data.transactionCategories;
-
-          console.log('this.transactionCategories: ', this.transactionCategories);
         }
       });
 
@@ -203,7 +201,7 @@ export class F3xComponent implements OnInit {
 
           this.canContinue();
          } else if (typeof e.form === 'string') {
-           if (e.form === '3x') {
+           if (e.form === '3X') {
             if (e.hasOwnProperty('reportTypeRadio')) {
               if (typeof e.reportTypeRadio === 'string') {
                this._setCoverageDates(e.reportTypeRadio);

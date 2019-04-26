@@ -29,11 +29,11 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="text-error text-center"
-                *ngIf="(frmReportType.invalid && (optionFailed)) ">
+                *ngIf="(frmReportType.invalid && (optionFailed))">
                 You must select a report type for filing.
               </div>
               <div class="text-error text-center"
-                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected); else nextErrors">
+                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && (!fromDateSelected || !toDateSelected))">
                 You must select coverage dates.
               </div>
               <ng-template #nextErrors>

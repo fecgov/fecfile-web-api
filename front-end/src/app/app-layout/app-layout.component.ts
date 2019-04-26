@@ -78,20 +78,18 @@ export class AppLayoutComponent implements OnInit {
             this.toggleMenu = false;
           }
           if(val.url.indexOf('/dashboard') === 0) {
-            // this.sideBarClass = 'dashboard active';
-            // this.showSideBar = true;
             if(this.toggleMenu) {
               this.showSideBar = true;
-              this.sideBarClass = 'dashboard active';
+              this.sideBarClass = 'app-container dashboard active';
             } else {
               this.showSideBar = false;
-              this.sideBarClass = 'active';              
+              this.sideBarClass = 'app-container active';              
             }             
             this._utilService.removeLocalItems('form_', 5);
           } else if(val.url.indexOf('/forms') === 0) {
             if(this.toggleMenu) {
               this.showSideBar = true;
-              this.sideBarClass = 'active';
+              this.sideBarClass = 'app-container active';
             }
           } else if (val.url.indexOf('/forms') !== 0 || val.url.indexOf('/dashboard') !== 0) {
             this._utilService.removeLocalItems('form_', 5);
@@ -126,7 +124,6 @@ export class AppLayoutComponent implements OnInit {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
         if (formInfo.hasOwnProperty('dueDate')) {
-          console.log('formInfo.dueDate = ' + formInfo.dueDate);
           if (typeof formInfo.dueDate === 'string') {
             if (formInfo.dueDate.length > 1) {
               const oneDay: number = 24 * 60 * 60 * 1000;
