@@ -359,11 +359,14 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
+    console.log('_setSelectedReport: ');
     const today: Date = new Date();
     const dd: string = String(today.getDate()).padStart(2, '0');
     const mm: string = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy: number = today.getFullYear();
     const dateToday: string = `${yyyy}-${mm}-${dd}`;
+
+    console.log('this.committeeReportTypes: ', this.committeeReportTypes);
 
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
@@ -378,7 +381,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
           const currentReport: any = monthlyReports.filter(el => {
             if (el.hasOwnProperty('election_state')) {
               if (Array.isArray(el.election_state)) { 
-                const dates: any = el.election_state[0].dates;
+                const dates: any = el.election_state[0].dates; 
                 if (Array.isArray(dates)) {
                   const startDate: any = dates[0].cvg_start_date;
                   const endDate: any = dates[0].cvg_end_date;
@@ -394,6 +397,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
           if (Array.isArray(currentReport)) {
             const selectedReport: any = currentReport[0];
+
             this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);
 
             this.frmReportType.controls['reportTypeRadio'].markAsTouched();

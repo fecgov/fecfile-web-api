@@ -213,7 +213,7 @@ export class ReportTypeSidebarComponent implements OnInit {
       'dueDate': selectedOption.getAttribute('data-duedate')
     };
 
-    this.fromDate = (selectedOption.getAttribute('data-startdate') === null) ? selectedOption.getAttribute('data-enddate') : selectedOption.getAttribute('data-startdate');
+    this.fromDate = selectedOption.getAttribute('data-startdate');
     this.toDate = selectedOption.getAttribute('data-enddate');
     this.dueDate = selectedOption.getAttribute('data-duedate');
 
