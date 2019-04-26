@@ -53,7 +53,6 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
-      console.log('this.selectedReport: ', this.selectedReport);
       if (this.selectedReport.hasOwnProperty('report_type_desciption')) {
         if (typeof this.selectedReport.report_type_desciption === 'string') {
           this._reportTypeDescription = this.selectedReport.report_type_desciption;
@@ -171,20 +170,36 @@ export class ReportTypeSidebarComponent implements OnInit {
     let selectedState: any = null;
 
     this._selectedState = selectedVal;
+    this.selectedElectionState = this._selectedState;
 
     if (selectedVal !== '0') {
       if (this.selectedReport.hasOwnProperty('election_state')) {
-        selectedState = this.selectedReport.election_state.find(el => {
-          return el.state === selectedVal;
-        });
+        if (Array.isArray(this.selectedReport.election_state)) {
+          if (this.selectedReport.election_state.length === 1) {
+            selectedState = this.selectedReport.election_state[0];
+            if (selectedState.state === selectedVal) {
+              if (selectedState.hasOwnProperty('dates')) {
+                if (Array.isArray(selectedState.dates)) {
+                  this.electionDates = [];
+                  this.electionDates[0] = selectedState.dates[0];
+                }
+              }                
+            }
+          } else if (this.selectedReport.election_state.length > 1) {
+            selectedState = this.selectedReport.election_state.find(el => {
+              return el.state === selectedVal;
+            });
 
-        if (selectedState.hasOwnProperty('dates')) {
-          if (Array.isArray(selectedState.dates)) {
-            this.electionDates = selectedState.dates;
-          }
-        }
-      }
-    }
+            if (selectedState.hasOwnProperty('dates')) {
+              if (Array.isArray(selectedState.dates)) {
+                this.electionDates = selectedState.dates;
+              }
+            }            
+          } // this.selectedReport.election_state.length
+        } // Array.isArray(this.selectedReport.election_state)
+      } // this.selectedReport.hasOwnProperty('election_state')
+    } // selectedVal !== '0'
+
   }
 
   public selectElectionDateChange(e): void {
