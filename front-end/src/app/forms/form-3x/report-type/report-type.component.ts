@@ -64,29 +64,29 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     this._messageService
       .clearMessage();
 
-    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
-      .subscribe(
-        message => {
-          console.log('message: ', message);
-          if (!message) {
-            return;
-          }
-          const dateName = message.name;
-          switch (dateName) {
-            case ReportTypeDateEnum.fromDate:
-              this._fromDateUserModified = message.date;
-              this._fromDateSelected = message.date;
-              this.fromDateSelected = true;
-              break;
-            case ReportTypeDateEnum.toDate:
-              this._toDateUserModified = message.date;
-              this._toDateSelected = message.date;
-              this.toDateSelected = true;
-              break;
-            default:
-          }
-        }
-      );
+    // this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+    //   .subscribe(
+    //     message => {
+    //       console.log('message: ', message);
+    //       if (!message) {
+    //         return;
+    //       }
+    //       const dateName = message.name;
+    //       switch (dateName) {
+    //         case ReportTypeDateEnum.fromDate:
+    //           this._fromDateUserModified = message.date;
+    //           this._fromDateSelected = message.date;
+    //           this.fromDateSelected = true;
+    //           break;
+    //         case ReportTypeDateEnum.toDate:
+    //           this._toDateUserModified = message.date;
+    //           this._toDateSelected = message.date;
+    //           this.toDateSelected = true;
+    //           break;
+    //         default:
+    //       }
+    //     }
+    //   );
   }
 
   ngOnInit(): void {
@@ -157,7 +157,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this._dateChangeSubscription.unsubscribe();
+    // this._dateChangeSubscription.unsubscribe();
   }  
 
   @HostListener('window:resize', ['$event'])
@@ -180,8 +180,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
-
-      console.log('updateTypeSelected: ');
       this.initCustomFormValidation();
       this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
@@ -189,7 +187,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.reportType = this.reportTypeSelected;
       const dataReportType: string = e.target.getAttribute('data-report-type');
 
-      console.log('this.reportType: ', this.reportType);
       if (dataReportType !== 'S') {
         this.toDateSelected = true;
         this.fromDateSelected = true;
@@ -399,8 +396,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
           if (Array.isArray(currentReport)) {
             const selectedReport: any = currentReport[0];
-
-            console.log('Array.isArray(currentReport): ');
             this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);
 
             this.frmReportType.controls['reportTypeRadio'].markAsTouched();
@@ -412,21 +407,15 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
             this.optionFailed = false;
 
-            console.log('currentReport[0]: ', selectedReport);
-
             if (Array.isArray(selectedReport.election_state)) {
               if (selectedReport.election_state[0].hasOwnProperty('dates')) {
-                console.log("this.committeeReportTypes.hasOwnProperty('dates'): ");
                 const electionState: any = selectedReport.election_state[0];
-                
+
                 this._dueDate = electionState.dates[0].due_date;
                 this._fromDateSelected = electionState.dates[0].cvg_start_date;
                 this.fromDateSelected = true;
                 this._toDateSelected = electionState.dates[0].cvg_end_date;
                 this.toDateSelected = true;
-
-                console.log('this.fromDateSelected: ', this.fromDateSelected);
-                console.log('this.toDateSelected: ', this.toDateSelected);
               }
 
               this.status.emit({

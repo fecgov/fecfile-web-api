@@ -124,7 +124,6 @@ export class AppLayoutComponent implements OnInit {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
         if (formInfo.hasOwnProperty('dueDate')) {
-          console.log('formInfo.dueDate = ' + formInfo.dueDate);
           if (typeof formInfo.dueDate === 'string') {
             if (formInfo.dueDate.length > 1) {
               const oneDay: number = 24 * 60 * 60 * 1000;
