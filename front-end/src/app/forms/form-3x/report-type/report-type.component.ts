@@ -64,29 +64,28 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     this._messageService
       .clearMessage();
 
-    // this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
-    //   .subscribe(
-    //     message => {
-    //       console.log('message: ', message);
-    //       if (!message) {
-    //         return;
-    //       }
-    //       const dateName = message.name;
-    //       switch (dateName) {
-    //         case ReportTypeDateEnum.fromDate:
-    //           this._fromDateUserModified = message.date;
-    //           this._fromDateSelected = message.date;
-    //           this.fromDateSelected = true;
-    //           break;
-    //         case ReportTypeDateEnum.toDate:
-    //           this._toDateUserModified = message.date;
-    //           this._toDateSelected = message.date;
-    //           this.toDateSelected = true;
-    //           break;
-    //         default:
-    //       }
-    //     }
-    //   );
+    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
+      .subscribe(
+        message => {
+          if (!message) {
+            return;
+          }
+          const dateName = message.name;
+          switch (dateName) {
+            case 'fromDate':
+              this._fromDateUserModified = message.date;
+              this._fromDateSelected = message.date;
+              this.fromDateSelected = true;
+              break;
+            case 'toDate':
+              this._toDateUserModified = message.date;
+              this._toDateSelected = message.date;
+              this.toDateSelected = true;
+              break;
+            default:
+          }
+        }
+      );
   }
 
   ngOnInit(): void {
@@ -157,7 +156,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // this._dateChangeSubscription.unsubscribe();
+    this._dateChangeSubscription.unsubscribe();
   }  
 
   @HostListener('window:resize', ['$event'])
@@ -360,7 +359,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
-    console.log('_setSelectedReport:');
     const today: Date = new Date();
     const dd: string = String(today.getDate()).padStart(2, '0');
     const mm: string = String(today.getMonth() + 1).padStart(2, '0');

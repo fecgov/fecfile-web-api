@@ -33,7 +33,7 @@
                 You must select a report type for filing.
               </div>
               <div class="text-error text-center"
-                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && !fromDateSelected && !toDateSelected)">
+                *ngIf="((frmReportType.dirty || frmReportType.touched) && !optionFailed && (!fromDateSelected || !toDateSelected))">
                 You must select coverage dates.
               </div>
               <ng-template #nextErrors>
