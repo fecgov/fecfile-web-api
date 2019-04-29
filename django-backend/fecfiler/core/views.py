@@ -22,6 +22,7 @@ from boto.s3.key import Key
 from django.conf import settings
 import re
 import csv
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -1394,8 +1395,6 @@ def get_all_transactions(request):
 TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
 """
-
-from django.core.paginator import Paginator
 
 @api_view(['GET'])
 def get_all_transactions(request):
