@@ -199,7 +199,7 @@ export class F3xComponent implements OnInit {
 
           this.canContinue();
          } else if (typeof e.form === 'string') {
-           if (e.form === '3X') {
+           if (e.form === this._formType) {
             if (e.hasOwnProperty('reportTypeRadio')) {
               if (typeof e.reportTypeRadio === 'string') {
                this._setCoverageDates(e.reportTypeRadio);
@@ -236,16 +236,16 @@ export class F3xComponent implements OnInit {
         if(this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
         } else if(this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
         }
       } else if(this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate(['/forms/form/3X'], { queryParams: { step: this.step } });
+        this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
       }
     }
   }
