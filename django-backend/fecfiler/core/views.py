@@ -1386,9 +1386,7 @@ def get_all_transactions(request):
         return Response(json_result, status=status_value)
 
     except Exception as e:
-        return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST
-
-
+        return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 **********************************************************************************************************************************************
