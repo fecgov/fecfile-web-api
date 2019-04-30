@@ -78,11 +78,11 @@
 
                 <td *ngIf="isColumnVisible('form_type')">{{report.form_type}}</td>
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
-                <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Submitted' ? report.fec_id : '' }}</td>
+                <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}</td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
-                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Submitted'? (report.filed_date| date: 'MM/dd/yyyy') : (report.last_update_date| date: 'MM/dd/yyyy')}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy') : (report.last_update_date| date: 'MM/dd/yyyy')}}</td>
 
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
@@ -114,7 +114,7 @@
                             </button>
                         </div>
 
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -129,7 +129,7 @@
                             </button>
                         </div>
 
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Submitted'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
