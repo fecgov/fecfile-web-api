@@ -50,6 +50,7 @@ export class ReportsMessageService {
    * @param message
    */
   public sendApplyFiltersMessage(message: any) {
+    console.log("sendApplyFiltersMessage message = ", message);
     this.applyFiltersSubject.next(message);
   }
 
