@@ -195,7 +195,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
 
       this.status.emit({
-        'form': '3X',
+        'form': this._formType,
         'reportTypeRadio': this.reportTypeSelected
       });
     } else {
