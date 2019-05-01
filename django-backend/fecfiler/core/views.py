@@ -1450,7 +1450,7 @@ def get_all_transactions(request):
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
         if sortcolumn:
-            trans_query_string = trans_query_string + """ ORDER BY '"""+ sortcolumn + """' """ + descending
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
         else:
             trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
@@ -1469,7 +1469,7 @@ def get_all_transactions(request):
         forms_obj = paginator.page(page_num)
         json_result = {'transactions': list(forms_obj), 
                         'totalAmount': sum_trans,
-                    'itemsPerPage': itemsperpage, 'page number': page_num}
+                    'itemsPerPage': itemsperpage, 'page number': page_num,'total pages':count}
         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
