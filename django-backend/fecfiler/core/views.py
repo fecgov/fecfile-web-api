@@ -1107,7 +1107,7 @@ def create_json_file(request):
     try:
         
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, id=request.data['id'])
+        comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['id'])
 
         if comm_info:
             header = {
@@ -1132,7 +1132,7 @@ def create_json_file(request):
 
             vdata['form_type'] = "F99"
             vdata['committeeid'] = comm_info.committeeid
-            #vdata['password'] = comm_info.password
+            vdata['password'] = "test"
             #vdata['newAmendIndicator'] = comm_info.committeeid
             #vdata['reportSequence'] = comm_info.committeeid
             vdata['emailAddress1'] = comm_info.email_on_file
@@ -2151,7 +2151,7 @@ def build_form3x_json_file(request):
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         if 'report_id' in request.data and (not request.data['reporT_id']=='') and int(request.data['report_id'])>=1:
 
-            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+            comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'])
 
             if comm_info:
                 comm_info = comm_info[0]
