@@ -258,7 +258,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                       
                  if (environment.name !== 'local') {                
                    this._dialogService
-                   .reportExist(alertStr, ConfirmModalComponent,'Report already exist' ,true,false,true)
+                   .reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
                    .then(res => {
                      if(res === 'cancel') {
                       this.optionFailed = true;
