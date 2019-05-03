@@ -1404,6 +1404,7 @@ def get_all_transactions(request):
         sortcolumn = request.GET.get('sortColumnName')
         itemsperpage = request.GET.get('itemsPerPage', 5)
         search_string = request.GET.get('search')
+        report_id = request.GET.get('reportid')
         if descending:
             descending = 'DESC'
         else:
@@ -1436,7 +1437,7 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
-                           where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                            # + """ ORDER BY """ + order_string
         print(query_string)
         with connection.cursor() as cursor:
@@ -1446,7 +1447,7 @@ def get_all_transactions(request):
             sum_trans = result[1]
         
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
         if sortcolumn:
