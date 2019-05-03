@@ -45,7 +45,7 @@ export class FormsComponent implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(res.validateMessage) {
-          this.showValidateBar = res.validateMessage.showValidateBar;
+          //this.showValidateBar = res.validateMessage.showValidateBar;
         }
       });
   }
