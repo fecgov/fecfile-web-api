@@ -26,7 +26,7 @@
         height: 90px;
         position: relative;
         float: left;
-        width: 94%;
+        width: 99%;
         border-bottom: 1px solid $iron;
         border-top: 1px solid $iron;
         padding-left: .75em;
@@ -35,19 +35,16 @@
         }
         @include media(tablet) {
           font-size: 1em;
-          width: 97%;
         }
         @include media(mediumDesktop) {
           font-size: 1em;
           height: 50px;
           padding-top: 10px;
-          width: 95%;
         }         
         @include media(largeDesktop) {
           font-size: 1em;
           height: 50px;
           padding-top: 10px;
-          width: 95%;
         }         
         .type-item__box {
           display: inline-block;
@@ -184,25 +181,12 @@
     .forms__btn-container {
       margin: 0 auto;
       padding: 0;
-      width: 80%;
-      @include media(tablet) {
-        margin: 0;
-        padding: 0;
-        width: 95%;
-      }
-      @include media(mediumDesktop) {
-        width: 95%;
-        .btn-right {
-          margin-right: 20px;
-        }    
-      }         
-      @include media(largeDesktop) {
-        width: 95%;
-        .btn-right {
-          margin-right: 20px;
-        }         
-      }
+      width: 100%;
       @include clearfix();
     }
+      .no-buff {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   } // .form__type
+  }
 } // .form__type-container
