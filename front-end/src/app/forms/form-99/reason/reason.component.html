@@ -5,33 +5,31 @@
     >
       <header>
         <div class="header-container">
-          <div class="header__text">
-            <h1 class="text-left">
+            <h1>
               <ng-container *ngIf="!typeSelected">
                 Form 99
               </ng-container>
               <ng-container  *ngIf="typeSelected">
                 Form 99 / {{ typeSelected }}
               </ng-container>
+              <span class="header__btns">
+                <button
+                  type="button"
+                  class="btn btn-validate"
+                  (click)="printPreview()"
+                  [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
+                >
+                  Print Preview
+                </button> &nbsp;
+                <button
+                  type="button"
+                  class="btn btn-validate"
+                  (click)="validateForm()"
+                >
+                    Validate
+                </button>
+              </span>
             </h1>
-          </div>
-          <div class="header__btns">
-            <button
-              type="button"
-              class="btn btn-validate"
-              (click)="printPreview()"
-              [disabled]="frmReason.controls.reasonText.errors?.requiredLength || (! validFile)"
-            >
-              Print Preview
-            </button> &nbsp;
-            <button
-              type="button"
-              class="btn btn-validate"
-              (click)="validateForm()"
-            >
-                Validate
-            </button>
-          </div>
         </div>
       </header>
       <section>

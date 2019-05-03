@@ -18,16 +18,9 @@
   header {
     .header-container {
       display: block;
-      width: 80%;
-      @include media(tablet) {
-        width: 100%;
-      }
-      @include media(mediumDesktop) {
-        width: 100%;
-      }
-      @include media(largeDesktop) {
-        width: 100%;
-      }
+      width: 100%;
+      border-bottom: 1px solid $bombay;
+      padding-bottom: .75em;
       .header__text {
         float: none;
         display: block;
@@ -51,26 +44,9 @@
         }
       }
       .header__btns {
-        display: block;
-        float: none;
-        padding-top: 15px;
-        text-align: left;
-        width: 100%;
+        float: right;
         @include media(tablet) {
           display: block;
-          float: none;
-          text-align: left;
-          width: 100%;
-        }
-        @include media(mediumDesktop) {
-          float: left;
-          text-align: right;
-          width: 47%;
-        }
-        @include media(largeDesktop) {
-          float: left;
-          text-align: right;
-          width: 47%;
         }
         .btn-print-preview {
           @extend .btn-secondary-gray;
@@ -140,7 +116,6 @@
           overflow: scroll; 
           padding: 1rem;
           position: relative;
-          width: 95%;
           height: 50vh;
           &:empty:before {
             content: attr(placeholder);
@@ -193,30 +168,20 @@
     } // .content
   } // section
   footer {
-    margin-top: 20px;
+    margin-top: 1.25em;
+    padding-top: 1em;
+    border-top: 1px solid $bombay;
+
     .grid-row {
-      margin-bottom: 15px !important;
+      margin-bottom: 1em !important;
       .grid-row__col--12 {
         .forms__btn-container {
+          width: 100%;
           margin: 0 auto;
           padding: 0;
-          width: 80%;
           @include media(tablet) {
             margin: 0;
             padding: 0;
-            width: 95%;
-          }
-          @include media(mediumDesktop) {
-            width: 98%;
-            .btn-right {
-              margin-right: 20px;
-            }
-          }
-          @include media(largeDesktop) {
-            width: 98%;
-            .btn-right {
-              margin-right: 20px;
-            }
           }
         }
       }

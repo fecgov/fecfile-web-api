@@ -1,31 +1,29 @@
 <div class="preview-container">
   <header>
       <div class="header-container">
-        <div class="header__text">
-          <h1 class="text-left" *ngIf="!typeSelected">
+          <h1 *ngIf="!typeSelected">
             Form 99
           </h1>
-          <h1 class="text-left" *ngIf="typeSelected">
+          <h1 *ngIf="typeSelected">
             Form 99 / {{ typeSelected }}
+            <span class="header__btns">
+              <button
+               type="button"
+               class="btn btn-validate"
+               (click)="printPreview()"
+               
+             >
+               Print Preview
+             </button> &nbsp;
+             <button
+               type="button"
+               class="btn btn-validate"
+               (click)="validateForm()"
+             >
+                 Validate
+             </button>
+           </span>
           </h1>
-        </div>
-        <div class="header__btns">
-           <button
-            type="button"
-            class="btn btn-validate"
-            (click)="printPreview()"
-            
-          >
-            Print Preview
-          </button> &nbsp;
-          <button
-            type="button"
-            class="btn btn-validate"
-            (click)="validateForm()"
-          >
-              Validate
-          </button>
-        </div>
       </div>
     </header>
   <section>
