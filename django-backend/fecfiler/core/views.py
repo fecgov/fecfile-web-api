@@ -1107,7 +1107,7 @@ def create_json_file(request):
     try:
         
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.get(committeeid=request.user.username, id=request.data['id'])
+        comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['id'])
 
         if comm_info:
             header = {
@@ -1132,7 +1132,7 @@ def create_json_file(request):
 
             vdata['form_type'] = "F99"
             vdata['committeeid'] = comm_info.committeeid
-            #vdata['password'] = comm_info.password
+            vdata['password'] = "test"
             #vdata['newAmendIndicator'] = comm_info.committeeid
             #vdata['reportSequence'] = comm_info.committeeid
             vdata['emailAddress1'] = comm_info.email_on_file
@@ -2149,9 +2149,9 @@ def build_form3x_json_file(request):
     try:
         # import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        if 'report_id' in request.data and (not request.data['reporT_id']=='') and int(request.data['report_id'])>=1:
+        if 'reportid' in request.data and (not request.data['reportid']=='') and int(request.data['reportid'])>=1:
 
-            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+            comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'])
 
             if comm_info:
                 comm_info = comm_info[0]
@@ -2173,15 +2173,16 @@ def build_form3x_json_file(request):
                         "data": {'
                 """
                 form3x_header_string ='{"header": { "version": "8.3","softwareName": "nxg_fec", "softwareVersion": "1.01 Beta", "additionalInfomation": ""   }, "data": {'
-                amendment_number_data=get_amendmentNumber(request.user.username, request.user.report_id)  
+                amendment_number_data=get_amendmentNumber(committeeid, request.data['reportid'])  
                 if amendment_number_data:
                     amendment_number = amendment_number_data[0]['amend_number']    
 
-                form3x_header_data= get_f3x_report_data(request.user.username, request.user.report_id)
+                form3x_header_data= get_f3x_report_data(committeeid, request.data['reportid'])
                 if form3x_header_data:
                     form3x_header_data=form3x_header_data[0]
                     form3x_header_string = form3x_header_string +'"committeeId": "'+form3x_header_data['cmte_id']+'",'
-                    form3x_header_string = form3x_header_string +'"password": "'+form3x_header_data['cmte_id']+'",'
+                    #form3x_header_string = form3x_header_string +'"password": "'+form3x_header_data['cmte_id']+'",'
+                    form3x_header_string = form3x_header_string +'"password":"test" ,'
                     form3x_header_string = form3x_header_string +'"committeeName": "'+form3x_header_data['cmte_nm']+'",'
                     form3x_header_string = form3x_header_string +'"changeOfAddress": "'+form3x_header_data['cmte_addr_chg_flag']+'",'
                     form3x_header_string = form3x_header_string +'"street1": "'+form3x_header_data['cmte_street_1']+'",'
@@ -2206,8 +2207,8 @@ def build_form3x_json_file(request):
 
                 
                     
-                    form3x_sa_list = forn3x_header_data(request.user.username)
-                    form3x_json_header_list=""
+                    #form3x_sa_list = forn3x_header_data(request.user.username)
+                    #form3x_json_header_list=""
                     form3x_data_string ='"summary": {'
                     form3x_data_string = form3x_data_string + '"cashOnHandYYYY": 2019,'
                     form3x_data_string = form3x_data_string + '"colA": {'
@@ -2318,7 +2319,7 @@ def build_form3x_json_file(request):
                     form3x_data_string = form3x_data_string + '"schedules": {'
                     form3x_data_string = form3x_data_string + '"SA": [{'
                     
-                    form3x_sa_list = get_f3x_SA_data(request.user.username, request.data.report_id)
+                    form3x_sa_list = get_f3x_SA_data(committeeid, request.data['reportid'])
                     frx_receipt_data_list = []
                     response_inkind_out_list = []
                     for forn3x_sa_data in form3x_sa_list:
@@ -2415,7 +2416,7 @@ def build_form3x_json_file(request):
                     data_obj['data'] = frx_receipt_data_list
                     k.set_contents_from_string(json.dumps(data_obj, indent=4))            
                     url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-                    tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x_inkind.json'
+                    tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x.json'
                     vdata = {}
                     vdata['form_type'] = "F3X"
                     vdata['committeeid'] = comm_info.committeeid
