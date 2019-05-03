@@ -109,11 +109,11 @@
         }
         .editor {
           border: 1px solid black;
-          box-shadow: 0 .1rem .4rem black;
+          box-shadow: 0 0.1rem 0.4rem black;
           cursor: text;
-          font-size: 1.2rem;
+          font-size: 1em;
           margin-bottom: 1rem;
-          overflow: scroll; 
+          overflow: scroll;
           padding: 1rem;
           position: relative;
           height: 50vh;
@@ -129,12 +129,12 @@
           }
           ol,
           ul {
-              display: block;
-              margin-block-start: 1em;
-              margin-block-end: 1em;
-              margin-inline-start: 0px;
-              margin-inline-end: 0px;
-              padding-inline-start: 40px;            
+            display: block;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            padding-inline-start: 40px;
           }
         }
         @include clearfix();
@@ -142,7 +142,7 @@
       .file-attached-container {
         .close-icon {
           color: $red;
-          vertical-align: top
+          vertical-align: top;
         }
       }
       .tooltip-inner {
@@ -186,5 +186,5 @@
         }
       }
     }
-}
+  }
 }
