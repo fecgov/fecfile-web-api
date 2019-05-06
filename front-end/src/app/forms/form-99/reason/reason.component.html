@@ -48,7 +48,7 @@
         </div>
         <div class="grid-row info-row">
           <div class="grid-row__col grid-row__col--9 text-left">
-            <b>Text*</b>
+            <strong class="label">Text*</strong>
             <ng-template #tipContent1>
               Please note that if you copy and paste text into the text box the formatting may be lost. The text box is
               only for composing a message or letter. The text box does feature basic formatting. If you need to include
@@ -56,7 +56,7 @@
             </ng-template>
             <button
               type="button"
-              class="btn btn-info"
+              class="btn"
               [ngbTooltip]="tipContent1"
               #t1="ngbTooltip"
               (click)="toggleToolTip(t1)"
@@ -266,7 +266,6 @@
                 role="textarea"
                 (input)="editorChange($event)"
                 (paste)="removeHTML($event)"
-                #htmlEditor
               ></div>
             </div>
           </div>
@@ -306,7 +305,7 @@
               File Attachment
               <button
                 type="button"
-                class="btn btn-info"
+                class="btn"
                 [ngbTooltip]="tipContent2"
                 #t2="ngbTooltip"
                 (click)="toggleToolTip(t2)"
