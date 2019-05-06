@@ -39,13 +39,13 @@ export class TransactionSidebarComponent implements OnInit {
     this.itemSelected = e.target.value;
 
     this.status.emit({
-      'form': '3x',
+      'form': this._formType,
       'transactionCategory': e.target.value
     });
 
    this._messageService
      .sendMessage({
-       'form': '3x',
+       'form': this._formType,
        'transactionCategory': e.target.value,
      });
   }

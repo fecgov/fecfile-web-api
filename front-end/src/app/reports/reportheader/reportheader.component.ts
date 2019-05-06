@@ -7,7 +7,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { ReportFilterModel } from '../model/report-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 
-
 export enum ActiveView {
   reports = "reports",
   recycleBin = "recycleBin"
@@ -134,6 +133,7 @@ private readonly filtersLSK = 'reports.filters';
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
+    console.log(" Report Header ngOnDestroy ...")
     this.applyFiltersSubscription.unsubscribe();
   }
 

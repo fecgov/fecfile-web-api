@@ -34,6 +34,8 @@
     .header-container {
       display: block;
       width: 100%;
+      border-bottom: 1px solid $bombay;
+      padding-bottom: .75em;
       .header__text {
         display: block;
         float: none;
@@ -53,29 +55,11 @@
         }         
       }
       .header__btns {
-        display: block;
-        float: none;
-        padding-top: 0;
-        text-align: left;
-        width: 100%;
+        float: right;
         @include media(tablet) {
           display: block;
-          float: none;
+          float: right;
           padding-top: 0;
-          text-align: left;
-          width: 100%;
-        }
-        @include media(mediumDesktop) {
-          float: left;
-          padding-top: 0;
-          text-align: right;
-          width: 50%;
-        }         
-        @include media(largeDesktop) {
-          float: left;
-          padding-top: 0;
-          text-align: right;
-          width: 50%;
         }         
         .btn-print-preview {
           @extend .btn-secondary-gray;

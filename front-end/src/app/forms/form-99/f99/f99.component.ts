@@ -106,7 +106,7 @@ export class F99Component implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(res.validateMessage) {
-          this.showValidateBar = res.validateMessage.showValidateBar;
+          //this.showValidateBar = res.validateMessage.showValidateBar;
         } else if (res.form_submitted) {
           this._form_submitted = true;
 

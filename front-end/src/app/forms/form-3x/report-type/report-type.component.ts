@@ -195,7 +195,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
 
       this.status.emit({
-        'form': '3X',
+        'form': this._formType,
         'reportTypeRadio': this.reportTypeSelected
       });
     } else {
@@ -258,7 +258,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                       
                  if (environment.name !== 'local') {                
                    this._dialogService
-                   .reportExist(alertStr, ConfirmModalComponent,'Report already exist' ,true,false,true)
+                   .reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
                    .then(res => {
                      if(res === 'cancel') {
                       this.optionFailed = true;
@@ -369,26 +369,13 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       if (this.committeeReportTypes.length >= 1) {
         if (!this.reportTypeSelected) {
 
-          const monthlyReports: any = this.committeeReportTypes.filter(el => {
-            return (el.regular_special_report_ind === 'R' && 
-                    el.report_type !== 'TER' && 
-                    el.report_type !== 'MY');
-          });      
-
-          const currentReport: any = monthlyReports.filter(el => {
-            if (el.hasOwnProperty('election_state')) {
-              if (Array.isArray(el.election_state)) { 
-                const dates: any = el.election_state[0].dates; 
-                if (Array.isArray(dates)) {
-                  const startDate: any = dates[0].cvg_start_date;
-                  const endDate: any = dates[0].cvg_end_date;
-                  const dueDate: any = dates[0].due_date;
-
-                  if ((dateToday >= startDate) && (dateToday <= endDate)) {
-                    return el;
-                  }
+          const currentReport: any = this.committeeReportTypes.filter(el => {
+            if (el.hasOwnProperty('default_disp_ind')) {
+              if (typeof el.default_disp_ind === 'string') {
+                if (el.default_disp_ind === 'Y') {
+                  return el;
                 }
-              }              
+              }
             }
           });
 
@@ -423,7 +410,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
               });              
             }
 
-          }
+          } // typeof currentReport
         }
       }
     }
