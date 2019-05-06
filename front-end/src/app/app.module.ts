@@ -5,14 +5,13 @@ import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NgxEditorModule } from 'ngx-editor';
-import { AngularFileUploaderModule } from "angular-file-uploader";
+import { AngularFileUploaderModule } from 'angular-file-uploader';
 import { CookieService } from 'ngx-cookie-service';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { ArchwizardModule } from 'angular-archwizard';
-import { QuillModule } from 'ngx-quill';
 import { AngularEditorModule } from '@kolkov/angular-editor';
-import { NgbModule, NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
 
@@ -77,7 +76,7 @@ import { TrashConfirmComponent } from './forms/transactions/transactions-table/t
 import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
 import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
 
- const appInitializerFn = (appConfig: AppConfigService) => {
+const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();
   };
@@ -136,10 +135,7 @@ import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/
     SafeHTMLPipe,
     ReportsFilterTypeComponent
   ],
-  entryComponents: [
-    ConfirmModalComponent,
-    TrashConfirmComponent,
-  ],
+  entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
     BrowserModule,
     NgSelectModule,
@@ -154,7 +150,6 @@ import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/
     NgxEditorModule,
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
-    QuillModule,
     AngularEditorModule,
     NgbModule.forRoot(),
     ModalModule.forRoot(),
@@ -175,8 +170,6 @@ import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/
     }
   ],
   bootstrap: [AppComponent],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA
-  ]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule { }
+export class AppModule {}

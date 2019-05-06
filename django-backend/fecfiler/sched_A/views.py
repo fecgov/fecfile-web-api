@@ -13,7 +13,7 @@ import datetime
 from django.conf import settings
 from decimal import Decimal
 from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value, check_report_id
-
+from fecfiler.sched_B.views import post_schedB, get_schedB, put_schedB, delete_schedB, schedB_sql_dict, get_list_child_schedB, delete_parent_child_link_sql_schedB
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 """
 list_mandatory_fields_schedA = ['report_id', 'cmte_id', 'line_number', 'transaction_type', 'contribution_date', 'contribution_amount']
 list_mandatory_fields_aggregate = ['transaction_type']
+list_child_schedB = ['16']
 
 def get_next_transaction_id(trans_char):
 
@@ -44,10 +45,10 @@ def get_next_transaction_id(trans_char):
 def check_transaction_id(transaction_id):
 
     try:
-        transaction_type_list = ["SA", "SB", ]
+        transaction_type_list = ["SA",]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
-            raise Exception('The Transaction ID: {} is not in the specified format. Transaction IDs start with SA, SB characters'.format(transaction_id))
+            raise Exception('The Transaction ID: {} is not in the specified format. Transaction IDs start with SA characters'.format(transaction_id))
         return transaction_id
     except Exception:
         raise 
@@ -322,7 +323,9 @@ def get_schedA(data):
 
         if flag:
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedA(report_id, cmte_id, transaction_id)
+            childA_forms_obj = get_list_child_schedA(report_id, cmte_id, transaction_id)
+            childB_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
+            child_forms_obj = childA_forms_obj + childB_forms_obj
             if len(child_forms_obj) > 0:
                 forms_obj[0]['child'] = child_forms_obj
         else:
@@ -372,6 +375,7 @@ def delete_schedA(data):
         transaction_id = check_transaction_id(data.get('transaction_id'))
         delete_sql_schedA(transaction_id, report_id, cmte_id)
         delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
+        delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
 
@@ -444,14 +448,18 @@ def schedA(request):
                 data = put_schedA(datum)
             else:
                 data = post_schedA(datum)
-
             # Associating child transactions to parent and storing them to DB
             if 'child' in request.data:
                 children = check_type_list(request.data.get('child'))
                 if len(children) > 0:
                     child_output=[]
                     for child in children:
-                        child_datum = schedA_sql_dict(child)
+                        transaction_type = child.get('transaction_type')
+                        if transaction_type in list_child_schedB:
+                            child_datum =schedB_sql_dict(child)
+                        else:
+                            child_datum = schedA_sql_dict(child)
+
                         child_datum['back_ref_transaction_id'] = data.get('transaction_id')
                         child_datum['report_id'] = report_id
                         child_datum['cmte_id'] = cmte_id
@@ -459,9 +467,15 @@ def schedA(request):
                             child_datum['entity_id'] = child.get('entity_id')
                         if 'transaction_id' in child and check_null_value(child.get('transaction_id')):
                             child_datum['transaction_id'] = check_transaction_id(child.get('transaction_id'))
-                            child_data = put_schedA(child_datum)
+                            if transaction_type in list_child_schedB:
+                                child_data = put_schedB(child_datum)
+                            else:
+                                child_data = put_schedA(child_datum)
                         else:
-                            child_data = post_schedA(child_datum)
+                            if transaction_type in list_child_schedB:
+                                child_data = post_schedB(child_datum)
+                            else:
+                                child_data = post_schedA(child_datum)
             output = get_schedA(data)                                           
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -499,10 +513,13 @@ def schedA(request):
     if request.method == 'PUT':
 
         try:
-            datum = schedA_sql_dict(request.data)
+            if request.data.get('transaction_type') in list_child_schedB:
+                datum = schedB_sql_dict(request.data)
+            else:
+                datum = schedA_sql_dict(request.data)
 
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
-                datum['transaction_id'] = check_transaction_id(request.data.get('transaction_id'))
+                datum['transaction_id'] = request.data.get('transaction_id')
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
 
@@ -519,11 +536,13 @@ def schedA(request):
 
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
-
-            data = put_schedA(datum)
-            output = get_schedA(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-            
+            if request.data.get('transaction_type') in list_child_schedB:
+                data = put_schedB(datum)
+                output = get_schedB(data)
+            else:    
+                data = put_schedA(datum)
+                output = get_schedA(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)            
         except Exception as e:
             logger.debug(e)
             return Response("The schedA API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST) 
