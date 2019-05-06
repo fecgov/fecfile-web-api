@@ -56,7 +56,7 @@
             </ng-template>
             <button
               type="button"
-              class="btn"
+              class="btn btn-info"
               [ngbTooltip]="tipContent1"
               #t1="ngbTooltip"
               (click)="toggleToolTip(t1)"
@@ -306,7 +306,7 @@
               File Attachment
               <button
                 type="button"
-                class="btn"
+                class="btn btn-info"
                 [ngbTooltip]="tipContent2"
                 #t2="ngbTooltip"
                 (click)="toggleToolTip(t2)"
@@ -318,7 +318,7 @@
                 <span class="sr-only">Click here for more information</span>
               </button>
             </h4>
-            <div class="file-upload-container" *ngIf="file === null">
+            <div class="file-upload-container border-bottom" *ngIf="file === null">
               <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
             </div>
             <div class="file-attached-container" *ngIf="file !== null">
@@ -369,9 +369,7 @@
         </div>
       </div>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <h4>* = Required</h4>
-        </div>
+        <h4 class="grid-row__col grid-row__col--12">* = Required</h4>
       </div>
     </footer>
   </form>

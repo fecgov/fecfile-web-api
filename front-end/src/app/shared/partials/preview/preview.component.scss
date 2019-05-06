@@ -18,7 +18,8 @@
 	      display: block;
 				width: 100%;
 				border-bottom: 1px solid $bombay;
-      	padding-bottom: .75em;
+				padding-bottom: .75em;
+				margin-bottom: 1em;
 	      .header__text {
 	        display: block;
 	        float: none;
@@ -142,10 +143,7 @@
 		}
 	}
 }
-footer, .border-top {
-	margin: 1em 0;
-	border-top: 1px solid $bombay;
-	padding-top: 1em;
+footer {
 	.grid-row {
 		.grid-row__col--12 {
 		    .forms__btn-container {
@@ -155,4 +153,17 @@ footer, .border-top {
 		    }		
 		}
 	}
+}
+.border-bottom {
+	border-bottom: $bombay;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+.border-top {
+	border-top: $bombay;
+	margin-top: 1em;
+	padding-top: 1em;
+}
+.space-bottom {
+	padding-bottom: 1em;
 }
