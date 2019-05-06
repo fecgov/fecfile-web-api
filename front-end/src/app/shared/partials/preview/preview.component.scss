@@ -142,8 +142,10 @@
 		}
 	}
 }
-footer {
-	margin-bottom: 10px;
+footer, .border-top {
+	margin: 1em 0;
+	border-top: 1px solid $bombay;
+	padding-top: 1em;
 	.grid-row {
 		.grid-row__col--12 {
 		    .forms__btn-container {
