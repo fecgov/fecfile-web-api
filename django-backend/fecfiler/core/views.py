@@ -1105,9 +1105,13 @@ END - SEARCH ENTITIES API - CORE APP
 def create_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
-        
+        print("request.data['committeeid']= ", request.data['committeeid'])
+        print("request.data['reportid']", request.data['reportid'])
+
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['id'])
+        #comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['reportid'])
+        print(CommitteeInfo)
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
 
         if comm_info:
             header = {
@@ -1124,41 +1128,104 @@ def create_json_file(request):
             k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
-            data_obj['data'] = serializer.data
+            f99data = {}
+            f99data['committeeId'] = comm_info.committeeid
+            f99data['committeeName'] = comm_info.committeename
+            f99data['street1'] = comm_info.street1
+            f99data['stree2'] = comm_info.street2
+            f99data['city'] = comm_info.city
+            f99data['state'] = comm_info.state
+            f99data['zipCode'] = str(comm_info.zipcode)
+            f99data['treasurerLastName'] = comm_info.treasurerlastname
+            f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+            f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+            f99data['treasurerPrefix'] = comm_info.treasurerprefix
+            f99data['treasurerSuffix'] = comm_info.treasurersuffix
+            f99data['reason'] = comm_info.reason
+            f99data['text'] = comm_info.text
+            #f99data['dateSigned'] = datetime.datetime.now()
+            f99data['email1'] = comm_info.email_on_file
+            f99data['email2'] = comm_info.email_on_file_1
+            f99data['fomrType'] = comm_info.form_type
+            f99data['attachement'] = ''
+            f99data['password'] = "test"
+
+            #data_obj['data'] = serializer.data
+            data_obj['data'] = f99data
             k.set_contents_from_string(json.dumps(data_obj))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + comm_info.committeeid + '_f99.json'
-            vdata = {}
+            
+            """
+            form99_header_string ='{"header": { "version": "8.3","softwareName": "nxg_fec", "softwareVersion": "1.01 Beta", "additionalInfomation": ""   }, "data": {'
+            form99_data_string = '"committeeId": "'+comm_info.committeeid+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"street1": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"stree2": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"city": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            """
 
-            vdata['form_type'] = "F99"
-            vdata['committeeid'] = comm_info.committeeid
-            vdata['password'] = "test"
+            tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+            #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+            vdata = {}
+            print ("url= ", url)
+            print ("tmp_filename= ", tmp_filename)
+
+            #vdata['form_type'] = "F99"
+            
             #vdata['newAmendIndicator'] = comm_info.committeeid
             #vdata['reportSequence'] = comm_info.committeeid
-            vdata['emailAddress1'] = comm_info.email_on_file
-            vdata['fecDataFile'] = comm_info.committeeid
+            #vdata['emailAddress1'] = comm_info.email_on_file
+            #vdata['fecDataFile'] = comm_info.committeeid
             #vdata['reportType'] = comm_info.committeeid
             #vdata['coverageStartDate'] = comm_info.committeeid
             #vdata['coverageEndDate'] = comm_info.committeeid
             #vdata['originalFECId'] = comm_info.committeeid
             #vdata['backDoorCode'] = comm_info.committeeid
-            vdata['emailAddress2'] = comm_info.email_on_file_1
-            #vdata['fecAttachment'] = comm_info.committeeid
+            #vdata['emailAddress2'] = comm_info.email_on_file_1
+            #vdata['fecAttachment'] = comm_info.
+
+
             vdata['wait'] = 'false'
-            print(vdata)
+            #print("vdata",vdata)
             json.dump(data_obj, open(tmp_filename, 'w'))
             vfiles = {}
             vfiles["json_file"] = open(tmp_filename, 'rb')
+            #print("vfiles",vfiles)
+
             res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
             #import ipdb; ipdb.set_trace()
-            print(res.text)
+            #print(res.text)
             return Response(res.text, status=status.HTTP_200_OK)
+            #return Response("successful", status=status.HTTP_200_OK)
             
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
             
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+    #except CommitteeInfo.DoesNotExist:
+     #   return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response("The create_json_file API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 
 """
 **********************************************************************************************************************************************
