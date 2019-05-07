@@ -21,6 +21,7 @@
       width: 100%;
       border-bottom: 1px solid $bombay;
       padding-bottom: .75em;
+      margin-bottom: 1em;
       .header__text {
         float: none;
         display: block;
@@ -168,10 +169,6 @@
     } // .content
   } // section
   footer {
-    margin-top: 1.25em;
-    padding-top: 1em;
-    border-top: 1px solid $bombay;
-
     .grid-row {
       margin-bottom: 1em !important;
       .grid-row__col--12 {
@@ -186,5 +183,10 @@
         }
       }
     }
+  }
+  .border-bottom {
+    border-bottom: $bombay;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
   }
 }
