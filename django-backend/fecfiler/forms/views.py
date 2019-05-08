@@ -879,13 +879,21 @@ def get_form99list(request):
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj=data_row[0]
+
             if forms_obj is None:
                 forms_obj = []
+                
+    
+            json_result = { 'reports': forms_obj}    
         except Exception as e:
             print (str(e))
             return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(forms_obj, status=status.HTTP_200_OK)
+        #return Response(forms_obj, status=status.HTTP_200_OK)
+        return Response(json_result, status=status.HTTP_200_OK)
+
+
+
         
         
 #API to delete saved forms
