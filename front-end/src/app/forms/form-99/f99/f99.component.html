@@ -1,12 +1,12 @@
 <div class="forms__wizard">
-  <div
+  <!--<div
     class="form__alerts"
     [ngClass]="{
       'show-alerts': showValidateBar === true
     }"
   >
     <app-validate></app-validate>
-  </div>
+  </div>-->
   <div
     class="form__container"
     [ngClass]="{
@@ -37,25 +37,21 @@
       }"
     >
       <div
-        class="form__step"
         [hidden]="step!=='step_1'"
       >
         <f99-type (status)='onNotify($event)'></f99-type>
       </div>
       <div
-        class="form__step"
         [hidden]="step!=='step_2'"
       >
         <f99-reason (status)='onNotify($event)'></f99-reason>
       </div>
       <div
-        class="form__step"
         [hidden]="step!=='step_3'"
       >
         <app-preview (status)='onNotify($event)'></app-preview>
       </div>
       <div
-        class="form__step"
         [hidden]="step!=='step_4'"
       >
         <app-sign
@@ -64,7 +60,6 @@
         ></app-sign>
       </div>
       <div
-        class="form__step"
         [hidden]="step!=='step_5'"
       >
         <app-submit

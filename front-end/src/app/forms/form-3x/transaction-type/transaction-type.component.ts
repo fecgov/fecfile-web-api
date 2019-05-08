@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } fro
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
@@ -124,6 +125,21 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   /**
+   * Resets transaction type selected on panel close.
+   *
+   * @param      {Boolean}  opened  The opened
+   */
+  public pannelChange(opened: boolean): void {
+    if (opened) { // panel is closed
+      this.transactionType = '';
+      this.transactionTypeText = '';
+      this.frmOption.controls['secondaryOption'].setValue('');
+      this.transactionCategorySelected = true;
+      this.transactionTypeFailed = true;      
+    }
+  }
+
+  /**
    * Updates the type selected when radio button clicked.
    *
    * @param      {Object}  e            The event object.
@@ -131,10 +147,6 @@ export class TransactionTypeComponent implements OnInit {
    *                                    from the selectedOptions.
    */
   public updateTypeSelected(e, childOption): void {
-    console.log('updateTypeSelected: ');
-    console.log('e: ', e);
-    console.log('val: ', e.target.value);
-
     const val: string = e.target.value;
 
     this.transactionType = val;
@@ -160,18 +172,13 @@ export class TransactionTypeComponent implements OnInit {
       'childTransactionType': ''
     };
 
-    console.log('this._mainTransactionCategory: ', this._mainTransactionCategory);
-
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
-    console.log('transactionObj: ', transactionObj);
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
 
     this.transactionCategorySelected = true;
 
     this.transactionTypeFailed = false;
-
-    // console.log('this.secondaryOptions: ', this.secondaryOptions);
 
     if (this.transactionCategory) {
       this.tranasctionCategoryVal = this.transactionCategory;

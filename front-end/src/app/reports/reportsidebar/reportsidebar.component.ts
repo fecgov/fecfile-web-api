@@ -82,7 +82,7 @@ export class ReportsidebarComponent implements OnInit {
   public title = '';
 
   @ViewChildren('categoryElements')
-  private categoryElements: QueryList<ReportsFilterTypeComponent>;
+  private categoryElements: QueryList<ReportsFilterTypeComponent>; 
 
   public isHideTypeFilter: boolean;
   public isHideCvgDateFilter: boolean;
@@ -147,8 +147,6 @@ export class ReportsidebarComponent implements OnInit {
     this.initValidationErrors();
 
     this.applyFiltersCache();
-    //this.getCategoryTypes();
-    //this.getStates();
     this.getReports();
     this.getForms();
     this.getStatuss();
@@ -282,6 +280,7 @@ export class ReportsidebarComponent implements OnInit {
     console.log("applyFilters ...!");
 
     if (!this.validateFilters()) {
+      console.log(" applyFilters errors infilters ...!");
       return;
     }
 
@@ -299,7 +298,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterForms = filterForms;
 
-    console.log("applyFilters filters.filterForms =", filters.filterForms[0]);
+    console.log("applyFilters filters.filterForms =", filters.filterForms);
    
     // Report Type
     const filterReports = [];
@@ -311,7 +310,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterReports = filterReports;
     
-    console.log("applyFilters filters.filterReports =", filters.filterReports[0]);
+    console.log("applyFilters filters.filterReports =", filters.filterReports);
 
     // Amendment Indicator
     const filterAmendmentIndicators = [];
@@ -323,7 +322,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterAmendmentIndicators = filterAmendmentIndicators
     
-    console.log("applyFilters filters.filterAmendmentIndicators =", filters.filterAmendmentIndicators[0]);
+    console.log("applyFilters filters.filterAmendmentIndicators =", filters.filterAmendmentIndicators);
 
     // Filed Status
     const filterStatuss = [];
@@ -335,7 +334,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterStatuss =filterStatuss;
 
-    console.log("applyFilters filters.filterStatuss =", filters.filterStatuss[0]);
+    console.log("applyFilters filters.filterStatuss =", filters.filterStatuss);
 
     filters.filterCvgDateFrom = this.filterCvgDateFrom;
     filters.filterCvgDateTo = this.filterCvgDateTo;
@@ -554,6 +553,10 @@ export class ReportsidebarComponent implements OnInit {
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+
+    console.log("applyFiltersCache ...!");
+    console.log("applyFiltersCache filtersJson = ", filtersJson);
+
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {

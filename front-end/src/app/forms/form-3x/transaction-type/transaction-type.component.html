@@ -22,9 +22,8 @@
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="actionsMenu">
-            <button class="dropdown-item">View</button>
-            <button class="dropdown-item">Print</button>
-            <button class="dropdown-item">Import</button>
+            <button class="dropdown-item"><i class="view-icon"></i> View</button>
+            <button class="dropdown-item"><i class="print-icon"></i> Print</button>
           </div>
         </div>
       </div>
@@ -51,7 +50,10 @@
           </ng-container>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <ngb-accordion class="secondary-options">
+              <ngb-accordion 
+                class="secondary-options"
+                (pannelChange)="beforeChange($event)"
+                >
                 <ngb-panel
                   class="secondary-options__item"
                   *ngFor="let option of secondaryOptions; index as i"
@@ -64,6 +66,7 @@
                       <div class="option-header-text">
                         <button
                           class="btn btn-link"
+                          (click)="pannelChange(opened)"
                           ngbPanelToggle
                         >
                           {{option?.text}}
@@ -86,6 +89,7 @@
                         <button
                           type="button"
                           class="btn btn-link"
+                          (click)="pannelChange(opened)"
                           ngbPanelToggle
                         >
                           <i

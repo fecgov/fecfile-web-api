@@ -11,8 +11,8 @@ import logging
 from django.db import connection
 from django.http import JsonResponse
 from django.conf import settings
+from decimal import Decimal
 from fecfiler.core.views import get_entities, put_entities, post_entities, remove_entities, undo_delete_entities, delete_entities, date_format, NoOPError, check_null_value, check_report_id
-from fecfiler.sched_A.views import get_next_transaction_id, check_transaction_id, check_type_list, check_decimal
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -23,14 +23,57 @@ SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINK
 ********************************************************************************************************************************
 """
 """
+**************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
+"""
+list_mandatory_fields_schedB = ['report_id', 'expenditure_date', 'expenditure_amount', 'semi_annual_refund_bundled_amount', 'cmte_id', 'line_number', 'transaction_type', ]
+#list_mandatory_fields_aggregate = ['transaction_type']
+#list_child_schedA = ['16']
+
+def get_next_transaction_id(trans_char):
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT public.get_next_transaction_id(%s)""", [trans_char])
+            transaction_ids = cursor.fetchone()
+            transaction_id = transaction_ids[0]
+        return transaction_id
+    except Exception:
+        raise 
+
+def check_transaction_id(transaction_id):
+
+    try:
+        transaction_type_list = ["SB", ]
+        transaction_type = transaction_id[0:2]
+        if not (transaction_type in transaction_type_list):
+            raise Exception('The Transaction ID: {} is not in the specified format. Transaction IDs start with SB characters'.format(transaction_id))
+        return transaction_id
+    except Exception:
+        raise
+
+def check_type_list(data):
+    try:
+        if not type(data) is list:
+            raise Exception('The child transactions have to be sent in as an array or list. Input received: {}'.format(data))
+        else:
+            return data
+    except:
+        raise
+
+def check_decimal(value):
+
+    try:
+        check_value = Decimal(value)
+        return value
+    except Exception as e:
+        raise Exception('Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}'.format(value))
+"""
 **************************************************** FUNCTIONS - MANDATORY FIELDS CHECK **********************************************************
 """
-
-def check_mandatory_fields_schedB(data):
+def check_mandatory_fields(data, list_mandatory_fields):
     try:
-        list_mandatory_fields_schedB = ['report_id', 'expenditure_date', 'expenditure_amount', 'semi_annual_refund_bundled_amount', 'cmte_id', 'line_number', 'transaction_type', ]
         error =[]
-        for field in list_mandatory_fields_schedB:
+        for field in list_mandatory_fields:
             if not(field in data and check_null_value(data.get(field))):
                 error.append(field)
         if len(error) > 0:
@@ -149,6 +192,7 @@ def put_sql_schedB(cmte_id, report_id, line_number, transaction_type, transactio
             # Insert data into schedB table
             cursor.execute("""UPDATE public.sched_b SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, expenditure_purpose = %s, category_code = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, beneficiary_cmte_id = %s, beneficiary_cand_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, other_state = %s, other_zip = %s, nc_soft_account = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", 
                 [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_id, report_id, cmte_id])
+            # print(cursor.query)
             if (cursor.rowcount == 0):
                 raise Exception('The Transaction ID: {} does not exist in schedB table'.format(transaction_id))
     except Exception:
@@ -181,7 +225,7 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
 """
 def post_schedB(datum):
     try:
-        check_mandatory_fields_schedB(datum)
+        check_mandatory_fields(datum, list_mandatory_fields_schedB)
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
@@ -239,7 +283,7 @@ def get_schedB(data):
 
 def put_schedB(datum):
     try:
-        check_mandatory_fields_schedB(datum)
+        check_mandatory_fields(datum, list_mandatory_fields_schedB)
         transaction_id = datum.get('transaction_id')
         check_transaction_id(transaction_id)
         flag = False

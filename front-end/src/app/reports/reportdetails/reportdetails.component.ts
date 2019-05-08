@@ -60,8 +60,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private filters: ReportFilterModel;
 
   public reportsModel: Array<reportModel>;
-  public filterReportsModel: Array<reportModel>;
-  public totalAmount: number;
+  //public filterReportsModel: Array<reportModel>;
+  //public totalAmount: number;
   public reportsView = ActiveView.reports;
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
@@ -197,6 +197,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
+    console.log ("Report Detais ngOnDestroy...");
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
@@ -478,14 +479,14 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // only permit 5 checked at a time
+    // only permit 7 checked at a time
     if (e.target.checked === true) {
       this.columnOptionCount = 0;
       for (const col of this.sortableColumns) {
         if (col.checked) {
           this.columnOptionCount++;
         }
-        if (this.columnOptionCount > 5) {
+        if (this.columnOptionCount > 7) {
           this.setColumnChecked(colName, false);
           e.target.checked = false;
           this.columnOptionCount--;
@@ -899,7 +900,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Get cached values from session.
    */
-  /*private getCachedValues() {
+  private getCachedValues() {
     this.applyFiltersCache();
     switch (this.tableType) {
       case this.reportsView:
@@ -916,7 +917,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       default:
         break;
     }
-  }*/
+  }
 
 
   /**
@@ -941,6 +942,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
+    console.log (" applyFiltersCache filtersJson=", filtersJson);
     if (filtersJson != null) {
       this.filters = JSON.parse(filtersJson);
     } else {
@@ -955,7 +957,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param key the key to the value in the local storage cache
    */
 
-  /* Mahendrea
   private applyColCache(key: string) {
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
@@ -964,7 +965,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       // Just in case cache has an unexpected issue, use default.
       this.setSortableColumns();
     }
-  }*/
+  }
 
 
   /**
@@ -1009,7 +1010,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * component's class variables.
    */
   private setCachedValues() {
-
+    console.log (" setCachedValues this.tableType = ", this.tableType)
     switch (this.tableType) {
       case this.reportsView:
         console.log("setCachedValues ...");
@@ -1035,7 +1036,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   private setCacheValuesforView(columnsKey: string, sortedColKey: string,
     pageKey: string) {
-
+   
+  
     // shared between trx and recycle tables
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
@@ -1097,29 +1099,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.numberOfPages =  this.reportsModel.length / this.config.itemsPerPage;
         this.numberOfPages = Math.ceil(this.numberOfPages);
       }
-    }
-  }
-
-  private getCachedValues() {
-    switch (this.tableType) {
-      case this.reportsView:
-        console.log("getCachedValues...!");
-        this.applyColCache(this.reportSortableColumnsLSK);
-        this.applyCurrentSortedColCache(this.reportCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.reportPageLSK);
-        break;
-      default:
-        break;
-    }
-  }
-  private applyColCache(key: string) {
-    console.log("applyColCache");
-    const sortableColumnsJson: string | null = localStorage.getItem(key);
-    if (localStorage.getItem(key) != null) {
-      this.sortableColumns = JSON.parse(sortableColumnsJson);
-    } else {
-      // Just in case cache has an unexpected issue, use default.
-      this.setSortableColumns();
     }
   }
 
