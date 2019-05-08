@@ -28,7 +28,7 @@ import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
 })
 export class ReasonComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input('editor') editor: any;
+  @ViewChild('htmlEditor') htmlEditor: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
 
   public frmReason: FormGroup;
@@ -213,7 +213,9 @@ export class ReasonComponent implements OnInit {
       try {
         const htmlTagType: string = e.currentTarget.getAttribute('data-command');
 
-        window.document.execCommand(htmlTagType, false, '');
+        document.execCommand(htmlTagType, false, '');
+
+        this.htmlEditor.nativeElement.focus();
       } catch (error) {
         console.log('There was an error.');
         console.log('error: ', error);

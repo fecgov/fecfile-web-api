@@ -355,8 +355,9 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
 
+    console.log("filter dates ")
     filters.show = modified;
-    console.log("applyFilters filters =", filters)
+    console.log("applyFilters filters = ", filters)
     this._reportsMessageService.sendApplyFiltersMessage(filters);
   }
 

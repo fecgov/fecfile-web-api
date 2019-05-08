@@ -3,12 +3,18 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
-import { form99, form3XReport, form99PrintPreviewResponse, reportModel} from '../../interfaces/FormsService/FormsService';
+import { form99, form3XReport, form99PrintPreviewResponse} from '../../interfaces/FormsService/FormsService';
+import { reportModel } from '../../../reports/model/report.model'
 import { environment } from '../../../../environments/environment';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
-export interface GetReportsResponse {
+import { ReportFilterModel } from 'src/app/reports/model/report-filter.model';
+import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
+import { DatePipe } from '@angular/common';
+import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+
+/*export interface GetReportsResponse {
   reports: reportModel[];
-}
+}*/
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +23,16 @@ export interface GetReportsResponse {
 export class FormsService {
 
   private _orderByPipe: OrderByPipe;
-  
+  private _filterPipe: FilterPipe;
+  private _zipCodePipe: ZipCodePipe;
+  private _datePipe: DatePipe;
+ 
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService
   ) { 
     this._orderByPipe = new OrderByPipe();
+    this._filterPipe = new FilterPipe();
   }
 
   /**
@@ -562,173 +572,99 @@ export class FormsService {
       );
   }
 
- public formHasUnsavedData(formType: string): boolean {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
+  public formHasUnsavedData(formType: string): boolean {
+      let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
 
-    if(formSaved !== null) {
-      let formStatus: boolean = formSaved.saved;
+      if(formSaved !== null) {
+        let formStatus: boolean = formSaved.saved;
 
-      if(!formStatus) {
-        return true;
+        if(!formStatus) {
+          return true;
+        }
       }
-    }
 
-    return false;
- }
+      return false;
+  }
 
   public saveReport(form_type: string, access_type: string): Observable<any> {
-  let token: string = JSON.parse(this._cookieService.get('user'));
-  let httpOptions =  new HttpHeaders();
-  let url: string = '/core/reports';
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let url: string = '/core/reports';
 
-  let params = new HttpParams();
-  let formData: FormData = new FormData();
+    let params = new HttpParams();
+    let formData: FormData = new FormData();
 
-  //httpOptions = httpOptions.append('Content-Type', 'application/json');
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
+    //httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
 
-  let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
-  
-  console.log(" saveReport formF3X_ReportInfo ",formF3X_ReportInfo );
+    let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
+    
+    console.log(" saveReport formF3X_ReportInfo ",formF3X_ReportInfo );
 
 
-  formData.append('report_id', formF3X_ReportInfo.reportId);
-  formData.append('form_type', `F${formF3X_ReportInfo.formType}`);
-  if (formF3X_ReportInfo.amend_Indicator===null || formF3X_ReportInfo.amend_Indicator===''){
-    formData.append('amend_ind', 'N');
-  }
-  else
-  {
-    formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
-  }
-  
-  formData.append('report_type', formF3X_ReportInfo.reportType);
-  formData.append('election_code', formF3X_ReportInfo.electionCode);
-  formData.append('date_of_election', formF3X_ReportInfo.electionDate);
-  formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
-  formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
-  formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
-  formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
+    formData.append('report_id', formF3X_ReportInfo.reportId);
+    formData.append('form_type', `F${formF3X_ReportInfo.formType}`);
+    if (formF3X_ReportInfo.amend_Indicator===null || formF3X_ReportInfo.amend_Indicator===''){
+      formData.append('amend_ind', 'N');
+    }
+    else
+    {
+      formData.append('amend_ind', formF3X_ReportInfo.amend_Indicator);
+    }
+    
+    formData.append('report_type', formF3X_ReportInfo.reportType);
+    formData.append('election_code', formF3X_ReportInfo.electionCode);
+    formData.append('date_of_election', formF3X_ReportInfo.electionDate);
+    formData.append('state_of_election', formF3X_ReportInfo.stateOfElection);
+    formData.append('cvg_start_dt', formF3X_ReportInfo.cvgStartDate);
+    formData.append('cvg_end_dt', formF3X_ReportInfo.cvgEndDate);
+    formData.append('coh_bop', formF3X_ReportInfo.coh_bop);
 
-  if (access_type==='Saved'){
-    formData.append('status', 'Saved');
-  }
-  else if (access_type==='Submitted'){
-    formData.append('status', 'Submitted');
-  }
+    if (access_type==='Saved'){
+      formData.append('status', 'Saved');
+    }
+    else if (access_type==='Submitted'){
+      formData.append('status', 'Submitted');
+    }
 
-  console.log("form 3X saveReport formData",formData);
+    console.log("form 3X saveReport formData",formData);
 
-  return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        formData,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if (res) {
-            localStorage.setItem('`form_${form_type}_ReportInfo_Res', JSON.stringify(res));
-            let form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
-            return res;
+    return this._http
+        .post(
+          `${environment.apiUrl}${url}`,
+          formData,
+          {
+            headers: httpOptions
           }
-          return false;
-      }));
- }
-
-
- public removeFormDashBoard(formType: string): void {
-   if (formType === "3X") {
-      console.log ("FormsService removeFormDashBoard")
-      localStorage.removeItem('form3XReportInfo.showDashBoard');
-      localStorage.removeItem('form3XReportInfo.DashBoardLine1');
-      localStorage.removeItem('form3XReportInfo.DashBoardLine2');
-   }
- }
-
-  
-  public getReports(view: string, page: number, itemsPerPage: number,
-    sortColumnName: string, descending: boolean, reportId: number): Observable<any> {
-  const token: string = JSON.parse(this._cookieService.get('user'));
-  let httpOptions =  new HttpHeaders();
-  let params = new HttpParams();
-  
-  const url ='/f99/get_form99list';   
-
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  
-  params = params.append('view', view);
-  params = params.append('reportId', reportId.toString());
-  console.log("reportId =", reportId.toString());
-
-  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-  console.log("httpOptions",httpOptions)
-  console.log("params",params);
-  
-  return this._http
-  .get(
-      `${environment.apiUrl}${url}`,
-      {
-        headers: httpOptions,
-        params 
-      }
-    );
-  
-  
-    }
-  
-  /**
-   * Map server fields from the response to the model.
-   */
-  public mapFromServerFields(serverData: any, modelArray: reportModel[]) {
-
-    if (!serverData || !Array.isArray(serverData)) {
-      console.log(" no server data mapFromServerFields  modelArray", modelArray);
-      return;
-    }
-    if (!modelArray) {
-      modelArray = [];
-    }
-
-    for (const row of serverData) {
-      const model = new reportModel({});
-      model.form_type = row.form_type;
-      model.status = row.status;
-      model.fec_id = row.fec_id;
-      model.amend_ind = row.amend_ind;
-      model.cvg_start_date = row.cvg_start_date;
-      model.cvg_end_date = row.cvg_end_date;
-      model.last_update_date = row.last_update_date;
-      model.report_type_desc = row.report_type_desc;
-      model.filed_date = row.filed_date;
-      modelArray.push(model);
-    }
-    console.log(" mapFromServerFields  modelArray", modelArray);
-    return modelArray;
+        )
+        .pipe(map(res => {
+            if (res) {
+              localStorage.setItem('`form_${form_type}_ReportInfo_Res', JSON.stringify(res));
+              let form3XReportInfoRes: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo_Res`));
+              return res;
+            }
+            return false;
+        }));
   }
 
-  /**
-   *
-   * @param array
-   * @param sortColumnName
-   * @param descending
-   */
-  public sortReports(array: any, sortColumnName: string, descending: boolean) {
 
-    console.log("sortTransactions array =", array);
-    console.log("sortTransactions sortColumnName =", sortColumnName);
-    console.log("sortTransactions descending =", descending);
-    const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
-    console.log("sortTransactions array= ", array);
-    return array;
-      
+  public removeFormDashBoard(formType: string): void {
+    if (formType === "3X") {
+        console.log ("FormsService removeFormDashBoard")
+        localStorage.removeItem('form3XReportInfo.showDashBoard');
+        localStorage.removeItem('form3XReportInfo.DashBoardLine1');
+        localStorage.removeItem('form3XReportInfo.DashBoardLine2');
+    }
   }
 
-public getTransactionCategories( form_type: string): Observable<any> {
+  public clearDashBoardReportFilterOptions(): void {
+    // to refresh/clear Dash Board Filter options
+    localStorage.removeItem('reports.filters');
+    localStorage.removeItem('Reports.view');
+  }
+ 
+  public getTransactionCategories( form_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url: string = '';
@@ -745,19 +681,14 @@ public getTransactionCategories( form_type: string): Observable<any> {
     params = params.append('form_type', "F3X");
 
     return this._http
-       .get(
+      .get(
           `${environment.apiUrl}${url}`,
           {
-           /* headers: httpOptions,
+          /* headers: httpOptions,
             params*/
             headers: httpOptions/*  */
           }
-       );
+      );
   }
-
-  public clearDashBoardReportFilterOptions(): void {
-    // to refresh/clear Dash Board Filter options
-    localStorage.removeItem('reports.filters');
-    localStorage.removeItem('Reports.view');
-  }
+  
 }

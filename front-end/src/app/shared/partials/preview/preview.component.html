@@ -141,28 +141,31 @@
           </div>
         </div>
       </div>
-
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <hr />
+      <div class="grid-row border-top">
+        <h4 class="grid-row__col grid-row__col--6 text-left">Text</h4>
+        <div class="grid-row-col grid-row__col--3">
+            <label class="label">
+              <strong>Attachment:</strong>&nbsp;
+            </label>
+            <span *ngIf="orgFileUrl">
+              <a href="{{ orgFileUrl }}" target="_blank">{{ fileName }}</a>
+            </span>
+            <span *ngIf="!orgFileUrl">
+              {{ fileName }}
+            </span>
         </div>
-      </div>
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--6 text-left">
-          <h4>Text</h4>
-        </div>
-        <div class="grid-row__col grid-row__col--6 text-right">
+        <div class="grid-row__col grid-row__col--3 text-right">
           <button
             type="button"
             class="btn btn-edit"
             (click)="goToPreviousStep()"
-          >
+          ><i class="edit-icon"></i>
               Edit
             </button>
         </div>
       </div>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+        <div class="grid-row__col grid-row__col--6">
           <div 
             class="text-content" 
             [innerHtml]="formDetails?.text | safeHTML"
@@ -170,31 +173,11 @@
           </div>          
         </div>
       </div>
-      <div class="grid-row">
-        <div class="grid-row-col grid-row__col--12">
-          <br />
-          <hr />
-          <br />
-            <span class="label">
-              <b>Attachment:</b>&nbsp;
-            </span>
-            <span *ngIf="orgFileUrl">
-              <a href="{{ orgFileUrl }}" target="_blank">{{ fileName }}</a>
-            </span>
-            <span *ngIf="!orgFileUrl">
-              {{ fileName }}
-            </span>
-            <br />
-            <br />
-          <hr />
-          <br />
-        </div>
-      </div>
     </div> <!-- ./content -->
   </section>
   <footer>
     <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12 text-center">
+      <div class="grid-row__col grid-row__col--12 border-top space-bottom">
         <div class="forms__btn-container">
           <button
             type="button"

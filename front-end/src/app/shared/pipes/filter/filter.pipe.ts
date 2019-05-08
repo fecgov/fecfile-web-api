@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform, Injectable } from '@angular/core';
+import { reportModel } from '../../../reports/model/report.model';
 
 export enum FilterTypeEnum {
     contains = 'contains',
@@ -31,7 +32,13 @@ export class FilterPipe implements PipeTransform {
      * @param value the search string
      * @param filterType The type of search (startsWith, contains). Optional and will default to contains.
      */
-    transform(items: any[], fields: Array<string>, value: string, filterType?: FilterTypeEnum): any[] {
+    transform(items: reportModel[], fields: Array<string>, value: string, filterType?: FilterTypeEnum): any[] {
+
+        console.log(" transform items= ", items);
+        console.log(" transform value= ", value);
+        console.log(" transform filterType= ", filterType);
+        console.log(" transform fields= ", fields);
+
 
         if (!items) {
             return [];
