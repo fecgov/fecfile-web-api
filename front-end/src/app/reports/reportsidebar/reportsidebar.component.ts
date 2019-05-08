@@ -298,8 +298,7 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterForms = filterForms;
 
-    console.log("applyFilters filters.filterForms =", filters.filterForms);
-   
+      
     // Report Type
     const filterReports = [];
     for (const r of this.reports) {
@@ -310,13 +309,12 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterReports = filterReports;
     
-    console.log("applyFilters filters.filterReports =", filters.filterReports);
 
     // Amendment Indicator
     const filterAmendmentIndicators = [];
     for (const a of this.amendmentindicators) {
       if (a.selected) {
-        filterAmendmentIndicators.push(a.amendmentindicator_cd);
+        filterAmendmentIndicators.push(a.amend_ind);
         modified = true;
       }
     }
@@ -328,7 +326,7 @@ export class ReportsidebarComponent implements OnInit {
     const filterStatuss = [];
     for (const s of this.statuss) {
       if (s.selected) {
-        filterStatuss.push(s.status_cd);
+        filterStatuss.push(s.status/*  */);
         modified = true;
       }
     }
