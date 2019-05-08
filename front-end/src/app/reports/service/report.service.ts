@@ -358,13 +358,12 @@ export class ReportsService {
       const filedToDate = new Date(filters.filterFiledDateTo);
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
-        console.log("coverage dates1");
+        console.log("rep.status =", rep.status);
         if (rep.status==='Filed') {
           if (rep.filed_date) {
             console.log("coverage dates2");
             const repDate = new Date(rep.filed_date);
-            if (repDate >= filedFromDate &&
-              repDate <= filedToDate) {
+            if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
             else { 
@@ -376,8 +375,7 @@ export class ReportsService {
           if (rep.last_update_date) {
             console.log("coverage dates2");
             const repDate = new Date(rep.last_update_date);
-            if (repDate >= filedFromDate &&
-              repDate <= filedToDate) {
+            if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
             else { 
@@ -385,7 +383,12 @@ export class ReportsService {
             }
          }
         }
+
+        if (isFilter){
+          filteredFiledDateArray.push(rep);    
+        }
       }
+      
       response.reports = filteredFiledDateArray;
     }
 
