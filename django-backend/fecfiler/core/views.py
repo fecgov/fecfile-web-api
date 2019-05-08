@@ -1197,8 +1197,8 @@ def get_entity_expenditure_id(report_id, cmte_id):
 
 def get_f3x_values(cmte_id, report_id):
     try:
-        import ipdb;ipdb.set_trace()
-        query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop
+        # import ipdb;ipdb.set_trace()
+        query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, cmte_addr_chg_flag, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
         forms_obj = []
         with connection.cursor() as cursor:
@@ -1358,12 +1358,27 @@ def get_committee_mater_values(cmte_id):
     except Exception:
         raise
 
+# def get_list_report(report_id, cmte_id):
+#     try:
+#         query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+#                      FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+#         forms_obj = None
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+#             for row in cursor.fetchall():
+#                 data_row = list(row)
+#                 forms_obj=data_row[0]
+#         if forms_obj is []:
+#             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+#         return forms_obj
+#     except Exception:
+#         raise
 
 @api_view(["POST"])
 def create_f3x_expenditure_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
-        import ipdb;ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         report_id = request.POST.get('report_id')
         comm_info = True
         if comm_info:
@@ -1376,11 +1391,8 @@ def create_f3x_expenditure_json_file(request):
                 "additionalInfomation":"Any other useful information"
             }
             f_3x_list = get_f3x_values(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
             response_expenditure_receipt_list = []
-            #if not f_3x_list:
-              #  f_3x_list = []
-            import ipdb;ipdb.set_trace()
-            #response_expenditure_receipt_list = []
             for f3_i in f_3x_list:
                 #response_dict_out = {}
                 #response_dict_receipt = {}
@@ -1391,7 +1403,7 @@ def create_f3x_expenditure_json_file(request):
                 print ("we got the data")
                 # comm_id = Committee.objects.get(committeeid=request.user.username)
                 for entity_obj in entity_id_list:
-                    response_dict_out = {}
+                    response_dict_out = {}                             
                     response_dict_receipt = {}
                     list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
                     if not list_entity:
@@ -1404,53 +1416,74 @@ def create_f3x_expenditure_json_file(request):
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_name']
 
-                    #response_dict_receipt['payeeOrganizationName'] = list_entity['']
-                    response_dict_out['payeeLastName'] = list_entity['last_name']
-                    response_dict_out['payeeFirstName'] = list_entity['first_name']
-                    response_dict_out['payeeMiddleName'] = list_entity['middle_name']
-                    response_dict_out['payeePrefix'] = list_entity['preffix']
-                    response_dict_out['payeeSuffix'] = list_entity['suffix']
-                    response_dict_out['payeeStreet1 '] = list_entity['street_1']
-                    response_dict_out['payeeStreet2'] = list_entity['street_2']
-                    response_dict_out['payeeCity'] = list_entity['city']
-                    response_dict_out['payeeState'] = list_entity['state']
-                    response_dict_out['payeeZip'] = list_entity['zip_code']
-                    response_dict_out['expenditureDate'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_out['expenditureAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
-                    response_dict_out['expenditurePurposeDescription'] = entity_obj['purpose_description']
-                    response_dict_out['categoryCode'] = '15G'
-                    response_dict_out['memoCode'] = entity_obj['memo_code']
-                    response_dict_out['memoDescription'] = entity_obj['memo_text']
+                    response_dict_receipt['payeeOrganizationName'] = list_entity['entity_name']
+                    response_dict_receipt['payeeLastName'] = list_entity['last_name']
+                    response_dict_receipt['payeeFirstName'] = list_entity['first_name']
+                    response_dict_receipt['payeeMiddleName'] = list_entity['middle_name']
+                    response_dict_receipt['payeePrefix'] = list_entity['preffix']
+                    response_dict_receipt['payeeSuffix'] = list_entity['suffix']
+                    response_dict_receipt['payeeStreet1 '] = list_entity['street_1']
+                    response_dict_receipt['payeeStreet2'] = list_entity['street_2']
+                    response_dict_receipt['payeeCity'] = list_entity['city']
+                    response_dict_receipt['payeeState'] = list_entity['state']
+                    response_dict_receipt['payeeZip'] = list_entity['zip_code']
+                    response_dict_receipt['expenditureDate'] = entity_obj['expenditure_date'].replace('-','')
+                    response_dict_receipt['expenditureAmount'] = "%.2f" % round(entity_obj['expenditure_amount'],2)
+                    response_dict_receipt['expenditurePurposeDescription'] = entity_obj['expenditure_purpose']
+                    response_dict_receipt['categoryCode'] = '15G'
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
 
                     # response_expendtiture_out_list.append(response_dict_out)
                     response_expenditure_receipt_list.append(response_dict_receipt)
 
-            # import ipdb;ipdb.set_trace()
+            # import ipdb;ipdb.set_trace()$
             # get_list_entity(entity_id, comm_info.committeeid)
 
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
             data_obj['data'] = comm_info_obj
             data_obj['data']['form_type'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SB':[]}
             data_obj['data']['Schedule']['SB'] = response_expenditure_receipt_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
             k.set_contents_from_string(json.dumps(data_obj, indent=4))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_Expenditure.json'
+            tmp_filename = '/tmp/' + committeeid + '_'+str(report_id)+'.json'
             vdata = {}
             # vdata['form_type'] = "F3X"
             # vdata['committeeid'] = comm_info.committeeid
             json.dump(data_obj, open(tmp_filename, 'w'))
             vfiles = {}
             vfiles["json_file"] = open(tmp_filename, 'rb')
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
             # import ipdb; ipdb.set_trace()
-            return Response(res.text, status=status.HTTP_200_OK)
+            return Response('', status=status.HTTP_200_OK)
             
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
