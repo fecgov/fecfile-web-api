@@ -1163,7 +1163,7 @@ def get_all_transactions(request):
         page_num = int(request.GET.get('page', 1))
         descending = request.GET.get('descending', False)
         sortcolumn = request.GET.get('sortColumnName')
-        itemsperpage = request.GET.get('itemsPerPage', 5)
+        itemsperpage = request.GET.get('itemsPerPage',5)
         search_string = request.GET.get('search')
         report_id = request.GET.get('reportid')
         if descending:
