@@ -330,7 +330,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                     localStorage.removeItem(`form_${this._formType}_saved`);
                     localStorage.removeItem('reports.filters');
                     localStorage.removeItem('Reports.view');
-                    //localStorage.setItem('isShowOK', 'No');
                   }
                 });
             }
