@@ -139,7 +139,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       cvgEndDate: '',
       dueDate: '',
       amend_Indicator: '',
-      coh_bop: '0'
+      coh_bop: '0',
+      daysUntilDue: ''
     };
   }
 
@@ -241,10 +242,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       if (Array.isArray(currentReport)) {
         this._form3xReportTypeDetails = currentReport[0];
 
-        console.log('currentReport: ', currentReport);
-
         if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
-          console.log('localStorage item already exists, remove it: ');
           window.localStorage.removeItem(`form_${this._formType}_report_type`);
         }
       }
