@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { ActiveView } from '../reportheader/reportheader.component';
 
+
 export interface GetReportsResponse {
   reports: reportModel[];
 }
@@ -354,15 +355,21 @@ export class ReportsService {
 
     if (filters.filterFiledDateFrom && filters.filterFiledDateTo ) {
       console.log("Filed/Saved dates validation...");
-      const filedFromDate = new Date(filters.filterFiledDateFrom);
-      const filedToDate = new Date(filters.filterFiledDateTo);
+      const filedFromDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateFrom));
+      const filedToDate =  this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
+      console.log("filedFromDate", filedFromDate);
+      console.log("filedToDate", filedToDate);
+
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
         console.log("rep.status =", rep.status);
         if (rep.status==='Filed') {
           if (rep.filed_date) {
             console.log("coverage dates2");
-            const repDate = new Date(rep.filed_date);
+            let d= new Date(rep.filed_date);
+            d.setUTCHours(0,0,0,0);
+            const repDate =  this.getDateMMDDYYYYformat(d);
+            console.log("repDate", repDate);
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
@@ -374,7 +381,10 @@ export class ReportsService {
         else if (rep.status==='Saved') {
           if (rep.last_update_date) {
             console.log("coverage dates2");
-            const repDate = new Date(rep.last_update_date);
+            //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
+            let d= new Date(rep.last_update_date);
+            d.setUTCHours(0,0,0,0);
+            const repDate =  this.getDateMMDDYYYYformat(d);
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
@@ -393,6 +403,12 @@ export class ReportsService {
     }
 
     
+  }
+  private getDateMMDDYYYYformat(dateValue:Date):string{
+    var year = dateValue.getUTCFullYear()+"";
+    var month = (dateValue.getUTCMonth()+1)+"";
+    var day = dateValue.getUTCDate()+"";
+    return month + day  +year;
   }
 
 }

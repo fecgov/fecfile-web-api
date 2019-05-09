@@ -326,7 +326,7 @@ export class ReportsidebarComponent implements OnInit {
     const filterStatuss = [];
     for (const s of this.statuss) {
       if (s.selected) {
-        filterStatuss.push(s.status/*  */);
+        filterStatuss.push(s.status_cd/*  */);
         modified = true;
       }
     }
