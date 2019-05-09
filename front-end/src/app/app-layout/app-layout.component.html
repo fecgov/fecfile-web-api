@@ -27,7 +27,16 @@
         id="navbarSupportedContent"
         [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }"
       >
-        <app-header></app-header>
+      <div class="form-group ml-1 mt-2">
+          <input
+            type="text"
+            name="search"
+            class="form-control-sm"
+            placeholder="Search for..."
+          />
+          <i class="search-icon" aria-hidden="true"></i>
+      </div>
+        <app-header class="container"></app-header>
       </div>
     </nav>
   </div>
