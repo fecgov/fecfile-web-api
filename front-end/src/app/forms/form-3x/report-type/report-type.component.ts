@@ -1,4 +1,16 @@
-import { Component, EventEmitter, ElementRef, HostListener, OnInit, Input, Output, OnDestroy, ViewChild, ViewEncapsulation, DoCheck } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  ElementRef,
+  HostListener,
+  OnInit,
+  Input,
+  Output,
+  OnDestroy,
+  ViewChild,
+  ViewEncapsulation,
+  DoCheck
+} from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -8,7 +20,11 @@ import { ValidateComponent } from '../../../shared/partials/validate/validate.co
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { ReportTypeService } from './report-type.service';
 import { ReportTypeMessageService, ReportTypeDateEnum } from './report-type-message.service';
-import { form3x_data, Icommittee_form3x_reporttype, form3XReport} from '../../../shared/interfaces/FormsService/FormsService';
+import {
+  form3x_data,
+  Icommittee_form3x_reporttype,
+  form3XReport
+} from '../../../shared/interfaces/FormsService/FormsService';
 import { Subscription } from 'rxjs/Subscription';
 
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
@@ -21,7 +37,6 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   encapsulation: ViewEncapsulation.None
 })
 export class ReportTypeComponent implements OnInit, OnDestroy {
-
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = {};
@@ -59,33 +74,29 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
-    private _dialogService: DialogService,
+    private _dialogService: DialogService
   ) {
-    this._messageService
-      .clearMessage();
+    this._messageService.clearMessage();
 
-    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage()
-      .subscribe(
-        message => {
-          if (!message) {
-            return;
-          }
-          const dateName = message.name;
-          switch (dateName) {
-            case 'fromDate':
-              this._fromDateUserModified = message.date;
-              this._fromDateSelected = message.date;
-              this.fromDateSelected = true;
-              break;
-            case 'toDate':
-              this._toDateUserModified = message.date;
-              this._toDateSelected = message.date;
-              this.toDateSelected = true;
-              break;
-            default:
-          }
-        }
-      );
+    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage().subscribe(message => {
+      if (!message) {
+        return;
+      }
+      const dateName = message.name;
+      switch (dateName) {
+        case 'fromDate':
+          this._fromDateUserModified = message.date;
+          this._fromDateSelected = message.date;
+          this.fromDateSelected = true;
+          break;
+        case 'toDate':
+          this._toDateUserModified = message.date;
+          this._toDateSelected = message.date;
+          this.toDateSelected = true;
+          break;
+        default:
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -97,8 +108,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(false));
     }
 
-    this._messageService
-      .clearMessage();
+    this._messageService.clearMessage();
 
     this.screenWidth = window.innerWidth;
 
@@ -139,25 +149,23 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
-        if (!this.reportTypeSelected) { 
+        if (!this.reportTypeSelected) {
           if (
-              this._committeeDetails.hasOwnProperty('cmte_filing_freq') && 
-              typeof this._committeeDetails.cmte_filing_freq === 'string'
+            this._committeeDetails.hasOwnProperty('cmte_filing_freq') &&
+            typeof this._committeeDetails.cmte_filing_freq === 'string'
           ) {
-            if (this._committeeDetails.cmte_filing_freq === 'M') {
-              this._setSelectedReport();
-            }            
-          } 
+            this._setSelectedReport();
+          }
         }
       }
-    }    
+    }
 
     this._setReportTypes();
   }
 
   ngOnDestroy(): void {
     this._dateChangeSubscription.unsubscribe();
-  }  
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -195,8 +203,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
 
       this.status.emit({
-        'form': this._formType,
-        'reportTypeRadio': this.reportTypeSelected
+        form: this._formType,
+        reportTypeRadio: this.reportTypeSelected
       });
     } else {
       this.reportTypeSelected = '';
@@ -209,7 +217,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    *
    */
   public doValidateReportType() {
-
     this.initCustomFormValidation();
     if (!this.doCustomValidation()) {
       this.customFormValidation.error = true;
@@ -219,61 +226,56 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     }
 
     if (this.frmReportType.valid) {
-        this.optionFailed = false;
-        this.isValidType = true;
+      this.optionFailed = false;
+      this.isValidType = true;
 
-        this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
+      this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
-        this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
-        this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
-        this._form3xReportTypeDetails.dueDate = this._formatDate(this._dueDate);
-        this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
-        this._form3xReportTypeDetails.election_state = this._selectedElectionState;
-        this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
-        this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
+      this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
+      this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
+      this._form3xReportTypeDetails.dueDate = this._formatDate(this._dueDate);
+      this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+      this._form3xReportTypeDetails.election_state = this._selectedElectionState;
+      this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
+      this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
 
-        localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
+      localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
 
-        
-        this._reportTypeService
-          .saveReport(this._formType, 'Saved')
-          .subscribe(res => {
-            if (res) {
-              let reportId = 0;
-              if (Array.isArray(res)) {
-                 reportId = res[0].report_id;
+      this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {
+        if (res) {
+          let reportId = 0;
+          if (Array.isArray(res)) {
+            reportId = res[0].report_id;
 
+            const cvgStartDate: any = res[0].cvg_start_date;
+            let datearray: any = cvgStartDate.split('-');
 
-                 const cvgStartDate: any = res[0].cvg_start_date;
-                 let datearray: any = cvgStartDate.split('-');
+            const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
 
-                 const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+            const cvgEndDate: any = res[0].cvg_end_date;
+            datearray = cvgEndDate.split('-');
 
-                 const cvgEndDate: any = res[0].cvg_end_date;
-                 datearray = cvgEndDate.split('-');
-
-                 const newcvgEndDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-                 const alertStr: string = `The coverage dates entered overlap 
+            const newcvgEndDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
+            const alertStr: string = `The coverage dates entered overlap 
                    with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
-                      
-                 if (environment.name !== 'local') {                
-                   this._dialogService
-                   .reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
-                   .then(res => {
-                     if(res === 'cancel') {
-                      this.optionFailed = true;
-                      this.isValidType = false;
-                      window.scrollTo(0, 0);
-                      this.status.emit({
-                        form: {},
-                        direction: 'previous',
-                        step: 'step_1'
-                      });
+
+            if (environment.name !== 'local') {
+              this._dialogService
+                .reportExist(alertStr, ConfirmModalComponent, 'Report already exists', true, false, true)
+                .then(res => {
+                  if (res === 'cancel') {
+                    this.optionFailed = true;
+                    this.isValidType = false;
+                    window.scrollTo(0, 0);
+                    this.status.emit({
+                      form: {},
+                      direction: 'previous',
+                      step: 'step_1'
+                    });
 
                     return 0;
-                   } 
-                   else if(res === 'ReportExist') {
-                    let reporturl="/reports?reportId="
+                  } else if (res === 'ReportExist') {
+                    let reporturl = '/reports?reportId=';
                     this._router.navigateByUrl(`${reporturl}{reportId}`);
 
                     localStorage.setItem('Existing_Report_id', reportId.toString());
@@ -281,23 +283,22 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                     localStorage.removeItem('reports.filters');
                     localStorage.removeItem('Reports.view');
                     //localStorage.setItem('isShowOK', 'No');
-                   }
-                 });
-                } 
-              }
-              else {
-                  console.log("New report created Report id =",reportId);   
-              }
-              this.status.emit({
-                form: this.frmReportType,
-                direction: 'next',
-                step: 'step_2',
-                previousStep: 'step_1'
-              });
+                  }
+                });
             }
+          } else {
+            console.log('New report created Report id =', reportId);
+          }
+          this.status.emit({
+            form: this.frmReportType,
+            direction: 'next',
+            step: 'step_2',
+            previousStep: 'step_1'
           });
+        }
+      });
 
-        return 1;
+      return 1;
     } else {
       this.optionFailed = true;
       this.isValidType = false;
@@ -310,11 +311,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   /**
    * Perform custom validations not handled by angular's built in
    * validation framework.
-   * 
+   *
    * @returns true if valid
    */
   private doCustomValidation(): boolean {
-
     // TODO compare dates for start <= end
     // TODO check for valid date format
 
@@ -359,16 +359,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
-    const today: Date = new Date();
-    const dd: string = String(today.getDate()).padStart(2, '0');
-    const mm: string = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy: number = today.getFullYear();
-    const dateToday: string = `${yyyy}-${mm}-${dd}`;
-
+    console.log('this.committeeReportTypes: ', this.committeeReportTypes);
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
         if (!this.reportTypeSelected) {
-
           const currentReport: any = this.committeeReportTypes.filter(el => {
             if (el.hasOwnProperty('default_disp_ind')) {
               if (typeof el.default_disp_ind === 'string') {
@@ -389,7 +383,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
             this.reportTypeSelected = selectedReport.report_type;
 
-            this.reportType = this.reportTypeSelected
+            this.reportType = this.reportTypeSelected;
 
             this.optionFailed = false;
 
@@ -405,11 +399,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
               }
 
               this.status.emit({
-                'form': '3X',
-                'reportTypeRadio': this.reportTypeSelected
-              });              
+                form: '3X',
+                reportTypeRadio: this.reportTypeSelected
+              });
             }
-
           } // typeof currentReport
         }
       }
@@ -488,9 +481,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
           this._reportTypeDescripton = null;
         }
       }
-    }    
+    }
   }
-
 
   /**
    * Changes format of date from m/d/yyyy to yyyy-m-d.
@@ -512,7 +504,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       return '';
     }
   }
-
 
   private initUserModFields() {
     this._fromDateUserModified = null;
