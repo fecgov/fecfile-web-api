@@ -29,7 +29,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
 from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 import urllib
 from django.db import connection
-
+import boto
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
