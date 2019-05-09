@@ -55,6 +55,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
   private _committeeDetails: any = null;
   private _dueDate: string = null;
+  private _daysUntilReportDue: number = null;
   private _formType: string = null;
   private _form3xReportTypeDetails: any = null;
   private _fromDateSelected: string = null;
@@ -222,6 +223,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                   if (dates[0].hasOwnProperty('election_date')) {
                     this._selectedElectionDate = dates[0].election_date;
                   }
+
+                  if (dates[0].hasOwnProperty('due_date')) {
+                    this._dueDate = dates[0].due_date;
+                  }
                 }
               }
             }
@@ -280,6 +285,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this._form3xReportTypeDetails.election_state = this._selectedElectionState;
       this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
       this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
+      this._form3xReportTypeDetails.daysUntilDue = this._calcDaysUntilReportDue(this._dueDate);
 
       window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
 
@@ -542,12 +548,34 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       const day: string = dateArr[2];
       const year: string = dateArr[0].replace('2018', '2019');
 
-      /// return `${year}-${month}-${day}`;
-
       return `${month}/${day}/${year}`;
     } catch (e) {
       return '';
     }
+  }
+
+  /**
+   * Calculates the days until report due.
+   *
+   * @param      {any}     reportDueDate  The report due date
+   * @return     {number}  The days until report due.
+   */
+  private _calcDaysUntilReportDue(reportDueDate: any): number {
+    const oneDay: number = 24 * 60 * 60 * 1000;
+    const today: any = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const dueDateArr = reportDueDate.split('-');
+    let dueDate: any = '';
+
+    const dueDateMonth = parseInt(dueDateArr[1]) - 1;
+    const dueDateDay = parseInt(dueDateArr[2]);
+    const dueDateYear = parseInt(dueDateArr[0]);
+    const day = new Date(dueDateYear, dueDateMonth, dueDateDay);
+
+    dueDate = Math.round(Math.abs((today.getTime() - day.getTime()) / oneDay));
+
+    return dueDate;
   }
 
   private initUserModFields() {

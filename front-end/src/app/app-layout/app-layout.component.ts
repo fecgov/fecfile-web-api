@@ -27,6 +27,7 @@ export class AppLayoutComponent implements OnInit {
   public formType: string = null;
   public formStartDate: string = null;
   public formEndDate: string = null;
+  public formDaysUntilDue: string = null;
   public radAnalystInfo: any = {};
   public showLegalDisclaimer: boolean = false;
   public showFormDueDate: boolean = false;
@@ -115,36 +116,29 @@ export class AppLayoutComponent implements OnInit {
     } else if (route.indexOf('/forms/form/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-        if (formInfo.hasOwnProperty('dueDate')) {
-          if (typeof formInfo.dueDate === 'string') {
-            if (formInfo.dueDate.length > 1) {
-              const oneDay: number = 24 * 60 * 60 * 1000;
-              const today: any = new Date();
-              today.setHours(0, 0, 0, 0);
-              const dueDateArr = formInfo.dueDate.split('/');
-              let dueDate: any = '';
 
-              const dueDateMonth = this._utilService.toInteger(dueDateArr[0]) - 1;
-              const dueDateDay = this._utilService.toInteger(dueDateArr[1]);
-              dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
-
-              if (this._utilService.compareDatesAfter(today, dueDate)) {
-                this.showFormDueDate = true;
-                this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / oneDay));
-              } else if (this._utilService.compareDatesEqual(today, dueDate)) {
-                this.showFormDueDate = false;
-                this.formDueDate = 0;
-              } else {
-                this.showFormDueDate = false;
-                this.formDueDate = 0;
-              }
-
-              this.formType = formInfo.formType;
-              this.formDescription = formInfo.reportTypeDescription;
-              this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
-              this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
-            }
+        if (typeof formInfo === 'object') {
+          if (formInfo.hasOwnProperty('formType')) {
+            this.formType = formInfo.formType;
           }
+
+          if (formInfo.hasOwnProperty('reportTypeDescription')) {
+            this.formDescription = formInfo.reportTypeDescription;
+          }
+
+          if (formInfo.hasOwnProperty('cvgStartDate')) {
+            this.formStartDate = formInfo.cvgStartDate;
+          }
+
+          if (formInfo.hasOwnProperty('cvgEndDate')) {
+            this.formEndDate = formInfo.cvgEndDate;
+          }
+
+          if (formInfo.hasOwnProperty('daysUntilDue')) {
+            this.formDaysUntilDue = formInfo.daysUntilDue;
+          }
+
+          this.showFormDueDate = true;
         }
       }
     } else {
