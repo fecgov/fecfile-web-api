@@ -1300,14 +1300,16 @@ def get_all_transactions(request):
                 data_row = list(row)
                 forms_obj=data_row[0]
                 forms_obj = data_row[0]
-                for d in forms_obj:
-                    for i in d:
-                        if not d[i]:
-                            d[i] = ''
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_204_NO_CONTENT
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
+        
         # import ipdb; ipdb.set_trace()
         paginator = Paginator(forms_obj, itemsperpage)
         if paginator.num_pages < page_num:
