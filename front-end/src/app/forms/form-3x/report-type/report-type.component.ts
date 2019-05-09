@@ -39,7 +39,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 export class ReportTypeComponent implements OnInit, OnDestroy {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
-  @Input() selectedReportInfo: any = {};
+  @Input() selectedReportInfo: any = null;
 
   public frmReportType: FormGroup;
   public fromDateSelected = false;
@@ -194,12 +194,54 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.reportType = this.reportTypeSelected;
       const dataReportType: string = e.target.getAttribute('data-report-type');
 
+      const currentReport: any = this.committeeReportTypes.filter(el => {
+        return el.report_type === this.reportType;
+      });
+
       if (dataReportType !== 'S') {
         this.toDateSelected = true;
         this.fromDateSelected = true;
+
+        if (Array.isArray(currentReport)) {
+          if (currentReport[0].hasOwnProperty('election_state')) {
+            const electionState: any = currentReport[0].election_state;
+
+            if (Array.isArray(electionState)) {
+              if (electionState[0].hasOwnProperty('dates')) {
+                const dates: any = electionState[0].dates;
+
+                if (Array.isArray(dates)) {
+                  if (dates[0].hasOwnProperty('cvg_start_date')) {
+                    this._fromDateSelected = dates[0].cvg_start_date;
+                  }
+
+                  if (dates[0].hasOwnProperty('cvg_end_date')) {
+                    this._toDateSelected = dates[0].cvg_end_date;
+                  }
+
+                  if (dates[0].hasOwnProperty('election_date')) {
+                    this._selectedElectionDate = dates[0].election_date;
+                  }
+                }
+              }
+            }
+          }
+          this._reportTypeDescripton = currentReport[0].report_type_desciption;
+        }
       } else {
         this.toDateSelected = false;
         this.fromDateSelected = false;
+      }
+
+      if (Array.isArray(currentReport)) {
+        this._form3xReportTypeDetails = currentReport[0];
+
+        console.log('currentReport: ', currentReport);
+
+        if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
+          console.log('localStorage item already exists, remove it: ');
+          window.localStorage.removeItem(`form_${this._formType}_report_type`);
+        }
       }
 
       this.status.emit({
@@ -239,7 +281,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
       this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
 
-      localStorage.setItem('form_3X_report_type', JSON.stringify(this._form3xReportTypeDetails));
+      window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
 
       this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {
         if (res) {
@@ -359,7 +401,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * Sets the selected report when the report type screen first loads.
    */
   private _setSelectedReport(): void {
-    console.log('this.committeeReportTypes: ', this.committeeReportTypes);
     if (Array.isArray(this.committeeReportTypes)) {
       if (this.committeeReportTypes.length >= 1) {
         if (!this.reportTypeSelected) {
@@ -367,6 +408,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
             if (el.hasOwnProperty('default_disp_ind')) {
               if (typeof el.default_disp_ind === 'string') {
                 if (el.default_disp_ind === 'Y') {
+                  if (!this.selectedReportInfo.hasOwnProperty('report_type_desciption')) {
+                    this._reportTypeDescripton = el.report_type_desciption;
+                  }
+
                   return el;
                 }
               }
@@ -399,7 +444,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
               }
 
               this.status.emit({
-                form: '3X',
+                form: this._formType,
                 reportTypeRadio: this.reportTypeSelected
               });
             }
