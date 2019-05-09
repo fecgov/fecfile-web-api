@@ -692,7 +692,7 @@ export class ReasonComponent implements OnInit {
 
   private deletePDFFile(){
     this._dialogService
-    .confirm("Do you want to delete uploaded pdf file??",ConfirmModalComponent, "Delete PDF File",true)
+    .confirm("Do you want to delete uploaded pdf file?",ConfirmModalComponent, "Delete PDF File",true)
     //.reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
     .then(res => {
       if(res === 'cancel') {
