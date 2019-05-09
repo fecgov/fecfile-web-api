@@ -48,7 +48,6 @@ export class ReportTypeService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    console.log('form3xReportType:', form3xReportType);
 
     formData.append('form_type', `F${formType}`);
     formData.append('report_type', form3xReportType.reportType);
