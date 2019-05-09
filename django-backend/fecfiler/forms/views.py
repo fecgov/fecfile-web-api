@@ -30,6 +30,7 @@ from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 import urllib
 from django.db import connection
 import boto
+from boto.s3.key import Key
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
