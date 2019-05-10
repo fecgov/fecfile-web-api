@@ -15,6 +15,10 @@ export interface GetTransactionsResponse {
   transactions: TransactionModel[];
   totalAmount: number;
   totalTransactionCount: number;
+
+  // remove after API is renamed.
+  itemsPerPage: number;
+  'total pages': number;
 }
 
 @Injectable({
@@ -75,13 +79,18 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    sortColumnName = 'transaction_amount';
+    const reportid = 1206963;
+
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('descending', descending ? 'true' : 'false');
+    params = params.append('reportid', reportid.toString());
+
     // TODO these will be used for filtering
     // These are not yet defined in API
-    // params = params.append('page', page);
-    // params = params.append('itemsPerPage', itemsPerPage);
-    // params = params.append('sortColumnName', sortColumnName);
-    // params = params.append('descending', descending);
-    // params = params.append('search', filter.search);
+    // params = params.append('search', filter.);
 
     // These are defined in API
     // params = params.append('report_id', '1');
@@ -176,7 +185,7 @@ export class TransactionsService {
   /**
    * Some data from the server is formatted for display in the UI.  Users will search
    * on the reformatted data.  For the search filter to work against the formatted data,
-   * the server array must also contain the formatted data.  They will be added her.
+   * the server array must also contain the formatted data.  They will be added later.
    * 
    * @param response the server data
    */
@@ -357,7 +366,11 @@ export class TransactionsService {
     const mockResponse: GetTransactionsResponse = {
       transactions: this.mockRestoreTrxArray,
       totalAmount: 0,
-      totalTransactionCount: this.mockRestoreTrxArray.length
+      totalTransactionCount: this.mockRestoreTrxArray.length,
+
+      // remove after API is renamed.
+      itemsPerPage: 5,
+      'total pages': 0
     };
     return Observable.of(mockResponse);
   }

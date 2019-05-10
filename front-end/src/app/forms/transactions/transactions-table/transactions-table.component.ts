@@ -55,7 +55,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
 
   // ngx-pagination config
-  public maxItemsPerPage = 100;
+  public maxItemsPerPage = 10;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
@@ -153,10 +153,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
-      itemsPerPage: 5,
+      itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
     this.config = paginateConfig;
+    // this.config.currentPage = 1;
 
     this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
@@ -226,11 +227,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
-        this.transactionsModel = this._transactionsService.sortTransactions(
-          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+        // this.transactionsModel = this._transactionsService.sortTransactions(
+        //   transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+
+        this.transactionsModel = transactionsModelL;
 
         this.totalAmount = res.totalAmount;
-        this.config.totalItems = res.totalTransactionCount;
+        // this.config.totalItems = res.totalTransactionCount;
+        this.config.totalItems = res.itemsPerPage * res['total pages'];
         this.allTransactionsSelected = false;
       });
   }
@@ -859,11 +863,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private applyCurrentPageCache(key: string) {
     const currentPageCache: string =
       localStorage.getItem(key);
-    if (this._utilService.isNumber(currentPageCache)) {
-      this.config.currentPage = this._utilService.toInteger(currentPageCache);
-    } else {
-      this.config.currentPage = 1;
-    }
+      if (currentPageCache) {
+        if (this._utilService.isNumber(currentPageCache)) {
+          this.config.currentPage = this._utilService.toInteger(currentPageCache);
+        } else {
+          this.config.currentPage = 1;
+        }
+      } else {
+        this.config.currentPage = 1;
+      }
   }
 
 

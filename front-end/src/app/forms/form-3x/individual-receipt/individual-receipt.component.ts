@@ -29,8 +29,8 @@ export class IndividualReceiptComponent implements OnInit {
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
+  public formType = '';
 
-  private _formType: string = '';
   private _types: any = [];
   private _transaction: any = {};
 
@@ -49,12 +49,12 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+   this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.frmIndividualReceipt = this._fb.group({});
 
     this._individualReceiptService
-      .getDynamicFormFields(this._formType, 'Individual Receipt')
+      .getDynamicFormFields(this.formType, 'Individual Receipt')
       .subscribe(res => {
         this.formFields = res.data.formFields;
         this._setForm(this.formFields);
@@ -173,10 +173,10 @@ export class IndividualReceiptComponent implements OnInit {
 
       }
 
-      localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
+      localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
       this._individualReceiptService
-        .saveScheduleA(this._formType)
+        .saveScheduleA(this.formType)
         .subscribe(res => {
           if (res) {
             this.frmIndividualReceipt.reset();
