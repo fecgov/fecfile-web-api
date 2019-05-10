@@ -29,7 +29,8 @@ from PyPDF2 import PdfFileWriter, PdfFileReader, PdfFileMerger
 from PyPDF2.generic import BooleanObject, NameObject, IndirectObject
 import urllib
 from django.db import connection
-
+import boto
+from boto.s3.key import Key
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -879,13 +880,21 @@ def get_form99list(request):
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj=data_row[0]
+
             if forms_obj is None:
                 forms_obj = []
+                
+    
+            json_result = { 'reports': forms_obj}    
         except Exception as e:
             print (str(e))
             return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(forms_obj, status=status.HTTP_200_OK)
+        #return Response(forms_obj, status=status.HTTP_200_OK)
+        return Response(json_result, status=status.HTTP_200_OK)
+
+
+
         
         
 #API to delete saved forms
@@ -1115,68 +1124,62 @@ def save_print_f99(request):
 
     comm_info = CommitteeInfo.objects.filter(id=create_json_data['id']).last()
     if comm_info:
-        serializer = CommitteeInfoSerializer(comm_info)
-        # imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
-
-        treasurer_name = ''
-        if not comm_info.treasurerprefix is None:
-            treasurer_name = treasurer_name +  comm_info.treasurerprefix
-        if not comm_info.treasurerfirstname is None:
-            treasurer_name = treasurer_name +  " " + comm_info.treasurerfirstname
-        if not comm_info.treasurermiddlename is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurermiddlename
-        if not comm_info.treasurerlastname is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurerlastname
-        if not comm_info.treasurersuffix is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
-        if comm_info.updated_at is None:
-            date_signed_mm = comm_info.created_at.astimezone(est).strftime('%m')
-            date_signed_dd = comm_info.created_at.astimezone(est).strftime('%d')
-            date_signed_yy = comm_info.created_at.astimezone(est).strftime('%Y')
-            # filing_timestamp = comm_info.created_at.strftime('%m/%d/%Y %H:%M:%S')
-            # print(comm_info.created_at)
-            # print(filing_timestamp)
-        else:
-            date_signed_mm = comm_info.updated_at.astimezone(est).strftime('%m')
-            date_signed_dd = comm_info.updated_at.astimezone(est).strftime('%d')
-            date_signed_yy = comm_info.updated_at.astimezone(est).strftime('%Y')
-            # filing_timestamp = comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S')
-            # print(comm_info.updated_at)
-            # print(filing_timestamp)
-
-
-        data = {
-            #'IMGNO': imageno,
-            #'FILING_TIMESTAMP': filing_timestamp,
-            'COMMITTEE_NAME': comm_info.committeename,
-            'FILER_FEC_ID_NUMBER':comm_info.committeeid,
-            'STREET_1': comm_info.street1,
-            'CITY': comm_info.city,
-            'STATE': comm_info.state,
-            'ZIP': comm_info.zipcode,
-            'REASON_TYPE': comm_info.reason,
-            'DATE_SIGNED_MM':date_signed_mm,
-            'DATE_SIGNED_DD':date_signed_dd,
-            'DATE_SIGNED_YY':date_signed_yy,
-            'TREASURER_FULL_NAME': treasurer_name,
-            'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
-            'EF_STAMP':"[Electronically Filed]",
-            'MISCELLANEOUS_TEXT': comm_info.text,
+        header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
         }
 
-        if not comm_info.street2 is None:
-            data['STREET_2'] = comm_info.street2    
+        serializer = CommitteeInfoSerializer(comm_info)
+        conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+        bucket = conn.get_bucket("dev-efile-repo")
+        k = Key(bucket)
+        k.content_type = "application/json"
+        data_obj = {}
+        data_obj['header'] = header
+        f99data = {}
+        f99data['committeeId'] = comm_info.committeeid
+        f99data['committeeName'] = comm_info.committeename
+        f99data['street1'] = comm_info.street1
+        f99data['stree2'] = comm_info.street2
+        f99data['city'] = comm_info.city
+        f99data['state'] = comm_info.state
+        f99data['zipCode'] = str(comm_info.zipcode)
+        f99data['treasurerLastName'] = comm_info.treasurerlastname
+        f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+        f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+        f99data['treasurerPrefix'] = comm_info.treasurerprefix
+        f99data['treasurerSuffix'] = comm_info.treasurersuffix
+        f99data['reason'] = comm_info.reason
+        f99data['text'] = comm_info.text
+        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['email1'] = comm_info.email_on_file
+        f99data['email2'] = comm_info.email_on_file_1
+        f99data['fomrType'] = comm_info.form_type
+        f99data['attachement'] = ''
+        f99data['password'] = "test"
 
-        #print(data)
+        #data_obj['data'] = serializer.data
+        data_obj['data'] = f99data
+        k.set_contents_from_string(json.dumps(data_obj))            
+        url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
 
-        with open('data.json', 'w') as outfile:
-            json.dump(data, outfile, ensure_ascii=False)
+        tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+        #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+        vdata = {}
+        print ("url= ", url)
+        print ("tmp_filename= ", tmp_filename)
+
+
+        vdata['wait'] = 'false'
+        #print("vdata",vdata)
+        json.dump(data_obj, open(tmp_filename, 'w'))
+
+        #with open('data.json', 'w') as outfile:
+         #   json.dump(data, outfile, ensure_ascii=False)
         
-        #obj = open('data.json', 'w')
-        #obj.write(serializer.data)
-        #obj.close
-
-        # variables to be sent along the JSON file in form-data
+         # variables to be sent along the JSON file in form-data
         filing_type='FEC'
         vendor_software_name='FECFILE'
 
@@ -1203,14 +1206,25 @@ def save_print_f99(request):
 
             #attachment = open(file_object['Body'], 'rb')
 
+            """
+                file_obj = {
+                    'json_file': ('data.json', open('data.json', 'r'), 'application/json'),
+                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'json_file': ('data.json', open('data.json', 'r'), 'application/json')
+                }
+            """
             file_obj = {
-                'json_file': ('data.json', open('data.json', 'r'), 'application/json'),
+                'json_file': ('data.json', open(tmp_filename, 'r'), 'application/json'),
                 'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
             }
         else:
             file_obj = {
-                'json_file': ('data.json', open('data.json', 'r'), 'application/json')
+                'json_file': ('data.json', open(tmp_filename, 'r'), 'application/json')
             }
+
         #printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
         printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
@@ -1263,48 +1277,60 @@ def update_print_f99(request):
     #try:
     comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
-        serializer = CommitteeInfoSerializer(comm_info)
-        # imageno = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+ "{}".format(comm_info.id)
-
-        treasurer_name = ''
-        if not comm_info.treasurerprefix is None:
-            treasurer_name = treasurer_name +  comm_info.treasurerprefix
-        if not comm_info.treasurerfirstname is None:
-            treasurer_name = treasurer_name +  " " + comm_info.treasurerfirstname
-        if not comm_info.treasurermiddlename is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurermiddlename
-        if not comm_info.treasurerlastname is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurerlastname
-        if not comm_info.treasurersuffix is None:
-            treasurer_name = treasurer_name +  " " +  comm_info.treasurersuffix
-
-        data = {
-            # 'IMGNO': imageno,
-            # 'FILING_TIMESTAMP': comm_info.updated_at.strftime('%m/%d/%Y %H:%M:%S'),
-            'COMMITTEE_NAME': comm_info.committeename,
-            'FILER_FEC_ID_NUMBER':comm_info.committeeid,
-            'STREET_1': comm_info.street1,
-            'CITY': comm_info.city,
-            'STATE': comm_info.state,
-            'ZIP': comm_info.zipcode,
-            'REASON_TYPE': comm_info.reason,
-            'DATE_SIGNED_MM':comm_info.updated_at.astimezone(est).strftime('%m'),
-            'DATE_SIGNED_DD':comm_info.updated_at.astimezone(est).strftime('%d'),
-            'DATE_SIGNED_YY':comm_info.updated_at.astimezone(est).strftime('%Y'),
-            'TREASURER_FULL_NAME': treasurer_name,
-            'TREASURER_NAME': comm_info.treasurerfirstname + " " + comm_info.treasurerlastname,
-            'EF_STAMP':"[Electronically Filed]",
-            'MISCELLANEOUS_TEXT': comm_info.text,
-
+        header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
         }
 
-        if not comm_info.street2 is None:
-            data['STREET_2'] = comm_info.street2    
+        serializer = CommitteeInfoSerializer(comm_info)
+        conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+        bucket = conn.get_bucket("dev-efile-repo")
+        k = Key(bucket)
+        k.content_type = "application/json"
+        data_obj = {}
+        data_obj['header'] = header
+        f99data = {}
+        f99data['committeeId'] = comm_info.committeeid
+        f99data['committeeName'] = comm_info.committeename
+        f99data['street1'] = comm_info.street1
+        f99data['stree2'] = comm_info.street2
+        f99data['city'] = comm_info.city
+        f99data['state'] = comm_info.state
+        f99data['zipCode'] = str(comm_info.zipcode)
+        f99data['treasurerLastName'] = comm_info.treasurerlastname
+        f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+        f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+        f99data['treasurerPrefix'] = comm_info.treasurerprefix
+        f99data['treasurerSuffix'] = comm_info.treasurersuffix
+        f99data['reason'] = comm_info.reason
+        f99data['text'] = comm_info.text
+        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['email1'] = comm_info.email_on_file
+        f99data['email2'] = comm_info.email_on_file_1
+        f99data['fomrType'] = comm_info.form_type
+        f99data['attachement'] = ''
+        f99data['password'] = "test"
 
-        #print(data)
+        #data_obj['data'] = serializer.data
+        data_obj['data'] = f99data
+        k.set_contents_from_string(json.dumps(data_obj))            
+        url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
 
-        with open('data.json', 'w') as outfile:
-            json.dump(data, outfile, ensure_ascii=False)
+        tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+        #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+        vdata = {}
+        print ("url= ", url)
+        print ("tmp_filename= ", tmp_filename)
+
+
+        vdata['wait'] = 'false'
+        #print("vdata",vdata)
+        json.dump(data_obj, open(tmp_filename, 'w'))
+
+        #with open('data.json', 'w') as outfile:
+         #   json.dump(data, outfile, ensure_ascii=False)
         
         #obj = open('data.json', 'w')
         #obj.write(serializer.data)
@@ -1336,6 +1362,8 @@ def update_print_f99(request):
 
             #attachment = open(file_object['Body'], 'rb')
 
+            
+            """
             file_obj = {
                 'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
                 'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
@@ -1344,6 +1372,17 @@ def update_print_f99(request):
             file_obj = {
                 'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
             }
+            """
+
+            file_obj = {
+                'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+            }
+        else:
+            file_obj = {
+                'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+            }
+
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
         # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
         printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
@@ -1364,7 +1403,7 @@ def update_print_f99(request):
     except ValueError:
         return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
     """
-
+    
 def set_need_appearances_writer(writer):
 
     try:

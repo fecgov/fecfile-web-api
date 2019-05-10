@@ -112,19 +112,10 @@
       }
       .app__top-logo {
         float: left;
-        margin: 0 !important;
+        margin-bottom: -28px;
         padding: 0 !important;
         img {
-          width: 200px;
-          @include media(tablet) {
-            width: 200px;
-          }
-          @include media(mediumDesktop) {
-            width: 200px;
-          }
-          @include media(largeDesktop) {
-            width: 260px;
-          }
+          width: 260px;
         }
       } // .app__top-logo
       .app__top-nav {

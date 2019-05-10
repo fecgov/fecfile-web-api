@@ -10,9 +10,12 @@ import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
-import { reportModel} from 'src/app/shared/interfaces/FormsService/FormsService';
+//import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
+import { GetReportsResponse } from '../../reports/service/report.service';
+import { reportModel } from '../model/report.model';
+import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
+
 
 @Component({
   selector: 'app-reportdetails',
@@ -131,7 +134,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private allReportsSelected: boolean;
 
   constructor(
-    private _formsService: FormsService,
+    private _ReportsService: ReportsService,
     private _reportsMessageService: ReportsMessageService,
     private _tableService: TableService,
     private _utilService: UtilService,
@@ -298,8 +301,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log("view",this.view);
     console.log("existingReportId",this.existingReportId);
   
-    this._formsService.getReports (this.view, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending,this.existingReportId)
+    this._ReportsService.getReports (this.view, page, this.config.itemsPerPage,
+      this.currentSortedColumnName, sortedCol.descending,  this.filters, this.existingReportId)
       
       .subscribe((res: GetReportsResponse) => {
         console.log("getReportsPage res", res);
@@ -307,19 +310,32 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         console.log("getReportsPage res.reports", res.reports);
 
         this.reportsModel = [];
-        const reportsModel = this._formsService.mapFromServerFields(res,
-           this.reportsModel);
 
-        console.log("getReportsPage reportsModel", this.reportsModel);
+        this._ReportsService.mockApplyFilters(res, this.filters);
+
+        console.log("after filter getReportsPage res", res);
+        console.log("after filter getReportsPage res.reports", res.reports);
+        
+        //const reportsModel = this._ReportsService.mapFromServerFields(res,
+          //this.reportsModel);  
+        
+        const reportsModelL = this._ReportsService.mapFromServerFields(res.reports);
+        console.log("reportsModelL= ", reportsModelL);
+        //this._ReportsService.mockApplyFilters( this.reportsModel, this.filters);
+
+        console.log(" getReportsPage reportsModelL", reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
 
-        this.reportsModel = this._formsService.sortReports(
-          this.reportsModel, this.currentSortedColumnName, sortedCol.descending);
+        this.reportsModel = this._ReportsService.sortReports(
+          reportsModelL, this.currentSortedColumnName, sortedCol.descending);
+        
+        console.log(" getReportsPage this.reportsModel= ", this.reportsModel);
       
         this.allReportsSelected = false;
       });
 
+      
   }  
 
   
@@ -1087,8 +1103,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    this.currentSortedColumnName = this._tableService.setSortDirection('form_type',
-      this.sortableColumns, false);
+    //this.currentSortedColumnName = this._tableService.setSortDirection('form_type',
+      //this.sortableColumns, false);
+    this.currentSortedColumnName = this._tableService.setSortDirection('last_update_date',
+      this.sortableColumns, true);
   }
 
 

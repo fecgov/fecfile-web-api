@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^core/build_form3x_json_file$', views.build_form3x_json_file, name='build_form3x_json_file'),
     # url(r'^core/create_f3x_partner_json_file$', views.create_f3x_partner_json_file, name='create_f3x_partner_json_file'),
     # url(r'^core/create_f3x_json_file$', views.create_f3x_json_file, name='create_f3x_json_file'),
+
 ]

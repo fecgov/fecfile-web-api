@@ -16,7 +16,6 @@ import { FormsComponent } from '../forms/forms.component';
   encapsulation: ViewEncapsulation.None
 })
 export class AppLayoutComponent implements OnInit {
-
   @Input() status: any;
 
   public committeeName: string = null;
@@ -28,74 +27,68 @@ export class AppLayoutComponent implements OnInit {
   public formType: string = null;
   public formStartDate: string = null;
   public formEndDate: string = null;
+  public formDaysUntilDue: string = null;
   public radAnalystInfo: any = {};
   public showLegalDisclaimer: boolean = false;
-  public showFormDueDate: boolean = false
+  public showFormDueDate: boolean = false;
   public showSideBar: boolean = true;
   public sideBarClass: string = null;
   public toggleMenu: boolean = false;
 
-	constructor(
+  constructor(
     private _apiService: ApiService,
-		private _sessionService: SessionService,
+    private _sessionService: SessionService,
     private _messageService: MessageService,
     private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal
-	) { }
+  ) {}
 
-	ngOnInit(): void {
+  ngOnInit(): void {
     let route: string = this._router.url;
 
-    this._apiService
-      .getCommiteeDetails()
-      .subscribe(res => {
-        if(res) {
-          localStorage.setItem('committee_details', JSON.stringify(res));
+    this._apiService.getCommiteeDetails().subscribe(res => {
+      if (res) {
+        localStorage.setItem('committee_details', JSON.stringify(res));
 
-          this.committeeName = res.committeename;
-          this.committeeId = res.committeeid;
-          this._messageService
-            .sendMessage({'committee_details_loaded': true});
-        }
-      });
+        this.committeeName = res.committeename;
+        this.committeeId = res.committeeid;
+        this._messageService.sendMessage({ committee_details_loaded: true });
+      }
+    });
 
-    this._apiService
-      .getRadAnalyst()
-      .subscribe(res => {
-        if (res) {
-          if (Array.isArray(res.response)) {
-            this.radAnalystInfo = res.response[0];
-          }
+    this._apiService.getRadAnalyst().subscribe(res => {
+      if (res) {
+        if (Array.isArray(res.response)) {
+          this.radAnalystInfo = res.response[0];
         }
-      });
+      }
+    });
 
-    this._router
-      .events
-      .subscribe(val => {
-        if(val instanceof NavigationEnd) {
-          if(this.toggleMenu) {
-            this.toggleMenu = false;
-          }
-          if(val.url.indexOf('/dashboard') === 0) {
-            if(this.toggleMenu) {
-              this.showSideBar = true;
-              this.sideBarClass = 'app-container dashboard active';
-            } else {
-              this.showSideBar = false;
-              this.sideBarClass = 'app-container active';              
-            }             
-            this._utilService.removeLocalItems('form_', 5);
-          } else if(val.url.indexOf('/forms') === 0) {
-            if(this.toggleMenu) {
-              this.showSideBar = true;
-              this.sideBarClass = 'app-container active';
-            }
-          } else if (val.url.indexOf('/forms') !== 0 || val.url.indexOf('/dashboard') !== 0) {
-            this._utilService.removeLocalItems('form_', 5);
-          }
+    this._router.events.subscribe(val => {
+      if (val instanceof NavigationEnd) {
+        if (this.toggleMenu) {
+          this.toggleMenu = false;
         }
-      });
+        if (val.url.indexOf('/dashboard') === 0) {
+          if (this.toggleMenu) {
+            this.showSideBar = true;
+            this.sideBarClass = 'app-container dashboard active';
+          } else {
+            this.showSideBar = false;
+            this.sideBarClass = 'app-container active';
+          }
+          this._utilService.removeLocalItems('form_', 5);
+        } else if (val.url.indexOf('/forms') === 0) {
+          if (this.toggleMenu) {
+            this.showSideBar = true;
+            this.sideBarClass = 'app-container active';
+          }
+        } else if (val.url.indexOf('/forms') !== 0 || val.url.indexOf('/dashboard') !== 0) {
+          this._utilService.removeLocalItems('form_', 5);
+        }
+      }
+    });
   }
 
   /**
@@ -123,40 +116,33 @@ export class AppLayoutComponent implements OnInit {
     } else if (route.indexOf('/forms/form/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-        if (formInfo.hasOwnProperty('dueDate')) {
-          if (typeof formInfo.dueDate === 'string') {
-            if (formInfo.dueDate.length > 1) {
-              const oneDay: number = 24 * 60 * 60 * 1000;
-              const today: any = new Date();
-              today.setHours(0, 0, 0, 0);
-              const dueDateArr = formInfo.dueDate.split('/');
-              let dueDate: any = '';
 
-              const dueDateMonth = this._utilService.toInteger(dueDateArr[0]) - 1;
-              const dueDateDay = this._utilService.toInteger(dueDateArr[1]);
-              dueDate = new Date(dueDateArr[2], dueDateMonth, dueDateDay);
-
-              if (this._utilService.compareDatesAfter(today, dueDate)) {
-                this.showFormDueDate = true;
-                this.formDueDate = Math.round(Math.abs((today.getTime() - dueDate.getTime()) / (oneDay)));
-              } else if (this._utilService.compareDatesEqual(today, dueDate)) {
-                this.showFormDueDate = false;
-                this.formDueDate = 0;
-              } else {
-                this.showFormDueDate = false;
-                this.formDueDate = 0;
-              }
-
-              this.formType = formInfo.formType;
-              this.formDescription = formInfo.reportTypeDescription;
-              this.formStartDate = formInfo.cvgStartDate.replace('2018', 2019);
-              this.formEndDate = formInfo.cvgEndDate.replace('2018', 2019);
-            }
+        if (typeof formInfo === 'object') {
+          if (formInfo.hasOwnProperty('formType')) {
+            this.formType = formInfo.formType;
           }
+
+          if (formInfo.hasOwnProperty('reportTypeDescription')) {
+            this.formDescription = formInfo.reportTypeDescription;
+          }
+
+          if (formInfo.hasOwnProperty('cvgStartDate')) {
+            this.formStartDate = formInfo.cvgStartDate;
+          }
+
+          if (formInfo.hasOwnProperty('cvgEndDate')) {
+            this.formEndDate = formInfo.cvgEndDate;
+          }
+
+          if (formInfo.hasOwnProperty('daysUntilDue')) {
+            this.formDaysUntilDue = formInfo.daysUntilDue;
+          }
+
+          this.showFormDueDate = true;
         }
       }
     } else {
-        this.showFormDueDate = false;
+      this.showFormDueDate = false;
     }
   }
   /**
@@ -182,11 +168,11 @@ export class AppLayoutComponent implements OnInit {
     const route: string = this._router.url;
     this.showSideBar = e.showSidebar;
 
-    if(this.showSideBar) {
-      if(route) {
-        if(route.indexOf('/dashboard') === 0) {
+    if (this.showSideBar) {
+      if (route) {
+        if (route.indexOf('/dashboard') === 0) {
           this.sideBarClass = 'dashboard active';
-        } else if(route.indexOf('/dashboard') === -1) {
+        } else if (route.indexOf('/dashboard') === -1) {
           this.sideBarClass = 'active';
         }
       }
@@ -200,15 +186,15 @@ export class AppLayoutComponent implements OnInit {
    *
    * @param      {Object}  content  The content
    */
-  public open(content): void{
-    this._modalService
-      .open(content, {ariaLabelledBy: 'modal-basic-title'})
-      .result
-      .then((result) => {
+  public open(content): void {
+    this._modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+      result => {
         this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
-    });
+      },
+      reason => {
+        this.closeResult = `Dismissed ${this._getDismissReason(reason)}`;
+      }
+    );
   }
 
   private _getDismissReason(reason: any): string {
@@ -217,12 +203,11 @@ export class AppLayoutComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 
-  public editFrom() : void {
-    alert("Feature to be implemented.");
-  } 
-
+  public editFrom(): void {
+    alert('Feature to be implemented.');
+  }
 }

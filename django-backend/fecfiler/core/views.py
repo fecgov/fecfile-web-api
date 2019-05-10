@@ -22,6 +22,7 @@ from boto.s3.key import Key
 from django.conf import settings
 import re
 import csv
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -1107,9 +1108,13 @@ END - SEARCH ENTITIES API - CORE APP
 def create_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
-        
+        print("request.data['committeeid']= ", request.data['committeeid'])
+        print("request.data['reportid']", request.data['reportid'])
+
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['id'])
+        #comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['reportid'])
+        print(CommitteeInfo)
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
 
         if comm_info:
             header = {
@@ -1126,44 +1131,107 @@ def create_json_file(request):
             k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
-            data_obj['data'] = serializer.data
+            f99data = {}
+            f99data['committeeId'] = comm_info.committeeid
+            f99data['committeeName'] = comm_info.committeename
+            f99data['street1'] = comm_info.street1
+            f99data['stree2'] = comm_info.street2
+            f99data['city'] = comm_info.city
+            f99data['state'] = comm_info.state
+            f99data['zipCode'] = str(comm_info.zipcode)
+            f99data['treasurerLastName'] = comm_info.treasurerlastname
+            f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+            f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+            f99data['treasurerPrefix'] = comm_info.treasurerprefix
+            f99data['treasurerSuffix'] = comm_info.treasurersuffix
+            f99data['reason'] = comm_info.reason
+            f99data['text'] = comm_info.text
+            #f99data['dateSigned'] = datetime.datetime.now()
+            f99data['email1'] = comm_info.email_on_file
+            f99data['email2'] = comm_info.email_on_file_1
+            f99data['fomrType'] = comm_info.form_type
+            f99data['attachement'] = ''
+            f99data['password'] = "test"
+
+            #data_obj['data'] = serializer.data
+            data_obj['data'] = f99data
             k.set_contents_from_string(json.dumps(data_obj))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + comm_info.committeeid + '_f99.json'
-            vdata = {}
+            
+            """
+            form99_header_string ='{"header": { "version": "8.3","softwareName": "nxg_fec", "softwareVersion": "1.01 Beta", "additionalInfomation": ""   }, "data": {'
+            form99_data_string = '"committeeId": "'+comm_info.committeeid+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"street1": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"stree2": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"city": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
+            """
 
-            vdata['form_type'] = "F99"
-            vdata['committeeid'] = comm_info.committeeid
-            vdata['password'] = "test"
+            tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+            #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+            vdata = {}
+            print ("url= ", url)
+            print ("tmp_filename= ", tmp_filename)
+
+            #vdata['form_type'] = "F99"
+            
             #vdata['newAmendIndicator'] = comm_info.committeeid
             #vdata['reportSequence'] = comm_info.committeeid
-            vdata['emailAddress1'] = comm_info.email_on_file
-            vdata['fecDataFile'] = comm_info.committeeid
+            #vdata['emailAddress1'] = comm_info.email_on_file
+            #vdata['fecDataFile'] = comm_info.committeeid
             #vdata['reportType'] = comm_info.committeeid
             #vdata['coverageStartDate'] = comm_info.committeeid
             #vdata['coverageEndDate'] = comm_info.committeeid
             #vdata['originalFECId'] = comm_info.committeeid
             #vdata['backDoorCode'] = comm_info.committeeid
-            vdata['emailAddress2'] = comm_info.email_on_file_1
-            #vdata['fecAttachment'] = comm_info.committeeid
+            #vdata['emailAddress2'] = comm_info.email_on_file_1
+            #vdata['fecAttachment'] = comm_info.
+
+
             vdata['wait'] = 'false'
-            print(vdata)
+            #print("vdata",vdata)
             json.dump(data_obj, open(tmp_filename, 'w'))
             vfiles = {}
             vfiles["json_file"] = open(tmp_filename, 'rb')
+            #print("vfiles",vfiles)
+
             res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
             #import ipdb; ipdb.set_trace()
-            print(res.text)
+            #print(res.text)
             return Response(res.text, status=status.HTTP_200_OK)
+            #return Response("successful", status=status.HTTP_200_OK)
             
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
             
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+    #except CommitteeInfo.DoesNotExist:
+     #   return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response("The create_json_file API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 """
+
 ******************************************************************************************************************************
 Generate Expenditures data Json file API - CORE APP - SPRINT 12 - FNE 769  - BY YESWANTH KUMAR TELLA
 ******************************************************************************************************************************
@@ -1498,65 +1566,107 @@ END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
 
-"""             
-******************************************************************************************************************************
-GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - FNE 613 - BY PRAVEEN JINKA
-******************************************************************************************************************************
+"""
+**********************************************************************************************************************************************
+TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
+**********************************************************************************************************************************************
+
 """
 @api_view(['GET'])
 def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
+        page_num = int(request.GET.get('page', 1))
+        descending = request.GET.get('descending', False)
+        sortcolumn = request.GET.get('sortColumnName')
+        itemsperpage = request.GET.get('itemsPerPage', 5)
+        search_string = request.GET.get('search')
+        report_id = request.GET.get('reportid')
+        if descending:
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
         #     order_string = "transaction_id"
-        for key, value in request.query_params.items():
-            try:
-                check_value = int(value)
-                param_string = param_string + " AND " + key + "=" + str(value)
-            except Exception as e:
-                if key == 'transaction_date':
-                    transaction_date = date_format(request.query_params.get('transaction_date'))
-                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+        # import ipdb;ipdb.set_trace()
+        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 
+            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'occupation', 'employer', 'memo_code', 'memo_text']
+        if search_string:
+            for key in keys:
+                if not param_string:
+                    param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
                 else:
-                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+        # for key, value in request.query_params.items():
+        #     try:
+        #         check_value = int(value)
+        #         param_string = param_string + " AND " + key + "=" + str(value)
+        #     except Exception as e:
+        #         if key == 'transaction_date':
+        #             transaction_date = date_format(request.query_params.get('transaction_date'))
+        #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+        #         else:
+        #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
-                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
-                            # + """ ORDER BY """ + order_string
-        # print(query_string)
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
+                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           # + """ ORDER BY """ + order_string
+        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
-            
+        
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
+        if sortcolumn:
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        else:
+            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
-
-        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_204_NO_CONTENT
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
+        
+        # import ipdb; ipdb.set_trace()
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 
+                        'totalAmount': sum_trans,
+                    'itemsPerPage': itemsperpage, 'page number': page_num,'total pages':paginator.num_pages}
+        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
-******************************************************************************************************************************
+*****************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
+
 """
 ********************************************************************************************************************************
 STATE API- CORE APP - SPRINT 9 - FNE ??? - BY PRAVEEN JINKA 
@@ -1951,7 +2061,6 @@ def get_f3x_report_data(cmte_id, report_id):
         return forms_obj
     except Exception:
         raise
-
 """
 *****************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
