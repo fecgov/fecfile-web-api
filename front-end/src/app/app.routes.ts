@@ -59,7 +59,7 @@ export const AppRoutes: Routes = [
           { path: ':form_step', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService] }
         ]
 			},
-			{ path: 'forms/transactions/:form_id', component: TransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+			{ path: 'forms/transactions/:form_id/:report_id', component: TransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		]
     },
     { path: '**', redirectTo: '' }
