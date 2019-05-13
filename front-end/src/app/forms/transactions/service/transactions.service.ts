@@ -39,6 +39,10 @@ export class TransactionsService {
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
+  private _propertyNameConverterMap: Map<string, string> = new Map([
+    ['zip', 'zip_code'],
+  ]);
+
 
   constructor(
     private _http: HttpClient,
@@ -70,7 +74,7 @@ export class TransactionsService {
       itemsPerPage: number,
       sortColumnName: string,
       descending: boolean,
-      filter: TransactionFilterModel): Observable<any> {
+      filters: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
@@ -79,14 +83,61 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    sortColumnName = 'transaction_amount';
-    const reportid = 1206963;
+    const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
+    const reportid = 1206963; // 1213131
 
     params = params.append('page', page.toString());
     params = params.append('itemsPerPage', itemsPerPage.toString());
-    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('sortColumnName', serverSortColumnName);
     params = params.append('descending', descending ? 'true' : 'false');
     params = params.append('reportid', reportid.toString());
+
+    if (filters) {
+      if (filters.keywords) {
+        if (filters.keywords.length > 0) {
+          let i = 1;
+          for (let keyword of filters.keywords) {
+            keyword = keyword.trim();
+            params = params.append('keyword' + i, keyword);
+            i++;
+          }
+        }
+      }
+
+      if (filters.filterCategories) {
+        if (filters.filterCategories.length > 0) {
+          let i = 1;
+          for (const category of filters.filterCategories) {
+            params = params.append('category' + i, category);
+            i++;
+          }
+        }
+      }
+
+      if (filters.filterDateFrom && filters.filterDateTo) {
+        params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
+        params = params.append('transactionDateTo', filters.filterDateTo.toString());
+      }
+
+      if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
+        if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
+            filters.filterAmountMin <= filters.filterAmountMax) {
+              params = params.append('amountMin', filters.filterAmountMin.toString());
+              params = params.append('amountMax', filters.filterAmountMax.toString());
+        }
+      }
+
+      if (filters.filterStates) {
+        if (filters.filterStates.length > 0) {
+          let i = 1;
+          for (const state of filters.filterStates) {
+            params = params.append('state' + i, state);
+            i++;
+          }
+        }
+      }
+
+    }
 
     // TODO these will be used for filtering
     // These are not yet defined in API
@@ -128,6 +179,9 @@ export class TransactionsService {
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip_code;
+
+      // this._propertyNameConverterMap.get('zip');
+
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
       model.aggregate = 0;
@@ -140,6 +194,67 @@ export class TransactionsService {
       modelArray.push(model);
     }
     return modelArray;
+  }
+
+
+  /**
+   * Map a single field name to its server field name equivalent.
+   *
+   * TODO Too many places where fields names are referenced when converting
+   * from/to server names.  Need to consolidate.
+   */
+  public mapToSingleServerName(appFieldName: string) {
+
+    // TODO map field names in constructor
+    let name = '';
+
+    // if (appFieldName === 'zip') {
+    //   this._propertyNameConverterMap.get(appFieldName);
+    // }
+
+    name = appFieldName;
+    switch (appFieldName) {
+      case 'type':
+        name = 'transaction_type_desc';
+        break;
+      case 'transactionId':
+        name = 'transaction_id';
+        break;
+      case 'street':
+        name = 'street_1';
+        break;
+      case 'zip':
+        name = 'zip_code';
+        break;
+      case 'date':
+        name = 'transaction_date';
+        break;
+      case 'amount':
+        name = 'transaction_amount';
+        break;
+      case 'purposeDescription':
+        name = 'purpose_description';
+        break;
+      case 'contributorEmployer':
+        name = 'employer';
+        break;
+      case 'contributorOccupation':
+        name = 'occupation';
+        break;
+      case 'memoCode':
+        name = 'memo_code';
+        break;
+      case 'memoText':
+        name = 'memo_text';
+        break;
+      case 'deletedDate':
+        name = 'deleted_date';
+        break;
+      default:
+        // name = name;;
+    }
+    return name ? name : '';
+
   }
 
 
