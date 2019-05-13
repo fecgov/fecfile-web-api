@@ -34,6 +34,7 @@ export class AppLayoutComponent implements OnInit {
   public showSideBar: boolean = true;
   public sideBarClass: string = null;
   public toggleMenu: boolean = false;
+  public dueDate: string  = null;
 
   constructor(
     private _apiService: ApiService,
@@ -136,6 +137,10 @@ export class AppLayoutComponent implements OnInit {
 
           if (formInfo.hasOwnProperty('daysUntilDue')) {
             this.formDaysUntilDue = formInfo.daysUntilDue;
+          }
+
+          if (formInfo.hasOwnProperty('dueDate')) {
+            this.dueDate = formInfo.dueDate;
           }
 
           this.showFormDueDate = true;
