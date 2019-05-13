@@ -137,6 +137,9 @@ export class TransactionsService {
         }
       }
 
+      if (filters.filterMemoCode === true) {
+        params = params.append('memoCode', 'true');
+      }
     }
 
     // TODO these will be used for filtering
