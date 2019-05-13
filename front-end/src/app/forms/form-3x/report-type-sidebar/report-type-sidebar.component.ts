@@ -1,9 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
+import {
+  selectedElectionState,
+  selectedElectionDate,
+  selectedReportType
+} from '../../../shared/interfaces/FormsService/FormsService';
 import { ReportTypeMessageService, ReportTypeDateEnum } from '../report-type/report-type-message.service';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -14,12 +19,11 @@ import { Subscription } from 'rxjs/Subscription';
   providers: [NgbTooltipConfig]
 })
 export class ReportTypeSidebarComponent implements OnInit {
-
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() specialReports: boolean = false;
   @Input() regularReports: boolean = false;
   @Input() selectedReport: any = null;
-  @Input() selectedreporttype:  selectedReportType;
+  @Input() selectedreporttype: selectedReportType;
 
   public dueDate: string = null;
   public electionStates: any = null;
@@ -31,6 +35,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   public selectedElecetionDate: string = null;
 
   private _reportTypeDescription: string = null;
+  private _formType: string = null;
   private _previousReportTypeDescription: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
@@ -42,12 +47,14 @@ export class ReportTypeSidebarComponent implements OnInit {
     private _formService: FormsService,
     private _messageService: MessageService,
     private _reportTypeMessageService: ReportTypeMessageService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.frmReportSidebar = this._fb.group({});
   }
 
@@ -58,36 +65,54 @@ export class ReportTypeSidebarComponent implements OnInit {
           this._reportTypeDescription = this.selectedReport.report_type_desciption;
         }
       }
-      const newReportSelected = this._previousReportTypeDescription !==
-        this._reportTypeDescription;
+      const newReportSelected = this._previousReportTypeDescription !== this._reportTypeDescription;
 
       if (this.selectedReport.hasOwnProperty('regular_special_report_ind')) {
         if (typeof this.selectedReport.regular_special_report_ind === 'string') {
           if (this.selectedReport.regular_special_report_ind === 'S') {
+            // special reports
             if (this.selectedReport.hasOwnProperty('election_state')) {
               if (Array.isArray(this.selectedReport.election_state)) {
                 if (this.selectedReport.election_state.length === 1) {
                   const electionState: any = this.selectedReport.election_state[0];
 
-                  this.fromDate = '';
-                  this.toDate = '';
+                  if (!this.selectedElectionState && !this.selectedElecetionDate) {
+                    if (this.fromDate || this.toDate) {
+                      this.toDate = '';
+                      this.fromDate = '';
+                    }
+                  }
+
                   if (electionState.hasOwnProperty('state') && electionState.hasOwnProperty('state')) {
                     this.electionStates = [];
                     this.electionStates[0] = {
-                      'state': electionState.state,
-                      'state_description': electionState.state_description,
+                      state: electionState.state,
+                      state_description: electionState.state_description
                     };
                   }
                 } else {
-                  this.fromDate = '';
-                  this.toDate = '';
+                  if (!this.selectedElectionState && !this.selectedElecetionDate) {
+                    if (this.fromDate || this.toDate) {
+                      this.toDate = '';
+                      this.fromDate = '';
+                    }
+                  } else if (this.selectedElectionState && !this.selectedElecetionDate) {
+                    this.selectedElectionState = null;
+
+                    if (this.fromDate || this.toDate) {
+                      this.toDate = '';
+                      this.fromDate = '';
+                    }
+                  }
+
                   if (this.selectedReport.hasOwnProperty('election_state')) {
-                    this.electionStates =  this.selectedReport.election_state;
-                  }                    
+                    this.electionStates = this.selectedReport.election_state;
+                  }
                 }
               } // Array.isArray(this.selectedReport.election_state)
             } // this.selectedReport.hasOwnProperty('election_state')
           } else {
+            // regular reports
             if (this.selectedReport.hasOwnProperty('election_state')) {
               if (Array.isArray(this.selectedReport.election_state)) {
                 if (this.selectedReport.election_state.length === 1) {
@@ -103,13 +128,29 @@ export class ReportTypeSidebarComponent implements OnInit {
 
                         if (Array.isArray(dates)) {
                           if (
-                            typeof dates[0].cvg_start_date === 'string' && dates[0].cvg_start_date !== null && 
-                            typeof dates[0].cvg_end_date === 'string' && dates[0].cvg_end_date !== null &&
-                            typeof dates[0].due_date === 'string' && dates[0].due_date.length !== null
+                            typeof dates[0].cvg_start_date === 'string' &&
+                            dates[0].cvg_start_date !== null &&
+                            typeof dates[0].cvg_end_date === 'string' &&
+                            dates[0].cvg_end_date !== null &&
+                            typeof dates[0].due_date === 'string' &&
+                            dates[0].due_date.length !== null
                           ) {
-                            this.fromDate = dates[0].cvg_start_date.replace('2018', 2019);
-                            this.toDate = dates[0].cvg_end_date.replace('2018', 2019);
-                            this.dueDate = dates[0].due_date;                      
+                            this.fromDate = dates[0].cvg_start_date;
+                            this.toDate = dates[0].cvg_end_date;
+                            this.dueDate = dates[0].due_date;
+
+                            this._messageService.sendMessage({
+                              form: true,
+                              type: this._formType,
+                              reportType: 'regular',
+                              electionDates: [
+                                {
+                                  cvg_end_date: this.toDate,
+                                  cvg_start_date: this.fromDate,
+                                  due_date: this.dueDate
+                                }
+                              ]
+                            });
                           }
                         }
                       }
@@ -117,18 +158,16 @@ export class ReportTypeSidebarComponent implements OnInit {
                   }
                 } // this.selectedReport.election_state.length === 1
               } // Array.isArray(this.selectedReport.election_state)
-            } // this.selectedReport.hasOwnProperty('election_state')              
-          } // this.selectedReport.regular_special_report_ind === 'S' 
+            } // this.selectedReport.hasOwnProperty('election_state')
+          } // this.selectedReport.regular_special_report_ind === 'S'
         } // typeof this.selectedReport.regular_special_report_ind === 'string'
-      } // this.selectedReport.hasOwnProperty('regular_special_report_ind')      
-
+      } // this.selectedReport.hasOwnProperty('regular_special_report_ind')
     } // this.selectedReport !== null
   }
 
-
   /**
    * Check if the selected Report matches the Report from local storage.
-   * 
+   *
    * @param form3XReportType the F3X Report Type from local storage.
    * @returns true if the report type from storage matches the selected report type.
    */
@@ -142,7 +181,6 @@ export class ReportTypeSidebarComponent implements OnInit {
     }
     return false;
   }
-
 
   /**
    * Changes format of date from yyyy-m-d to m/d/yyyy.
@@ -183,7 +221,7 @@ export class ReportTypeSidebarComponent implements OnInit {
                   this.electionDates = [];
                   this.electionDates[0] = selectedState.dates[0];
                 }
-              }                
+              }
             }
           } else if (this.selectedReport.election_state.length > 1) {
             selectedState = this.selectedReport.election_state.find(el => {
@@ -194,28 +232,38 @@ export class ReportTypeSidebarComponent implements OnInit {
               if (Array.isArray(selectedState.dates)) {
                 this.electionDates = selectedState.dates;
               }
-            }            
+            }
           } // this.selectedReport.election_state.length
         } // Array.isArray(this.selectedReport.election_state)
       } // this.selectedReport.hasOwnProperty('election_state')
     } // selectedVal !== '0'
-
   }
 
   public selectElectionDateChange(e): void {
     const selectedOption: any = e.target[e.target.selectedIndex];
 
-    this._selectedElectionDate =  e.target.value;
+    this._selectedElectionDate = e.target.value;
+
+    const fromDate: string = selectedOption.getAttribute('data-startDate');
+    const toDate: string = selectedOption.getAttribute('data-endDate');
+    const dueDate: string = selectedOption.getAttribute('data-dueDate');
 
     this._selectedElectionDates = {
-      'fromDate': selectedOption.getAttribute('data-startdate'),
-      'toDate': selectedOption.getAttribute('data-enddate'),
-      'dueDate': selectedOption.getAttribute('data-duedate')
+      fromDate: fromDate,
+      toDate: toDate,
+      dueDate: dueDate
     };
 
-    this.fromDate = selectedOption.getAttribute('data-startdate');
-    this.toDate = selectedOption.getAttribute('data-enddate');
-    this.dueDate = selectedOption.getAttribute('data-duedate');
+    this.fromDate = fromDate;
+    this.toDate = toDate;
+    this.dueDate = dueDate;
+
+    this._messageService.sendMessage({
+      form: true,
+      type: this._formType,
+      reportType: 'special',
+      electionDates: this.electionDates
+    });
 
     this._selectedElectionDate = e.target.value;
   }
@@ -223,28 +271,63 @@ export class ReportTypeSidebarComponent implements OnInit {
   public fromDateChange(date: string) {
     this.fromDate = date;
 
-    // This is an undesirable way to fix a issue with timing change detection
-    setTimeout(() => {
-      this._reportTypeMessageService.sendDateChangeMessage(
+    this._messageService.sendMessage({
+      form: true,
+      type: this._formType,
+      reportType: 'special',
+      electionDates: [
         {
-          name: ReportTypeDateEnum.fromDate,
-          date: date
+          cvg_end_date: this.toDate,
+          cvg_start_date: this.fromDate,
+          due_date: this.dueDate,
+          election_date: this.selectedElecetionDate
         }
-      );
-    }, 200);
+      ]
+    });
+
+    // this.fromDate = date;
+
+    // // This is an undesirable way to fix a issue with timing change detection
+    // setTimeout(() => {
+    //   this._reportTypeMessageService.sendDateChangeMessage({
+    //     name: ReportTypeDateEnum.fromDate,
+    //     date: date
+    //   });
+    // }, 200);
   }
 
   public toDateChange(date: string) {
+    console.log('toDateChange: ');
+
     this.toDate = date;
 
-    // This is an undesirable way to fix a issue with timing change detection
-    setTimeout(() => {
-      this._reportTypeMessageService.sendDateChangeMessage(
+    console.log('this.toDate: ', this.toDate);
+    console.log('this.fromDate: ', this.fromDate);
+
+    this._messageService.sendMessage({
+      form: true,
+      type: this._formType,
+      reportType: 'special',
+      electionDates: [
         {
-          name: ReportTypeDateEnum.toDate,
-          date: date
+          cvg_end_date: this.toDate,
+          cvg_start_date: this.fromDate,
+          due_date: this.dueDate,
+          election_date: this.selectedElecetionDate
         }
-      );
-    }, 200);
+      ]
+    });
+    // console.log('toDateChange: ');
+
+    // console.log('date: ', date);
+    // this.toDate = date;
+
+    // // This is an undesirable way to fix a issue with timing change detection
+    // setTimeout(() => {
+    //   this._reportTypeMessageService.sendDateChangeMessage({
+    //     name: ReportTypeDateEnum.toDate,
+    //     date: date
+    //   });
+    // }, 200);
   }
 }
