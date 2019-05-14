@@ -1,6 +1,6 @@
-<div class="forms__wizard" >
- 
-  <div class="form__sidebar" *ngIf="showSideBar">
+<!--<div class="forms__wizard" > -->
+<div class="transactions__main-container" >  
+  <div class="transactions__sidebar" *ngIf="showSideBar">
      <app-reportsidebar
           title="Filter Options"
           (status)='onNotify($event)'
@@ -8,15 +8,15 @@
      >
       </app-reportsidebar>
   </div>
- 
-  <div class="form__container">
-      <div class="form__content" >
-        <div class="card pl-3 pr-3">
-                   <h1 class="pb-3 pt-3 border-bottom"><B>Reports</B>
-                      <span class="float-right">
-                        </span>
-                      </h1>
-         </div>       
+
+  <!--<div class="form__container"></div>-->
+  <div class="transactions__container">
+      <div class="form__content">
+        <header>
+            <div class="header-container">
+              <h1 class="pb-1 m-3 border-bottom">Reports</h1>
+            </div>
+          </header>      
           <div>      
           <div class="grid-row">
                <div class="grid-row__col grid-row__col--12">

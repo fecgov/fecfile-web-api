@@ -26,6 +26,7 @@
           }
         }
         .dropdown-menu {
+          min-width: 0px !important;
           &.show {
             .dropdown-item {
               &:focus,

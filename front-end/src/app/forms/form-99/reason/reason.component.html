@@ -326,13 +326,14 @@
                 <div class="grid-row__col grid-row__col--12">
                   <h5>
                     {{ file.name }}
-                    <button type="button" class="btn btn-link" (click)="open(deletePDF)">
-                      <span vertical-align="top" class="close-icon"></span>
+                    <!--<button type="button" class="btn btn-link" (click)="open(deletePDF)">-->
+                    <button type="button" class="btn btn-link" (click)="deletePDFFile()">
+                    <span vertical-align="top" class="close-icon"></span>
                     </button>
                   </h5>
                 </div>
 
-                <ng-template #deletePDF let-d="dismiss">
+               <!--<ng-template #deletePDF let-d="dismiss">
                   <div class="modal-header">
                     <h2 class="modal-title">
                       Delete PDF file
@@ -342,11 +343,12 @@
                     <p>Do you want to delete uploaded pdf file?</p>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-dark" (click)="d('Yes click')">Yes</button> &nbsp;
+                    <button type="button" class="btn btn-secondary" (click)="d('OK click')">OK</button> &nbsp;
 
-                    <button type="button" class="btn btn-outline-dark" (click)="d('No click')">No</button> &nbsp;
+                    <button type="button" class="btn btn-secondary-gray" (click)="d('Cancel click')">Cancel</button> &nbsp;
                   </div>
-                </ng-template>
+                </ng-template>--> 
+
               </div>
             </div>
           </div>
