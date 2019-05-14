@@ -36,7 +36,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   styleUrls: ['./report-type.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ReportTypeComponent implements OnInit, OnDestroy {
+export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = null;
@@ -76,31 +76,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService
-  ) {
-    this._messageService.clearMessage();
-
-    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage().subscribe(message => {
-      if (!message) {
-        return;
-      }
-      const dateName = message.name;
-      switch (dateName) {
-        case 'fromDate':
-          this._fromDateUserModified = message.date;
-          this._fromDateSelected = message.date;
-          this.fromDateSelected = true;
-          break;
-        case 'toDate':
-          this._toDateUserModified = message.date;
-          this._toDateSelected = message.date;
-          this.toDateSelected = true;
-          break;
-        default:
-      }
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
+    this._messageService.clearMessage();
+
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -188,10 +168,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     });
 
     this._setReportTypes();
-  }
-
-  ngOnDestroy(): void {
-    this._dateChangeSubscription.unsubscribe();
   }
 
   @HostListener('window:resize', ['$event'])
