@@ -1568,7 +1568,7 @@ END - GET ALL TRANSACTIONS API - CORE APP
 
 """
 **********************************************************************************************************************************************
-TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
+GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - - BY  Praveen Jinka
 **********************************************************************************************************************************************
 
 """
@@ -1577,90 +1577,51 @@ def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
-        page_num = int(request.GET.get('page', 1))
-        descending = request.GET.get('descending', False)
-        sortcolumn = request.GET.get('sortColumnName')
-        itemsperpage = request.GET.get('itemsPerPage', 5)
-        search_string = request.GET.get('search')
-        report_id = request.GET.get('reportid')
-        if descending:
-            descending = 'DESC'
-        else:
-            descending = 'ASC'
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
         #     order_string = "transaction_id"
-        # import ipdb;ipdb.set_trace()
-        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
-            'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount', 'purpose_description', 
-            'occupation', 'employer', 'memo_code', 'memo_text']
-        if search_string:
-            for key in keys:
-                if not param_string:
-                    param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        for key, value in request.query_params.items():
+            try:
+                check_value = int(value)
+                param_string = param_string + " AND " + key + "=" + str(value)
+            except Exception as e:
+                if key == 'transaction_date':
+                    transaction_date = date_format(request.query_params.get('transaction_date'))
+                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
                 else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
-            param_string = param_string + " )"
-        # for key, value in request.query_params.items():
-        #     try:
-        #         check_value = int(value)
-        #         param_string = param_string + " AND " + key + "=" + str(value)
-        #     except Exception as e:
-        #         if key == 'transaction_date':
-        #             transaction_date = date_format(request.query_params.get('transaction_date'))
-        #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
-        #         else:
-        #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
-                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
-                           # + """ ORDER BY """ + order_string
-        print(query_string)
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
+                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            # + """ ORDER BY """ + order_string
+        # print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
-        
+            
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
-        if sortcolumn:
-            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
-        else:
-            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-                forms_obj = data_row[0]
-                if forms_obj is None:
-                    forms_obj =[]
-                    status_value = status.HTTP_204_NO_CONTENT
-                else:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                    status_value = status.HTTP_200_OK
-        
-        # import ipdb; ipdb.set_trace()
-        paginator = Paginator(forms_obj, itemsperpage)
-        if paginator.num_pages < page_num:
-            page_num = paginator.num_pages
-        forms_obj = paginator.page(page_num)
-        json_result = {'transactions': list(forms_obj), 
-                        'totalAmount': sum_trans,
-                    'itemsPerPage': itemsperpage, 'page number': page_num,'total pages':paginator.num_pages}
-        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+        status_value = status.HTTP_200_OK
+        if forms_obj is None:
+            forms_obj =[]
+            status_value = status.HTTP_204_NO_CONTENT
+
+        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 """
 *****************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
