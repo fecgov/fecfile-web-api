@@ -109,20 +109,29 @@ export class ReportTypeService {
       .pipe(
         map(res => {
           if (res) {
+            console.log("res =",res);
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
               const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-
-              if (Array.isArray(res)) {
+              console.log("res1 =",res);
+              /*if (Array.isArray(res)) {
+                console.log("res2 =",res);
                 if (res[0].hasOwnProperty('report_id')) {
+                  console.log("res3 =",res);
                   if (typeof res[0].report_id) {
+                    console.log("res 4=",res);
                     reportObj.reportId = res[0].report_id;
 
                     window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
                   }
                 }
-              }
-            }
-
+              }*/
+              if (res['report_id']) {
+                
+                reportObj.reportId = res['report_id'];
+                window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                console.log("res =",res);
+               }
+              }    
             return res;
           }
           return false;
