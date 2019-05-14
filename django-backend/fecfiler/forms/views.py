@@ -1142,7 +1142,7 @@ def save_print_f99(request):
         f99data['committeeId'] = comm_info.committeeid
         f99data['committeeName'] = comm_info.committeename
         f99data['street1'] = comm_info.street1
-        f99data['stree2'] = comm_info.street2
+        f99data['street2'] = comm_info.street2
         f99data['city'] = comm_info.city
         f99data['state'] = comm_info.state
         f99data['zipCode'] = str(comm_info.zipcode)
@@ -1153,11 +1153,11 @@ def save_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = datetime.now()
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
-        f99data['fomrType'] = comm_info.form_type
-        f99data['attachement'] = ''
+        f99data['formType'] = comm_info.form_type
+        f99data['attachement'] = 'X'
         f99data['password'] = "test"
 
         #data_obj['data'] = serializer.data
@@ -1295,7 +1295,7 @@ def update_print_f99(request):
         f99data['committeeId'] = comm_info.committeeid
         f99data['committeeName'] = comm_info.committeename
         f99data['street1'] = comm_info.street1
-        f99data['stree2'] = comm_info.street2
+        f99data['street2'] = comm_info.street2
         f99data['city'] = comm_info.city
         f99data['state'] = comm_info.state
         f99data['zipCode'] = str(comm_info.zipcode)
@@ -1306,11 +1306,11 @@ def update_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = datetime.now()
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
-        f99data['fomrType'] = comm_info.form_type
-        f99data['attachement'] = ''
+        f99data['formType'] = comm_info.form_type
+        f99data['attachement'] = 'X'
         f99data['password'] = "test"
 
         #data_obj['data'] = serializer.data
