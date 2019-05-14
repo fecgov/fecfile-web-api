@@ -1153,7 +1153,7 @@ def save_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = '05/14/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
         f99data['formType'] = comm_info.form_type
@@ -1306,7 +1306,7 @@ def update_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = '05/14/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
         f99data['formType'] = comm_info.form_type
