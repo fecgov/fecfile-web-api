@@ -39,6 +39,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   private _newReportSelected: boolean = false;
   private _previousReportTypeDescription: string = null;
   private _previousReportSelected: string = null;
+  private _previousStateSelected: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -227,6 +228,11 @@ export class ReportTypeSidebarComponent implements OnInit {
         if (Array.isArray(this.selectedReport.election_state)) {
           if (this.selectedReport.election_state.length === 1) {
             selectedState = this.selectedReport.election_state[0];
+
+            if (this._previousStateSelected === null) {
+              this._previousStateSelected = selectedState.state;
+            }
+
             if (selectedState.state === selectedVal) {
               if (selectedState.hasOwnProperty('dates')) {
                 if (Array.isArray(selectedState.dates)) {
@@ -239,6 +245,15 @@ export class ReportTypeSidebarComponent implements OnInit {
             selectedState = this.selectedReport.election_state.find(el => {
               return el.state === selectedVal;
             });
+
+            if (this._previousStateSelected === null) {
+              this._previousStateSelected = selectedState.state;
+            }
+
+            if (this._previousStateSelected !== null && this._previousStateSelected !== selectedState.state) {
+              this.fromDate = '';
+              this.toDate = '';
+            }
 
             if (selectedState.hasOwnProperty('dates')) {
               if (Array.isArray(selectedState.dates)) {
