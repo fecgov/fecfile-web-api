@@ -2694,7 +2694,7 @@ def create_f3x_json_file(request):
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['ccontributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
                     response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
                     response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
@@ -3907,7 +3907,7 @@ END  -REATTRIBUTION AND REATTRIBUTION MEMO Json - CORE APP
 """
 """
 **************************************************************************************************************************************
-Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API - CORE APP - SPRINT 12 - FNE 928 - BY Yeswanth Tella
+Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API - CORE APP - SPRINT 12 - FNE 791 - BY Yeswanth Tella
 **************************************************************************************************************************************
 
 """
@@ -4206,7 +4206,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['ccontributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
                     response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
                     response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
