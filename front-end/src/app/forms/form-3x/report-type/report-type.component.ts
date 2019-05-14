@@ -290,9 +290,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {
         if (res) {
           let reportId = 0;
-          if (Array.isArray(res)) {
+          console.log(" doValidateReportType res =", res);
+          if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
+            console.log(" doValidateReportType report already exists");
             reportId = res[0].report_id;
-
             const cvgStartDate: any = res[0].cvg_start_date;
             let datearray: any = cvgStartDate.split('-');
 
@@ -331,9 +332,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                   }
                 });
             }
-          } else {
-            console.log('New report created Report id =', reportId);
-          }
+          } 
           this.status.emit({
             form: this.frmReportType,
             direction: 'next',

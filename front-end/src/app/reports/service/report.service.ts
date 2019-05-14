@@ -149,11 +149,8 @@ export class ReportsService {
   
   params = params.append('view', view);
   params = params.append('reportId', reportId.toString());
-  console.log("reportId =", reportId.toString());
 
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-  console.log("httpOptions",httpOptions)
-  console.log("params",params);
   
   return this._http
   .get(
@@ -171,9 +168,7 @@ export class ReportsService {
    * Map server fields from the response to the model.
    */
   public mapFromServerFields(serverData: any) {
-    console.log(" mapFromServerFields serverData = ", serverData);
     if (!serverData || !Array.isArray(serverData)) {
-      console.log(" no server data mapFromServerFields  serverData", serverData);
       return;
     }
 
@@ -193,7 +188,7 @@ export class ReportsService {
       model.filed_date = row.filed_date;
       modelArray.push(model);
     }
-    console.log(" mapFromServerFields  modelArray", modelArray);
+
     return modelArray;
   }
 
@@ -205,12 +200,8 @@ export class ReportsService {
    */
   public sortReports(array: any, sortColumnName: string, descending: boolean) {
 
-    console.log("sortTransactions array =", array);
-    console.log("sortTransactions sortColumnName =", sortColumnName);
-    console.log("sortTransactions descending =", descending);
     const direction = descending ? -1 : 1;
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
-    console.log("sortTransactions array= ", array);
     return array;
       
   }
@@ -238,9 +229,6 @@ export class ReportsService {
    */
   public mockApplyFilters(response: any, filters: ReportFilterModel){
 
-    console.log(" Reports mockApplyFilters filters...", filters);
-    console.log(" Reports mockApplyFilters response...", response);
-
     if (!response) {
       return;
     }
@@ -251,9 +239,6 @@ export class ReportsService {
 
     let isFilter = false;
 
-    
-    console.log(" Reports mockApplyFilters filters.filterForms =", filters.filterForms)
-    
     if (filters.filterForms) {
        if (filters.filterForms.length > 0) {
         isFilter = true;
@@ -312,7 +297,6 @@ export class ReportsService {
 
 
     if (filters.filterCvgDateFrom && filters.filterCvgDateTo) {
-      console.log("coverage dates validation...");
       const cvgFromDate = new Date(filters.filterCvgDateFrom);
       const cvgToDate = new Date(filters.filterCvgDateTo);
       const filteredCvgDateArray = [];
@@ -349,27 +333,18 @@ export class ReportsService {
       response.reports = filteredCvgDateArray;
     }
 
-    //{{report.status === 'Filed'? (report.filed_date|
-    console.log("coverage dates ", filters.filterFiledDateFrom);
-    console.log("coverage dates ", filters.filterFiledDateTo);
-
     if (filters.filterFiledDateFrom && filters.filterFiledDateTo ) {
-      console.log("Filed/Saved dates validation...");
       const filedFromDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateFrom));
       const filedToDate =  this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
-      console.log("filedFromDate", filedFromDate);
-      console.log("filedToDate", filedToDate);
-
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
-        console.log("rep.status =", rep.status);
+
         if (rep.status==='Filed') {
           if (rep.filed_date) {
-            console.log("coverage dates2");
             let d= new Date(rep.filed_date);
             d.setUTCHours(0,0,0,0);
             const repDate =  this.getDateMMDDYYYYformat(d);
-            console.log("repDate", repDate);
+
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
@@ -380,7 +355,6 @@ export class ReportsService {
         }
         else if (rep.status==='Saved') {
           if (rep.last_update_date) {
-            console.log("coverage dates2");
             //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
             let d= new Date(rep.last_update_date);
             d.setUTCHours(0,0,0,0);

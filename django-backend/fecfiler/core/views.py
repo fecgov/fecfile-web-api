@@ -3899,12 +3899,14 @@ def create_f3x_reattribution_json_file(request):
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
+
 """
 
-******************************************************************************************************************************
-END  -REATTRIBUTION AND REATTRIBUTION MEMO Json - CORE APP
-******************************************************************************************************************************
+********************************************************************************************************************************
+END  - REATTRIBUTION AND REATTRIBUTION MEMO Json - CORE APP
+********************************************************************************************************************************
 """
+
 """
 **************************************************************************************************************************************
 Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API - CORE APP - SPRINT 12 - FNE 791 - BY Yeswanth Tella
@@ -4316,6 +4318,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
             
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
