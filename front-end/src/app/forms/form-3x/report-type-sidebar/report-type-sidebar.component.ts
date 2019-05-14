@@ -36,7 +36,9 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   private _reportTypeDescription: string = null;
   private _formType: string = null;
+  private _newReportSelected: boolean = false;
   private _previousReportTypeDescription: string = null;
+  private _previousReportSelected: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -60,12 +62,17 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
-      if (this.selectedReport.hasOwnProperty('report_type_desciption')) {
-        if (typeof this.selectedReport.report_type_desciption === 'string') {
-          this._reportTypeDescription = this.selectedReport.report_type_desciption;
+      if (this.selectedReport.hasOwnProperty('report_type')) {
+        if (typeof this.selectedReport.report_type === 'string') {
+          if (this._previousReportSelected === null) {
+            this._previousReportSelected = this.selectedReport.report_type;
+          }
+        }
+
+        if (this._previousReportSelected !== this.selectedReport.report_type) {
+          this._newReportSelected = true;
         }
       }
-      const newReportSelected = this._previousReportTypeDescription !== this._reportTypeDescription;
 
       if (this.selectedReport.hasOwnProperty('regular_special_report_ind')) {
         if (typeof this.selectedReport.regular_special_report_ind === 'string') {
@@ -77,9 +84,11 @@ export class ReportTypeSidebarComponent implements OnInit {
                   const electionState: any = this.selectedReport.election_state[0];
 
                   if (!this.selectedElectionState && !this.selectedElecetionDate) {
-                    if (this.fromDate || this.toDate) {
-                      this.toDate = '';
-                      this.fromDate = '';
+                    if (this._newReportSelected) {
+                      if (this.fromDate && this.toDate) {
+                        this.toDate = '';
+                        this.fromDate = '';
+                      }
                     }
                   }
 
@@ -91,17 +100,14 @@ export class ReportTypeSidebarComponent implements OnInit {
                     };
                   }
                 } else {
-                  if (!this.selectedElectionState && !this.selectedElecetionDate) {
-                    if (this.fromDate || this.toDate) {
-                      this.toDate = '';
-                      this.fromDate = '';
-                    }
-                  } else if (this.selectedElectionState && !this.selectedElecetionDate) {
+                  if (this.selectedElectionState && !this.selectedElecetionDate) {
                     this.selectedElectionState = null;
 
-                    if (this.fromDate || this.toDate) {
-                      this.toDate = '';
-                      this.fromDate = '';
+                    if (this._newReportSelected) {
+                      if (this.fromDate && this.toDate) {
+                        this.toDate = '';
+                        this.fromDate = '';
+                      }
                     }
                   }
 
@@ -118,44 +124,46 @@ export class ReportTypeSidebarComponent implements OnInit {
                 if (this.selectedReport.election_state.length === 1) {
                   // Apply the dates from the newly selected report
                   // Don't set the dates if the change trigger is from the date itself.
-                  if (newReportSelected) {
+                  // if (newReportSelected) {
+                  if (this._newReportSelected) {
                     this.fromDate = '';
                     this.toDate = '';
-                    this._selectedElectionDates = null;
-                    if (this.selectedReport.election_state[0]['dates']) {
-                      if (Array.isArray(this.selectedReport.election_state[0].dates)) {
-                        let dates: any = this.selectedReport.election_state[0].dates;
+                  }
+                  this._selectedElectionDates = null;
+                  if (this.selectedReport.election_state[0]['dates']) {
+                    if (Array.isArray(this.selectedReport.election_state[0].dates)) {
+                      let dates: any = this.selectedReport.election_state[0].dates;
 
-                        if (Array.isArray(dates)) {
-                          if (
-                            typeof dates[0].cvg_start_date === 'string' &&
-                            dates[0].cvg_start_date !== null &&
-                            typeof dates[0].cvg_end_date === 'string' &&
-                            dates[0].cvg_end_date !== null &&
-                            typeof dates[0].due_date === 'string' &&
-                            dates[0].due_date.length !== null
-                          ) {
-                            this.fromDate = dates[0].cvg_start_date;
-                            this.toDate = dates[0].cvg_end_date;
-                            this.dueDate = dates[0].due_date;
+                      if (Array.isArray(dates)) {
+                        if (
+                          typeof dates[0].cvg_start_date === 'string' &&
+                          dates[0].cvg_start_date !== null &&
+                          typeof dates[0].cvg_end_date === 'string' &&
+                          dates[0].cvg_end_date !== null &&
+                          typeof dates[0].due_date === 'string' &&
+                          dates[0].due_date.length !== null
+                        ) {
+                          this.fromDate = dates[0].cvg_start_date;
+                          this.toDate = dates[0].cvg_end_date;
+                          this.dueDate = dates[0].due_date;
 
-                            this._messageService.sendMessage({
-                              form: true,
-                              type: this._formType,
-                              reportType: 'regular',
-                              electionDates: [
-                                {
-                                  cvg_end_date: this.toDate,
-                                  cvg_start_date: this.fromDate,
-                                  due_date: this.dueDate
-                                }
-                              ]
-                            });
-                          }
+                          this._messageService.sendMessage({
+                            form: true,
+                            type: this._formType,
+                            reportType: 'regular',
+                            electionDates: [
+                              {
+                                cvg_end_date: this.toDate,
+                                cvg_start_date: this.fromDate,
+                                due_date: this.dueDate
+                              }
+                            ]
+                          });
                         }
                       }
                     }
                   }
+                  // }
                 } // this.selectedReport.election_state.length === 1
               } // Array.isArray(this.selectedReport.election_state)
             } // this.selectedReport.hasOwnProperty('election_state')
@@ -206,6 +214,10 @@ export class ReportTypeSidebarComponent implements OnInit {
   public selectStateChange(e): void {
     let selectedVal: string = e.target.value;
     let selectedState: any = null;
+
+    if (this._newReportSelected) {
+      this._newReportSelected = false;
+    }
 
     this._selectedState = selectedVal;
     this.selectedElectionState = this._selectedState;
@@ -284,25 +296,10 @@ export class ReportTypeSidebarComponent implements OnInit {
         }
       ]
     });
-
-    // this.fromDate = date;
-
-    // // This is an undesirable way to fix a issue with timing change detection
-    // setTimeout(() => {
-    //   this._reportTypeMessageService.sendDateChangeMessage({
-    //     name: ReportTypeDateEnum.fromDate,
-    //     date: date
-    //   });
-    // }, 200);
   }
 
   public toDateChange(date: string) {
-    console.log('toDateChange: ');
-
     this.toDate = date;
-
-    console.log('this.toDate: ', this.toDate);
-    console.log('this.fromDate: ', this.fromDate);
 
     this._messageService.sendMessage({
       form: true,
@@ -317,17 +314,5 @@ export class ReportTypeSidebarComponent implements OnInit {
         }
       ]
     });
-    // console.log('toDateChange: ');
-
-    // console.log('date: ', date);
-    // this.toDate = date;
-
-    // // This is an undesirable way to fix a issue with timing change detection
-    // setTimeout(() => {
-    //   this._reportTypeMessageService.sendDateChangeMessage({
-    //     name: ReportTypeDateEnum.toDate,
-    //     date: date
-    //   });
-    // }, 200);
   }
 }

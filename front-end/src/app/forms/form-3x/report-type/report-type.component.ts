@@ -84,7 +84,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
         return;
       }
       const dateName = message.name;
-      console.log('message: ', message);
       switch (dateName) {
         case 'fromDate':
           this._fromDateUserModified = message.date;
@@ -163,17 +162,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
     }
 
-    // if (this.fromDateSelected && this.toDateSelected) {
-    //   this.frmReportType.markAsDirty();
-    //   this.frmReportType.markAsTouched();
-    // }
-
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
           if (res.reportType === 'special') {
             if (Array.isArray(res.electionDates)) {
-              console.log('res: ', res);
               if (typeof res.electionDates[0] === 'object') {
                 this._fromDateSelected = res.electionDates[0].cvg_start_date;
                 this._toDateSelected = res.electionDates[0].cvg_end_date;
@@ -322,9 +315,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {
         if (res) {
           let reportId = 0;
-          console.log(' doValidateReportType res =', res);
           if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
-            console.log(' doValidateReportType report already exists');
             reportId = res[0].report_id;
             const cvgStartDate: any = res[0].cvg_start_date;
             let datearray: any = cvgStartDate.split('-');
