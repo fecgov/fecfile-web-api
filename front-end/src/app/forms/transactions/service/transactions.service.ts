@@ -89,7 +89,9 @@ export class TransactionsService {
     params = params.append('page', page.toString());
     params = params.append('itemsPerPage', itemsPerPage.toString());
     params = params.append('sortColumnName', serverSortColumnName);
-    params = params.append('descending', descending ? 'true' : 'false');
+    if (descending) {
+      params = params.append('descending', 'true');
+    }
     params = params.append('reportid', reportid.toString());
 
     if (filters) {
