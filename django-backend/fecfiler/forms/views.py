@@ -31,7 +31,7 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
-from datetime import datetime
+import datetime as dt
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -1154,7 +1154,8 @@ def save_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        f99data['dateSigned'] = datetime.now().strftime('%m/%d/%Y')
+        #f99data['dateSigned'] = dt.now().strftime('%m/%d/%Y')
+        f99data['dateSigned'] = '5/15/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
         f99data['formType'] = comm_info.form_type
@@ -1307,7 +1308,8 @@ def update_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        f99data['dateSigned'] = datetime.now().strftime('%m/%d/%Y')
+        #f99data['dateSigned'] = dt.now().strftime('%m/%d/%Y')
+        f99data['dateSigned'] = '5/15/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
         f99data['formType'] = comm_info.form_type
