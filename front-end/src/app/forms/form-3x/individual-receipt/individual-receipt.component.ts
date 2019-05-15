@@ -135,7 +135,7 @@ export class IndividualReceiptComponent implements OnInit {
 
           formValidators.push(Validators.pattern(dollarRegEx));
         } else if (validation === 'alphaNumeric') {
-          const alphaNumericRegEx: any = /^([a-zA-Z0-9])+$/gi;
+          const alphaNumericRegEx: any = /^(([a-z]|[A-Z]|[0-9])+)$/gi;
 
           formValidators.push(Validators.pattern(alphaNumericRegEx));
         } else if (validation === 'date') {

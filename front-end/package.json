@@ -37,6 +37,7 @@
     "ngx-cookie-service": "^1.0.10",
     "ngx-editor": "^3.3.0",
     "ngx-pagination": "^3.2.1",
+    "ngx-pipes": "^2.5.0",
     "popper.js": "^1.14.4",
     "quill": "^1.3.6",
     "rxjs": "6.3.3",
