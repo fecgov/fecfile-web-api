@@ -17,7 +17,6 @@ import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/For
   encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit {
-
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
@@ -25,7 +24,6 @@ export class IndividualReceiptComponent implements OnInit {
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
-  public formSubmitted: boolean = false;
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
@@ -38,28 +36,30 @@ export class IndividualReceiptComponent implements OnInit {
     private _http: HttpClient,
     private _fb: FormBuilder,
     private _formService: FormsService,
-    private _individualReceiptService :IndividualReceiptService,
+    private _individualReceiptService: IndividualReceiptService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _utilService: UtilService
   ) {
-    this._config.placement = 'right'
+    this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-   this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.frmIndividualReceipt = this._fb.group({});
 
-    this._individualReceiptService
-      .getDynamicFormFields(this._formType, 'Individual Receipt')
-      .subscribe(res => {
-        this.formFields = res.data.formFields;
-        this._setForm(this.formFields);
-        this.states = res.data.states;
-      });
+    this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
+      console.log('res: ', res);
+      // this.formFields = res.data.formFields;
+      this.formFields = res.formFields;
+      this._setForm(this.formFields);
+      this.states = res.states;
+
+      // this.states = res.data.states;
+    });
   }
 
   ngDoCheck(): void {
@@ -71,6 +71,30 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
+   * Move the following template functions to utils.
+   */
+
+  /**
+   * For testing from within template if object is a object.
+   *
+   * @param      {any}      obj     The object
+   * @return     {boolean}  True if object, False otherwise.
+   */
+  public isObject(obj: any): boolean {
+    return typeof obj === 'object' ? true : false;
+  }
+
+  /**
+   * Determines if element passed in from template is an array.
+   *
+   * @param      {<Array>}   item    The item
+   * @return     {Boolean}  True if array, False otherwise.
+   */
+  public isArray(item: Array<any>): boolean {
+    return Array.isArray(item);
+  }
+
+  /**
    * Generates the dynamic form after all the form fields are retrived.
    *
    * @param      {Array}  fields  The fields
@@ -78,18 +102,12 @@ export class IndividualReceiptComponent implements OnInit {
   private _setForm(fields: any): void {
     const formGroup: any = [];
 
-    fields.forEach((el) => {
-      el.cols.forEach((e) => {
-        if (
-          e.name !== 'LineNumber' &&
-          e.name !== 'TransactionId' &&
-          e.name !== 'TransactionTypeCode' &&
-          e.name !== 'BackReferenceTranIdNumber' &&
-          e.name !== 'BackReferenceSchedName'
-        ) {
+    fields.forEach(el => {
+      if (el.hasOwnProperty('cols')) {
+        el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
-        }
-      });
+        });
+      }
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -104,12 +122,26 @@ export class IndividualReceiptComponent implements OnInit {
   private _mapValidators(validators): Array<any> {
     const formValidators = [];
 
-    if(validators) {
-      for(const validation of Object.keys(validators)) {
-        if(validation === 'required') {
+    if (validators) {
+      for (const validation of Object.keys(validators)) {
+        if (validation === 'required') {
           formValidators.push(Validators.required);
-        } else if(validation === 'min') {
-          formValidators.push(Validators.min(validators[validation]));
+        } else if (validation === 'min') {
+          formValidators.push(Validators.minLength(validators[validation]));
+        } else if (validation === 'max') {
+          formValidators.push(Validators.maxLength(validators[validation]));
+        } else if (validation === 'dollarAmount') {
+          const dollarRegEx: any = /^[+-]?\d+(\.\d+)?$/g;
+
+          formValidators.push(Validators.pattern(dollarRegEx));
+        } else if (validation === 'alphaNumeric') {
+          const alphaNumericRegEx: any = /^([a-zA-Z0-9])+$/gi;
+
+          formValidators.push(Validators.pattern(alphaNumericRegEx));
+        } else if (validation === 'date') {
+          const dateRegEx: any = /^(\d{4}\-\d{2}\-\d{2})/;
+
+          formValidators.push(Validators.pattern(dateRegEx));
         }
       }
     }
@@ -118,50 +150,10 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Checks for hidden fields.
-   *
-   * @param      {number}  i       The current index for the item.
-   * @param      {any}     item    The item.
-   */
-  public hasHiddenFields(i: number, item: any): void {
-    let skipRow: any = null;
-    if (item.hasOwnProperty('cols')) {
-      if (Array.isArray(item.cols)) {
-        skipRow = item.cols.findIndex(el => (
-            el.name === 'LineNumber' ||
-            el.name === 'TransactionId' ||
-            el.name === 'TransactionTypeCode' ||
-            el.name === 'BackReferenceTranIdNumber' ||
-            el.name === 'BackReferenceSchedName'
-        ));
-
-        if (skipRow === 0) {
-          item['hiddenFields'] = true;
-        } else {
-          item['hiddenFields'] = false;
-        }
-
-        return item;
-      }
-    }
-  }
-  /**
-   * Determines if element passed in from template is an array.
-   *
-   * @param      {<Array>}   item    The item
-   * @return     {Boolean}  True if array, False otherwise.
-   */
-  public isArray(item: Array<any>): boolean {
-    return Array.isArray(item);
-  }
-
-  /**
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    this.formSubmitted = true;
-    if(this.frmIndividualReceipt.valid) {
-      this.formSubmitted = false;
+    if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
@@ -170,20 +162,20 @@ export class IndividualReceiptComponent implements OnInit {
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
-
       }
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._individualReceiptService
-        .saveScheduleA(this._formType)
-        .subscribe(res => {
-          if (res) {
-            this.frmIndividualReceipt.reset();
-            this.formSubmitted = false;
-            window.scrollTo(0,0);
-          }
-        });
+      this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
+        if (res) {
+          this.frmIndividualReceipt.reset();
+          window.scrollTo(0, 0);
+        }
+      });
+    } else {
+      this.frmIndividualReceipt.markAsDirty();
+      this.frmIndividualReceipt.markAsTouched();
+      window.scrollTo(0, 0);
     }
   }
 

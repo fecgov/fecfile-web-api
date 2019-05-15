@@ -1,46 +1,19 @@
 <div class="individual-receipt-container">
-  <form
-    [formGroup]="frmIndividualReceipt"
-    (ngSubmit)="doValidateReceipt()"
-  >
+  <form [formGroup]="frmIndividualReceipt" (ngSubmit)="doValidateReceipt()">
     <header>
       <div class="header-content">
         <div class="float-left">
           <h1>
             Form 3X
-            <ng-container *ngIf="transactionTypeText">
-              / {{ transactionTypeText }}
-            </ng-container>
+            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
           </h1>
         </div>
-
-       <!-- <div class="float-right" ngbDropdown>
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-            id="dropdownBasic2"
-            ngbDropdownToggle
-          >
+        <div class="float-right" ngbDropdown>
+          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item"><i class="view-icon"></i> View</button>
-            <button class="dropdown-item"><i class="print-icon"></i> Print</button>
-          </div>
-        </div>-->
-
-       <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-            id="actionsMenu"
-            ngbDropdownToggle
-          >
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="actionsMenu">
             <button class="dropdown-item"><i class="view-icon"></i> View</button>
             <button class="dropdown-item"><i class="print-icon"></i> Print</button>
           </div>
@@ -49,13 +22,13 @@
       <hr />
     </header>
     <section>
-      <ng-container *ngFor="let row of formFields; trackBy: hasHiddenFields">
-        <ng-container *ngIf="row.hiddenFields">
-          <ng-container *ngFor="let col of row.cols">
-            <input type="hidden" name="{{ col.name }}" value="">
+      <ng-container *ngFor="let row of formFields">
+        <ng-container *ngIf="row.hidden">
+          <ng-container *ngFor="let hiddenField of row.hidden">
+            <input type="hidden" [name]="hiddenField.name" [value]="hiddenField.value" />
           </ng-container>
         </ng-container>
-        <div class="row" *ngIf="!row.hiddenFields">
+        <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="isArray(row.cols)">
             <div class="col" *ngFor="let col of row.cols">
               <div class="form-group">
@@ -64,7 +37,7 @@
                   <ng-container *ngIf="col?.validation?.required">
                     *
                   </ng-container>
-                 <button
+                  <button
                     type="button"
                     class="btn btn-info"
                     ngbTooltip="{{ col.infoText }}"
@@ -75,57 +48,70 @@
                     <span class="sr-only">Click here for more information</span>
                   </button>
                 </label>
-                <ng-container
-                  *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'"
-                >
-                  <input
-                    type="{{ col.type }}"
-                    name="{{ col.name }}"
-                    class="form-control"
-                    [formControlName]="col.name"
-                  />
-
+                <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
+                  <ng-container *ngIf="col.inputGroup">
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i [class]="col.inputIcon" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                      <input class="form-control" [type]="col.type" [name]="col.name" [formControlName]="col.name" />
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="!col.inputGroup">
+                    <input class="form-control" [type]="col.type" [name]="col.name" [formControlName]="col.name" />
+                  </ng-container>
                   <div
                     class="error-text"
-                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                    *ngIf="
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                      frmIndividualReceipt.get(col.name).invalid
+                    "
                   >
-                    <div
-                      class="text-error text-left"
-                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
-                    >
+                    <div class="text-error text-left" *ngIf="frmIndividualReceipt.get(col.name).errors?.required">
                       {{ col.text }} is required.
                     </div>
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors?.maxlength">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="
+                          frmIndividualReceipt.get(col.name).errors.maxlength?.requiredLength <
+                          frmIndividualReceipt.get(col.name).errors.maxlength?.actualLength
+                        "
+                      >
+                        Only {{ frmIndividualReceipt.get(col.name).errors.maxlength?.requiredLength }} characters
+                        allowed.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="isObject(frmIndividualReceipt.get(col.name).errors?.pattern)">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors.pattern?.actualValue"
+                      >
+                        Alphanumeric characters only.
+                      </div>
+                    </ng-container>
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
-                  <textarea
-                    class="form-control"
-                    rows="5"
-                    name="{{ col.name }}"
-                    [formControlName]="col.name"
-                  ></textarea>
+                  <textarea class="form-control" rows="5" name="{{ col.name }}" [formControlName]="col.name"></textarea>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'select' && col.name === 'ContributorState'">
-                  <ng-select
-                    class="state-select"
-                    [formControlName]="col.name"
-                  >
-                    <ng-option
-                      *ngFor="let item of states"
-                      [value]="item.code"
-                    >
+                  <ng-select class="state-select" [formControlName]="col.name">
+                    <ng-option *ngFor="let item of states" [value]="item.code">
                       {{ item.name }}
                     </ng-option>
                   </ng-select>
 
                   <div
                     class="error-text"
-                    *ngIf="frmIndividualReceipt.get(col.name).invalid && frmIndividualReceipt.get(col.name).dirty || frmIndividualReceipt.get(col.name).touched || frmIndividualReceipt.get(col.name).blur || formSubmitted"
+                    *ngIf="
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                      frmIndividualReceipt.get(col.name).invalid
+                    "
                   >
-                    <div
-                      class="text-error text-left"
-                      *ngIf="frmIndividualReceipt.get(col.name).errors?.required"
-                    >
+                    <div class="text-error text-left" *ngIf="frmIndividualReceipt.get(col.name).errors?.required">
                       {{ col.text }} is required.
                     </div>
                   </div>
@@ -140,27 +126,17 @@
       <footer>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-                <button
-                  class="btn btn-previous btn-left"
-                  type="button"
-                  (click)="previousStep()"
-                >
-                  Previous
-                </button>
-                <button
-                  class="btn btn-secondary btn-right"
-                  type="submit"
-                >
-                  Save &amp; Add Transaction
-                </button>
-                <a
-                  class="btn btn-previous btn-right"
-                  [routerLink]="['/forms/transactions', '3X']"
-                >
-                  View Transactions
-                </a>
-              </div>
+            <div class="forms__btn-container">
+              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                Previous
+              </button>
+              <button class="btn btn-secondary btn-right" type="submit">
+                Save &amp; Add Transaction
+              </button>
+              <a class="btn btn-previous btn-right" [routerLink]="['/forms/transactions', '3X']">
+                View Transactions
+              </a>
+            </div>
           </div>
         </div>
       </footer>
