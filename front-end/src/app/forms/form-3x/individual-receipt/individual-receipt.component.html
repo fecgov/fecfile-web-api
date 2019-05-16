@@ -84,10 +84,10 @@
                         allowed.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="isObject(frmIndividualReceipt.get(col.name).errors?.pattern)">
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors.pattern?.actualValue"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphanumeric"
                       >
                         Alphanumeric characters only.
                       </div>

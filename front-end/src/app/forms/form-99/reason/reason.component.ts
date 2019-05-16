@@ -18,7 +18,7 @@ import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-import { htmlLength } from '../../../shared/utils/forms/html-length.validator';
+import { htmlLength } from '../../../shared/utils/forms/validation/html-length.validator';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
@@ -690,13 +690,13 @@ export class ReasonComponent implements OnInit {
     }
   }
 
-  private deletePDFFile(){
+  private deletePDFFile() {
     this._dialogService
-    .confirm("Do you want to delete uploaded pdf file?",ConfirmModalComponent, "Delete PDF File",true)
-    //.reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
-    .then(res => {
-      if(res === 'cancel') {
-       /*this.optionFailed = true;
+      .confirm('Do you want to delete uploaded pdf file?', ConfirmModalComponent, 'Delete PDF File', true)
+      //.reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
+      .then(res => {
+        if (res === 'cancel') {
+          /*this.optionFailed = true;
        this.isValidType = false;
        window.scrollTo(0, 0);
        this.status.emit({
@@ -705,16 +705,15 @@ export class ReasonComponent implements OnInit {
          step: 'step_1'
        });*/
 
-     return 0;
-    } 
-    else if(res === 'okay') {
-      this.PdfDeleted = true;
-      this.file = null;
-      this.notValidPdf = false;
-      this.PdfUploaded = false;
-      this._form99Details.filename = '';
-      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
-    }
-  });
- } 
+          return 0;
+        } else if (res === 'okay') {
+          this.PdfDeleted = true;
+          this.file = null;
+          this.notValidPdf = false;
+          this.PdfUploaded = false;
+          this._form99Details.filename = '';
+          localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+        }
+      });
+  }
 }

@@ -8,6 +8,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
+import { alphanumeric } from '../../../shared/utils/forms/validation/alphaNumeric.validator';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -66,6 +67,12 @@ export class IndividualReceiptComponent implements OnInit {
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
+      }
+    }
+
+    if (this.frmIndividualReceipt.touched || this.frmIndividualReceipt.dirty) {
+      if (this.frmIndividualReceipt.invalid) {
+        console.log('this.frmIndividualReceipt:', this.frmIndividualReceipt);
       }
     }
   }
@@ -135,9 +142,10 @@ export class IndividualReceiptComponent implements OnInit {
 
           formValidators.push(Validators.pattern(dollarRegEx));
         } else if (validation === 'alphaNumeric') {
-          const alphaNumericRegEx: any = /^(([a-z]|[A-Z]|[0-9])+)$/gi;
+          formValidators.push(alphanumeric());
+          // const alphaNumericRegEx: any = /^(([a-z]|[A-Z])+)$/gi;
 
-          formValidators.push(Validators.pattern(alphaNumericRegEx));
+          // formValidators.push(Validators.pattern(alphaNumericRegEx));
         } else if (validation === 'date') {
           const dateRegEx: any = /^(\d{4}\-\d{2}\-\d{2})/;
 
