@@ -29,7 +29,7 @@
           </ng-container>
         </ng-container>
         <div class="row" *ngIf="row.cols">
-          <ng-container *ngIf="isArray(row.cols)">
+          <ng-container *ngIf="row.cols | isArray">
             <div class="col" *ngFor="let col of row.cols">
               <div class="form-group">
                 <label for="{{ col.name }}">

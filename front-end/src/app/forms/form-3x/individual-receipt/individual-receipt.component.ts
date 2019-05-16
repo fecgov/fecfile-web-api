@@ -69,36 +69,6 @@ export class IndividualReceiptComponent implements OnInit {
         this.formVisible = true;
       }
     }
-
-    if (this.frmIndividualReceipt.touched || this.frmIndividualReceipt.dirty) {
-      if (this.frmIndividualReceipt.invalid) {
-        console.log('this.frmIndividualReceipt:', this.frmIndividualReceipt);
-      }
-    }
-  }
-
-  /**
-   * Move the following template functions to utils.
-   */
-
-  /**
-   * For testing from within template if object is a object.
-   *
-   * @param      {any}      obj     The object
-   * @return     {boolean}  True if object, False otherwise.
-   */
-  public isObject(obj: any): boolean {
-    return typeof obj === 'object' ? true : false;
-  }
-
-  /**
-   * Determines if element passed in from template is an array.
-   *
-   * @param      {<Array>}   item    The item
-   * @return     {Boolean}  True if array, False otherwise.
-   */
-  public isArray(item: Array<any>): boolean {
-    return Array.isArray(item);
   }
 
   /**
