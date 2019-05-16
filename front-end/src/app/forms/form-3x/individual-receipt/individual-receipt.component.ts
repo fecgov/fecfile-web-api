@@ -137,15 +137,12 @@ export class IndividualReceiptComponent implements OnInit {
           formValidators.push(Validators.minLength(validators[validation]));
         } else if (validation === 'max') {
           formValidators.push(Validators.maxLength(validators[validation]));
+        } else if (validation === 'alphaNumeric') {
+          formValidators.push(alphanumeric());
         } else if (validation === 'dollarAmount') {
           const dollarRegEx: any = /^[+-]?\d+(\.\d+)?$/g;
 
           formValidators.push(Validators.pattern(dollarRegEx));
-        } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphanumeric());
-          // const alphaNumericRegEx: any = /^(([a-z]|[A-Z])+)$/gi;
-
-          // formValidators.push(Validators.pattern(alphaNumericRegEx));
         } else if (validation === 'date') {
           const dateRegEx: any = /^(\d{4}\-\d{2}\-\d{2})/;
 
