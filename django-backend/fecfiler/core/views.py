@@ -1311,13 +1311,13 @@ def get_all_transactions(request):
                     status_value = status.HTTP_200_OK
         
         # import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
         paginator = Paginator(forms_obj, itemsperpage)
         if paginator.num_pages < page_num:
             page_num = paginator.num_pages
         forms_obj = paginator.page(page_num)
-        json_result = {'transactions': list(forms_obj), 
-                        'totalAmount': sum_trans,
-                    'itemsPerPage': itemsperpage, 'page number': page_num,'total pages':paginator.num_pages}
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
