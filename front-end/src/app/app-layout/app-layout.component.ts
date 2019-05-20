@@ -119,7 +119,7 @@ export class AppLayoutComponent implements OnInit {
 
       this.sideBarClass = 'dashboard active';
       this.showFormDueDate = false;
-    } else if (route.indexOf('/forms/form/3X') === 0) {
+    } else if (route.indexOf('/forms/form/3X') === 0 || route.indexOf('/forms/transactions/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
 
