@@ -1234,7 +1234,17 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 **********************************************************************************************************************************************
 
 """
-@api_view(['GET'])
+
+def filter_get_all_trans(request):
+    param_string = ""
+    if request.method == 'GET':
+        return param_string
+    for f_key in request.data['filters']:
+        if 'filter' in f_key:
+            
+
+
+@api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         cmte_id = request.user.username
@@ -1244,6 +1254,9 @@ def get_all_transactions(request):
         sortcolumn = request.GET.get('sortColumnName')
         itemsperpage = request.GET.get('itemsPerPage', 5)
         search_string = request.GET.get('search')
+        import ipdb;ipdb.set_trace()
+        params = request.data['filters']
+        keywords = params['keywords']
         report_id = request.GET.get('reportid')
         if descending:
             descending = 'DESC'
@@ -1264,6 +1277,22 @@ def get_all_transactions(request):
                     param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
                 else:
                     param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+
+        if keywords:
+            for word in keywords:
+                if '"' in word:
+                    continue
+                elif "'" in word:
+                    if not param_string:
+                        param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                    else:
+                        param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
+                else:
+                    if not param_string:
+                        param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                    else:
+                        param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
             param_string = param_string + " )"
         # for key, value in request.query_params.items():
         #     try:
