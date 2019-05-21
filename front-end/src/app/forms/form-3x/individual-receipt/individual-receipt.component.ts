@@ -25,6 +25,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
+  public hiddenFields: any = [];
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
@@ -53,13 +54,19 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt = this._fb.group({});
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
-      console.log('res: ', res);
-      // this.formFields = res.data.formFields;
-      this.formFields = res.formFields;
-      this._setForm(this.formFields);
-      this.states = res.states;
+      if (res) {
+        console.log('res: ', res);
+        // this.formFields = res.data.formFields;
+        this.hiddenFields = res.hiddenFields;
 
-      // this.states = res.data.states;
+        this.formFields = res.formFields;
+        this._setForm(this.formFields);
+
+        this.states = res.states;
+
+        console.log('this.hiddenFields: ', this.hiddenFields);
+        // this.states = res.data.states;
+      }
     });
   }
 

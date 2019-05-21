@@ -22,12 +22,10 @@
       <hr />
     </header>
     <section>
+      <ng-container *ngFor="let hiddenField of hiddenFields">
+        <input type="hidden" [name]="hiddenField.name" [value]="hiddenField.value" />
+      </ng-container>
       <ng-container *ngFor="let row of formFields">
-        <ng-container *ngIf="row.hidden">
-          <ng-container *ngFor="let hiddenField of row.hidden">
-            <input type="hidden" [name]="hiddenField.name" [value]="hiddenField.value" />
-          </ng-container>
-        </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
             <div class="col" *ngFor="let col of row.cols">
