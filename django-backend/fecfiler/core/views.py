@@ -1235,13 +1235,25 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 
 """
 
-def filter_get_all_trans(request):
-    param_string = ""
+def filter_get_all_trans(request, param_string):
     if request.method == 'GET':
         return param_string
-    for f_key in request.data['filters']:
-        if 'filter' in f_key:
-            
+    filt_dict = request.data['filters']
+    for f_key, value_d in filt_dict.items():
+        if 'filterCategories' in f_key:
+            cat_tuple = '("'+'","'.join(value_d)+'")'
+            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+        if 'filterFromDate' in f_key and 'filterToDate' in f_key:
+            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
+        if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
+            param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
+        if 'filterStates' in f_key:
+            state_tuple = '("'+'","'.join(value_d)+'")'
+            param_string = param_string + " AND state In " + state_tuple
+        if 'filterMemoCode' in f_key:
+            if value_d:
+                param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+    return param_string
 
 
 @api_view(['GET', 'POST'])
