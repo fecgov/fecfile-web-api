@@ -1304,25 +1304,6 @@ def get_entity_expenditure_id(report_id, cmte_id):
         raise
 
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         # import ipdb;ipdb.set_trace()
-#         query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, cmte_addr_chg_flag, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = []
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is []:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
-
-
 def get_summary_dict(form3x_header_data):
     form3x_data_string ='{'
     form3x_data_string = form3x_data_string + '"cashOnHandYYYY": 2019,'
@@ -1387,7 +1368,7 @@ def get_summary_dict(form3x_header_data):
     form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data['coh_coy']) + ','
     form3x_data_string = form3x_data_string + '"11ai_itemized":'+ str(form3x_header_data['indv_item_contb_ytd']) + ','
     form3x_data_string = form3x_data_string + '"11aii_unitemized":'+ str(form3x_header_data['indv_unitem_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"11aiii_total":'+ str(0.0) + ','
+    form3x_data_string = form3x_data_string + '"11aiii_total":'+ str(form3x_header_data['ttl_indv_contb_ytd']) + ','
     form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_ytd_i']) + ','
     form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data['other_pol_cmte_contb_ytd_i']) + ','
     form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data['ttl_contb_col_ttl_ytd']) + ','
@@ -2506,132 +2487,6 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
 
 
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         query_string = """SELECT report_id, cmte_id, form_type, amend_ind, report_type, cmte_addr_chg_flag, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-#         return forms_obj
-#     except Exception:
-#         raise
-
-# def get_summary_dict():
-#     return {
-#             "cashOnHandYYYY": 2019,
-#             "colA": {
-#                 "6b_cashOnHandBeginning": 567863.45,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "9_debtsTo": 0,
-#                 "10_debtsBy": 0,
-#                 "11ai_Itemized": 0,
-#                 "11aii_Unitemized": 0,
-#                 "11aiii_Total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpenditureMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualsPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionsRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_fedShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFed": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             },
-#             "colB": {
-#                 "6a_cashOnHandJan_1": 7676.67,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "11ai_itemized": 0,
-#                 "11aii_unitemized": 0,
-#                 "11aiii_total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpendituresMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_federalShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFederal": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             }
-#         }
-
 def get_committee_mater_values(cmte_id):
     try:
         query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
@@ -2700,7 +2555,7 @@ def create_f3x_json_file(request):
                 "softwareVersion":"1.02 Beta",
                 "additionalInfomation":"Any other useful information"
             }
-            f_3x_list = get_f3x_values(committeeid, report_id)
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
             response_inkind_out_list = []
@@ -2891,133 +2746,6 @@ def get_entity_partner_id(report_id, cmte_id , transaction_id=None):
     except Exception:
         raise
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         query_string = """SELECT report_id, cmte_id, form_type, amend_ind, report_type, cmte_addr_chg_flag, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-#         return forms_obj
-#     except Exception:
-#         raise
-
-
-# def get_summary_dict():
-#     return {
-#             "cashOnHandYYYY": 2019,
-#             "colA": {
-#                 "6b_cashOnHandBeginning": 567863.45,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "9_debtsTo": 0,
-#                 "10_debtsBy": 0,
-#                 "11ai_Itemized": 0,
-#                 "11aii_Unitemized": 0,
-#                 "11aiii_Total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpenditureMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualsPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionsRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_fedShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFed": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             },
-#             "colB": {
-#                 "6a_cashOnHandJan_1": 7676.67,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "11ai_itemized": 0,
-#                 "11aii_unitemized": 0,
-#                 "11aiii_total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpendituresMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_federalShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFederal": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             }
-#         }
-
 def get_committee_mater_values(cmte_id):
     try:
         query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
@@ -3082,7 +2810,7 @@ def create_f3x_partner_json_file(request):
                 "softwareVersion":"1.02 Beta",
                 "additionalInfomation":"Any other useful information"
             }
-            f_3x_list = get_f3x_values(committeeid, report_id)
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
             response_inkind_out_list = []
@@ -3261,132 +2989,7 @@ def get_entity_partner_id(report_id, cmte_id):
     except Exception:
         raise
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, election_code, cmte_addr_chg_flag, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
 
-
-# def get_summary_dict():
-#     return {
-#             "cashOnHandYYYY": 2019,
-#             "colA": {
-#                 "6b_cashOnHandBeginning": 567863.45,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "9_debtsTo": 0,
-#                 "10_debtsBy": 0,
-#                 "11ai_Itemized": 0,
-#                 "11aii_Unitemized": 0,
-#                 "11aiii_Total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpenditureMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualsPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionsRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_fedShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFed": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             },
-#             "colB": {
-#                 "6a_cashOnHandJan_1": 7676.67,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "11ai_itemized": 0,
-#                 "11aii_unitemized": 0,
-#                 "11aiii_total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpendituresMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_federalShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFederal": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             }
-#         }
 
 def get_committee_mater_values(cmte_id):
     try:
@@ -3452,7 +3055,7 @@ def create_f3x_returned_bounced_json_file(request):
                 "softwareVersion":"1.02 Beta",
                 "additionalInfomation":"Any other useful information"
             }
-            f_3x_list = get_f3x_values(committeeid, report_id)
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             #response_inkind_receipt_list = []
             response_inkind_out_list = []
@@ -3604,132 +3207,6 @@ def get_entity_partner_id(report_id, cmte_id, transaction_id = None):
     except Exception:
         raise
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, election_code, cmte_addr_chg_flag, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
-
-
-# def get_summary_dict():
-#     return {
-#             "cashOnHandYYYY": 2019,
-#             "colA": {
-#                 "6b_cashOnHandBeginning": 567863.45,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "9_debtsTo": 0,
-#                 "10_debtsBy": 0,
-#                 "11ai_Itemized": 0,
-#                 "11aii_Unitemized": 0,
-#                 "11aiii_Total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpenditureMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualsPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionsRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_fedShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFed": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             },
-#             "colB": {
-#                 "6a_cashOnHandJan_1": 7676.67,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "11ai_itemized": 0,
-#                 "11aii_unitemized": 0,
-#                 "11aiii_total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpendituresMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_federalShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFederal": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             }
-#         }
 
 def get_committee_mater_values(cmte_id):
     try:
@@ -3796,7 +3273,7 @@ def create_f3x_reattribution_json_file(request):
                 "softwareVersion":"1.02 Beta",
                 "additionalInfomation":"Any other useful information"
             }
-            f_3x_list = get_f3x_values(committeeid, report_id)
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
             response_inkind_out_list = []
@@ -4021,132 +3498,6 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
 
 
 
-# def get_f3x_values(cmte_id, report_id):
-#     try:
-#         query_string = """SELECT report_id, cmte_id, form_type, amend_ind, report_type, cmte_addr_chg_flag, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop, date_signed
-#                      FROM public.form_3x WHERE report_id = %s AND cmte_id = %s"""
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-#         return forms_obj
-#     except Exception:
-#         raise
-
-# def get_summary_dict():
-#     return {
-#             "cashOnHandYYYY": 2019,
-#             "colA": {
-#                 "6b_cashOnHandBeginning": 567863.45,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "9_debtsTo": 0,
-#                 "10_debtsBy": 0,
-#                 "11ai_Itemized": 0,
-#                 "11aii_Unitemized": 0,
-#                 "11aiii_Total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpenditureMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualsPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionsRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_fedShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFed": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             },
-#             "colB": {
-#                 "6a_cashOnHandJan_1": 7676.67,
-#                 "6c_totalReceipts": 0,
-#                 "6d_subtotal": 0,
-#                 "7_totalDisbursements": 0,
-#                 "8_cashOnHandAtClose": 0,
-#                 "11ai_itemized": 0,
-#                 "11aii_unitemized": 0,
-#                 "11aiii_total": 0,
-#                 "11b_politicalPartyCommittees": 0,
-#                 "11c_otherPoliticalCommitteesPACs": 0,
-#                 "11d_totalContributions": 0,
-#                 "12_transfersFromAffiliatedOtherPartyCommittees": 0,
-#                 "13_allLoansReceived": 0,
-#                 "14_loanRepaymentsReceived": 0,
-#                 "15_offsetsToOperatingExpendituresRefunds": 0,
-#                 "16_refundsOfFederalContributions": 0,
-#                 "17_otherFederalReceiptsDividends": 0,
-#                 "18a_transfersFromNonFederalAccount_h3": 0,
-#                 "18b_transfersFromNonFederalLevin_h5": 0,
-#                 "18c_totalNonFederalTransfers": 0,
-#                 "19_totalReceipts": 0,
-#                 "20_totalFederalReceipts": 0,
-#                 "21ai_federalShare": 0,
-#                 "21aii_nonFederalShare": 0,
-#                 "21b_otherFederalOperatingExpenditures": 0,
-#                 "21c_totalOperatingExpenditures": 0,
-#                 "22_transfersToAffiliatedOtherPartyCommittees": 0,
-#                 "23_contributionsToFederalCandidatesCommittees": 0,
-#                 "24_independentExpenditures": 0,
-#                 "25_coordinatedExpendituresMadeByPartyCommittees": 0,
-#                 "26_loanRepayments": 0,
-#                 "27_loansMade": 0,
-#                 "28a_individualPersons": 0,
-#                 "28b_politicalPartyCommittees": 0,
-#                 "28c_otherPoliticalCommittees": 0,
-#                 "28d_totalContributionRefunds": 0,
-#                 "29_otherDisbursements": 0,
-#                 "30ai_sharedFederalActivity_h6_federalShare": 0,
-#                 "30aii_sharedFederalActivity_h6_nonFederal": 0,
-#                 "30b_nonAllocable_100_federalElectionActivity": 0,
-#                 "30c_totalFederalElectionActivity": 0,
-#                 "31_totalDisbursements": 0,
-#                 "32_totalFederalDisbursements": 0,
-#                 "33_totalContributions": 0,
-#                 "34_totalContributionRefunds": 0,
-#                 "35_netContributions": 0,
-#                 "36_totalFederalOperatingExpenditures": 0,
-#                 "37_offsetsToOperatingExpenditures": 0,
-#                 "38_netOperatingExpenditures": 0
-#             }
-#         }
-
 def get_committee_mater_values(cmte_id):
     try:
         query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
@@ -4215,7 +3566,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                 "softwareVersion":"1.02 Beta",
                 "additionalInfomation":"Any other useful information"
             }
-            f_3x_list = get_f3x_values(committeeid, report_id)
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
             response_inkind_out_list = []
