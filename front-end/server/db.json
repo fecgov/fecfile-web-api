@@ -10,7 +10,7 @@
                   "name":"ContributorLastName",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"30",
                      "alphaNumeric":true
                   }
@@ -22,7 +22,7 @@
                   "name":"ContributorFirstName",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"20",
                      "alphaNumeric":true
                   }
@@ -38,7 +38,7 @@
                   "name":"ContributorMiddleName",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"20",
                      "alphaNumeric":true
                   }
@@ -50,7 +50,7 @@
                   "name":"ContributorPrefix",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"10",
                      "alphaNumeric":true
                   }
@@ -62,7 +62,7 @@
                   "name":"ContributorSuffix",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"10",
                      "alphaNumeric":true
                   }
@@ -78,7 +78,7 @@
                   "name":"ContributorStreet1",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"34",
                      "alphaNumeric":true
                   }
@@ -90,7 +90,7 @@
                   "name":"ContributorStreet2",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"34",
                      "alphaNumeric":true
                   }
@@ -106,7 +106,7 @@
                   "name":"ContributorCity",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"30",
                      "alphaNumeric":true
                   }
@@ -118,7 +118,7 @@
                   "name":"ContributorState",
                   "type":"select",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"2",
                      "alphaNumeric":true
                   }
@@ -130,7 +130,7 @@
                   "name":"ContributorZip",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"9",
                      "alphaNumeric":true
                   }
@@ -141,36 +141,36 @@
             "cols":[  
                {  
                   "text":"Contribution Date",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributionDate",
                   "type":"date",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":null,
                      "date":true
                   }
                },
                {  
                   "text":"Contribution Amount",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributionAmount",
                   "type":"number",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"12",
                      "dollarAmount":true
                   }
                },
                {  
                   "text":"Contribution Aggregate",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributionAggregate",
                   "type":"number",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"12",
                      "alphaNumeric":true
                   }
@@ -181,24 +181,24 @@
             "cols":[  
                {  
                   "text":"Contributor Employer",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributorEmployer",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"38",
                      "alphaNumeric":true
                   }
                },
                {  
                   "text":"Contributor Occupation",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributorOccupation",
                   "type":"text",
                   "validation":{  
-                     "required":"true",
+                     "required": true,
                      "max":"38",
                      "alphaNumeric":true
                   }
@@ -209,24 +209,24 @@
             "cols":[  
                {  
                   "text":"Memo Code",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"MemoCode",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"1",
                      "alphaNumeric":true
                   }
                },
                {  
                   "text":"Memo Text",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"MemoText",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"100",
                      "alphaNumeric":true
                   }
@@ -237,12 +237,12 @@
             "cols":[  
                {  
                   "text":"Contribution Purpose Description",
-                  "infoIcon":"true",
+                  "infoIcon": true,
                   "infoText":"Request language from RAD",
                   "name":"ContributionPurposeDescription",
                   "type":"text",
                   "validation":{  
-                     "required":"false",
+                     "required": false,
                      "max":"100",
                      "alphaNumeric":true
                   }

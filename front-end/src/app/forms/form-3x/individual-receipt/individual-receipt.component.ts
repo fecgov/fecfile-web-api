@@ -109,7 +109,9 @@ export class IndividualReceiptComponent implements OnInit {
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
-          formValidators.push(Validators.required);
+          if (validators[validation]) {
+            formValidators.push(Validators.required);
+          }
         } else if (validation === 'min') {
           formValidators.push(Validators.minLength(validators[validation]));
         } else if (validation === 'max') {
@@ -135,6 +137,8 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
+    console.log('doValidate: ');
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
 
