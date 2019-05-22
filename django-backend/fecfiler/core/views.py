@@ -1261,15 +1261,15 @@ def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
-        page_num = int(request.GET.get('page', 1))
-        descending = request.GET.get('descending', False)
-        sortcolumn = request.GET.get('sortColumnName')
-        itemsperpage = request.GET.get('itemsPerPage', 5)
-        search_string = request.GET.get('search')
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', False)
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
         import ipdb;ipdb.set_trace()
         params = request.data['filters']
         keywords = params['keywords']
-        report_id = request.GET.get('reportid')
+        report_id = request.data.get('reportid')
         if descending:
             descending = 'DESC'
         else:
@@ -1283,29 +1283,32 @@ def get_all_transactions(request):
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
             'transaction_date', 'transaction_amount', 'purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
-        if search_string:
-            for key in keys:
-                if not param_string:
-                    param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
-                else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
-            param_string = param_string + " )"
+        # if search_string:
+        #     for key in keys:
+        #         if not param_string:
+        #             param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #         else:
+        #             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #     param_string = param_string + " )"
 
         if keywords:
-            for word in keywords:
-                if '"' in word:
-                    continue
-                elif "'" in word:
-                    if not param_string:
-                        param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
                     else:
-                        param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
-                else:
-                    if not param_string:
-                        param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
-                    else:
-                        param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
             param_string = param_string + " )"
+        param_string = filter_get_all_trans(request, param_string)
+        import ipdb;ipdb.set_trace()
         # for key, value in request.query_params.items():
         #     try:
         #         check_value = int(value)
@@ -1351,7 +1354,7 @@ def get_all_transactions(request):
                                 d[i] = ''
                     status_value = status.HTTP_200_OK
         
-        # import ipdb; ipdb.set_trace()
+        import ipdb; ipdb.set_trace()
         total_count = len(forms_obj)
         paginator = Paginator(forms_obj, itemsperpage)
         if paginator.num_pages < page_num:
