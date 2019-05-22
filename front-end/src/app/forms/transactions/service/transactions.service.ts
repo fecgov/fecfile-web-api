@@ -10,6 +10,7 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { map } from 'rxjs/operators';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -78,6 +79,7 @@ export class TransactionsService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
+    const formData: FormData = new FormData();
     const url = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -144,26 +146,56 @@ export class TransactionsService {
       }
     }
 
-    // TODO these will be used for filtering
-    // These are not yet defined in API
-    // params = params.append('search', filter.);
+    // use if API is a POST request
+    const request: any = {};
+    request.formType = formType;
+    request.reportid = reportid;
+    request.page = page;
+    request.itemsPerPage = itemsPerPage;
+    request.sortColumnName = sortColumnName;
+    request.descending = descending;
+    if (filters) {
+      request.filters = filters;
+      if (request.filters.keywords) {
+        const keywordsEdited = [];
+        for (const keyword of request.filters.keywords) {
+          // replace ` and " with ' for backend.
+          let kw = keyword.replace(/\"/g, `'`);
+          kw = kw.replace(/`/g, `'`);
+          keywordsEdited.push(kw);
+        }
+        request.filters.keywords = keywordsEdited;
+      }
+    }
 
-    // These are defined in API
-    // params = params.append('report_id', '1');
-    // params = params.append('line_number', '11AI');
-    // params = params.append('transaction_type', '15');
-    // params = params.append('transaction_type_desc', 'Individual Receipt');
-    // params = params.append('transaction_id', 'VVBSTFQ9Z78');
-    // params = params.append('transaction_date', '2018-10-18');
+    console.log(JSON.stringify(request));
 
     return this._http
-    .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions,
-          params
+    .post(
+      `${environment.apiUrl}${'/sa/schedA'}`,
+      request, // formData,
+      {
+        headers: httpOptions
+      }
+    )
+    .pipe(map(res => {
+        if (res) {
+          console.log('res: ', res);
+
+          return res;
         }
-      );
+        return false;
+    }));
+
+
+    // return this._http
+    // .get(
+    //     `${environment.apiUrl}${url}`,
+    //     {
+    //       headers: httpOptions,
+    //       params
+    //     }
+    //   );
   }
 
 

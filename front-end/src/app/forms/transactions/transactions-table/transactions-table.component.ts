@@ -956,7 +956,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    this.currentSortedColumnName = this._tableService.setSortDirection('name',
+    this.currentSortedColumnName = this._tableService.setSortDirection('default',
       this.sortableColumns, false);
   }
 
