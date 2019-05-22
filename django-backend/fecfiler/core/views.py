@@ -1451,7 +1451,7 @@ def get_committee_mater_values(cmte_id):
         else:
             forms_obj = forms_obj[0]
             committee_info_dict = {}
-            committee_info_dict['committeeId'] = forms_obj['cmte_id']
+            committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
             committee_info_dict['committeeName'] = forms_obj['cmte_name']
             committee_info_dict['street1'] = forms_obj['street_1']
             committee_info_dict['street2'] = forms_obj['street_2']
@@ -1523,7 +1523,7 @@ def create_f3x_expenditure_json_file(request):
                     response_dict_receipt['transactionId'] = entity_obj['transaction_id']
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
-                    response_dict_receipt['entityType'] = list_entity['entity_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
 
                     response_dict_receipt['payeeOrganizationName'] = list_entity['entity_name']
                     response_dict_receipt['payeeLastName'] = list_entity['last_name']
@@ -1573,7 +1573,7 @@ def create_f3x_expenditure_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
             comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SB':[]}
             data_obj['data']['Schedule']['SB'] = response_expenditure_receipt_list
@@ -2647,7 +2647,7 @@ def get_committee_mater_values(cmte_id):
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
         forms_obj = forms_obj[0]
         committee_info_dict = {}
-        committee_info_dict['committeeId'] = forms_obj['cmte_id']
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
         committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
         committee_info_dict['street1'] = forms_obj['street_1']
         committee_info_dict['street2'] = forms_obj['street_2']
@@ -2814,7 +2814,7 @@ def create_f3x_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
         
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SA': [],}
             data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
@@ -3033,7 +3033,7 @@ def get_committee_mater_values(cmte_id):
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
         forms_obj = forms_obj[0]
         committee_info_dict = {}
-        committee_info_dict['committeeId'] = forms_obj['cmte_id']
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
         committee_info_dict['committeeName'] = forms_obj['cmte_name']
         committee_info_dict['street1'] = forms_obj['street_1']
         committee_info_dict['street2'] = forms_obj['street_2']
@@ -3104,8 +3104,9 @@ def create_f3x_partner_json_file(request):
                     response_dict_receipt['transactionId'] = entity_obj['transaction_id']
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
-                    response_dict_receipt['entityType'] = list_entity['entity_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
 
+                    response_dict_receipt['contributorOrganizationName']=list_entity['entity_name']
                     response_dict_receipt['contributorStreet1'] = list_entity['street_1']
                     response_dict_receipt['contributorStreet2'] = list_entity['street_2']
                     response_dict_receipt['contributorCity'] = list_entity['city']
@@ -3139,7 +3140,7 @@ def create_f3x_partner_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
-                        response_dict_out['contributorOrganizationName'] = list_child_entity['entity_name']
+                       
 
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
@@ -3190,7 +3191,7 @@ def create_f3x_partner_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
             comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SA': []}
             data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list 
@@ -3402,7 +3403,7 @@ def get_committee_mater_values(cmte_id):
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
         forms_obj = forms_obj[0]
         committee_info_dict = {}
-        committee_info_dict['committeeId'] = forms_obj['cmte_id']
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
         committee_info_dict['committeeName'] = forms_obj['cmte_name']
         committee_info_dict['street1'] = forms_obj['street_1']
         committee_info_dict['street2'] = forms_obj['street_2']
@@ -3474,7 +3475,7 @@ def create_f3x_returned_bounced_json_file(request):
                     response_dict_out['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_out['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_out['entityType'] = list_entity['entity_type']
-                    response_dict_out['contributorOrganizationName'] = list_entity['entity_name']
+                    
 
                     response_dict_out['contributorLastName'] = list_entity['last_name']
                     response_dict_out['contributorFirstName'] = list_entity['first_name']
@@ -3525,7 +3526,7 @@ def create_f3x_returned_bounced_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
             comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SA': []}
             data_obj['data']['Schedule']['SA'] = response_inkind_out_list
@@ -3558,7 +3559,7 @@ def create_f3x_returned_bounced_json_file(request):
 
 """
 ******************************************************************************************************************************
-END  - Partnership Memo Json - CORE APP
+END  - Returned or Bonused Receipt  Json file API - CORE APP
 ******************************************************************************************************************************
 """
 
@@ -3745,7 +3746,7 @@ def get_committee_mater_values(cmte_id):
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
         forms_obj = forms_obj[0]
         committee_info_dict = {}
-        committee_info_dict['committeeId'] = forms_obj['cmte_id']
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
         committee_info_dict['committeeName'] = forms_obj['cmte_name']
         committee_info_dict['street1'] = forms_obj['street_1']
         committee_info_dict['street2'] = forms_obj['street_2']
@@ -3817,7 +3818,7 @@ def create_f3x_reattribution_json_file(request):
                     response_dict_receipt['transactionId'] = entity_obj['transaction_id']
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
-                    response_dict_receipt['entityType'] = list_entity['entity_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
 
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -3859,7 +3860,7 @@ def create_f3x_reattribution_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
-                        response_dict_out['contributorOrganizationName'] = list_child_entity['entity_name']
+                       
 
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
@@ -3911,7 +3912,7 @@ def create_f3x_reattribution_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
             
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SA': []}
             data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
@@ -4161,7 +4162,7 @@ def get_committee_mater_values(cmte_id):
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
         forms_obj = forms_obj[0]
         committee_info_dict = {}
-        committee_info_dict['committeeId'] = forms_obj['cmte_id']
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
         committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
         committee_info_dict['street1'] = forms_obj['street_1']
         committee_info_dict['street2'] = forms_obj['street_2']
@@ -4328,7 +4329,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                 comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
         
             data_obj['data'] = comm_info_obj
-            data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = get_summary_dict()
             data_obj['data']['Schedule'] = {'SA': [],}
             data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
