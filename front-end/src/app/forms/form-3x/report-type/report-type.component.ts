@@ -36,7 +36,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   styleUrls: ['./report-type.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ReportTypeComponent implements OnInit, OnDestroy {
+export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = null;
@@ -76,31 +76,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService
-  ) {
-    this._messageService.clearMessage();
-
-    this._dateChangeSubscription = this._reportTypeMessageService.getDateChangeMessage().subscribe(message => {
-      if (!message) {
-        return;
-      }
-      const dateName = message.name;
-      switch (dateName) {
-        case 'fromDate':
-          this._fromDateUserModified = message.date;
-          this._fromDateSelected = message.date;
-          this.fromDateSelected = true;
-          break;
-        case 'toDate':
-          this._toDateUserModified = message.date;
-          this._toDateSelected = message.date;
-          this.toDateSelected = true;
-          break;
-        default:
-      }
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
+    this._messageService.clearMessage();
+
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -162,11 +142,32 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
     }
 
-    this._setReportTypes();
-  }
+    this._messageService.getMessage().subscribe(res => {
+      if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
+        if (res.type === this._formType) {
+          if (res.reportType === 'special') {
+            if (Array.isArray(res.electionDates)) {
+              if (typeof res.electionDates[0] === 'object') {
+                this._fromDateSelected = res.electionDates[0].cvg_start_date;
+                this._toDateSelected = res.electionDates[0].cvg_end_date;
 
-  ngOnDestroy(): void {
-    this._dateChangeSubscription.unsubscribe();
+                if (this._fromDateSelected !== null && this._toDateSelected !== null) {
+                  if (this._fromDateSelected.length >= 1 && this._toDateSelected.length >= 1) {
+                    this.fromDateSelected = true;
+                    this.toDateSelected = true;
+
+                    this.frmReportType.markAsDirty();
+                    this.frmReportType.markAsTouched();
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    this._setReportTypes();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -290,9 +291,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {
         if (res) {
           let reportId = 0;
-          console.log(" doValidateReportType res =", res);
           if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
-            console.log(" doValidateReportType report already exists");
             reportId = res[0].report_id;
             const cvgStartDate: any = res[0].cvg_start_date;
             let datearray: any = cvgStartDate.split('-');
@@ -332,7 +331,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                   }
                 });
             }
-          } 
+          }
           this.status.emit({
             form: this.frmReportType,
             direction: 'next',

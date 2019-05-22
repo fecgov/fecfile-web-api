@@ -1,5 +1,5 @@
 import { Component, HostListener, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
@@ -34,7 +34,9 @@ export class AppLayoutComponent implements OnInit {
   public showSideBar: boolean = true;
   public sideBarClass: string = null;
   public toggleMenu: boolean = false;
-  public dueDate: string  = null;
+  public dueDate: string = null;
+
+  private _step: string = null;
 
   constructor(
     private _apiService: ApiService,
@@ -42,7 +44,8 @@ export class AppLayoutComponent implements OnInit {
     private _messageService: MessageService,
     private _utilService: UtilService,
     private _router: Router,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -106,6 +109,8 @@ export class AppLayoutComponent implements OnInit {
     localStorage.removeItem('reports.filters');
     localStorage.removeItem('Reports.view');
 
+    this._step = this._activatedRoute.snapshot.queryParams.step;
+
     if (route === '/dashboard') {
       /**
        * Fix this issue with the sidenar on the dashboard.
@@ -114,7 +119,7 @@ export class AppLayoutComponent implements OnInit {
 
       this.sideBarClass = 'dashboard active';
       this.showFormDueDate = false;
-    } else if (route.indexOf('/forms/form/3X') === 0) {
+    } else if (route.indexOf('/forms/form/3X') === 0 || route.indexOf('/forms/transactions/3X') === 0) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
         const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
 
@@ -143,7 +148,11 @@ export class AppLayoutComponent implements OnInit {
             this.dueDate = formInfo.dueDate;
           }
 
-          this.showFormDueDate = true;
+          if (this._step !== 'step_1') {
+            this.showFormDueDate = true;
+          } else {
+            this.showFormDueDate = false;
+          }
         }
       }
     } else {
