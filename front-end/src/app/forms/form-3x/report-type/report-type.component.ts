@@ -42,11 +42,12 @@ export class ReportTypeComponent implements OnInit {
   @Input() selectedReportInfo: any = null;
 
   public frmReportType: FormGroup;
-  public fromDateSelected = false;
-  public reportTypeSelected = '';
-  public isValidType = false;
-  public optionFailed = false;
-  public screenWidth = 0;
+  public fromDateSelected: boolean = false;
+  public reportTypeSelected: string = null;
+  public isValidType: boolean = false;
+  public optionFailed: boolean = false;
+  public invalidDates: boolean = false;
+  public screenWidth: number = 0;
   public reportType: string = null;
   public toDateSelected = false;
   public tooltipPosition = 'right';
@@ -145,6 +146,8 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
+          // console.log('getMessage: ');
+          // console.log('res:', res);
           if (res.reportType === 'S') {
             if (Array.isArray(res.electionDates)) {
               if (typeof res.electionDates[0] === 'object') {
@@ -163,8 +166,28 @@ export class ReportTypeComponent implements OnInit {
               }
             }
           }
-        }
-      }
+          if (res.hasOwnProperty('validDates')) {
+            console.log('res has validDates');
+            console.log('res: ', res);
+            if (!res.validDates) {
+              this.invalidDates = true;
+
+              console.log('this.invalidDates: ', this.invalidDates);
+
+              this.optionFailed = false;
+
+              this.frmReportType.setErrors({ invalid: true });
+
+              // this.frmReportType.controls['reportTypeRadio'].setErrors({ incorrect: true });
+
+              this.frmReportType.markAsDirty();
+              this.frmReportType.markAsTouched();
+            }
+
+            this.invalidDates = false;
+          }
+        } // res.type === this._formType
+      } // res.hasOwnProperty
     });
 
     this._setReportTypes();
@@ -263,13 +286,7 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidateReportType() {
-    this.initCustomFormValidation();
-    if (!this.doCustomValidation()) {
-      this.customFormValidation.error = true;
-      this.optionFailed = false;
-      window.scrollTo(0, 0);
-      return 0;
-    }
+    console.log('this.frmReportType: ', this.frmReportType);
 
     if (this.frmReportType.valid) {
       this.optionFailed = false;
@@ -343,11 +360,30 @@ export class ReportTypeComponent implements OnInit {
 
       return 1;
     } else {
-      this.optionFailed = true;
-      this.isValidType = false;
-      window.scrollTo(0, 0);
+      if (this.frmReportType.controls['reportTypeRadio'].invalid) {
+        console.log('reportTypeRadio is invalid: ');
 
-      return 0;
+        /**
+         * TODO: Add validation here for radio button
+         */
+
+        // this.optionFailed = true;
+        // this.isValidType = false;
+        // window.scrollTo(0, 0);
+
+        return 0;
+      } else {
+        console.log('reportTypeRadio is valid, something else is wrong.');
+
+        /**
+         * TODO: Add validation here when dates from report type are invalid.
+         */
+
+        // this.optionFailed = false;
+        // this.isValidType = false;
+
+        // window.scrollTo(0, 0);
+      }
     }
   }
 
@@ -357,26 +393,26 @@ export class ReportTypeComponent implements OnInit {
    *
    * @returns true if valid
    */
-  private doCustomValidation(): boolean {
-    // TODO compare dates for start <= end
-    // TODO check for valid date format
+  // private doCustomValidation(): boolean {
+  //   // TODO compare dates for start <= end
+  //   // TODO check for valid date format
 
-    // start and end are required
-    let valid = true;
-    if (!this.fromDateSelected) {
-      valid = false;
-      this.customFormValidation.messages.push('You must select coverage dates.');
-      return;
-    }
+  //   // start and end are required
+  //   let valid = true;
+  //   if (!this.fromDateSelected) {
+  //     valid = false;
+  //     this.customFormValidation.messages.push('You must select coverage dates.');
+  //     return;
+  //   }
 
-    if (!this.toDateSelected) {
-      valid = false;
-      this.customFormValidation.messages.push('You must select coverage dates.');
-      return;
-    }
+  //   if (!this.toDateSelected) {
+  //     valid = false;
+  //     this.customFormValidation.messages.push('You must select coverage dates.');
+  //     return;
+  //   }
 
-    return valid;
-  }
+  //   return valid;
+  // }
 
   /**
    * Toggles the tooltip.
