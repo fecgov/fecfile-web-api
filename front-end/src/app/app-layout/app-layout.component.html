@@ -72,7 +72,7 @@
       <div class="contact-info">
         <div class="contact-info__item">
           <h6>
-            <strong>Federal Election Commission</strong>
+            <label>Federal Election Commission</label>
             <br />
             <address>
               1050 First Street NE, Washington DC, 20002
@@ -83,7 +83,7 @@
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>Main Office</strong>
+            <label>Main Office</label>
             <br />
             <address>
               (202) 694-1000
@@ -93,12 +93,11 @@
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>
-              <br />
+            <label>
               RAD Analyst,
               {{ radAnalystInfo?.first_name }}
               {{ radAnalystInfo?.last_name }}
-            </strong>
+            </label>
             <br />
             <address>
               <ng-container *ngIf="radAnalystInfo"> (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }} </ng-container>
@@ -113,7 +112,7 @@
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>Tech Support</strong>
+            <label>Tech Support</label>
             <br />
             <address>
               (202) 694-1307
