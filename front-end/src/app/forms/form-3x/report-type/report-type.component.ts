@@ -145,7 +145,7 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
-          if (res.reportType === 'special') {
+          if (res.reportType === 'S') {
             if (Array.isArray(res.electionDates)) {
               if (typeof res.electionDates[0] === 'object') {
                 this._fromDateSelected = res.electionDates[0].cvg_start_date;

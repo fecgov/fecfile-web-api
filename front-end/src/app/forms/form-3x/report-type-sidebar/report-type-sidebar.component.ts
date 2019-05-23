@@ -40,6 +40,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   private _previousReportTypeDescription: string = null;
   private _previousReportSelected: string = null;
   private _previousStateSelected: string = null;
+  private _reportType: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -63,6 +64,13 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
+      console.log('this.selectedReport: ', this.selectedReport);
+      if (this.selectedReport.hasOwnProperty('regular_special_report_ind')) {
+        if (typeof this.selectedReport.regular_special_report_ind === 'string') {
+          this._reportType = this.selectedReport.regular_special_report_ind;
+        }
+      }
+
       if (this.selectedReport.hasOwnProperty('report_type')) {
         if (typeof this.selectedReport.report_type === 'string') {
           if (this._previousReportSelected === null) {
@@ -288,20 +296,36 @@ export class ReportTypeSidebarComponent implements OnInit {
     this._messageService.sendMessage({
       form: true,
       type: this._formType,
-      reportType: 'special',
+      reportType: this._reportType,
       electionDates: this.electionDates
     });
 
     this._selectedElectionDate = e.target.value;
   }
 
+  /**
+   * Executed when from date field is changed.
+   *
+   * @param      {string}  date    The date
+   */
   public fromDateChange(date: string) {
-    this.fromDate = date;
+    console.log('formDateChange: ');
+    console.log('date: ', date);
+
+    if (this.fromDate !== null) {
+      if (date !== this.fromDate) {
+        console.log('Invalid date for report selected: ');
+      } else {
+        this.fromDate = date;
+      }
+    } else {
+      this.fromDate = date;
+    }
 
     this._messageService.sendMessage({
       form: true,
       type: this._formType,
-      reportType: 'special',
+      reportType: this._reportType,
       electionDates: [
         {
           cvg_end_date: this.toDate,
@@ -313,6 +337,11 @@ export class ReportTypeSidebarComponent implements OnInit {
     });
   }
 
+  /**
+   * Executed when the to date field is changed.
+   *
+   * @param      {string}  date    The date
+   */
   public toDateChange(date: string) {
     this.toDate = date;
 
