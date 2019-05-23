@@ -1,5 +1,5 @@
 <div class="financial-summary-container">
-  <header>
+  <header class="header-content">
     <div class="grid-row">
       <div class="grid-row__col grid-row__col--6">
         <h1>Financial Summary</h1>
@@ -11,13 +11,21 @@
         >
           Browse Receipts
         </button>
-        <button
-          type="button"
-          class="btn btn-link btn-options"
-        >
-          <span class="ellipsis-icon" aria-hidden="true"></span>
-          <span class="sr-only">Click for more options</span>
-        </button>
+        <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
+          <button
+            type="button"
+            class="btn btn-link btn-options"
+            id="actionsMenu"
+            ngbDropdownToggle
+          >
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="actionsMenu">
+            <button class="dropdown-item"><i class="view-icon"></i> View</button>
+            <button class="dropdown-item"><i class="print-icon"></i> Print</button>
+           </div>
+        </div>
       </div>
     </div>
     <hr />

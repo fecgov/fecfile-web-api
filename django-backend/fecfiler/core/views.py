@@ -1131,11 +1131,12 @@ def create_json_file(request):
             k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
+
             f99data = {}
             f99data['committeeId'] = comm_info.committeeid
             f99data['committeeName'] = comm_info.committeename
             f99data['street1'] = comm_info.street1
-            f99data['stree2'] = comm_info.street2
+            f99data['street2'] = comm_info.street2
             f99data['city'] = comm_info.city
             f99data['state'] = comm_info.state
             f99data['zipCode'] = str(comm_info.zipcode)
@@ -1146,46 +1147,18 @@ def create_json_file(request):
             f99data['treasurerSuffix'] = comm_info.treasurersuffix
             f99data['reason'] = comm_info.reason
             f99data['text'] = comm_info.text
-            #f99data['dateSigned'] = datetime.datetime.now()
+            f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+            #f99data['dateSigned'] = '5/15/2019'
             f99data['email1'] = comm_info.email_on_file
             f99data['email2'] = comm_info.email_on_file_1
-            f99data['fomrType'] = comm_info.form_type
-            f99data['attachement'] = ''
+            f99data['formType'] = comm_info.form_type
+            f99data['attachement'] = 'X'
             f99data['password'] = "test"
 
             #data_obj['data'] = serializer.data
             data_obj['data'] = f99data
             k.set_contents_from_string(json.dumps(data_obj))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            
-            """
-            form99_header_string ='{"header": { "version": "8.3","softwareName": "nxg_fec", "softwareVersion": "1.01 Beta", "additionalInfomation": ""   }, "data": {'
-            form99_data_string = '"committeeId": "'+comm_info.committeeid+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"street1": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"stree2": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"city": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            """
 
             tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
             #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
@@ -1193,34 +1166,102 @@ def create_json_file(request):
             print ("url= ", url)
             print ("tmp_filename= ", tmp_filename)
 
-            #vdata['form_type'] = "F99"
-            
-            #vdata['newAmendIndicator'] = comm_info.committeeid
-            #vdata['reportSequence'] = comm_info.committeeid
-            #vdata['emailAddress1'] = comm_info.email_on_file
-            #vdata['fecDataFile'] = comm_info.committeeid
-            #vdata['reportType'] = comm_info.committeeid
-            #vdata['coverageStartDate'] = comm_info.committeeid
-            #vdata['coverageEndDate'] = comm_info.committeeid
-            #vdata['originalFECId'] = comm_info.committeeid
-            #vdata['backDoorCode'] = comm_info.committeeid
-            #vdata['emailAddress2'] = comm_info.email_on_file_1
-            #vdata['fecAttachment'] = comm_info.
-
 
             vdata['wait'] = 'false'
             #print("vdata",vdata)
             json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print("vfiles",vfiles)
 
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            #with open('data.json', 'w') as outfile:
+            #   json.dump(data, outfile, ensure_ascii=False)
+            
+            #obj = open('data.json', 'w')
+            #obj.write(serializer.data)
+            #obj.close
+
+            # variables to be sent along the JSON file in form-data
+            filing_type='FEC'
+            vendor_software_name='FECFILE'
+
+            data_obj = {
+                    'filing_type':filing_type,
+                    'vendor_software_name':vendor_software_name,
+                    'committeeId':comm_info.committeeid,
+                    'password':'test',
+                    'formType':comm_info.form_type,
+                    'newAmendIndicator':'N',
+                    'reportSequence':1,
+                    'emailAddress1':comm_info.email_on_file,
+                    'reportType':comm_info.reason,
+                    'coverageStartDate':None,
+                    'coverageEndDate':None,
+                    'originalFECId':None,
+                    'backDoorCode':None,
+                    'emailAddress2': comm_info.email_on_file_1,
+                    'wait':False
+                }
+
+            print(data_obj)
+            
+            if not (comm_info.file in [None, '', 'null', ' ',""]):
+                filename = comm_info.file.name 
+                #print(filename)
+                myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
+                #myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+                #print(myurl)
+                myfile = urllib.request.urlopen(myurl)
+
+                #s3 = boto3.client('s3')
+
+                #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+
+                #attachment = open(file_object['Body'], 'rb')
+
+        
+                file_obj = {
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                    'fecAttachment': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+                }
+    
+                """
+                    # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+                    # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+                    printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+                    if not printresp.ok:
+                        return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        #dictcreate = createresp.json()
+                        dictprint = printresp.json()
+                        merged_dict = {**update_json_data, **dictprint}
+                        #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+                        return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                        #return Response(printresp.json(), status=status.HTTP_201_CREATED)
+                else:
+                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+                """
+            print(file_obj)
+            #res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=file_obj)
+            #mahi asked to changed on 05/17/2019
+            res = requests.post("https://" +  settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+
             #import ipdb; ipdb.set_trace()
-            #print(res.text)
+            print(res.text)
             return Response(res.text, status=status.HTTP_200_OK)
             #return Response("successful", status=status.HTTP_200_OK)
-            
+            if not res.ok:
+                return Response(res.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                #dictcreate = createresp.json()
+                dictprint = res.json()
+                merged_dict = {**update_json_data, **dictprint}
+                #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                #return Response(printresp.json(), status=status.HTTP_201_CREATED)
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
             

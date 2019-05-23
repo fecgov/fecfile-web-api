@@ -53,8 +53,8 @@
                <ng-template #tipContent>
                  Only a treasurer or assistant treasurer designated on a Form 1 (Statement of Organization) may sign the report. 104.14(a)
                </ng-template>
-               <h4>
-                 Signee*
+               <label>
+                 <strong>Signee*</strong>
                  <button
                    type="button"
                    class="btn btn-info"
@@ -68,9 +68,9 @@
                    <i class="info-icon" aria-hidden="true"></i>
                    <span class="sr-only">Click here for more information</span>
                  </button>
-               </h4>
+                </label>
                <div>
-                 <label>
+                 <span>
                    <input
                      type="radio"
                      name="signee"
@@ -79,13 +79,13 @@
                      formControlName="signee"
                    />
                    {{ committee_details?.treasurerfirstname }} {{ committee_details?.treasurerlastname }}
-               </label>
+                 </span>
                <br />
                <br />
                </div>
              </div>
              <div class="grid-row__col grid-row__col--6">
-               <h4>Date*</h4>
+               <label><strong>Date*</strong></label>
                <div>
                  {{ date_stamp.getMonth() + 1 }}/{{ date_stamp.getDate() }}/{{ date_stamp.getFullYear() }}
                </div>
@@ -100,10 +100,10 @@
            </div>
            <div class="grid-row">
               <div class="grid-row__col grid-row__col--4">
-                  <h4>Email(s) on File</h4>
+                  <label><strong>Email(s) on File</strong></label>
               </div>
               <div class="grid-row__col grid-row__col--8">
-                  <h4>Additional Email(s) For Your Confirmation Receipt</h4>
+                  <label><strong>Additional Email(s) For Your Confirmation Receipt</strong></label>
                 </div>
             <!-- <div class="grid-row__col grid-row__col--3">
                   &nbsp;
@@ -293,10 +293,7 @@
              Submit
            </button>
          </div>
-       </div>
-       <div  class="grid-row">
-          <h4 class="grid-row__col grid-row__col--12 space-bottom">* = Required</h4>
-      </div>         
+       </div>         
     </footer>
    </form>
  </div> <!-- ./signee-container -->
