@@ -146,8 +146,8 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
-          // console.log('getMessage: ');
-          // console.log('res:', res);
+          console.log('getMessage: ');
+          console.log('res:', res);
           if (res.reportType === 'S') {
             if (Array.isArray(res.electionDates)) {
               if (typeof res.electionDates[0] === 'object') {
@@ -178,13 +178,13 @@ export class ReportTypeComponent implements OnInit {
 
               this.frmReportType.setErrors({ invalid: true });
 
-              // this.frmReportType.controls['reportTypeRadio'].setErrors({ incorrect: true });
-
               this.frmReportType.markAsDirty();
               this.frmReportType.markAsTouched();
+            } else {
+              this.frmReportType.setErrors(null);
+              //this.frmReportType.setErrors({ status: 'VALID' });
+              this.invalidDates = false;
             }
-
-            this.invalidDates = false;
           }
         } // res.type === this._formType
       } // res.hasOwnProperty
@@ -213,8 +213,6 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
-      this.initCustomFormValidation();
-      this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
@@ -360,59 +358,29 @@ export class ReportTypeComponent implements OnInit {
 
       return 1;
     } else {
-      if (this.frmReportType.controls['reportTypeRadio'].invalid) {
+      console.log('form is invalid: ');
+      console.log('this.frmReportType.invalid', this.frmReportType.invalid);
+      if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
         console.log('reportTypeRadio is invalid: ');
 
-        /**
-         * TODO: Add validation here for radio button
-         */
+        this.invalidDates = false;
+        this.optionFailed = true;
+        this.isValidType = false;
 
-        // this.optionFailed = true;
-        // this.isValidType = false;
-        // window.scrollTo(0, 0);
+        window.scrollTo(0, 0);
 
         return 0;
       } else {
         console.log('reportTypeRadio is valid, something else is wrong.');
 
-        /**
-         * TODO: Add validation here when dates from report type are invalid.
-         */
+        this.invalidDates = true;
+        this.optionFailed = false;
+        this.isValidType = false;
 
-        // this.optionFailed = false;
-        // this.isValidType = false;
-
-        // window.scrollTo(0, 0);
+        window.scrollTo(0, 0);
       }
     }
   }
-
-  /**
-   * Perform custom validations not handled by angular's built in
-   * validation framework.
-   *
-   * @returns true if valid
-   */
-  // private doCustomValidation(): boolean {
-  //   // TODO compare dates for start <= end
-  //   // TODO check for valid date format
-
-  //   // start and end are required
-  //   let valid = true;
-  //   if (!this.fromDateSelected) {
-  //     valid = false;
-  //     this.customFormValidation.messages.push('You must select coverage dates.');
-  //     return;
-  //   }
-
-  //   if (!this.toDateSelected) {
-  //     valid = false;
-  //     this.customFormValidation.messages.push('You must select coverage dates.');
-  //     return;
-  //   }
-
-  //   return valid;
-  // }
 
   /**
    * Toggles the tooltip.
@@ -607,17 +575,5 @@ export class ReportTypeComponent implements OnInit {
     dueDate = Math.round(Math.abs((today.getTime() - day.getTime()) / oneDay));
 
     return dueDate;
-  }
-
-  private initUserModFields() {
-    this._fromDateUserModified = null;
-    this._toDateUserModified = null;
-  }
-
-  private initCustomFormValidation() {
-    this.customFormValidation = {
-      error: false,
-      messages: []
-    };
   }
 }
