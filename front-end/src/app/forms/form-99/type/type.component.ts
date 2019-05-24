@@ -39,7 +39,7 @@ export class TypeComponent implements OnInit {
 
   ngOnInit(): void {
     this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
-
+    console.log(" type this._form99Details =", this._form99Details)
     this.screenWidth = window.innerWidth;
 
     if(this.screenWidth < 768) {
@@ -68,6 +68,21 @@ export class TypeComponent implements OnInit {
       });
   }
 
+ /*ngAfterViewChecked(): void {
+  this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+  console.log(" ngAfterViewChecked type this._form99Details =", this._form99Details)
+  this.screenWidth = window.innerWidth;
+
+  if(this.screenWidth < 768) {
+    this.tooltipPosition = 'bottom';
+    this.tooltipLeft = '0';
+  } else if (this.screenWidth >= 768) {
+    this.tooltipPosition = 'right';
+    this.tooltipLeft = 'auto';
+  }
+
+  this._setForm();
+ } */
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.screenWidth = event.target.innerWidth;

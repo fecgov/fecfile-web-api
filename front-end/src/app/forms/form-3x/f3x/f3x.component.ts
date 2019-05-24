@@ -6,7 +6,7 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportTypeService } from '../report-type/report-type.service';
 import { TransactionTypeService } from '../transaction-type/transaction-type.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
+import { form3x_data, form3XReport, form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
 import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 
@@ -117,7 +117,27 @@ export class F3xComponent implements OnInit {
    * Sets the reports.
    */
   private _setReports(): void {
-    if (typeof this.reportType === 'undefined' || this.reportType === null) {
+    if (typeof JSON.parse(localStorage.getItem('form_3X_details')) !== 'undefined' || JSON.parse(localStorage.getItem('form_3X_details')) !== null) {  
+      console.log("report found...");
+      let form3XDetailsInstance:form3xReportTypeDetails =  JSON.parse(localStorage.getItem('form_3X_details'));
+      console.log("form3XDetailsInstance =", form3XDetailsInstance)
+      console.log("form3XDetailsInstance.reportId =", form3XDetailsInstance.reportId)
+      console.log("form3XDetailsInstance.reportType =", form3XDetailsInstance.reportType)
+      this.reportTypeIndicator=form3XDetailsInstance.reportId;
+      this.selectedReportType=form3XDetailsInstance.reportType;
+      if (this.reportTypeIndicator === 'S') {
+        this.regularReports = false;
+        this.specialReports = true;
+      } else {
+        this.specialReports = false;
+        this.regularReports = true;
+      }
+      console.log("this.reportTypeIndicator =", this.reportTypeIndicator);
+      console.log("this.selectedReportType =", this.selectedReportType);
+      console.log("this.specialReports =", this.specialReports);
+      console.log("this.regularReports =", this.regularReports);
+    } else if (typeof this.reportType === 'undefined' || this.reportType === null) {
+      console.log("report not found...");
       if (typeof this.reportTypes !== 'undefined' && this.reportTypes !== null) {
         this.selectedReportType  = this.reportTypes.find(x => x.default_disp_ind === 'Y');
         if (typeof this.selectedReportType === 'object') {

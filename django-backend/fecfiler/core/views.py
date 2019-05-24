@@ -3714,7 +3714,40 @@ def create_inkind_bitcoin_f3x_json_file(request):
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_report_info(request):
+    """
+    Get report details
+    """
+    cmte_id = request.user.username
+    report_id = request.query_params.get('reportid')
+    print("cmte_id", cmte_id)
+    print("report_id", report_id)
+    try:
+        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
+            print("you are here1")
+            if int(request.query_params.get('reportid'))>=1:
+                print("you are here2")
+                with connection.cursor() as cursor:
+                    # GET all rows from Reports table
+                    
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue
+                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
+                    print("query_string", query_string)
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
+                
+                    for row in cursor.fetchall():
+                        data_row = list(row)
+                        forms_obj=data_row[0]
+                        
+            if forms_obj is None:
+                raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
+
+            return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception:
+        raise
 
 
 

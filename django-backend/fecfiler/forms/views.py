@@ -1588,3 +1588,24 @@ def validate_HTMLtag(strWord):
         return ""  
     except Exception as e:
         return Response("The validate_HTMLtag function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_f99_report_info(request):
+    """
+    Get F99 report details
+    """
+    print("request.query_params.get('reportid')=", request.query_params.get('reportid'))
+    try:
+        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
+            print("you are here1")
+            if int(request.query_params.get('reportid'))>=1:
+                print("you are here2")
+                id_comm = CommitteeInfo()
+                id_comm.id = request.query_params.get('reportid')
+                #comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, id=request.query_params.get('reportid')).last()
+                serializer = CommitteeInfoSerializer(comm_info)
+                if comm_info:
+                    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    except CommitteeInfo.DoesNotExist:
+            return Response({"FEC Error 004":"There is no submitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)

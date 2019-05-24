@@ -80,6 +80,7 @@ export class ReasonComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+    console.log(" Reason this._form99Details =", this._form99Details);
 
     if (this._form99Details) {
       if (this._form99Details.text) {
@@ -107,6 +108,31 @@ export class ReasonComponent implements OnInit {
 
   ngDoCheck(): void {
     let form_99_details: any = {};
+    /*this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+    console.log(" ngDoCheck reason this._form99Details =", this._form99Details)
+
+    if (this._form99Details) {
+      if (this._form99Details.text) {
+        if (this._form99Details.reason) {
+          this.typeSelected = this._form99Details.reason;
+        }
+
+        this.frmReason = this._fb.group({
+          reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
+          file: ['']
+        });
+      } else {
+        this.frmReason = this._fb.group({
+          reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
+          file: ['']
+        });
+      }
+    } else {
+      this.frmReason = this._fb.group({
+        reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
+        file: ['']
+      });
+    }*/
 
     if (localStorage.getItem('form_99_details') !== null) {
       form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
@@ -114,6 +140,14 @@ export class ReasonComponent implements OnInit {
 
     if (form_99_details) {
       this.typeSelected = form_99_details.reason;
+      this._reasonInnerHTML=form_99_details.text;
+      //this.frmReason.controls.reasonText= form_99_details.text;
+      //this.frmReason.controls['reasonText'].setValue(form_99_details.text);
+      /*this.frmReason.setValue({
+        reasonText:form_99_details.text,
+        file:''
+      });*/
+      console.log("form_99_details.reason.text= ", form_99_details.text);
     }
 
     if (this.frmReason.get('reasonText').value.length >= 1) {
@@ -122,7 +156,6 @@ export class ReasonComponent implements OnInit {
       this.characterCount = this._countCharacters(text);
     } else if (this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
-
       this.characterCount = this._countCharacters(text);
     }
   }
