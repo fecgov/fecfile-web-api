@@ -140,7 +140,8 @@ export class ReasonComponent implements OnInit {
 
     if (form_99_details) {
       this.typeSelected = form_99_details.reason;
-      this._reasonInnerHTML=form_99_details.text;
+      //this._reasonInnerHTML=form_99_details.text; not woking
+
       //this.frmReason.controls.reasonText= form_99_details.text;
       //this.frmReason.controls['reasonText'].setValue(form_99_details.text);
       /*this.frmReason.setValue({
