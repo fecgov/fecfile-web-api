@@ -1238,20 +1238,21 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 def filter_get_all_trans(request, param_string):
     if request.method == 'GET':
         return param_string
+    # import ipdb;ipdb.set_trace()
     filt_dict = request.data['filters']
     for f_key, value_d in filt_dict.items():
         if 'filterCategories' in f_key:
-            cat_tuple = '("'+'","'.join(value_d)+'")'
+            cat_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
         if 'filterFromDate' in f_key and 'filterToDate' in f_key:
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
         if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
             param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
         if 'filterStates' in f_key:
-            state_tuple = '("'+'","'.join(value_d)+'")'
+            state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
         if 'filterMemoCode' in f_key:
-            if value_d:
+            if str(value_d) == 'true':
                 param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
     return param_string
 
@@ -1262,15 +1263,15 @@ def get_all_transactions(request):
         cmte_id = request.user.username
         param_string = ""
         page_num = int(request.data.get('page', 1))
-        descending = request.data.get('descending', False)
+        descending = request.data.get('descending', 'false')
         sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
-        import ipdb;ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         params = request.data['filters']
-        keywords = params['keywords']
+        keywords = params.get('keywords')
         report_id = request.data.get('reportid')
-        if descending:
+        if str(descending) == 'true':
             descending = 'DESC'
         else:
             descending = 'ASC'
@@ -1308,7 +1309,7 @@ def get_all_transactions(request):
                             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
             param_string = param_string + " )"
         param_string = filter_get_all_trans(request, param_string)
-        import ipdb;ipdb.set_trace()
+        #import ipdb;ipdb.set_trace()
         # for key, value in request.query_params.items():
         #     try:
         #         check_value = int(value)
@@ -1354,7 +1355,7 @@ def get_all_transactions(request):
                                 d[i] = ''
                     status_value = status.HTTP_200_OK
         
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         total_count = len(forms_obj)
         paginator = Paginator(forms_obj, itemsperpage)
         if paginator.num_pages < page_num:
