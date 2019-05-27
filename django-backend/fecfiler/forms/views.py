@@ -840,9 +840,9 @@ def get_form99list(request):
             cmte_id = request.user.username
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
-            print ("[cmte_id]", cmte_id)
-            print ("[viewtype]", viewtype)
-            print ("[reportid]", reportid)
+            # print ("[cmte_id]", cmte_id)
+            # print ("[viewtype]", viewtype)
+            # print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -870,7 +870,7 @@ def get_form99list(request):
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
 
-                print("query_string = ", query_string)
+                # print("query_string = ", query_string)
                 # Pull reports from reports_view
                 #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "","0"]:  
@@ -888,7 +888,7 @@ def get_form99list(request):
     
             json_result = { 'reports': forms_obj}    
         except Exception as e:
-            print (str(e))
+            # print (str(e))
             return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
         #return Response(forms_obj, status=status.HTTP_200_OK)

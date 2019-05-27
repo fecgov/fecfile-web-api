@@ -70,7 +70,7 @@ def check_decimal(value):
 """
 **************************************************** FUNCTIONS - MANDATORY FIELDS CHECK **********************************************************
 """
-def check_mandatory_fields(data, list_mandatory_fields):
+def check_mandatory_fields_SB(data, list_mandatory_fields):
     try:
         error =[]
         for field in list_mandatory_fields:
@@ -225,7 +225,7 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
 """
 def post_schedB(datum):
     try:
-        check_mandatory_fields(datum, list_mandatory_fields_schedB)
+        check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
@@ -283,7 +283,7 @@ def get_schedB(data):
 
 def put_schedB(datum):
     try:
-        check_mandatory_fields(datum, list_mandatory_fields_schedB)
+        check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
         transaction_id = datum.get('transaction_id')
         check_transaction_id(transaction_id)
         flag = False
