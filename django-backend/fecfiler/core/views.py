@@ -326,13 +326,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
     except Exception:
         raise
 
@@ -473,6 +473,7 @@ def post_reports(data):
         form_type = data.get('form_type')
         cvg_start_dt = data.get('cvg_start_dt')
         cvg_end_dt = data.get('cvg_end_dt')
+        due_dt = data.get('due_dt')
         if cvg_start_dt is None:
             raise Exception('The cvg_start_dt is null.')
         if cvg_end_dt is None:
@@ -486,7 +487,8 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'), data.get('email_1'), data.get('email_2'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -621,6 +623,16 @@ def reports(request):
                 email_2 = check_email(request.data.get('email_2'))
             else:
                 email_2 = None
+
+            if 'additional_email_1' in request.data:
+                additional_email_1 = check_email(request.data.get('additional_email_1'))
+            else:
+                additional_email_1 = None                
+            
+            if 'additional_email_2' in request.data:
+                additional_email_2 = check_email(request.data.get('additional_email_2'))
+            else:
+                additional_email_2 = None
             
             datum = {
                 'cmte_id': request.user.username,
@@ -632,10 +644,13 @@ def reports(request):
                 'state_of_election': check_null_value(request.data.get('state_of_election')),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
+                'due_dt': date_format(request.data.get('due_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
                 'status': f_status,
                 'email_1': email_1,
                 'email_2': email_2,
+                'additional_email_1': additional_email_1,
+                'additional_email_2': additional_email_2,
             }    
             data = post_reports(datum)
             if type(data) is dict:
@@ -3875,7 +3890,7 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
                     
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
                                       FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
                     print("query_string", query_string)

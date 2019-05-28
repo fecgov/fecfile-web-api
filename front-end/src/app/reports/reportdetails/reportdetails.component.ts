@@ -630,7 +630,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Clone the report selected by the user.
    *
-   * @param trx the Report to clone
+   * @param report the Report to clone
    */
   public cloneReport(): void {
     alert('Clone report is not yet supported');
@@ -640,7 +640,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Link the report selected by the user.
    *
-   * @param trx the Report to link
+   * @param report the Report to link
    */
   public linkReport(): void {
     alert('Link requirements have not been finalized');
@@ -650,7 +650,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * View the report selected by the user.
    *
-   * @param trx the Report to view
+   * @param report the Report to view
    */
   public viewReport(): void {
     alert('View report is not yet supported');
@@ -660,7 +660,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Edit the report selected by the user.
    *
-   * @param trx the Report to edit
+   * @param report the Report to edit
    */
   public editReport(report:reportModel): void {
 
@@ -684,13 +684,15 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this._ReportsService.getReportInfo(report.form_type, report.report_id)
       .subscribe((res: form3xReportTypeDetails) => {
         console.log("getReportInfo res =", res)
-        localStorage.setItem('form_3X_details', JSON.stringify(res));
+        localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+        localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
         //return false;
       });
       console.log(new Date().toISOString());
       setTimeout(() => 
       {
-        this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_1'} });
+        this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_2'} });
         console.log(new Date().toISOString());
       },
       1500);

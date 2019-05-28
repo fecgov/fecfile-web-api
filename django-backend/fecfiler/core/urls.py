@@ -29,7 +29,4 @@ urlpatterns = [
     url(r'^core/create_f3x_reattribution_json_file$', views.create_f3x_reattribution_json_file, name='create_f3x_reattribution_json_file'),
     url(r'^core/create_inkind_bitcoin_f3x_json_file$', views.create_inkind_bitcoin_f3x_json_file, name='create_inkind_bitcoin_f3x_json_file'),
     url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
-  
-
-
 ]
