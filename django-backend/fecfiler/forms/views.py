@@ -31,6 +31,7 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
+#import datetime as dt
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
@@ -839,9 +840,9 @@ def get_form99list(request):
             cmte_id = request.user.username
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
-            print ("[cmte_id]", cmte_id)
-            print ("[viewtype]", viewtype)
-            print ("[reportid]", reportid)
+            # print ("[cmte_id]", cmte_id)
+            # print ("[viewtype]", viewtype)
+            # print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -869,7 +870,7 @@ def get_form99list(request):
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
 
-                print("query_string = ", query_string)
+                # print("query_string = ", query_string)
                 # Pull reports from reports_view
                 #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "","0"]:  
@@ -887,7 +888,7 @@ def get_form99list(request):
     
             json_result = { 'reports': forms_obj}    
         except Exception as e:
-            print (str(e))
+            # print (str(e))
             return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
         #return Response(forms_obj, status=status.HTTP_200_OK)
@@ -1142,7 +1143,7 @@ def save_print_f99(request):
         f99data['committeeId'] = comm_info.committeeid
         f99data['committeeName'] = comm_info.committeename
         f99data['street1'] = comm_info.street1
-        f99data['stree2'] = comm_info.street2
+        f99data['street2'] = comm_info.street2
         f99data['city'] = comm_info.city
         f99data['state'] = comm_info.state
         f99data['zipCode'] = str(comm_info.zipcode)
@@ -1153,11 +1154,12 @@ def save_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+        #f99data['dateSigned'] = '5/15/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
-        f99data['fomrType'] = comm_info.form_type
-        f99data['attachement'] = ''
+        f99data['formType'] = comm_info.form_type
+        f99data['attachement'] = 'X'
         f99data['password'] = "test"
 
         #data_obj['data'] = serializer.data
@@ -1295,7 +1297,7 @@ def update_print_f99(request):
         f99data['committeeId'] = comm_info.committeeid
         f99data['committeeName'] = comm_info.committeename
         f99data['street1'] = comm_info.street1
-        f99data['stree2'] = comm_info.street2
+        f99data['street2'] = comm_info.street2
         f99data['city'] = comm_info.city
         f99data['state'] = comm_info.state
         f99data['zipCode'] = str(comm_info.zipcode)
@@ -1306,11 +1308,12 @@ def update_print_f99(request):
         f99data['treasurerSuffix'] = comm_info.treasurersuffix
         f99data['reason'] = comm_info.reason
         f99data['text'] = comm_info.text
-        #f99data['dateSigned'] = datetime.datetime.now()
+        f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+        #f99data['dateSigned'] = '5/15/2019'
         f99data['email1'] = comm_info.email_on_file
         f99data['email2'] = comm_info.email_on_file_1
-        f99data['fomrType'] = comm_info.form_type
-        f99data['attachement'] = ''
+        f99data['formType'] = comm_info.form_type
+        f99data['attachement'] = 'X'
         f99data['password'] = "test"
 
         #data_obj['data'] = serializer.data
@@ -1585,3 +1588,24 @@ def validate_HTMLtag(strWord):
         return ""  
     except Exception as e:
         return Response("The validate_HTMLtag function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_f99_report_info(request):
+    """
+    Get F99 report details
+    """
+    print("request.query_params.get('reportid')=", request.query_params.get('reportid'))
+    try:
+        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
+            print("you are here1")
+            if int(request.query_params.get('reportid'))>=1:
+                print("you are here2")
+                id_comm = CommitteeInfo()
+                id_comm.id = request.query_params.get('reportid')
+                #comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, id=request.query_params.get('reportid')).last()
+                serializer = CommitteeInfoSerializer(comm_info)
+                if comm_info:
+                    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    except CommitteeInfo.DoesNotExist:
+            return Response({"FEC Error 004":"There is no submitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)

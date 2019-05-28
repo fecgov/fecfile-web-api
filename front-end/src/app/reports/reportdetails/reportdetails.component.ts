@@ -2,20 +2,20 @@ import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } fro
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { UtilService } from 'src/app/shared/utils/util.service';
+import { SortableColumnModel } from '../../shared/services/TableService/sortable-column.model';
+import { TableService } from '../../shared/services/TableService/table.service';
+import { UtilService } from '../../shared/utils/util.service';
 import { ActiveView } from '../reportheader/reportheader.component';
 import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-//import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
 import { GetReportsResponse } from '../../reports/service/report.service';
 import { reportModel } from '../model/report.model';
 import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
-
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { form99, form3XReport, form99PrintPreviewResponse, form3xReportTypeDetails} from '../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'app-reportdetails',
@@ -139,6 +139,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
+    private _activatedRoute: ActivatedRoute,
+    private _router: Router
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -150,12 +152,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription = this._reportsMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
         (filters: ReportFilterModel) => {
-          console.log("getDoKeywordFilterSearchMessage ", filters);  
           if (filters) {
-            console.log("keywordFilterSearchSubscription filters=", filters);
             this.filters = filters;
-            console.log(" keywordFilterSearchSubscription this.filters = ",  this.filters);
-
             if (filters.formType) {
               this.formType = filters.formType;
             }
@@ -200,7 +198,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
-    console.log ("Report Detais ngOnDestroy...");
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
@@ -284,20 +281,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the reports to get
 	 */
 	public getReportsPage(page: number) : void {
-    console.log(" accessing getReportsPage ...");
 
     this.config.currentPage = page;
 
     const sortedCol: SortableColumnModel =
     this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
-    
-    console.log("this.formType", this.formType);
-    console.log("page", page);
-    console.log("this.config.itemsPerPage", this.config.itemsPerPage);
-    console.log("this.currentSortedColumnName", this.currentSortedColumnName);
-    console.log("sortedCol", sortedCol);
-    console.log("SortableColumnModel", SortableColumnModel);
     console.log("view",this.view);
     console.log("existingReportId",this.existingReportId);
   
@@ -305,28 +294,13 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName, sortedCol.descending,  this.filters, this.existingReportId)
       
       .subscribe((res: GetReportsResponse) => {
-        console.log("getReportsPage res", res);
-        
-        console.log("getReportsPage res.reports", res.reports);
-
+   
         this.reportsModel = [];
-
         this._ReportsService.mockApplyFilters(res, this.filters);
-
-        console.log("after filter getReportsPage res", res);
-        console.log("after filter getReportsPage res.reports", res.reports);
-        
-        //const reportsModel = this._ReportsService.mapFromServerFields(res,
-          //this.reportsModel);  
-        
         const reportsModelL = this._ReportsService.mapFromServerFields(res.reports);
-        console.log("reportsModelL= ", reportsModelL);
-        //this._ReportsService.mockApplyFilters( this.reportsModel, this.filters);
-
         console.log(" getReportsPage reportsModelL", reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
-
         this.reportsModel = this._ReportsService.sortReports(
           reportsModelL, this.currentSortedColumnName, sortedCol.descending);
         
@@ -656,7 +630,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Clone the report selected by the user.
    *
-   * @param trx the Report to clone
+   * @param report the Report to clone
    */
   public cloneReport(): void {
     alert('Clone report is not yet supported');
@@ -666,7 +640,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Link the report selected by the user.
    *
-   * @param trx the Report to link
+   * @param report the Report to link
    */
   public linkReport(): void {
     alert('Link requirements have not been finalized');
@@ -676,7 +650,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * View the report selected by the user.
    *
-   * @param trx the Report to view
+   * @param report the Report to view
    */
   public viewReport(): void {
     alert('View report is not yet supported');
@@ -686,10 +660,43 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Edit the report selected by the user.
    *
-   * @param trx the Report to edit
+   * @param report the Report to edit
    */
-  public editReport(): void {
-    alert('Edit report is not yet supported');
+  public editReport(report:reportModel): void {
+
+    if (report.form_type==='F99'){
+      this._ReportsService.getReportInfo(report.form_type, report.report_id)
+      .subscribe((res: form99) => {
+        console.log("getReportInfo res =", res)
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => 
+      {
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1'} });  
+        console.log(new Date().toISOString());
+      },
+      1500);
+
+    }
+    else if (report.form_type==='F3X'){
+      this._ReportsService.getReportInfo(report.form_type, report.report_id)
+      .subscribe((res: form3xReportTypeDetails) => {
+        console.log("getReportInfo res =", res)
+        localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+        localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => 
+      {
+        this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_2'} });
+        console.log(new Date().toISOString());
+      },
+      1500);
+    }
   }
 
 
@@ -958,7 +965,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
-    console.log (" applyFiltersCache filtersJson=", filtersJson);
     if (filtersJson != null) {
       this.filters = JSON.parse(filtersJson);
     } else {
@@ -1011,8 +1017,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private applyCurrentPageCache(key: string) {
     const currentPageCache: string =
       localStorage.getItem(key);
-
-      console.log("applyCurrentPageCache... key =", key);
     if (this._utilService.isNumber(currentPageCache)) {
       this.config.currentPage = this._utilService.toInteger(currentPageCache);
     } else {
@@ -1026,10 +1030,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * component's class variables.
    */
   private setCachedValues() {
-    console.log (" setCachedValues this.tableType = ", this.tableType)
+
     switch (this.tableType) {
       case this.reportsView:
-        console.log("setCachedValues ...");
+
         this.setCacheValuesforView(this.reportSortableColumnsLSK,
           this.reportCurrentSortedColLSK, this.reportPageLSK);
         break;
@@ -1058,7 +1062,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
 
-    console.log("setCacheValuesforView this.filters ...", this.filters) ;
+
     // shared between trx and recycle tables
     localStorage.setItem(this.filtersLSK,
       JSON.stringify(this.filters));
@@ -1095,7 +1099,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }*/
 
-    console.log (" setSortableColumns this.sortableColumns = ", this.sortableColumns);
+
   }
 
 

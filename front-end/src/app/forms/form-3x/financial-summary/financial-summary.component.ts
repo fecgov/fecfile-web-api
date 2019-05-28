@@ -6,7 +6,8 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'f3x-financial-summary',
   templateUrl: './financial-summary.component.html',
-  styleUrls: ['./financial-summary.component.scss']
+  styleUrls: ['./financial-summary.component.scss'],
+  providers: [NgbTooltipConfig]
 })
 export class FinancialSummaryComponent implements OnInit {
 

@@ -26,6 +26,7 @@
           }
         }
         .dropdown-menu {
+          min-width: 0px !important;
           &.show {
             .dropdown-item {
               &:focus,
@@ -118,6 +119,7 @@
                           background-color: $seaShell !important;
                         }
                         .child-options-label {
+                          font-family: $mainFontFamily;
                           padding-left: 10px;
                         }
                       }
@@ -131,7 +133,7 @@
       } // .content
     } // section
     footer {
-      bottom: 0;
+      //bottom: 0;
       position: relative;
       width: 100%;
       .forms__btn-container {

@@ -48,7 +48,7 @@
         </div>
         <div class="grid-row info-row">
           <div class="grid-row__col grid-row__col--9 text-left">
-            <strong class="label">Text*</strong>
+            <label><strong>Text*</strong></label>
             <ng-template #tipContent1>
               Please note that if you copy and paste text into the text box the formatting may be lost. The text box is
               only for composing a message or letter. The text box does feature basic formatting. If you need to include
@@ -302,8 +302,8 @@
               submit a C-1 Loan Agreement. Please note that if you have more than one PDF attachment, you will need to
               merge them into a single PDF.
             </ng-template>
-            <h4>
-              File Attachment
+            <label>
+              <strong>File Attachment</strong>
               <button
                 type="button"
                 class="btn btn-info"
@@ -317,7 +317,7 @@
                 <i class="info-icon" aria-hidden="true"></i>
                 <span class="sr-only">Click here for more information</span>
               </button>
-            </h4>
+            </label>
             <div class="file-upload-container border-bottom" *ngIf="file === null">
               <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
             </div>
@@ -369,9 +369,6 @@
             </button>
           </div>
         </div>
-      </div>
-      <div class="grid-row">
-        <h4 class="grid-row__col grid-row__col--12">* = Required</h4>
       </div>
     </footer>
   </form>

@@ -81,7 +81,6 @@ private readonly filtersLSK = 'reports.filters';
         .params
         .subscribe( params => {
           this.existingReportId = params.reportId;
-          console.log("parameters found...")
        });
     this.existingReportId = localStorage.getItem('Existing_Report_id');
     if (this.existingReportId !== "") {
@@ -96,7 +95,7 @@ private readonly filtersLSK = 'reports.filters';
     // If the filter was open on the last visit in the user session, open it.
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
 
-    console.log("filtersJson =", filtersJson)
+ 
     let filters: ReportFilterModel;
     if (filtersJson != null) {
       filters = JSON.parse(filtersJson);
@@ -116,7 +115,7 @@ private readonly filtersLSK = 'reports.filters';
   }
 
   private showFilter() : void {
-    console.log("In showFilter() ...!");
+
     if (this.showSideBar){
         this.showSideBar=false;
     } else
@@ -133,7 +132,6 @@ private readonly filtersLSK = 'reports.filters';
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
-    console.log(" Report Header ngOnDestroy ...")
     this.applyFiltersSubscription.unsubscribe();
   }
 
@@ -142,7 +140,6 @@ private readonly filtersLSK = 'reports.filters';
    * Search reports.
    */
   public search() {
-    console.log("in search() ...!");
     // Don't allow more than 12 filters
     if (this.searchTextArray.length > 12) {
       return;
@@ -201,7 +198,7 @@ private readonly filtersLSK = 'reports.filters';
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
-    console.log(" Report header showPinColumns ...");
+
     this.showreports();
     this._reportsMessageService.sendShowPinColumnMessage('show the Pin Col');
   }

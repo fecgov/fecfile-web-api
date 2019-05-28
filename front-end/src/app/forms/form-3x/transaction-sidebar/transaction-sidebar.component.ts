@@ -1,15 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output,ViewEncapsulation } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-
+import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 
 @Component({
   selector: 'transaction-sidebar',
   templateUrl: './transaction-sidebar.component.html',
   styleUrls: ['./transaction-sidebar.component.scss'],
-  providers: [NgbTooltipConfig]
+  providers: [NgbTooltipConfig],
+  encapsulation: ViewEncapsulation.None
 })
 export class TransactionSidebarComponent implements OnInit {
 

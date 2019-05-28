@@ -1,7 +1,4 @@
-<div
-  class="app-container"
-  [ngClass]="{'active': showSideBar}"
->
+<div class="app-container" [ngClass]="{ active: showSideBar }">
   <div class="app__top">
     <nav class="navbar py-0 navbar-expand-lg">
       <div class="navbar-brand app__top-logo">
@@ -25,16 +22,20 @@
       <div
         class="collapse navbar-collapse app__top-nav"
         id="navbarSupportedContent"
-        [ngClass]="{ 'toggleMenuStyle' : toggleMenu === true }"
+        [ngClass]="{ toggleMenuStyle: toggleMenu === true }"
       >
-        <app-header></app-header>
+        <div class="form-group ml-1 mt-2">
+          <input type="text" name="search" class="form-control-sm" placeholder="Search for..." />
+          <i class="search-icon" aria-hidden="true"></i>
+        </div>
+        <app-header class="container"></app-header>
       </div>
     </nav>
   </div>
   <div class="app__side-nav">
-    <app-sidebar (status)='onNotify($event)'></app-sidebar>
+    <app-sidebar (status)="onNotify($event)"></app-sidebar>
   </div>
- <main>
+  <main>
     <div class="app__content-wrapper">
       <div class="app__committee-info">
         <div class="float-left">
@@ -48,15 +49,12 @@
         <div class="float-right">
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
-              Form {{formType}} |  {{formDescription}} |
-              {{formStartDate | date: 'MM/dd/yyyy'}} - {{formEndDate | date: 'MM/dd/yyyy'}}
+              Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
+              {{ formEndDate | date: 'MM/dd/yyyy' }}
             </div>
             <div>
-              Due in {{formDueDate}} days
-              <a
-                class="btn btn-link btn-edit"
-                (click)="editFrom()"
-              >
+              Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              <a class="btn btn-link btn-edit" (click)="editFrom()">
                 <i class="edit-icon" aria-hidden="true"></i>
                 <span class="sr-only">Click to edit date.</span>
               </a>
@@ -74,39 +72,37 @@
       <div class="contact-info">
         <div class="contact-info__item">
           <h6>
-            <strong>Federal Election Commission</strong>
-            <br>
-            <address>1050 First Street NE, Washington DC, 20002
-            <br>
-            <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
+            <label>Federal Election Commission</label>
+            <br />
+            <address>
+              1050 First Street NE, Washington DC, 20002
+              <br />
+              <a href="https://fec.gov/contact" target="_blank">fec.gov/contact</a>
             </address>
           </h6>
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>Main Office</strong>
-            <br>
+            <label>Main Office</label>
+            <br />
             <address>
               (202) 694-1000
             </address>
-            <br>
+            <br />
           </h6>
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>
-              <br>
+            <label>
               RAD Analyst,
               {{ radAnalystInfo?.first_name }}
               {{ radAnalystInfo?.last_name }}
-            </strong>
-            <br>
+            </label>
+            <br />
             <address>
-              <ng-container *ngIf="radAnalystInfo">
-                (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }}
-              </ng-container>
-              <br>
-              <ng-container >
+              <ng-container *ngIf="radAnalystInfo"> (202) 694-1000 x{{ radAnalystInfo?.telephone_ext }} </ng-container>
+              <br />
+              <ng-container>
                 <a href="https://www.fec.gov/help-candidates-and-committees/question-rad/" target="_blank">
                   Find & contact your committee's analyst
                 </a>
@@ -116,8 +112,8 @@
         </div>
         <div class="contact-info__item">
           <h6>
-            <strong>Tech Support</strong>
-            <br>
+            <label>Tech Support</label>
+            <br />
             <address>
               (202) 694-1307
             </address>
@@ -126,13 +122,10 @@
             </a>
           </h6>
         </div>
-      </div> <!-- ./contact-info -->
+      </div>
+      <!-- ./contact-info -->
       <div class="legal-disclaimer">
-        <button
-          type="button"
-          class="btn btn-link"
-          (click)="open(legalDisclaimer)"
-        >
+        <button type="button" class="btn btn-link" (click)="open(legalDisclaimer)">
           Legal Disclaimer
         </button>
         <ng-template #legalDisclaimer let-d="dismiss">
@@ -143,20 +136,18 @@
           </div>
           <div class="modal-body">
             <p>
-              Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent statement or representation to a federal
-              government agency, including the Federal Election Commission, is punishable under the provisions of 18 U.S.C. § 1001. The Commission may report
-              apparent violations to the appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
+              Please be advised that knowingly and willfully making any materially false, fictitious, or fraudulent
+              statement or representation to a federal government agency, including the Federal Election Commission, is
+              punishable under the provisions of 18 U.S.C. § 1001. The Commission may report apparent violations to the
+              appropriate law enforcement authorities. 52 U.S.C. § 30107(a)(9).
             </p>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-dark"
-              (click)="d('Close click')"
-            >Close</button>
+            <button type="button" class="btn btn-outline-dark" (click)="d('Close click')">Close</button>
           </div>
         </ng-template>
       </div>
-    </div> <!-- ./app__footer -->
+    </div>
+    <!-- ./app__footer -->
   </footer>
 </div>

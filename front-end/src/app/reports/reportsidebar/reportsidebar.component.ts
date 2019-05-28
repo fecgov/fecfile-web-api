@@ -277,10 +277,10 @@ export class ReportsidebarComponent implements OnInit {
    * Set the filters.show to true indicating the filters have been altered.
    */
   public applyFilters() {
-    console.log("applyFilters ...!");
+
 
     if (!this.validateFilters()) {
-      console.log(" applyFilters errors infilters ...!");
+
       return;
     }
 
@@ -320,19 +320,15 @@ export class ReportsidebarComponent implements OnInit {
     }
     filters.filterAmendmentIndicators = filterAmendmentIndicators
     
-    console.log("applyFilters filters.filterAmendmentIndicators =", filters.filterAmendmentIndicators);
-
     // Filed Status
     const filterStatuss = [];
     for (const s of this.statuss) {
       if (s.selected) {
-        filterStatuss.push(s.status/*  */);
+        filterStatuss.push(s.status_cd/*  */);
         modified = true;
       }
     }
     filters.filterStatuss =filterStatuss;
-
-    console.log("applyFilters filters.filterStatuss =", filters.filterStatuss);
 
     filters.filterCvgDateFrom = this.filterCvgDateFrom;
     filters.filterCvgDateTo = this.filterCvgDateTo;
@@ -353,7 +349,6 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
 
-    console.log("filter dates ")
     filters.show = modified;
     console.log("applyFilters filters = ", filters)
     this._reportsMessageService.sendApplyFiltersMessage(filters);
@@ -415,14 +410,14 @@ export class ReportsidebarComponent implements OnInit {
 
 
   private getForms() {
-    //console.log(" In getForms Report Data received... !");
+ 
     // TODO using this service to get forms until available in another API.
     this._reportsService
       .getFormTypes()
         .subscribe(res => {
           let formsExist = false;
           if (res) {
-             console.log("getForms Data received...res !", res);
+
              formsExist = true;
               for (const s of res) {
                 // check for forms selected in the filter cache
@@ -439,23 +434,19 @@ export class ReportsidebarComponent implements OnInit {
           }
           if (formsExist) {
             this.forms = res;
-            console.log("Report this.forms = ", this.forms);
           } else {
             this.forms = [];
-            console.log("Report this.forms = ", this.forms);
           }
         });
   }
 
   private getReports() {
-    console.log(" In getReports Report Data received... !");
     // TODO using this service to get reports until available in another API.
     this._reportsService
       .getReportTypes()
         .subscribe(res => {
           let reportsExist = false;
           if (res) {
-            console.log("Report Data received... !");
              reportsExist = true;
               for (const s of res) {
                 // check for reports selected in the filter cache
@@ -472,23 +463,20 @@ export class ReportsidebarComponent implements OnInit {
           }
           if (reportsExist) {
             this.reports = res;
-            console.log("Report this.reports = ", this.reports);
           } else {
             this.reports = [];
-            console.log("Report this.reports = ", this.reports);
           }
         });
   }
  
   private getStatuss() {
-    console.log(" In getStatuss Report Data received... !");
     // TODO using this service to get reports until available in another API.
     this._reportsService
       .getStatuss()
         .subscribe(res => {
           let StatussExist = false;
           if (res.data) {
-            console.log("Report Data received... !");
+
             StatussExist = true;
               for (const s of res.data) {
                 // check for reports selected in the filter cache
@@ -505,23 +493,20 @@ export class ReportsidebarComponent implements OnInit {
           }
           if (StatussExist) {
             this.statuss = res.data;
-            console.log("Report this.statuss = ", this.statuss);
-          } else {
+           } else {
             this.statuss = [];
-            console.log("Report this.statuss = ", this.statuss);
           }
         });
   }
 
   private getAmendmentIndicators() {
-    console.log(" In getAmendmentIndicators Report Data received... !");
+
     // TODO using this service to get reports until available in another API.
     this._reportsService
       .getAmendmentIndicators()
         .subscribe(res => {
           let amendmentindicatorsExist = false;
           if (res.data) {
-            console.log("Report Data received... !");
               amendmentindicatorsExist = true;
               for (const s of res.data) {
                 // check for reports selected in the filter cache
@@ -538,10 +523,10 @@ export class ReportsidebarComponent implements OnInit {
           }
           if (amendmentindicatorsExist) {
             this.amendmentindicators = res.data;
-            console.log("Report this.amendmentindicators = ", this.amendmentindicators);
+
           } else {
             this.amendmentindicators = [];
-            console.log("Report this.amendmentindicators = ", this.amendmentindicators);
+  
           }
         });
   }
@@ -553,8 +538,6 @@ export class ReportsidebarComponent implements OnInit {
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
 
-    console.log("applyFiltersCache ...!");
-    console.log("applyFiltersCache filtersJson = ", filtersJson);
 
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
@@ -579,10 +562,6 @@ export class ReportsidebarComponent implements OnInit {
         this.filterStatus = this.cachedFilters.filterStatus;
         this.filterAmendmentIndicator = this.cachedFilters.filterAmendmentIndicator;*/
 
-        console.log("applyFiltersCache this.filterForm =", this.filterForms);
-        console.log("applyFiltersCache this.filterReport =", this.filterReports);
-        console.log("applyFiltersCache this.filterStatus =", this.filterStatuss);
-        console.log("applyFiltersCache this.filterAmendmentIndicator =", this.filterAmendmentIndicators);
       }
     } else {
       // Just in case cache has an unexpected issue, use default.

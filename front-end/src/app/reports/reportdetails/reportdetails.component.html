@@ -80,7 +80,7 @@
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
                 <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
-                <td *ngIf="isColumnVisible('amend_ind')">{{report.amend_ind}}</td>
+                <td *ngIf="isColumnVisible('amend_ind')"></td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}</td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy') : (report.last_update_date| date: 'MM/dd/yyyy')}}</td>
@@ -164,7 +164,6 @@
             </tr>
         </tbody>
     </table>
-    <hr/> 
     <div *ngIf="showPagination()" 
         class="d-flex justify-content-center Report-table-pagination-container">
         <pagination-controls [id]="config.id"

@@ -13,6 +13,7 @@ import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { ActiveView } from '../reportheader/reportheader.component';
 
+
 export interface GetReportsResponse {
   reports: reportModel[];
 }
@@ -148,11 +149,8 @@ export class ReportsService {
   
   params = params.append('view', view);
   params = params.append('reportId', reportId.toString());
-  console.log("reportId =", reportId.toString());
 
   console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-  console.log("httpOptions",httpOptions)
-  console.log("params",params);
   
   return this._http
   .get(
@@ -170,9 +168,7 @@ export class ReportsService {
    * Map server fields from the response to the model.
    */
   public mapFromServerFields(serverData: any) {
-    console.log(" mapFromServerFields serverData = ", serverData);
     if (!serverData || !Array.isArray(serverData)) {
-      console.log(" no server data mapFromServerFields  serverData", serverData);
       return;
     }
 
@@ -192,7 +188,7 @@ export class ReportsService {
       model.filed_date = row.filed_date;
       modelArray.push(model);
     }
-    console.log(" mapFromServerFields  modelArray", modelArray);
+
     return modelArray;
   }
 
@@ -204,12 +200,8 @@ export class ReportsService {
    */
   public sortReports(array: any, sortColumnName: string, descending: boolean) {
 
-    console.log("sortTransactions array =", array);
-    console.log("sortTransactions sortColumnName =", sortColumnName);
-    console.log("sortTransactions descending =", descending);
     const direction = descending ? -1 : 1;
     this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
-    console.log("sortTransactions array= ", array);
     return array;
       
   }
@@ -237,9 +229,6 @@ export class ReportsService {
    */
   public mockApplyFilters(response: any, filters: ReportFilterModel){
 
-    console.log(" Reports mockApplyFilters filters...", filters);
-    console.log(" Reports mockApplyFilters response...", response);
-
     if (!response) {
       return;
     }
@@ -250,9 +239,6 @@ export class ReportsService {
 
     let isFilter = false;
 
-    
-    console.log(" Reports mockApplyFilters filters.filterForms =", filters.filterForms)
-    
     if (filters.filterForms) {
        if (filters.filterForms.length > 0) {
         isFilter = true;
@@ -311,7 +297,6 @@ export class ReportsService {
 
 
     if (filters.filterCvgDateFrom && filters.filterCvgDateTo) {
-      console.log("coverage dates validation...");
       const cvgFromDate = new Date(filters.filterCvgDateFrom);
       const cvgToDate = new Date(filters.filterCvgDateTo);
       const filteredCvgDateArray = [];
@@ -348,21 +333,18 @@ export class ReportsService {
       response.reports = filteredCvgDateArray;
     }
 
-    //{{report.status === 'Filed'? (report.filed_date|
-    console.log("coverage dates ", filters.filterFiledDateFrom);
-    console.log("coverage dates ", filters.filterFiledDateTo);
-
     if (filters.filterFiledDateFrom && filters.filterFiledDateTo ) {
-      console.log("Filed/Saved dates validation...");
-      const filedFromDate = new Date(filters.filterFiledDateFrom);
-      const filedToDate = new Date(filters.filterFiledDateTo);
+      const filedFromDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateFrom));
+      const filedToDate =  this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
-        console.log("rep.status =", rep.status);
+
         if (rep.status==='Filed') {
           if (rep.filed_date) {
-            console.log("coverage dates2");
-            const repDate = new Date(rep.filed_date);
+            let d= new Date(rep.filed_date);
+            d.setUTCHours(0,0,0,0);
+            const repDate =  this.getDateMMDDYYYYformat(d);
+
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
@@ -373,8 +355,10 @@ export class ReportsService {
         }
         else if (rep.status==='Saved') {
           if (rep.last_update_date) {
-            console.log("coverage dates2");
-            const repDate = new Date(rep.last_update_date);
+            //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
+            let d= new Date(rep.last_update_date);
+            d.setUTCHours(0,0,0,0);
+            const repDate =  this.getDateMMDDYYYYformat(d);
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             }
@@ -394,5 +378,44 @@ export class ReportsService {
 
     
   }
+  private getDateMMDDYYYYformat(dateValue:Date):string{
+    var year = dateValue.getUTCFullYear()+"";
+    var month = (dateValue.getUTCMonth()+1)+"";
+    var day = dateValue.getUTCDate()+"";
+    return month + day  +year;
+  }
+  
+  public getReportInfo(form_type: string, report_id: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+    let url: string = '';
+    
+    
+    console.log("form_type =",form_type);
+    console.log("report_id =",report_id);
 
+    if (form_type==='F99'){
+      url = '/f99/get_f99_report_info';
+    } else if (form_type==='F3X'){
+      url = '/core/get_report_info';
+    }
+    
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    //params = params.append('committeeid', committee_id);
+    params = params.append('reportid', report_id);
+    console.log ("params =", params);
+    console.log("${environment.apiUrl}${url} =",`${environment.apiUrl}${url}`);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          params
+        }
+      )
+  }
 }
