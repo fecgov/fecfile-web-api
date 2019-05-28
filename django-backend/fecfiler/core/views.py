@@ -27,6 +27,8 @@ from django.core.paginator import Paginator
 # Create your views here.
 
 logger = logging.getLogger(__name__)
+# aws s3 bucket connection
+conn = boto.connect_s3()
 
 class NoOPError(Exception):
     def __init__(self, *args, **kwargs):
@@ -61,7 +63,7 @@ def get_filed_report_types(request):
                 forms_obj.append({"report_type":data_row,"rpt_type_desc":data_row[1],"regular_special_report_ind":data_row[2],"rpt_type_info":data_row[3],"cvg_start_date":data_row[4],"cvg_end_date":data_row[5],"due_date":data_row[6]})
                 
         if len(forms_obj)== 0:
-            return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)	                            
+            return Response("No entries were found for this committee", status=status.HTTP_400_BAD_REQUEST)                             
         #for form_obj in forms_obj:
         #    if form_obj['due_date']:
         #        form_obj['due_date'] = form_obj['due_date'].strftime("%m-%d-%Y")
@@ -144,7 +146,6 @@ def get_filed_form_types(request):
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 """
 ********************************************************************************************************************************
 GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA 
@@ -206,12 +207,7 @@ def check_list_cvg_dates(args):
         form_type = args[1]
         cvg_start_dt = args[2]
         cvg_end_dt = args[3]
-        # print("cmte_id =", cmte_id)
-        # print("form_type =", form_type)
-        # print("cvg_start_dt =", cvg_start_dt)
-        # print("cvg_end_dt =", cvg_end_dt)
-
-
+    
         forms_obj = []
         with connection.cursor() as cursor: 
             cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' ORDER BY report_id DESC", [cmte_id, form_type])
@@ -219,14 +215,14 @@ def check_list_cvg_dates(args):
             if len(args) == 4:
                 for row in cursor.fetchall():
                     if not(row[1] is None or row[2] is None):
-                        if (row[2] <= cvg_end_dt and row[1] >= cvg_start_dt):
+                        if ( cvg_end_dt <= row[2]  and  cvg_start_dt >= row[1] ) :
                             forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2],"report_type":row[3]})
 
             if len(args) == 5:
                 report_id = args[4]
                 for row in cursor.fetchall():
                     if not(row[1] is None or row[2] is None):
-                        if ((row[2] <= cvg_end_dt and row[1] >= cvg_start_dt) and row[0] != int(report_id)):
+                        if ((cvg_end_dt <= row[2]  and  cvg_start_dt >= row[1]) and row[0] != int(report_id)):
                             forms_obj.append({"report_id":row[0],"cvg_start_date":row[1],"cvg_end_date":row[2],"report_type":row[3]})
 
         return forms_obj
@@ -1083,7 +1079,6 @@ def search_entities(request):
 
         query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
-        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
             for row in cursor.fetchall():
@@ -1097,7 +1092,7 @@ def search_entities(request):
     except Exception as e:
         return Response("The search_entities API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
-************************* *****************************************************************************************************
+*****************************************************************************************************************************
 END - SEARCH ENTITIES API - CORE APP
 ******************************************************************************************************************************
 """
@@ -1129,11 +1124,12 @@ def create_json_file(request):
             k.content_type = "application/json"
             data_obj = {}
             data_obj['header'] = header
+
             f99data = {}
             f99data['committeeId'] = comm_info.committeeid
             f99data['committeeName'] = comm_info.committeename
             f99data['street1'] = comm_info.street1
-            f99data['stree2'] = comm_info.street2
+            f99data['street2'] = comm_info.street2
             f99data['city'] = comm_info.city
             f99data['state'] = comm_info.state
             f99data['zipCode'] = str(comm_info.zipcode)
@@ -1144,46 +1140,18 @@ def create_json_file(request):
             f99data['treasurerSuffix'] = comm_info.treasurersuffix
             f99data['reason'] = comm_info.reason
             f99data['text'] = comm_info.text
-            #f99data['dateSigned'] = datetime.datetime.now()
+            f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+            #f99data['dateSigned'] = '5/15/2019'
             f99data['email1'] = comm_info.email_on_file
             f99data['email2'] = comm_info.email_on_file_1
-            f99data['fomrType'] = comm_info.form_type
-            f99data['attachement'] = ''
+            f99data['formType'] = comm_info.form_type
+            f99data['attachement'] = 'X'
             f99data['password'] = "test"
 
             #data_obj['data'] = serializer.data
             data_obj['data'] = f99data
             k.set_contents_from_string(json.dumps(data_obj))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            
-            """
-            form99_header_string ='{"header": { "version": "8.3","softwareName": "nxg_fec", "softwareVersion": "1.01 Beta", "additionalInfomation": ""   }, "data": {'
-            form99_data_string = '"committeeId": "'+comm_info.committeeid+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"street1": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"stree2": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"city": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            form99_data_string = form99_data_string +'"committeeName": "'+comm_info.committeename+'",'
-            """
 
             tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
             #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
@@ -1191,34 +1159,102 @@ def create_json_file(request):
             print ("url= ", url)
             print ("tmp_filename= ", tmp_filename)
 
-            #vdata['form_type'] = "F99"
-            
-            #vdata['newAmendIndicator'] = comm_info.committeeid
-            #vdata['reportSequence'] = comm_info.committeeid
-            #vdata['emailAddress1'] = comm_info.email_on_file
-            #vdata['fecDataFile'] = comm_info.committeeid
-            #vdata['reportType'] = comm_info.committeeid
-            #vdata['coverageStartDate'] = comm_info.committeeid
-            #vdata['coverageEndDate'] = comm_info.committeeid
-            #vdata['originalFECId'] = comm_info.committeeid
-            #vdata['backDoorCode'] = comm_info.committeeid
-            #vdata['emailAddress2'] = comm_info.email_on_file_1
-            #vdata['fecAttachment'] = comm_info.
-
 
             vdata['wait'] = 'false'
             #print("vdata",vdata)
             json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print("vfiles",vfiles)
 
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            #with open('data.json', 'w') as outfile:
+            #   json.dump(data, outfile, ensure_ascii=False)
+            
+            #obj = open('data.json', 'w')
+            #obj.write(serializer.data)
+            #obj.close
+
+            # variables to be sent along the JSON file in form-data
+            filing_type='FEC'
+            vendor_software_name='FECFILE'
+
+            data_obj = {
+                    'filing_type':filing_type,
+                    'vendor_software_name':vendor_software_name,
+                    'committeeId':comm_info.committeeid,
+                    'password':'test',
+                    'formType':comm_info.form_type,
+                    'newAmendIndicator':'N',
+                    'reportSequence':1,
+                    'emailAddress1':comm_info.email_on_file,
+                    'reportType':comm_info.reason,
+                    'coverageStartDate':None,
+                    'coverageEndDate':None,
+                    'originalFECId':None,
+                    'backDoorCode':None,
+                    'emailAddress2': comm_info.email_on_file_1,
+                    'wait':False
+                }
+
+            print(data_obj)
+            
+            if not (comm_info.file in [None, '', 'null', ' ',""]):
+                filename = comm_info.file.name 
+                #print(filename)
+                myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
+                #myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+                #print(myurl)
+                myfile = urllib.request.urlopen(myurl)
+
+                #s3 = boto3.client('s3')
+
+                #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+
+                #attachment = open(file_object['Body'], 'rb')
+
+        
+                file_obj = {
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                    'fecAttachment': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+                }
+    
+                """
+                    # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+                    # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+                    printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+                    if not printresp.ok:
+                        return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        #dictcreate = createresp.json()
+                        dictprint = printresp.json()
+                        merged_dict = {**update_json_data, **dictprint}
+                        #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+                        return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                        #return Response(printresp.json(), status=status.HTTP_201_CREATED)
+                else:
+                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+                """
+            print(file_obj)
+            #res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=file_obj)
+            #mahi asked to changed on 05/17/2019
+            res = requests.post("https://" +  settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+
             #import ipdb; ipdb.set_trace()
-            #print(res.text)
+            print(res.text)
             return Response(res.text, status=status.HTTP_200_OK)
             #return Response("successful", status=status.HTTP_200_OK)
-            
+            if not res.ok:
+                return Response(res.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                #dictcreate = createresp.json()
+                dictprint = res.json()
+                merged_dict = {**update_json_data, **dictprint}
+                #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                #return Response(printresp.json(), status=status.HTTP_201_CREATED)
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -1227,6 +1263,324 @@ def create_json_file(request):
     except Exception as e:
         return Response("The create_json_file API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+"""
+
+******************************************************************************************************************************
+Generate Expenditures data Json file API - CORE APP - SPRINT 12 - FNE 769  - BY YESWANTH KUMAR TELLA
+******************************************************************************************************************************
+"""
+
+def get_entity_expenditure_id(report_id, cmte_id):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date
+                       FROM public.sched_b WHERE report_id = %s AND cmte_id = %s""" 
+        #AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+
+        with connection.cursor() as cursor:
+            # import pdb;pdb.set_trace()
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                for d in forms_obj:
+                    for i in d:
+                        if not d[i]:
+                            d[i] = ''
+        if forms_obj is []:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+def get_summary_dict(form3x_header_data):
+    form3x_data_string ='{'
+    form3x_data_string = form3x_data_string + '"cashOnHandYYYY": 2019,'
+    form3x_data_string = form3x_data_string + '"colA": {'
+    form3x_data_string = form3x_data_string + '"6b_cashOnHandBeginning": '+ str(form3x_header_data['coh_bop']) + ','
+    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data['ttl_receipts_sum_page_per']) + ','
+    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data['subttl_sum_page_per']) + ','
+    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data['ttl_disb_sum_page_per']) + ','
+    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data['coh_cop']) + ','
+    form3x_data_string = form3x_data_string + '"9_debtsTo":'+ str(form3x_header_data['debts_owed_to_cmte']) + ','
+    form3x_data_string = form3x_data_string + '"10_debtsBy":'+ str(form3x_header_data['debts_owed_by_cmte']) + ','
+    form3x_data_string = form3x_data_string + '"11ai_Itemized":'+ str(form3x_header_data['indv_item_contb_per']) + ','
+    form3x_data_string = form3x_data_string + '"11aii_Unitemized":'+ str(form3x_header_data['indv_unitem_contb_per']) + ','
+    form3x_data_string = form3x_data_string + '"11aiii_Total":'+ str(form3x_header_data['ttl_indv_contb']) + ','
+    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_per_i']) + ','
+    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data['other_pol_cmte_contb_per_i']) + ','
+    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data['ttl_contb_col_ttl_per']) + ','
+    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_from_affiliated_pty_per']) + ','
+    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data['all_loans_received_per']) + ','
+    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data['loan_repymts_received_per']) + ','
+    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data['offsets_to_op_exp_per_i']) + ','
+    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data['fed_cand_contb_ref_per']) + ','
+    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data['other_fed_receipts_per']) + ','
+    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data['tranf_from_nonfed_acct_per']) + ','
+    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data['tranf_from_nonfed_levin_per']) + ','
+    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data['ttl_nonfed_tranf_per']) + ','
+    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data['ttl_receipts_per']) + ','
+    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data['ttl_fed_receipts_per']) + ','
+    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data['shared_fed_op_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data['shared_nonfed_op_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data['other_fed_op_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data['ttl_op_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_to_affliliated_cmte_per']) + ','
+    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data['fed_cand_cmte_contb_per']) + ','
+    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data['indt_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"25_coordinatedExpenditureMadeByPartyCommittees":'+ str(form3x_header_data['coord_exp_by_pty_cmte_per']) + ','
+    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data['loan_repymts_made_per']) + ','
+    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data['loans_made_per']) + ','
+    form3x_data_string = form3x_data_string + '"28a_individualsPersons":'+ str(form3x_header_data['indv_contb_ref_per']) + ','
+    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_per_ii']) + ','
+    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data['other_pol_cmte_contb_per_ii']) + ','
+    form3x_data_string = form3x_data_string + '"28d_totalContributionsRefunds":'+ str(form3x_header_data['ttl_contb_ref_per_i']) + ','
+    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data['other_disb_per']) + ','
+    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_fedShare":'+ str(form3x_header_data['shared_fed_actvy_fed_shr_per']) + ','
+    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFed":'+ str(form3x_header_data['shared_fed_actvy_nonfed_per']) + ','
+    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data['non_alloc_fed_elect_actvy_per']) + ','
+    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data['ttl_fed_elect_actvy_per']) + ','
+    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data['ttl_disb_per']) + ','
+    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data['ttl_fed_disb_per']) + ','
+    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data['ttl_contb_per']) + ','
+    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_per_ii']) + ','
+    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data['net_contb_per']) + ','
+    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data['ttl_fed_op_exp_per']) + ','
+    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data['offsets_to_op_exp_per_ii']) + ','
+    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data['net_op_exp_per'])
+    form3x_data_string = form3x_data_string + '},'
+    form3x_data_string = form3x_data_string + '"colB": {'
+    form3x_data_string = form3x_data_string + '"6a_cashOnHandJan_1":'+ str(form3x_header_data['coh_begin_calendar_yr'])+','
+    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data['ttl_receipts_sum_page_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data['subttl_sum_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data['ttl_disb_sum_page_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data['coh_coy']) + ','
+    form3x_data_string = form3x_data_string + '"11ai_itemized":'+ str(form3x_header_data['indv_item_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"11aii_unitemized":'+ str(form3x_header_data['indv_unitem_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"11aiii_total":'+ str(form3x_header_data['ttl_indv_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_ytd_i']) + ','
+    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data['other_pol_cmte_contb_ytd_i']) + ','
+    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data['ttl_contb_col_ttl_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_from_affiliated_pty_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data['all_loans_received_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data['loan_repymts_received_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data['offsets_to_op_exp_ytd_i']) + ','
+    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data['fed_cand_cmte_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data['other_fed_receipts_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data['tranf_from_nonfed_acct_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data['tranf_from_nonfed_levin_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data['ttl_nonfed_tranf_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data['ttl_receipts_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data['ttl_fed_receipts_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data['shared_fed_op_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data['shared_nonfed_op_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data['other_fed_op_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data['ttl_op_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_to_affilitated_cmte_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data['fed_cand_cmte_contb_ref_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data['indt_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"25_coordinatedExpendituresMadeByPartyCommittees":'+ str(form3x_header_data['coord_exp_by_pty_cmte_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data['loan_repymts_made_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data['loans_made_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"28a_individualPersons":'+ str(form3x_header_data['indv_contb_ref_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_ytd_ii']) + ','
+    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data['other_pol_cmte_contb_ytd_ii']) + ','
+    form3x_data_string = form3x_data_string + '"28d_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_ytd_i']) + ','
+    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data['other_disb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_federalShare":'+ str(form3x_header_data['shared_fed_actvy_fed_shr_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFederal":'+ str(form3x_header_data['shared_fed_actvy_nonfed_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data['non_alloc_fed_elect_actvy_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data['ttl_fed_elect_actvy_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data['ttl_disb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data['ttl_fed_disb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data['ttl_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_ytd_ii']) + ','
+    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data['net_contb_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data['ttl_fed_op_exp_ytd']) + ','
+    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data['offsets_to_op_exp_ytd_ii']) + ','
+    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data['net_op_exp_ytd'])
+    form3x_data_string = form3x_data_string + '}'
+    form3x_data_string = form3x_data_string + '}'
+    return form3x_data_string
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                    FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = []
+        #committee_info_dict = {}
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is []:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        else:
+            forms_obj = forms_obj[0]
+            committee_info_dict = {}
+            committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+            committee_info_dict['committeeName'] = forms_obj['cmte_name']
+            committee_info_dict['street1'] = forms_obj['street_1']
+            committee_info_dict['street2'] = forms_obj['street_2']
+            committee_info_dict['city'] = forms_obj['city']
+            committee_info_dict['state'] = forms_obj['state']
+            committee_info_dict['zipCode'] = forms_obj['zip_code']
+            committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+            committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+            committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+            committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+            committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+# def get_list_report(report_id, cmte_id):
+#     try:
+#         query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+#                      FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+#         forms_obj = None
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+#             for row in cursor.fetchall():
+#                 data_row = list(row)
+#                 forms_obj=data_row[0]
+#         if forms_obj is []:
+#             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+#         return forms_obj
+#     except Exception:
+#         raise
+
+@api_view(["POST"])
+def create_f3x_expenditure_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        # import ipdb;ipdb.set_trace()
+        report_id = request.POST.get('report_id')
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            response_expenditure_receipt_list = []
+            # form3x_header_data= get_f3x_report_data(committeeid, report_id)
+            for f3_i in f_3x_list:
+                #response_dict_out = {}
+                #response_dict_receipt = {}
+                print (f3_i['report_id'])
+                entity_id_list = get_entity_expenditure_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}                             
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                        list_entity = list_entity[0]
+                    response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                    response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
+
+                    response_dict_receipt['payeeOrganizationName'] = list_entity['entity_name']
+                    response_dict_receipt['payeeLastName'] = list_entity['last_name']
+                    response_dict_receipt['payeeFirstName'] = list_entity['first_name']
+                    response_dict_receipt['payeeMiddleName'] = list_entity['middle_name']
+                    response_dict_receipt['payeePrefix'] = list_entity['preffix']
+                    response_dict_receipt['payeeSuffix'] = list_entity['suffix']
+                    response_dict_receipt['payeeStreet1 '] = list_entity['street_1']
+                    response_dict_receipt['payeeStreet2'] = list_entity['street_2']
+                    response_dict_receipt['payeeCity'] = list_entity['city']
+                    response_dict_receipt['payeeState'] = list_entity['state']
+                    response_dict_receipt['payeeZip'] = list_entity['zip_code']
+                    response_dict_receipt['expenditureDate'] = entity_obj['expenditure_date'].replace('-','')
+                    response_dict_receipt['expenditureAmount'] = "%.2f" % round(entity_obj['expenditure_amount'],2)
+                    response_dict_receipt['expenditurePurposeDescription'] = entity_obj['expenditure_purpose']
+                    response_dict_receipt['categoryCode'] = '15G'
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+                    # response_expendtiture_out_list.append(response_dict_out)
+                    response_expenditure_receipt_list.append(response_dict_receipt)
+
+            # import ipdb;ipdb.set_trace()$
+            # get_list_entity(entity_id, comm_info.committeeid)
+
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SB':[]}
+            data_obj['data']['Schedule']['SB'] = response_expenditure_receipt_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + '_'+str(report_id)+'.json'
+            vdata = {}
+            # vdata['form_type'] = "F3X"
+            # vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
+            # import ipdb; ipdb.set_trace()
+            return Response('', status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+"""  
+******************************************************************************************************************************
+END - GET ALL TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
 
 """
 **********************************************************************************************************************************************
@@ -1368,6 +1722,7 @@ def get_all_transactions(request):
 
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 """
 *****************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
@@ -1432,7 +1787,6 @@ def get_all_deleted_transactions(request):
             
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
                                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
-        # print(trans_query_string)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
@@ -1457,6 +1811,7 @@ END - GET ALL DELETED TRANSACTIONS API - CORE APP
 """
 ******************************************************************************************************************************
 GET SUMMARY TABLE API - CORE APP - SPRINT 10 - FNE 720 - BY PRAVEEN JINKA
+DISBURSEMENT FUNCTIONALITY ADDED - SPRINT 13 - FNE 1094 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 def check_calendar_year(calendar_year):
@@ -1473,7 +1828,7 @@ def period_receipts_sql(cmte_id, report_id):
             cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
-        raise Exception('The period_receipts_sql API is throwing an error: ' + str(e))
+        raise Exception('The period_receipts_sql function is throwing an error: ' + str(e))
 
 def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
     try:
@@ -1481,7 +1836,125 @@ def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
             cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND contribution_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
             return cursor.fetchall()
     except Exception as e:
-        raise Exception('The calendar_receipts_sql API is throwing an error: ' + str(e))
+        raise Exception('The calendar_receipts_sql function is throwing an error: ' + str(e))
+
+def period_disbursements_sql(cmte_id, report_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The period_disbursements_sql function is throwing an error: ' + str(e))
+
+def calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND expenditure_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The calendar_receipts_sql function is throwing an error: ' + str(e))
+
+def summary_disbursements(args):
+    try:
+        
+        XXIAI_amount = 0
+        XXIAII_amount = 0
+        XXIB_amount = 0
+        XXIC_amount = 0
+        XXII_amount = 0
+        XXIII_amount = 0
+        XXIV_amount = 0
+        XXV_amount = 0
+        XXVI_amount = 0
+        XXVII_amount = 0
+        XXVIIIA_amount = 0
+        XXVIIIB_amount = 0
+        XXVIIIC_amount = 0
+        XXVIIID_amount = 0
+        XXIX_amount = 0
+        XXXAI_amount = 0
+        XXXAII_amount = 0
+        XXXB_amount = 0
+        XXXC_amount = 0
+        XXXI_amount = 0
+        XXXII_amount = 0       
+
+        if len(args) == 2:
+            cmte_id = args[0]
+            report_id = args[1]
+            sql_output = period_disbursements_sql(cmte_id, report_id)
+        else:
+            cmte_id = args[0]
+            calendar_start_dt = args[1]
+            calendar_end_dt = args[2]
+            sql_output = calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt)
+
+        for row in sql_output:
+            data_row = list(row)
+            if data_row[0] == '21AI':
+                XXIAI_amount = XXIAI_amount + data_row[1]
+            if data_row[0] == '21AII':
+                XXIAII_amount = XXIAII_amount + data_row[1]
+            if data_row[0] == '21B':
+                XXIB_amount = XXIB_amount + data_row[1]
+            if data_row[0] == '22':
+                XXII_amount = XXII_amount + data_row[1]
+            if data_row[0] == '23':
+                XXIII_amount = XXIII_amount + data_row[1]
+            if data_row[0] == '24':
+                XXIV_amount = XXIV_amount + data_row[1]
+            if data_row[0] == '25':
+                XXV_amount = XXV_amount + data_row[1]
+            if data_row[0] == '26':
+                XXVI_amount = XXVI_amount + data_row[1]
+            if data_row[0] == '27':
+                XXVII_amount = XXVII_amount + data_row[1]
+            if data_row[0] == '28A':
+                XXVIIIA_amount = XXVIIIA_amount + data_row[1]
+            if data_row[0] == '28B':
+                XXVIIIB_amount = XXVIIIB_amount + data_row[1]
+            if data_row[0] == '28C':
+                XXVIIIC_amount = XXVIIIC_amount + data_row[1]
+            if data_row[0] == '29':
+                XXIX_amount = XXIX_amount + data_row[1]
+            if data_row[0] == '30AI':
+                XXXAI_amount = XXXAI_amount + data_row[1]
+            if data_row[0] == '30AII':
+                XXXAII_amount = XXXAII_amount + data_row[1]
+            if data_row[0] == '30B':
+                XXXB_amount = XXXB_amount + data_row[1]
+
+        XXIC_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
+        XXVIIID_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
+        XXXC_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
+        XXXI_amount = XXIC_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIIID_amount + XXIX_amount + XXXC_amount
+        XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
+
+        summary_disbursement = {'21AI': XXIAI_amount,
+                    '21AII': XXIAII_amount,
+                    '21B': XXIB_amount,
+                    '21C': XXIC_amount,
+                    '22': XXII_amount,
+                    '23': XXIII_amount,
+                    '24': XXIV_amount,
+                    '25': XXV_amount,
+                    '26': XXVI_amount,
+                    '27': XXVII_amount,
+                    '28A': XXVIIIA_amount,
+                    '28B': XXVIIIB_amount,
+                    '28C': XXVIIIC_amount,
+                    '28D': XXVIIID_amount,
+                    '29': XXIX_amount,
+                    '30AI': XXXAI_amount,
+                    '30AII': XXXAII_amount,
+                    '30B': XXXB_amount,
+                    '30C': XXXC_amount,
+                    '31': XXXI_amount,
+                    '32': XXXII_amount
+                        }    
+        return summary_disbursement
+    except Exception as e:
+        raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
 def summary_receipts(args):
     try:
@@ -1546,7 +2019,7 @@ def summary_receipts(args):
         XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIIIC_amount
         XX_amount = XIX_amount - XVIIIC_amount
 
-        summary_receipts = {'11AI': XIAI_amount,
+        summary_receipt = {'11AI': XIAI_amount,
                     '11AII': XIAII_amount,
                     '11AIII': XIAIII_amount,
                     '11B': XIB_amount,
@@ -1564,7 +2037,7 @@ def summary_receipts(args):
                     '19': XIX_amount,
                     '20': XX_amount
                         }    
-        return summary_receipts
+        return summary_receipt
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
@@ -1584,16 +2057,23 @@ def summary_table(request):
 
         period_args = [cmte_id, report_id]
         period_receipt = summary_receipts(period_args)
+        period_disbursement = summary_disbursements(period_args)
 
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
         calendar_receipt = summary_receipts(calendar_args)
+        calendar_disbursement = summary_disbursements(calendar_args)
 
-        forms_obj = {'period':{'period_receipts': period_receipt,
-                                'period_disbursements': 0,
-                                'period_summary': 0},
-                    'calendar':{'calendar_receipts': calendar_receipt,
-                                'calendar_disbursements': 0,
-                                'calendar_summary': 0}}                          
+        cash_summary = {'Beginning COH': 0,
+                        'Ending COH': 0,
+                        'Debts/Loans owed to committee': 0,
+                        'Debts/Loans owed by committee': 0}
+
+        forms_obj = {'Total Raised': {'period_receipts': period_receipt,
+                                'calendar_receipts': calendar_receipt},
+                    'Total Spent': {'period_disbursements': period_disbursement,
+                                    'calendar_disbursements': calendar_disbursement},
+                    'Cash summary': cash_summary}
+                        
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The summary_table API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -1603,9 +2083,36 @@ def summary_table(request):
 END - GET SUMMARY TABLE API - CORE APP
 ******************************************************************************************************************************
 """
+"""
+******************************************************************************************************************************
+GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1093 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_thirdNavigationTransactionTypes(request):
+    try:
+        cmte_id = request.user.username
 
+        if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
+            raise Exception ('Missing Input: Report_id is mandatory')
+        report_id = check_report_id(request.query_params.get('report_id'))
 
+        period_args = [cmte_id, report_id]
+        period_receipt = summary_receipts(period_args)
+        period_disbursement = summary_disbursements(period_args)
 
+        forms_obj = { 'Receipts': period_receipt.get('19'),
+                        'Disbursements': period_disbursement.get('31'),
+                        'Loans/Debts': 0,
+                        'Others': 0}
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_thirdNavigationTransactionTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+"""
+******************************************************************************************************************************
+END - GET SUMMARY TABLE API - CORE APP
+******************************************************************************************************************************
+"""
 @api_view(['GET'])
 def get_ReportTypes(request):
     """
@@ -1614,7 +2121,6 @@ def get_ReportTypes(request):
     try:
         cmte_id = request.user.username
         forms_obj = []
-        print("cmte_id", cmte_id)
         with connection.cursor() as cursor: 
             cursor.execute("SELECT json_agg(t) FROM (select rpt_type, rpt_type_desc from public.ref_rpt_types order by rpt_type_desc) t")
             for row in cursor.fetchall():
@@ -1761,7 +2267,7 @@ def get_f3x_report_data(cmte_id, report_id):
         query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
         forms_obj = None
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id], [report_id])
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
@@ -1771,303 +2277,11 @@ def get_f3x_report_data(cmte_id, report_id):
         return forms_obj
     except Exception:
         raise
-
-
-
-@api_view(["POST"])
-def create_f3x_json_file(request):
-    #creating a JSON file so that it is handy for all the public API's   
-    try:
-        # import ipdb;ipdb.set_trace()
-        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
-
-        if comm_info:
-            comm_info = comm_info[0]
-            serializer = CommitteeInfoSerializer(comm_info)
-            header = {
-                "version":"8.3",
-                "softwareName":"ABC Inc",
-                "softwareVersion":"1.02 Beta",
-                "additionalInfomation":"Any other useful information"
-            }
-            f_3x_list = get_f3x_values(request.user.username)
-            response_inkind_receipt_list = []
-            response_inkind_out_list = []
-            for f3_i in f_3x_list:
-                response_dict_out = {}
-                response_dict_receipt = {}
-                print (f3_i['report_id'])
-                entity_id_list = get_entity_id(f3_i['report_id'], f3_i['cmte_id'])
-                if not entity_id_list:
-                    continue
-                print ("we got the data")
-                # comm_id = Committee.objects.get(committeeid=request.user.username)
-                for entity_obj in entity_id_list:
-                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
-                    if not list_entity:
-                        continue
-                    else:
-                        list_entity = list_entity[0]
-                    response_dict_receipt['FORM TYPE'] = comm_info.form_type
-                    response_dict_receipt['FILER COMMITEE ID NUMBER'] = comm_info.committeeid
-                    response_dict_receipt['TRANSACTION TYPE CODE'] = entity_obj['transaction_type']
-                    response_dict_receipt['TRANSACTION ID'] = entity_obj['transaction_id']
-                    response_dict_receipt['BACK REFERENCE TRAN ID NUMBER'] = entity_obj['back_ref_transaction_id']
-                    response_dict_receipt['BACK REFERENCE SCHED NAME'] = entity_obj['back_ref_sched_name']
-                    response_dict_receipt['ENTITY TYPE'] = list_entity['entity_type']
-
-                    response_dict_receipt['CONTRIBUTOR LAST NAME'] = list_entity['last_name']
-                    response_dict_receipt['CONTRIBUTOR FIRST NAME'] = list_entity['first_name']
-                    response_dict_receipt['CONTRIBUTOR MIDDLE NAME'] = list_entity['middle_name']
-                    response_dict_receipt['CONTRIBUTOR PREFFIX'] = list_entity['preffix']
-                    response_dict_receipt['CONTRIBUTOR SUFFIX'] = list_entity['suffix']
-                    response_dict_receipt['CONTRIBUTOR STEET 1 '] = list_entity['street_1']
-                    response_dict_receipt['CONTRIBUTOR STEET 2'] = list_entity['street_2']
-                    response_dict_receipt['CONTRIBUTOR CITY'] = list_entity['city']
-                    response_dict_receipt['CONTRIBUTOR STATE'] = list_entity['state']
-                    response_dict_receipt['CONTRIBUTOR ZIP'] = list_entity['zip_code']
-                    response_dict_receipt['CONTRIBUTION DATE'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_receipt['CONTRIBUTION AMOUNT'] = entity_obj['contribution_amount']
-                    response_dict_receipt['CONTRIBUTION AGGREGATE'] = entity_obj['contribution_amount']
-                    response_dict_receipt['CONTRIBUTION PURPOSE DESCRIP'] = entity_obj['purpose_description']
-                    response_dict_receipt['CONTRIBUTOR EMPLOYER'] = list_entity['employer']
-                    response_dict_receipt['CONTRIBUTOR OCCUPATION'] = list_entity['occupation']
-                    response_dict_receipt['MEMO CODE'] = entity_obj['memo_code']
-                    response_dict_receipt['MEMO TEXT/DESCRIPTION'] = entity_obj['memo_text']
-
-
-
-                    response_dict_out['FORM TYPE'] = comm_info.form_type
-                    response_dict_out['FILER COMMITEE ID NUMBER'] = comm_info.committeeid
-                    response_dict_out['TRANSACTION TYPE CODE'] = entity_obj['transaction_type']
-                    response_dict_out['TRANSACTION ID'] = entity_obj['transaction_id']
-                    response_dict_out['BACK REFERENCE TRAN ID NUMBER'] = entity_obj['back_ref_transaction_id']
-                    response_dict_out['BACK REFERENCE SCHED NAME'] = entity_obj['back_ref_sched_name']
-                    response_dict_out['ENTITY TYPE'] = list_entity['entity_type']
-
-                    response_dict_out['PAYEE LAST NAME'] = list_entity['last_name']
-                    response_dict_out['PAYEE FIRST NAME'] = list_entity['first_name']
-                    response_dict_out['PAYEE MIDDLE NAME'] = list_entity['middle_name']
-                    response_dict_out['PAYEE PREFFIX'] = list_entity['preffix']
-                    response_dict_out['PAYEE SUFFIX'] = list_entity['suffix']
-                    response_dict_out['PAYEE STEET 1 '] = list_entity['street_1']
-                    response_dict_out['PAYEE STEET 2'] = list_entity['street_2']
-                    response_dict_out['PAYEE CITY'] = list_entity['city']
-                    response_dict_out['PAYEE STATE'] = list_entity['state']
-                    response_dict_out['PAYEE ZIP'] = list_entity['zip_code']
-                    response_dict_out['EXPENDITURE DATE'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_out['EXPENDITURE PURPOSE OF DESCRIP'] = entity_obj['purpose_description']
-                    response_dict_out['CATEGORY CODE'] = '15G'
-                    response_dict_out['MEMO CODE'] = entity_obj['memo_code']
-                    response_dict_out['MEMO TEXT/DESCRIPTION'] = entity_obj['memo_text']
-
-                    response_inkind_out_list.append(response_dict_out)
-                    response_inkind_receipt_list.append(response_dict_receipt)
-
-            # import pdb;pdb.set_trace()
-            # get_list_entity(entity_id, comm_info.committeeid)
-           
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            data_obj = {}
-            data_obj['header'] = header
-            data_obj['Inkind Receipt data'] = response_inkind_receipt_list
-            data_obj['Inkind out data'] = response_inkind_out_list
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x_inkind.json'
-            vdata = {}
-            vdata['form_type'] = "F3X"
-            vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
-            # import ipdb; ipdb.set_trace()
-            return Response(res.text, status=status.HTTP_200_OK)
-            
-        else:
-            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
-            
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
-
 """
-
 *****************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
-
-"""
-******************************************************************************************************************************
-Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SPRINT 11 - FNE   - BY YESWANTH TELLA
-******************************************************************************************************************************
-"""
-
-def get_entity_partner_id(report_id, cmte_id):
-    try:
-        # GET all rows from schedA table
-        forms_obj = []
-        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s ORDER BY transaction_id DESC"""
-        #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id])
-            for row in cursor.fetchall():
-            #forms_obj.append(data_row)
-                data_row = list(row)
-                #schedA_list = data_row[0]
-                forms_obj = data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-def get_f3x_values(cmte_id):
-    try:
-        query_string = """SELECT  report_id, cmte_id, form_type, amend_ind, report_type, election_code, date_of_election, state_of_election, cvg_start_dt, cvg_end_dt, coh_bop
-                     FROM public.form_3x WHERE cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-
-
-
-@api_view(["POST"])
-def create_f3x_partner_json_file(request):
-    #creating a JSON file so that it is handy for all the public API's   
-    try:
-        # import ipdb;ipdb.set_trace()
-        #comm_info =             .objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
-
-        if comm_info:
-            comm_info = comm_info[0]
-            serializer = CommitteeInfoSerializer(comm_info)
-            header = {    
-                "version":"8.3",
-                "softwareName":"ABC Inc",
-                "softwareVersion":"1.02 Beta",
-                "additionalInfomation":"Any other useful information"
-            }
-            f_3x_list = get_f3x_values(request.user.username)
-            response_inkind_receipt_list = []
-            response_inkind_out_list = []
-            for f3_i in f_3x_list:
-                response_dict_out = {}
-                response_dict_receipt = {}
-                print (f3_i['report_id'])
-                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
-                if not entity_id_list:
-                    continue
-                print ("we got the data")
-                # comm_id = Committee.objects.get(committeeid=request.user.username)
-                for entity_obj in entity_id_list:
-                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
-                    if not list_entity:
-                        continue
-                    else:
-                         list_entity = list_entity[0]
-                    response_dict_receipt['FORM TYPE'] = comm_info.form_type
-                    response_dict_receipt['FILER COMMITEE ID NUMBER'] = comm_info.committeeid
-                    response_dict_receipt['TRANSACTION TYPE CODE'] = entity_obj['transaction_type']
-                    response_dict_receipt['TRANSACTION ID'] = entity_obj['transaction_id']
-                    response_dict_receipt['BACK REFERENCE TRAN ID NUMBER'] = entity_obj['back_ref_transaction_id']
-                    response_dict_receipt['BACK REFERENCE SCHED NAME'] = entity_obj['back_ref_sched_name']
-                    response_dict_receipt['CONTRIBUTOR ORGANIZATION NAME'] = list_entity['entity_name']
-                    response_dict_receipt['CONTRIBUTOR STEET 1 '] = list_entity['street_1']
-                    response_dict_receipt['CONTRIBUTOR STEET 2'] = list_entity['street_2']
-                    response_dict_receipt['CONTRIBUTOR CITY'] = list_entity['city']
-                    response_dict_receipt['CONTRIBUTOR STATE'] = list_entity['state']
-                    response_dict_receipt['CONTRIBUTOR ZIP'] = list_entity['zip_code']
-                    response_dict_receipt['CONTRIBUTION DATE'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_receipt['CONTRIBUTION AMOUNT'] = entity_obj['contribution_amount']
-                    response_dict_receipt['CONTRIBUTION AGGREGATE'] = entity_obj['contribution_amount']
-                    response_dict_receipt['CONTRIBUTION PURPOSE DESCRIP'] = entity_obj['purpose_description']
-                    response_dict_receipt['MEMO CODE'] = entity_obj['memo_code']
-                    response_dict_receipt['MEMO TEXT/DESCRIPTION'] = entity_obj['memo_text']
-
-
-
-                    response_dict_out['FORM TYPE'] = comm_info.form_type
-                    response_dict_out['FILER COMMITEE ID NUMBER'] = comm_info.committeeid
-                    response_dict_out['TRANSACTION TYPE CODE'] = entity_obj['transaction_type']
-                    response_dict_out['TRANSACTION ID'] = entity_obj['transaction_id']
-                    response_dict_out['BACK REFERENCE TRAN ID NUMBER'] = entity_obj['back_ref_transaction_id']
-                    response_dict_out['BACK REFERENCE SCHED NAME'] = entity_obj['back_ref_sched_name']
-                    response_dict_out['ENTITY TYPE'] = list_entity['entity_type']
-
-                    response_dict_out['CONTRIBUTOR  LAST NAME'] = list_entity['last_name']
-                    response_dict_out['CONTRIBUTOR FIRST NAME'] = list_entity['first_name']
-                    response_dict_out['CONTRIBUTOR  MIDDLE NAME'] = list_entity['middle_name']
-                    response_dict_out['CONTRIBUTOR  PREFFIX'] = list_entity['preffix']
-                    response_dict_out['CONTRIBUTOR  SUFFIX'] = list_entity['suffix']
-                    response_dict_out['CONTRIBUTOR  STEET 1 '] = list_entity['street_1']
-                    response_dict_out['CONTRIBUTOR STEET 2'] = list_entity['street_2']
-                    response_dict_out['CONTRIBUTOR  CITY'] = list_entity['city']
-                    response_dict_out['CONTRIBUTOR  STATE'] = list_entity['state']
-                    response_dict_out['CONTRIBUTOR  ZIP'] = list_entity['zip_code']
-                    response_dict_out['CONTRIBUTION DATE'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_out['CONTRIBUTION AMOUNT'] = entity_obj['contribution_amount']
-                    response_dict_out['CONTRIBUTION AGGREGATE'] = entity_obj['contribution_amount']
-                    response_dict_out['CONTRIBUTION PURPOSE OF DESCRIP'] = entity_obj['purpose_description']
-                    response_dict_out['CONTRIBUTOR EMPLOYER'] = list_entity['employer']
-                    response_dict_out['CONTRIBUTOR OCCUPATION'] = list_entity['occupation']
-                    response_dict_out['MEMO CODE'] = entity_obj['memo_code']
-                    response_dict_out['MEMO TEXT/DESCRIPTION'] = entity_obj['memo_text']
-
-                    response_inkind_out_list.append(response_dict_out)
-                    response_inkind_receipt_list.append(response_dict_receipt)
-
-            # import ipdb;ipdb.set_trace()
-            # get_list_entity(entity_id, comm_info.committeeid)
-            
-            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print (k)
-            k.content_type = "application/json"
-            data_obj = {}
-            data_obj['header'] = header
-            data_obj['PARTNERSHIP CONTRIBUTION data'] = response_inkind_receipt_list
-            data_obj['PARTNERSHIP MEMO data'] = response_inkind_out_list
-            # get_list_entity(entity_id, comm_info.committeeid)
-            #serializer = CommitteeInfoSerializer(comm_info)
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + comm_info.committeeid + '_f3x_PARTNER.json'
-            vdata = {}
-            vdata['form_type'] = "F3X"
-            vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
-            # import ipdb; ipdb.set_trace()
-            return Response(res.text, status=status.HTTP_200_OK)
-            
-        else:
-            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
-            
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
-
 """
 ******************************************************************************************************************************
 END - Generate Partnership  - CORE APP
@@ -2106,21 +2320,21 @@ def get_amendmentNumber(cmte_id, report_id):
     except Exception:
         raise
 
-def get_f3x_report_data(cmte_id, report_id):
-    try:
-        query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id], [report_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
+# def get_f3x_report_data(cmte_id, report_id):
+#     try:
+#         query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+#         forms_obj = None
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id], [report_id])
+#             for row in cursor.fetchall():
+#                 data_row = list(row)
+#                 forms_obj=data_row[0]
+#         if forms_obj is None:
+#             pass
+#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+#         return forms_obj
+#     except Exception:
+#         raise
 
 def get_f3x_SA_children_data(cmte_id, report_id, transaction_id):
     try:
@@ -2427,3 +2641,1344 @@ def build_form3x_json_file(request):
                     return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
     except CommitteeInfo.DoesNotExist:
        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+"""
+******************************************************************************************************************************
+END  - CORE APP
+******************************************************************************************************************************
+"""
+
+"""
+******************************************************************************************************************************
+Generate In kind Receipt and out Kind transaction Json file API - CORE APP - SPRINT 12 - FNE 928 - BY Yeswanth Tella
+******************************************************************************************************************************
+
+"""
+def get_entity_id(report_id, cmte_id, transaction_id=None):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
+    try:
+        # GET all rows from schedB table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                  FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        forms_obj = forms_obj[0]
+        committee_info_dict = {}
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+        committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
+        committee_info_dict['street1'] = forms_obj['street_1']
+        committee_info_dict['street2'] = forms_obj['street_2']
+        committee_info_dict['city'] = forms_obj['city']
+        committee_info_dict['state'] = forms_obj['state']
+        committee_info_dict['zipCode'] = forms_obj['zip_code']
+        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+@api_view(["POST"])
+def create_f3x_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        report_id = request.POST.get('report_id')
+        #import ipdb;ipdb.set_trace()
+        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            # serializer = CommitteeInfoSerializer(comm_info)
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            response_dict_receipt = {}
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+                entity_id_list = get_entity_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                #import ipdb;ipdb.set_trace()
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                        list_entity = list_entity[0]
+                    response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                    response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
+
+                    response_dict_receipt['contributorLastName'] = list_entity['last_name']
+                    response_dict_receipt['contributorFirstName'] = list_entity['first_name']
+                    response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
+                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorSuffix'] = list_entity['suffix']
+                    response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
+                    response_dict_receipt['contributorStreet2'] = list_entity['street_2']
+                    response_dict_receipt['contributorCity'] = list_entity['city']
+                    response_dict_receipt['contributorState'] = list_entity['state']
+                    response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_receipt['contributorEmployer'] = list_entity['employer']
+                    response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+
+                    
+                    entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if not entity_id_child_list:
+                        response_inkind_receipt_list.append(response_dict_receipt)
+                        continue
+                    for entity_child_obj in entity_id_child_list:
+                        response_dict_out = {}
+                        list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                        if not list_child_entity:
+                            continue
+                        else:
+                            list_child_entity = list_child_entity[0]
+                        response_dict_receipt['child'] = []
+                        response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                        response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                        response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                        response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                        response_dict_out['entityType'] = list_child_entity['entity_type']
+
+                        response_dict_out['payeeLastName'] = list_child_entity['last_name']
+                        response_dict_out['payeeFirstName'] = list_child_entity['first_name']
+                        response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
+                        response_dict_out['payeePrefix'] = list_child_entity['preffix']
+                        response_dict_out['payeeSuffix'] = list_child_entity['suffix']
+                        response_dict_out['payeeStreet1'] = list_child_entity['street_1']
+                        response_dict_out['payeeStreet2'] = list_child_entity['street_2']
+                        response_dict_out['payeeCity'] = list_child_entity['city']
+                        response_dict_out['payeeState'] = list_child_entity['state']
+                        response_dict_out['payeezip'] = list_child_entity['zip_code']
+                        response_dict_out['expenditureDate'] = entity_child_obj['expenditure_date'].replace('-','')
+                        response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
+                        response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                        response_dict_out['categoryCode'] = '15G'
+                        response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                        response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                        response_dict_receipt['child'].append(response_dict_out)
+
+
+                    response_inkind_receipt_list.append(response_dict_receipt)
+
+            #import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+           
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+        
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': [],}
+            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
+            #import ipdb;ipdb.set_trace()
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
+            vdata = {}
+            #data_obj['data']['form_type'] = "F3X"
+            print('tmp_filename')
+            json.dump(data_obj, open(tmp_filename, 'w'))  
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            #print('tmp_filename')
+            #import ipdb; ipdb.set_trace()
+            print("vfiles",vfiles)
+            print ("tmp_filename= ", tmp_filename)
+            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+******************************************************************************************************************************
+END  - Inkind receipt and inkind out - CORE APP
+******************************************************************************************************************************
+"""
+
+"""
+******************************************************************************************************************************
+Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SPRINT 12 - FNE -765 - BY YESWANTH TELLA
+******************************************************************************************************************************
+"""
+def get_entity_partner_id(report_id, cmte_id , transaction_id=None):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                  FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        forms_obj = forms_obj[0]
+        committee_info_dict = {}
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+        committee_info_dict['committeeName'] = forms_obj['cmte_name']
+        committee_info_dict['street1'] = forms_obj['street_1']
+        committee_info_dict['street2'] = forms_obj['street_2']
+        committee_info_dict['city'] = forms_obj['city']
+        committee_info_dict['state'] = forms_obj['state']
+        committee_info_dict['zipCode'] = forms_obj['zip_code']
+        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+@api_view(["POST"])
+def create_f3x_partner_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        report_id = request.POST.get('report_id')
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {    
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            response_dict_receipt = {}
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                         list_entity = list_entity[0]
+                    response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                    response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
+
+                    response_dict_receipt['contributorOrganizationName']=list_entity['entity_name']
+                    response_dict_receipt['contributorStreet1'] = list_entity['street_1']
+                    response_dict_receipt['contributorStreet2'] = list_entity['street_2']
+                    response_dict_receipt['contributorCity'] = list_entity['city']
+                    response_dict_receipt['contributorState'] = list_entity['state']
+                    response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+                    
+
+                    #response_dict_receipt['child'] = []
+
+                    entity_id_child_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if not entity_id_child_list:
+                        response_inkind_receipt_list.append(response_dict_receipt)
+                        continue
+                    for entity_child_obj in entity_id_child_list:
+                        response_dict_out = {}
+                        list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                        if not list_child_entity:
+                            continue
+                        else:
+                            list_child_entity = list_child_entity[0]
+                        response_dict_receipt['child'] = []
+                        response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                        response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                        response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                        response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                        response_dict_out['entityType'] = list_child_entity['entity_type']
+                       
+
+                        response_dict_out['contributorLastName'] = list_child_entity['last_name']
+                        response_dict_out['contributorFirstName'] = list_child_entity['first_name']
+                        response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
+                        response_dict_out['contributorPrefix'] = list_child_entity['preffix']
+                        response_dict_out['contributorSuffix'] = list_child_entity['suffix']
+                        response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
+                        response_dict_out['contributorStreet2'] = list_child_entity['street_2']
+                        response_dict_out['contributorCity'] = list_child_entity['city']
+                        response_dict_out['contributorState'] = list_child_entity['state']
+                        response_dict_out['contributorZip'] = list_child_entity['zip_code']
+                        response_dict_out['contributionDate'] = entity_child_obj['contribution_date'].replace('-','')
+                        response_dict_out['contributionAmount'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionAggregate'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
+                        response_dict_out['contributorEmployer'] = list_child_entity['employer']
+                        response_dict_out['contributorOccupation'] = list_child_entity['occupation']
+                        response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                        response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                        response_dict_receipt['child'].append(response_dict_out)
+                    
+                    response_inkind_receipt_list.append(response_dict_receipt)
+
+            # import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': []}
+            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list 
+            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + '_f3x_PARTNER.json'
+            vdata = {}
+            # vdata['form_type'] = "F3X"
+            # vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            print(vfiles)
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
+            # import ipdb; ipdb.set_trace()
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+******************************************************************************************************************************
+END  - Partnership Memo Json - CORE APP
+******************************************************************************************************************************
+"""
+
+"""
+
+**********************************************************************************************************************************************
+Generate Returned or Bonused Receipt  Json file API - CORE APP - SPRINT 12 - FNE -920 - BY YESWANTH TELLA
+***********************************************************************************************************************************************
+"""
+
+def get_entity_partner_id(report_id, cmte_id):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                #forms_obj.append(data_row)
+                data_row = list(row)
+                #schedA_list = data_row[0]
+                forms_obj = data_row[0]
+                for d in forms_obj:
+                    for i in d:
+                        if not d[i]:
+                            d[i] = ''
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                  FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        forms_obj = forms_obj[0]
+        committee_info_dict = {}
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+        committee_info_dict['committeeName'] = forms_obj['cmte_name']
+        committee_info_dict['street1'] = forms_obj['street_1']
+        committee_info_dict['street2'] = forms_obj['street_2']
+        committee_info_dict['city'] = forms_obj['city']
+        committee_info_dict['state'] = forms_obj['state']
+        committee_info_dict['zipCode'] = forms_obj['zip_code']
+        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+@api_view(["POST"])
+def create_f3x_returned_bounced_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        report_id = request.POST.get('report_id')
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {    
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            #response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+
+                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                         list_entity = list_entity[0]
+                    response_dict_out['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_out['transactionId'] = entity_obj['transaction_id']
+                    response_dict_out['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_out['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_out['entityType'] = list_entity['entity_type']
+                    
+
+                    response_dict_out['contributorLastName'] = list_entity['last_name']
+                    response_dict_out['contributorFirstName'] = list_entity['first_name']
+                    response_dict_out['contributorMiddleName'] = list_entity['middle_name']
+                    response_dict_out['contributorPrefix'] = list_entity['preffix']
+                    response_dict_out['contributorSuffix'] = list_entity['suffix']
+                    response_dict_out['contributorStreet1 '] = list_entity['street_1']
+                    response_dict_out['contributorStreet2'] = list_entity['street_2']
+                    response_dict_out['contributorCity'] = list_entity['city']
+                    response_dict_out['contributorState'] = list_entity['state']
+                    response_dict_out['contributorZip'] = list_entity['zip_code']
+                    response_dict_out['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_out['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_out['contributorEmployer'] = list_entity['employer']
+                    response_dict_out['contributorOccupation'] = list_entity['occupation']
+                    response_dict_out['memoCode'] = entity_obj['memo_code']
+                    response_dict_out['memoDescription'] = entity_obj['memo_text']
+
+                    response_inkind_out_list.append(response_dict_out)
+                    #response_inkind_receipt_list.append(response_dict_receipt)
+
+            # import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': []}
+            data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + '_f3x_RETURNED.json'
+            vdata = {}
+            # vdata['form_type'] = "F3X"
+            # vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            print(vfiles)
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            # import ipdb; ipdb.set_trace()
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+"""
+******************************************************************************************************************************
+END  - Returned or Bonused Receipt  Json file API - CORE APP
+******************************************************************************************************************************
+"""
+
+"""
+
+**********************************************************************************************************************************************
+FNE-909 REATTRIBUTION AND REATTRIBUTION MEMO SPRINT 12 YESWANTH TELLA
+***********************************************************************************************************************************************
+
+"""
+
+def get_entity_partner_id(report_id, cmte_id, transaction_id = None):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                  FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        forms_obj = forms_obj[0]
+        committee_info_dict = {}
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+        committee_info_dict['committeeName'] = forms_obj['cmte_name']
+        committee_info_dict['street1'] = forms_obj['street_1']
+        committee_info_dict['street2'] = forms_obj['street_2']
+        committee_info_dict['city'] = forms_obj['city']
+        committee_info_dict['state'] = forms_obj['state']
+        committee_info_dict['zipCode'] = forms_obj['zip_code']
+        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+@api_view(["POST"])
+def create_f3x_reattribution_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        report_id = request.POST.get('report_id')
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {    
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            response_dict_receipt = {}
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                         list_entity = list_entity[0]
+                    response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                    response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
+
+                    response_dict_receipt['contributorLastName'] = list_entity['last_name']
+                    response_dict_receipt['contributorFirstName'] = list_entity['first_name']
+                    response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
+                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorSuffix'] = list_entity['suffix']
+                    response_dict_receipt['contributorStreet1'] = list_entity['street_1']
+                    response_dict_receipt['contributorStreet2'] = list_entity['street_2']
+                    response_dict_receipt['contributorCity'] = list_entity['city']
+                    response_dict_receipt['contributorState'] = list_entity['state']
+                    response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_receipt['contributorEmployer'] = list_entity['employer']
+                    response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+
+                    #response_dict_receipt['child'] = []
+                    entity_id_child_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if not entity_id_child_list:
+                        response_inkind_receipt_list.append(response_dict_receipt)
+                        continue
+                    for entity_child_obj in entity_id_child_list:
+                        response_dict_out = {}
+
+                        list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                        if not list_child_entity:
+                            continue
+                        else:
+                            list_child_entity = list_child_entity[0]
+                        response_dict_receipt['child'] = []
+                        response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                        response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                        response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                        response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                        response_dict_out['entityType'] = list_child_entity['entity_type']
+                       
+
+                        response_dict_out['contributorLastName'] = list_child_entity['last_name']
+                        response_dict_out['contributorFirstName'] = list_child_entity['first_name']
+                        response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
+                        response_dict_out['contributorPrefix'] = list_child_entity['preffix']
+                        response_dict_out['contributorSuffix'] = list_child_entity['suffix']
+                        response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
+                        response_dict_out['contributorStreet2'] = list_child_entity['street_2']
+                        response_dict_out['contributorCity'] = list_child_entity['city']
+                        response_dict_out['contributorState'] = list_child_entity['state']
+                        response_dict_out['contributorZip'] = list_child_entity['zip_code']
+                        response_dict_out['contributionDate'] = entity_child_obj['contribution_date'].replace('-','')
+                        response_dict_out['contributionAmount'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionAggregate'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
+                        response_dict_out['contributorEmployer'] = list_child_entity['employer']
+                        response_dict_out['contributorOccupation'] = list_child_entity['occupation']
+                        response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                        response_dict_out['memoDescription'] =entity_child_obj['memo_text']
+                        response_dict_receipt['child'].append(response_dict_out)
+                    
+                    response_inkind_receipt_list.append(response_dict_receipt)
+
+            # import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': []}
+            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + '_f3x_REATTRIBUTION.json'
+            vdata = {}
+            # vdata['form_type'] = "F3X"
+            # vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            print(vfiles)
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            # import ipdb; ipdb.set_trace()
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+
+********************************************************************************************************************************
+END  - REATTRIBUTION AND REATTRIBUTION MEMO Json - CORE APP
+********************************************************************************************************************************
+"""
+
+"""
+**************************************************************************************************************************************
+Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API - CORE APP - SPRINT 12 - FNE 791 - BY Yeswanth Tella
+**************************************************************************************************************************************
+
+"""
+def get_entity_id(report_id, cmte_id, transaction_id=None):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
+    try:
+        # GET all rows from schedB table
+        forms_obj = []
+        if not transaction_id:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        else:
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+        with connection.cursor() as cursor:
+            if not transaction_id:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            else:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                # forms_obj.append(data_row)
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+
+def get_committee_mater_values(cmte_id):
+    try:
+        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
+                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
+                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
+                  FROM public.committee_master Where cmte_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        forms_obj = forms_obj[0]
+        committee_info_dict = {}
+        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+        committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
+        committee_info_dict['street1'] = forms_obj['street_1']
+        committee_info_dict['street2'] = forms_obj['street_2']
+        committee_info_dict['city'] = forms_obj['city']
+        committee_info_dict['state'] = forms_obj['state']
+        committee_info_dict['zipCode'] = forms_obj['zip_code']
+        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
+        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
+        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
+        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
+        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
+        return committee_info_dict
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+@api_view(["POST"])
+def create_inkind_bitcoin_f3x_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
+    try:
+        report_id = request.POST.get('report_id')
+        #import ipdb;ipdb.set_trace()
+        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            # serializer = CommitteeInfoSerializer(comm_info)
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            response_dict_receipt = {}
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+                entity_id_list = get_entity_id(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                #import ipdb;ipdb.set_trace()
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                        list_entity = list_entity[0]
+                    response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                    response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_receipt['entityType'] = list_entity['entity_type']
+
+                    response_dict_receipt['contributorLastName'] = list_entity['last_name']
+                    response_dict_receipt['contributorFirstName'] = list_entity['first_name']
+                    response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
+                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorSuffix'] = list_entity['suffix']
+                    response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
+                    response_dict_receipt['contributorStreet2'] = list_entity['street_2']
+                    response_dict_receipt['contributorCity'] = list_entity['city']
+                    response_dict_receipt['contributorState'] = list_entity['state']
+                    response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_receipt['contributorEmployer'] = list_entity['employer']
+                    response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                    response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                    response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+
+                    
+                    entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if not entity_id_child_list:
+                        response_inkind_receipt_list.append(response_dict_receipt)
+                        continue
+                    for entity_child_obj in entity_id_child_list:
+                        response_dict_out = {}
+                        list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                        if not list_child_entity:
+                            continue
+                        else:
+                            list_child_entity = list_child_entity[0]
+                        response_dict_receipt['child'] = []
+                        response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                        response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                        response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                        response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                        response_dict_out['entityType'] = list_child_entity['entity_type']
+
+                        response_dict_out['payeeLastName'] = list_child_entity['last_name']
+                        response_dict_out['payeeFirstName'] = list_child_entity['first_name']
+                        response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
+                        response_dict_out['payeePrefix'] = list_child_entity['preffix']
+                        response_dict_out['payeeSuffix'] = list_child_entity['suffix']
+                        response_dict_out['payeeStreet1'] = list_child_entity['street_1']
+                        response_dict_out['payeeStreet2'] = list_child_entity['street_2']
+                        response_dict_out['payeeCity'] = list_child_entity['city']
+                        response_dict_out['payeeState'] = list_child_entity['state']
+                        response_dict_out['payeezip'] = list_child_entity['zip_code']
+                        response_dict_out['expenditureDate'] = entity_child_obj['expenditure_date'].replace('-','')
+                        response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
+                        response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                        response_dict_out['categoryCode'] = '15G'
+                        response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                        response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                        response_dict_receipt['child'].append(response_dict_out)
+
+
+                    response_inkind_receipt_list.append(response_dict_receipt)
+
+            #import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+           
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+        
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': [],}
+            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
+            #import ipdb;ipdb.set_trace()
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
+            vdata = {}
+            #data_obj['data']['form_type'] = "F3X"
+            print('tmp_filename')
+            json.dump(data_obj, open(tmp_filename, 'w'))  
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            #print('tmp_filename')
+            #import ipdb; ipdb.set_trace()
+            print("vfiles",vfiles)
+            print ("tmp_filename= ", tmp_filename)
+            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_report_info(request):
+    """
+    Get report details
+    """
+    cmte_id = request.user.username
+    report_id = request.query_params.get('reportid')
+    print("cmte_id", cmte_id)
+    print("report_id", report_id)
+    try:
+        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
+            print("you are here1")
+            if int(request.query_params.get('reportid'))>=1:
+                print("you are here2")
+                with connection.cursor() as cursor:
+                    # GET all rows from Reports table
+                    
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue
+                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
+
+                    print("query_string", query_string)
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
+                
+                    for row in cursor.fetchall():
+                        data_row = list(row)
+                        forms_obj=data_row[0]
+                        
+            if forms_obj is None:
+                raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
+
+            return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception:
+        raise
+
+
+
