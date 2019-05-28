@@ -20,9 +20,7 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    // const url: string = '/core/get_dynamic_forms_fields';
-    // `${environment.apiUrl}${url}`
-    const url: string = 'http://localhost:3000/data';
+    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -34,8 +32,8 @@ export class IndividualReceiptService {
     params = params.append('transaction_type', transactionType);
 
     return this._http.get(url, {
-      headers: httpOptions
-      // params
+      headers: httpOptions,
+      params
     });
   }
 
@@ -63,7 +61,7 @@ export class IndividualReceiptService {
     if (reportType.hasOwnProperty('reportId')) {
       formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
-        formData.append('report_id', reportType.reportid);  
+      formData.append('report_id', reportType.reportid);
     }
 
     //formData.append('report_id', reportType.reportId);

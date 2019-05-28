@@ -8,7 +8,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  */
 export function alphanumeric(): ValidatorFn {
 	return (control: AbstractControl): { [key: string]: any } => {
-		const regex: any = new RegExp(/^[a-zA-Z0-9]*$/);
+		const regex: any = new RegExp(/^[a-zA-Z0-9\s]*$/);
 		const text: string = control.value;
 
 		if (!regex.test(text)) {

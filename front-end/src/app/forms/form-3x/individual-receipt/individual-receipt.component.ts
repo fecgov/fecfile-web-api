@@ -56,16 +56,13 @@ export class IndividualReceiptComponent implements OnInit {
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
         console.log('res: ', res);
-        // this.formFields = res.data.formFields;
-        this.hiddenFields = res.hiddenFields;
 
-        this.formFields = res.formFields;
+        this.formFields = res.data.formFields;
+        this.hiddenFields = res.data.hiddenFields;
+
         this._setForm(this.formFields);
 
-        this.states = res.states;
-
-        console.log('this.hiddenFields: ', this.hiddenFields);
-        // this.states = res.data.states;
+        this.states = res.data.states;
       }
     });
   }
@@ -122,10 +119,6 @@ export class IndividualReceiptComponent implements OnInit {
           const dollarRegEx: any = /^[+-]?\d+(\.\d+)?$/g;
 
           formValidators.push(Validators.pattern(dollarRegEx));
-        } else if (validation === 'date') {
-          const dateRegEx: any = /^(\d{4}\-\d{2}\-\d{2})/;
-
-          formValidators.push(Validators.pattern(dateRegEx));
         }
       }
     }
