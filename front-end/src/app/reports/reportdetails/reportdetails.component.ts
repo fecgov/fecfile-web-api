@@ -2,20 +2,20 @@ import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } fro
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { UtilService } from 'src/app/shared/utils/util.service';
+import { SortableColumnModel } from '../../shared/services/TableService/sortable-column.model';
+import { TableService } from '../../shared/services/TableService/table.service';
+import { UtilService } from '../../shared/utils/util.service';
 import { ActiveView } from '../reportheader/reportheader.component';
 import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-//import { FormsService, GetReportsResponse } from 'src/app/shared/services/FormsService/forms.service';
 import { GetReportsResponse } from '../../reports/service/report.service';
 import { reportModel } from '../model/report.model';
 import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
-
+import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { form99, form3XReport, form99PrintPreviewResponse, form3xReportTypeDetails} from '../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'app-reportdetails',
@@ -139,6 +139,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
+    private _activatedRoute: ActivatedRoute,
+    private _router: Router
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -660,8 +662,39 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    *
    * @param trx the Report to edit
    */
-  public editReport(): void {
-    alert('Edit report is not yet supported');
+  public editReport(report:reportModel): void {
+
+    if (report.form_type==='F99'){
+      this._ReportsService.getReportInfo(report.form_type, report.report_id)
+      .subscribe((res: form99) => {
+        console.log("getReportInfo res =", res)
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => 
+      {
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1'} });  
+        console.log(new Date().toISOString());
+      },
+      1500);
+
+    }
+    else if (report.form_type==='F3X'){
+      this._ReportsService.getReportInfo(report.form_type, report.report_id)
+      .subscribe((res: form3xReportTypeDetails) => {
+        console.log("getReportInfo res =", res)
+        localStorage.setItem('form_3X_details', JSON.stringify(res));
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => 
+      {
+        this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_1'} });
+        console.log(new Date().toISOString());
+      },
+      1500);
+    }
   }
 
 

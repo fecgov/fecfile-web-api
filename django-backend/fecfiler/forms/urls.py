@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^f99/save_print_f99$', views.save_print_f99, name='save_print_f99'),
     url(r'^f99/update_print_f99$', views.update_print_f99, name='update_print_f99'),
     url(r'^f99/print_pdf$', views.print_pdf, name='print_pdf'),
-
+    url(r'^f99/get_f99_report_info$', views.get_f99_report_info, name='get_f99_report_info'),
 ]
