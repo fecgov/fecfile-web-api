@@ -278,7 +278,26 @@ export interface f3xTransactionTypes {
     selected: string;
    }
   
-   
-
- 
+   export interface form3xReportTypeDetails {
+    cmteId: string,
+    reportId: string,
+    formType: string,
+    electionCode: string,
+    reportType: string,
+    reportTypeDescription: string,
+    regularSpecialReportInd: string,
+    stateOfElection:string,
+    electionDate:string,
+    cvgStartDate: string,
+    cvgEndDate: string,
+    dueDate: string,
+    amend_Indicator: string,
+    coh_bop: string,
+    daysUntilDue: string,
+    email1: string,
+    email2: string,
+    additionalEmail1: string,
+    additionalEmail2: string,
+  }
+  
  

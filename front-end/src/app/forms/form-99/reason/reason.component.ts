@@ -80,18 +80,18 @@ export class ReasonComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
-
+    
     if (this._form99Details) {
       if (this._form99Details.text) {
         if (this._form99Details.reason) {
           this.typeSelected = this._form99Details.reason;
         }
-
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
         });
-      } else {
+        this.frmReason.controls['reasonText'].setValue(this._form99Details.text);
+       } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
@@ -107,22 +107,21 @@ export class ReasonComponent implements OnInit {
 
   ngDoCheck(): void {
     let form_99_details: any = {};
-
+    
     if (localStorage.getItem('form_99_details') !== null) {
       form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
     }
 
     if (form_99_details) {
       this.typeSelected = form_99_details.reason;
+      
     }
 
     if (this.frmReason.get('reasonText').value.length >= 1) {
       let text: string = this.frmReason.get('reasonText').value;
-
-      this.characterCount = this._countCharacters(text);
+       this.characterCount = this._countCharacters(text);
     } else if (this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
-
       this.characterCount = this._countCharacters(text);
     }
   }
@@ -583,9 +582,8 @@ export class ReasonComponent implements OnInit {
   }
 
   public printPreview() {
-    console.log('Reason screen printPreview: step-I ');
+
     if (this.frmReason.valid) {
-      console.log('Reason screen printPreview: step -II');
 
       if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
@@ -607,11 +605,11 @@ export class ReasonComponent implements OnInit {
         this.showValidateBar = false;
 
         if (this.file !== null) {
-          console.log('Reason screen printPreview: step -IV');
+
           this._formsService.PreviewForm_ReasonScreen({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
-                console.log('Reason screen printPreview: res: ', res);
+
                 this._form99Details.id = res.id;
                 localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
                 // success
@@ -628,7 +626,7 @@ export class ReasonComponent implements OnInit {
             }
           );
         } else {
-          console.log('Reason screen printPreview: step -V');
+
           this._formsService.PreviewForm_ReasonScreen({}, {}, this._formType).subscribe(
             res => {
               if (res) {

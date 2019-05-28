@@ -146,7 +146,6 @@ def get_filed_form_types(request):
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 """
 ********************************************************************************************************************************
 GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA 
@@ -208,12 +207,7 @@ def check_list_cvg_dates(args):
         form_type = args[1]
         cvg_start_dt = args[2]
         cvg_end_dt = args[3]
-        print("cmte_id =", cmte_id)
-        print("form_type =", form_type)
-        print("cvg_start_dt =", cvg_start_dt)
-        print("cvg_end_dt =", cvg_end_dt)
-
-
+    
         forms_obj = []
         with connection.cursor() as cursor: 
             cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' ORDER BY report_id DESC", [cmte_id, form_type])
@@ -332,13 +326,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
     except Exception:
         raise
 
@@ -479,6 +473,7 @@ def post_reports(data):
         form_type = data.get('form_type')
         cvg_start_dt = data.get('cvg_start_dt')
         cvg_end_dt = data.get('cvg_end_dt')
+        due_dt = data.get('due_dt')
         if cvg_start_dt is None:
             raise Exception('The cvg_start_dt is null.')
         if cvg_end_dt is None:
@@ -492,7 +487,8 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'), data.get('email_1'), data.get('email_2'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -627,6 +623,16 @@ def reports(request):
                 email_2 = check_email(request.data.get('email_2'))
             else:
                 email_2 = None
+
+            if 'additional_email_1' in request.data:
+                additional_email_1 = check_email(request.data.get('additional_email_1'))
+            else:
+                additional_email_1 = None                
+            
+            if 'additional_email_2' in request.data:
+                additional_email_2 = check_email(request.data.get('additional_email_2'))
+            else:
+                additional_email_2 = None
             
             datum = {
                 'cmte_id': request.user.username,
@@ -638,10 +644,13 @@ def reports(request):
                 'state_of_election': check_null_value(request.data.get('state_of_election')),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
+                'due_dt': date_format(request.data.get('due_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
                 'status': f_status,
                 'email_1': email_1,
                 'email_2': email_2,
+                'additional_email_1': additional_email_1,
+                'additional_email_2': additional_email_2,
             }    
             data = post_reports(datum)
             if type(data) is dict:
@@ -1085,7 +1094,6 @@ def search_entities(request):
 
         query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
-        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
             for row in cursor.fetchall():
@@ -1099,7 +1107,7 @@ def search_entities(request):
     except Exception as e:
         return Response("The search_entities API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
-************************* *****************************************************************************************************
+*****************************************************************************************************************************
 END - SEARCH ENTITIES API - CORE APP
 ******************************************************************************************************************************
 """
@@ -1584,7 +1592,6 @@ def create_f3x_expenditure_json_file(request):
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
 """  
-
 ******************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
@@ -1592,55 +1599,138 @@ END - GET ALL TRANSACTIONS API - CORE APP
 
 """
 **********************************************************************************************************************************************
-GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - - BY  Praveen Jinka
+TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
-
 """
-@api_view(['GET'])
+def filter_get_all_trans(request, param_string):
+    if request.method == 'GET':
+        return param_string
+    # import ipdb;ipdb.set_trace()
+    filt_dict = request.data['filters']
+    for f_key, value_d in filt_dict.items():
+        if 'filterCategories' in f_key:
+            cat_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+        if 'filterFromDate' in f_key and 'filterToDate' in f_key:
+            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
+        if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
+            param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
+        if 'filterStates' in f_key:
+            state_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND state In " + state_tuple
+        if 'filterMemoCode' in f_key:
+            if str(value_d) == 'true':
+                param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+    return param_string
+
+
+@api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        # import ipdb;ipdb.set_trace()
+        params = request.data['filters']
+        keywords = params.get('keywords')
+        report_id = request.data.get('reportid')
+        if str(descending) == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
         #     order_string = "transaction_id"
-        for key, value in request.query_params.items():
-            try:
-                check_value = int(value)
-                param_string = param_string + " AND " + key + "=" + str(value)
-            except Exception as e:
-                if key == 'transaction_date':
-                    transaction_date = date_format(request.query_params.get('transaction_date'))
-                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
-                else:
-                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+        # import ipdb;ipdb.set_trace()
+        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 
+            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'occupation', 'employer', 'memo_code', 'memo_text']
+        # if search_string:
+        #     for key in keys:
+        #         if not param_string:
+        #             param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #         else:
+        #             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #     param_string = param_string + " )"
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
-                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
-                            # + """ ORDER BY """ + order_string
-        # print(query_string)
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
+                    else:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+            param_string = param_string + " )"
+        param_string = filter_get_all_trans(request, param_string)
+        #import ipdb;ipdb.set_trace()
+        # for key, value in request.query_params.items():
+        #     try:
+        #         check_value = int(value)
+        #         param_string = param_string + " AND " + key + "=" + str(value)
+        #     except Exception as e:
+        #         if key == 'transaction_date':
+        #             transaction_date = date_format(request.query_params.get('transaction_date'))
+        #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+        #         else:
+        #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
+                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           # + """ ORDER BY """ + order_string
+        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
-            
+        
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
+        if sortcolumn:
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        else:
+            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
-
-        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_204_NO_CONTENT
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
+        
+        #import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
     except Exception as e:
@@ -1710,7 +1800,6 @@ def get_all_deleted_transactions(request):
             
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
                                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
-        # print(trans_query_string)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
@@ -1735,6 +1824,7 @@ END - GET ALL DELETED TRANSACTIONS API - CORE APP
 """
 ******************************************************************************************************************************
 GET SUMMARY TABLE API - CORE APP - SPRINT 10 - FNE 720 - BY PRAVEEN JINKA
+DISBURSEMENT FUNCTIONALITY ADDED - SPRINT 13 - FNE 1094 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 def check_calendar_year(calendar_year):
@@ -1751,7 +1841,7 @@ def period_receipts_sql(cmte_id, report_id):
             cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
-        raise Exception('The period_receipts_sql API is throwing an error: ' + str(e))
+        raise Exception('The period_receipts_sql function is throwing an error: ' + str(e))
 
 def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
     try:
@@ -1759,7 +1849,125 @@ def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
             cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND contribution_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
             return cursor.fetchall()
     except Exception as e:
-        raise Exception('The calendar_receipts_sql API is throwing an error: ' + str(e))
+        raise Exception('The calendar_receipts_sql function is throwing an error: ' + str(e))
+
+def period_disbursements_sql(cmte_id, report_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The period_disbursements_sql function is throwing an error: ' + str(e))
+
+def calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND expenditure_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The calendar_receipts_sql function is throwing an error: ' + str(e))
+
+def summary_disbursements(args):
+    try:
+        
+        XXIAI_amount = 0
+        XXIAII_amount = 0
+        XXIB_amount = 0
+        XXIC_amount = 0
+        XXII_amount = 0
+        XXIII_amount = 0
+        XXIV_amount = 0
+        XXV_amount = 0
+        XXVI_amount = 0
+        XXVII_amount = 0
+        XXVIIIA_amount = 0
+        XXVIIIB_amount = 0
+        XXVIIIC_amount = 0
+        XXVIIID_amount = 0
+        XXIX_amount = 0
+        XXXAI_amount = 0
+        XXXAII_amount = 0
+        XXXB_amount = 0
+        XXXC_amount = 0
+        XXXI_amount = 0
+        XXXII_amount = 0       
+
+        if len(args) == 2:
+            cmte_id = args[0]
+            report_id = args[1]
+            sql_output = period_disbursements_sql(cmte_id, report_id)
+        else:
+            cmte_id = args[0]
+            calendar_start_dt = args[1]
+            calendar_end_dt = args[2]
+            sql_output = calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt)
+
+        for row in sql_output:
+            data_row = list(row)
+            if data_row[0] == '21AI':
+                XXIAI_amount = XXIAI_amount + data_row[1]
+            if data_row[0] == '21AII':
+                XXIAII_amount = XXIAII_amount + data_row[1]
+            if data_row[0] == '21B':
+                XXIB_amount = XXIB_amount + data_row[1]
+            if data_row[0] == '22':
+                XXII_amount = XXII_amount + data_row[1]
+            if data_row[0] == '23':
+                XXIII_amount = XXIII_amount + data_row[1]
+            if data_row[0] == '24':
+                XXIV_amount = XXIV_amount + data_row[1]
+            if data_row[0] == '25':
+                XXV_amount = XXV_amount + data_row[1]
+            if data_row[0] == '26':
+                XXVI_amount = XXVI_amount + data_row[1]
+            if data_row[0] == '27':
+                XXVII_amount = XXVII_amount + data_row[1]
+            if data_row[0] == '28A':
+                XXVIIIA_amount = XXVIIIA_amount + data_row[1]
+            if data_row[0] == '28B':
+                XXVIIIB_amount = XXVIIIB_amount + data_row[1]
+            if data_row[0] == '28C':
+                XXVIIIC_amount = XXVIIIC_amount + data_row[1]
+            if data_row[0] == '29':
+                XXIX_amount = XXIX_amount + data_row[1]
+            if data_row[0] == '30AI':
+                XXXAI_amount = XXXAI_amount + data_row[1]
+            if data_row[0] == '30AII':
+                XXXAII_amount = XXXAII_amount + data_row[1]
+            if data_row[0] == '30B':
+                XXXB_amount = XXXB_amount + data_row[1]
+
+        XXIC_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
+        XXVIIID_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
+        XXXC_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
+        XXXI_amount = XXIC_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIIID_amount + XXIX_amount + XXXC_amount
+        XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
+
+        summary_disbursement = {'21AI': XXIAI_amount,
+                    '21AII': XXIAII_amount,
+                    '21B': XXIB_amount,
+                    '21C': XXIC_amount,
+                    '22': XXII_amount,
+                    '23': XXIII_amount,
+                    '24': XXIV_amount,
+                    '25': XXV_amount,
+                    '26': XXVI_amount,
+                    '27': XXVII_amount,
+                    '28A': XXVIIIA_amount,
+                    '28B': XXVIIIB_amount,
+                    '28C': XXVIIIC_amount,
+                    '28D': XXVIIID_amount,
+                    '29': XXIX_amount,
+                    '30AI': XXXAI_amount,
+                    '30AII': XXXAII_amount,
+                    '30B': XXXB_amount,
+                    '30C': XXXC_amount,
+                    '31': XXXI_amount,
+                    '32': XXXII_amount
+                        }    
+        return summary_disbursement
+    except Exception as e:
+        raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
 def summary_receipts(args):
     try:
@@ -1824,7 +2032,7 @@ def summary_receipts(args):
         XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIIIC_amount
         XX_amount = XIX_amount - XVIIIC_amount
 
-        summary_receipts = {'11AI': XIAI_amount,
+        summary_receipt = {'11AI': XIAI_amount,
                     '11AII': XIAII_amount,
                     '11AIII': XIAIII_amount,
                     '11B': XIB_amount,
@@ -1842,7 +2050,7 @@ def summary_receipts(args):
                     '19': XIX_amount,
                     '20': XX_amount
                         }    
-        return summary_receipts
+        return summary_receipt
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
@@ -1862,20 +2070,57 @@ def summary_table(request):
 
         period_args = [cmte_id, report_id]
         period_receipt = summary_receipts(period_args)
+        period_disbursement = summary_disbursements(period_args)
 
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
         calendar_receipt = summary_receipts(calendar_args)
+        calendar_disbursement = summary_disbursements(calendar_args)
 
-        forms_obj = {'period':{'period_receipts': period_receipt,
-                                'period_disbursements': 0,
-                                'period_summary': 0},
-                    'calendar':{'calendar_receipts': calendar_receipt,
-                                'calendar_disbursements': 0,
-                                'calendar_summary': 0}}                          
+        cash_summary = {'Beginning COH': 0,
+                        'Ending COH': 0,
+                        'Debts/Loans owed to committee': 0,
+                        'Debts/Loans owed by committee': 0}
+
+        forms_obj = {'Total Raised': {'period_receipts': period_receipt,
+                                'calendar_receipts': calendar_receipt},
+                    'Total Spent': {'period_disbursements': period_disbursement,
+                                    'calendar_disbursements': calendar_disbursement},
+                    'Cash summary': cash_summary}
+                        
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The summary_table API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+"""
+******************************************************************************************************************************
+END - GET SUMMARY TABLE API - CORE APP
+******************************************************************************************************************************
+"""
+"""
+******************************************************************************************************************************
+GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1093 - BY PRAVEEN JINKA
+******************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_thirdNavigationTransactionTypes(request):
+    try:
+        cmte_id = request.user.username
+
+        if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
+            raise Exception ('Missing Input: Report_id is mandatory')
+        report_id = check_report_id(request.query_params.get('report_id'))
+
+        period_args = [cmte_id, report_id]
+        period_receipt = summary_receipts(period_args)
+        period_disbursement = summary_disbursements(period_args)
+
+        forms_obj = { 'Receipts': period_receipt.get('19'),
+                        'Disbursements': period_disbursement.get('31'),
+                        'Loans/Debts': 0,
+                        'Others': 0}
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_thirdNavigationTransactionTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
 ******************************************************************************************************************************
 END - GET SUMMARY TABLE API - CORE APP
@@ -1889,7 +2134,6 @@ def get_ReportTypes(request):
     try:
         cmte_id = request.user.username
         forms_obj = []
-        print("cmte_id", cmte_id)
         with connection.cursor() as cursor: 
             cursor.execute("SELECT json_agg(t) FROM (select rpt_type, rpt_type_desc from public.ref_rpt_types order by rpt_type_desc) t")
             for row in cursor.fetchall():
@@ -3714,7 +3958,37 @@ def create_inkind_bitcoin_f3x_json_file(request):
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_report_info(request):
+    """
+    Get report details
+    """
+    cmte_id = request.user.username
+    report_id = request.query_params.get('reportid')
+    print("cmte_id", cmte_id)
+    print("report_id", report_id)
+    try:
+        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
+            print("you are here1")
+            if int(request.query_params.get('reportid'))>=1:
+                print("you are here2")
+                with connection.cursor() as cursor:
+                    # GET all rows from Reports table
+                    
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
+                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
+                    print("query_string", query_string)
 
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
+                
+                    for row in cursor.fetchall():
+                        data_row = list(row)
+                        forms_obj=data_row[0]
+                        
+            if forms_obj is None:
+                raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
 
-
+            return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception:
+        raise

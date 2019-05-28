@@ -384,5 +384,38 @@ export class ReportsService {
     var day = dateValue.getUTCDate()+"";
     return month + day  +year;
   }
+  
+  public getReportInfo(form_type: string, report_id: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+    let url: string = '';
+    
+    
+    console.log("form_type =",form_type);
+    console.log("report_id =",report_id);
 
+    if (form_type==='F99'){
+      url = '/f99/get_f99_report_info';
+    } else if (form_type==='F3X'){
+      url = '/core/get_report_info';
+    }
+    
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    //params = params.append('committeeid', committee_id);
+    params = params.append('reportid', report_id);
+    console.log ("params =", params);
+    console.log("${environment.apiUrl}${url} =",`${environment.apiUrl}${url}`);
+
+    return this._http
+     .get(
+        `${environment.apiUrl}${url}`,
+        {
+          headers: httpOptions,
+          params
+        }
+      )
+  }
 }

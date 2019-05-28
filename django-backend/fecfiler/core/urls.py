@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^core/state$', views.state, name='state'),
     url(r'^core/get_all_deleted_transactions$', views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
     url(r'^core/summary_table$', views.summary_table, name='summary_table'),
+    url(r'^core/thirdNavTransactionTypes$', views.get_thirdNavigationTransactionTypes, name='get_thirdNavigationTransactionTypes'),
     url(r'^core/get_FormTypes$', views.get_FormTypes, name='get_FormTypes'),
     url(r'^core/get_ReportTypes$', views.get_ReportTypes, name='get_ReportTypes'),
     url(r'^core/get_AmendmentIndicators$', views.get_AmendmentIndicators, name='get_AmendmentIndicators'),
@@ -27,8 +28,5 @@ urlpatterns = [
     url(r'^core/create_f3x_returned_bounced_json_file$', views.create_f3x_returned_bounced_json_file, name='create_f3x_returned_bounced_json_file'),
     url(r'^core/create_f3x_reattribution_json_file$', views.create_f3x_reattribution_json_file, name='create_f3x_reattribution_json_file'),
     url(r'^core/create_inkind_bitcoin_f3x_json_file$', views.create_inkind_bitcoin_f3x_json_file, name='create_inkind_bitcoin_f3x_json_file'),
-
-  
-
-
+    url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
 ]
