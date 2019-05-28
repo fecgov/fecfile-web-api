@@ -1599,53 +1599,138 @@ END - GET ALL TRANSACTIONS API - CORE APP
 
 """
 **********************************************************************************************************************************************
-GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - - BY  Praveen Jinka
+TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
-
 """
-@api_view(['GET'])
+def filter_get_all_trans(request, param_string):
+    if request.method == 'GET':
+        return param_string
+    # import ipdb;ipdb.set_trace()
+    filt_dict = request.data['filters']
+    for f_key, value_d in filt_dict.items():
+        if 'filterCategories' in f_key:
+            cat_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+        if 'filterFromDate' in f_key and 'filterToDate' in f_key:
+            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
+        if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
+            param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
+        if 'filterStates' in f_key:
+            state_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND state In " + state_tuple
+        if 'filterMemoCode' in f_key:
+            if str(value_d) == 'true':
+                param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+    return param_string
+
+
+@api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        # import ipdb;ipdb.set_trace()
+        params = request.data['filters']
+        keywords = params.get('keywords')
+        report_id = request.data.get('reportid')
+        if str(descending) == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
         #     order_string = "transaction_id"
-        for key, value in request.query_params.items():
-            try:
-                check_value = int(value)
-                param_string = param_string + " AND " + key + "=" + str(value)
-            except Exception as e:
-                if key == 'transaction_date':
-                    transaction_date = date_format(request.query_params.get('transaction_date'))
-                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
-                else:
-                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+        # import ipdb;ipdb.set_trace()
+        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 
+            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'occupation', 'employer', 'memo_code', 'memo_text']
+        # if search_string:
+        #     for key in keys:
+        #         if not param_string:
+        #             param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #         else:
+        #             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #     param_string = param_string + " )"
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
-                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
-                            # + """ ORDER BY """ + order_string
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
+                    else:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+            param_string = param_string + " )"
+        param_string = filter_get_all_trans(request, param_string)
+        #import ipdb;ipdb.set_trace()
+        # for key, value in request.query_params.items():
+        #     try:
+        #         check_value = int(value)
+        #         param_string = param_string + " AND " + key + "=" + str(value)
+        #     except Exception as e:
+        #         if key == 'transaction_date':
+        #             transaction_date = date_format(request.query_params.get('transaction_date'))
+        #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+        #         else:
+        #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
+                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           # + """ ORDER BY """ + order_string
+        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
-            
+        
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
+        # print(trans_query_string)
+        if sortcolumn:
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        else:
+            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
-
-        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_204_NO_CONTENT
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
+        
+        #import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
     except Exception as e:
@@ -3890,7 +3975,9 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
                     
+
                     query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
+
                                       FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
                     print("query_string", query_string)
