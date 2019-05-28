@@ -19,7 +19,6 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { ReportTypeService } from './report-type.service';
-import { ReportTypeMessageService, ReportTypeDateEnum } from './report-type-message.service';
 import {
   form3x_data,
   Icommittee_form3x_reporttype,
@@ -72,7 +71,6 @@ export class ReportTypeComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _reportTypeMessageService: ReportTypeMessageService,
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
@@ -146,8 +144,6 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
-          console.log('getMessage: ');
-          console.log('res:', res);
           if (res.reportType === 'S') {
             if (Array.isArray(res.electionDates)) {
               if (typeof res.electionDates[0] === 'object') {
@@ -167,12 +163,8 @@ export class ReportTypeComponent implements OnInit {
             }
           }
           if (res.hasOwnProperty('validDates')) {
-            console.log('res has validDates');
-            console.log('res: ', res);
             if (!res.validDates) {
               this.invalidDates = true;
-
-              console.log('this.invalidDates: ', this.invalidDates);
 
               this.optionFailed = false;
 
@@ -284,8 +276,6 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidateReportType() {
-    console.log('this.frmReportType: ', this.frmReportType);
-
     if (this.frmReportType.valid) {
       this.optionFailed = false;
       this.isValidType = true;
@@ -358,11 +348,7 @@ export class ReportTypeComponent implements OnInit {
 
       return 1;
     } else {
-      console.log('form is invalid: ');
-      console.log('this.frmReportType.invalid', this.frmReportType.invalid);
       if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
-        console.log('reportTypeRadio is invalid: ');
-
         this.invalidDates = false;
         this.optionFailed = true;
         this.isValidType = false;
@@ -371,8 +357,6 @@ export class ReportTypeComponent implements OnInit {
 
         return 0;
       } else {
-        console.log('reportTypeRadio is valid, something else is wrong.');
-
         this.invalidDates = true;
         this.optionFailed = false;
         this.isValidType = false;

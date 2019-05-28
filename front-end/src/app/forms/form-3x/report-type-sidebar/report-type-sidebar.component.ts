@@ -9,7 +9,6 @@ import {
   selectedElectionDate,
   selectedReportType
 } from '../../../shared/interfaces/FormsService/FormsService';
-import { ReportTypeMessageService, ReportTypeDateEnum } from '../report-type/report-type-message.service';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
@@ -50,7 +49,6 @@ export class ReportTypeSidebarComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _formService: FormsService,
     private _messageService: MessageService,
-    private _reportTypeMessageService: ReportTypeMessageService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
