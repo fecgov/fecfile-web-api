@@ -19,7 +19,6 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { ReportTypeService } from './report-type.service';
-import { ReportTypeMessageService, ReportTypeDateEnum } from './report-type-message.service';
 import {
   form3x_data,
   Icommittee_form3x_reporttype,
@@ -42,11 +41,12 @@ export class ReportTypeComponent implements OnInit {
   @Input() selectedReportInfo: any = null;
 
   public frmReportType: FormGroup;
-  public fromDateSelected = false;
-  public reportTypeSelected = '';
-  public isValidType = false;
-  public optionFailed = false;
-  public screenWidth = 0;
+  public fromDateSelected: boolean = false;
+  public reportTypeSelected: string = null;
+  public isValidType: boolean = false;
+  public optionFailed: boolean = false;
+  public invalidDates: boolean = false;
+  public screenWidth: number = 0;
   public reportType: string = null;
   public toDateSelected = false;
   public tooltipPosition = 'right';
@@ -71,7 +71,6 @@ export class ReportTypeComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _messageService: MessageService,
-    private _reportTypeMessageService: ReportTypeMessageService,
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
@@ -145,7 +144,7 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.getMessage().subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
-          if (res.reportType === 'special') {
+          if (res.reportType === 'S') {
             if (Array.isArray(res.electionDates)) {
               if (typeof res.electionDates[0] === 'object') {
                 this._fromDateSelected = res.electionDates[0].cvg_start_date;
@@ -163,8 +162,24 @@ export class ReportTypeComponent implements OnInit {
               }
             }
           }
-        }
-      }
+          if (res.hasOwnProperty('validDates')) {
+            if (!res.validDates) {
+              this.invalidDates = true;
+
+              this.optionFailed = false;
+
+              this.frmReportType.setErrors({ invalid: true });
+
+              this.frmReportType.markAsDirty();
+              this.frmReportType.markAsTouched();
+            } else {
+              this.frmReportType.setErrors(null);
+              //this.frmReportType.setErrors({ status: 'VALID' });
+              this.invalidDates = false;
+            }
+          }
+        } // res.type === this._formType
+      } // res.hasOwnProperty
     });
 
     this._setReportTypes();
@@ -190,8 +205,6 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
-      this.initCustomFormValidation();
-      this.initUserModFields();
       this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
@@ -263,14 +276,6 @@ export class ReportTypeComponent implements OnInit {
    *
    */
   public doValidateReportType() {
-    this.initCustomFormValidation();
-    if (!this.doCustomValidation()) {
-      this.customFormValidation.error = true;
-      this.optionFailed = false;
-      window.scrollTo(0, 0);
-      return 0;
-    }
-
     if (this.frmReportType.valid) {
       this.optionFailed = false;
       this.isValidType = true;
@@ -343,39 +348,22 @@ export class ReportTypeComponent implements OnInit {
 
       return 1;
     } else {
-      this.optionFailed = true;
-      this.isValidType = false;
-      window.scrollTo(0, 0);
+      if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
+        this.invalidDates = false;
+        this.optionFailed = true;
+        this.isValidType = false;
 
-      return 0;
+        window.scrollTo(0, 0);
+
+        return 0;
+      } else {
+        this.invalidDates = true;
+        this.optionFailed = false;
+        this.isValidType = false;
+
+        window.scrollTo(0, 0);
+      }
     }
-  }
-
-  /**
-   * Perform custom validations not handled by angular's built in
-   * validation framework.
-   *
-   * @returns true if valid
-   */
-  private doCustomValidation(): boolean {
-    // TODO compare dates for start <= end
-    // TODO check for valid date format
-
-    // start and end are required
-    let valid = true;
-    if (!this.fromDateSelected) {
-      valid = false;
-      this.customFormValidation.messages.push('You must select coverage dates.');
-      return;
-    }
-
-    if (!this.toDateSelected) {
-      valid = false;
-      this.customFormValidation.messages.push('You must select coverage dates.');
-      return;
-    }
-
-    return valid;
   }
 
   /**
@@ -571,17 +559,5 @@ export class ReportTypeComponent implements OnInit {
     dueDate = Math.round(Math.abs((today.getTime() - day.getTime()) / oneDay));
 
     return dueDate;
-  }
-
-  private initUserModFields() {
-    this._fromDateUserModified = null;
-    this._toDateUserModified = null;
-  }
-
-  private initCustomFormValidation() {
-    this.customFormValidation = {
-      error: false,
-      messages: []
-    };
   }
 }
