@@ -10,67 +10,58 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class IndividualReceiptService {
+  constructor(private _http: HttpClient, private _cookieService: CookieService, private _utilService: UtilService) {}
 
-  constructor(
-    private _http: HttpClient,
-    private _cookieService: CookieService,
-     private _utilService: UtilService
-  ) { }
+  /**
+   * Gets the dynamic form fields.
+   *
+   * @param      {string}  formType         The form type
+   * @param      {string}  transactionType  The transaction type
+   */
+  public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+    let formData: FormData = new FormData();
 
- /**
-  * Gets the dynamic form fields.
-  *
-  * @param      {string}  formType         The form type
-  * @param      {string}  transactionType  The transaction type
-  */
- public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
-  const token: string = JSON.parse(this._cookieService.get('user'));
-  const url: string = '/core/get_dynamic_forms_fields';
-  let httpOptions =  new HttpHeaders();
-  let params = new HttpParams();
-  let formData: FormData = new FormData();
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    params = params.append('form_type', `F${formType}`);
+    params = params.append('transaction_type', transactionType);
 
-  params = params.append('form_type', `F${formType}`);
-  params = params.append('transaction_type', transactionType);
+    return this._http.get(url, {
+      headers: httpOptions,
+      params
+    });
+  }
 
-  return this._http
-      .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions,
-          params
-        }
-      );
- }
+  /**
+   * Saves a schedule a.
+   *
+   * @param      {string}  formType  The form type
+   */
+  public saveScheduleA(formType: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = '/sa/schedA';
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
+    const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
 
- /**
-  * Saves a schedule a.
-  *
-  * @param      {string}  formType  The form type
-  */
- public saveScheduleA(formType: string): Observable<any> {
-  const token: string = JSON.parse(this._cookieService.get('user'));
-  const url: string = '/sa/schedA';
-  const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-  const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-  const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-  const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+    let formData: FormData = new FormData();
 
-  let httpOptions =  new HttpHeaders();
-  let params = new HttpParams();
-  let formData: FormData = new FormData();
-
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     formData.append('cmte_id', committeeDetails.committeeid);
     // With Edit Report Functionality
     if (reportType.hasOwnProperty('reportId')) {
       formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
-        formData.append('report_id', reportType.reportid);  
+      formData.append('report_id', reportType.reportid);
     }
 
     //formData.append('report_id', reportType.reportId);
@@ -124,21 +115,16 @@ export class IndividualReceiptService {
     }
 
     return this._http
-        .post(
-          `${environment.apiUrl}${url}`,
-          formData,
-          {
-            headers: httpOptions
+      .post(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
           }
-        )
-        .pipe(map(res => {
-            if (res) {
-              console.log('res: ', res);
-
-              return res;
-            }
-            return false;
-        }));
- }
+          return false;
+        })
+      );
+  }
 }
-

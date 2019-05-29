@@ -1,484 +1,532 @@
-{
-  "data": {
-    "formFields": [{
-      "cols": [{
-        "text": "Entity Type",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "EntityType",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor Last Name",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorLastName",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor First Name",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorFirstName",
-        "type": "text",
-        "infoText": null
-      }]
-    }, {
-      "cols": [{
-        "text": "Contributor Middle Name",
-        "validation": null,
-        "infoIcon": null,
-        "name": "ContributorMiddleName",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor Prefix",
-        "validation": null,
-        "infoIcon": null,
-        "name": "ContributorPrefix",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor Suffix",
-        "validation": null,
-        "infoIcon": null,
-        "name": "ContributorSuffix",
-        "type": "text",
-        "infoText": null
-      }]
-    }, {
-      "cols": [{
-        "text": "Contributor Street 1",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorStreet1",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor Street 2",
-        "validation": null,
-        "infoIcon": null,
-        "name": "ContributorStreet2",
-        "type": "text",
-        "infoText": null
-      }]
-    }, {
-      "cols": [{
-        "text": "Contributor City",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorCity",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Contributor State",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorState",
-        "type": "select",
-        "infoText": null
-      }, {
-        "text": "Contributor Zip",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": null,
-        "name": "ContributorZip",
-        "type": "text",
-        "infoText": null
-      }]
-    }, {
-      "cols": [{
-        "text": "Contribution Date",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "true",
-        "name": "ContributionDate",
-        "type": "date",
-        "infoText": "Request language from RAD"
-      }, {
-        "text": "Contribution Amount",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "true",
-        "name": "ContributionAmount",
-        "type": "number",
-        "infoText": "Request language from RAD"
-      }, {
-        "text": "Contribution Aggregate",
-        "validation": null,
-        "infoIcon": "true",
-        "name": "ContributionAggregate",
-        "type": "number",
-        "infoText": "Request language from RAD"
-      }]
-    }, {
-      "cols": [{
-        "text": "Contributor Employer",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "true",
-        "name": "ContributorEmployer",
-        "type": "text",
-        "infoText": "Request language from RAD"
-      }, {
-        "text": "Contributor Occupation",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "true",
-        "name": "ContributorOccupation",
-        "type": "text",
-        "infoText": "Request language from RAD"
-      }]
-    }, {
-      "cols": [{
-        "text": "Memo Code",
-        "validation": null,
-        "infoIcon": "true",
-        "name": "MemoCode",
-        "type": "text",
-        "infoText": "Request language from RAD"
-      }, {
-        "text": "Memo Text",
-        "validation": null,
-        "infoIcon": "true",
-        "name": "MemoText",
-        "type": "text",
-        "infoText": "Request language from RAD"
-      }]
-    }, {
-      "cols": [{
-        "text": "Contribution Purpose Description",
-        "validation": null,
-        "infoIcon": "true",
-        "name": "ContributionPurposeDescription",
-        "type": "text",
-        "infoText": "Request language from RAD"
-      }]
-    }, {
-      "cols": [{
-        "text": "Line Number",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "false",
-        "name": "LineNumber",
-        "type": "text",
-        "infoText": null
-      }, {
-        "text": "Transaction Id",
-        "validation": {
-          "required": true
-        },
-        "infoIcon": "flase",
-        "name": "TransactionId",
-        "type": "text",
-        "infoText": null
-      }]
-    },
-    {
-      "cols": [{
-        "text": "Back Reference Tran Id Number",
-        "validation": null,
-        "infoIcon": "flase",
-        "name": "BackReferenceTranIdNumber",
-        "type": "text",
-        "infoText": null
-      },
-      {
-        "text": "Transaction Type Code",
-        "validation": null,
-        "infoIcon": "flase",
-        "name": "TransactionTypeCode",
-        "type": "text",
-        "infoText": null
-      }]
-    }],
-    "transactionCategories": [{
-      "text": "Contributions from Individuals",
-      "info": "Language will be provided by RAD",
-      "value": "contributions-from-individuals",
-      "type": "Receipts"
-    }, {
-      "text": "Contributions from Registered Filers",
-      "info": "Language will be provided by RAD",
-      "value": "contributions-from-registered-filers",
-      "type": "Receipts"
-    }, {
-      "text": "Transfers",
-      "info": "Language will be provided by RAD",
-      "value": "transfers",
-      "type": "Receipts"
-    }, {
-      "text": "Refunds",
-      "info": "Language will be provided by RAD",
-      "value": "refunds",
-      "type": "Receipts"
-    }, {
-      "text": "Other",
-      "info": "Language will be provided by RAD",
-      "value": "other",
-      "type": "Receipts"
-    }, {
-      "text": "Operating Expenditures",
-      "info": "Language will be provided by RAD",
-      "value": "operating-expenditures",
-      "type": "Disbursements"
-    }, {
-      "text": "Contributions/Expenditures to Reg. Filers",
-      "info": "Language will be provided by RAD",
-      "value": "contributions/expenditures-to-reg.-filers",
-      "type": "Disbursements"
-    }, {
-      "text": "Other Expenditures",
-      "info": "Language will be provided by RAD",
-      "value": "other-expenditures",
-      "type": "Disbursements"
-    }, {
-      "text": "Refund",
-      "info": "Language will be provided by RAD",
-      "value": "refund",
-      "type": "Disbursements"
-    }, {
-      "text": "Allocated or FEA Expenditures",
-      "info": "Language will be provided by RAD",
-      "value": "allocated-or-fea-expenditures",
-      "type": "Disbursements"
-    }, {
-      "text": "Loans Owed to Committee",
-      "info": "Language will be provided by RAD",
-      "value": "loans-owed-to-committee",
-      "type": "Loans and Debts"
-    }, {
-      "text": "Loans Owed by Committee",
-      "info": "Language will be provided by RAD",
-      "value": "loans-owed-by-committee",
-      "type": "Loans and Debts"
-    }, {
-      "text": "Debts Owed to Committee",
-      "info": "Language will be provided by RAD",
-      "value": "debts-owed-to-committee",
-      "type": "Loans and Debts"
-    }, {
-      "text": "Debts owed by Committee",
-      "info": "Language will be provided by RAD",
-      "value": "debts-owed-by-committee",
-      "type": "Loans and Debts"
-    }, {
-      "text": "H1 - Allocation Ratios",
-      "info": "Language will be provided by RAD",
-      "value": "h1---allocation-ratios",
-      "type": "Other"
-    }, {
-      "text": "H2 - Fundraising Ratios",
-      "info": "Language will be provided by RAD",
-      "value": "h2---fundraising-ratios",
-      "type": "Other"
-    }, {
-      "text": "Schedule L",
-      "info": "Language will be provided by RAD",
-      "value": "schedule-l",
-      "type": "Other"
-    }],
-    "states": [{
-      "code": "AL",
-      "name": "Alabama"
-    }, {
-      "code": "AK",
-      "name": "Alaska"
-    }, {
-      "code": "AZ",
-      "name": "Arizona"
-    }, {
-      "code": "AR",
-      "name": "Arkansas"
-    }, {
-      "code": "CA",
-      "name": "California"
-    }, {
-      "code": "CO",
-      "name": "Colorado"
-    }, {
-      "code": "CT",
-      "name": "Connecticut"
-    }, {
-      "code": "DE",
-      "name": "Delaware"
-    }, {
-      "code": "DC",
-      "name": "District Of Columbia"
-    }, {
-      "code": "FL",
-      "name": "Florida"
-    }, {
-      "code": "GA",
-      "name": "Georgia"
-    }, {
-      "code": "GU",
-      "name": "Guam"
-    }, {
-      "code": "HI",
-      "name": "Hawaii"
-    }, {
-      "code": "ID",
-      "name": "Idaho"
-    }, {
-      "code": "IL",
-      "name": "Illinois"
-    }, {
-      "code": "IN",
-      "name": "Indiana"
-    }, {
-      "code": "IA",
-      "name": "Iowa"
-    }, {
-      "code": "KS",
-      "name": "Kansas"
-    }, {
-      "code": "KY",
-      "name": "Kentucky"
-    }, {
-      "code": "LA",
-      "name": "Louisiana"
-    }, {
-      "code": "ME",
-      "name": "Maine"
-    }, {
-      "code": "MD",
-      "name": "Maryland"
-    }, {
-      "code": "MA",
-      "name": "Massachusetts"
-    }, {
-      "code": "MI",
-      "name": "Michigan"
-    }, {
-      "code": "MN",
-      "name": "Minnesota"
-    }, {
-      "code": "MS",
-      "name": "Mississippi"
-    }, {
-      "code": "MO",
-      "name": "Missouri"
-    }, {
-      "code": "MT",
-      "name": "Montana"
-    }, {
-      "code": "NE",
-      "name": "Nebraska"
-    }, {
-      "code": "NV",
-      "name": "Nevada"
-    }, {
-      "code": "NH",
-      "name": "New Hampshire"
-    }, {
-      "code": "NJ",
-      "name": "New Jersey"
-    }, {
-      "code": "NM",
-      "name": "New Mexico"
-    }, {
-      "code": "NY",
-      "name": "New York"
-    }, {
-      "code": "NC",
-      "name": "North Carolina"
-    }, {
-      "code": "ND",
-      "name": "North Dakota"
-    }, {
-      "code": "OH",
-      "name": "Ohio"
-    }, {
-      "code": "OK",
-      "name": "Oklahoma"
-    }, {
-      "code": "OR",
-      "name": "Oregon"
-    }, {
-      "code": "PA",
-      "name": "Pennsylvania"
-    }, {
-      "code": "PR",
-      "name": "Puerto Rico"
-    }, {
-      "code": "RI",
-      "name": "Rhode Island"
-    }, {
-      "code": "SC",
-      "name": "South Carolina"
-    }, {
-      "code": "SD",
-      "name": "South Dakota"
-    }, {
-      "code": "TN",
-      "name": "Tennessee"
-    }, {
-      "code": "TX",
-      "name": "Texas"
-    }, {
-      "code": "UT",
-      "name": "Utah"
-    }, {
-      "code": "VT",
-      "name": "Vermont"
-    }, {
-      "code": "VA",
-      "name": "Virginia"
-    }, {
-      "code": "VI",
-      "name": "U.S. Virgin Islands"
-    }, {
-      "code": "WA",
-      "name": "Washington"
-    }, {
-      "code": "WV",
-      "name": "West Virginia"
-    }, {
-      "code": "WI",
-      "name": "Wisconsin"
-    }, {
-      "code": "WY",
-      "name": "Wyoming"
-    }, {
-      "code": "ZZ",
-      "name": "Foreign Countries"
-    }, {
-      "code": "AS",
-      "name": "American Samoa"
-    }, {
-      "code": "MP",
-      "name": "Northern Mariana Islands"
-    }, {
-      "code": "US",
-      "name": "United States"
-    }, {
-      "code": "AA",
-      "name": "Armed Forces Americas"
-    }, {
-      "code": "AE",
-      "name": "Armed Forces Europe"
-    }, {
-      "code": "AP",
-      "name": "Armed Forces Pacific"
-    }]
-  }
+{  
+   "data":{  
+      "formFields":[  
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Last Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorLastName",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"30",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor First Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorFirstName",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"20",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Middle Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorMiddleName",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"20",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor Prefix",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorPrefix",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"10",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor Suffix",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorSuffix",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"10",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Street 1",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorStreet1",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"34",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor Street 2",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorStreet2",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"34",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor City",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorCity",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"30",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor State",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorState",
+                  "type":"select",
+                  "validation":{  
+                     "required": true,
+                     "max":"2",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor Zip",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"ContributorZip",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"9",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contribution Date",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributionDate",
+                  "type":"date",
+                  "validation":{  
+                     "required": true,
+                     "max":null,
+                     "date":true
+                  }
+               },
+               {  
+                  "text":"Contribution Amount",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributionAmount",
+                  "type":"number",
+                  "validation":{  
+                     "required": true,
+                     "max":"12",
+                     "dollarAmount":true
+                  }
+               },
+               {  
+                  "text":"Contribution Aggregate",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributionAggregate",
+                  "type":"number",
+                  "validation":{  
+                     "required": false,
+                     "max":"12",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Employer",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributorEmployer",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Contributor Occupation",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributorOccupation",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Memo Code",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"MemoCode",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"1",
+                     "alphaNumeric":true
+                  }
+               },
+               {  
+                  "text":"Memo Text",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"MemoText",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"100",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contribution Purpose Description",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributionPurposeDescription",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"100",
+                     "alphaNumeric":true
+                  }
+               }
+            ]
+         }
+      ],
+      "hiddenFields":[  
+         {  
+            "type":"hidden",
+            "name":"EntityType",
+            "value":"IND"
+         },
+         {  
+            "type":"hidden",
+            "name":"LineNumber",
+            "value":"11A"
+         },
+         {  
+            "type":"hidden",
+            "name":"TransactionId",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"BackReferenceTranIdNumber",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"BackReferenceSchedName",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"TransactionTypeCode",
+            "value":"15"
+         }
+      ],
+      "states":[  
+         {  
+            "name":"Alabama",
+            "code":"AL"
+         },
+         {  
+            "name":"Alaska",
+            "code":"AK"
+         },
+         {  
+            "name":"Arizona",
+            "code":"AZ"
+         },
+         {  
+            "name":"Arkansas",
+            "code":"AR"
+         },
+         {  
+            "name":"California",
+            "code":"CA"
+         },
+         {  
+            "name":"Colorado",
+            "code":"CO"
+         },
+         {  
+            "name":"Connecticut",
+            "code":"CT"
+         },
+         {  
+            "name":"Delaware",
+            "code":"DE"
+         },
+         {  
+            "name":"District Of Columbia",
+            "code":"DC"
+         },
+         {  
+            "name":"Florida",
+            "code":"FL"
+         },
+         {  
+            "name":"Georgia",
+            "code":"GA"
+         },
+         {  
+            "name":"Guam",
+            "code":"GU"
+         },
+         {  
+            "name":"Hawaii",
+            "code":"HI"
+         },
+         {  
+            "name":"Idaho",
+            "code":"ID"
+         },
+         {  
+            "name":"Illinois",
+            "code":"IL"
+         },
+         {  
+            "name":"Indiana",
+            "code":"IN"
+         },
+         {  
+            "name":"Iowa",
+            "code":"IA"
+         },
+         {  
+            "name":"Kansas",
+            "code":"KS"
+         },
+         {  
+            "name":"Kentucky",
+            "code":"KY"
+         },
+         {  
+            "name":"Louisiana",
+            "code":"LA"
+         },
+         {  
+            "name":"Maine",
+            "code":"ME"
+         },
+         {  
+            "name":"Maryland",
+            "code":"MD"
+         },
+         {  
+            "name":"Massachusetts",
+            "code":"MA"
+         },
+         {  
+            "name":"Michigan",
+            "code":"MI"
+         },
+         {  
+            "name":"Minnesota",
+            "code":"MN"
+         },
+         {  
+            "name":"Mississippi",
+            "code":"MS"
+         },
+         {  
+            "name":"Missouri",
+            "code":"MO"
+         },
+         {  
+            "name":"Montana",
+            "code":"MT"
+         },
+         {  
+            "name":"Nebraska",
+            "code":"NE"
+         },
+         {  
+            "name":"Nevada",
+            "code":"NV"
+         },
+         {  
+            "name":"New Hampshire",
+            "code":"NH"
+         },
+         {  
+            "name":"New Jersey",
+            "code":"NJ"
+         },
+         {  
+            "name":"New Mexico",
+            "code":"NM"
+         },
+         {  
+            "name":"New York",
+            "code":"NY"
+         },
+         {  
+            "name":"North Carolina",
+            "code":"NC"
+         },
+         {  
+            "name":"North Dakota",
+            "code":"ND"
+         },
+         {  
+            "name":"Ohio",
+            "code":"OH"
+         },
+         {  
+            "name":"Oklahoma",
+            "code":"OK"
+         },
+         {  
+            "name":"Oregon",
+            "code":"OR"
+         },
+         {  
+            "name":"Pennsylvania",
+            "code":"PA"
+         },
+         {  
+            "name":"Puerto Rico",
+            "code":"PR"
+         },
+         {  
+            "name":"Rhode Island",
+            "code":"RI"
+         },
+         {  
+            "name":"South Carolina",
+            "code":"SC"
+         },
+         {  
+            "name":"South Dakota",
+            "code":"SD"
+         },
+         {  
+            "name":"Tennessee",
+            "code":"TN"
+         },
+         {  
+            "name":"Texas",
+            "code":"TX"
+         },
+         {  
+            "name":"Utah",
+            "code":"UT"
+         },
+         {  
+            "name":"Vermont",
+            "code":"VT"
+         },
+         {  
+            "name":"Virginia",
+            "code":"VA"
+         },
+         {  
+            "name":"U.S. Virgin Islands",
+            "code":"VI"
+         },
+         {  
+            "name":"Washington",
+            "code":"WA"
+         },
+         {  
+            "name":"West Virginia",
+            "code":"WV"
+         },
+         {  
+            "name":"Wisconsin",
+            "code":"WI"
+         },
+         {  
+            "name":"Wyoming",
+            "code":"WY"
+         },
+         {  
+            "name":"Foreign Countries",
+            "code":"ZZ"
+         },
+         {  
+            "name":"American Samoa",
+            "code":"AS"
+         },
+         {  
+            "name":"Northern Mariana Islands",
+            "code":"MP"
+         },
+         {  
+            "name":"United States",
+            "code":"US"
+         },
+         {  
+            "name":"Armed Forces Americas",
+            "code":"AA"
+         },
+         {  
+            "name":"Armed Forces Europe",
+            "code":"AE"
+         },
+         {  
+            "name":"Armed Forces Pacific",
+            "code":"AP"
+         }
+      ]
+   }
 }
