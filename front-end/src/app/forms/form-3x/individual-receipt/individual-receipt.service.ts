@@ -121,8 +121,6 @@ export class IndividualReceiptService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('res: ', res);
-
             return res;
           }
           return false;

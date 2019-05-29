@@ -142,7 +142,6 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    console.log('this.frmIndividualReceipt:', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
 
