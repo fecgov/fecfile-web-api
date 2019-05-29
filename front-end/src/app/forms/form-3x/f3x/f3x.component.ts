@@ -1,13 +1,21 @@
 import { Component, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportTypeService } from '../report-type/report-type.service';
 import { TransactionTypeService } from '../transaction-type/transaction-type.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { form3x_data, form3XReport } from '../../../shared/interfaces/FormsService/FormsService';
-import { selectedElectionState, selectedElectionDate, selectedReportType } from '../../../shared/interfaces/FormsService/FormsService';
+import {
+  form3x_data,
+  form3XReport,
+  form3xReportTypeDetails
+} from '../../../shared/interfaces/FormsService/FormsService';
+import {
+  selectedElectionState,
+  selectedElectionDate,
+  selectedReportType
+} from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 
 @Component({
@@ -18,7 +26,6 @@ import { MessageService } from '../../../shared/services/MessageService/message.
   encapsulation: ViewEncapsulation.None
 })
 export class F3xComponent implements OnInit {
-
   public currentStep: string = 'step_1';
   public step: string = '';
   public steps: any = {};
@@ -51,7 +58,6 @@ export class F3xComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _activatedRoute: ActivatedRoute
-
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -62,52 +68,46 @@ export class F3xComponent implements OnInit {
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    this._reportTypeService
-      .getReportTypes(this._formType)
-      .subscribe(res => {
-        if (typeof res === 'object') {
-          if (Array.isArray(res.report_type)) {
-            this.reportTypes  = res.report_type;
+    this._reportTypeService.getReportTypes(this._formType).subscribe(res => {
+      if (typeof res === 'object') {
+        if (Array.isArray(res.report_type)) {
+          this.reportTypes = res.report_type;
 
-            this.reportsLoading = false;
+          this.reportsLoading = false;
 
-            this._setReports();
-          }
+          this._setReports();
         }
-      });
+      }
+    });
 
-    this._transactionTypeService
-      .getTransactionCategories(this._formType)
-      .subscribe(res => {
-        if (res) {
-          this.transactionCategories = res.data.transactionCategories;
-        }
-      });
+    this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
+      if (res) {
+        this.transactionCategories = res.data.transactionCategories;
+      }
+    });
 
-      this._router
-        .events
-        .subscribe(val => {
-          if(val) {
-            if(val instanceof NavigationEnd) {
-              if(val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
-                localStorage.removeItem(`form_${this._formType}_report_type`);
-                localStorage.removeItem(`form_${this._formType}_transaction_type`);
-                localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
-                localStorage.removeItem(`form_${this._formType}_saved`);
-              }
-            } else {
-              if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
-                this.currentStep = this._activatedRoute.snapshot.queryParams.step;
-                this.step = this._activatedRoute.snapshot.queryParams.step;
-              }
-              window.scrollTo(0, 0);
-            }
+    this._router.events.subscribe(val => {
+      if (val) {
+        if (val instanceof NavigationEnd) {
+          if (val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
+            localStorage.removeItem(`form_${this._formType}_report_type`);
+            localStorage.removeItem(`form_${this._formType}_transaction_type`);
+            localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+            localStorage.removeItem(`form_${this._formType}_saved`);
           }
-        });
+        } else {
+          if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+            this.currentStep = this._activatedRoute.snapshot.queryParams.step;
+            this.step = this._activatedRoute.snapshot.queryParams.step;
+          }
+          window.scrollTo(0, 0);
+        }
+      }
+    });
   }
 
   ngDoCheck(): void {
-    if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+    if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
@@ -117,19 +117,53 @@ export class F3xComponent implements OnInit {
    * Sets the reports.
    */
   private _setReports(): void {
-    if (typeof this.reportType === 'undefined' || this.reportType === null) {
+    if (
+      typeof JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== 'undefined' ||
+      JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== null
+    ) {
+   
+      const form3XDetailsInstance =  JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+      console.log("form3XDetailsInstance =", form3XDetailsInstance)
+
+      if (form3XDetailsInstance.hasOwnProperty('regularspecialreportind')) {
+        this.reportTypeIndicator=form3XDetailsInstance.regularspecialreportind;
+      }
+
+      if (form3XDetailsInstance.hasOwnProperty('reporttype')) {
+        this.selectedReportType=form3XDetailsInstance.reporttype;
+      }
+     
+      if (this.reportTypeIndicator === 'S') {
+        this.regularReports = false;
+        this.specialReports = true;
+      } else {
+        this.specialReports = false;
+        this.regularReports = true;
+      }
+
+      console.log("this.reportTypeIndicator =", this.reportTypeIndicator);
+      console.log("this.selectedReportType =", this.selectedReportType);
+
+      if (this.reportTypeIndicator === 'S') {
+        this.regularReports = false;
+        this.specialReports = true;
+      } else {
+        this.specialReports = false;
+        this.regularReports = true;
+      }
+    } else if (typeof this.reportType === 'undefined' || this.reportType === null) {
       if (typeof this.reportTypes !== 'undefined' && this.reportTypes !== null) {
-        this.selectedReportType  = this.reportTypes.find(x => x.default_disp_ind === 'Y');
+        this.selectedReportType = this.reportTypes.find(x => x.default_disp_ind === 'Y');
         if (typeof this.selectedReportType === 'object') {
           if (typeof this.selectedReportType.regular_special_report_ind === 'string') {
             this.reportTypeIndicator = this.selectedReportType.regular_special_report_ind;
           }
         } else {
           if (Array.isArray(this.reportTypes)) {
-            this.reportType  = this.reportTypes[0].report_type;
-            this.selectedReportType = this.reportTypes.find(x => x.report_type===this.reportType);
+            this.reportType = this.reportTypes[0].report_type;
+            this.selectedReportType = this.reportTypes.find(x => x.report_type === this.reportType);
             if (typeof this.selectedReportType === 'object') {
-              this.reportTypeIndicator= this.selectedReportType.regular_special_report_ind;
+              this.reportTypeIndicator = this.selectedReportType.regular_special_report_ind;
             }
           }
         }
@@ -157,11 +191,11 @@ export class F3xComponent implements OnInit {
       this.reportTypeIndicator = this.selectedReport.regular_special_report_ind;
       if (typeof this.reportTypeIndicator === 'string') {
         if (this.reportTypeIndicator === 'S') {
-           this.specialReports=true;
-           this.regularReports=false;
+          this.specialReports = true;
+          this.regularReports = false;
         } else {
-          this.regularReports=true;
-          this.specialReports=false;
+          this.regularReports = true;
+          this.specialReports = false;
         }
       }
     }
@@ -174,14 +208,13 @@ export class F3xComponent implements OnInit {
    */
 
   public onNotify(e): void {
-
     if (typeof e === 'object') {
       /**
        * This block indicates a user can move to the next
        * step or previous step in a form.
        */
-       if (e.hasOwnProperty('form')) {
-         if (typeof e.form === 'object') {
+      if (e.hasOwnProperty('form')) {
+        if (typeof e.form === 'object') {
           this.frm = e.form;
 
           this.direction = e.direction;
@@ -198,32 +231,32 @@ export class F3xComponent implements OnInit {
           }
 
           this.canContinue();
-         } else if (typeof e.form === 'string') {
-           if (e.form === this._formType) {
+        } else if (typeof e.form === 'string') {
+          if (e.form === this._formType) {
             if (e.hasOwnProperty('reportTypeRadio')) {
               if (typeof e.reportTypeRadio === 'string') {
-               this._setCoverageDates(e.reportTypeRadio);
+                this._setCoverageDates(e.reportTypeRadio);
               }
             } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
-               this.selectedReportInfo = e;
+              this.selectedReportInfo = e;
             } else if (e.hasOwnProperty('transactionCategory')) {
               if (typeof e.transactionCategory === 'string') {
                 this.transactionCategory = e.transactionCategory;
               }
             }
           }
-         }
-       } else if (e.hasOwnProperty('direction')) {
-         if (typeof e.direction === 'string') {
-            if (e.direction === 'previous') {
-              this.direction = e.direction;
+        }
+      } else if (e.hasOwnProperty('direction')) {
+        if (typeof e.direction === 'string') {
+          if (e.direction === 'previous') {
+            this.direction = e.direction;
 
-              this.previousStep = e.previousStep;
+            this.previousStep = e.previousStep;
 
-              this._step = e.step;
-            }
-         }
-       }
+            this._step = e.step;
+          }
+        }
+      }
     }
   }
 
@@ -231,18 +264,18 @@ export class F3xComponent implements OnInit {
    * Determines ability to continue.
    */
   public canContinue(): void {
-    if(this.frm && this.direction) {
-      if(this.direction === 'next') {
-        if(this.frm.valid) {
+    if (this.frm && this.direction) {
+      if (this.direction === 'next') {
+        if (this.frm.valid) {
           this.step = this._step;
 
           this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
-        } else if(this.frm === 'preview') {
+        } else if (this.frm === 'preview') {
           this.step = this._step;
 
           this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
         }
-      } else if(this.direction === 'previous') {
+      } else if (this.direction === 'previous') {
         this.step = this._step;
 
         this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });

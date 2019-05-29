@@ -66,7 +66,14 @@ export class IndividualReceiptService {
   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     formData.append('cmte_id', committeeDetails.committeeid);
-    formData.append('report_id', reportType.reportId);
+    // With Edit Report Functionality
+    if (reportType.hasOwnProperty('reportId')) {
+      formData.append('report_id', reportType.reportId);
+    } else if (reportType.hasOwnProperty('reportid')) {
+        formData.append('report_id', reportType.reportid);  
+    }
+
+    //formData.append('report_id', reportType.reportId);
     formData.append('transaction_type', '15');
     formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);

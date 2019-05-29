@@ -9,7 +9,6 @@ import {
   selectedElectionDate,
   selectedReportType
 } from '../../../shared/interfaces/FormsService/FormsService';
-import { ReportTypeMessageService, ReportTypeDateEnum } from '../report-type/report-type-message.service';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
@@ -40,6 +39,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   private _previousReportTypeDescription: string = null;
   private _previousReportSelected: string = null;
   private _previousStateSelected: string = null;
+  private _reportType: string = null;
   private _selectedElectionDates: any = null;
   private _selectedState: string = null;
   private _selectedElectionDate: string = null;
@@ -49,7 +49,6 @@ export class ReportTypeSidebarComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _formService: FormsService,
     private _messageService: MessageService,
-    private _reportTypeMessageService: ReportTypeMessageService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
@@ -63,6 +62,13 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
+      // console.log('this.selectedReport: ', this.selectedReport);
+      if (this.selectedReport.hasOwnProperty('regular_special_report_ind')) {
+        if (typeof this.selectedReport.regular_special_report_ind === 'string') {
+          this._reportType = this.selectedReport.regular_special_report_ind;
+        }
+      }
+
       if (this.selectedReport.hasOwnProperty('report_type')) {
         if (typeof this.selectedReport.report_type === 'string') {
           if (this._previousReportSelected === null) {
@@ -148,18 +154,19 @@ export class ReportTypeSidebarComponent implements OnInit {
                           this.toDate = dates[0].cvg_end_date;
                           this.dueDate = dates[0].due_date;
 
-                          this._messageService.sendMessage({
-                            form: true,
-                            type: this._formType,
-                            reportType: 'regular',
-                            electionDates: [
-                              {
-                                cvg_end_date: this.toDate,
-                                cvg_start_date: this.fromDate,
-                                due_date: this.dueDate
-                              }
-                            ]
-                          });
+                          // this._messageService.sendMessage({
+                          //   form: true,
+                          //   type: this._formType,
+                          //   reportType: this._reportType,
+                          //   validDates: true,
+                          //   electionDates: [
+                          //     {
+                          //       cvg_end_date: this.toDate,
+                          //       cvg_start_date: this.fromDate,
+                          //       due_date: this.dueDate
+                          //     }
+                          //   ]
+                          // });
                         }
                       }
                     }
@@ -212,6 +219,11 @@ export class ReportTypeSidebarComponent implements OnInit {
     }
   }
 
+  /**
+   * Executed when a special report has election state(s).
+   *
+   * @param      {Object}  e       The event object.
+   */
   public selectStateChange(e): void {
     let selectedVal: string = e.target.value;
     let selectedState: any = null;
@@ -266,6 +278,11 @@ export class ReportTypeSidebarComponent implements OnInit {
     } // selectedVal !== '0'
   }
 
+  /**
+   * Executed when a special report has election date(s).
+   *
+   * @param      {Object}  e       The event object.
+   */
   public selectElectionDateChange(e): void {
     const selectedOption: any = e.target[e.target.selectedIndex];
 
@@ -288,46 +305,101 @@ export class ReportTypeSidebarComponent implements OnInit {
     this._messageService.sendMessage({
       form: true,
       type: this._formType,
-      reportType: 'special',
+      validDates: true,
+      reportType: this._reportType,
       electionDates: this.electionDates
     });
 
     this._selectedElectionDate = e.target.value;
   }
 
+  /**
+   * Executed when from date field is changed.
+   *
+   * @param      {string}  date    The date
+   */
   public fromDateChange(date: string) {
-    this.fromDate = date;
-
-    this._messageService.sendMessage({
+    let message: any = {
       form: true,
       type: this._formType,
-      reportType: 'special',
-      electionDates: [
-        {
+      reportType: this._reportType,
+      validDates: false,
+      electionDates: []
+    };
+
+    if (this.fromDate !== null) {
+      if (date !== this.fromDate) {
+        message.validDates = false;
+
+        message.electionDates = [];
+      } else {
+        this.fromDate = date;
+
+        message.validDates = true;
+        message.electionDates.push({
           cvg_end_date: this.toDate,
           cvg_start_date: this.fromDate,
           due_date: this.dueDate,
           election_date: this.selectedElecetionDate
-        }
-      ]
-    });
+        });
+      }
+    } else {
+      this.fromDate = date;
+
+      message.validDates = true;
+      message.electionDates.push({
+        cvg_end_date: this.toDate,
+        cvg_start_date: this.fromDate,
+        due_date: this.dueDate,
+        election_date: this.selectedElecetionDate
+      });
+    }
+
+    this._messageService.sendMessage(message);
   }
 
+  /**
+   * Executed when the to date field is changed.
+   *
+   * @param      {string}  date    The date
+   */
   public toDateChange(date: string) {
-    this.toDate = date;
-
-    this._messageService.sendMessage({
+    let message: any = {
       form: true,
       type: this._formType,
-      reportType: 'special',
-      electionDates: [
-        {
+      reportType: this._reportType,
+      validDates: false,
+      electionDates: []
+    };
+
+    if (this.toDate !== null) {
+      if (date !== this.fromDate) {
+        message.validDates = false;
+
+        message.electionDates = [];
+      } else {
+        this.toDate = date;
+
+        message.validDates = true;
+        message.electionDates.push({
           cvg_end_date: this.toDate,
           cvg_start_date: this.fromDate,
           due_date: this.dueDate,
           election_date: this.selectedElecetionDate
-        }
-      ]
-    });
+        });
+      }
+    } else {
+      this.toDate = date;
+
+      message.validDates = true;
+      message.electionDates.push({
+        cvg_end_date: this.toDate,
+        cvg_start_date: this.fromDate,
+        due_date: this.dueDate,
+        election_date: this.selectedElecetionDate
+      });
+    }
+
+    this._messageService.sendMessage(message);
   }
 }
