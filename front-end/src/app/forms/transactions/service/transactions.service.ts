@@ -172,7 +172,8 @@ export class TransactionsService {
 
     return this._http
     .post(
-      `${environment.apiUrl}${'/sa/schedA'}`,
+      // `${environment.apiUrl}${'/sa/schedA'}`,
+      `${environment.apiUrl}${url}`,
       request, // formData,
       {
         headers: httpOptions
