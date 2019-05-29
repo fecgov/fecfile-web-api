@@ -755,7 +755,7 @@ def check_entity_type(entity_type):
 
     entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]
     if not (entity_type in entity_type_list):
-        raise Exception('The Entity Type is not within the specified list. Input received: ' + entity_type)
+        raise Exception('The Entity Type is not within the specified list: [' + ', '.join(entity_type_list) + ']. Input received: ' + entity_type)
 
 def get_next_entity_id(entity_type):
 

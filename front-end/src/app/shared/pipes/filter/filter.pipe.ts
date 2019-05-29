@@ -34,12 +34,6 @@ export class FilterPipe implements PipeTransform {
      */
     transform(items: reportModel[], fields: Array<string>, value: string, filterType?: FilterTypeEnum): any[] {
 
-        console.log(" transform items= ", items);
-        console.log(" transform value= ", value);
-        console.log(" transform filterType= ", filterType);
-        console.log(" transform fields= ", fields);
-
-
         if (!items) {
             return [];
         }
