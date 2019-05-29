@@ -14,6 +14,7 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { NgPipesModule } from 'ngx-pipes';
 
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -153,7 +154,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     AngularEditorModule,
     NgbModule.forRoot(),
     ModalModule.forRoot(),
-    NgxPaginationModule
+    NgxPaginationModule,
+    NgPipesModule
   ],
   providers: [
     CookieService,
