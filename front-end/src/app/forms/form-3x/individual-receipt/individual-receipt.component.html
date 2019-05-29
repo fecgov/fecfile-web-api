@@ -104,9 +104,17 @@
                     <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphanumeric"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphaNumeric"
                       >
                         Alphanumeric characters only.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
+                      >
+                        Floating point numbers only.
                       </div>
                     </ng-container>
                   </div>

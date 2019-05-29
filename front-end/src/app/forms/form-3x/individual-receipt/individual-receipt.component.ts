@@ -8,7 +8,8 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import { alphanumeric } from '../../../shared/utils/forms/validation/alphaNumeric.validator';
+import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -55,12 +56,10 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        console.log('res: ', res);
-
         this.formFields = res.data.formFields;
         this.hiddenFields = res.data.hiddenFields;
 
-        this._setForm(this.formFields);
+        this._setForm(this.formFields, this.hiddenFields);
 
         this.states = res.data.states;
       }
@@ -80,7 +79,8 @@ export class IndividualReceiptComponent implements OnInit {
    *
    * @param      {Array}  fields  The fields
    */
-  private _setForm(fields: any): void {
+  private _setForm(fields: any, hiddenFields: any): void {
+    console.log('_setForm: ');
     const formGroup: any = [];
 
     fields.forEach(el => {
@@ -89,6 +89,13 @@ export class IndividualReceiptComponent implements OnInit {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
         });
       }
+    });
+
+    hiddenFields.forEach(el => {
+      console.log('el: ', el);
+      formGroup[el.name] = new FormControl(el.value);
+
+      console.log('formGroup[el.name]: ', formGroup[el.name]);
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -110,15 +117,19 @@ export class IndividualReceiptComponent implements OnInit {
             formValidators.push(Validators.required);
           }
         } else if (validation === 'min') {
-          formValidators.push(Validators.minLength(validators[validation]));
+          if (validators[validation] !== null) {
+            formValidators.push(Validators.minLength(validators[validation]));
+          }
         } else if (validation === 'max') {
-          formValidators.push(Validators.maxLength(validators[validation]));
+          if (validators[validation] !== null) {
+            formValidators.push(Validators.maxLength(validators[validation]));
+          }
         } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphanumeric());
+          formValidators.push(alphaNumeric());
         } else if (validation === 'dollarAmount') {
-          const dollarRegEx: any = /^[+-]?\d+(\.\d+)?$/g;
-
-          formValidators.push(Validators.pattern(dollarRegEx));
+          if (validators[validation] !== null) {
+            formValidators.push(floatingPoint());
+          }
         }
       }
     }

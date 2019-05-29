@@ -6,13 +6,13 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  * @param      {Object}  control     The control
  * @param      {String}  key         The key
  */
-export function alphaNumeric(): ValidatorFn {
+export function alphanumeric(): ValidatorFn {
 	return (control: AbstractControl): { [key: string]: any } => {
 		const regex: any = new RegExp(/^[a-zA-Z0-9\s]*$/);
 		const text: string = control.value;
 
 		if (!regex.test(text)) {
-			return { nonAlphaNumeric: true };
+			return { nonAlphanumeric: true };
 		}
 
 		return null;
