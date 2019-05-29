@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  ElementRef,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+  ViewChild
+} from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -23,6 +32,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
+  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
@@ -59,7 +69,7 @@ export class IndividualReceiptComponent implements OnInit {
         this.formFields = res.data.formFields;
         this.hiddenFields = res.data.hiddenFields;
 
-        this._setForm(this.formFields, this.hiddenFields);
+        this._setForm(this.formFields);
 
         this.states = res.data.states;
       }
@@ -79,8 +89,7 @@ export class IndividualReceiptComponent implements OnInit {
    *
    * @param      {Array}  fields  The fields
    */
-  private _setForm(fields: any, hiddenFields: any): void {
-    console.log('_setForm: ');
+  private _setForm(fields: any): void {
     const formGroup: any = [];
 
     fields.forEach(el => {
@@ -91,14 +100,17 @@ export class IndividualReceiptComponent implements OnInit {
       }
     });
 
+    this.frmIndividualReceipt = new FormGroup(formGroup);
+  }
+
+  private _setHiddenFields(hiddenFields: any): void {
+    const formGroup: any = [];
+
     hiddenFields.forEach(el => {
-      console.log('el: ', el);
       formGroup[el.name] = new FormControl(el.value);
 
-      console.log('formGroup[el.name]: ', formGroup[el.name]);
+      this.frmIndividualReceipt.addControl(el.name, new FormControl(el.value));
     });
-
-    this.frmIndividualReceipt = new FormGroup(formGroup);
   }
 
   /**
@@ -133,7 +145,6 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
     }
-
     return formValidators;
   }
 
@@ -143,8 +154,13 @@ export class IndividualReceiptComponent implements OnInit {
   public doValidateReceipt() {
     console.log('doValidate: ');
     console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
+
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
+
+      // this._setHiddenFields(this.hiddenFields);
+
+      console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
@@ -154,11 +170,18 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
 
+      this.hiddenFields.forEach(el => {
+        receiptObj[el.name] = el.value;
+      });
+
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
       this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
           this.frmIndividualReceipt.reset();
+
+          localStorage.removeItem(`form_${this._formType}_receipt`);
+
           window.scrollTo(0, 0);
         }
       });

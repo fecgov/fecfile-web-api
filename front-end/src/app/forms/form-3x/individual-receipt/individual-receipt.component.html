@@ -23,7 +23,7 @@
     </header>
     <section>
       <ng-container *ngFor="let hiddenField of hiddenFields">
-        <input type="hidden" [name]="hiddenField.name" [value]="hiddenField.value" />
+        <input type="hidden" #hiddenFields [name]="hiddenField.name" [value]="hiddenField.value" />
       </ng-container>
       <ng-container *ngFor="let row of formFields">
         <div class="row" *ngIf="row.cols">
@@ -57,7 +57,7 @@
                         [name]="col.name"
                         [formControlName]="col.name"
                         [ngClass]="
-                          frmIndividualReceipt.get(col.name).invalid &&
+                          frmIndividualReceipt.get(col.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                             ? 'input-field-error'
                             : ''
@@ -65,14 +65,14 @@
                       />
                     </div>
                   </ng-container>
-                  <ng-container *ngIf="!col.inputGroup">
+                  <ng-container *ngIf="!col.inputGroup && col.type !== 'hidden'">
                     <input
                       class="form-control"
                       [type]="col.type"
                       [name]="col.name"
                       [formControlName]="col.name"
                       [ngClass]="
-                        frmIndividualReceipt.get(col.name).invalid &&
+                        frmIndividualReceipt.get(col.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                           ? 'input-field-error'
                           : ''
@@ -109,14 +109,6 @@
                         Alphanumeric characters only.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
-                      >
-                        Floating point numbers only.
-                      </div>
-                    </ng-container>
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
@@ -127,7 +119,7 @@
                     class="state-select"
                     [formControlName]="col.name"
                     [ngClass]="
-                      frmIndividualReceipt.get(col.name).invalid &&
+                      frmIndividualReceipt.get(col.name)?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                         ? 'input-field-error'
                         : ''
@@ -142,7 +134,7 @@
                     class="error-text"
                     *ngIf="
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
-                      frmIndividualReceipt.get(col.name).invalid
+                      frmIndividualReceipt.get(col.name)?.invalid
                     "
                   >
                     <div class="text-error text-left" *ngIf="frmIndividualReceipt.get(col.name).errors?.required">

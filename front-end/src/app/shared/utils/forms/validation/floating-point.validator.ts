@@ -11,8 +11,12 @@ export function floatingPoint(): ValidatorFn {
 		const regex: any = new RegExp(/^[+-]?\d+(\.\d+)?$/g);
 		const text: string = control.value;
 
-		if (!regex.test(text)) {
-			return { nonFloatingPoint: true };
+		if (text) {
+			if (text.length >= 1) {
+				if (!regex.test(text)) {
+					return { nonFloatingPoint: true };
+				}
+			}
 		}
 
 		return null;
