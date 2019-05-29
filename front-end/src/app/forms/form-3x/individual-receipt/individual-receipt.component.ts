@@ -103,16 +103,6 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt = new FormGroup(formGroup);
   }
 
-  private _setHiddenFields(hiddenFields: any): void {
-    const formGroup: any = [];
-
-    hiddenFields.forEach(el => {
-      formGroup[el.name] = new FormControl(el.value);
-
-      this.frmIndividualReceipt.addControl(el.name, new FormControl(el.value));
-    });
-  }
-
   /**
    * Sets the form field valition requirements.
    *
@@ -152,15 +142,8 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    console.log('doValidate: ');
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
-
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
-
-      // this._setHiddenFields(this.hiddenFields);
-
-      console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
