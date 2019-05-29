@@ -150,6 +150,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+    
+    
+    if (localStorage) {
+      console.log('localStorage');
+    }
 
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
@@ -213,17 +218,48 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     this.config.currentPage = page;
 
-    const sortedCol: SortableColumnModel =
+    let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    // smahal: quick fix for sortCol issue not retrived from cache
+    // if (!sortedCol) {
+    //   this.setSortDefault();
+    //   sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    // }
+
+    if (sortedCol) {
+      if (sortedCol.descending === undefined || sortedCol.descending === null) {
+        sortedCol.descending = false;
+      }
+    } else {
+      sortedCol = new SortableColumnModel('', false, false, false, false);
+    }
+
+    // temp fix for sprint 13 demo
+    if (this.currentSortedColumnName === 'default') {
+      this.currentSortedColumnName = 'name';
+    }
 
     this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
       this.currentSortedColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
+        // because the backend receives 'default' as the column name
+        // AND because 'default' is not a column known to this component in
+        // this.sortableColumns, we must tell it make the name column appear sorted.
+        // Ideally the columns name and direction sorted should come back in the response
+        // from the API call.  TODO do this in other sprint/release.
+        // Or change the API interface to accept a flag for default rather than using
+        // the column name.
+
+        if (this.currentSortedColumnName === 'default') {
+          this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
+        }
+
         this._transactionsService.mockAddUIFileds(res);
-        this._transactionsService.mockApplyRestoredTransaction(res);
-        this._transactionsService.mockApplyFilters(res, this.filters);
+        // this._transactionsService.mockApplyRestoredTransaction(res);
+        // this._transactionsService.mockApplyFilters(res, this.filters);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
@@ -234,7 +270,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.totalAmount = res.totalAmount;
         // this.config.totalItems = res.totalTransactionCount;
-        this.config.totalItems = res.itemsPerPage * res['total pages'];
+        // this.config.totalItems = res.itemsPerPage * res['total pages'];
+        this.config.totalItems = res.itemsPerPage * res['totalPages'];
         this.allTransactionsSelected = false;
       });
   }
@@ -938,7 +975,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     //   'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
 
     const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
-     const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
+    const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
       'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
 
     this.sortableColumns = [];
@@ -956,8 +993,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    this.currentSortedColumnName = this._tableService.setSortDirection('default',
-      this.sortableColumns, false);
+    // this.currentSortedColumnName = this._tableService.setSortDirection('name',
+    //   this.sortableColumns, false);
+
+    // this.currentSortedColumnName = this._tableService.setSortDirection('default',
+    //   this.sortableColumns, false);
+
+    // When default, the backend will sort by name and transaction date
+    this.currentSortedColumnName = 'default';
   }
 
 

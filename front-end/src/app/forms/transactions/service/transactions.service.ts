@@ -84,7 +84,7 @@ export class TransactionsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+    
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
     const reportid = 1206963; // 1213131
 
@@ -148,12 +148,26 @@ export class TransactionsService {
 
     // use if API is a POST request
     const request: any = {};
-    request.formType = formType;
+    // request.formType = formType;
     request.reportid = reportid;
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+    // if (filters) {
+    //   request.filters = filters;
+    //   if (request.filters.keywords) {
+    //     const keywordsEdited = [];
+    //     for (const keyword of request.filters.keywords) {
+    //       // replace ` and " with ' for backend.
+    //       let kw = keyword.replace(/\"/g, `'`);
+    //       kw = kw.replace(/`/g, `'`);
+    //       keywordsEdited.push(kw);
+    //     }
+    //     request.filters.keywords = keywordsEdited;
+    //   }
+    // }
+
     if (filters) {
       request.filters = filters;
       if (request.filters.keywords) {
@@ -165,16 +179,26 @@ export class TransactionsService {
           keywordsEdited.push(kw);
         }
         request.filters.keywords = keywordsEdited;
+      } else {
+        request.filters.keywords = [];
       }
+    } else {
+      const filters: any = {};
+      filters.keywords = [];
+
+      request.filters = filters;
     }
 
-    console.log(JSON.stringify(request));
+    const jsonReq = JSON.stringify(request);
+    console.log(jsonReq);
+    console.log(jsonReq.length);
 
     return this._http
     .post(
       // `${environment.apiUrl}${'/sa/schedA'}`,
       `${environment.apiUrl}${url}`,
       request, // formData,
+      // formData,
       {
         headers: httpOptions
       }
