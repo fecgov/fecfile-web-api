@@ -364,6 +364,8 @@ export class TransactionsService {
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added later.
    * 
+   * This may be neeeded.  Rename if so from mock name.
+   *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
