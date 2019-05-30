@@ -32,7 +32,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
-  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
+  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef; // remove this variable
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;

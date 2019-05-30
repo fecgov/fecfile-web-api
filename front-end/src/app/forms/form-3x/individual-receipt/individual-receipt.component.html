@@ -23,7 +23,7 @@
     </header>
     <section>
       <ng-container *ngFor="let hiddenField of hiddenFields">
-        <input type="hidden" #hiddenFields [name]="hiddenField.name" [value]="hiddenField.value" />
+        <input type="hidden" [name]="hiddenField.name" [value]="hiddenField.value" />
       </ng-container>
       <ng-container *ngFor="let row of formFields">
         <div class="row" *ngIf="row.cols">
