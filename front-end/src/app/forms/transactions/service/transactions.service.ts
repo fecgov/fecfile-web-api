@@ -183,22 +183,16 @@ export class TransactionsService {
         request.filters.keywords = [];
       }
     } else {
-      const filters: any = {};
-      filters.keywords = [];
+      const emptyFilters: any = {};
+      emptyFilters.keywords = [];
 
-      request.filters = filters;
+      request.filters = emptyFilters;
     }
-
-    const jsonReq = JSON.stringify(request);
-    console.log(jsonReq);
-    console.log(jsonReq.length);
 
     return this._http
     .post(
-      // `${environment.apiUrl}${'/sa/schedA'}`,
       `${environment.apiUrl}${url}`,
-      request, // formData,
-      // formData,
+      request,
       {
         headers: httpOptions
       }
