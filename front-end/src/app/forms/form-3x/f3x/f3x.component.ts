@@ -121,17 +121,24 @@ export class F3xComponent implements OnInit {
       typeof JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== 'undefined' ||
       JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== null
     ) {
-      let form3XDetailsInstance: form3xReportTypeDetails = JSON.parse(
-        localStorage.getItem(`form_${this._formType}_details`)
-      );
+      const form3XDetailsInstance = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
 
       if (typeof form3XDetailsInstance === 'object' && form3XDetailsInstance !== null) {
-        this.reportTypeIndicator = form3XDetailsInstance.hasOwnProperty('reportId')
-          ? form3XDetailsInstance.reportId
-          : '';
-        this.selectedReportType = form3XDetailsInstance.hasOwnProperty('reportType')
-          ? form3XDetailsInstance.reportType
-          : '';
+        if (form3XDetailsInstance.hasOwnProperty('regularspecialreportind')) {
+          this.reportTypeIndicator = form3XDetailsInstance.regularspecialreportind;
+        }
+
+        if (form3XDetailsInstance.hasOwnProperty('reporttype')) {
+          this.selectedReportType = form3XDetailsInstance.reporttype;
+        }
+      }
+
+      if (this.reportTypeIndicator === 'S') {
+        this.regularReports = false;
+        this.specialReports = true;
+      } else {
+        this.specialReports = false;
+        this.regularReports = true;
       }
 
       if (this.reportTypeIndicator === 'S') {

@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  ElementRef,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+  ViewChild
+} from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -8,6 +17,8 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
+import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -21,10 +32,11 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
+  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
-  public formSubmitted: boolean = false;
+  public hiddenFields: any = [];
   public testForm: FormGroup;
   public formVisible: boolean = false;
   public states: any = [];
@@ -53,9 +65,14 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt = this._fb.group({});
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
-      this.formFields = res.data.formFields;
-      this._setForm(this.formFields);
-      this.states = res.data.states;
+      if (res) {
+        this.formFields = res.data.formFields;
+        this.hiddenFields = res.data.hiddenFields;
+
+        this._setForm(this.formFields);
+
+        this.states = res.data.states;
+      }
     });
   }
 
@@ -76,17 +93,11 @@ export class IndividualReceiptComponent implements OnInit {
     const formGroup: any = [];
 
     fields.forEach(el => {
-      el.cols.forEach(e => {
-        if (
-          e.name !== 'LineNumber' &&
-          e.name !== 'TransactionId' &&
-          e.name !== 'TransactionTypeCode' &&
-          e.name !== 'BackReferenceTranIdNumber' &&
-          e.name !== 'BackReferenceSchedName'
-        ) {
+      if (el.hasOwnProperty('cols')) {
+        el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
-        }
-      });
+        });
+      }
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -104,62 +115,34 @@ export class IndividualReceiptComponent implements OnInit {
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
-          formValidators.push(Validators.required);
+          if (validators[validation]) {
+            formValidators.push(Validators.required);
+          }
         } else if (validation === 'min') {
-          formValidators.push(Validators.min(validators[validation]));
+          if (validators[validation] !== null) {
+            formValidators.push(Validators.minLength(validators[validation]));
+          }
+        } else if (validation === 'max') {
+          if (validators[validation] !== null) {
+            formValidators.push(Validators.maxLength(validators[validation]));
+          }
+        } else if (validation === 'alphaNumeric') {
+          formValidators.push(alphaNumeric());
+        } else if (validation === 'dollarAmount') {
+          if (validators[validation] !== null) {
+            formValidators.push(floatingPoint());
+          }
         }
       }
     }
-
     return formValidators;
-  }
-
-  /**
-   * Checks for hidden fields.
-   *
-   * @param      {number}  i       The current index for the item.
-   * @param      {any}     item    The item.
-   */
-  public hasHiddenFields(i: number, item: any): void {
-    let skipRow: any = null;
-    if (item.hasOwnProperty('cols')) {
-      if (Array.isArray(item.cols)) {
-        skipRow = item.cols.findIndex(
-          el =>
-            el.name === 'LineNumber' ||
-            el.name === 'TransactionId' ||
-            el.name === 'TransactionTypeCode' ||
-            el.name === 'BackReferenceTranIdNumber' ||
-            el.name === 'BackReferenceSchedName'
-        );
-
-        if (skipRow === 0) {
-          item['hiddenFields'] = true;
-        } else {
-          item['hiddenFields'] = false;
-        }
-
-        return item;
-      }
-    }
-  }
-  /**
-   * Determines if element passed in from template is an array.
-   *
-   * @param      {<Array>}   item    The item
-   * @return     {Boolean}  True if array, False otherwise.
-   */
-  public isArray(item: Array<any>): boolean {
-    return Array.isArray(item);
   }
 
   /**
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    this.formSubmitted = true;
     if (this.frmIndividualReceipt.valid) {
-      this.formSubmitted = false;
       let receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
@@ -170,21 +153,25 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
 
+      this.hiddenFields.forEach(el => {
+        receiptObj[el.name] = el.value;
+      });
+
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
       this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
-          console.log('res: ', res);
-
-          this._individualReceiptService.getSchedA(this._formType, res).subscribe(resp => {
-            console.log('resp: ', resp);
-          });
-
           this.frmIndividualReceipt.reset();
-          this.formSubmitted = false;
+
+          localStorage.removeItem(`form_${this._formType}_receipt`);
+
           window.scrollTo(0, 0);
         }
       });
+    } else {
+      this.frmIndividualReceipt.markAsDirty();
+      this.frmIndividualReceipt.markAsTouched();
+      window.scrollTo(0, 0);
     }
   }
 

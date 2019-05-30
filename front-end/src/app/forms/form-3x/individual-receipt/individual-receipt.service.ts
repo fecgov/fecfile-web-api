@@ -20,7 +20,11 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
+<<<<<<< HEAD
     const url: string = '/core/get_dynamic_forms_fields';
+=======
+    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+>>>>>>> develop
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -31,7 +35,11 @@ export class IndividualReceiptService {
     params = params.append('form_type', `F${formType}`);
     params = params.append('transaction_type', transactionType);
 
+<<<<<<< HEAD
     return this._http.get(`${environment.apiUrl}${url}`, {
+=======
+    return this._http.get(url, {
+>>>>>>> develop
       headers: httpOptions,
       params
     });
@@ -57,7 +65,14 @@ export class IndividualReceiptService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     formData.append('cmte_id', committeeDetails.committeeid);
-    formData.append('report_id', reportType.reportId);
+    // With Edit Report Functionality
+    if (reportType.hasOwnProperty('reportId')) {
+      formData.append('report_id', reportType.reportId);
+    } else if (reportType.hasOwnProperty('reportid')) {
+      formData.append('report_id', reportType.reportid);
+    }
+
+    //formData.append('report_id', reportType.reportId);
     formData.append('transaction_type', '15');
     formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);
@@ -114,14 +129,18 @@ export class IndividualReceiptService {
       .pipe(
         map(res => {
           if (res) {
+<<<<<<< HEAD
             console.log('res: ', res);
 
+=======
+>>>>>>> develop
             return res;
           }
           return false;
         })
       );
   }
+<<<<<<< HEAD
 
   /**
    * Gets the sched a after submitted.
@@ -146,4 +165,6 @@ export class IndividualReceiptService {
       }
     });
   }
+=======
+>>>>>>> develop
 }

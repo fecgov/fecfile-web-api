@@ -293,10 +293,11 @@ export interface f3xTransactionTypes {
     dueDate: string,
     amend_Indicator: string,
     coh_bop: string,
-    daysUntilDue: string
+    daysUntilDue: string,
+    email1: string,
+    email2: string,
+    additionalEmail1: string,
+    additionalEmail2: string,
   }
-
-
-  
   
  

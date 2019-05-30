@@ -326,13 +326,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, email_1, email_2])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
     except Exception:
         raise
 
@@ -473,6 +473,7 @@ def post_reports(data):
         form_type = data.get('form_type')
         cvg_start_dt = data.get('cvg_start_dt')
         cvg_end_dt = data.get('cvg_end_dt')
+        due_dt = data.get('due_dt')
         if cvg_start_dt is None:
             raise Exception('The cvg_start_dt is null.')
         if cvg_end_dt is None:
@@ -486,7 +487,8 @@ def post_reports(data):
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('status'), data.get('email_1'), data.get('email_2'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -621,6 +623,16 @@ def reports(request):
                 email_2 = check_email(request.data.get('email_2'))
             else:
                 email_2 = None
+
+            if 'additional_email_1' in request.data:
+                additional_email_1 = check_email(request.data.get('additional_email_1'))
+            else:
+                additional_email_1 = None                
+            
+            if 'additional_email_2' in request.data:
+                additional_email_2 = check_email(request.data.get('additional_email_2'))
+            else:
+                additional_email_2 = None
             
             datum = {
                 'cmte_id': request.user.username,
@@ -632,10 +644,13 @@ def reports(request):
                 'state_of_election': check_null_value(request.data.get('state_of_election')),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
+                'due_dt': date_format(request.data.get('due_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
                 'status': f_status,
                 'email_1': email_1,
                 'email_2': email_2,
+                'additional_email_1': additional_email_1,
+                'additional_email_2': additional_email_2,
             }    
             data = post_reports(datum)
             if type(data) is dict:
@@ -740,7 +755,7 @@ def check_entity_type(entity_type):
 
     entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]
     if not (entity_type in entity_type_list):
-        raise Exception('The Entity Type is not within the specified list. Input received: ' + entity_type)
+        raise Exception('The Entity Type is not within the specified list: [' + ', '.join(entity_type_list) + ']. Input received: ' + entity_type)
 
 def get_next_entity_id(entity_type):
 
@@ -1584,53 +1599,138 @@ END - GET ALL TRANSACTIONS API - CORE APP
 
 """
 **********************************************************************************************************************************************
-GET ALL TRANSACTIONS API - CORE APP - SPRINT 8 - - BY  Praveen Jinka
+TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
-
 """
-@api_view(['GET'])
+def filter_get_all_trans(request, param_string):
+    if request.method == 'GET':
+        return param_string
+    # import ipdb;ipdb.set_trace()
+    filt_dict = request.data['filters']
+    for f_key, value_d in filt_dict.items():
+        if 'filterCategories' in f_key:
+            cat_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+        if 'filterFromDate' in f_key and 'filterToDate' in f_key:
+            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
+        if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
+            param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
+        if 'filterStates' in f_key:
+            state_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND state In " + state_tuple
+        if 'filterMemoCode' in f_key:
+            if str(value_d) == 'true':
+                param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+    return param_string
+
+
+@api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        # import ipdb;ipdb.set_trace()
+        params = request.data['filters']
+        keywords = params.get('keywords')
+        report_id = request.data.get('reportid')
+        if str(descending) == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
         #     order_string = "transaction_id"
-        for key, value in request.query_params.items():
-            try:
-                check_value = int(value)
-                param_string = param_string + " AND " + key + "=" + str(value)
-            except Exception as e:
-                if key == 'transaction_date':
-                    transaction_date = date_format(request.query_params.get('transaction_date'))
-                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
-                else:
-                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+        # import ipdb;ipdb.set_trace()
+        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 
+            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'occupation', 'employer', 'memo_code', 'memo_text']
+        # if search_string:
+        #     for key in keys:
+        #         if not param_string:
+        #             param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #         else:
+        #             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+        #     param_string = param_string + " )"
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
-                            where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
-                            # + """ ORDER BY """ + order_string
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
+                    else:
+                        if not param_string:
+                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+            param_string = param_string + " )"
+        param_string = filter_get_all_trans(request, param_string)
+        #import ipdb;ipdb.set_trace()
+        # for key, value in request.query_params.items():
+        #     try:
+        #         check_value = int(value)
+        #         param_string = param_string + " AND " + key + "=" + str(value)
+        #     except Exception as e:
+        #         if key == 'transaction_date':
+        #             transaction_date = date_format(request.query_params.get('transaction_date'))
+        #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
+        #         else:
+        #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
+                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           # + """ ORDER BY """ + order_string
+        print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
-            
+        
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
+        # print(trans_query_string)
+        if sortcolumn:
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        else:
+            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
-
-        json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_204_NO_CONTENT
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
+        
+        #import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
 
     except Exception as e:
@@ -3875,7 +3975,7 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
                     
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, 0 as daysUntilDue
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
                                       FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
                     print("query_string", query_string)
@@ -3892,6 +3992,3 @@ def get_report_info(request):
             return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception:
         raise
-
-
-
