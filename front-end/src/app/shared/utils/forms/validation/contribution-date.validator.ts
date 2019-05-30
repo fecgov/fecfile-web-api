@@ -14,13 +14,28 @@ export function contributionDate(reportType: any): ValidatorFn {
 		if (typeof reportType === 'object') {
 			if (
 				typeof reportType.cvgStartDate === 'string' &&
-				(typeof reportType.cvgStartDate === 'string' && typeof reportType.cvgEndDate === 'string')
+				typeof reportType.cvgEndDate === 'string' &&
+				(reportType.cvgStartDate !== null && reportType.cvgEndDate !== null)
 			) {
 				const cvgStartDate: string = reportType.cvgStartDate;
 				const cvgEndDate: string = reportType.cvgEndDate;
 
 				if (typeof text === 'string') {
+					console.log('typeof text: ', typeof text);
+					console.log('text.length: ', text.length);
 					if (text.length >= 1) {
+						const date: Date = new Date(text);
+						const formattedDate: string = `${date
+							.getDate()
+							.toString()
+							.padStart(2, '0')}/${date
+							.getMonth()
+							.toString()
+							.padStart(2, '0') + 1}/${date.getFullYear()}`;
+						// console.log('text: ', text);
+						// console.log('formattedDate: ', formattedDate);
+						// console.log('cvgStartDate: ', cvgStartDate);
+						// console.log('cvgEndDate: ', cvgEndDate);
 					}
 				}
 			}

@@ -71,12 +71,22 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        this.formFields = res.data.formFields;
-        this.hiddenFields = res.data.hiddenFields;
+        console.log('getDynamicForms: ', res);
 
-        this._setForm(this.formFields);
+        // this.formFields = res.data.formFields;
+        // this.hiddenFields = res.data.hiddenFields;
+        // this.states = res.data.states;
 
-        this.states = res.data.states;
+        this.formFields = res.formFields;
+
+        console.log('this.formFields: ', this.formFields);
+
+        this.hiddenFields = res.hiddenFields;
+        this.states = res.states;
+
+        if (this.formFields.length >= 1) {
+          this._setForm(this.formFields);
+        }
       }
     });
   }
@@ -87,6 +97,13 @@ export class IndividualReceiptComponent implements OnInit {
         this.formVisible = true;
       }
     }
+  }
+
+  public fieldChange(e): void {
+    console.log('fieldChange: ');
+
+    // console.log('e: ', e);
+    console.log('value: ', e.target.value);
   }
 
   /**
@@ -100,7 +117,7 @@ export class IndividualReceiptComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.name, e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
         });
       }
     });
@@ -115,7 +132,7 @@ export class IndividualReceiptComponent implements OnInit {
    * @param      {Object} validators  The validators.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(fieldName: string, validators: any): Array<any> {
+  private _mapValidators(validators: any): Array<any> {
     const formValidators = [];
 
     if (validators) {
@@ -138,8 +155,12 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } else if (fieldName === 'ContributionDate') {
-          formValidators.push(contributionDate(this._reportType));
+        } else if (validation === 'contributionDate') {
+          console.log('contributionDate: ');
+          console.log('validators[validation: ', validators[validation]);
+          if (validators[validation]) {
+            formValidators.push(contributionDate(this._reportType));
+          }
         }
       }
     }
@@ -150,11 +171,13 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
+          console.log('changeDate: ');
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
