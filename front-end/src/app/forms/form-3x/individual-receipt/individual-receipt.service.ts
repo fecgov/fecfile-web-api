@@ -20,11 +20,7 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-<<<<<<< HEAD
-    const url: string = '/core/get_dynamic_forms_fields';
-=======
     const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
->>>>>>> develop
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -35,11 +31,7 @@ export class IndividualReceiptService {
     params = params.append('form_type', `F${formType}`);
     params = params.append('transaction_type', transactionType);
 
-<<<<<<< HEAD
-    return this._http.get(`${environment.apiUrl}${url}`, {
-=======
     return this._http.get(url, {
->>>>>>> develop
       headers: httpOptions,
       params
     });
@@ -129,42 +121,10 @@ export class IndividualReceiptService {
       .pipe(
         map(res => {
           if (res) {
-<<<<<<< HEAD
-            console.log('res: ', res);
-
-=======
->>>>>>> develop
             return res;
           }
           return false;
         })
       );
   }
-<<<<<<< HEAD
-
-  /**
-   * Gets the sched a after submitted.
-   *
-   * @param      {string}  formType  The form type
-   * @param      {any}     receipt   The receipt
-   */
-  public getSchedA(formType: string, receipt: any): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
-    const data: any = JSON.stringify(receipt);
-    let httpOptions = new HttpHeaders();
-
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    console.log('report_id', receipt.report_id);
-
-    return this._http.get(url, {
-      headers: httpOptions,
-      params: {
-        report_id: receipt.report_id
-      }
-    });
-  }
-=======
->>>>>>> develop
 }
