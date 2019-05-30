@@ -150,11 +150,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
-    
-    
-    if (localStorage) {
-      console.log('localStorage');
-    }
 
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
