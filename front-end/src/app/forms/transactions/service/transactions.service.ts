@@ -10,11 +10,16 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { map } from 'rxjs/operators';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
   totalAmount: number;
   totalTransactionCount: number;
+
+  // remove after API is renamed.
+  itemsPerPage: number;
+  'total pages': number;
 }
 
 @Injectable({
@@ -35,6 +40,10 @@ export class TransactionsService {
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
+  private _propertyNameConverterMap: Map<string, string> = new Map([
+    ['zip', 'zip_code'],
+  ]);
+
 
   constructor(
     private _http: HttpClient,
@@ -66,39 +75,146 @@ export class TransactionsService {
       itemsPerPage: number,
       sortColumnName: string,
       descending: boolean,
-      filter: TransactionFilterModel): Observable<any> {
+      filters: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let params = new HttpParams();
+    const formData: FormData = new FormData();
     const url = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    
+    const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
+    const reportid = 1206963; // 1213131
 
-    // TODO these will be used for filtering
-    // These are not yet defined in API
-    // params = params.append('page', page);
-    // params = params.append('itemsPerPage', itemsPerPage);
-    // params = params.append('sortColumnName', sortColumnName);
-    // params = params.append('descending', descending);
-    // params = params.append('search', filter.search);
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', serverSortColumnName);
+    if (descending) {
+      params = params.append('descending', 'true');
+    }
+    params = params.append('reportid', reportid.toString());
 
-    // These are defined in API
-    // params = params.append('report_id', '1');
-    // params = params.append('line_number', '11AI');
-    // params = params.append('transaction_type', '15');
-    // params = params.append('transaction_type_desc', 'Individual Receipt');
-    // params = params.append('transaction_id', 'VVBSTFQ9Z78');
-    // params = params.append('transaction_date', '2018-10-18');
+    if (filters) {
+      if (filters.keywords) {
+        if (filters.keywords.length > 0) {
+          let i = 1;
+          for (let keyword of filters.keywords) {
+            keyword = keyword.trim();
+            params = params.append('keyword' + i, keyword);
+            i++;
+          }
+        }
+      }
+
+      if (filters.filterCategories) {
+        if (filters.filterCategories.length > 0) {
+          let i = 1;
+          for (const category of filters.filterCategories) {
+            params = params.append('category' + i, category);
+            i++;
+          }
+        }
+      }
+
+      if (filters.filterDateFrom && filters.filterDateTo) {
+        params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
+        params = params.append('transactionDateTo', filters.filterDateTo.toString());
+      }
+
+      if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
+        if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
+            filters.filterAmountMin <= filters.filterAmountMax) {
+              params = params.append('amountMin', filters.filterAmountMin.toString());
+              params = params.append('amountMax', filters.filterAmountMax.toString());
+        }
+      }
+
+      if (filters.filterStates) {
+        if (filters.filterStates.length > 0) {
+          let i = 1;
+          for (const state of filters.filterStates) {
+            params = params.append('state' + i, state);
+            i++;
+          }
+        }
+      }
+
+      if (filters.filterMemoCode === true) {
+        params = params.append('memoCode', 'true');
+      }
+    }
+
+    // use if API is a POST request
+    const request: any = {};
+    // request.formType = formType;
+    request.reportid = reportid;
+    request.page = page;
+    request.itemsPerPage = itemsPerPage;
+    request.sortColumnName = sortColumnName;
+    request.descending = descending;
+    // if (filters) {
+    //   request.filters = filters;
+    //   if (request.filters.keywords) {
+    //     const keywordsEdited = [];
+    //     for (const keyword of request.filters.keywords) {
+    //       // replace ` and " with ' for backend.
+    //       let kw = keyword.replace(/\"/g, `'`);
+    //       kw = kw.replace(/`/g, `'`);
+    //       keywordsEdited.push(kw);
+    //     }
+    //     request.filters.keywords = keywordsEdited;
+    //   }
+    // }
+
+    if (filters) {
+      request.filters = filters;
+      if (request.filters.keywords) {
+        const keywordsEdited = [];
+        for (const keyword of request.filters.keywords) {
+          // replace ` and " with ' for backend.
+          let kw = keyword.replace(/\"/g, `'`);
+          kw = kw.replace(/`/g, `'`);
+          keywordsEdited.push(kw);
+        }
+        request.filters.keywords = keywordsEdited;
+      } else {
+        request.filters.keywords = [];
+      }
+    } else {
+      const emptyFilters: any = {};
+      emptyFilters.keywords = [];
+
+      request.filters = emptyFilters;
+    }
 
     return this._http
-    .get(
-        `${environment.apiUrl}${url}`,
-        {
-          headers: httpOptions,
-          params
+    .post(
+      `${environment.apiUrl}${url}`,
+      request,
+      {
+        headers: httpOptions
+      }
+    )
+    .pipe(map(res => {
+        if (res) {
+          console.log('res: ', res);
+
+          return res;
         }
-      );
+        return false;
+    }));
+
+
+    // return this._http
+    // .get(
+    //     `${environment.apiUrl}${url}`,
+    //     {
+    //       headers: httpOptions,
+    //       params
+    //     }
+    //   );
   }
 
 
@@ -119,6 +235,9 @@ export class TransactionsService {
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip_code;
+
+      // this._propertyNameConverterMap.get('zip');
+
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
       model.aggregate = 0;
@@ -131,6 +250,67 @@ export class TransactionsService {
       modelArray.push(model);
     }
     return modelArray;
+  }
+
+
+  /**
+   * Map a single field name to its server field name equivalent.
+   *
+   * TODO Too many places where fields names are referenced when converting
+   * from/to server names.  Need to consolidate.
+   */
+  public mapToSingleServerName(appFieldName: string) {
+
+    // TODO map field names in constructor
+    let name = '';
+
+    // if (appFieldName === 'zip') {
+    //   this._propertyNameConverterMap.get(appFieldName);
+    // }
+
+    name = appFieldName;
+    switch (appFieldName) {
+      case 'type':
+        name = 'transaction_type_desc';
+        break;
+      case 'transactionId':
+        name = 'transaction_id';
+        break;
+      case 'street':
+        name = 'street_1';
+        break;
+      case 'zip':
+        name = 'zip_code';
+        break;
+      case 'date':
+        name = 'transaction_date';
+        break;
+      case 'amount':
+        name = 'transaction_amount';
+        break;
+      case 'purposeDescription':
+        name = 'purpose_description';
+        break;
+      case 'contributorEmployer':
+        name = 'employer';
+        break;
+      case 'contributorOccupation':
+        name = 'occupation';
+        break;
+      case 'memoCode':
+        name = 'memo_code';
+        break;
+      case 'memoText':
+        name = 'memo_text';
+        break;
+      case 'deletedDate':
+        name = 'deleted_date';
+        break;
+      default:
+        // name = name;;
+    }
+    return name ? name : '';
+
   }
 
 
@@ -176,8 +356,10 @@ export class TransactionsService {
   /**
    * Some data from the server is formatted for display in the UI.  Users will search
    * on the reformatted data.  For the search filter to work against the formatted data,
-   * the server array must also contain the formatted data.  They will be added her.
+   * the server array must also contain the formatted data.  They will be added later.
    * 
+   * This may be neeeded.  Rename if so from mock name. Hello???
+   *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
@@ -357,7 +539,11 @@ export class TransactionsService {
     const mockResponse: GetTransactionsResponse = {
       transactions: this.mockRestoreTrxArray,
       totalAmount: 0,
-      totalTransactionCount: this.mockRestoreTrxArray.length
+      totalTransactionCount: this.mockRestoreTrxArray.length,
+
+      // remove after API is renamed.
+      itemsPerPage: 5,
+      'total pages': 0
     };
     return Observable.of(mockResponse);
   }

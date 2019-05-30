@@ -53,6 +53,7 @@ export class ReportTypeService {
     formData.append('report_type', form3xReportType.reportType);
     formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
+    formData.append('due_dt', form3xReportType.dueDate);
 
     if (form3xReportType.hasOwnProperty('amend_Indicator')) {
       if (typeof form3xReportType.amend_Indicator === 'string') {
@@ -102,6 +103,11 @@ export class ReportTypeService {
       formData.append('status', 'Submitted');
     }
 
+    /*formData.append('email_1', form3xReportType.email_1);
+    formData.append('email_2', form3xReportType.email_2);
+    formData.append('additional_email_1', form3xReportType.additional_email_1);
+    formData.append('additional_email_2', form3xReportType.additional_email_2);*/
+
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
         headers: httpOptions
@@ -111,19 +117,7 @@ export class ReportTypeService {
           if (res) {
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
               const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-              /*if (Array.isArray(res)) {
-                console.log("res2 =",res);
-                if (res[0].hasOwnProperty('report_id')) {
-                  console.log("res3 =",res);
-                  if (typeof res[0].report_id) {
-                    console.log("res 4=",res);
-                    reportObj.reportId = res[0].report_id;
-
-                    window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
-                  }
-                }
-              }*/
-              if (res['report_id']) {
+               if (res['report_id']) {
                 reportObj.reportId = res['report_id'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
               }
