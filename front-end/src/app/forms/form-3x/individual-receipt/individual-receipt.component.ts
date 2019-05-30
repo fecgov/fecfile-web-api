@@ -19,6 +19,7 @@ import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -32,7 +33,6 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
-  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
@@ -42,6 +42,7 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
+  private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
 
@@ -61,6 +62,10 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    console.log('this._reportType: ', this._reportType);
 
     this.frmIndividualReceipt = this._fb.group({});
 
@@ -95,7 +100,7 @@ export class IndividualReceiptComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.name, e.validation));
         });
       }
     });
@@ -106,10 +111,11 @@ export class IndividualReceiptComponent implements OnInit {
   /**
    * Sets the form field valition requirements.
    *
-   * @param      {Object}  validators  The validators
+   * @param      {String} fieldName The name of the field.
+   * @param      {Object} validators  The validators.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators): Array<any> {
+  private _mapValidators(fieldName: string, validators: any): Array<any> {
     const formValidators = [];
 
     if (validators) {
@@ -132,6 +138,8 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
+        } else if (fieldName === 'ContributionDate') {
+          formValidators.push(contributionDate(this._reportType));
         }
       }
     }
