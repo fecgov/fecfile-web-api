@@ -71,6 +71,7 @@ export class TransactionsService {
    */
   public getFormTransactions(
       formType: string,
+      reportId: number,
       page: number,
       itemsPerPage: number,
       sortColumnName: string,
@@ -84,9 +85,8 @@ export class TransactionsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
-    const reportid = 1206963; // 1213131
 
     params = params.append('page', page.toString());
     params = params.append('itemsPerPage', itemsPerPage.toString());
@@ -94,7 +94,9 @@ export class TransactionsService {
     if (descending) {
       params = params.append('descending', 'true');
     }
-    params = params.append('reportid', reportid.toString());
+
+    // reportId = 1206963;
+    params = params.append('reportid', reportId.toString());
 
     if (filters) {
       if (filters.keywords) {
@@ -149,7 +151,7 @@ export class TransactionsService {
     // use if API is a POST request
     const request: any = {};
     // request.formType = formType;
-    request.reportid = reportid;
+    request.reportid = reportId;
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
@@ -358,11 +360,17 @@ export class TransactionsService {
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added later.
    * 
-   * This may be neeeded.  Rename if so from mock name. Hello???
+   * This may be neeeded.
    *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
+    if (!response) {
+      return;
+    }
+    if (!response.transactions) {
+      return;
+    }
     for (const trx of response.transactions) {
       trx.transaction_amount_ui = `$${trx.transaction_amount}`;
       trx.transaction_date_ui = this._datePipe.transform(trx.transaction_date, 'MM/dd/yyyy');
