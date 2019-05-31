@@ -156,8 +156,6 @@ export class IndividualReceiptComponent implements OnInit {
             formValidators.push(floatingPoint());
           }
         } else if (validation === 'contributionDate') {
-          console.log('contributionDate: ');
-          console.log('validators[validation: ', validators[validation]);
           if (validators[validation]) {
             formValidators.push(contributionDate(this._reportType));
           }

@@ -56,7 +56,6 @@
                         [type]="col?.type"
                         [name]="col?.name"
                         [formControlName]="col?.name"
-                        (change)="fieldChange($event)"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -72,7 +71,6 @@
                       [type]="col?.type"
                       [name]="col?.name"
                       [formControlName]="col?.name"
-                      (change)="fieldChange($event)"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
