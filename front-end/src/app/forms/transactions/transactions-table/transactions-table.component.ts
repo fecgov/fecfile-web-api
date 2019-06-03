@@ -45,6 +45,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public formType: string;
 
   @Input()
+  public reportId: string;
+
+  @Input()
   public tableType: string;
 
   public transactionsModel: Array<TransactionModel>;
@@ -151,6 +154,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
+    // reportId is converted to String when used as @Input().  Convert back to Number.
+    // If it can't be converted, make it 0.
+    // this.reportId = isNaN(this.reportId) ? Number(this.reportId) : this.reportId;
+
+    // if (typeof this.reportId === 'string') {
+    //   this.reportId = Number(this.reportId);
+    // }
+    // this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
+
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
       itemsPerPage: this.maxItemsPerPage,
@@ -235,8 +247,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName = 'name';
     }
 
-    this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending, this.filters)
+    this._transactionsService.getFormTransactions(this.formType, this.reportId,
+        page, this.config.itemsPerPage,
+        this.currentSortedColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
@@ -579,8 +592,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to edit
    */
-  public editTransaction(): void {
-    alert('Edit transaction is not yet supported');
+  public editTransaction(trx): void {
+    // alert('Edit transaction is not yet supported');
+    this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
 
