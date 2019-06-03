@@ -243,7 +243,9 @@ export class TransactionsService {
       model.type = row.transaction_type_desc;
       model.transactionId = row.transaction_id;
       model.name = row.name;
-      model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
+      // model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
+      model.street = row.street_1;
+      model.street2 = row.street_2;
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip_code;
@@ -290,6 +292,9 @@ export class TransactionsService {
         break;
       case 'street':
         name = 'street_1';
+        break;
+      case 'street2':
+        name = 'street_2';
         break;
       case 'zip':
         name = 'zip_code';
@@ -340,6 +345,7 @@ export class TransactionsService {
     serverObject.transaction_id = model.transactionId;
     serverObject.name =  model.name;
     serverObject.street_1 = model.street;
+    serverObject.street_2 = model.street2;
     serverObject.city = model.city;
     serverObject.state = model.state;
     serverObject.zip_code = model.zip;
