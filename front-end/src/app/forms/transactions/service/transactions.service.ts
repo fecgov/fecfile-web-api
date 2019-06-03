@@ -183,22 +183,16 @@ export class TransactionsService {
         request.filters.keywords = [];
       }
     } else {
-      const filters: any = {};
-      filters.keywords = [];
+      const emptyFilters: any = {};
+      emptyFilters.keywords = [];
 
-      request.filters = filters;
+      request.filters = emptyFilters;
     }
-
-    const jsonReq = JSON.stringify(request);
-    console.log(jsonReq);
-    console.log(jsonReq.length);
 
     return this._http
     .post(
-      // `${environment.apiUrl}${'/sa/schedA'}`,
       `${environment.apiUrl}${url}`,
-      request, // formData,
-      // formData,
+      request,
       {
         headers: httpOptions
       }
@@ -364,6 +358,8 @@ export class TransactionsService {
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added later.
    * 
+   * This may be neeeded.  Rename if so from mock name. Hello???
+   *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {

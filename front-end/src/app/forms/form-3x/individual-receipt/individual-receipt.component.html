@@ -176,7 +176,8 @@
               <button class="btn btn-secondary btn-right" type="submit">
                 Save &amp; Add Transaction
               </button>
-              <a class="btn btn-previous btn-right" [routerLink]="['/forms/transactions', '3X']">
+              <!-- <a class="btn btn-previous btn-right" [routerLink]="['/forms/transactions', '3X']"> -->
+              <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
               </a>
             </div>

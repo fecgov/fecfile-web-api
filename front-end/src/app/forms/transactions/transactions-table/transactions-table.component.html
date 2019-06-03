@@ -97,7 +97,7 @@
         <td>
           <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
         </td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.type}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{aggregate < 200 ? trx.type (u):trx.type}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trx.name}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}}</td>
