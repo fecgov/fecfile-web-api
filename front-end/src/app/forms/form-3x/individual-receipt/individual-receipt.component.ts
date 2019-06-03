@@ -193,12 +193,17 @@ export class IndividualReceiptComponent implements OnInit {
 
     let reportId = '0';
     const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+    console.log("viewTransactions form3XReportType", form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
       if (form3XReportType.hasOwnProperty('reportId')) {
         reportId = form3XReportType.reportId;
+      }else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
       }
     }
+
+    console.log("reportId",reportId);
 
     if (!reportId) {
       reportId = '0';
