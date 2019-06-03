@@ -45,6 +45,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public formType: string;
 
   @Input()
+  public reportId: number;
+
+  @Input()
   public tableType: string;
 
   public transactionsModel: Array<TransactionModel>;
@@ -235,8 +238,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName = 'name';
     }
 
-    this._transactionsService.getFormTransactions(this.formType, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending, this.filters)
+    this._transactionsService.getFormTransactions(this.formType, this.reportId,
+        page, this.config.itemsPerPage,
+        this.currentSortedColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
@@ -579,8 +583,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to edit
    */
-  public editTransaction(): void {
-    alert('Edit transaction is not yet supported');
+  public editTransaction(trx): void {
+    // alert('Edit transaction is not yet supported');
+    this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
 

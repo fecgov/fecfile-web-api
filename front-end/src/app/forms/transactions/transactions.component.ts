@@ -4,10 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
 import { Subscription } from 'rxjs/Subscription';
+import { TransactionModel } from './model/transaction.model';
 
 export enum ActiveView {
   transactions = 'transactions',
-  recycleBin = 'recycleBin'
+  recycleBin = 'recycleBin',
+  edit = 'edit'
 }
 
 /**
@@ -37,6 +39,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
+  public editView = ActiveView.edit;
   public isShowFilters = false;
   public searchText = '';
   public searchTextArray = [];
@@ -46,6 +49,18 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * the server.
    */
   private applyFiltersSubscription: Subscription;
+
+  /**
+   * Subscription for showing the TransactionsEditComponent.
+   */
+  private editTransactionSubscription: Subscription;
+
+  /**
+   * Subscription for showing all Transactions.
+   */
+  private showTransactionsSubscription: Subscription;
+
+  public transactionToEdit: TransactionModel;
 
   private filters: TransactionFilterModel = new TransactionFilterModel();
   private readonly filtersLSK = 'transactions.filters';
@@ -61,6 +76,21 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           this.doSearch();
         }
       );
+
+      this.editTransactionSubscription = this._transactionsMessageService.getEditTransactionMessage()
+      .subscribe(
+        (trx: TransactionModel) => {
+          this.transactionToEdit = trx;
+          this.showEdit();
+        }
+      );
+
+      this.showTransactionsSubscription = this._transactionsMessageService.getShowTransactionsMessage()
+      .subscribe(
+        message => {
+          this.showTransactions();
+        }
+      );
   }
 
 
@@ -68,6 +98,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     const reportIdString = this._activatedRoute.snapshot.paramMap.get('report_id');
     this.reportId = Number(reportIdString);
@@ -98,6 +129,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.applyFiltersSubscription.unsubscribe();
+    this.editTransactionSubscription.unsubscribe();
   }
 
 
@@ -159,6 +191,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
+   * Show edit for a single transaction.
+   */
+  public showEdit() {
+    this.view = ActiveView.edit;
+  }
+
+
+  /**
    * Show the option to select/deselect columns in the table.
    */
   public showPinColumns() {
@@ -204,6 +244,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public isRecycleBinViewActive() {
     return this.view === this.recycleBinView ? true : false;
+  }
+
+
+  /**
+   * Check if the view to show is Edit.
+   */
+  public isEditViewActive() {
+    return this.view === this.editView ? true : false;
   }
 
 

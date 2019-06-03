@@ -79,7 +79,7 @@ export class TransactionsService {
       filters: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    let params = new HttpParams();
+    // let params = new HttpParams();
     const formData: FormData = new FormData();
     const url = '/core/get_all_transactions';
 
@@ -88,69 +88,79 @@ export class TransactionsService {
 
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
-    params = params.append('page', page.toString());
-    params = params.append('itemsPerPage', itemsPerPage.toString());
-    params = params.append('sortColumnName', serverSortColumnName);
-    if (descending) {
-      params = params.append('descending', 'true');
-    }
+    // params = params.append('page', page.toString());
+    // params = params.append('itemsPerPage', itemsPerPage.toString());
+    // params = params.append('sortColumnName', serverSortColumnName);
+    // if (descending) {
+    //   params = params.append('descending', 'true');
+    // }
 
-    // reportId = 1206963;
-    params = params.append('reportid', reportId.toString());
+    // // reportId = 1206963;
+    // params = params.append('reportid', reportId.toString());
 
-    if (filters) {
-      if (filters.keywords) {
-        if (filters.keywords.length > 0) {
-          let i = 1;
-          for (let keyword of filters.keywords) {
-            keyword = keyword.trim();
-            params = params.append('keyword' + i, keyword);
-            i++;
-          }
-        }
-      }
+    // if (filters) {
+    //   if (filters.keywords) {
+    //     if (filters.keywords.length > 0) {
+    //       let i = 1;
+    //       for (let keyword of filters.keywords) {
+    //         keyword = keyword.trim();
+    //         params = params.append('keyword' + i, keyword);
+    //         i++;
+    //       }
+    //     }
+    //   }
 
-      if (filters.filterCategories) {
-        if (filters.filterCategories.length > 0) {
-          let i = 1;
-          for (const category of filters.filterCategories) {
-            params = params.append('category' + i, category);
-            i++;
-          }
-        }
-      }
+    //   if (filters.filterCategories) {
+    //     if (filters.filterCategories.length > 0) {
+    //       let i = 1;
+    //       for (const category of filters.filterCategories) {
+    //         params = params.append('category' + i, category);
+    //         i++;
+    //       }
+    //     }
+    //   }
 
-      if (filters.filterDateFrom && filters.filterDateTo) {
-        params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
-        params = params.append('transactionDateTo', filters.filterDateTo.toString());
-      }
+    //   if (filters.filterDateFrom && filters.filterDateTo) {
+    //     params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
+    //     params = params.append('transactionDateTo', filters.filterDateTo.toString());
+    //   }
 
-      if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
-        if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
-            filters.filterAmountMin <= filters.filterAmountMax) {
-              params = params.append('amountMin', filters.filterAmountMin.toString());
-              params = params.append('amountMax', filters.filterAmountMax.toString());
-        }
-      }
+    //   if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
+    //     if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
+    //         filters.filterAmountMin <= filters.filterAmountMax) {
+    //           params = params.append('amountMin', filters.filterAmountMin.toString());
+    //           params = params.append('amountMax', filters.filterAmountMax.toString());
+    //     }
+    //   }
 
-      if (filters.filterStates) {
-        if (filters.filterStates.length > 0) {
-          let i = 1;
-          for (const state of filters.filterStates) {
-            params = params.append('state' + i, state);
-            i++;
-          }
-        }
-      }
+    //   if (filters.filterStates) {
+    //     if (filters.filterStates.length > 0) {
+    //       let i = 1;
+    //       for (const state of filters.filterStates) {
+    //         params = params.append('state' + i, state);
+    //         i++;
+    //       }
+    //     }
+    //   }
 
-      if (filters.filterMemoCode === true) {
-        params = params.append('memoCode', 'true');
-      }
-    }
+    //   if (filters.filterMemoCode === true) {
+    //     params = params.append('memoCode', 'true');
+    //   }
+    // }
 
     // use if API is a POST request
     const request: any = {};
     // request.formType = formType;
+
+
+    /////////////////////////////////
+    /////////////////////////////////
+    /////////////////////////////////
+    reportId = 1206963;
+    /////////////////////////////////
+    /////////////////////////////////
+    //////////////////////////////////
+
     request.reportid = reportId;
     request.page = page;
     request.itemsPerPage = itemsPerPage;

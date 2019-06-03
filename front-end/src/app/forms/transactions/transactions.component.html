@@ -33,6 +33,7 @@
       <hr />
     </header>
     <div>
+      <div *ngIf="!isEditViewActive()">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="transactions__btn-container">
@@ -104,16 +105,24 @@
             </div>          
           </div>
         </div>
-        <app-transactions-table 
-          *ngIf="isTransactionViewActive()"
-          formType="{{formType}}" 
-          tableType="{{transactionsView}}">
-        </app-transactions-table>
-        <app-transactions-table
-          *ngIf="isRecycleBinViewActive()"
-          formType="{{formType}}" 
-          tableType="{{recycleBinView}}">
-        </app-transactions-table>                
       </div>
+      <app-transactions-table 
+        *ngIf="isTransactionViewActive()"
+        formType="{{formType}}" 
+        reportId="{{reportId}}"
+        tableType="{{transactionsView}}">
+      </app-transactions-table>
+      <app-transactions-table
+        *ngIf="isRecycleBinViewActive()"
+        formType="{{formType}}"
+        reportId="{{reportId}}" 
+        tableType="{{recycleBinView}}">
+      </app-transactions-table>
+      <app-transactions-edit
+        *ngIf="isEditViewActive()"
+        [transactionToEdit]="transactionToEdit"
+        formType="{{formType}}">
+      </app-transactions-edit>
+    </div>
   </div>
 </div>
