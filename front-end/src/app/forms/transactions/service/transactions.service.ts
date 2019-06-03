@@ -71,7 +71,7 @@ export class TransactionsService {
    */
   public getFormTransactions(
       formType: string,
-      reportId: number,
+      reportId: string,
       page: number,
       itemsPerPage: number,
       sortColumnName: string,
@@ -99,11 +99,11 @@ export class TransactionsService {
     // View Transactions from the Individual Receipt compoent.
     // It is here for development purposes only.  Not for production.
 
-    if (reportId === 0) {
-      console.log('WARNING: Using default Report ID 1206963 for development reasons as no value ' +
-        'was present in localStorage for form_F3X_report_type from IndividualReceiptComponent');
-      reportId = 1206963;
-    }
+    // if (reportId === '0') {
+    //   console.log('WARNING: Using default Report ID 1206963 for development reasons as no value ' +
+    //     'was present in localStorage for form_F3X_report_type from IndividualReceiptComponent');
+    //   reportId = '431'; // '1206963';
+    // }
 
     /////////////////////////////////
     /////////////////////////////////

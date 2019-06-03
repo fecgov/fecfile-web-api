@@ -35,7 +35,7 @@ export enum ActiveView {
 export class TransactionsComponent implements OnInit, OnDestroy {
 
   public formType = '';
-  public reportId = 0;
+  public reportId = '0';
   public view: string = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
@@ -100,9 +100,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    const reportIdString = this._activatedRoute.snapshot.paramMap.get('report_id');
-    this.reportId = Number(reportIdString);
-    this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
+    this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
+
+    // const reportIdString = this._activatedRoute.snapshot.paramMap.get('report_id');
+    // this.reportId = Number(reportIdString);
+    // this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
 
     // If the filter was open on the last visit in the user session, open it.
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);

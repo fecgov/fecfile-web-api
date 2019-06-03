@@ -16,11 +16,12 @@ import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
-import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
+import { f3xTransactionTypes, form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
 
 @Component({
   selector: 'app-transactions-edit',
@@ -42,6 +43,9 @@ export class TransactionsEditComponent implements OnInit {
   @Input()
   public formType: string;
 
+  @Input()
+  public reportId: string;
+
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
   public hiddenFields: any = [];
@@ -55,11 +59,9 @@ export class TransactionsEditComponent implements OnInit {
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
-    private _formService: FormsService,
+    private _reportsService: ReportsService,
     private _individualReceiptService: IndividualReceiptService,
-    private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
-    private _router: Router,
     private _utilService: UtilService,
     private _transactionsMessageService: TransactionsMessageService,
   ) {
@@ -251,15 +253,21 @@ export class TransactionsEditComponent implements OnInit {
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._individualReceiptService.saveScheduleA(this.formType).subscribe(res => {
-        if (res) {
-          this.frmIndividualReceipt.reset();
+      this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+        .subscribe((res: form3xReportTypeDetails) => {
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
-          localStorage.removeItem(`form_${this.formType}_receipt`);
+          this._individualReceiptService.saveScheduleA(this.formType).subscribe(res => {
+            if (res) {
+              this.frmIndividualReceipt.reset();
 
-          window.scrollTo(0, 0);
-        }
-      });
+              localStorage.removeItem(`form_${this.formType}_receipt`);
+
+              window.scrollTo(0, 0);
+            }
+          });
+
+        });
     } else {
       this.frmIndividualReceipt.markAsDirty();
       this.frmIndividualReceipt.markAsTouched();
