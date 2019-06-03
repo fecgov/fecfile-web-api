@@ -93,12 +93,14 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
-        contributionDate(cvgStartDate, cvgEndDate),
-        Validators.required
-      ]);
+      if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+          contributionDate(cvgStartDate, cvgEndDate),
+          Validators.required
+        ]);
 
-      this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+      }
     }
   }
 
