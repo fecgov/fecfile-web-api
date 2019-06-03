@@ -232,6 +232,8 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (!reportId) {
       reportId = '0';
+      // reportId = '431';
+      // reportId = '1206963';
     }
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 

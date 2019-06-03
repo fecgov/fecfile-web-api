@@ -100,7 +100,7 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{aggregate < 200 ? trx.type (u):trx.type}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trx.name}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
