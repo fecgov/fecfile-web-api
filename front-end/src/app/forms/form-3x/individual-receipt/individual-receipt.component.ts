@@ -81,10 +81,24 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
       }
+    }
+
+    if (this._reportType !== null) {
+      const cvgStartDate: string = this._reportType.cvgStartDate;
+      const cvgEndDate: string = this._reportType.cvgEndDate;
+
+      this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+        contributionDate(cvgStartDate, cvgEndDate),
+        Validators.required
+      ]);
+
+      this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
     }
   }
 
@@ -99,7 +113,7 @@ export class IndividualReceiptComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
         });
       }
     });
@@ -114,7 +128,7 @@ export class IndividualReceiptComponent implements OnInit {
    * @param      {Object} validators  The validators.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators: any, fieldName: string): Array<any> {
+  private _mapValidators(validators: any): Array<any> {
     const formValidators = [];
 
     if (validators) {
@@ -137,11 +151,16 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } else if (fieldName === 'ContributionDate') {
-          formValidators.push(contributionDate(this._reportType));
-        }
+        } /* else if (validation === 'contributionDate') {
+          console.log('validators: ', validators);
+          if (validators[validation]) {
+            console.log('validators[validation]: ', validators[validation]);
+            formValidators.push(contributionDate(this._reportType));
+          }
+        } */
       }
     }
+
     return formValidators;
   }
 
@@ -197,20 +216,19 @@ export class IndividualReceiptComponent implements OnInit {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-
     let reportId = '0';
     const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-    console.log("viewTransactions form3XReportType", form3XReportType);
+    console.log('viewTransactions form3XReportType', form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
       if (form3XReportType.hasOwnProperty('reportId')) {
         reportId = form3XReportType.reportId;
-      }else if (form3XReportType.hasOwnProperty('reportid')) {
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
         reportId = form3XReportType.reportid;
       }
     }
 
-    console.log("reportId",reportId);
+    console.log('reportId', reportId);
 
     if (!reportId) {
       reportId = '0';
