@@ -132,7 +132,7 @@ export class TransactionsEditComponent implements OnInit {
               e.value = this.transactionToEdit.street;
               break;
             case 'ContributorStreet2':
-              // e.value = this.transactionToEdit.street;
+              e.value = this.transactionToEdit.street2;
               // TODO need API to provide street line 2
               break;
             case 'ContributorCity':

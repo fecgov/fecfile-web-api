@@ -154,6 +154,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
 
+    // reportId is converted to String when used as @Input().  Convert back to Number.
+    // If it can't be converted, make it 0.
+    // this.reportId = isNaN(this.reportId) ? Number(this.reportId) : this.reportId;
+
+    if (typeof this.reportId === 'string') {
+      this.reportId = Number(this.reportId);
+    }
+    this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
+
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
       itemsPerPage: this.maxItemsPerPage,

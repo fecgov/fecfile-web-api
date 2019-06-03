@@ -88,75 +88,23 @@ export class TransactionsService {
 
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
-    // params = params.append('page', page.toString());
-    // params = params.append('itemsPerPage', itemsPerPage.toString());
-    // params = params.append('sortColumnName', serverSortColumnName);
-    // if (descending) {
-    //   params = params.append('descending', 'true');
-    // }
-
-    // // reportId = 1206963;
-    // params = params.append('reportid', reportId.toString());
-
-    // if (filters) {
-    //   if (filters.keywords) {
-    //     if (filters.keywords.length > 0) {
-    //       let i = 1;
-    //       for (let keyword of filters.keywords) {
-    //         keyword = keyword.trim();
-    //         params = params.append('keyword' + i, keyword);
-    //         i++;
-    //       }
-    //     }
-    //   }
-
-    //   if (filters.filterCategories) {
-    //     if (filters.filterCategories.length > 0) {
-    //       let i = 1;
-    //       for (const category of filters.filterCategories) {
-    //         params = params.append('category' + i, category);
-    //         i++;
-    //       }
-    //     }
-    //   }
-
-    //   if (filters.filterDateFrom && filters.filterDateTo) {
-    //     params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
-    //     params = params.append('transactionDateTo', filters.filterDateTo.toString());
-    //   }
-
-    //   if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
-    //     if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
-    //         filters.filterAmountMin <= filters.filterAmountMax) {
-    //           params = params.append('amountMin', filters.filterAmountMin.toString());
-    //           params = params.append('amountMax', filters.filterAmountMax.toString());
-    //     }
-    //   }
-
-    //   if (filters.filterStates) {
-    //     if (filters.filterStates.length > 0) {
-    //       let i = 1;
-    //       for (const state of filters.filterStates) {
-    //         params = params.append('state' + i, state);
-    //         i++;
-    //       }
-    //     }
-    //   }
-
-    //   if (filters.filterMemoCode === true) {
-    //     params = params.append('memoCode', 'true');
-    //   }
-    // }
-
-    // use if API is a POST request
-    const request: any = {};
-    // request.formType = formType;
-
+        const request: any = {};
 
     /////////////////////////////////
     /////////////////////////////////
     /////////////////////////////////
-    reportId = 1206963;
+
+    // This is a temp patch/fix for and issue where
+    // report ID is not in local storage when user clicks
+    // View Transactions from the Individual Receipt compoent.
+    // It is here for development purposes only.  Not for production.
+
+    if (reportId === 0) {
+      console.log('WARNING: Using default Report ID 1206963 for development reasons as no value ' +
+        'was present in localStorage for form_F3X_report_type from IndividualReceiptComponent');
+      reportId = 1206963;
+    }
+
     /////////////////////////////////
     /////////////////////////////////
     //////////////////////////////////
@@ -166,6 +114,7 @@ export class TransactionsService {
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+
     // if (filters) {
     //   request.filters = filters;
     //   if (request.filters.keywords) {
