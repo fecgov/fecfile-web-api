@@ -65,24 +65,13 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    console.log('this._reportType: ', this._reportType);
-
     this.frmIndividualReceipt = this._fb.group({});
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        console.log('getDynamicForms: ', res);
-
-        // this.formFields = res.data.formFields;
-        // this.hiddenFields = res.data.hiddenFields;
-        // this.states = res.data.states;
-
-        this.formFields = res.formFields;
-
-        console.log('this.formFields: ', this.formFields);
-
-        this.hiddenFields = res.hiddenFields;
-        this.states = res.states;
+        this.formFields = res.data.formFields;
+        this.hiddenFields = res.data.hiddenFields;
+        this.states = res.data.states;
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -99,13 +88,6 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
-  public fieldChange(e): void {
-    console.log('fieldChange: ');
-
-    // console.log('e: ', e);
-    console.log('value: ', e.target.value);
-  }
-
   /**
    * Generates the dynamic form after all the form fields are retrived.
    *
@@ -117,7 +99,7 @@ export class IndividualReceiptComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
       }
     });
@@ -132,7 +114,7 @@ export class IndividualReceiptComponent implements OnInit {
    * @param      {Object} validators  The validators.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators: any): Array<any> {
+  private _mapValidators(validators: any, fieldName: string): Array<any> {
     const formValidators = [];
 
     if (validators) {
@@ -155,10 +137,8 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } else if (validation === 'contributionDate') {
-          if (validators[validation]) {
-            formValidators.push(contributionDate(this._reportType));
-          }
+        } else if (fieldName === 'ContributionDate') {
+          formValidators.push(contributionDate(this._reportType));
         }
       }
     }
@@ -169,13 +149,11 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       let receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
-          console.log('changeDate: ');
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
