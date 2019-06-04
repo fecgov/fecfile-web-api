@@ -254,7 +254,7 @@ export class TransactionsEditComponent implements OnInit {
           // TODO API call to save Transaction will need to vary depending on Transaction Type.
           // Only supporting Sched A at this time.
 
-          this._individualReceiptService.saveScheduleA(this.formType).subscribe(res => {
+          this._individualReceiptService.putScheduleA(this.formType).subscribe(res => {
             if (res) {
               this.frmIndividualReceipt.reset();
 
