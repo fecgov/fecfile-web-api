@@ -73,6 +73,8 @@ export class IndividualReceiptComponent implements OnInit {
         this.hiddenFields = res.data.hiddenFields;
         this.states = res.data.states;
 
+        console.log('this.frmFields: ', this.formFields);
+
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
         }
