@@ -243,6 +243,8 @@ export class TransactionsEditComponent implements OnInit {
         receiptObj[el.name] = el.value;
       });
 
+      receiptObj.transactionId = this.transactionToEdit.transactionId;
+
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
       this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
