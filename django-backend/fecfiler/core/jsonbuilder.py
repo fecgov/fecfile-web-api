@@ -1660,40 +1660,121 @@ def create_inkind_bitcoin_f3x_json_file(request):
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
 """
-
-******************************************************************************************************************************************
+**************************************************************************************************************************************
+Generate Tribal receipt transaction Json file API - CORE APP - SPRINT 14 - FNE 1111 - BY Yeswanth Tella
+**************************************************************************************************************************************
 """
-@api_view(['GET'])
-def get_report_info(request):
-    """
-    Get report details
-    """
-    cmte_id = request.user.username
-    report_id = request.query_params.get('reportid')
-    print("cmte_id", cmte_id)
-    print("report_id", report_id)
+@api_view(["POST"])
+def create_tribal_json_file(request):
+    #creating a JSON file so that it is handy for all the public API's   
     try:
-        if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
-            print("you are here1")
-            if int(request.query_params.get('reportid'))>=1:
-                print("you are here2")
-                with connection.cursor() as cursor:
-                    # GET all rows from Reports table
+        report_id = request.POST.get('report_id')
+        comm_info = True
+        if comm_info:
+            committeeid = request.user.username
+            comm_info_obj = get_committee_mater_values(committeeid)
+            header = {    
+                "version":"8.3",
+                "softwareName":"ABC Inc",
+                "softwareVersion":"1.02 Beta",
+                "additionalInfomation":"Any other useful information"
+            }
+            f_3x_list = get_f3x_report_data(committeeid, report_id)
+            report_info = get_list_report(report_id, committeeid)
+            #response_inkind_receipt_list = []
+            response_inkind_out_list = []
+            for f3_i in f_3x_list:
+                print (f3_i['report_id'])
+
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                if not entity_id_list:
+                    continue
+                print ("we got the data")
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        continue
+                    else:
+                         list_entity = list_entity[0]
+                    response_dict_out['transactionTypeCode'] = entity_obj['transaction_type']
+                    response_dict_out['transactionId'] = entity_obj['transaction_id']
+                    response_dict_out['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                    response_dict_out['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                    response_dict_out['entityType'] = list_entity['entity_type']
                     
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
-                    print("query_string", query_string)
+                    response_dict_out['contributorOrganizationName']=list_entity['entity_name']
+                    response_dict_out['contributorStreet1 '] = list_entity['street_1']
+                    response_dict_out['contributorStreet2'] = list_entity['street_2']
+                    response_dict_out['contributorCity'] = list_entity['city']
+                    response_dict_out['contributorState'] = list_entity['state']
+                    response_dict_out['contributorZip'] = list_entity['zip_code']
+                    response_dict_out['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_out['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionPurposeDescription'] = entity_obj['purpose_description']
+                    response_dict_out['memoCode'] = entity_obj['memo_code']
+                    response_dict_out['memoDescription'] = entity_obj['memo_text']
 
-                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
-                
-                    for row in cursor.fetchall():
-                        data_row = list(row)
-                        forms_obj=data_row[0]
-                        
-            if forms_obj is None:
-                raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
+                    response_inkind_out_list.append(response_dict_out)
+                    #response_inkind_receipt_list.append(response_dict_receipt)
 
-            return Response(forms_obj, status=status.HTTP_200_OK)
-    except Exception:
-        raise
+            # import ipdb;ipdb.set_trace()
+            # get_list_entity(entity_id, comm_info.committeeid)
+
+            data_obj = {}
+            data_obj['header'] = header
+            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+            comm_info_obj['reportCode'] = f3_i['report_type']
+            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+            if not f3_i['date_of_election']:
+                comm_info_obj['electionDate'] = ''
+            else:
+                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_start_dt']:
+                comm_info_obj['coverageStartDate'] = ''
+            else:
+                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['cvg_end_dt']:
+                comm_info_obj['coverageEndDate'] = ''
+            else:
+                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            if not f3_i['date_signed']:
+                comm_info_obj['dateSigned'] = ''
+            else:
+                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+            data_obj['data'] = comm_info_obj
+            data_obj['data']['formType'] = "F3X"
+            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            data_obj['data']['Schedule'] = {'SA': []}
+            data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            print(k)
+            k.content_type = "application/json"
+            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            tmp_filename = '/tmp/' + committeeid + '_f3x_RETURNED.json'
+            vdata = {}
+            # vdata['form_type'] = "F3X"
+            # vdata['committeeid'] = comm_info.committeeid
+            json.dump(data_obj, open(tmp_filename, 'w'))
+            vfiles = {}
+            vfiles["json_file"] = open(tmp_filename, 'rb')
+            print(vfiles)
+            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            # import ipdb; ipdb.set_trace()
+            return Response(res.text, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
+            
+    except CommitteeInfo.DoesNotExist:
+        return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
+
