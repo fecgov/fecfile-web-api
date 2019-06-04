@@ -23,6 +23,10 @@ import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 
+/**
+ * A component for editing Transactions.  It is similar to the 
+ * IndividualRecepeiptComponent used for adding Transactions.
+ */
 @Component({
   selector: 'app-transactions-edit',
   templateUrl: './transactions-edit.component.html',
@@ -31,11 +35,6 @@ import { ReportsService } from 'src/app/reports/service/report.service';
   encapsulation: ViewEncapsulation.None
 })
 export class TransactionsEditComponent implements OnInit {
-  // @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  // @Input() selectedOptions: any = {};
-  // @Input() formOptionsVisible: boolean = false;
-  // @Input() transactionTypeText = '';
-  // @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
 
   @Input()
   public transactionToEdit: TransactionModel;
@@ -73,12 +72,7 @@ export class TransactionsEditComponent implements OnInit {
 
     console.log(this.transactionToEdit);
 
-
     this.frmIndividualReceipt = this._fb.group({});
-
-    // const formVal = {value: [ContributorLastName : 'Jones']};
-    // this.frmIndividualReceipt.setValue(formVal);
-
 
     this._individualReceiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
       if (res) {
@@ -93,8 +87,6 @@ export class TransactionsEditComponent implements OnInit {
         this._setForm(this.formFields);
 
         this.states = res.data.states;
-
-        // this.frmIndividualReceipt.setValue({ContributorLastName: 'Jones'});
       }
     });
   }
@@ -257,13 +249,17 @@ export class TransactionsEditComponent implements OnInit {
         .subscribe((res: form3xReportTypeDetails) => {
           localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
+          // TODO API call to save Transaction will need to vary depending on Transaction Type.
+          // Only supporting Sched A at this time.
+
           this._individualReceiptService.saveScheduleA(this.formType).subscribe(res => {
             if (res) {
               this.frmIndividualReceipt.reset();
 
               localStorage.removeItem(`form_${this.formType}_receipt`);
 
-              window.scrollTo(0, 0);
+              // window.scrollTo(0, 0);
+              this.viewTransactions();
             }
           });
 
@@ -274,17 +270,6 @@ export class TransactionsEditComponent implements OnInit {
       window.scrollTo(0, 0);
     }
   }
-
-  // /**
-  //  * Goes to the previous step.
-  //  */
-  // public previousStep(): void {
-  //   this.status.emit({
-  //     form: {},
-  //     direction: 'previous',
-  //     step: 'step_2'
-  //   });
-  // }
 
   /**
    * Navigate to the Transactions.
