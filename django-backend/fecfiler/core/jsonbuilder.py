@@ -213,21 +213,40 @@ def get_committee_mater_values(cmte_id):
     except Exception:
         raise
 
-# def get_list_report(report_id, cmte_id):
-#     try:
-#         query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-#                      FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-#         forms_obj = None
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 data_row = list(row)
-#                 forms_obj=data_row[0]
-#         if forms_obj is []:
-#             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
+
+def get_f3x_report_data(cmte_id, report_id):
+    try:
+        query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+def get_list_report(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
 
 @api_view(["POST"])
 def create_f3x_expenditure_json_file(request):
@@ -386,21 +405,7 @@ def get_amendmentNumber(cmte_id, report_id):
     except Exception:
         raise
 
-def get_f3x_report_data(cmte_id, report_id):
-    try:
-        query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
+
 
 # def get_f3x_report_data(cmte_id, report_id):
 #     try:
@@ -617,7 +622,7 @@ def build_form3x_json_file(request):
                         response_dict_out = {}
                         frx_receipt_data = {}
                         print (forn3x_sa_data['report_id'])
-                        entity_id_list = get_entity_id(forn3x_sa_data['report_id'], forn3x_sa_data['cmte_id'])
+                        entity_id_list = get_entity_sched_a_data(forn3x_sa_data['report_id'], forn3x_sa_data['cmte_id'])
                         if not entity_id_list:
                             continue
                         print ("we got the data")
@@ -658,7 +663,7 @@ def build_form3x_json_file(request):
                                         response_dict_out = {}
                                         frx_receipt_data = {}
                                         print (form3x_sa_chld_data['report_id'])
-                                        entity_id_chld_list = get_entity_id(form3x_sa_chld_data['report_id'], form3x_sa_chld_data['cmte_id'])
+                                        entity_id_chld_list = get_entity_sched_a_data(form3x_sa_chld_data['report_id'], form3x_sa_chld_data['cmte_id'])
                                         if not entity_id_chld_list:
                                             continue
                                         print ("we got the data")
@@ -736,7 +741,7 @@ Generate In kind Receipt and out Kind transaction Json file API - CORE APP - SPR
 ******************************************************************************************************************************
 
 """
-def get_entity_id(report_id, cmte_id, transaction_id=None):
+def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None):
     try:
         # GET all rows from schedA table
         forms_obj = []
@@ -800,55 +805,6 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
 
 
 
-def get_committee_mater_values(cmte_id):
-    try:
-        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
-                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
-                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
-                  FROM public.committee_master Where cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-        forms_obj = forms_obj[0]
-        committee_info_dict = {}
-        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
-        committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
-        committee_info_dict['street1'] = forms_obj['street_1']
-        committee_info_dict['street2'] = forms_obj['street_2']
-        committee_info_dict['city'] = forms_obj['city']
-        committee_info_dict['state'] = forms_obj['state']
-        committee_info_dict['zipCode'] = forms_obj['zip_code']
-        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
-        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
-        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
-        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
-        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
-        return committee_info_dict
-    except Exception:
-        raise
-
-def get_list_report(report_id, cmte_id):
-    try:
-        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-        return forms_obj
-    except Exception:
-        raise
-
 @api_view(["POST"])
 def create_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
@@ -875,7 +831,7 @@ def create_f3x_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_id(f3_i['report_id'], f3_i['cmte_id'])
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1028,85 +984,6 @@ END  - Inkind receipt and inkind out - CORE APP
 Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SPRINT 12 - FNE -765 - BY YESWANTH TELLA
 ******************************************************************************************************************************
 """
-def get_entity_partner_id(report_id, cmte_id , transaction_id=None):
-    try:
-        # GET all rows from schedA table
-        forms_obj = []
-        if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            if not transaction_id:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-            else:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = data_row[0]
-                if forms_obj is not None:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                # forms_obj.append(data_row)
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-def get_committee_mater_values(cmte_id):
-    try:
-        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
-                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
-                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
-                  FROM public.committee_master Where cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-        forms_obj = forms_obj[0]
-        committee_info_dict = {}
-        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
-        committee_info_dict['committeeName'] = forms_obj['cmte_name']
-        committee_info_dict['street1'] = forms_obj['street_1']
-        committee_info_dict['street2'] = forms_obj['street_2']
-        committee_info_dict['city'] = forms_obj['city']
-        committee_info_dict['state'] = forms_obj['state']
-        committee_info_dict['zipCode'] = forms_obj['zip_code']
-        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
-        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
-        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
-        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
-        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
-        return committee_info_dict
-    except Exception:
-        raise
-
-def get_list_report(report_id, cmte_id):
-    try:
-        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-        return forms_obj
-    except Exception:
-        raise
 
 @api_view(["POST"])
 def create_f3x_partner_json_file(request):
@@ -1130,7 +1007,7 @@ def create_f3x_partner_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1165,7 +1042,7 @@ def create_f3x_partner_json_file(request):
 
                     #response_dict_receipt['child'] = []
 
-                    entity_id_child_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -1277,81 +1154,31 @@ Generate Returned or Bonused Receipt  Json file API - CORE APP - SPRINT 12 - FNE
 ***********************************************************************************************************************************************
 """
 
-def get_entity_partner_id(report_id, cmte_id):
-    try:
-        # GET all rows from schedA table
-        forms_obj = []
-        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                #forms_obj.append(data_row)
-                data_row = list(row)
-                #schedA_list = data_row[0]
-                forms_obj = data_row[0]
-                for d in forms_obj:
-                    for i in d:
-                        if not d[i]:
-                            d[i] = ''
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
+# def get_entity_sched_a_data(report_id, cmte_id):
+#     try:
+#         # GET all rows from schedA table
+#         forms_obj = []
+#         query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+#                          FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+#         #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+#             for row in cursor.fetchall():
+#                 #forms_obj.append(data_row)
+#                 data_row = list(row)
+#                 #schedA_list = data_row[0]
+#                 forms_obj = data_row[0]
+#                 for d in forms_obj:
+#                     for i in d:
+#                         if not d[i]:
+#                             d[i] = ''
+#         if forms_obj is None:
+#             pass
+#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+#         return forms_obj
+#     except Exception:
+#         raise
 
-
-
-def get_committee_mater_values(cmte_id):
-    try:
-        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
-                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
-                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
-                  FROM public.committee_master Where cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-        forms_obj = forms_obj[0]
-        committee_info_dict = {}
-        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
-        committee_info_dict['committeeName'] = forms_obj['cmte_name']
-        committee_info_dict['street1'] = forms_obj['street_1']
-        committee_info_dict['street2'] = forms_obj['street_2']
-        committee_info_dict['city'] = forms_obj['city']
-        committee_info_dict['state'] = forms_obj['state']
-        committee_info_dict['zipCode'] = forms_obj['zip_code']
-        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
-        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
-        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
-        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
-        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
-        return committee_info_dict
-    except Exception:
-        raise
-
-def get_list_report(report_id, cmte_id):
-    try:
-        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-        return forms_obj
-    except Exception:
-        raise
 
 @api_view(["POST"])
 def create_f3x_returned_bounced_json_file(request):
@@ -1375,7 +1202,7 @@ def create_f3x_returned_bounced_json_file(request):
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
 
-                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1489,88 +1316,6 @@ FNE-909 REATTRIBUTION AND REATTRIBUTION MEMO SPRINT 12 YESWANTH TELLA
 
 """
 
-def get_entity_partner_id(report_id, cmte_id, transaction_id = None):
-    try:
-        # GET all rows from schedA table
-        forms_obj = []
-        if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            if not transaction_id:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-            else:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = data_row[0]
-                if forms_obj is not None:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                # forms_obj.append(data_row)
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-
-def get_committee_mater_values(cmte_id):
-    try:
-        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
-                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
-                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
-                  FROM public.committee_master Where cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-        forms_obj = forms_obj[0]
-        committee_info_dict = {}
-        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
-        committee_info_dict['committeeName'] = forms_obj['cmte_name']
-        committee_info_dict['street1'] = forms_obj['street_1']
-        committee_info_dict['street2'] = forms_obj['street_2']
-        committee_info_dict['city'] = forms_obj['city']
-        committee_info_dict['state'] = forms_obj['state']
-        committee_info_dict['zipCode'] = forms_obj['zip_code']
-        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
-        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
-        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
-        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
-        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
-        return committee_info_dict
-    except Exception:
-        raise
-
-def get_list_report(report_id, cmte_id):
-    try:
-        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-
 @api_view(["POST"])
 def create_f3x_reattribution_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
@@ -1593,7 +1338,7 @@ def create_f3x_reattribution_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'])
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1633,7 +1378,7 @@ def create_f3x_reattribution_json_file(request):
 
 
                     #response_dict_receipt['child'] = []
-                    entity_id_child_list = get_entity_partner_id(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -1747,119 +1492,6 @@ Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API -
 **************************************************************************************************************************************
 
 """
-def get_entity_id(report_id, cmte_id, transaction_id=None):
-    try:
-        # GET all rows from schedA table
-        forms_obj = []
-        if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            if not transaction_id:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-            else:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = data_row[0]
-                if forms_obj is not None:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                # forms_obj.append(data_row)
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
-    try:
-        # GET all rows from schedB table
-        forms_obj = []
-        if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-        with connection.cursor() as cursor:
-            if not transaction_id:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-            else:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = data_row[0]
-                if forms_obj is not None:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                # forms_obj.append(data_row)
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-        return forms_obj
-    except Exception:
-        raise
-
-
-
-def get_committee_mater_values(cmte_id):
-    try:
-        query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
-                        cmte_type, cmte_filed_type, treasurer_last_name, treasurer_first_name,
-                       treasurer_middle_name, treasurer_prefix, treasurer_suffix 
-                  FROM public.committee_master Where cmte_id = %s"""
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
-        forms_obj = forms_obj[0]
-        committee_info_dict = {}
-        committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
-        committee_info_dict['committeeName'] = forms_obj['cmte_name'] 
-        committee_info_dict['street1'] = forms_obj['street_1']
-        committee_info_dict['street2'] = forms_obj['street_2']
-        committee_info_dict['city'] = forms_obj['city']
-        committee_info_dict['state'] = forms_obj['state']
-        committee_info_dict['zipCode'] = forms_obj['zip_code']
-        committee_info_dict['treasurerLastName'] = forms_obj['treasurer_last_name']
-        committee_info_dict['treasurerFirstName'] = forms_obj['treasurer_first_name']
-        committee_info_dict['treasurerMiddleName'] = forms_obj['treasurer_middle_name']
-        committee_info_dict['treasurerPrefix'] = forms_obj['treasurer_prefix']
-        committee_info_dict['treasurerSuffix'] = forms_obj['treasurer_suffix']
-        return committee_info_dict
-    except Exception:
-        raise
-
-def get_list_report(report_id, cmte_id):
-    try:
-        query_string = """SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type
-                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-        if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
-        return forms_obj
-    except Exception:
-        raise
-
 @api_view(["POST"])
 def create_inkind_bitcoin_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
@@ -1886,7 +1518,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_id(f3_i['report_id'], f3_i['cmte_id'])
+                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
