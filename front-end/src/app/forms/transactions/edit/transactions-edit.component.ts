@@ -249,7 +249,7 @@ export class TransactionsEditComponent implements OnInit {
 
       this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
         .subscribe((res: form3xReportTypeDetails) => {
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
 
           // TODO API call to save Transaction will need to vary depending on Transaction Type.
           // Only supporting Sched A at this time.
@@ -260,7 +260,6 @@ export class TransactionsEditComponent implements OnInit {
 
               localStorage.removeItem(`form_${this.formType}_receipt`);
 
-              // window.scrollTo(0, 0);
               this.viewTransactions();
             }
           });
