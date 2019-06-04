@@ -147,8 +147,9 @@
                   "type":"date",
                   "validation":{  
                      "required": true,
-                     "max":null,
-                     "date":true
+                     "max": null,
+                     "date": true,
+                     "contributionDate": true
                   }
                },
                {  
@@ -160,7 +161,7 @@
                   "validation":{  
                      "required": true,
                      "max":"12",
-                     "dollarAmount":true
+                     "dollarAmount": true
                   }
                },
                {  

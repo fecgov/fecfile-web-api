@@ -1,81 +1,81 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule, ModuleWithProviders } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { NgxEditorModule } from 'ngx-editor';
-import { AngularFileUploaderModule } from 'angular-file-uploader';
-import { CookieService } from 'ngx-cookie-service';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
-import { ArchwizardModule } from 'angular-archwizard';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularEditorModule } from '@kolkov/angular-editor';
-import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ArchwizardModule } from 'angular-archwizard';
+import { AngularFileUploaderModule } from 'angular-file-uploader';
+import { ModalModule } from 'ngx-bootstrap';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { CookieService } from 'ngx-cookie-service';
+import { NgxEditorModule } from 'ngx-editor';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { NgPipesModule } from 'ngx-pipes';
-
-import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
+import { AccountComponent } from './account/account.component';
+import { AppConfigService } from './app-config.service';
+import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { AppComponent } from './app.component';
+import { routing } from './app.routes';
+import { ContributorsComponent } from './contributors/contributors.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
+import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
+import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
+import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
+import { TransactionSidebarComponent } from './forms/form-3x/transaction-sidebar/transaction-sidebar.component';
+import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
+import { F99Component } from './forms/form-99/f99/f99.component';
+import { ReasonComponent } from './forms/form-99/reason/reason.component';
+import { TypeComponent } from './forms/form-99/type/type.component';
+import { FormsComponent } from './forms/forms.component';
+import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
+import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
+import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
+import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
+import { TrashConfirmComponent } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
+import { TransactionsComponent } from './forms/transactions/transactions.component';
+import { LoginComponent } from './login/login.component';
+import { ProfileComponent } from './profile/profile.component';
+import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
+import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
+import { ReportsComponent } from './reports/reports.component';
+import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
+import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
+import { SettingsComponent } from './settings/settings.component';
+import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
+import { HeaderComponent } from './shared/partials/header/header.component';
+import { PreviewComponent } from './shared/partials/preview/preview.component';
+import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
+import { SignComponent } from './shared/partials/sign/sign.component';
+import { StepsComponent } from './shared/partials/steps/steps.component';
+import { SubmitComponent } from './shared/partials/submit/submit.component';
+import { ValidateComponent } from './shared/partials/validate/validate.component';
+import { FilterPipe } from './shared/pipes/filter/filter.pipe';
+import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
+import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
+import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
 import { DialogService } from './shared/services/DialogService/dialog.service';
-
-import { routing } from './app.routes';
-import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProfileComponent } from './profile/profile.component';
-import { HeaderComponent } from './shared/partials/header/header.component';
-import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
-import { FormsComponent } from './forms/forms.component';
-import { AppLayoutComponent } from './app-layout/app-layout.component';
-import { ReportsComponent } from './reports/reports.component';
-import { ContributorsComponent } from './contributors/contributors.component';
-import { ToolsComponent } from './tools/tools.component';
-import { F99Component } from './forms/form-99/f99/f99.component';
-import { TypeComponent } from './forms/form-99/type/type.component';
-import { ReasonComponent } from './forms/form-99/reason/reason.component';
-import { StepsComponent } from './shared/partials/steps/steps.component';
-import { PreviewComponent } from './shared/partials/preview/preview.component';
-import { ValidateComponent } from './shared/partials/validate/validate.component';
-import { SignComponent } from './shared/partials/sign/sign.component';
-import { SubmitComponent } from './shared/partials/submit/submit.component';
-import { AccountComponent } from './account/account.component';
-import { UsersComponent } from './users/users.component';
-import { SettingsComponent } from './settings/settings.component';
-
-import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
-import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
-import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
-import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
+import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
+import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
+import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
+import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
+import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
+import { ToolsComponent } from './tools/tools.component';
+import { UsersComponent } from './users/users.component';
+import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
 
-import { AppConfigService } from './app-config.service';
-import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionSidebarComponent } from './forms/form-3x/transaction-sidebar/transaction-sidebar.component';
-import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
 
-import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
-import { TransactionTypeComponent } from './forms/form-3x/transaction-type/transaction-type.component';
-import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
-import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
-import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
-import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
-import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
-import { TransactionsComponent } from './forms/transactions/transactions.component';
-import { ModalModule } from 'ngx-bootstrap';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
-import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
-import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
-import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
-import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
-import { FilterPipe } from './shared/pipes/filter/filter.pipe';
-import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
-import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
-import { TrashConfirmComponent } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
-import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
-import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
+
+
+
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -101,6 +101,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
     TransactionCategoriesComponent,
+    TransactionsEditComponent,
     TrashConfirmComponent,
     F99Component,
     TypeComponent,
