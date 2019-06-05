@@ -64,7 +64,7 @@ export class IndividualReceiptService {
       formData.append('report_id', reportType.reportid);
     }
 
-    //formData.append('report_id', reportType.reportId);
+    // formData.append('report_id', reportType.reportId);
     formData.append('transaction_type', '15');
     formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);
@@ -145,8 +145,7 @@ export class IndividualReceiptService {
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
 
     let httpOptions = new HttpHeaders();
-    let params = new HttpParams();
-    let formData: FormData = new FormData();
+    const formData: FormData = new FormData();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -161,7 +160,7 @@ export class IndividualReceiptService {
       formData.append('report_id', reportType.reportid);
     }
 
-    //formData.append('report_id', reportType.reportId);
+    // formData.append('report_id', reportType.reportId);
     formData.append('transaction_type', '15');
     formData.append('line_number', '11AI');
     formData.append('first_name', receipt.ContributorFirstName);
@@ -173,6 +172,7 @@ export class IndividualReceiptService {
     formData.append('employer', receipt.ContributorEmployer);
     formData.append('contribution_amount', receipt.ContributionAmount);
     formData.append('contribution_date', receipt.ContributionDate);
+    // formData.append('contribution_aggregate', receipt.ContributionAggregate);
     formData.append('entity_type', receipt.EntityType);
     if (receipt.ContributorMiddleName !== null) {
       if (typeof receipt.ContributorMiddleName === 'string') {
@@ -210,6 +210,11 @@ export class IndividualReceiptService {
         formData.append('purpose_description', receipt.ContributionPurposeDescription);
       }
     }
+    // if (receipt.ContributionAggregate !== null) {
+    //   if (typeof receipt.ContributionAggregate === 'string') {
+    //     formData.append('contribution_aggregate', receipt.ContributionAggregate);
+    //   }
+    // }
 
     return this._http
       .put(`${environment.apiUrl}${url}`, formData, {
