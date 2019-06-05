@@ -22,7 +22,7 @@
         }
         .dropdown-toggle {
           &:after {
-            display:none;
+            display: none;
           }
         }
         .dropdown-menu {
@@ -58,7 +58,7 @@
           }
           label {
             display: block;
-            padding-bottom: .75em;
+            padding-bottom: 0.75em;
           }
           input[type='text'],
           input[type='date'],
@@ -76,7 +76,7 @@
             }
           }
           .ng-select.transaction-type-select,
-          .ng-select.transaction-category-select  {
+          .ng-select.transaction-category-select {
             width: 360px;
             .ng-select-container {
               .ng-value-container {
@@ -103,7 +103,15 @@
               width: 300px;
             }
           }
-
+          .ng-dropdown-panel {
+            .ng-dropdown-panel-items {
+              .ng-option {
+                &.ng-option-marked {
+                  background-color: $mercury;
+                }
+              }
+            }
+          }
         }
       }
     }
