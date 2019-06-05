@@ -15,6 +15,7 @@ import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
@@ -54,7 +55,8 @@ export class IndividualReceiptComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    private _utilService: UtilService
+    private _utilService: UtilService,
+    private _messageService: MessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -190,7 +192,14 @@ export class IndividualReceiptComponent implements OnInit {
       this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
           this._individualReceiptService.getSchedA(this._formType, res).subscribe(resp => {
-            console.log('resp: ', resp);
+            // console.log('resp: ', resp);
+
+            const message: any = {
+              formType: this._formType,
+              totals: resp
+            };
+
+            this._messageService.sendMessage(message);
           });
 
           this.frmIndividualReceipt.reset();
