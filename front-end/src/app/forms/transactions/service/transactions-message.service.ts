@@ -14,6 +14,8 @@ export class TransactionsMessageService {
   private subject = new Subject<any>();
   private applyFiltersSubject = new Subject<any>();
   private doKeywordFilterSearchSubject = new Subject<any>();
+  private editTransactionSubject = new Subject<any>();
+  private showTransactionsSubject = new Subject<any>();
 
 
   /**
@@ -96,8 +98,6 @@ export class TransactionsMessageService {
     return this.doKeywordFilterSearchSubject.asObservable();
   }
 
-  /*private subject = new Subject<any>();
-  private applyFiltersSubject = new Subject<any>();*/
 
   public sendMessage(message: any) {
     this.subject.next(message);
@@ -111,15 +111,30 @@ export class TransactionsMessageService {
     return this.subject.asObservable();
   }
 
-  /*public sendApplyFiltersMessage(message: any) {
-    this.applyFiltersSubject.next(message);
+
+  public sendEditTransactionMessage(message: any) {
+    this.editTransactionSubject.next(message);
   }
 
-  public clearApplyFiltersMessage() {
-    this.applyFiltersSubject.next();
+  public clearEditTransactionMessage() {
+    this.editTransactionSubject.next();
   }
 
-  public getApplyFiltersMessage(): Observable<any> {
-    return this.applyFiltersSubject.asObservable();
-  }  */
+  public getEditTransactionMessage(): Observable<any> {
+    return this.editTransactionSubject.asObservable();
+  }
+
+
+  public sendShowTransactionsMessage(message: any) {
+    this.showTransactionsSubject.next(message);
+  }
+
+  public clearShowTransactionsMessage() {
+    this.showTransactionsSubject.next();
+  }
+
+  public getShowTransactionsMessage(): Observable<any> {
+    return this.showTransactionsSubject.asObservable();
+  }
+
 }
