@@ -1,26 +1,5 @@
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt" (ngSubmit)="doValidateReceipt()">
-    <!-- <header>
-      <div class="header-content">
-        <div class="float-left">
-          <h1>
-            Form 3X
-            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
-          </h1>
-        </div>
-        <div class="float-right" ngbDropdown>
-          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item"><i class="view-icon"></i> View</button>
-            <button class="dropdown-item"><i class="print-icon"></i> Print</button>
-          </div>
-        </div>
-      </div>
-      <hr />
-    </header> -->
     <section>
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" #hiddenFields [name]="hiddenField.name" [value]="hiddenField.value" />
@@ -161,15 +140,11 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
-                Previous
-              </button>
               <button class="btn btn-secondary btn-right" type="submit">
-                Save &amp; Add Transaction
+                Save
               </button>
-              <!-- <a class="btn btn-previous btn-right" [routerLink]="['/forms/transactions', '3X']"> -->
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
-                View Transactions
+                Cancel
               </a>
             </div>
           </div>
