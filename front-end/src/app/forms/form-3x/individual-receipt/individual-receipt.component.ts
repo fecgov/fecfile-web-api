@@ -147,19 +147,11 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(Validators.maxLength(validators[validation]));
           }
-        } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphaNumeric());
         } else if (validation === 'dollarAmount') {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } /* else if (validation === 'contributionDate') {
-          console.log('validators: ', validators);
-          if (validators[validation]) {
-            console.log('validators[validation]: ', validators[validation]);
-            formValidators.push(contributionDate(this._reportType));
-          }
-        } */
+        }
       }
     }
 
@@ -171,7 +163,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public doValidateReceipt() {
     if (this.frmIndividualReceipt.valid) {
-      let receiptObj: any = {};
+      const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
