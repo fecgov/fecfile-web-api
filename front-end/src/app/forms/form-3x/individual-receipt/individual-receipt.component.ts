@@ -189,6 +189,10 @@ export class IndividualReceiptComponent implements OnInit {
 
       this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
+          this._individualReceiptService.getSchedA(this._formType, res).subscribe(resp => {
+            console.log('resp: ', resp);
+          });
+
           this.frmIndividualReceipt.reset();
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
