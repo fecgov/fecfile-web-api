@@ -59,6 +59,15 @@ export class TransactionSidebarComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this._messageService.clearMessage();
+  }
+
+  /**
+   * Sets the selected item.
+   *
+   * @param      {Object}  e  The event object.
+   */
   public selectItem(e): void {
     this.itemSelected = e.target.value;
 

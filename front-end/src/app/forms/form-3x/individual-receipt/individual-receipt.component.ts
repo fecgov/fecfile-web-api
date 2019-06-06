@@ -65,6 +65,8 @@ export class IndividualReceiptComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    this._messageService.clearMessage();
+
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
     this.frmIndividualReceipt = this._fb.group({});
@@ -104,6 +106,10 @@ export class IndividualReceiptComponent implements OnInit {
         this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this._messageService.clearMessage();
   }
 
   /**
@@ -184,7 +190,7 @@ export class IndividualReceiptComponent implements OnInit {
       this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
           this._individualReceiptService.getSchedA(this._formType, res).subscribe(resp => {
-            // console.log('resp: ', resp);
+            console.log('resp: ', resp);
 
             const message: any = {
               formType: this._formType,
