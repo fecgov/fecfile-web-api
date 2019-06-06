@@ -93,7 +93,7 @@ def get_list_all_schedA(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from schedA table
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
@@ -123,7 +123,7 @@ def get_list_schedA(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
@@ -156,7 +156,7 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
 
             # GET child rows from schedA table
 
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
@@ -256,13 +256,13 @@ def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_
 def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT contribution_amount, transaction_id, report_id, line_number FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' ORDER BY contribution_date ASC, create_date ASC""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""SELECT contribution_amount, transaction_id, report_id, line_number, contribution_date FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' ORDER BY contribution_date ASC, create_date ASC""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as  e:
         raise Exception('The list_all_transactions_entity function is throwing an error: ' + str(e))
 
-def update_linenumber_transactions_SA(contribution_date, transaction_type, entity_id, cmte_id, report_id):
+def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type, entity_id, cmte_id, report_id):
     try:
         itemization_transaction_type_list = ["15",]
         itemization_value = 200
@@ -276,22 +276,21 @@ def update_linenumber_transactions_SA(contribution_date, transaction_type, entit
             for transaction in transactions_list:
                 aggregate_amount = aggregate_amount + transaction[0]
                 if str(report_id) == str(transaction[2]):
-                    if aggregate_amount <= itemization_value:
-                        if transaction[3] != "11AII":
-                            put_sql_linenumber_schedA(cmte_id, report_id, "11AII", transaction[1], entity_id)
-                    else:
-                        if transaction[3] != "11AI":
-                            put_sql_linenumber_schedA(cmte_id, report_id, "11AI", transaction[1], entity_id)
+                    if contribution_date <= transaction[4]:
+                        if aggregate_amount <= itemization_value:
+                            put_sql_linenumber_schedA(cmte_id, report_id, "11AII", transaction[1], entity_id, aggregate_amount)
+                        else:
+                            put_sql_linenumber_schedA(cmte_id, report_id, "11AI", transaction[1], entity_id, aggregate_amount)
     except Exception as  e:
-        raise Exception('The update_linenumber_transactions_SA function is throwing an error: ' + str(e))
+        raise Exception('The update_linenumber_aggamt_transactions_SA function is throwing an error: ' + str(e))
 
-def put_sql_linenumber_schedA(cmte_id, report_id, line_number, transaction_id, entity_id):
+def put_sql_linenumber_schedA(cmte_id, report_id, line_number, transaction_id, entity_id, aggregate_amount):
 
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""", 
-                [line_number, transaction_id, report_id, cmte_id, entity_id])
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, aggregate_amt = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""", 
+                [line_number, aggregate_amount, transaction_id, report_id, cmte_id, entity_id])
             if (cursor.rowcount == 0):
                 raise Exception('put_sql_linenumber_schedA function: The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
     except Exception:
@@ -350,7 +349,7 @@ def post_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The post_sql_schedA function is throwing an error: ' + str(e))
-        update_linenumber_transactions_SA(datum.get('contribution_date'), datum.get('transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get('transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
     except:
         raise
@@ -410,7 +409,7 @@ def put_schedA(datum):
                 }
                 remove_entities(get_data)
             raise Exception('The put_sql_schedA function is throwing an error: ' + str(e))
-        update_linenumber_transactions_SA(datum.get('contribution_date'), datum.get('transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get('transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
     except:
         raise
@@ -424,7 +423,7 @@ def delete_schedA(data):
         delete_sql_schedA(transaction_id, report_id, cmte_id)
         delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
         delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
-        update_linenumber_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(), datum.get('transaction_type'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
+        update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(), datum.get('transaction_type'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
     except:
         raise
 
