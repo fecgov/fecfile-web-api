@@ -690,9 +690,42 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-
         try:
+            if 'amend_ind' in request.data:
+                amend_ind = check_null_value(request.data.get('amend_ind'))
+            else:
+                amend_ind = "N"
+
+            if 'election_code' in request.data:
+                election_code = check_null_value(request.data.get('election_code'))
+            else:
+                election_code = None
+
+            if 'status' in request.data:
+                f_status = check_null_value(request.data.get('status'))
+            else:
+                f_status = "Saved"
+
+            if 'email_1' in request.data:
+                email_1 = check_email(request.data.get('email_1'))
+            else:
+                email_1 = None
+
+            if 'email_2' in request.data:
+                email_2 = check_email(request.data.get('email_2'))
+            else:
+                email_2 = None
+
+            if 'additional_email_1' in request.data:
+                additional_email_1 = check_email(request.data.get('additional_email_1'))
+            else:
+                additional_email_1 = None                
             
+            if 'additional_email_2' in request.data:
+                additional_email_2 = check_email(request.data.get('additional_email_2'))
+            else:
+                additional_email_2 = None
+
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -703,6 +736,11 @@ def reports(request):
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
+                'status': f_status,
+                'email_1': email_1,
+                'email_2': email_2,
+                'additional_email_1': additional_email_1,
+                'additional_email_2': additional_email_2,                
             }
             if 'amend_ind' in request.data:
                 datum['amend_ind'] = request.data.get('amend_ind')
@@ -711,7 +749,10 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-            if type(data) is dict:
+
+            if (f_status == 'Submitted' and data):
+                return JsonResponse({'Submitted': true}, status=status.HTTP_201_CREATED, safe=False)    
+            elif type(data) is dict:
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
