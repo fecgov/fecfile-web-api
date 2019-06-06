@@ -21,10 +21,10 @@
           </button>
         </div>
         <ng-container *ngIf="categoryType?.value === 'receipts'">
-          <span class="float-right amount" style="padding:.75em"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+          <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
         </ng-container>
         <ng-container *ngIf="categoryType?.value !== 'receipts'">
-          <span class="float-right amount" style="padding:.75em">
+          <span class="float-right amount">
             $0.00
           </span>
         </ng-container>
