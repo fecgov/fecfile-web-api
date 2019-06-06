@@ -276,10 +276,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.transactionsModel = transactionsModelL;
 
-        this.totalAmount = res.totalAmount;
-        // this.config.totalItems = res.totalTransactionCount;
-        // this.config.totalItems = res.itemsPerPage * res['total pages'];
-        this.config.totalItems = res.itemsPerPage * res['totalPages'];
+        this.totalAmount = res.totalAmount ? res.totalAmount : 0;
+        this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        // this.config.totalItems = res.itemsPerPage * res['totalPages'];
         this.allTransactionsSelected = false;
       });
   }
@@ -294,8 +293,21 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     this.calculateNumberOfPages();
 
-    const sortedCol: SortableColumnModel =
+    let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    if (sortedCol) {
+      if (sortedCol.descending === undefined || sortedCol.descending === null) {
+        sortedCol.descending = false;
+      }
+    } else {
+      sortedCol = new SortableColumnModel('', false, false, false, false);
+    }
+
+    // temp fix for sprint 13 demo
+    if (this.currentSortedColumnName === 'default') {
+      this.currentSortedColumnName = 'name';
+    }
 
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
@@ -592,8 +604,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to edit
    */
-  public editTransaction(trx): void {
-    // alert('Edit transaction is not yet supported');
+  public editTransaction(trx: TransactionModel): void {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
@@ -709,7 +720,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.config.currentPage : 1;
 
     if (!this.transactionsModel) {
-      return;
+      return '0';
     }
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0

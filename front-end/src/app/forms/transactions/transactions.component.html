@@ -17,11 +17,14 @@
     <header>
       <div class="header-content">
         <div class="float-left">
-          <h1>Transactions / Form {{formType}}
+          <h1 *ngIf="!isEditViewActive(); else editHeading">Transactions / Form {{formType}}
             <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
               <span class="trash-icon"></span>
             </span>
           </h1>
+          <ng-template #editHeading>
+            <h1 [@fadeInOut] *ngIf="isEditViewActive()">Form {{formType}} / {{transactionToEdit.type}} / Edit</h1>
+          </ng-template>
         </div>
         <div class="float-right">
           <button [@fadeInOut] *ngIf="isShowFilters" class="btn btn-primary btn-right" type="submit"
