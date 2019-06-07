@@ -4,6 +4,7 @@ import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
+import { form3xReportTypeDetails} from '../../../shared/interfaces/FormsService//FormsService';
 
 @Injectable({
   providedIn: 'root'
@@ -150,10 +151,11 @@ export class ReportTypeService {
       .pipe(
         map(res => {
           if (res) {
+            console.log("Form 3X save res = ", res);
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
-              const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-               if (res['report_id']) {
-                reportObj.reportId = res['report_id'];
+              const reportObj: form3xReportTypeDetails = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
+               if (res['reportId']) {
+                reportObj.reportId = res['reportId'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
               }
             }
