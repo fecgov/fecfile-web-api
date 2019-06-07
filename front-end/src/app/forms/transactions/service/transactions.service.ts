@@ -149,7 +149,10 @@ export class TransactionsService {
 
       request.filters = emptyFilters;
     }
-
+     
+    console.log(" Transaction Table request = ", request);
+    console.log(" Transaction Table httpOptions = ", httpOptions);
+  
     return this._http
     .post(
       `${environment.apiUrl}${url}`,
@@ -160,7 +163,7 @@ export class TransactionsService {
     )
     .pipe(map(res => {
         if (res) {
-          console.log('res: ', res);
+          console.log('Transaction Table res: ', res);
 
           return res;
         }
