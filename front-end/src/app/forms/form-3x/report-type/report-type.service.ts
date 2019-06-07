@@ -4,6 +4,7 @@ import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
+import { form3xReportTypeDetails} from '../../../shared/interfaces/FormsService//FormsService';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +48,13 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (form3xReportType === null)
+    {
+      console.log("get backup object");
+      let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }
 
     formData.append('form_type', `F${formType}`);
     formData.append('report_type', form3xReportType.reportType);
@@ -97,16 +104,45 @@ export class ReportTypeService {
       }
     }
 
+    console.log(" access_type =", access_type);
+
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
     }
 
-    /*formData.append('email_1', form3xReportType.email_1);
-    formData.append('email_2', form3xReportType.email_2);
-    formData.append('additional_email_1', form3xReportType.additional_email_1);
-    formData.append('additional_email_2', form3xReportType.additional_email_2);*/
+    if (form3xReportType.email1 !== null) {
+      if (typeof form3xReportType.email1 === 'string') {
+        if (form3xReportType.email1.length >= 1) {
+          formData.append('email_1', form3xReportType.email1);
+        }
+      }
+    }
+
+    if (form3xReportType.email2 !== null) {
+      if (typeof form3xReportType.email2 === 'string') {
+        if (form3xReportType.email2.length >= 1) {
+          formData.append('email_2', form3xReportType.email2);
+        }
+      }
+    }
+
+    if (form3xReportType.additionalEmail1 !== null) {
+      if (typeof form3xReportType.additionalEmail1 === 'string') {
+        if (form3xReportType.additionalEmail1.length >= 1) {
+          formData.append('additional_email_1', form3xReportType.additionalEmail1);
+        }
+      }
+    }
+
+    if (form3xReportType.additionalEmail2 !== null) {
+      if (typeof form3xReportType.additionalEmail2 === 'string') {
+        if (form3xReportType.additionalEmail2.length >= 1) {
+          formData.append('additional_email_2', form3xReportType.additionalEmail2);
+        }
+      }
+    }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
@@ -115,10 +151,11 @@ export class ReportTypeService {
       .pipe(
         map(res => {
           if (res) {
+            console.log("Form 3X save res = ", res);
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
-              const reportObj: any = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-               if (res['report_id']) {
-                reportObj.reportId = res['report_id'];
+              const reportObj: form3xReportTypeDetails = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
+               if (res['reportId']) {
+                reportObj.reportId = res['reportId'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
               }
             }

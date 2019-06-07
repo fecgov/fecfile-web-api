@@ -361,9 +361,15 @@ def get_list_report(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from Reports table
+            '''
             query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date 
                                             FROM public.reports WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND report_id = %s"""
-            
+            '''
+
+            query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
+                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
+
+
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
 
             for row in cursor.fetchall():
@@ -375,6 +381,7 @@ def get_list_report(report_id, cmte_id):
         return forms_obj
     except Exception:
         raise
+
 
 def put_sql_report(report_id, cmte_id, report_type, cvg_start_date, cvg_end_date):
 
@@ -690,9 +697,42 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-
         try:
+            if 'amend_ind' in request.data:
+                amend_ind = check_null_value(request.data.get('amend_ind'))
+            else:
+                amend_ind = "N"
+
+            if 'election_code' in request.data:
+                election_code = check_null_value(request.data.get('election_code'))
+            else:
+                election_code = None
+
+            if 'status' in request.data:
+                f_status = check_null_value(request.data.get('status'))
+            else:
+                f_status = "Saved"
+
+            if 'email_1' in request.data:
+                email_1 = check_email(request.data.get('email_1'))
+            else:
+                email_1 = None
+
+            if 'email_2' in request.data:
+                email_2 = check_email(request.data.get('email_2'))
+            else:
+                email_2 = None
+
+            if 'additional_email_1' in request.data:
+                additional_email_1 = check_email(request.data.get('additional_email_1'))
+            else:
+                additional_email_1 = None                
             
+            if 'additional_email_2' in request.data:
+                additional_email_2 = check_email(request.data.get('additional_email_2'))
+            else:
+                additional_email_2 = None
+
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -703,6 +743,11 @@ def reports(request):
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'coh_bop': int(request.data.get('coh_bop')),
+                'status': f_status,
+                'email_1': email_1,
+                'email_2': email_2,
+                'additional_email_1': additional_email_1,
+                'additional_email_2': additional_email_2,                
             }
             if 'amend_ind' in request.data:
                 datum['amend_ind'] = request.data.get('amend_ind')
@@ -711,7 +756,10 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-            if type(data) is dict:
+
+            if (f_status == 'Submitted' and data):
+                return JsonResponse({'Submitted': true}, status=status.HTTP_201_CREATED, safe=False)    
+            elif type(data) is dict:
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -808,7 +856,7 @@ def post_sql_entity(entity_id, entity_type, cmte_id, entity_name, first_name, la
 def get_list_entity(entity_id, cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         forms_obj = None
         with connection.cursor() as cursor:
@@ -825,7 +873,7 @@ def get_list_entity(entity_id, cmte_id):
 def get_list_all_entity(cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
         forms_obj = None
         with connection.cursor() as cursor:
@@ -988,7 +1036,7 @@ def entities(request):
                     'first_name': request.data.get('first_name'),
                     'last_name': request.data.get('last_name'),
                     'middle_name': request.data.get('middle_name'),
-                    'preffix': request.data.get('preffix'),
+                    'preffix': request.data.get('prefix'),
                     'suffix': request.data.get('suffix'),
                     'street_1': request.data.get('street_1'),
                     'street_2': request.data.get('street_2'),
@@ -1040,7 +1088,7 @@ def entities(request):
                 'first_name': request.data.get('first_name'),
                 'last_name': request.data.get('last_name'),
                 'middle_name': request.data.get('middle_name'),
-                'preffix': request.data.get('preffix'),
+                'preffix': request.data.get('prefix'),
                 'suffix': request.data.get('suffix'),
                 'street_1': request.data.get('street_1'),
                 'street_2': request.data.get('street_2'),
@@ -1093,7 +1141,7 @@ def search_entities(request):
             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
             order_string = key + ","
 
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")

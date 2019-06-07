@@ -26,7 +26,13 @@ export class SubmitComponent implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(res.form_submitted) {
-          localStorage.removeItem(`form_${this.form_type}_details`);
+          if (this.form_type ==='99'){
+            localStorage.removeItem(`form_${this.form_type}_details`);
+          } else if (this.form_type ==='3X'){
+            localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
+            localStorage.removeItem(`form_${this.form_type}_report_type`);
+          }
+
           localStorage.removeItem(`form_${this.form_type}_saved`);
         }
       });
@@ -36,7 +42,8 @@ export class SubmitComponent implements OnInit {
       .subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
-            if(val.url.indexOf('/forms/form/99') === -1) {
+            console.log("val.url = ", val.url);
+            if((val.url.indexOf('/forms/form/99') === -1) || (val.url.indexOf('/forms/form/3X') === -1)) {
               this._messageService
                 .sendMessage({
                   'validateMessage': {

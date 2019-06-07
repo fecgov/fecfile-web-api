@@ -24,6 +24,7 @@ import { TransactionsComponent } from './forms/transactions/transactions.compone
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
+import { SignComponent } from './shared/partials/sign/sign.component';
 
 
 export const AppRoutes: Routes = [
@@ -60,6 +61,7 @@ export const AppRoutes: Routes = [
         ]
 			},
 			{ path: 'forms/transactions/:form_id/:report_id', component: TransactionsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+			{ path: 'signandSubmit/:form_id', component: SignComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		]
     },
     { path: '**', redirectTo: '' }

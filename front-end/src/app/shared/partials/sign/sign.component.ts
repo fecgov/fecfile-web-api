@@ -8,7 +8,8 @@ import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service'
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
-
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { loadElementInternal } from '@angular/core/src/render3/util';
 
 @Component({
   selector: 'app-sign',
@@ -55,7 +56,9 @@ export class SignComponent implements OnInit {
     private _fb: FormBuilder,
     private _formsService: FormsService,
     private _messageService: MessageService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _router: Router,
+    private _reportTypeService: ReportTypeService,
   ) { }
 
   ngOnInit(): void {
@@ -63,7 +66,11 @@ export class SignComponent implements OnInit {
 
     this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+    if (this.formType === '3X'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+    } else if (this.formType === '99'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+    }
 
     this._setForm();
 
@@ -71,6 +78,7 @@ export class SignComponent implements OnInit {
       .getMessage()
       .subscribe(res => {
         if(res.message) {
+          console.log("res.message", res.message);
           if(res.message === 'New form99') {
             this._setForm();
           }
@@ -80,9 +88,17 @@ export class SignComponent implements OnInit {
 
   ngDoCheck(): void {
     if(this.formType === '99') {
-      let form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+      const form_99_details: any = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
       if(form_99_details) {
         this.typeSelected = form_99_details.reason;
+      }
+    }  else if(this.formType === '3X') {
+      const form_3X_report_type: any = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      console.log("form_3X_report_type", form_3X_report_type);
+      if(form_3X_report_type) {
+        if (form_3X_report_type.hasOwnProperty('reportType')) {
+          this.typeSelected = form_3X_report_type.reportType;
+        }      
       }
     }
   }
@@ -123,17 +139,31 @@ export class SignComponent implements OnInit {
    * @return     {boolean}  True if has unsaved data, False otherwise.
    */
   public hasUnsavedData(): boolean {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+    if(this.formType === '99') {
+      let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
 
-    if(formSaved !== null) {
-      let formStatus: boolean = formSaved.saved;
+      if(formSaved !== null) {
+        let formStatus: boolean = formSaved.saved;
 
-      if(!formStatus) {
-        return true;
+        if(!formStatus) {
+          return true;
+        }
       }
-    }
 
-    return false;
+      return false;
+    } else if(this.formType === '3X') {
+      let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
+
+      if(formSaved !== null) {
+        let formStatus: boolean = formSaved.saved;
+
+        if(!formStatus) {
+          return true;
+        }
+      }
+
+      return false;
+    }
   }
 
   private _setForm(): void {
@@ -151,16 +181,48 @@ export class SignComponent implements OnInit {
             this._form_details.additional_email_2 = '';
           }
         }
+      } else if(this.formType === '3X') {
+        console.log("this._form_details =", this._form_details);
+        //this.typeSelected = this._form_details.reportType;
+
+        if(this._form_details.reportType) {
+          if (this._form_details.reportType.hasOwnProperty('reportType')) {
+            this.typeSelected = this._form_details.reportType.reportType;
+          }      
+        }
+
+        if(this._form_details.additionalEmail1.length >= 1) {
+          if(this._form_details.additionalEmail1 === '-') {
+            this._form_details.additionalEmail1 = '';
+          }
+        }
+
+        if(this._form_details.additionalEmail2.length >= 1) {
+          if(this._form_details.additionalEmail2 === '-') {
+            this._form_details.additionalEmail2 = '';
+          }
+        }
+      }
+      if(this.formType === '99') {
+        this.frmSignee = this._fb.group({
+          signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
+          additional_email_1: [this._form_details.additional_email_1, Validators.email],
+          additional_email_2: [this._form_details.additional_email_2, Validators.email],
+          confirm_email_1: [this._form_details.confirm_email_1, Validators.email],
+          confirm_email_2: [this._form_details.confirm_email_2, Validators.email],
+          agreement: [false, Validators.requiredTrue]
+        });
+      } else if(this.formType === '3X') {
+        this.frmSignee = this._fb.group({
+          signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
+          additional_email_1: [this._form_details.additionalEmail1, Validators.email],
+          additional_email_2: [this._form_details.additionalEmail2, Validators.email],
+          confirm_email_1: [this._form_details.additionalEmail1, Validators.email],
+          confirm_email_2: [this._form_details.additionalEmail2, Validators.email],
+          agreement: [false, Validators.requiredTrue]
+        });
       }
 
-      this.frmSignee = this._fb.group({
-        signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
-        additional_email_1: [this._form_details.additional_email_1, Validators.email],
-        additional_email_2: [this._form_details.additional_email_2, Validators.email],
-        confirm_email_1: [this._form_details.confirm_email_1, Validators.email],
-        confirm_email_2: [this._form_details.confirm_email_2, Validators.email],
-        agreement: [false, Validators.requiredTrue]
-      });
     } else {
       this.frmSignee = this._fb.group({
         signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
@@ -211,9 +273,17 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
-    let formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+    
     let formStatus: boolean = true;
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+
+    if (this.formType === '3X'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
+    }  if (this.formType === '99'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+      const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+    }
+
     this.additionalEmail1Invalid=false;
     this.additionalEmail2Invalid=false;
     
@@ -224,13 +294,22 @@ export class SignComponent implements OnInit {
       if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
 
         this.frmSaved = true;
-        this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
-        this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+        if (this.formType === '99'){
+          this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+          this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+        } else  if (this.formType === '3X'){
+          this._form_details.additionalEmail_1 = this.frmSignee.get('additional_email_1').value;
+          this._form_details.additionalEmail_2 = this.frmSignee.get('additional_email_2').value;
+        }
 
-        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+        if (this.formType === '99'){
+          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+        } else if (this.formType === '3X'){
+          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+        }
 
-        this._formsService
-          .Signee_SaveForm({}, this.formType)
+        if (this.formType === '3X'){
+          this._reportTypeService.saveReport(this.formType, 'Saved')
           .subscribe(res => {
             if(res) {
               this.frmSaved = true;
@@ -239,12 +318,31 @@ export class SignComponent implements OnInit {
                 'saved': this.frmSaved
               };
 
-              localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
+              localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify(formSavedObj));
             }
           },
           (error) => {
             console.log('error: ', error);
           });
+        } if (this.formType === '99'){
+
+          this._formsService
+            .Signee_SaveForm({}, this.formType)
+            .subscribe(res => {
+              if(res) {
+                this.frmSaved = true;
+
+                let formSavedObj: any = {
+                  'saved': this.frmSaved
+                };
+
+                localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
+              }
+            },
+            (error) => {
+              console.log('error: ', error);
+            });
+        }
       }
     }  
      console.log(" saveForm this.frmSaved =", this.frmSaved);
@@ -255,8 +353,16 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
-    let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+    let doSubmitFormSaved: boolean = false;
+    if (this.formType === '3X'){
+      let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      doSubmitFormSaved=formSaved;
+    } else if (this.formType === '99'){
+      let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+      doSubmitFormSaved=formSaved.form_saved;
+    }
 
     if(this.formType === '99') {
       this._form_details.file = '';
@@ -273,8 +379,12 @@ export class SignComponent implements OnInit {
     this.validateAdditionalEmails();
    
     if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
-      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-
+      if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+      } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+      }
+         
       if(this.frmSignee.invalid) {
         if(this.frmSignee.get('agreement').value) {
           this.signFailed = false;
@@ -284,7 +394,8 @@ export class SignComponent implements OnInit {
       } else if(this.frmSignee.valid) {
         this.signFailed = false;
 
-        if(!formSaved.form_saved) {
+        if(!doSubmitFormSaved) {
+          if (this.formType === '99'){
           this._formsService
             .saveForm({}, {}, this.formType)
             .subscribe(res => {
@@ -319,6 +430,25 @@ export class SignComponent implements OnInit {
             (error) => {
               console.log('error: ', error);
             });
+          }
+          else if (this.formType === '3X'){
+            this._reportTypeService.saveReport(this.formType, 'Submitted')
+            .subscribe(res => {
+              if(res) {
+                this.frmSaved = true;
+  
+                let formSavedObj: any = {
+                  'saved': this.frmSaved
+                };
+    
+                  this._messageService
+                    .sendMessage({
+                      'form_submitted': true
+                    });
+                }
+              }); 
+            }
+            // upto here 
         } else {
           this._messageService
             .sendMessage({
@@ -327,64 +457,115 @@ export class SignComponent implements OnInit {
                 'showValidateBar': false
               }
             });
+            if (this.formType === '99'){
+              this._formsService
+                .submitForm({}, this.formType)
+                .subscribe(res => {
+                  if(res) {
+                    this.status.emit({
+                      form: this.frmSignee,
+                      direction: 'next',
+                      step: 'step_5',
+                      previousStep: this._step
+                    });
 
-          this._formsService
-            .submitForm({}, this.formType)
-            .subscribe(res => {
-              if(res) {
-                this.status.emit({
-                  form: this.frmSignee,
-                  direction: 'next',
-                  step: 'step_5',
-                  previousStep: this._step
-                });
-
-                this._messageService
-                  .sendMessage({
-                    'form_submitted': true
-                  });
-              }
-            });
-        }
+                    this._messageService
+                      .sendMessage({
+                        'form_submitted': true
+                      });
+                  }
+                }); 
+              } else if (this.formType === '3X'){
+                this._reportTypeService.saveReport(this.formType, 'Submitted')
+                .subscribe(res => {
+                  if(res) {
+                    this.frmSaved = true;
+      
+                    let formSavedObj: any = {
+                      'saved': this.frmSaved
+                    };
+        
+                      this._messageService
+                        .sendMessage({
+                          'form_submitted': true
+                        });
+                    }
+                  }); 
+            }
+          }
       }
-    }
+   }
   }
-
   
   public changeAdditionalEmail(e): void {
     this.frmSaved=false
     this.clearWarnMsg();
   }
+
   public updateAdditionalEmail(e): void {
     this.frmSaved=false
     this.clearWarnMsg();
     
     if(e.target.value.length) {
      if(e.target.name === 'additional_email_1') {
-       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+       if (this.formType === '99'){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+       } else if (this.formType === '3X'){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+       }
 
        this._form_details.additional_email_1 = e.target.value;
 
-       localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-
-       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
-         saved: false
-       }));
+       if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+       } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+      }
+      
+      if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+          saved: false
+        }));
+      } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify({
+          saved: false
+        }));
+      }
      } else if(e.target.name === 'additional_email_2') {
-       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+       if (this.formType === '99'){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+       } else if (this.formType === '3X'){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+       } 
 
        this._form_details.additional_email_2 = e.target.value;
 
-       localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+       if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+       } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+       }
 
-       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
-         saved: false
-       }));
+       if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+          saved: false
+        }));
+      } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify({
+          saved: false
+        }));
+      }
      }
     } else {
-     localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
-       saved: true
-     }));
+      if (this.formType === '99'){
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({
+          saved: true
+        }));
+      } else if (this.formType === '3X'){
+        localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify({
+          saved: true
+        }));
+      }
     }
   }
 
@@ -414,6 +595,7 @@ export class SignComponent implements OnInit {
    *
    */
   public goToPreviousStep(): void {
+    if (this.formType === '99'){
     this.frmSaved = false;
 
     this.status.emit({
@@ -430,11 +612,18 @@ export class SignComponent implements OnInit {
           'showValidateBar': false
         }
       });
+    } else if (this.formType === '3X'){
+      this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2' } });
+    }
+
   }
 
   public printPreview(): void {
-
-    this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+    if (this.formType === '3X'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+    } else if (this.formType === '3X'){
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+    } 
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
       this.frmSignee.controls.additional_email_2.valid) {
@@ -442,8 +631,13 @@ export class SignComponent implements OnInit {
       this.validateAdditionalEmails();
 
       if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
-        this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
-        this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+        if (this.formType === '99'){
+          this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+          this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+        } else if (this.formType === '3X'){
+          this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
+          this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+        }
 
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
 
