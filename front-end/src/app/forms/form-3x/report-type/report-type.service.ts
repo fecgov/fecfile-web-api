@@ -154,8 +154,8 @@ export class ReportTypeService {
             console.log("Form 3X save res = ", res);
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
               const reportObj: form3xReportTypeDetails = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-               if (res['reportId']) {
-                reportObj.reportId = res['reportId'];
+               if (res['reportid']) {
+                reportObj.reportId = res['reportid'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
               }
             }
