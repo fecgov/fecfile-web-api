@@ -203,7 +203,7 @@ export class TransactionsService {
 
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
-      model.aggregate = 0;
+      model.aggregate = row.aggregate_amt ? row.aggregate_amt : 0;
       model.purposeDescription = row.purpose_description;
       model.contributorEmployer = row.employer;
       model.contributorOccupation = row.occupation;

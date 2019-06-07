@@ -392,14 +392,16 @@ export class TransactionsFilterComponent implements OnInit {
 
               for (const node2 of node1.options) {
                 for (const option of node2.options) {
-                  if (this.cachedFilters.filterCategories) {
-                    // check for categories selected in the filter cache
-                    // TODO scroll to first check item
-                    if (this.cachedFilters.filterCategories.includes(option.text)) {
-                      option.selected = true;
-                      this.isHideTypeFilter = false;
-                    } else {
-                      option.selected = false;
+                  if (this.cachedFilters) {
+                    if (this.cachedFilters.filterCategories) {
+                      // check for categories selected in the filter cache
+                      // TODO scroll to first check item
+                      if (this.cachedFilters.filterCategories.includes(option.text)) {
+                        option.selected = true;
+                        this.isHideTypeFilter = false;
+                      } else {
+                        option.selected = false;
+                      }
                     }
                   }
                   categoryGroup.options.push(option);
@@ -438,12 +440,14 @@ export class TransactionsFilterComponent implements OnInit {
               for (const s of res.data.states) {
                 // check for states selected in the filter cache
                 // TODO scroll to first check item
-                if (this.cachedFilters.filterStates) {
-                  if (this.cachedFilters.filterStates.includes(s.code)) {
-                    s.selected = true;
-                    this.isHideStateFilter = false;
-                  } else {
-                    s.selected = false;
+                if (this.cachedFilters) {
+                  if (this.cachedFilters.filterStates) {
+                    if (this.cachedFilters.filterStates.includes(s.code)) {
+                      s.selected = true;
+                      this.isHideStateFilter = false;
+                    } else {
+                      s.selected = false;
+                    }
                   }
                 }
               }
