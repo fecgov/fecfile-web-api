@@ -19,6 +19,7 @@ import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -32,7 +33,6 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
-  @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
 
   public formFields: any = [];
   public frmIndividualReceipt: FormGroup;
@@ -42,6 +42,7 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
+  private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
 
@@ -62,24 +63,43 @@ export class IndividualReceiptComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
     this.frmIndividualReceipt = this._fb.group({});
 
     this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
         this.formFields = res.data.formFields;
         this.hiddenFields = res.data.hiddenFields;
-
-        this._setForm(this.formFields);
-
         this.states = res.data.states;
+
+        if (this.formFields.length >= 1) {
+          this._setForm(this.formFields);
+        }
       }
     });
   }
 
   ngDoCheck(): void {
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
+      }
+    }
+
+    if (this._reportType !== null) {
+      const cvgStartDate: string = this._reportType.cvgStartDate;
+      const cvgEndDate: string = this._reportType.cvgEndDate;
+
+      if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+          contributionDate(cvgStartDate, cvgEndDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
       }
     }
   }
@@ -106,10 +126,11 @@ export class IndividualReceiptComponent implements OnInit {
   /**
    * Sets the form field valition requirements.
    *
-   * @param      {Object}  validators  The validators
+   * @param      {String} fieldName The name of the field.
+   * @param      {Object} validators  The validators.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators): Array<any> {
+  private _mapValidators(validators: any): Array<any> {
     const formValidators = [];
 
     if (validators) {
@@ -132,9 +153,16 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        }
+        } /* else if (validation === 'contributionDate') {
+          console.log('validators: ', validators);
+          if (validators[validation]) {
+            console.log('validators[validation]: ', validators[validation]);
+            formValidators.push(contributionDate(this._reportType));
+          }
+        } */
       }
     }
+
     return formValidators;
   }
 
@@ -190,18 +218,24 @@ export class IndividualReceiptComponent implements OnInit {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-
     let reportId = '0';
     const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+    console.log('viewTransactions form3XReportType', form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
       if (form3XReportType.hasOwnProperty('reportId')) {
         reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
       }
     }
 
+    console.log('reportId', reportId);
+
     if (!reportId) {
       reportId = '0';
+      // reportId = '431';
+      // reportId = '1206963';
     }
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 

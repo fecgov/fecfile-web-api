@@ -71,6 +71,7 @@ export class TransactionsService {
    */
   public getFormTransactions(
       formType: string,
+      reportId: string,
       page: number,
       itemsPerPage: number,
       sortColumnName: string,
@@ -78,82 +79,42 @@ export class TransactionsService {
       filters: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    let params = new HttpParams();
+    // let params = new HttpParams();
     const formData: FormData = new FormData();
     const url = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
+
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
-    const reportid = 1206963; // 1213131
 
-    params = params.append('page', page.toString());
-    params = params.append('itemsPerPage', itemsPerPage.toString());
-    params = params.append('sortColumnName', serverSortColumnName);
-    if (descending) {
-      params = params.append('descending', 'true');
-    }
-    params = params.append('reportid', reportid.toString());
+        const request: any = {};
 
-    if (filters) {
-      if (filters.keywords) {
-        if (filters.keywords.length > 0) {
-          let i = 1;
-          for (let keyword of filters.keywords) {
-            keyword = keyword.trim();
-            params = params.append('keyword' + i, keyword);
-            i++;
-          }
-        }
-      }
+    /////////////////////////////////
+    /////////////////////////////////
+    /////////////////////////////////
 
-      if (filters.filterCategories) {
-        if (filters.filterCategories.length > 0) {
-          let i = 1;
-          for (const category of filters.filterCategories) {
-            params = params.append('category' + i, category);
-            i++;
-          }
-        }
-      }
+    // This is a temp patch/fix for and issue where
+    // report ID is not in local storage when user clicks
+    // View Transactions from the Individual Receipt compoent.
+    // It is here for development purposes only.  Not for production.
 
-      if (filters.filterDateFrom && filters.filterDateTo) {
-        params = params.append('transactionDateFrom', filters.filterDateFrom.toString());
-        params = params.append('transactionDateTo', filters.filterDateTo.toString());
-      }
+    // if (reportId === '0') {
+    //   console.log('WARNING: Using default Report ID 1206963 for development reasons as no value ' +
+    //     'was present in localStorage for form_F3X_report_type from IndividualReceiptComponent');
+    //   reportId = '431'; // '1206963';
+    // }
 
-      if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
-        if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
-            filters.filterAmountMin <= filters.filterAmountMax) {
-              params = params.append('amountMin', filters.filterAmountMin.toString());
-              params = params.append('amountMax', filters.filterAmountMax.toString());
-        }
-      }
+    /////////////////////////////////
+    /////////////////////////////////
+    //////////////////////////////////
 
-      if (filters.filterStates) {
-        if (filters.filterStates.length > 0) {
-          let i = 1;
-          for (const state of filters.filterStates) {
-            params = params.append('state' + i, state);
-            i++;
-          }
-        }
-      }
-
-      if (filters.filterMemoCode === true) {
-        params = params.append('memoCode', 'true');
-      }
-    }
-
-    // use if API is a POST request
-    const request: any = {};
-    // request.formType = formType;
-    request.reportid = reportid;
+    request.reportid = reportId;
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+
     // if (filters) {
     //   request.filters = filters;
     //   if (request.filters.keywords) {
@@ -231,7 +192,9 @@ export class TransactionsService {
       model.type = row.transaction_type_desc;
       model.transactionId = row.transaction_id;
       model.name = row.name;
-      model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
+      // model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
+      model.street = row.street_1;
+      model.street2 = row.street_2;
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip_code;
@@ -278,6 +241,9 @@ export class TransactionsService {
         break;
       case 'street':
         name = 'street_1';
+        break;
+      case 'street2':
+        name = 'street_2';
         break;
       case 'zip':
         name = 'zip_code';
@@ -328,6 +294,7 @@ export class TransactionsService {
     serverObject.transaction_id = model.transactionId;
     serverObject.name =  model.name;
     serverObject.street_1 = model.street;
+    serverObject.street_2 = model.street2;
     serverObject.city = model.city;
     serverObject.state = model.state;
     serverObject.zip_code = model.zip;
@@ -358,11 +325,17 @@ export class TransactionsService {
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added later.
    * 
-   * This may be neeeded.  Rename if so from mock name. Hello???
+   * This may be neeeded.
    *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
+    if (!response) {
+      return;
+    }
+    if (!response.transactions) {
+      return;
+    }
     for (const trx of response.transactions) {
       trx.transaction_amount_ui = `$${trx.transaction_amount}`;
       trx.transaction_date_ui = this._datePipe.transform(trx.transaction_date, 'MM/dd/yyyy');

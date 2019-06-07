@@ -2152,8 +2152,9 @@ def get_ReportTypes(request):
 def get_FormTypes(request):
     try:
         forms_obj = []
+        cmte_id = request.user.username
         with connection.cursor() as cursor: 
-            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from public.ref_form_types order by form_type ) t")
+            cursor.execute("SELECT json_agg(t) FROM (select  distinct form_type from my_forms_view where cmte_id = %s order by form_type ) t", [cmte_id])
 
             for row in cursor.fetchall():
                 data_row = list(row)

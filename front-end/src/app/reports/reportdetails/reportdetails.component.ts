@@ -692,7 +692,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       console.log(new Date().toISOString());
       setTimeout(() => 
       {
-        this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_2'} });
+        this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4'} });
         console.log(new Date().toISOString());
       },
       1500);
