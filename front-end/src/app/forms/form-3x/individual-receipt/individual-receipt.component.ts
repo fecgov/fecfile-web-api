@@ -225,9 +225,9 @@ export class IndividualReceiptComponent implements OnInit {
     console.log('reportId', reportId);
 
     if (!reportId) {
-      reportId = '0';
+      // reportId = '0';
       // reportId = '431';
-      // reportId = '1206963';
+      reportId = '1206963';
     }
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 
