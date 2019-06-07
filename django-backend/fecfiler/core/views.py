@@ -1344,15 +1344,15 @@ def filter_get_all_trans(request, param_string):
     if request.method == 'GET':
         return param_string
     # import ipdb;ipdb.set_trace()
-    filt_dict = request.data['filters']
+    filt_dict = request.data.get('filters', {})
     for f_key, value_d in filt_dict.items():
         if 'filterCategories' in f_key:
             cat_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
-        if 'filterFromDate' in f_key and 'filterToDate' in f_key:
-            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterToDate'] +"'"
-        if 'filterAmountMin' in f_key and 'filterAmountMax' in f_key:
-            param_string = param_string + " AND transaction_amount >= " + value_d +" AND transaction_amount <= " + filt_dict['filterAmountMax']
+        if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
+            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
+        if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
+            param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
@@ -1361,6 +1361,15 @@ def filter_get_all_trans(request, param_string):
                 param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
     return param_string
 
+# def get_aggregate_amount(transaction_id):
+#     try:
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE transaction_id = %s AND delete_ind is distinct FROM 'Y'""", [transaction_id])
+#             aggregate_amt = cursor.fetchone()[0]
+#         return aggregate_amt
+#     except Exception as  e:
+#         return False
+#         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
@@ -1373,10 +1382,10 @@ def get_all_transactions(request):
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         # import ipdb;ipdb.set_trace()
-        params = request.data['filters']
+        params = request.data.get('filters', {})
         keywords = params.get('keywords')
         report_id = request.data.get('reportid')
-        if str(descending) == 'true':
+        if str(descending).lower() == 'true':
             descending = 'DESC'
         else:
             descending = 'ASC'
@@ -1385,36 +1394,41 @@ def get_all_transactions(request):
         # else:
         #     order_string = "transaction_id"
         # import ipdb;ipdb.set_trace()
-        keys = ['transaction_type', 'transaction_type_desc', 'transaction_id', 'name', 
+        keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
             'transaction_date', 'transaction_amount', 'purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
-        # if search_string:
-        #     for key in keys:
-        #         if not param_string:
-        #             param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
-        #         else:
-        #             param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
-        #     param_string = param_string + " )"
-
+        search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 
+            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'occupation', 'employer', 'memo_code', 'memo_text']
+        if search_string:
+            for key in search_keys:
+                if not param_string:
+                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+                else:
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+        keywords_string = ''
         if keywords:
             for key in keys:
                 for word in keywords:
                     if '"' in word:
                         continue
                     elif "'" in word:
-                        if not param_string:
-                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) = '" + str(word) +"'"
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
                         else:
-                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) = '" + str(search_string) +"'"
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
                     else:
-                        if not param_string:
-                            param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
                         else:
-                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
-            param_string = param_string + " )"
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+            keywords_string = keywords_string + " )"
+        param_string = param_string + keywords_string
         param_string = filter_get_all_trans(request, param_string)
-        #import ipdb;ipdb.set_trace()
+        
         # for key, value in request.query_params.items():
         #     try:
         #         check_value = int(value)
@@ -1425,7 +1439,6 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
         #         else:
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
-
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
                            where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                            # + """ ORDER BY """ + order_string
@@ -1436,14 +1449,15 @@ def get_all_transactions(request):
             count = result[0]
             sum_trans = result[1]
         
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
-        if sortcolumn:
+        # import ipdb;ipdb.set_trace()
+        if sortcolumn and sortcolumn != 'default':
             trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
-        else:
-            trans_query_string = trans_query_string + """ ORDER BY name , transaction_date DESC""" 
+        elif sortcolumn == 'default':
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date DESC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
@@ -1458,6 +1472,8 @@ def get_all_transactions(request):
                         for i in d:
                             if not d[i]:
                                 d[i] = ''
+                        #agg_amount = get_aggregate_amount(d['transaction_id'])
+                        #d['aggregate_amount'] =round(agg_amount, 2)   
                     status_value = status.HTTP_200_OK
         
         #import ipdb; ipdb.set_trace()
@@ -1470,9 +1486,9 @@ def get_all_transactions(request):
                     'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
-
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 
 """
 *****************************************************************************************************************************
