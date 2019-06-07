@@ -849,7 +849,7 @@ def post_sql_entity(entity_id, entity_type, cmte_id, entity_name, first_name, la
 def get_list_entity(entity_id, cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         forms_obj = None
         with connection.cursor() as cursor:
@@ -866,7 +866,7 @@ def get_list_entity(entity_id, cmte_id):
 def get_list_all_entity(cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
         forms_obj = None
         with connection.cursor() as cursor:
@@ -1029,7 +1029,7 @@ def entities(request):
                     'first_name': request.data.get('first_name'),
                     'last_name': request.data.get('last_name'),
                     'middle_name': request.data.get('middle_name'),
-                    'preffix': request.data.get('preffix'),
+                    'preffix': request.data.get('prefix'),
                     'suffix': request.data.get('suffix'),
                     'street_1': request.data.get('street_1'),
                     'street_2': request.data.get('street_2'),
@@ -1081,7 +1081,7 @@ def entities(request):
                 'first_name': request.data.get('first_name'),
                 'last_name': request.data.get('last_name'),
                 'middle_name': request.data.get('middle_name'),
-                'preffix': request.data.get('preffix'),
+                'preffix': request.data.get('prefix'),
                 'suffix': request.data.get('suffix'),
                 'street_1': request.data.get('street_1'),
                 'street_2': request.data.get('street_2'),
@@ -1134,7 +1134,7 @@ def search_entities(request):
             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
             order_string = key + ","
 
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
                                                     FROM public.entity WHERE cmte_id = '""" + cmte_id + """'""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""")
