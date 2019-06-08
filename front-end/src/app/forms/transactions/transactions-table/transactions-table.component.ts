@@ -247,9 +247,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName = 'name';
     }
 
+    const serverSortColumnName = this._transactionsService.
+      mapToSingleServerName(this.currentSortedColumnName);
+
     this._transactionsService.getFormTransactions(this.formType, this.reportId,
         page, this.config.itemsPerPage,
-        this.currentSortedColumnName, sortedCol.descending, this.filters)
+        serverSortColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
