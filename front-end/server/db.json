@@ -128,7 +128,7 @@
                   "infoIcon":null,
                   "infoText":null,
                   "name":"ContributorZip",
-                  "type":"text",
+                  "type":"number",
                   "validation":{  
                      "required": true,
                      "max":"9",
