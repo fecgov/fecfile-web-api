@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   OnInit,
+  DoCheck,
   ViewEncapsulation} from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -13,6 +14,7 @@ import { floatingPoint } from '../../../shared/utils/forms/validation/floating-p
 import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
+import { contributionDate } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 
 /**
  * A component for editing Transactions.  It is similar to the
@@ -25,7 +27,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class TransactionsEditComponent implements OnInit {
+export class TransactionsEditComponent implements OnInit, DoCheck {
 
   @Input()
   public transactionToEdit: TransactionModel;
@@ -43,6 +45,7 @@ export class TransactionsEditComponent implements OnInit {
   public formVisible = false;
   public states: any = [];
 
+  private _reportType: any = {};
 
   constructor(
     private _fb: FormBuilder,
@@ -57,10 +60,63 @@ export class TransactionsEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getFormFields();
+  }
 
+  ngDoCheck(): void {
+
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+    if (this._reportType !== null) {
+
+      // const cvgStartDate: string = this._reportType.cvgStartDate;
+      // const cvgEndDate: string = this._reportType.cvgEndDate;
+
+      // TODO why are these properties all lower case?
+      // Because the report_type in localStorage does not have the
+      // same object structure/property names as found in IndividualReceiptComponent.
+      // TODO get these objects in sync. The date formats are different as well as
+      // all lower case names.
+
+      const cvgStartDate: string = this._reportType.cvgstartdate;
+      const cvgEndDate: string = this._reportType.cvgenddate;
+
+      const cvgStartDateDate: any = new Date(`${cvgStartDate}T01:00:00`);
+      const startFormattedDate: string = `${(cvgStartDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgStartDateDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')}/${cvgStartDateDate.getFullYear()}`;
+
+
+      const cvgEndDateDate: any = new Date(`${cvgEndDate}T01:00:00`);
+      const endFormattedDate: string = `${(cvgEndDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgEndDateDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')}/${cvgEndDateDate.getFullYear()}`;
+
+      if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+          contributionDate(startFormattedDate, endFormattedDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+      }
+    }
+  }
+
+  /**
+   * Get the form field details from the server.
+   */
+  private getFormFields(): void {
     console.log(this.transactionToEdit);
 
     this.frmIndividualReceipt = this._fb.group({});
+
+    // TODO check if same call is needed in validate.
+    this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+      .subscribe((res: form3xReportTypeDetails) => {
+        localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+      });
 
     this._individualReceiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
       if (res) {
@@ -75,6 +131,27 @@ export class TransactionsEditComponent implements OnInit {
         this._setForm(this.formFields);
 
         this.states = res.data.states;
+
+
+        // this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+        //   .subscribe((res: form3xReportTypeDetails) => {
+        //     localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+
+        //   this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        //   if (this._reportType !== null) {
+        //     const cvgStartDate: string = this._reportType.cvgStartDate;
+        //     const cvgEndDate: string = this._reportType.cvgEndDate;
+
+        //     if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        //       this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+        //         contributionDate(cvgStartDate, cvgEndDate),
+        //         Validators.required
+        //       ]);
+
+        //       this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+        //     }
+        //   }
+        // });
       }
     });
   }

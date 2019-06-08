@@ -96,6 +96,15 @@
                         Floating point numbers only.
                       </div>
                     </ng-container>
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.contributionDateInvalid"
+                      >
+                        Entered date is outside of the report coverage period. Please enter transactions for this
+                        coverage period only.
+                      </div>
+                    </ng-container>                    
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">
