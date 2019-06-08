@@ -246,7 +246,8 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          // formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
       }
     });
@@ -257,11 +258,19 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
   /**
    * Sets the form field valition requirements.
    *
-   * @param      {Object}  validators  The validators
+   * @param      {Object} validators  The validators.
+   * @param      {String} fieldName The name of the field.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators): Array<any> {
+  private _mapValidators(validators: any, fieldName: string): Array<any> {
     const formValidators = [];
+
+    /**
+     * Adds alphanumeric validation for the zip code field.
+     */
+    if (fieldName === 'ContributorZip') {
+      formValidators.push(alphaNumeric());
+    }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -277,8 +286,6 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
           if (validators[validation] !== null) {
             formValidators.push(Validators.maxLength(validators[validation]));
           }
-        } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphaNumeric());
         } else if (validation === 'dollarAmount') {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
@@ -286,6 +293,7 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
         }
       }
     }
+
     return formValidators;
   }
 
