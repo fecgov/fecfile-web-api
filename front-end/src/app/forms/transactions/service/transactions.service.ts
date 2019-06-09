@@ -257,6 +257,9 @@ export class TransactionsService {
       case 'amount':
         name = 'transaction_amount';
         break;
+      case 'aggregate':
+        name = 'aggregate_amt';
+        break;
       case 'purposeDescription':
         name = 'purpose_description';
         break;
