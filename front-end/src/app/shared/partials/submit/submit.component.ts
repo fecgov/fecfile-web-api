@@ -20,8 +20,10 @@ export class SubmitComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    console.log("form submitted ...", this.form_type);
+    
     this._messageService
       .getMessage()
       .subscribe(res => {
@@ -43,7 +45,7 @@ export class SubmitComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             console.log("val.url = ", val.url);
-            if((val.url.indexOf('/forms/form/99') === -1) || (val.url.indexOf('/forms/form/3X') === -1)) {
+            if((val.url.indexOf('/forms/form/99') === -1) || (val.url.indexOf('/forms/form/3X') === -1) || (val.url.indexOf('/forms/form/3X') === -1)) {
               this._messageService
                 .sendMessage({
                   'validateMessage': {
