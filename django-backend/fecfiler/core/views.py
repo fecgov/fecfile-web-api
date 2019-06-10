@@ -383,15 +383,15 @@ def get_list_report(report_id, cmte_id):
         raise
 
 
-def put_sql_report(report_id, cmte_id, report_type, cvg_start_date, cvg_end_date):
+def put_sql_report(report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id):
 
     try:
         with connection.cursor() as cursor:
             # UPDATE row into Reports table
             # cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s, last_update_date = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
             #                     (data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), datetime.now(), data.get('report_id'), cmte_id))
-            cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                                [report_type, cvg_start_date, cvg_end_date, report_id, cmte_id])
+            cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                                [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception('The Report ID: {} does not exist in Reports table'.format(report_id))
     except Exception:
@@ -556,7 +556,9 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
-            put_sql_report(data.get('report_id'), cmte_id, data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
+            print("before put_sql_report")
+            put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
+            print("after put_sql_report")
             old_dict_report = old_list_report[0]
             prev_report_type = old_dict_report.get('report_type')
             prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
@@ -565,10 +567,10 @@ def put_reports(data):
                                            
             try:
                 if data.get('form_type') == "F3X":
-                    put_sql_form3x(data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'), data.get('report_id'), cmte_id)                            
+                    put_sql_form3x(data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'),  data.get('report_id'), cmte_id)                            
                 output = get_reports(data)
             except Exception as e:
-                    put_sql_report(data.get('report_id'), cmte_id, prev_report_type, prev_cvg_start_dt, prev_cvg_end_dt)
+                    put_sql_report(prev_report_type, prev_cvg_start_dt, prev_cvg_end_dt, data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
                     raise Exception('The put_sql_form3x function is throwing an error: ' + str(e))
             
             return output[0]
@@ -697,6 +699,7 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
+        print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
                 amend_ind = check_null_value(request.data.get('amend_ind'))
@@ -706,7 +709,7 @@ def reports(request):
             if 'election_code' in request.data:
                 election_code = check_null_value(request.data.get('election_code'))
             else:
-                election_code = None
+                election_code = ""
 
             if 'status' in request.data:
                 f_status = check_null_value(request.data.get('status'))
@@ -716,23 +719,26 @@ def reports(request):
             if 'email_1' in request.data:
                 email_1 = check_email(request.data.get('email_1'))
             else:
-                email_1 = None
+                email_1 = ""
 
             if 'email_2' in request.data:
                 email_2 = check_email(request.data.get('email_2'))
             else:
-                email_2 = None
+                email_2 = ""
 
             if 'additional_email_1' in request.data:
                 additional_email_1 = check_email(request.data.get('additional_email_1'))
             else:
-                additional_email_1 = None                
+                additional_email_1 = ""              
             
             if 'additional_email_2' in request.data:
                 additional_email_2 = check_email(request.data.get('additional_email_2'))
             else:
-                additional_email_2 = None
+                additional_email_2 = ""
 
+            print("f_status = ", f_status)
+            print("additional_email_1 = ", additional_email_1)
+            print("additional_email_2 = ", additional_email_2)
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -756,9 +762,9 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-
+            print("data = ", data)
             if (f_status == 'Submitted' and data):
-                return JsonResponse({'Submitted': true}, status=status.HTTP_201_CREATED, safe=False)    
+                return JsonResponse({'Submitted': True}, status=status.HTTP_201_CREATED, safe=False)    
             elif type(data) is dict:
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
@@ -1449,7 +1455,7 @@ def get_all_transactions(request):
             count = result[0]
             sum_trans = result[1]
         
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
@@ -1552,7 +1558,7 @@ def get_all_deleted_transactions(request):
         #     count = result[0]
         #     sum_trans = result[1]
             
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
