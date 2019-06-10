@@ -1370,8 +1370,9 @@ def filter_get_all_trans(request, param_string):
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
+        
         if 'filterMemoCode' in f_key:
-            if str(value_d) == 'true':
+            if str(value_d).lower() == 'true':
                 param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
     return param_string
 
@@ -1480,7 +1481,7 @@ def get_all_transactions(request):
                 forms_obj = data_row[0]
                 if forms_obj is None:
                     forms_obj =[]
-                    status_value = status.HTTP_204_NO_CONTENT
+                    status_value = status.HTTP_200_OK
                 else:
                     for d in forms_obj:
                         for i in d:
