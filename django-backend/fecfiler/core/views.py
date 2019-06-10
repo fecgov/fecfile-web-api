@@ -1298,6 +1298,8 @@ def filter_get_all_trans(request, param_string):
     # import ipdb;ipdb.set_trace()
     filt_dict = request.data.get('filters', {})
     for f_key, value_d in filt_dict.items():
+        if not value_d or value_d == 'null':
+            continue
         if 'filterCategories' in f_key:
             cat_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
@@ -1348,18 +1350,18 @@ def get_all_transactions(request):
         # import ipdb;ipdb.set_trace()
         keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'transaction_date', 'transaction_amount','aggregate_amt','purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
         search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'transaction_date', 'transaction_amount','aggregate_amt', 'purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
         if search_string:
             for key in search_keys:
                 if not param_string:
-                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
                 else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
             param_string = param_string + " )"
         keywords_string = ''
         if keywords:
@@ -1374,9 +1376,9 @@ def get_all_transactions(request):
                             keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
                     else:
                         if not keywords_string:
-                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
                         else:
-                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
             keywords_string = keywords_string + " )"
         param_string = param_string + keywords_string
         param_string = filter_get_all_trans(request, param_string)
