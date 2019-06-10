@@ -85,8 +85,10 @@ export class TransactionsFilterComponent implements OnInit {
   public isHideAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
+  public isHideItemizationFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
+  public itemizations: any =[];
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
@@ -124,6 +126,7 @@ export class TransactionsFilterComponent implements OnInit {
     this.isHideAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
+    this.isHideItemizationFilter = true;
 
     this.initValidationErrors();
 
@@ -185,6 +188,10 @@ export class TransactionsFilterComponent implements OnInit {
     return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
   }
 
+  public toggleItemizationFilterItem() {
+    this.isHideItemizationFilter = !this.isHideItemizationFilter;
+  }
+
 
   /**
    * Determine the state for scrolling.  The category tye wasn't displaying 
@@ -198,6 +205,13 @@ export class TransactionsFilterComponent implements OnInit {
     }
   }
 
+  public determineScrollItemization() {
+    if (this.msEdge) {
+      return !this.isHideItemizationFilter ? 'openNoAnimate' : 'closedNoAnimate';
+    } else {
+      return !this.isHideItemizationFilter ? 'open' : 'closed';
+    }
+  }
 
   /**
    * Scroll to the Category Type in the list that contains the
@@ -321,6 +335,17 @@ export class TransactionsFilterComponent implements OnInit {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
     }
+
+    // Itemization
+   
+    const filterItemizations = [];
+    for (const I of this.itemizations) {
+      if (I.selected) {
+        filterItemizations.push(I.code);
+        modified = true;
+      }
+    }
+    filters.filterItemizations = filterItemizations;
 
     filters.show = modified;
     this._transactionsMessageService.sendApplyFiltersMessage(filters);
@@ -457,6 +482,40 @@ export class TransactionsFilterComponent implements OnInit {
             this.states = res.data.states;
           } else {
             this.states = [];
+          }
+        });
+  }
+
+  private getItemizations() {
+    // TODO using this service to get states until available in another API.
+    this._transactionsService
+      .getItemizations()
+        .subscribe(res => {
+
+          let itemizationExist = false;
+          if (res.data) {
+            console.log("res.data", res.data);
+            if (res.data.itemizations) {
+              itemizationExist = true;
+              for (const s of res.data.itemizations) {
+                // check for states selected in the filter cache
+                // TODO scroll to first check item
+                if (this.cachedFilters.filterItemizations) {
+                  if (this.cachedFilters.filterItemizations.includes(s.code)) {
+                    s.selected = true;
+                    this.isHideStateFilter = false;
+                  } else {
+                    s.selected = false;
+                  }
+                }
+              }
+            }
+          }
+          if (itemizationExist) {
+            this.itemizations = res.data.itemizations;
+            console.log("this.itemizations", this.itemizations);
+          } else {
+            this.itemizations = [];
           }
         });
   }

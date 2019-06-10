@@ -477,6 +477,19 @@ export class TransactionsService {
         response.totalTransactionCount++;
       }
     }
+
+    if (filters.filterItemizations) {
+      if (filters.filterItemizations.length > 0) {
+        isFilter = true;
+        const fields = ['itemized'];
+        let filteredItemizationArray = [];
+        for (const itemization of filters.filterItemizations) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, itemization);
+          filteredItemizationArray = filteredItemizationArray.concat(filtered);
+        }
+        response.transactions = filteredItemizationArray;
+      }
+    }
   }
 
 
@@ -659,4 +672,29 @@ export class TransactionsService {
     return t1;
   }
 
+  public getItemizations(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/get_ItemizationIndicators';
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        /*.get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions,
+            params
+          }
+        );*/
+
+        .get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions
+          }
+        );
+   }
 }
