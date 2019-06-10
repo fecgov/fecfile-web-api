@@ -134,6 +134,7 @@ export class TransactionsFilterComponent implements OnInit {
       this.applyFiltersCache();
       this.getCategoryTypes();
       this.getStates();
+      this.getItemizations();
     }
   }
 
@@ -374,6 +375,11 @@ export class TransactionsFilterComponent implements OnInit {
         }
       }
     }
+
+    for (const s of this.itemizations) {
+      s.selected = false;
+    }
+    
     this.filterAmountMin = null;
     this.filterAmountMax = null;
     this.filterDateFrom = null;
@@ -381,6 +387,7 @@ export class TransactionsFilterComponent implements OnInit {
     this.filterMemoCode = false;
   }
 
+  
 
   /**
    * Clear any hightlighted types as result of the scroll to input.
@@ -495,9 +502,9 @@ export class TransactionsFilterComponent implements OnInit {
           let itemizationExist = false;
           if (res.data) {
             console.log("res.data", res.data);
-            if (res.data.itemizations) {
+            if (res.data) {
               itemizationExist = true;
-              for (const s of res.data.itemizations) {
+              for (const s of res.data) {
                 // check for states selected in the filter cache
                 // TODO scroll to first check item
                 if (this.cachedFilters.filterItemizations) {
@@ -512,7 +519,7 @@ export class TransactionsFilterComponent implements OnInit {
             }
           }
           if (itemizationExist) {
-            this.itemizations = res.data.itemizations;
+            this.itemizations = res.data;
             console.log("this.itemizations", this.itemizations);
           } else {
             this.itemizations = [];
