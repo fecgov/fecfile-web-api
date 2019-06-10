@@ -133,7 +133,7 @@ export class IndividualReceiptService {
    * transaction.  Therefore, transaction_id is required in this API call.
    *
    * TODO consider modifying saveScheduleA() to support both POST and PUT.
-   * 
+   *
    * @param      {string}  formType  The form type
    */
   public putScheduleA(formType: string): Observable<any> {
@@ -223,6 +223,35 @@ export class IndividualReceiptService {
       .pipe(
         map(res => {
           if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  public aggregateAmount(
+    reportId: number,
+    transactionType: string,
+    contributionDate: string,
+    entityId: string,
+    contributionAmount: number
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/sa/aggregate_amount`;
+    const data: any = {};
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+      .post(url, data, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            console.log('res: ', res);
             return res;
           }
           return false;
