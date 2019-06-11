@@ -54,7 +54,7 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col?.type"
+                        [type]="col.type === 'date' ? col.type : 'text'"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
@@ -70,7 +70,7 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       class="form-control"
-                      [type]="col?.type"
+                      [type]="col.type === 'date' ? col.type : 'text'"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
