@@ -258,7 +258,7 @@ export class TransactionsFilterComponent implements OnInit {
    * Send filter values to the table transactions component.
    * Set the filters.show to true indicating the filters have been altered.
    */
-  public applyFilters() {
+  public applyFilters(isClearKeyword: boolean) {
 
     if (!this.validateFilters()) {
       return;
@@ -322,8 +322,12 @@ export class TransactionsFilterComponent implements OnInit {
       modified = true;
     }
 
+    // if (isClearKeyword) {
+    //   filters.keywords = [];
+    // }
+
     filters.show = modified;
-    this._transactionsMessageService.sendApplyFiltersMessage(filters);
+    this._transactionsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
   }
 
 
@@ -354,6 +358,9 @@ export class TransactionsFilterComponent implements OnInit {
     this.filterDateFrom = null;
     this.filterDateTo = null;
     this.filterMemoCode = false;
+
+    // get transactions without any filters applied.
+    this.applyFilters(true);
   }
 
 

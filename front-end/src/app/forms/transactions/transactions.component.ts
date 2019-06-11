@@ -71,11 +71,29 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
       .subscribe(
-        (filters: TransactionFilterModel) => {
-          this.filters = filters;
+
+        (message: any) => {
+          this.filters = message.filters;
+
+          if (message.isClearKeyword) {
+            this.searchTextArray = [];
+          }
+
           this.doSearch();
         }
       );
+
+      //   (filters: TransactionFilterModel) => {
+      //     this.filters = filters;
+
+      //     // Clear keyword / search tags if filter component clear button was clicked
+      //     if (filters.keywords) {
+      //       this.searchTextArray = filters.keywords;
+      //     }
+
+      //     this.doSearch();
+      //   }
+      // );
 
       this.editTransactionSubscription = this._transactionsMessageService.getEditTransactionMessage()
       .subscribe(
