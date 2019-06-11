@@ -2013,6 +2013,28 @@ def get_AmendmentIndicators(request):
     except Exception as e:
         return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_ItemizationIndicators(request):
+    try:
+        cmte_id = request.user.username
+      
+        data = """{
+                    "data":  [{
+                            "itemization_code": "I",
+                            "itemization_desc": "Itemized"
+                        },
+                       {
+                            "itemization_code": "U",
+                            "itemization_desc": "UnItemized"
+                        }]
+                  }
+                """
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_ItemizationIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    
 def get_f3x_SA_data(cmte_id, report_id):
     try:
         query_string = """SELECT * FROM public.sched_a WHERE cmte_id = %s AND report_id = %s"""

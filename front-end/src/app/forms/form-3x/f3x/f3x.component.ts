@@ -91,10 +91,12 @@ export class F3xComponent implements OnInit {
         if (val instanceof NavigationEnd) {
           if (val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
              console.log(new Date().toISOString());
-             localStorage.setItem(`form_${this._formType}_saved_backup`,localStorage.getItem(`form_${this._formType}_saved`));
-             localStorage.setItem(`form_${this._formType}_report_type_backup`, localStorage.getItem(`form_${this._formType}_report_type`));
-             console.log(`form_${this._formType}_report_type_backup`+"copied ");
-             console.log(new Date().toISOString());  
+             if ( localStorage.getItem(`form_${this._formType}_report_type`) !== null ){
+              localStorage.setItem(`form_${this._formType}_saved_backup`,localStorage.getItem(`form_${this._formType}_saved`));
+              localStorage.setItem(`form_${this._formType}_report_type_backup`, localStorage.getItem(`form_${this._formType}_report_type`));
+              console.log(`form_${this._formType}_report_type_backup`+"copied ");
+              console.log(new Date().toISOString());  
+             }
 
              setTimeout(() => 
              {

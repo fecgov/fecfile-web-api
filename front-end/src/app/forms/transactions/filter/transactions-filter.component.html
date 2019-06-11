@@ -169,6 +169,29 @@
               </div>
         </div>
       </div> 
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleItemizationFilterItem()">
+          Itemization
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideItemizationFilter)">
+          </i>          
+        </div>
+        <div class="card-body" [@openCloseScroll]="!isHideItemizationFilter ? 'open' : 'closed'">
+          <div class="transactions__filter-type-list-body">
+            <ul class="transactions__filter-type-list">
+              <li *ngFor="let itemization of itemizations">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="{{ itemization?.itemization_code }}" 
+                    [(ngModel)]="itemization.selected">
+                  <label class="form-check-label" for="{{ itemization?.itemization_code }}">
+                    {{ itemization?.itemization_code }} - {{ itemization?.itemization_desc}}</label>
+                 </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div> 
   </section>
   <footer>

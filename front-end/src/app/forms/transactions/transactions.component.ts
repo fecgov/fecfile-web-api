@@ -75,8 +75,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         (message: any) => {
           this.filters = message.filters;
 
+          if (this.filters.filterStates) {
+            for (const state of this.filters.filterStates) {
+              this.searchTextArray.push(state);
+            }
+          }
+
           if (message.isClearKeyword) {
-            this.searchTextArray = [];
+            // this.searchTextArray = [];
+            this.clearSearch();
           }
 
           this.doSearch();
