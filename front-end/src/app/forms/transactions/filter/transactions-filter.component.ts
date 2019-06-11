@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionsMessageService } from '../service/transactions-message.service';
@@ -8,6 +8,7 @@ import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
+import { Subscription } from 'rxjs/Subscription';
 
 
 /**
@@ -69,7 +70,7 @@ import { TransactionsFilterTypeComponent } from './filter-type/transactions-filt
     ]),
   ]
 })
-export class TransactionsFilterComponent implements OnInit {
+export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
   @Input()
   public formType: string;
@@ -98,6 +99,11 @@ export class TransactionsFilterComponent implements OnInit {
   public dateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
 
+  /**
+   * Subscription for removing selected filters.
+   */
+  private removeFilterSubscription: Subscription;
+
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
@@ -106,7 +112,14 @@ export class TransactionsFilterComponent implements OnInit {
   constructor(
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService
-  ) {}
+  ) {
+    this.removeFilterSubscription = this._transactionsMessageService.getRemoveFilterMessage()
+      .subscribe(
+        (message: any) => {
+          this.removeFilter(message);
+        }
+      );
+  }
 
 
   /**
@@ -136,6 +149,14 @@ export class TransactionsFilterComponent implements OnInit {
       this.getStates();
       this.getItemizations();
     }
+  }
+
+
+  /**
+   * A method to run when component is destroyed.
+   */
+  public ngOnDestroy(): void {
+    this.removeFilterSubscription.unsubscribe();
   }
 
 
@@ -618,6 +639,43 @@ export class TransactionsFilterComponent implements OnInit {
     }
 
     return true;
+  }
+
+
+  /**
+   * Process the message received to remove the filter.
+   * 
+   * @param message contains details on the filter to remove
+   */
+  private removeFilter(message: any) {
+    if (message) {
+      if (message.key) {
+        switch (message.key) {
+          case 'state':
+            for (const st of this.states) {
+              if (st.code === message.value) {
+                st.selected = false;
+              }
+            }
+            break;
+          case 'category':
+            for (const categoryGroup of this.transactionCategories) {
+              for (const categoryType of categoryGroup.options) {
+                if (categoryType.text === message.value) {
+                  categoryType.selected = false;
+                }
+              }
+            }
+            break;
+          case 'amount':
+            this.filterAmountMin = null;
+            this.filterAmountMax = null;
+            break;
+          default:
+            console.log('unexpected key for remove filter = ' + message.key);
+        }
+      }
+    }
   }
 
 }

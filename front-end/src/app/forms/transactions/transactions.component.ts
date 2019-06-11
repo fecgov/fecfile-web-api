@@ -75,12 +75,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         (message: any) => {
           this.filters = message.filters;
 
-          if (this.filters.filterStates) {
-            for (const state of this.filters.filterStates) {
-              this.searchTextArray.push(state);
-            }
-          }
-
           if (message.isClearKeyword) {
             // this.searchTextArray = [];
             this.clearSearch();
@@ -89,18 +83,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           this.doSearch();
         }
       );
-
-      //   (filters: TransactionFilterModel) => {
-      //     this.filters = filters;
-
-      //     // Clear keyword / search tags if filter component clear button was clicked
-      //     if (filters.keywords) {
-      //       this.searchTextArray = filters.keywords;
-      //     }
-
-      //     this.doSearch();
-      //   }
-      // );
 
       this.editTransactionSubscription = this._transactionsMessageService.getEditTransactionMessage()
       .subscribe(
@@ -194,11 +176,42 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   /**
    * Remove the search text from the array.
-   * 
+   *
    * @param index index in the array
    */
   public removeSearchText(index: number) {
     this.searchTextArray.splice(index, 1);
+    this.doSearch();
+  }
+
+
+  /**
+   * Remove the state filter tag and inform the filter component to clear it.
+   */
+  public removeStateFilter(index: number, state: string) {
+    this.filters.filterStates.splice(index, 1);
+    this.removeFilter('state', state);
+  }
+
+
+  /**
+   * Remove the state filter tag and inform the filter component to clear it.
+   */
+  public removeCategoryFilter(index: number, category: string) {
+    this.filters.filterCategories.splice(index, 1);
+    this.removeFilter('category', category);
+  }
+
+
+  public removeAmountFilter() {
+    this.filters.filterAmountMin = null;
+    this.filters.filterAmountMax = null;
+    this.removeFilter('amount', null);
+  }
+
+
+  private removeFilter(key: string, value: string) {
+    this._transactionsMessageService.sendRemoveFilterMessage({key: key, value: value});
     this.doSearch();
   }
 
