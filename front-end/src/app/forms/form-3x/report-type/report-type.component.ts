@@ -299,10 +299,8 @@ export class ReportTypeComponent implements OnInit {
       this._form3xReportTypeDetails.email2 = committeeDetails.email_on_file_1;
       this._form3xReportTypeDetails.additionalEmail1 = '';
       this._form3xReportTypeDetails.additionalEmail2 = '';
+      this._form3xReportTypeDetails.formType = '3X';
 
-
-      /*this._form3xReportTypeDetails.additionalEmail1 = '';
-      this._form3xReportTypeDetails.additionalEmail2 = '';*/
       window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
 
       this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => {

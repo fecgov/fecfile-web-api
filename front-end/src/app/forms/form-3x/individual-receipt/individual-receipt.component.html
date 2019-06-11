@@ -54,8 +54,9 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col?.type"
+                        [type]="col.type === 'date' ? col.type : 'text'"
                         [name]="col?.name"
+                        [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -69,8 +70,9 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       class="form-control"
-                      [type]="col?.type"
+                      [type]="col.type === 'date' ? col.type : 'text'"
                       [name]="col?.name"
+                      [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -112,7 +114,7 @@
                         class="text-error text-left"
                         *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
                       >
-                        Floating point numbers only.
+                        Only numerical values are allowed.
                       </div>
                     </ng-container>
                     <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
