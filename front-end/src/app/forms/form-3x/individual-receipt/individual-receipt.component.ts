@@ -115,10 +115,7 @@ export class IndividualReceiptComponent implements OnInit {
       }
 
       if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
-        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([
-          floatingPoint(),
-          Validators.required
-        ]);
+        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
 
         this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
       }
