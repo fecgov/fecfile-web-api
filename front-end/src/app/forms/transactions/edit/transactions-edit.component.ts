@@ -1,13 +1,8 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  DoCheck,
-  ViewEncapsulation} from '@angular/core';
+import { Component, Input, OnInit, DoCheck, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from '../../../shared/utils/util.service';
-import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
+import { ReceiptService } from '../../form-3x/receipts/receipts.service';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
@@ -28,7 +23,6 @@ import { contributionDate } from 'src/app/shared/utils/forms/validation/contribu
   encapsulation: ViewEncapsulation.None
 })
 export class TransactionsEditComponent implements OnInit, DoCheck {
-
   @Input()
   public transactionToEdit: TransactionModel;
 
@@ -50,10 +44,10 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
   constructor(
     private _fb: FormBuilder,
     private _reportsService: ReportsService,
-    private _individualReceiptService: IndividualReceiptService,
+    private _receiptService: ReceiptService,
     private _config: NgbTooltipConfig,
     private _utilService: UtilService,
-    private _transactionsMessageService: TransactionsMessageService,
+    private _transactionsMessageService: TransactionsMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -64,10 +58,8 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
   }
 
   ngDoCheck(): void {
-
     this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
     if (this._reportType !== null) {
-
       // const cvgStartDate: string = this._reportType.cvgStartDate;
       // const cvgEndDate: string = this._reportType.cvgEndDate;
 
@@ -81,11 +73,12 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
       const cvgEndDate: string = this._reportType.cvgenddate;
 
       const cvgStartDateDate: any = new Date(`${cvgStartDate}T01:00:00`);
-      const startFormattedDate: string = `${(cvgStartDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgStartDateDate
+      const startFormattedDate: string = `${(cvgStartDateDate.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}/${cvgStartDateDate
         .getDate()
         .toString()
         .padStart(2, '0')}/${cvgStartDateDate.getFullYear()}`;
-
 
       const cvgEndDateDate: any = new Date(`${cvgEndDate}T01:00:00`);
       const endFormattedDate: string = `${(cvgEndDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgEndDateDate
@@ -113,14 +106,12 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
     this.frmIndividualReceipt = this._fb.group({});
 
     // TODO check if same call is needed in validate.
-    this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
-      .subscribe((res: form3xReportTypeDetails) => {
-        localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
-      });
+    this._reportsService.getReportInfo(`F${this.formType}`, this.reportId).subscribe((res: form3xReportTypeDetails) => {
+      localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+    });
 
-    this._individualReceiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
+    this._receiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-
         this._mapTransactionFieldToForm(res);
 
         this.formFields = res.data.formFields;
@@ -131,7 +122,6 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
         this._setForm(this.formFields);
 
         this.states = res.data.states;
-
 
         // this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
         //   .subscribe((res: form3xReportTypeDetails) => {
@@ -186,7 +176,7 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
             case 'ContributorSuffix':
               e.value = nameArray[4] ? nameArray[4] : null;
               break;
-              // TODO need API to return individual name fields
+            // TODO need API to return individual name fields
             case 'ContributorStreet1':
               e.value = this.transactionToEdit.street;
               break;
@@ -320,14 +310,15 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+      this._reportsService
+        .getReportInfo(`F${this.formType}`, this.reportId)
         .subscribe((res: form3xReportTypeDetails) => {
           localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
 
           // TODO API call to save Transaction will need to vary depending on Transaction Type.
           // Only supporting Sched A at this time.
 
-          this._individualReceiptService.putScheduleA(this.formType).subscribe(res2 => {
+          this._receiptService.putScheduleA(this.formType).subscribe(res2 => {
             if (res2) {
               this.frmIndividualReceipt.reset();
 
@@ -336,7 +327,6 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
               this.viewTransactions();
             }
           });
-
         });
     } else {
       this.frmIndividualReceipt.markAsDirty();
@@ -349,7 +339,6 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-
     this._transactionsMessageService.sendShowTransactionsMessage('');
 
     // let reportId = '0';

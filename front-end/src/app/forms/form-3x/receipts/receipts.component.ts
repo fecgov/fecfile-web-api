@@ -16,20 +16,20 @@ import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { IndividualReceiptService } from './individual-receipt.service';
+import { ReceiptService } from './receipts.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 
 @Component({
-  selector: 'f3x-individual-receipt',
-  templateUrl: './individual-receipt.component.html',
-  styleUrls: ['./individual-receipt.component.scss'],
+  selector: 'f3x-receipts',
+  templateUrl: './receipts.component.html',
+  styleUrls: ['./receipts.component.scss'],
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class IndividualReceiptComponent implements OnInit {
+export class ReceiptComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
@@ -51,7 +51,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _http: HttpClient,
     private _fb: FormBuilder,
     private _formService: FormsService,
-    private _individualReceiptService: IndividualReceiptService,
+    private _receiptService: ReceiptService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
@@ -71,7 +71,7 @@ export class IndividualReceiptComponent implements OnInit {
 
     this.frmIndividualReceipt = this._fb.group({});
 
-    this._individualReceiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
+    this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
         this.formFields = res.data.formFields;
         this.hiddenFields = res.data.hiddenFields;
@@ -119,10 +119,7 @@ export class IndividualReceiptComponent implements OnInit {
       }
 
       if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
-        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([
-          floatingPoint(),
-          Validators.required
-        ]);
+        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
 
         this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
       }
@@ -215,9 +212,9 @@ export class IndividualReceiptComponent implements OnInit {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._individualReceiptService.saveScheduleA(this._formType).subscribe(res => {
+      this._receiptService.saveScheduleA(this._formType).subscribe(res => {
         if (res) {
-          this._individualReceiptService.getSchedA(this._formType, res).subscribe(resp => {
+          this._receiptService.getSchedA(this._formType, res).subscribe(resp => {
             console.log('resp: ', resp);
 
             const message: any = {

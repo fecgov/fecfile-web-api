@@ -25,7 +25,7 @@ import { ContributorsComponent } from './contributors/contributors.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
-import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
+import { ReceiptComponent } from './forms/form-3x/receipts/receipts.component';
 import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
 import { TransactionSidebarComponent } from './forms/form-3x/transaction-sidebar/transaction-sidebar.component';
@@ -71,11 +71,6 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
-
-
-
-
-
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -130,7 +125,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     OrderByPipe,
     ZipCodePipe,
     FilterPipe,
-    IndividualReceiptComponent,
+    ReceiptComponent,
     ReportsidebarComponent,
     ReportheaderComponent,
     ReportdetailsComponent,
