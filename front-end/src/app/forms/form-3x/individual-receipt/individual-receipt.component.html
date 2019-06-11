@@ -114,7 +114,7 @@
                         class="text-error text-left"
                         *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
                       >
-                        Floating point numbers only.
+                        Only numerical values are allowed.
                       </div>
                     </ng-container>
                     <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
@@ -124,14 +124,6 @@
                       >
                         Entered date is outside of the report coverage period. Please enter transactions for this
                         coverage period only.
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphanumeric"
-                      >
-                        Alphanumeric characters only.
                       </div>
                     </ng-container>
                   </div>
