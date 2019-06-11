@@ -120,7 +120,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionTypeComponent,
     ReportTypeComponent,
     ReportTypeSidebarComponent,
-    IndividualReceiptComponent,
     FinancialSummaryComponent,
     OrderByPipe,
     ZipCodePipe,
