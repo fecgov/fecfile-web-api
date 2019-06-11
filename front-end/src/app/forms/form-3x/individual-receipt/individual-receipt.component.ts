@@ -106,6 +106,23 @@ export class IndividualReceiptComponent implements OnInit {
         this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
       }
     }
+
+    if (this.frmIndividualReceipt) {
+      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
+        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
+
+        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
+      }
+
+      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
+        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([
+          floatingPoint(),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
+      }
+    }
   }
 
   /**
