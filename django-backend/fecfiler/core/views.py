@@ -1642,7 +1642,7 @@ def summary_disbursements(args):
         XXIAI_amount = 0
         XXIAII_amount = 0
         XXIB_amount = 0
-        XXIC_amount = 0
+        XXI_amount = 0
         XXII_amount = 0
         XXIII_amount = 0
         XXIV_amount = 0
@@ -1652,12 +1652,12 @@ def summary_disbursements(args):
         XXVIIIA_amount = 0
         XXVIIIB_amount = 0
         XXVIIIC_amount = 0
-        XXVIIID_amount = 0
+        XXVIII_amount = 0
         XXIX_amount = 0
         XXXAI_amount = 0
         XXXAII_amount = 0
         XXXB_amount = 0
-        XXXC_amount = 0
+        XXX_amount = 0
         XXXI_amount = 0
         XXXII_amount = 0       
 
@@ -1706,35 +1706,58 @@ def summary_disbursements(args):
             if data_row[0] == '30B':
                 XXXB_amount = XXXB_amount + data_row[1]
 
-        XXIC_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
-        XXVIIID_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
-        XXXC_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
-        XXXI_amount = XXIC_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIIID_amount + XXIX_amount + XXXC_amount
+        XXI_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
+        XXVIII_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
+        XXX_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
+        XXXI_amount = XXI_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIII_amount + XXIX_amount + XXX_amount
         XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
 
-        summary_disbursement = {'21AI': XXIAI_amount,
-                    '21AII': XXIAII_amount,
-                    '21B': XXIB_amount,
-                    '21C': XXIC_amount,
-                    '22': XXII_amount,
-                    '23': XXIII_amount,
-                    '24': XXIV_amount,
-                    '25': XXV_amount,
-                    '26': XXVI_amount,
-                    '27': XXVII_amount,
-                    '28A': XXVIIIA_amount,
-                    '28B': XXVIIIB_amount,
-                    '28C': XXVIIIC_amount,
-                    '28D': XXVIIID_amount,
-                    '29': XXIX_amount,
-                    '30AI': XXXAI_amount,
-                    '30AII': XXXAII_amount,
-                    '30B': XXXB_amount,
-                    '30C': XXXC_amount,
-                    '31': XXXI_amount,
-                    '32': XXXII_amount
-                        }    
-        return summary_disbursement
+        summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount},
+                                {'line_item':'21', 'level':1, 'description':'Operating Expenditures', 'amt':XXI_amount},
+                                {'line_item':'21AI', 'level':2, 'description':'Total Individual Contributions', 'amt':XXIAI_amount},
+                                {'line_item':'21AII', 'level':2, 'description':'Itemized Individual Contributions', 'amt':XXIAII_amount},
+                                {'line_item':'21B', 'level':2, 'description':'Unitemized Individual Contributions', 'amt':XXIB_amount},
+                                {'line_item':'22', 'level':1, 'description':'Party Committee Contributions', 'amt':XXII_amount},
+                                {'line_item':'23', 'level':1, 'description':'Other Committee Contributions', 'amt':XXIII_amount},
+                                {'line_item':'24', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XXIV_amount},
+                                {'line_item':'25', 'level':1, 'description':'All Loans Received', 'amt':XXV_amount},
+                                {'line_item':'27', 'level':1, 'description':'Loan Repayments Received', 'amt':XXVII_amount},
+                                {'line_item':'26', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XXVI_amount},
+                                {'line_item':'28', 'level':1, 'description':'Candidate Refunds', 'amt':XXVIII_amount},
+                                {'line_item':'28A', 'level':2, 'description':'Other Receipts', 'amt':XXVIIIA_amount},
+                                {'line_item':'28B', 'level':2, 'description':'Total Transfers', 'amt':XXVIIIB_amount},
+                                {'line_item':'28C', 'level':2, 'description':'Non-Federal Transfers', 'amt':XXVIIIC_amount},
+                                {'line_item':'29', 'level':1, 'description':'Levin Funds', 'amt':XXIX_amount},
+                                {'line_item':'30', 'level':1, 'description':'Total Federal Receipts', 'amt':XXX_amount},
+                                {'line_item':'30AI', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAI_amount},
+                                {'line_item':'30AII', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAII_amount},
+                                {'line_item':'30B', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXB_amount},
+                                {'line_item':'32', 'level':1, 'description':'Total Federal Receipts', 'amt':XXXII_amount},
+                                ]
+
+        # summary_disbursement = {'21AI': XXIAI_amount,
+        #             '21AII': XXIAII_amount,
+        #             '21B': XXIB_amount,
+        #             '21': XXI_amount,
+        #             '22': XXII_amount,
+        #             '23': XXIII_amount,
+        #             '24': XXIV_amount,
+        #             '25': XXV_amount,
+        #             '26': XXVI_amount,
+        #             '27': XXVII_amount,
+        #             '28A': XXVIIIA_amount,
+        #             '28B': XXVIIIB_amount,
+        #             '28C': XXVIIIC_amount,
+        #             '28': XXVIII_amount,
+        #             '29': XXIX_amount,
+        #             '30AI': XXXAI_amount,
+        #             '30AII': XXXAII_amount,
+        #             '30B': XXXB_amount,
+        #             '30': XXX_amount,
+        #             '31': XXXI_amount,
+        #             '32': XXXII_amount
+        #                 }    
+        return summary_disbursement_list
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
@@ -1742,7 +1765,7 @@ def summary_receipts(args):
     try:
         XIAI_amount = 0
         XIAII_amount = 0
-        XIAIII_amount = 0
+        XIA_amount = 0
         XIB_amount = 0
         XIC_amount = 0
         XID_amount = 0
@@ -1754,7 +1777,7 @@ def summary_receipts(args):
         XVII_amount = 0
         XVIIIA_amount = 0
         XVIIIB_amount = 0
-        XVIIIC_amount = 0
+        XVIII_amount = 0
         XIX_amount = 0
         XX_amount = 0
 
@@ -1795,31 +1818,49 @@ def summary_receipts(args):
             if data_row[0] == '18B':
                 XVIIIB_amount = XVIIIB_amount + data_row[1]
 
-        XIAIII_amount = XIAI_amount + XIAII_amount
-        XID_amount = XIAIII_amount + XIB_amount + XIC_amount
-        XVIIIC_amount = XVIIIA_amount + XVIIIB_amount
-        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIIIC_amount
-        XX_amount = XIX_amount - XVIIIC_amount
+        XIA_amount = XIAI_amount + XIAII_amount
+        XID_amount = XIA_amount + XIB_amount + XIC_amount
+        XVIII_amount = XVIIIA_amount + XVIIIB_amount
+        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIII_amount
+        XX_amount = XIX_amount - XVIII_amount
 
-        summary_receipt = {'11AI': XIAI_amount,
-                    '11AII': XIAII_amount,
-                    '11AIII': XIAIII_amount,
-                    '11B': XIB_amount,
-                    '11C': XIC_amount,
-                    '11D': XID_amount,
-                    '12': XII_amount,
-                    '13': XIII_amount,
-                    '14': XIV_amount,
-                    '15': XV_amount,
-                    '16': XVI_amount,
-                    '17': XVII_amount,
-                    '18A': XVIIIA_amount,
-                    '18B': XVIIIB_amount,
-                    '18C': XVIIIC_amount,
-                    '19': XIX_amount,
-                    '20': XX_amount
-                        }    
-        return summary_receipt
+        summary_receipt_list = [ {'line_item':'19', 'level':1, 'description':'Total Receipts', 'amt':XIX_amount},
+                                {'line_item':'11D', 'level':1, 'description':'Total Contributions', 'amt':XID_amount},
+                                {'line_item':'11A', 'level':2, 'description':'Total Individual Contributions', 'amt':XIA_amount},
+                                {'line_item':'11AI', 'level':3, 'description':'Itemized Individual Contributions', 'amt':XIAI_amount},
+                                {'line_item':'11AII', 'level':3, 'description':'Unitemized Individual Contributions', 'amt':XIAII_amount},
+                                {'line_item':'11B', 'level':2, 'description':'Party Committee Contributions', 'amt':XIB_amount},
+                                {'line_item':'11C', 'level':2, 'description':'Other Committee Contributions', 'amt':XIC_amount},
+                                {'line_item':'12', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XII_amount},
+                                {'line_item':'13', 'level':1, 'description':'All Loans Received', 'amt':XIII_amount},
+                                {'line_item':'14', 'level':1, 'description':'Loan Repayments Received', 'amt':XIV_amount},
+                                {'line_item':'15', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XV_amount},
+                                {'line_item':'16', 'level':1, 'description':'Candidate Refunds', 'amt':XVI_amount},
+                                {'line_item':'17', 'level':1, 'description':'Other Receipts', 'amt':XVII_amount},
+                                {'line_item':'18', 'level':1, 'description':'Total Transfers', 'amt':XVIII_amount},
+                                {'line_item':'18A', 'level':2, 'description':'Non-Federal Transfers', 'amt':XVIIIA_amount},
+                                {'line_item':'18B', 'level':2, 'description':'Levin Funds', 'amt':XVIIIB_amount},
+                                {'line_item':'20', 'level':1, 'description':'Total Federal Receipts', 'amt':XX_amount},
+                                ]
+        # summary_receipt = {'11AI': XIAI_amount,
+        #             '11AII': XIAII_amount,
+        #             '11A': XIA_amount,
+        #             '11B': XIB_amount,
+        #             '11C': XIC_amount,
+        #             '11D': XID_amount,
+        #             '12': XII_amount,
+        #             '13': XIII_amount,
+        #             '14': XIV_amount,
+        #             '15': XV_amount,
+        #             '16': XVI_amount,
+        #             '17': XVII_amount,
+        #             '18A': XVIIIA_amount,
+        #             '18B': XVIIIB_amount,
+        #             '18': XVIII_amount,
+        #             '19': XIX_amount,
+        #             '20': XX_amount
+        #                 }    
+        return summary_receipt_list
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
