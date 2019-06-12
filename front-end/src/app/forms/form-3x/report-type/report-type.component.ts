@@ -119,9 +119,13 @@ export class ReportTypeComponent implements OnInit {
       dueDate: '',
       amend_Indicator: '',
       coh_bop: '0',
-      daysUntilDue: ''
+      daysUntilDue: '',
+      email1: '',
+      email2: '',
+      additionalEmail1: '',
+      additionalEmail2: '',
     };
-  }
+ }
 
   ngDoCheck(): void {
     if (window.localStorage.getItem(`form_${this._formType}_reset_form`) !== null) {
@@ -280,6 +284,7 @@ export class ReportTypeComponent implements OnInit {
       this.optionFailed = false;
       this.isValidType = true;
 
+      const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
       this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
       this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
@@ -290,6 +295,11 @@ export class ReportTypeComponent implements OnInit {
       this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
       this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
       this._form3xReportTypeDetails.daysUntilDue = this._calcDaysUntilReportDue(this._dueDate);
+      this._form3xReportTypeDetails.email1 = committeeDetails.email_on_file;
+      this._form3xReportTypeDetails.email2 = committeeDetails.email_on_file_1;
+      this._form3xReportTypeDetails.additionalEmail1 = '';
+      this._form3xReportTypeDetails.additionalEmail2 = '';
+      this._form3xReportTypeDetails.formType = '3X';
 
       window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
 

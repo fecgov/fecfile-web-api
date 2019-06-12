@@ -355,7 +355,7 @@ def schedB_sql_dict(data):
             'first_name': data.get('first_name'),
             'last_name': data.get('last_name'),
             'middle_name': data.get('middle_name'),
-            'preffix': data.get('preffix'),
+            'preffix': data.get('prefix'),
             'suffix': data.get('suffix'),
             'street_1': data.get('street_1'),
             'street_2': data.get('street_2'),

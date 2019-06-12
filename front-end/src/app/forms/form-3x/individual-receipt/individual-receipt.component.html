@@ -42,6 +42,7 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
+                  <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
                 </label>
                 <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
                   <ng-container *ngIf="col.inputGroup">
@@ -53,8 +54,9 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col?.type"
+                        [type]="col.type === 'date' ? col.type : 'text'"
                         [name]="col?.name"
+                        [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -68,8 +70,9 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       class="form-control"
-                      [type]="col?.type"
+                      [type]="col.type === 'date' ? col.type : 'text'"
                       [name]="col?.name"
+                      [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -86,9 +89,6 @@
                       frmIndividualReceipt.get(col.name).invalid
                     "
                   >
-                    <div class="text-error text-left" *ngIf="frmIndividualReceipt.get(col.name).errors?.required">
-                      {{ col.text }} is required.
-                    </div>
                     <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors?.maxlength">
                       <div
                         class="text-error text-left"
@@ -114,7 +114,7 @@
                         class="text-error text-left"
                         *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
                       >
-                        Floating point numbers only.
+                        Only numerical values are allowed.
                       </div>
                     </ng-container>
                     <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
@@ -146,18 +146,6 @@
                       {{ item.name }}
                     </ng-option>
                   </ng-select>
-
-                  <div
-                    class="error-text"
-                    *ngIf="
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
-                      frmIndividualReceipt.get(col.name)?.invalid
-                    "
-                  >
-                    <div class="text-error text-left" *ngIf="frmIndividualReceipt.get(col.name).errors?.required">
-                      {{ col.text }} is required.
-                    </div>
-                  </div>
                 </ng-container>
               </div>
             </div>
@@ -176,7 +164,6 @@
               <button class="btn btn-secondary btn-right" type="submit">
                 Save &amp; Add Transaction
               </button>
-              <!-- <a class="btn btn-previous btn-right" [routerLink]="['/forms/transactions', '3X']"> -->
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
               </a>
