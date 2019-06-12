@@ -68,13 +68,13 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_3'">
-        <f3x-receipts
+        <f3x-individual-receipt
           [formOptionsVisible]="formOptionsVisible"
           [selectedOptions]="selectedOptions"
           [transactionTypeText]="transactionTypeText"
           (status)="onNotify($event)"
         >
-        </f3x-receipts>
+        </f3x-individual-receipt>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">

@@ -44,7 +44,7 @@ export class TransactionSidebarComponent implements OnInit {
             if (res.formType === this._formType) {
               if (res.hasOwnProperty('totals')) {
                 if (typeof res.totals === 'object') {
-                  console.log('res: ', res);
+                  // console.log('res: ', res);
                   if (res.totals.hasOwnProperty('Receipts')) {
                     if (typeof res.totals.Receipts === 'number') {
                       this.receiptsTotal = res.totals.Receipts;

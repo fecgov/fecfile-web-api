@@ -2,7 +2,7 @@ import { Component, Input, OnInit, DoCheck, ViewEncapsulation } from '@angular/c
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from '../../../shared/utils/util.service';
-import { ReceiptService } from '../../form-3x/receipts/receipts.service';
+import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
@@ -44,7 +44,7 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
   constructor(
     private _fb: FormBuilder,
     private _reportsService: ReportsService,
-    private _receiptService: ReceiptService,
+    private _individualReceiptService: IndividualReceiptService,
     private _config: NgbTooltipConfig,
     private _utilService: UtilService,
     private _transactionsMessageService: TransactionsMessageService
@@ -110,7 +110,7 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
       localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
     });
 
-    this._receiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
+    this._individualReceiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
       if (res) {
         this._mapTransactionFieldToForm(res);
 
@@ -318,7 +318,7 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
           // TODO API call to save Transaction will need to vary depending on Transaction Type.
           // Only supporting Sched A at this time.
 
-          this._receiptService.putScheduleA(this.formType).subscribe(res2 => {
+          this._individualReceiptService.putScheduleA(this.formType).subscribe(res2 => {
             if (res2) {
               this.frmIndividualReceipt.reset();
 

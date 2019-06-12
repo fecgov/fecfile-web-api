@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class ReceiptService {
+export class IndividualReceiptService {
   constructor(private _http: HttpClient, private _cookieService: CookieService, private _utilService: UtilService) {}
 
   /**
@@ -38,17 +38,26 @@ export class ReceiptService {
   }
 
   /**
-   * Saves a schedule a.
+   * Saves a schedule.
+   *
+   * Right now this only works with schedule A.
+   * Others will be implemented soon.
    *
    * @param      {string}  formType  The form type
    */
-  public saveScheduleA(formType: string): Observable<any> {
+  public saveSchedule(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sa/schedA';
+    const url: string = `${environment.apiUrl}/sa/schedA`;
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
+    // let url: string = null;
+
+    // if (transactionType === 'receipts') {
+    //   url = `${environment.apiUrl}/sa/schedA`;
+    // } else if (transactionType === 'disbursements') {
+    //   url = `${environment.apiUrl}/sb/schedB`;
+    // }
 
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
@@ -115,7 +124,7 @@ export class ReceiptService {
     }
 
     return this._http
-      .post(`${environment.apiUrl}${url}`, formData, {
+      .post(url, formData, {
         headers: httpOptions
       })
       .pipe(
@@ -231,21 +240,18 @@ export class ReceiptService {
   }
 
   /**
-   * Gets the sched a after submitted.
+   * Gets the schedule after submitted.
    *
    * @param      {string}  formType  The form type
    * @param      {any}     receipt   The receipt
    */
-  public getSchedA(formType: string, receipt: any): Observable<any> {
+  public getSchedule(formType: string, receipt: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
     const data: any = JSON.stringify(receipt);
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    console.log('report_id', receipt.report_id);
-
     return this._http.get(url, {
       headers: httpOptions,
       params: {

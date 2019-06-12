@@ -16,20 +16,20 @@ import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { ReceiptService } from './receipts.service';
+import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 
 @Component({
-  selector: 'f3x-receipts',
-  templateUrl: './receipts.component.html',
-  styleUrls: ['./receipts.component.scss'],
+  selector: 'f3x-individual-receipt',
+  templateUrl: './individual-receipt.component.html',
+  styleUrls: ['./individual-receipt.component.scss'],
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class ReceiptComponent implements OnInit {
+export class IndividualReceiptComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
@@ -46,12 +46,13 @@ export class ReceiptComponent implements OnInit {
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
+  private _transactionType: string = null;
 
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
     private _formService: FormsService,
-    private _receiptService: ReceiptService,
+    private _receiptService: IndividualReceiptService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
@@ -85,45 +86,15 @@ export class ReceiptComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    /**
-     * Adds validation for contribution date field.  Date must be within report period.
-     */
-
-    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
       }
     }
 
-    if (this._reportType !== null) {
-      const cvgStartDate: string = this._reportType.cvgStartDate;
-      const cvgEndDate: string = this._reportType.cvgEndDate;
+    this._validateContributionDate();
 
-      if (this.frmIndividualReceipt.controls['ContributionDate']) {
-        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
-          contributionDate(cvgStartDate, cvgEndDate),
-          Validators.required
-        ]);
-
-        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
-      }
-    }
-
-    if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
-        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
-
-        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
-      }
-
-      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
-        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
-
-        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
-      }
-    }
+    this._getTransactionType();
   }
 
   ngOnDestroy(): void {
@@ -192,6 +163,56 @@ export class ReceiptComponent implements OnInit {
   }
 
   /**
+   * Validates the contribution date selected.
+   */
+  private _validateContributionDate(): void {
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (this._reportType !== null) {
+      const cvgStartDate: string = this._reportType.cvgStartDate;
+      const cvgEndDate: string = this._reportType.cvgEndDate;
+
+      if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+          contributionDate(cvgStartDate, cvgEndDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+      }
+    }
+
+    if (this.frmIndividualReceipt) {
+      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
+        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
+
+        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
+      }
+
+      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
+        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
+
+        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
+      }
+    }
+  }
+
+  /**
+   * Gets the transaction type.
+   */
+  private _getTransactionType(): void {
+    const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
+
+    if (typeof transactionType === 'object') {
+      if (transactionType !== null) {
+        if (transactionType.hasOwnProperty('mainTransactionTypeValue')) {
+          this._transactionType = transactionType.mainTransactionTypeValue;
+        }
+      }
+    }
+  }
+
+  /**
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
@@ -212,11 +233,9 @@ export class ReceiptComponent implements OnInit {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveScheduleA(this._formType).subscribe(res => {
+      this._receiptService.saveSchedule(this._formType, this._transactionType).subscribe(res => {
         if (res) {
-          this._receiptService.getSchedA(this._formType, res).subscribe(resp => {
-            console.log('resp: ', resp);
-
+          this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
             const message: any = {
               formType: this._formType,
               totals: resp
