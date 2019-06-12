@@ -1,28 +1,25 @@
 import {
   Component,
-  EventEmitter,
-  ElementRef,
   Input,
   OnInit,
-  Output,
-  ViewEncapsulation,
-  ViewChild
-} from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
+  DoCheck,
+  ViewEncapsulation} from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../../../environments/environment';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
-import { f3xTransactionTypes, form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
+import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
+import { contributionDate } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 
+/**
+ * A component for editing Transactions.  It is similar to the
+ * IndividualRecepeiptComponent used for adding Transactions.
+ */
 @Component({
   selector: 'app-transactions-edit',
   templateUrl: './transactions-edit.component.html',
@@ -30,12 +27,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class TransactionsEditComponent implements OnInit {
-  // @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  // @Input() selectedOptions: any = {};
-  // @Input() formOptionsVisible: boolean = false;
-  // @Input() transactionTypeText = '';
-  // @ViewChild('hiddenFields') hiddenFieldValues: ElementRef;
+export class TransactionsEditComponent implements OnInit, DoCheck {
 
   @Input()
   public transactionToEdit: TransactionModel;
@@ -50,14 +42,12 @@ export class TransactionsEditComponent implements OnInit {
   public frmIndividualReceipt: FormGroup;
   public hiddenFields: any = [];
   public testForm: FormGroup;
-  public formVisible: boolean = false;
+  public formVisible = false;
   public states: any = [];
 
-  private _types: any = [];
-  private _transaction: any = {};
+  private _reportType: any = {};
 
   constructor(
-    private _http: HttpClient,
     private _fb: FormBuilder,
     private _reportsService: ReportsService,
     private _individualReceiptService: IndividualReceiptService,
@@ -70,15 +60,63 @@ export class TransactionsEditComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.getFormFields();
+  }
 
+  ngDoCheck(): void {
+
+    this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+    if (this._reportType !== null) {
+
+      // const cvgStartDate: string = this._reportType.cvgStartDate;
+      // const cvgEndDate: string = this._reportType.cvgEndDate;
+
+      // TODO why are these properties all lower case?
+      // Because the report_type in localStorage does not have the
+      // same object structure/property names as found in IndividualReceiptComponent.
+      // TODO get these objects in sync. The date formats are different as well as
+      // all lower case names.
+
+      const cvgStartDate: string = this._reportType.cvgstartdate;
+      const cvgEndDate: string = this._reportType.cvgenddate;
+
+      const cvgStartDateDate: any = new Date(`${cvgStartDate}T01:00:00`);
+      const startFormattedDate: string = `${(cvgStartDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgStartDateDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')}/${cvgStartDateDate.getFullYear()}`;
+
+
+      const cvgEndDateDate: any = new Date(`${cvgEndDate}T01:00:00`);
+      const endFormattedDate: string = `${(cvgEndDateDate.getMonth() + 1).toString().padStart(2, '0')}/${cvgEndDateDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')}/${cvgEndDateDate.getFullYear()}`;
+
+      if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+          contributionDate(startFormattedDate, endFormattedDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+      }
+    }
+  }
+
+  /**
+   * Get the form field details from the server.
+   */
+  private getFormFields(): void {
     console.log(this.transactionToEdit);
-
 
     this.frmIndividualReceipt = this._fb.group({});
 
-    // const formVal = {value: [ContributorLastName : 'Jones']};
-    // this.frmIndividualReceipt.setValue(formVal);
-
+    // TODO check if same call is needed in validate.
+    this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+      .subscribe((res: form3xReportTypeDetails) => {
+        localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+      });
 
     this._individualReceiptService.getDynamicFormFields(this.formType, 'Individual Receipt').subscribe(res => {
       if (res) {
@@ -94,7 +132,26 @@ export class TransactionsEditComponent implements OnInit {
 
         this.states = res.data.states;
 
-        // this.frmIndividualReceipt.setValue({ContributorLastName: 'Jones'});
+
+        // this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
+        //   .subscribe((res: form3xReportTypeDetails) => {
+        //     localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+
+        //   this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        //   if (this._reportType !== null) {
+        //     const cvgStartDate: string = this._reportType.cvgStartDate;
+        //     const cvgEndDate: string = this._reportType.cvgEndDate;
+
+        //     if (this.frmIndividualReceipt.controls['ContributionDate']) {
+        //       this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+        //         contributionDate(cvgStartDate, cvgEndDate),
+        //         Validators.required
+        //       ]);
+
+        //       this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+        //     }
+        //   }
+        // });
       }
     });
   }
@@ -102,7 +159,7 @@ export class TransactionsEditComponent implements OnInit {
   /**
    * The transactionModel has current values from the API.  Here they values will
    * be added to the form fields in order to display and allow for editing in the form.
-   * 
+   *
    * @param res the form field response from the API.
    */
   private _mapTransactionFieldToForm(res: any) {
@@ -189,7 +246,8 @@ export class TransactionsEditComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          // formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
       }
     });
@@ -200,11 +258,19 @@ export class TransactionsEditComponent implements OnInit {
   /**
    * Sets the form field valition requirements.
    *
-   * @param      {Object}  validators  The validators
+   * @param      {Object} validators  The validators.
+   * @param      {String} fieldName The name of the field.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators): Array<any> {
+  private _mapValidators(validators: any, fieldName: string): Array<any> {
     const formValidators = [];
+
+    /**
+     * Adds alphanumeric validation for the zip code field.
+     */
+    if (fieldName === 'ContributorZip') {
+      formValidators.push(alphaNumeric());
+    }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -220,8 +286,6 @@ export class TransactionsEditComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(Validators.maxLength(validators[validation]));
           }
-        } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphaNumeric());
         } else if (validation === 'dollarAmount') {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
@@ -229,6 +293,7 @@ export class TransactionsEditComponent implements OnInit {
         }
       }
     }
+
     return formValidators;
   }
 
@@ -237,7 +302,7 @@ export class TransactionsEditComponent implements OnInit {
    */
   public doValidateReceipt() {
     if (this.frmIndividualReceipt.valid) {
-      let receiptObj: any = {};
+      const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
@@ -251,19 +316,24 @@ export class TransactionsEditComponent implements OnInit {
         receiptObj[el.name] = el.value;
       });
 
+      receiptObj.transactionId = this.transactionToEdit.transactionId;
+
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
       this._reportsService.getReportInfo(`F${this.formType}`, this.reportId)
         .subscribe((res: form3xReportTypeDetails) => {
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
 
-          this._individualReceiptService.saveScheduleA(this.formType).subscribe(res => {
-            if (res) {
+          // TODO API call to save Transaction will need to vary depending on Transaction Type.
+          // Only supporting Sched A at this time.
+
+          this._individualReceiptService.putScheduleA(this.formType).subscribe(res2 => {
+            if (res2) {
               this.frmIndividualReceipt.reset();
 
               localStorage.removeItem(`form_${this.formType}_receipt`);
 
-              window.scrollTo(0, 0);
+              this.viewTransactions();
             }
           });
 
@@ -274,17 +344,6 @@ export class TransactionsEditComponent implements OnInit {
       window.scrollTo(0, 0);
     }
   }
-
-  // /**
-  //  * Goes to the previous step.
-  //  */
-  // public previousStep(): void {
-  //   this.status.emit({
-  //     form: {},
-  //     direction: 'previous',
-  //     step: 'step_2'
-  //   });
-  // }
 
   /**
    * Navigate to the Transactions.

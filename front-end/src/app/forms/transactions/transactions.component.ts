@@ -109,12 +109,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     // If the filter was open on the last visit in the user session, open it.
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
     let filters: TransactionFilterModel;
-    if (filtersJson != null) {
+    if (filtersJson !== null && filtersJson !== 'null') {
       filters = JSON.parse(filtersJson);
-      if (filters.keywords) {
-        if (filters.keywords.length > 0) {
-          this.searchTextArray = filters.keywords;
-          filters.show = true;
+      if (filters) {
+        if (filters.keywords) {
+          if (filters.keywords.length > 0) {
+            this.searchTextArray = filters.keywords;
+            filters.show = true;
+          }
         }
       }
     } else {

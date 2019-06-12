@@ -81,6 +81,10 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    /**
+     * Adds validation for contribution date field.  Date must be within report period.
+     */
+
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
     if (this.selectedOptions) {
@@ -102,6 +106,20 @@ export class IndividualReceiptComponent implements OnInit {
         this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
       }
     }
+
+    if (this.frmIndividualReceipt) {
+      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
+        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
+
+        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
+      }
+
+      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
+        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
+
+        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
+      }
+    }
   }
 
   /**
@@ -115,7 +133,7 @@ export class IndividualReceiptComponent implements OnInit {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
       }
     });
@@ -126,12 +144,19 @@ export class IndividualReceiptComponent implements OnInit {
   /**
    * Sets the form field valition requirements.
    *
-   * @param      {String} fieldName The name of the field.
    * @param      {Object} validators  The validators.
+   * @param      {String} fieldName The name of the field.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators: any): Array<any> {
+  private _mapValidators(validators: any, fieldName: string): Array<any> {
     const formValidators = [];
+
+    /**
+     * Adds alphanumeric validation for the zip code field.
+     */
+    if (fieldName === 'ContributorZip') {
+      formValidators.push(alphaNumeric());
+    }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -147,19 +172,11 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(Validators.maxLength(validators[validation]));
           }
-        } else if (validation === 'alphaNumeric') {
-          formValidators.push(alphaNumeric());
         } else if (validation === 'dollarAmount') {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } /* else if (validation === 'contributionDate') {
-          console.log('validators: ', validators);
-          if (validators[validation]) {
-            console.log('validators[validation]: ', validators[validation]);
-            formValidators.push(contributionDate(this._reportType));
-          }
-        } */
+        }
       }
     }
 
@@ -171,7 +188,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public doValidateReceipt() {
     if (this.frmIndividualReceipt.valid) {
-      let receiptObj: any = {};
+      const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'ContributionDate') {
