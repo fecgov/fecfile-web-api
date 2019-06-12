@@ -1870,7 +1870,7 @@ def summary_table(request):
         cmte_id = request.user.username
 
         if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
-            raise Exception ('Missing Input: Report_id is mandatory')
+            raise Exception ('Missing Input: report_id is mandatory')
 
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
@@ -1924,8 +1924,8 @@ def get_thirdNavigationTransactionTypes(request):
         period_receipt = summary_receipts(period_args)
         period_disbursement = summary_disbursements(period_args)
 
-        forms_obj = { 'Receipts': period_receipt.get('19'),
-                        'Disbursements': period_disbursement.get('31'),
+        forms_obj = { 'Receipts': period_receipt[0].get('amt'),
+                        'Disbursements': period_disbursement[0].get('amt'),
                         'Loans/Debts': 0,
                         'Others': 0}
         return Response(forms_obj, status=status.HTTP_200_OK)
