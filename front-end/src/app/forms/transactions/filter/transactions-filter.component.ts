@@ -599,6 +599,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * @returns true if valid.
    */
   private validateFilters(): boolean {
+
     this.initValidationErrors();
     if (this.filterDateFrom !== null && this.filterDateTo === null) {
       this.dateFilterValidation.isError = true;
@@ -666,6 +667,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
                 }
               }
             }
+            break;
+          case 'date':
+            this.filterDateFrom = null;
+            this.filterDateTo = null;
             break;
           case 'amount':
             this.filterAmountMin = null;

@@ -93,19 +93,83 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="transactions__btn-container">
-              <div *ngFor="let searchTextItem of searchTextArray; let i = index">
-                <button
-                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeSearchText(i)">
-                  <i class="fas fa-window-close"></i>
-                  {{ searchTextItem }}
-                </button>
-                <span class="transactions__btn-search-filter-join" 
-                  *ngIf="i < (searchTextArray.length -1 )">
-                    or
-                </span>
-              </div>
-              <div *ngFor="let categoryZ of filters.filterCategories; let i = index">
+              <!-- <div id="button-container" class="btn-group transactions__tag_wrapper">
+                  <button class="btn btn-primary transactions__tag_btn">Button 1</button>
+                  <button class="btn btn-primary transactions__tag_btn">Button 2</button>
+                  <button class="btn btn-primary transactions__tag_btn">Button 3</button>
+                  <button class="btn btn-primary transactions__tag_btn">Button 4</button>
+              </div> -->
+
+              <div style="display: inline-block">
+
+                <div id="button-container" class="transactions__tag_wrapper">
+                  <div *ngIf="searchTextArray.length > 0" class="transactions__tag_group">
+                    <span *ngFor="let searchTextItem of searchTextArray; let i = index">
+                      <button 
+                        class="btn transactions__tag_btn transactions__btn-search-filter"
+                        (click)="removeSearchText(i)">
+                        <i class="fas fa-window-close"></i>
+                        {{ searchTextItem }}
+                      </button>
+                      <span class="transactions__btn-search-filter-join" 
+                        *ngIf="i < (searchTextArray.length -1 )">
+                          or
+                      </span>
+                    </span>
+                  </div>
+
+                  <div *ngIf="filters.filterCategories && filters.filterCategories.length > 0" 
+                      class="transactions__tag_group">
+                  <!-- <div> -->
+                    <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
+                      <button
+                        class="btn transactions__tag_btn transactions__btn-search-filter"
+                        (click)="removeCategoryFilter(i, categoryZ)">
+                        <i class="fas fa-window-close"></i>
+                        Type: {{ categoryZ }}
+                      </button>
+                      <span class="transactions__btn-search-filter-join" 
+                        *ngIf="i < (filters.filterCategories.length -1 )">
+                          or
+                      </span>
+                    </span>
+                  </div>                  
+
+                </div>
+
+                <!-- <div id="" class="transactions__tag_wrapper">
+                  <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
+                    <button
+                      class="btn transactions__tag_btn transactions__btn-search-filter"
+                      (click)="removeCategoryFilter(i, categoryZ)">
+                      <i class="fas fa-window-close"></i>
+                      Type: {{ categoryZ }}
+                    </button>
+                    <span class="transactions__btn-search-filter-join" 
+                      *ngIf="i < (filters.filterCategories.length -1 )">
+                        or
+                    </span>
+                  </span>
+                </div>
+              </div> -->
+
+
+              <!-- <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+                <div class="tag__category">
+                  <button
+                    class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                    (click)="removeSearchText(i)">
+                    <i class="fas fa-window-close"></i>
+                    {{ searchTextItem }}
+                  </button>
+                  <span class="transactions__btn-search-filter-join" 
+                    *ngIf="i < (searchTextArray.length -1 )">
+                      or
+                  </span>
+                </div>
+              </div> -->
+
+              <!-- <div *ngFor="let categoryZ of filters.filterCategories; let i = index">
                 <button
                   class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
                   (click)="removeCategoryFilter(i, categoryZ)">
@@ -116,7 +180,18 @@
                   *ngIf="i < (filters.filterCategories.length -1 )">
                     or
                 </span>
-              </div>
+              </div> -->
+
+
+              <div *ngIf="filters.filterDateFrom  && filters.filterDateTo">
+                <button
+                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                  (click)="removeDateFilter()">
+                  <i class="fas fa-window-close"></i>
+                  Date: {{ filters.filterDateFrom | date: 'MM/dd/yyyy'}} - 
+                          {{ filters.filterDateTo | date: 'MM/dd/yyyy'}}
+                </button>
+              </div> 
               <div *ngFor="let state of filters.filterStates; let i = index">
                 <button
                   class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
@@ -137,10 +212,6 @@
                   Amount: {{ filters.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
                           {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
                 </button>
-                <span class="transactions__btn-search-filter-join" 
-                  *ngIf="i < (filters.filterStates.length -1 )">
-                    or
-                </span>
               </div> 
             </div>          
           </div>

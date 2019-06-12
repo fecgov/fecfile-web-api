@@ -76,7 +76,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           this.filters = message.filters;
 
           if (message.isClearKeyword) {
-            // this.searchTextArray = [];
             this.clearSearch();
           }
 
@@ -195,7 +194,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Remove the state filter tag and inform the filter component to clear it.
+   * Remove the State filter tag and inform the filter component to clear it.
    */
   public removeCategoryFilter(index: number, category: string) {
     this.filters.filterCategories.splice(index, 1);
@@ -203,6 +202,19 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
 
+  /**
+   * Remove the Date filter tag and inform the filter component to clear it.
+   */
+  public removeDateFilter() {
+    this.filters.filterDateFrom = null;
+    this.filters.filterDateTo = null;
+    this.removeFilter('date', null);
+  }
+
+
+  /**
+   * Remove the Amount filter tag and inform the filter component to clear it.
+   */
   public removeAmountFilter() {
     this.filters.filterAmountMin = null;
     this.filters.filterAmountMax = null;
@@ -210,6 +222,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
 
+  /**
+   * Inform the Filter Component to clear the filter settings for the given key/value.
+   *
+   * @param key
+   * @param value
+   */
   private removeFilter(key: string, value: string) {
     this._transactionsMessageService.sendRemoveFilterMessage({key: key, value: value});
     this.doSearch();
