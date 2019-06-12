@@ -252,6 +252,7 @@ export class IndividualReceiptService {
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
     return this._http.get(url, {
       headers: httpOptions,
       params: {
