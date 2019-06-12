@@ -83,6 +83,8 @@ export class F3xComponent implements OnInit {
     this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
+
+        console.log('this.transactionCategories: ', this.transactionCategories);
       }
     });
 
@@ -90,25 +92,28 @@ export class F3xComponent implements OnInit {
       if (val) {
         if (val instanceof NavigationEnd) {
           if (val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
-             console.log(new Date().toISOString());
-             if ( localStorage.getItem(`form_${this._formType}_report_type`) !== null ){
-              localStorage.setItem(`form_${this._formType}_saved_backup`,localStorage.getItem(`form_${this._formType}_saved`));
-              localStorage.setItem(`form_${this._formType}_report_type_backup`, localStorage.getItem(`form_${this._formType}_report_type`));
-              console.log(`form_${this._formType}_report_type_backup`+"copied ");
-              console.log(new Date().toISOString());  
-             }
+            console.log(new Date().toISOString());
+            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+              localStorage.setItem(
+                `form_${this._formType}_saved_backup`,
+                localStorage.getItem(`form_${this._formType}_saved`)
+              );
+              localStorage.setItem(
+                `form_${this._formType}_report_type_backup`,
+                localStorage.getItem(`form_${this._formType}_report_type`)
+              );
+              console.log(`form_${this._formType}_report_type_backup` + 'copied ');
+              console.log(new Date().toISOString());
+            }
 
-             setTimeout(() => 
-             {
+            setTimeout(() => {
               localStorage.removeItem(`form_${this._formType}_report_type`);
               localStorage.removeItem(`form_${this._formType}_transaction_type`);
               localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
               localStorage.removeItem(`form_${this._formType}_saved`);
-              console.log(`form_${this._formType}_report_type_backup`+"removed ");
+              console.log(`form_${this._formType}_report_type_backup` + 'removed ');
               console.log(new Date().toISOString());
-             },
-             200);
-
+            }, 200);
           }
         } else {
           if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {

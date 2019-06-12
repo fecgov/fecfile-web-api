@@ -72,11 +72,6 @@ import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
 
-
-
-
-
-
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();
@@ -125,7 +120,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionTypeComponent,
     ReportTypeComponent,
     ReportTypeSidebarComponent,
-    IndividualReceiptComponent,
     FinancialSummaryComponent,
     OrderByPipe,
     ZipCodePipe,
