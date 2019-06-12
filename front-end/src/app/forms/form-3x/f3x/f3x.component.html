@@ -1,21 +1,21 @@
 <div class="forms__wizard" *ngIf="!loadingData">
-  <div class="form__sidebar" *ngIf="step!=='financial_summary'">
-    <div [hidden]="step!=='step_1'">
-     <report-type-sidebar
+  <div class="form__sidebar" *ngIf="step !== 'financial_summary'">
+    <div [hidden]="step !== 'step_1'">
+      <report-type-sidebar
         title="Report Coverage Dates"
         (status)="onNotify($event)"
         [selectedReport]="selectedReport"
         [specialReports]="specialReports"
         [regularReports]="regularReports"
-        >
+      >
       </report-type-sidebar>
     </div>
-    <div *ngIf="step==='step_2' || step==='step_3'">
+    <div *ngIf="step === 'step_2' || step === 'step_3'">
       <transaction-sidebar
         [step]="step"
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"
-        (status)='onNotify($event)'
+        (status)="onNotify($event)"
       >
       </transaction-sidebar>
     </div>
@@ -24,34 +24,28 @@
     class="form__container"
     [ngClass]="{
       'show-alerts': showValidateBar === true,
-      'hide-alerts': step==='step_6'
+      'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps" *ngIf="step!=='financial_summary'">
+    <div class="form__steps" *ngIf="step !== 'financial_summary'">
       <app-steps
         [steps]="[
-          {text: 'Report', step: 'step_1'},
-          {text: 'Type', step: 'step_2'},
-          {text: 'Form', step: 'step_3'},
-          {text: 'Preview', step: 'step_4'},
-          {text: 'Sign', step: 'step_5'},
-          {text: 'Submit', step: 'step_6'}
+          { text: 'Report', step: 'step_1' },
+          { text: 'Type', step: 'step_2' },
+          { text: 'Form', step: 'step_3' },
+          { text: 'Preview', step: 'step_4' },
+          { text: 'Sign', step: 'step_5' },
+          { text: 'Submit', step: 'step_6' }
         ]"
         [current_step]="currentStep"
       >
       </app-steps>
     </div>
-    <div
-      class="form__content"
-    >
-      <div *ngIf="step==='financial_summary'">
-        <f3x-financial-summary>
-        </f3x-financial-summary>
+    <div class="form__content">
+      <div *ngIf="step === 'financial_summary'">
+        <f3x-financial-summary> </f3x-financial-summary>
       </div>
-      <div
-        class="form__step"
-        [hidden]="step!=='step_1'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_1'">
         <f3x-report-type
           [formRadioOptionsVisible]="formRadioOptionsVisible"
           (status)="onNotify($event)"
@@ -64,52 +58,38 @@
         </f3x-report-type>
       </div>
 
-      <div
-        class="form__step"
-        [hidden]="step!=='step_2'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_2'">
         <f3x-transaction-type
-          (status)='onNotify($event)'
+          (status)="onNotify($event)"
           [transactionCategory]="transactionCategory"
           [transactionCategories]="transactionCategories"
         >
         </f3x-transaction-type>
       </div>
 
-      <div
-        class="form__step"
-        [hidden]="step!=='step_3'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_3'">
         <f3x-individual-receipt
           [formOptionsVisible]="formOptionsVisible"
           [selectedOptions]="selectedOptions"
           [transactionTypeText]="transactionTypeText"
-          (status)='onNotify($event)'
+          (status)="onNotify($event)"
         >
         </f3x-individual-receipt>
       </div>
 
-      <div
-        class="form__step"
-        [hidden]="step!=='step_4'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_4'">
         <f3x-preview></f3x-preview>
       </div>
 
-      <div
-        class="form__step"
-        [hidden]="step!=='step_5'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_5'">
         <f3x-sign></f3x-sign>
       </div>
 
-      <div
-        class="form__step"
-        [hidden]="step!=='step_6'"
-      >
+      <div class="form__step" [hidden]="step !== 'step_6'">
         <f3x-submit></f3x-submit>
       </div>
-
     </div>
-  </div> <!-- ./form__container -->
-</div> <!-- ./forms__wizard -->
+  </div>
+  <!-- ./form__container -->
+</div>
+<!-- ./forms__wizard -->
