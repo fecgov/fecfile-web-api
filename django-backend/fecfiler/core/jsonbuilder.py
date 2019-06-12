@@ -70,7 +70,7 @@ def get_entity_expenditure_id(report_id, cmte_id):
 
 def get_summary_dict(form3x_header_data):
     form3x_data_string ='{'
-    form3x_data_string = form3x_data_string + '"cashOnHandYYYY": 2019,'
+    form3x_data_string = form3x_data_string + '"cashOnHandYear": 2019,'
     form3x_data_string = form3x_data_string + '"colA": {'
     form3x_data_string = form3x_data_string + '"6b_cashOnHandBeginning": '+ str(form3x_header_data['coh_bop']) + ','
     form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data['ttl_receipts_sum_page_per']) + ','
@@ -295,15 +295,15 @@ def create_f3x_expenditure_json_file(request):
                     response_dict_receipt['payeeLastName'] = list_entity['last_name']
                     response_dict_receipt['payeeFirstName'] = list_entity['first_name']
                     response_dict_receipt['payeeMiddleName'] = list_entity['middle_name']
-                    response_dict_receipt['payeePrefix'] = list_entity['preffix']
+                    response_dict_receipt['payeePrefix'] = list_entity['prefix']
                     response_dict_receipt['payeeSuffix'] = list_entity['suffix']
                     response_dict_receipt['payeeStreet1 '] = list_entity['street_1']
                     response_dict_receipt['payeeStreet2'] = list_entity['street_2']
                     response_dict_receipt['payeeCity'] = list_entity['city']
                     response_dict_receipt['payeeState'] = list_entity['state']
                     response_dict_receipt['payeeZip'] = list_entity['zip_code']
-                    response_dict_receipt['expenditureDate'] = entity_obj['expenditure_date'].replace('-','')
-                    response_dict_receipt['expenditureAmount'] = "%.2f" % round(entity_obj['expenditure_amount'],2)
+                    response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                    response_dict_receipt['expenditureAmount'] = round(entity_obj['expenditure_amount'],2)
                     response_dict_receipt['expenditurePurposeDescription'] = entity_obj['expenditure_purpose']
                     response_dict_receipt['categoryCode'] = '15G'
                     response_dict_receipt['memoCode'] = entity_obj['memo_code']
@@ -341,8 +341,8 @@ def create_f3x_expenditure_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SB':[]}
-            data_obj['data']['Schedule']['SB'] = response_expenditure_receipt_list
+            data_obj['data']['schedule'] = {'SB':[]}
+            data_obj['data']['schedule']['SB'] = response_expenditure_receipt_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
             print(k)
@@ -385,10 +385,10 @@ def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None):
         # GET all rows from schedA table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
         with connection.cursor() as cursor:
             if not transaction_id:
@@ -401,12 +401,12 @@ def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None):
                 if forms_obj is not None:
                     for d in forms_obj:
                         for i in d:
-                            if not d[i]:
+                            if not d[i] and i != 'aggregate_amt':
                                 d[i] = ''
-                # forms_obj.append(data_row)
         if forms_obj is None:
             pass
-            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))
+        print(forms_obj)   
         return forms_obj
     except Exception:
         raise
@@ -493,16 +493,16 @@ def create_f3x_json_file(request):
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
                     response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
-                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorPrefix'] = list_entity['prefix']
                     response_dict_receipt['contributorSuffix'] = list_entity['suffix']
                     response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
                     response_dict_receipt['contributorStreet2'] = list_entity['street_2']
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                     response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
-                    response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_receipt['contributorEmployer'] = list_entity['employer']
                     response_dict_receipt['contributorOccupation'] = list_entity['occupation']
@@ -533,14 +533,14 @@ def create_f3x_json_file(request):
                         response_dict_out['payeeLastName'] = list_child_entity['last_name']
                         response_dict_out['payeeFirstName'] = list_child_entity['first_name']
                         response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
-                        response_dict_out['payeePrefix'] = list_child_entity['preffix']
+                        response_dict_out['payeePrefix'] = list_child_entity['prefix']
                         response_dict_out['payeeSuffix'] = list_child_entity['suffix']
                         response_dict_out['payeeStreet1'] = list_child_entity['street_1']
                         response_dict_out['payeeStreet2'] = list_child_entity['street_2']
                         response_dict_out['payeeCity'] = list_child_entity['city']
                         response_dict_out['payeeState'] = list_child_entity['state']
                         response_dict_out['payeezip'] = list_child_entity['zip_code']
-                        response_dict_out['expenditureDate'] = entity_child_obj['expenditure_date'].replace('-','')
+                        response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                         response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                         response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                         response_dict_out['categoryCode'] = '15G'
@@ -581,8 +581,8 @@ def create_f3x_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SA': [],}
-            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedule'] = {'SA': [],}
+            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
             bucket = conn.get_bucket("dev-efile-repo")
@@ -654,11 +654,15 @@ def create_f3x_partner_json_file(request):
                 for entity_obj in entity_id_list:
                     response_dict_out = {}
                     response_dict_receipt = {}
+                    if entity_obj['aggregate_amt'] == '':
+                        print("yes. it is null")
                     list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
                     if not list_entity:
                         continue
                     else:
                          list_entity = list_entity[0]
+
+                   
                     response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
                     response_dict_receipt['transactionId'] = entity_obj['transaction_id']
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
@@ -671,9 +675,9 @@ def create_f3x_partner_json_file(request):
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_receipt['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
-                    response_dict_receipt['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                    response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = entity_obj['aggregate_amt']
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_receipt['memoCode'] = entity_obj['memo_code']
                     response_dict_receipt['memoDescription'] = entity_obj['memo_text']
@@ -704,16 +708,16 @@ def create_f3x_partner_json_file(request):
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
                         response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
-                        response_dict_out['contributorPrefix'] = list_child_entity['preffix']
+                        response_dict_out['contributorPrefix'] = list_child_entity['prefix']
                         response_dict_out['contributorSuffix'] = list_child_entity['suffix']
                         response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
                         response_dict_out['contributorStreet2'] = list_child_entity['street_2']
                         response_dict_out['contributorCity'] = list_child_entity['city']
                         response_dict_out['contributorState'] = list_child_entity['state']
                         response_dict_out['contributorZip'] = list_child_entity['zip_code']
-                        response_dict_out['contributionDate'] = entity_child_obj['contribution_date'].replace('-','')
-                        response_dict_out['contributionAmount'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
-                        response_dict_out['contributionAggregate'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                        response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
                         response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
                         response_dict_out['contributorEmployer'] = list_child_entity['employer']
                         response_dict_out['contributorOccupation'] = list_child_entity['occupation']
@@ -752,8 +756,8 @@ def create_f3x_partner_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SA': []}
-            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list 
+            data_obj['data']['schedule'] = {'SA': []}
+            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list 
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -864,16 +868,16 @@ def create_f3x_returned_bounced_json_file(request):
                     response_dict_out['contributorLastName'] = list_entity['last_name']
                     response_dict_out['contributorFirstName'] = list_entity['first_name']
                     response_dict_out['contributorMiddleName'] = list_entity['middle_name']
-                    response_dict_out['contributorPrefix'] = list_entity['preffix']
+                    response_dict_out['contributorPrefix'] = list_entity['prefix']
                     response_dict_out['contributorSuffix'] = list_entity['suffix']
                     response_dict_out['contributorStreet1 '] = list_entity['street_1']
                     response_dict_out['contributorStreet2'] = list_entity['street_2']
                     response_dict_out['contributorCity'] = list_entity['city']
                     response_dict_out['contributorState'] = list_entity['state']
                     response_dict_out['contributorZip'] = list_entity['zip_code']
-                    response_dict_out['contributionDate'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_out['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
-                    response_dict_out['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                    response_dict_out['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_out['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
                     response_dict_out['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_out['contributorEmployer'] = list_entity['employer']
                     response_dict_out['contributorOccupation'] = list_entity['occupation']
@@ -912,8 +916,8 @@ def create_f3x_returned_bounced_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SA': []}
-            data_obj['data']['Schedule']['SA'] = response_inkind_out_list
+            data_obj['data']['schedule'] = {'SA': []}
+            data_obj['data']['schedule']['SA'] = response_inkind_out_list
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -999,16 +1003,16 @@ def create_f3x_reattribution_json_file(request):
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
                     response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
-                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorPrefix'] = list_entity['prefix']
                     response_dict_receipt['contributorSuffix'] = list_entity['suffix']
                     response_dict_receipt['contributorStreet1'] = list_entity['street_1']
                     response_dict_receipt['contributorStreet2'] = list_entity['street_2']
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
-                    response_dict_receipt['contributionAmount'] = "%.2f" % round(entity_obj['contribution_amount'],2)
-                    response_dict_receipt['contributionAggregate'] = "%.2f" % round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                    response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_receipt['contributorEmployer'] = list_entity['employer']
                     response_dict_receipt['contributorOccupation'] = list_entity['occupation']
@@ -1041,16 +1045,16 @@ def create_f3x_reattribution_json_file(request):
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
                         response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
-                        response_dict_out['contributorPrefix'] = list_child_entity['preffix']
+                        response_dict_out['contributorPrefix'] = list_child_entity['prefix']
                         response_dict_out['contributorSuffix'] = list_child_entity['suffix']
                         response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
                         response_dict_out['contributorStreet2'] = list_child_entity['street_2']
                         response_dict_out['contributorCity'] = list_child_entity['city']
                         response_dict_out['contributorState'] = list_child_entity['state']
                         response_dict_out['contributorZip'] = list_child_entity['zip_code']
-                        response_dict_out['contributionDate'] = entity_child_obj['contribution_date'].replace('-','')
-                        response_dict_out['contributionAmount'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
-                        response_dict_out['contributionAggregate'] = "%.2f" % round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionDate'] = datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                        response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
+                        response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
                         response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
                         response_dict_out['contributorEmployer'] = list_child_entity['employer']
                         response_dict_out['contributorOccupation'] = list_child_entity['occupation']
@@ -1090,8 +1094,8 @@ def create_f3x_reattribution_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SA': []}
-            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedule'] = {'SA': []}
+            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -1180,16 +1184,16 @@ def create_inkind_bitcoin_f3x_json_file(request):
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
                     response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
-                    response_dict_receipt['contributorPrefix'] = list_entity['preffix']
+                    response_dict_receipt['contributorPrefix'] = list_entity['prefix']
                     response_dict_receipt['contributorSuffix'] = list_entity['suffix']
                     response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
                     response_dict_receipt['contributorStreet2'] = list_entity['street_2']
                     response_dict_receipt['contributorCity'] = list_entity['city']
                     response_dict_receipt['contributorState'] = list_entity['state']
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                    response_dict_receipt['contributionDate'] = entity_obj['contribution_date'].replace('-','')
+                    response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                     response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
-                    response_dict_receipt['contributionAggregate'] = round(entity_obj['contribution_amount'],2)
+                    response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_receipt['contributorEmployer'] = list_entity['employer']
                     response_dict_receipt['contributorOccupation'] = list_entity['occupation']
@@ -1220,14 +1224,14 @@ def create_inkind_bitcoin_f3x_json_file(request):
                         response_dict_out['payeeLastName'] = list_child_entity['last_name']
                         response_dict_out['payeeFirstName'] = list_child_entity['first_name']
                         response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
-                        response_dict_out['payeePrefix'] = list_child_entity['preffix']
+                        response_dict_out['payeePrefix'] = list_child_entity['prefix']
                         response_dict_out['payeeSuffix'] = list_child_entity['suffix']
                         response_dict_out['payeeStreet1'] = list_child_entity['street_1']
                         response_dict_out['payeeStreet2'] = list_child_entity['street_2']
                         response_dict_out['payeeCity'] = list_child_entity['city']
                         response_dict_out['payeeState'] = list_child_entity['state']
                         response_dict_out['payeezip'] = list_child_entity['zip_code']
-                        response_dict_out['expenditureDate'] = entity_child_obj['expenditure_date'].replace('-','')
+                        response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                         response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                         response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                         response_dict_out['categoryCode'] = '15G'
@@ -1268,8 +1272,8 @@ def create_inkind_bitcoin_f3x_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['Schedule'] = {'SA': [],}
-            data_obj['data']['Schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedule'] = {'SA': [],}
+            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
             bucket = conn.get_bucket("dev-efile-repo")
