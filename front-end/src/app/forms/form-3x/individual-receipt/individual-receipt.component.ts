@@ -109,29 +109,6 @@ export class IndividualReceiptComponent implements OnInit {
         this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
       }
     }
-    if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
-        const el: ElementRef = this._elementRef.nativeElement.querySelector("input[name='ContributionAmount']");
-
-        console.log('el: ', el);
-        this._renderer.listen(el, 'blur', e => {
-          console.log('Contribution amount blur: ');
-        });
-
-        // el.addEventListener('blur', e => {
-        //   console.log('blur contribution field: ');
-        // });
-
-        // this._renderer.listen(, 'blur', e => {
-        //   console.log('blur contribution amount:');
-        // });
-        // this.frmIndividualReceipt.controls['ContributionAmount'].valueChanges.subscribe(val => {
-        //   if (val) {
-        //     console.log('val: ', val);
-        //   }
-        // });
-      }
-    }
   }
 
   /**
