@@ -341,8 +341,8 @@ def create_f3x_expenditure_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SB':[]}
-            data_obj['data']['schedule']['SB'] = response_expenditure_receipt_list
+            data_obj['data']['schedules'] = {'SB':[]}
+            data_obj['data']['schedules']['SB'] = response_expenditure_receipt_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
             print(k)
@@ -581,8 +581,8 @@ def create_f3x_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SA': [],}
-            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedules'] = {'SA': [],}
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
             bucket = conn.get_bucket("dev-efile-repo")
@@ -756,8 +756,8 @@ def create_f3x_partner_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SA': []}
-            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list 
+            data_obj['data']['schedules'] = {'SA': []}
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -916,8 +916,8 @@ def create_f3x_returned_bounced_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SA': []}
-            data_obj['data']['schedule']['SA'] = response_inkind_out_list
+            data_obj['data']['schedules'] = {'SA': []}
+            data_obj['data']['schedules']['SA'] = response_inkind_out_list
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -1094,8 +1094,8 @@ def create_f3x_reattribution_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SA': []}
-            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedules'] = {'SA': []}
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
@@ -1272,8 +1272,8 @@ def create_inkind_bitcoin_f3x_json_file(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedule'] = {'SA': [],}
-            data_obj['data']['schedule']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedules'] = {'SA': [],}
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
             bucket = conn.get_bucket("dev-efile-repo")
