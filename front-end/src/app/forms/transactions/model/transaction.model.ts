@@ -17,6 +17,7 @@ export class TransactionModel {
     memoCode: string;
     memoText: string;
     selected: boolean;
+    itemized: string;
 
     constructor(transaction: any) {
         this.type = transaction.type ? transaction.type : '';
@@ -37,5 +38,6 @@ export class TransactionModel {
         this.memoCode = transaction.memoCode ? transaction.memoCode : '';
         this.memoText = transaction.memoText ? transaction.memoText : '';
         this.selected = transaction.selected;
+        this.itemized = transaction.itemized;
     }
 }

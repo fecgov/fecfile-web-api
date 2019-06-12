@@ -383,15 +383,21 @@ def get_list_report(report_id, cmte_id):
         raise
 
 
-def put_sql_report(report_id, cmte_id, report_type, cvg_start_date, cvg_end_date):
+def put_sql_report(report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id):
 
     try:
         with connection.cursor() as cursor:
             # UPDATE row into Reports table
             # cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s, last_update_date = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
             #                     (data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), datetime.now(), data.get('report_id'), cmte_id))
-            cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                                [report_type, cvg_start_date, cvg_end_date, report_id, cmte_id])
+
+            if status=="Saved":
+                cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                                [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
+            elif status=="Submitted":
+                cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s, filed_date = last_update_date WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                                [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
+
             if (cursor.rowcount == 0):
                 raise Exception('The Report ID: {} does not exist in Reports table'.format(report_id))
     except Exception:
@@ -556,7 +562,9 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
-            put_sql_report(data.get('report_id'), cmte_id, data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'))
+            print("before put_sql_report")
+            put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
+            print("after put_sql_report")
             old_dict_report = old_list_report[0]
             prev_report_type = old_dict_report.get('report_type')
             prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
@@ -565,10 +573,10 @@ def put_reports(data):
                                            
             try:
                 if data.get('form_type') == "F3X":
-                    put_sql_form3x(data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'), data.get('report_id'), cmte_id)                            
+                    put_sql_form3x(data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'),  data.get('report_id'), cmte_id)                            
                 output = get_reports(data)
             except Exception as e:
-                    put_sql_report(data.get('report_id'), cmte_id, prev_report_type, prev_cvg_start_dt, prev_cvg_end_dt)
+                    put_sql_report(prev_report_type, prev_cvg_start_dt, prev_cvg_end_dt, data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
                     raise Exception('The put_sql_form3x function is throwing an error: ' + str(e))
             
             return output[0]
@@ -697,6 +705,7 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
+        print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
                 amend_ind = check_null_value(request.data.get('amend_ind'))
@@ -706,7 +715,7 @@ def reports(request):
             if 'election_code' in request.data:
                 election_code = check_null_value(request.data.get('election_code'))
             else:
-                election_code = None
+                election_code = ""
 
             if 'status' in request.data:
                 f_status = check_null_value(request.data.get('status'))
@@ -716,23 +725,26 @@ def reports(request):
             if 'email_1' in request.data:
                 email_1 = check_email(request.data.get('email_1'))
             else:
-                email_1 = None
+                email_1 = ""
 
             if 'email_2' in request.data:
                 email_2 = check_email(request.data.get('email_2'))
             else:
-                email_2 = None
+                email_2 = ""
 
             if 'additional_email_1' in request.data:
                 additional_email_1 = check_email(request.data.get('additional_email_1'))
             else:
-                additional_email_1 = None                
+                additional_email_1 = ""              
             
             if 'additional_email_2' in request.data:
                 additional_email_2 = check_email(request.data.get('additional_email_2'))
             else:
-                additional_email_2 = None
+                additional_email_2 = ""
 
+            print("f_status = ", f_status)
+            print("additional_email_1 = ", additional_email_1)
+            print("additional_email_2 = ", additional_email_2)
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -756,9 +768,9 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-
+            print("data = ", data)
             if (f_status == 'Submitted' and data):
-                return JsonResponse({'Submitted': true}, status=status.HTTP_201_CREATED, safe=False)    
+                return JsonResponse({'Submitted': True}, status=status.HTTP_201_CREATED, safe=False)    
             elif type(data) is dict:
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
@@ -1346,6 +1358,8 @@ def filter_get_all_trans(request, param_string):
     # import ipdb;ipdb.set_trace()
     filt_dict = request.data.get('filters', {})
     for f_key, value_d in filt_dict.items():
+        if not value_d or value_d == 'null':
+            continue
         if 'filterCategories' in f_key:
             cat_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
@@ -1356,8 +1370,9 @@ def filter_get_all_trans(request, param_string):
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
+        
         if 'filterMemoCode' in f_key:
-            if str(value_d) == 'true':
+            if str(value_d).lower() == 'true':
                 param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
     return param_string
 
@@ -1396,18 +1411,18 @@ def get_all_transactions(request):
         # import ipdb;ipdb.set_trace()
         keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'transaction_date', 'transaction_amount','aggregate_amt','purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
         search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount', 'purpose_description', 
+            'transaction_date', 'transaction_amount','aggregate_amt', 'purpose_description', 
             'occupation', 'employer', 'memo_code', 'memo_text']
         if search_string:
             for key in search_keys:
                 if not param_string:
-                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
                 else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
             param_string = param_string + " )"
         keywords_string = ''
         if keywords:
@@ -1422,9 +1437,9 @@ def get_all_transactions(request):
                             keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
                     else:
                         if not keywords_string:
-                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
                         else:
-                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) LIKE '%" + str(word) +"%'"
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
             keywords_string = keywords_string + " )"
         param_string = param_string + keywords_string
         param_string = filter_get_all_trans(request, param_string)
@@ -1449,7 +1464,7 @@ def get_all_transactions(request):
             count = result[0]
             sum_trans = result[1]
         
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print(trans_query_string)
@@ -1466,7 +1481,7 @@ def get_all_transactions(request):
                 forms_obj = data_row[0]
                 if forms_obj is None:
                     forms_obj =[]
-                    status_value = status.HTTP_204_NO_CONTENT
+                    status_value = status.HTTP_200_OK
                 else:
                     for d in forms_obj:
                         for i in d:
@@ -1552,7 +1567,7 @@ def get_all_deleted_transactions(request):
         #     count = result[0]
         #     sum_trans = result[1]
             
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
@@ -1627,7 +1642,7 @@ def summary_disbursements(args):
         XXIAI_amount = 0
         XXIAII_amount = 0
         XXIB_amount = 0
-        XXIC_amount = 0
+        XXI_amount = 0
         XXII_amount = 0
         XXIII_amount = 0
         XXIV_amount = 0
@@ -1637,12 +1652,12 @@ def summary_disbursements(args):
         XXVIIIA_amount = 0
         XXVIIIB_amount = 0
         XXVIIIC_amount = 0
-        XXVIIID_amount = 0
+        XXVIII_amount = 0
         XXIX_amount = 0
         XXXAI_amount = 0
         XXXAII_amount = 0
         XXXB_amount = 0
-        XXXC_amount = 0
+        XXX_amount = 0
         XXXI_amount = 0
         XXXII_amount = 0       
 
@@ -1691,35 +1706,58 @@ def summary_disbursements(args):
             if data_row[0] == '30B':
                 XXXB_amount = XXXB_amount + data_row[1]
 
-        XXIC_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
-        XXVIIID_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
-        XXXC_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
-        XXXI_amount = XXIC_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIIID_amount + XXIX_amount + XXXC_amount
+        XXI_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
+        XXVIII_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
+        XXX_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
+        XXXI_amount = XXI_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIII_amount + XXIX_amount + XXX_amount
         XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
 
-        summary_disbursement = {'21AI': XXIAI_amount,
-                    '21AII': XXIAII_amount,
-                    '21B': XXIB_amount,
-                    '21C': XXIC_amount,
-                    '22': XXII_amount,
-                    '23': XXIII_amount,
-                    '24': XXIV_amount,
-                    '25': XXV_amount,
-                    '26': XXVI_amount,
-                    '27': XXVII_amount,
-                    '28A': XXVIIIA_amount,
-                    '28B': XXVIIIB_amount,
-                    '28C': XXVIIIC_amount,
-                    '28D': XXVIIID_amount,
-                    '29': XXIX_amount,
-                    '30AI': XXXAI_amount,
-                    '30AII': XXXAII_amount,
-                    '30B': XXXB_amount,
-                    '30C': XXXC_amount,
-                    '31': XXXI_amount,
-                    '32': XXXII_amount
-                        }    
-        return summary_disbursement
+        summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount},
+                                {'line_item':'21', 'level':1, 'description':'Operating Expenditures', 'amt':XXI_amount},
+                                {'line_item':'21AI', 'level':2, 'description':'Total Individual Contributions', 'amt':XXIAI_amount},
+                                {'line_item':'21AII', 'level':2, 'description':'Itemized Individual Contributions', 'amt':XXIAII_amount},
+                                {'line_item':'21B', 'level':2, 'description':'Unitemized Individual Contributions', 'amt':XXIB_amount},
+                                {'line_item':'22', 'level':1, 'description':'Party Committee Contributions', 'amt':XXII_amount},
+                                {'line_item':'23', 'level':1, 'description':'Other Committee Contributions', 'amt':XXIII_amount},
+                                {'line_item':'24', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XXIV_amount},
+                                {'line_item':'25', 'level':1, 'description':'All Loans Received', 'amt':XXV_amount},
+                                {'line_item':'27', 'level':1, 'description':'Loan Repayments Received', 'amt':XXVII_amount},
+                                {'line_item':'26', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XXVI_amount},
+                                {'line_item':'28', 'level':1, 'description':'Candidate Refunds', 'amt':XXVIII_amount},
+                                {'line_item':'28A', 'level':2, 'description':'Other Receipts', 'amt':XXVIIIA_amount},
+                                {'line_item':'28B', 'level':2, 'description':'Total Transfers', 'amt':XXVIIIB_amount},
+                                {'line_item':'28C', 'level':2, 'description':'Non-Federal Transfers', 'amt':XXVIIIC_amount},
+                                {'line_item':'29', 'level':1, 'description':'Levin Funds', 'amt':XXIX_amount},
+                                {'line_item':'30', 'level':1, 'description':'Total Federal Receipts', 'amt':XXX_amount},
+                                {'line_item':'30AI', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAI_amount},
+                                {'line_item':'30AII', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAII_amount},
+                                {'line_item':'30B', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXB_amount},
+                                {'line_item':'32', 'level':1, 'description':'Total Federal Receipts', 'amt':XXXII_amount},
+                                ]
+
+        # summary_disbursement = {'21AI': XXIAI_amount,
+        #             '21AII': XXIAII_amount,
+        #             '21B': XXIB_amount,
+        #             '21': XXI_amount,
+        #             '22': XXII_amount,
+        #             '23': XXIII_amount,
+        #             '24': XXIV_amount,
+        #             '25': XXV_amount,
+        #             '26': XXVI_amount,
+        #             '27': XXVII_amount,
+        #             '28A': XXVIIIA_amount,
+        #             '28B': XXVIIIB_amount,
+        #             '28C': XXVIIIC_amount,
+        #             '28': XXVIII_amount,
+        #             '29': XXIX_amount,
+        #             '30AI': XXXAI_amount,
+        #             '30AII': XXXAII_amount,
+        #             '30B': XXXB_amount,
+        #             '30': XXX_amount,
+        #             '31': XXXI_amount,
+        #             '32': XXXII_amount
+        #                 }    
+        return summary_disbursement_list
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
@@ -1727,7 +1765,7 @@ def summary_receipts(args):
     try:
         XIAI_amount = 0
         XIAII_amount = 0
-        XIAIII_amount = 0
+        XIA_amount = 0
         XIB_amount = 0
         XIC_amount = 0
         XID_amount = 0
@@ -1739,7 +1777,7 @@ def summary_receipts(args):
         XVII_amount = 0
         XVIIIA_amount = 0
         XVIIIB_amount = 0
-        XVIIIC_amount = 0
+        XVIII_amount = 0
         XIX_amount = 0
         XX_amount = 0
 
@@ -1780,31 +1818,49 @@ def summary_receipts(args):
             if data_row[0] == '18B':
                 XVIIIB_amount = XVIIIB_amount + data_row[1]
 
-        XIAIII_amount = XIAI_amount + XIAII_amount
-        XID_amount = XIAIII_amount + XIB_amount + XIC_amount
-        XVIIIC_amount = XVIIIA_amount + XVIIIB_amount
-        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIIIC_amount
-        XX_amount = XIX_amount - XVIIIC_amount
+        XIA_amount = XIAI_amount + XIAII_amount
+        XID_amount = XIA_amount + XIB_amount + XIC_amount
+        XVIII_amount = XVIIIA_amount + XVIIIB_amount
+        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIII_amount
+        XX_amount = XIX_amount - XVIII_amount
 
-        summary_receipt = {'11AI': XIAI_amount,
-                    '11AII': XIAII_amount,
-                    '11AIII': XIAIII_amount,
-                    '11B': XIB_amount,
-                    '11C': XIC_amount,
-                    '11D': XID_amount,
-                    '12': XII_amount,
-                    '13': XIII_amount,
-                    '14': XIV_amount,
-                    '15': XV_amount,
-                    '16': XVI_amount,
-                    '17': XVII_amount,
-                    '18A': XVIIIA_amount,
-                    '18B': XVIIIB_amount,
-                    '18C': XVIIIC_amount,
-                    '19': XIX_amount,
-                    '20': XX_amount
-                        }    
-        return summary_receipt
+        summary_receipt_list = [ {'line_item':'19', 'level':1, 'description':'Total Receipts', 'amt':XIX_amount},
+                                {'line_item':'11D', 'level':1, 'description':'Total Contributions', 'amt':XID_amount},
+                                {'line_item':'11A', 'level':2, 'description':'Total Individual Contributions', 'amt':XIA_amount},
+                                {'line_item':'11AI', 'level':3, 'description':'Itemized Individual Contributions', 'amt':XIAI_amount},
+                                {'line_item':'11AII', 'level':3, 'description':'Unitemized Individual Contributions', 'amt':XIAII_amount},
+                                {'line_item':'11B', 'level':2, 'description':'Party Committee Contributions', 'amt':XIB_amount},
+                                {'line_item':'11C', 'level':2, 'description':'Other Committee Contributions', 'amt':XIC_amount},
+                                {'line_item':'12', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XII_amount},
+                                {'line_item':'13', 'level':1, 'description':'All Loans Received', 'amt':XIII_amount},
+                                {'line_item':'14', 'level':1, 'description':'Loan Repayments Received', 'amt':XIV_amount},
+                                {'line_item':'15', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XV_amount},
+                                {'line_item':'16', 'level':1, 'description':'Candidate Refunds', 'amt':XVI_amount},
+                                {'line_item':'17', 'level':1, 'description':'Other Receipts', 'amt':XVII_amount},
+                                {'line_item':'18', 'level':1, 'description':'Total Transfers', 'amt':XVIII_amount},
+                                {'line_item':'18A', 'level':2, 'description':'Non-Federal Transfers', 'amt':XVIIIA_amount},
+                                {'line_item':'18B', 'level':2, 'description':'Levin Funds', 'amt':XVIIIB_amount},
+                                {'line_item':'20', 'level':1, 'description':'Total Federal Receipts', 'amt':XX_amount},
+                                ]
+        # summary_receipt = {'11AI': XIAI_amount,
+        #             '11AII': XIAII_amount,
+        #             '11A': XIA_amount,
+        #             '11B': XIB_amount,
+        #             '11C': XIC_amount,
+        #             '11D': XID_amount,
+        #             '12': XII_amount,
+        #             '13': XIII_amount,
+        #             '14': XIV_amount,
+        #             '15': XV_amount,
+        #             '16': XVI_amount,
+        #             '17': XVII_amount,
+        #             '18A': XVIIIA_amount,
+        #             '18B': XVIIIB_amount,
+        #             '18': XVIII_amount,
+        #             '19': XIX_amount,
+        #             '20': XX_amount
+        #                 }    
+        return summary_receipt_list
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
@@ -1814,7 +1870,7 @@ def summary_table(request):
         cmte_id = request.user.username
 
         if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
-            raise Exception ('Missing Input: Report_id is mandatory')
+            raise Exception ('Missing Input: report_id is mandatory')
 
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
@@ -1868,8 +1924,8 @@ def get_thirdNavigationTransactionTypes(request):
         period_receipt = summary_receipts(period_args)
         period_disbursement = summary_disbursements(period_args)
 
-        forms_obj = { 'Receipts': period_receipt.get('19'),
-                        'Disbursements': period_disbursement.get('31'),
+        forms_obj = { 'Receipts': period_receipt[0].get('amt'),
+                        'Disbursements': period_disbursement[0].get('amt'),
                         'Loans/Debts': 0,
                         'Others': 0}
         return Response(forms_obj, status=status.HTTP_200_OK)
@@ -1998,6 +2054,28 @@ def get_AmendmentIndicators(request):
     except Exception as e:
         return Response("The get_AmendmentIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_ItemizationIndicators(request):
+    try:
+        cmte_id = request.user.username
+      
+        data = """{
+                    "data":  [{
+                            "itemization_code": "I",
+                            "itemization_desc": "Itemized"
+                        },
+                       {
+                            "itemization_code": "U",
+                            "itemization_desc": "UnItemized"
+                        }]
+                  }
+                """
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_ItemizationIndicators API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    
 def get_f3x_SA_data(cmte_id, report_id):
     try:
         query_string = """SELECT * FROM public.sched_a WHERE cmte_id = %s AND report_id = %s"""

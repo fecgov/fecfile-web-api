@@ -6,6 +6,12 @@ import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 
+/**
+ * Try adding the ngModel attribute to the input fields and then using that like in the documentation.
+ * https://angular.io/api/forms/NgModel#description
+ * Then getting the value on change for the field.
+ */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +48,7 @@ export class IndividualReceiptService {
    *
    * @param      {string}  formType  The form type
    */
-  public saveScheduleA(formType: string): Observable<any> {
+  public saveSchedule(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -228,6 +234,28 @@ export class IndividualReceiptService {
           return false;
         })
       );
+  }
+
+  /**
+   * Gets the schedule after submitted.
+   *
+   * @param      {string}  formType  The form type
+   * @param      {any}     receipt   The receipt
+   */
+  public getSchedule(formType: string, receipt: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
+    const data: any = JSON.stringify(receipt);
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(url, {
+      headers: httpOptions,
+      params: {
+        report_id: receipt.report_id
+      }
+    });
   }
 
   public aggregateAmount(

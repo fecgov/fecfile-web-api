@@ -21,6 +21,7 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
+                  <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
                 </label>
                 <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
                   <ng-container *ngIf="col.inputGroup">
@@ -34,6 +35,7 @@
                         class="form-control"
                         [type]="col.type"
                         [name]="col.name"
+                        [maxlength]="col?.validation?.max"
                         [formControlName]="col.name"
                         [ngClass]="
                           frmIndividualReceipt.get(col.name)?.invalid &&
@@ -49,6 +51,7 @@
                       class="form-control"
                       [type]="col.type"
                       [name]="col.name"
+                      [maxlength]="col?.validation?.max"
                       [formControlName]="col.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col.name)?.invalid &&
@@ -96,6 +99,23 @@
                         Floating point numbers only.
                       </div>
                     </ng-container>
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.contributionDateInvalid"
+                      >
+                        Entered date is outside of the report coverage period. Please enter transactions for this
+                        coverage period only.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphanumeric"
+                      >
+                        Alphanumeric characters only.
+                      </div>
+                    </ng-container>                                        
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col.type === 'textarea'">

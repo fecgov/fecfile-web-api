@@ -298,18 +298,19 @@ export class SignComponent implements OnInit {
           this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
           this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
         } else  if (this.formType === '3X'){
-          this._form_details.additionalEmail_1 = this.frmSignee.get('additional_email_1').value;
-          this._form_details.additionalEmail_2 = this.frmSignee.get('additional_email_2').value;
+          this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
+          this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
         }
 
         if (this.formType === '99'){
           localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
         } else if (this.formType === '3X'){
-          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+           localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
         }
 
         if (this.formType === '3X'){
-          this._reportTypeService.saveReport(this.formType, 'Saved')
+          console.log("saveForm called form3x  saved...");
+           this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved')
           .subscribe(res => {
             if(res) {
               this.frmSaved = true;
@@ -353,6 +354,7 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
+    console.log("doSubmitForm called ...");
     let doSubmitFormSaved: boolean = false;
     if (this.formType === '3X'){
       let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
@@ -382,7 +384,7 @@ export class SignComponent implements OnInit {
       if (this.formType === '99'){
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
       } else if (this.formType === '3X'){
-        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+         localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
       }
          
       if(this.frmSignee.invalid) {
@@ -404,6 +406,7 @@ export class SignComponent implements OnInit {
                   .submitForm({}, this.formType)
                   .subscribe(res => {
                     if(res) {
+                      console.log(" response = ",res );
                       this.status.emit({
                         form: this.frmSignee,
                         direction: 'next',
@@ -432,21 +435,32 @@ export class SignComponent implements OnInit {
             });
           }
           else if (this.formType === '3X'){
-            this._reportTypeService.saveReport(this.formType, 'Submitted')
+            console.log("doSubmitForm called form3x not saved...");
+            this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted')
             .subscribe(res => {
-              if(res) {
-                this.frmSaved = true;
-  
-                let formSavedObj: any = {
-                  'saved': this.frmSaved
-                };
-    
-                  this._messageService
-                    .sendMessage({
-                      'form_submitted': true
-                    });
+             if(res) {
+                    /*this.frmSaved = true;
+      
+                    let formSavedObj: any = {
+                      'saved': this.frmSaved
+                    };*/
+                    console.log(" response = ",res );
+                    
+                    /*this.status.emit({
+                      form: this.frmSignee,
+                      direction: 'next',
+                      step: 'step_5',
+                      previousStep: this._step
+                    });*/
+
+                    this._router.navigate(['/submitform/3X']);
+
+                    this._messageService
+                      .sendMessage({
+                        'form_submitted': true
+                      });
                 }
-              }); 
+             }); 
             }
             // upto here 
         } else {
@@ -462,6 +476,7 @@ export class SignComponent implements OnInit {
                 .submitForm({}, this.formType)
                 .subscribe(res => {
                   if(res) {
+                    console.log(" response = ",res );
                     this.status.emit({
                       form: this.frmSignee,
                       direction: 'next',
@@ -476,22 +491,33 @@ export class SignComponent implements OnInit {
                   }
                 }); 
               } else if (this.formType === '3X'){
-                this._reportTypeService.saveReport(this.formType, 'Submitted')
+                console.log("doSubmitForm called form3x saved...");
+                this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted')
                 .subscribe(res => {
-                  if(res) {
-                    this.frmSaved = true;
-      
-                    let formSavedObj: any = {
-                      'saved': this.frmSaved
-                    };
-        
-                      this._messageService
-                        .sendMessage({
-                          'form_submitted': true
-                        });
+                 if(res) {
+                        console.log(" response = ",res );
+                        /*this.frmSaved = true;
+          
+                        let formSavedObj: any = {
+                          'saved': this.frmSaved
+                        };*/
+            
+                        /*this.status.emit({
+                          form: this.frmSignee,
+                          direction: 'next',
+                          step: 'step_5',
+                          previousStep: this._step
+                        });*/
+
+                        this._router.navigate(['/submitform/3X']);
+
+                        this._messageService
+                          .sendMessage({
+                            'form_submitted': true
+                          });
                     }
-                  }); 
-            }
+                 }); 
+            } 
           }
       }
    }
@@ -510,11 +536,13 @@ export class SignComponent implements OnInit {
      if(e.target.name === 'additional_email_1') {
        if (this.formType === '99'){
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+        this._form_details.additional_email_1 = e.target.value;
        } else if (this.formType === '3X'){
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+        this._form_details.additionalEmail1 = e.target.value;
        }
 
-       this._form_details.additional_email_1 = e.target.value;
+       
 
        if (this.formType === '99'){
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
@@ -534,11 +562,13 @@ export class SignComponent implements OnInit {
      } else if(e.target.name === 'additional_email_2') {
        if (this.formType === '99'){
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+        this._form_details.additional_email_2 = e.target.value;
        } else if (this.formType === '3X'){
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+        this._form_details.additionalEmail2 = e.target.value;
        } 
 
-       this._form_details.additional_email_2 = e.target.value;
+       
 
        if (this.formType === '99'){
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));

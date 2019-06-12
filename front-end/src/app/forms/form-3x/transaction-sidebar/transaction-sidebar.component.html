@@ -1,47 +1,38 @@
 <div class="form-sidebar">
   <header>
     <h3 class="text-center">Transaction Categories</h3>
-    <hr/>
+    <hr />
     <div class="search-field-container">
-      <div class="input-group">              
-        <input
-          type="text"
-          name="search"
-          class="search-input"
-          placeholder="Search by Type"
-          class="form-control py-1"
-        />
-      </div> 
+      <div class="input-group">
+        <input type="text" name="search" class="search-input" placeholder="Search by Type" class="form-control py-1" />
+      </div>
     </div>
   </header>
   <section>
-    <ul class="form-sidebar__links" >
+    <ul class="form-sidebar__links">
       <li
         [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
       >
         <div class="float-left">
-          <button
-            type="button"
-            class="btn btn-link"
-            value="{{ categoryType?.value }}"
-            (click)="selectItem($event)"
-          >
+          <button type="button" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
             <i class="plus-icon" aria-hidden="true"></i>
-           {{ categoryType?.text }}
+            {{ categoryType?.text }}
           </button>
         </div>
-        <span class="float-right amount" style="padding:.75em">
-          $0.00
-        </span>
+        <ng-container *ngIf="categoryType?.value === 'receipts'">
+          <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+        </ng-container>
+        <ng-container *ngIf="categoryType?.value !== 'receipts'">
+          <span class="float-right amount">
+            $0.00
+          </span>
+        </ng-container>
       </li>
     </ul>
   </section>
   <footer>
-    <div
-      class="form-sidebar__item"
-      *ngIf="cashOnHand?.showCashOnHand"
-    >
+    <div class="form-sidebar__item" *ngIf="cashOnHand?.showCashOnHand">
       <div class="form-sidebar-item__text">
         {{ cashOnHand.text }}
       </div>
@@ -60,16 +51,12 @@
           Summary
         </button>
       </div>
-      <ng-container *ngIf="step!=='step_3'">
+      <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            [routerLink]="['/signandSubmit', '3X']"
-          >
+          <button type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
             Sign &amp; Submit
           </button>
-        </div>        
+        </div>
       </ng-container>
     </div>
   </footer>
