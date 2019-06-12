@@ -153,20 +153,6 @@ export class ReportTypeSidebarComponent implements OnInit {
                           this.fromDate = dates[0].cvg_start_date;
                           this.toDate = dates[0].cvg_end_date;
                           this.dueDate = dates[0].due_date;
-
-                          // this._messageService.sendMessage({
-                          //   form: true,
-                          //   type: this._formType,
-                          //   reportType: this._reportType,
-                          //   validDates: true,
-                          //   electionDates: [
-                          //     {
-                          //       cvg_end_date: this.toDate,
-                          //       cvg_start_date: this.fromDate,
-                          //       due_date: this.dueDate
-                          //     }
-                          //   ]
-                          // });
                         }
                       }
                     }

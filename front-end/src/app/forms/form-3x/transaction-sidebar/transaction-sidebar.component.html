@@ -5,28 +5,29 @@
     <div class="search-field-container">
       <div class="input-group">
         <input type="text" name="search" class="search-input" placeholder="Search by Type" class="form-control py-1" />
-        <div class="input-group-append">
-          <span class="input-group-text">
-            <!-- <i class="search-icon text-grey" aria-hidden="true"></i> -->
-            <i class="search-icon" aria-hidden="true"></i>
-          </span>
-        </div>
       </div>
     </div>
   </header>
   <section>
     <ul class="form-sidebar__links">
-      <li [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
-        *ngFor="let categoryType of transactionCategories">
+      <li
+        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        *ngFor="let categoryType of transactionCategories"
+      >
         <div class="float-left">
           <button type="button" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
             <i class="plus-icon" aria-hidden="true"></i>
             {{ categoryType?.text }}
           </button>
         </div>
-        <span class="float-right amount" style="padding:.75em">
-          $0.00
-        </span>
+        <ng-container *ngIf="categoryType?.value === 'receipts'">
+          <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+        </ng-container>
+        <ng-container *ngIf="categoryType?.value !== 'receipts'">
+          <span class="float-right amount">
+            $0.00
+          </span>
+        </ng-container>
       </li>
     </ul>
   </section>
@@ -41,12 +42,16 @@
     </div>
     <div class="form-sidebar__btns">
       <div class="btn-row">
-        <button type="button" class="btn btn-secondary-gray" [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'financial_summary' }">
+        <button
+          type="button"
+          class="btn btn-secondary-gray"
+          [routerLink]="['/forms/form/', '3X']"
+          [queryParams]="{ step: 'financial_summary' }"
+        >
           Summary
         </button>
       </div>
-      <ng-container *ngIf="step!=='step_3'">
+      <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row">
           <button type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
             Sign &amp; Submit

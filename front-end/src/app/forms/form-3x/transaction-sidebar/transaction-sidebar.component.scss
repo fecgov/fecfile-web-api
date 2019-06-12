@@ -37,6 +37,9 @@
         padding-bottom: 15px;
         padding-top: 15px;
         vertical-align: middle;
+        .amount {
+          padding: 0.75em;
+        }
         &.selected {
           background-color: $shuttleGray;
           color: $white;
