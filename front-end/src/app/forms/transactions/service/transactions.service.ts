@@ -149,7 +149,10 @@ export class TransactionsService {
 
       request.filters = emptyFilters;
     }
-
+     
+    console.log(" Transaction Table request = ", request);
+    console.log(" Transaction Table httpOptions = ", httpOptions);
+  
     return this._http
     .post(
       `${environment.apiUrl}${url}`,
@@ -160,7 +163,7 @@ export class TransactionsService {
     )
     .pipe(map(res => {
         if (res) {
-          console.log('res: ', res);
+          console.log('Transaction Table res: ', res);
 
           return res;
         }
@@ -203,13 +206,14 @@ export class TransactionsService {
 
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
-      model.aggregate = 0;
+      model.aggregate = row.aggregate_amt ? row.aggregate_amt : 0;
       model.purposeDescription = row.purpose_description;
       model.contributorEmployer = row.employer;
       model.contributorOccupation = row.occupation;
       model.memoCode = row.memo_code;
       model.memoText = row.memo_text;
       model.deletedDate = row.deleted_date ? row.deleted_date : null;
+      model.itemized = row.itemized;
       modelArray.push(model);
     }
     return modelArray;
@@ -254,6 +258,9 @@ export class TransactionsService {
       case 'amount':
         name = 'transaction_amount';
         break;
+      case 'aggregate':
+        name = 'aggregate_amt';
+        break;
       case 'purposeDescription':
         name = 'purpose_description';
         break;
@@ -272,11 +279,13 @@ export class TransactionsService {
       case 'deletedDate':
         name = 'deleted_date';
         break;
+      case 'itemized':
+        name = 'itemized';
+        break;        
       default:
         // name = name;;
     }
     return name ? name : '';
-
   }
 
 
@@ -306,6 +315,7 @@ export class TransactionsService {
     serverObject.occupation = model.contributorOccupation;
     serverObject.memo_code = model.memoCode;
     serverObject.memo_text = model.memoText;
+    serverObject.itemized = model.itemized;
 
     return serverObject;
   }
@@ -368,7 +378,7 @@ export class TransactionsService {
         const fields = [ 'city', 'employer', 'occupation',
           'memo_code', 'memo_text', 'name', 'purpose_description', 'state',
           'street_1', 'transaction_id', 'transaction_type_desc', 'aggregate',
-          'transaction_amount_ui', 'transaction_date_ui', 'deleted_date_ui', 'zip_code_ui'];
+          'transaction_amount_ui', 'transaction_date_ui', 'deleted_date_ui', 'zip_code_ui', 'itemized'];
 
         for (let keyword of filters.keywords) {
           let filterType = FilterTypeEnum.contains;
@@ -465,6 +475,19 @@ export class TransactionsService {
           response.totalAmount += trx.transaction_amount;
         }
         response.totalTransactionCount++;
+      }
+    }
+
+    if (filters.filterItemizations) {
+      if (filters.filterItemizations.length > 0) {
+        isFilter = true;
+        const fields = ['itemized'];
+        let filteredItemizationArray = [];
+        for (const itemization of filters.filterItemizations) {
+          const filtered = this._filterPipe.transform(response.transactions, fields, itemization);
+          filteredItemizationArray = filteredItemizationArray.concat(filtered);
+        }
+        response.transactions = filteredItemizationArray;
       }
     }
   }
@@ -649,4 +672,29 @@ export class TransactionsService {
     return t1;
   }
 
+  public getItemizations(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/get_ItemizationIndicators';
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        /*.get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions,
+            params
+          }
+        );*/
+
+        .get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions
+          }
+        );
+   }
 }

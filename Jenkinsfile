@@ -57,7 +57,7 @@ pipeline {
               steps { buildBack("${VERSION}") }
             }
             stage("front-end") {
-              steps { imageBuild("${VERSION}", "awsqa") }
+              steps { imageBuild("${VERSION}qa", "awsqa") }
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
@@ -73,7 +73,7 @@ pipeline {
             //Deploy backend
             deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
-            deployToK8s("${VERSION}", "qa", "fecfile-frontend","fecnxg-frontend")
+            deployToK8s("${VERSION}qa", "qa", "fecfile-frontend","fecnxg-frontend")
           }
         }
       }
@@ -88,7 +88,7 @@ pipeline {
               steps { buildBack("${VERSION}") }
             }
             stage("front-end") {
-              steps { imageBuild("${VERSION}", "awsuat") }
+              steps { imageBuild("${VERSION}uat", "awsuat") }
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
@@ -104,7 +104,7 @@ pipeline {
             //Deploy backend
             deployToK8s("${VERSION}", "uat","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
-            deployToK8s("${VERSION}", "uat", "fecfile-frontend","fecnxg-frontend")
+            deployToK8s("${VERSION}uat", "uat", "fecfile-frontend","fecnxg-frontend")
           }
         }
       }
