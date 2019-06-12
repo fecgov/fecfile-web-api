@@ -9,10 +9,15 @@
     padding: 5px 15px 0 15px;
     position: relative;
     .input-group {
+      .form-control {
+      border: none !important;
+      }
       .input-group-append {
         .input-group-text {
+        background-color: white !important;
           .search-icon {
             left: 205px !important;
+
           }
         }
       }
