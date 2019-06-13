@@ -290,6 +290,7 @@ def create_f3x_expenditure_json_file(request):
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_type']
+                    response_dict_receipt['lineNumber'] = entity_obj['line_number']
 
                     response_dict_receipt['payeeOrganizationName'] = list_entity['entity_name']
                     response_dict_receipt['payeeLastName'] = list_entity['last_name']
@@ -489,6 +490,7 @@ def create_f3x_json_file(request):
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_type']
+                    response_dict_receipt['lineNumber'] = entity_obj['line_number']
 
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -529,6 +531,7 @@ def create_f3x_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
+                        response_dict_out['lineNumber'] = entity_child_obj['line_number']
 
                         response_dict_out['payeeLastName'] = list_child_entity['last_name']
                         response_dict_out['payeeFirstName'] = list_child_entity['first_name']
@@ -668,6 +671,7 @@ def create_f3x_partner_json_file(request):
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_type']
+                    response_dict_receipt['lineNumber'] = entity_obj['line_number']                      
 
                     response_dict_receipt['contributorOrganizationName']=list_entity['entity_name']
                     response_dict_receipt['contributorStreet1'] = list_entity['street_1']
@@ -703,7 +707,7 @@ def create_f3x_partner_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
-                       
+                        response_dict_out['lineNumber'] = entity_child_obj['line_number']   
 
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
@@ -863,7 +867,8 @@ def create_f3x_returned_bounced_json_file(request):
                     response_dict_out['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_out['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_out['entityType'] = list_entity['entity_type']
-                    
+                    response_dict_out['lineNumber'] = entity_obj['line_number']   
+
 
                     response_dict_out['contributorLastName'] = list_entity['last_name']
                     response_dict_out['contributorFirstName'] = list_entity['first_name']
@@ -999,6 +1004,7 @@ def create_f3x_reattribution_json_file(request):
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_type']
+                    response_dict_receipt['lineNumber'] = entity_obj['line_number']
 
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -1040,7 +1046,7 @@ def create_f3x_reattribution_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
-                       
+                        response_dict_out['lineNumber'] = entity_child_obj['line_number']
 
                         response_dict_out['contributorLastName'] = list_child_entity['last_name']
                         response_dict_out['contributorFirstName'] = list_child_entity['first_name']
@@ -1180,6 +1186,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                     response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
                     response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                     response_dict_receipt['entityType'] = list_entity['entity_type']
+                    response_dict_receipt['lineNumber'] = entity_obj['line_number']
 
                     response_dict_receipt['contributorLastName'] = list_entity['last_name']
                     response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -1193,7 +1200,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                     response_dict_receipt['contributorZip'] = list_entity['zip_code']
                     response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                     response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
-                    response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
+                    response_dict_receipt['contributionAggregate'] = entity_obj['aggregate_amt']
                     response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                     response_dict_receipt['contributorEmployer'] = list_entity['employer']
                     response_dict_receipt['contributorOccupation'] = list_entity['occupation']
@@ -1220,6 +1227,7 @@ def create_inkind_bitcoin_f3x_json_file(request):
                         response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                         response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                         response_dict_out['entityType'] = list_child_entity['entity_type']
+                        response_dict_out['lineNumber'] = entity_child_obj['line_number']
 
                         response_dict_out['payeeLastName'] = list_child_entity['last_name']
                         response_dict_out['payeeFirstName'] = list_child_entity['first_name']
