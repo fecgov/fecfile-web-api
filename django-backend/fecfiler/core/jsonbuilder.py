@@ -197,7 +197,7 @@ def get_committee_mater_values(cmte_id):
         else:
             forms_obj = forms_obj[0]
             committee_info_dict = {}
-            committee_info_dict['filercommitteeIdNumber'] = forms_obj['cmte_id']
+            committee_info_dict['committeeId'] = forms_obj['cmte_id']
             committee_info_dict['committeeName'] = forms_obj['cmte_name']
             committee_info_dict['street1'] = forms_obj['street_1']
             committee_info_dict['street2'] = forms_obj['street_2']
