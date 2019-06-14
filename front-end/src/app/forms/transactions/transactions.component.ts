@@ -18,7 +18,8 @@ export enum FilterTypes {
   amount = 'amount',
   date = 'date',
   state = 'state',
-  memoCode = 'memoCode'
+  memoCode = 'memoCode',
+  itemizations = 'itemizations'
 }
 
 /**
@@ -192,7 +193,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
     // Date
-
     if (filters.filterDateFrom && filters.filterDateTo) {
       const dateGroup = [];
       dateGroup.push(
@@ -276,6 +276,36 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.tagArray.push({type: FilterTypes.memoCode, prefix: null, group: ['Memo Code']});
       }
     }
+
+    // Itemizations
+    if (this.filters.filterItemizations) {
+      if (this.filters.filterItemizations.length > 0) {
+        const itemizedGroup = [];
+
+        // is tag showing? Then modify it is the curr position
+        // TODO put type strings in constants file as an enumeration
+        // They are also used in the filter component as well.
+
+        let itemizedTag = false;
+        for (const tag of this.tagArray) {
+          if (tag.type === FilterTypes.itemizations) {
+            itemizedTag = true;
+            for (const item of filters.filterItemizations) {
+              itemizedGroup.push(item);
+            }
+            tag.group = itemizedGroup;
+          }
+        }
+        // If tag is not already showing, add it to the tag array.
+        if (!itemizedTag) {
+          for (const item of filters.filterItemizations) {
+            itemizedGroup.push(item);
+          }
+          this.tagArray.push({type: FilterTypes.itemizations, prefix: 'Itemized', group: itemizedGroup});
+        }
+      }
+    }
+
 
     console.log('tagArray: ' + JSON.stringify(this.tagArray));
 
@@ -374,6 +404,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
+   * Remove the Itemized filter tag and inform the filter component to clear it.
+   */
+  public removeItemizationsFilter(index: number, item: string) {
+    this.filters.filterItemizations.splice(index, 1);
+    this.removeFilter(FilterTypes.itemizations, item);
+  }
+
+
+  /**
    * Inform the Filter Component to clear the filter settings for the given key/value.
    *
    * @param key
@@ -418,6 +457,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       case FilterTypes.memoCode:
         this.removeMemoFilter();
         this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.itemizations:
+        this.removeItemizationsFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
         break;
       default:
         console.log('unexpected type received for remove tag');

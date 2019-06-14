@@ -363,6 +363,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     for (const I of this.itemizations) {
       if (I.selected) {
         filterItemizations.push(I.code);
+        // filterItemizations.push(I.itemization_code); // should it be itemization_code - smahal
         modified = true;
       }
     }
@@ -532,7 +533,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
                 if (this.cachedFilters.filterItemizations) {
                   if (this.cachedFilters.filterItemizations.includes(s.code)) {
                     s.selected = true;
-                    this.isHideStateFilter = false;
+                    this.isHideItemizationFilter = false;
                   } else {
                     s.selected = false;
                   }
@@ -575,6 +576,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
         // Note state and type apply filters are handled after server call to get values.
+
+        // TODO itenized was left out and needs to be added.
 
       }
     } else {
@@ -679,6 +682,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             break;
           case FilterTypes.memoCode:
             this.filterMemoCode = false;
+            break;
+          case FilterTypes.itemizations:
+            for (const itemization of this.itemizations) {
+              if (itemization.itemization_code === message.value) { // smahal should it be itemization_code
+                itemization.selected = false;
+              }
+            }
             break;
           default:
             console.log('unexpected key for remove filter = ' + message.key);
