@@ -5,24 +5,42 @@
   margin-right: auto;
   min-height: 500px;
   position: relative;
-  .search-field-container {
+
+ 
+   .search-field-container {
     padding: 5px 15px 0 15px;
     position: relative;
-    .input-group {
-      .form-control {
-      border: none !important;
-      }
-      .input-group-append {
-        .input-group-text {
-        background-color: white !important;
-          .search-icon {
-            left: 205px !important;
-
-          }
-        }
-      }
-    }
   }
+
+  .search-field-container input {
+    @include make-text-input(175px, 1.5em, 1em, 1em);
+    margin-left: auto;
+    margin-right: auto;
+    position: relative; 
+  }
+  .search-field-container .search-icon { 
+    color: $shuttleGray;
+    position: absolute;
+    left: 200px;
+    top: 22px;
+  }
+  // .search-field-container {
+  //   padding: 5px 15px 0 15px;
+  //   position: relative;
+  //   .input-group {
+  //     .form-control {
+  //     border: none !important;
+  //     }
+  //     .input-group-append {
+  //       .input-group-text {
+  //       background-color: white !important;
+  //         .search-icon {
+  //           left: 205px !important;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
   section {
     .form-sidebar__links {
       list-style-type: none;
