@@ -5,7 +5,9 @@ import {
   Input,
   OnInit,
   Output,
+  OnChanges,
   Renderer,
+  SimpleChanges,
   ViewEncapsulation,
   ViewChild
 } from '@angular/core';
@@ -75,9 +77,17 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        this.formFields = res.data.formFields;
-        this.hiddenFields = res.data.hiddenFields;
-        this.states = res.data.states;
+        // this.formFields = res.data.formFields;
+        // this.hiddenFields = res.data.hiddenFields;
+        // this.states = res.data.states;
+
+        console.log('res: ', res);
+
+        this.formFields = res.formFields;
+        this.hiddenFields = res.hiddenFields;
+        this.states = res.states;
+
+        console.log('this.states: ', this.states);
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -173,27 +183,27 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if (this.frmIndividualReceipt.controls['ContributionDate']) {
-        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
+      if (this.frmIndividualReceipt.controls['contribution_date']) {
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
           contributionDate(cvgStartDate, cvgEndDate),
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
       }
     }
 
     if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
-        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
+      if (this.frmIndividualReceipt.controls['contribution_amount']) {
+        this.frmIndividualReceipt.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
 
-        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
       }
 
-      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
-        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
+      if (this.frmIndividualReceipt.controls['contribution_aggregate']) {
+        this.frmIndividualReceipt.controls['contribution_aggregate'].setValidators([floatingPoint()]);
 
-        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_aggregate'].updateValueAndValidity();
       }
     }
   }
@@ -221,7 +231,7 @@ export class IndividualReceiptComponent implements OnInit {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
-        if (field === 'ContributionDate') {
+        if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
@@ -234,8 +244,9 @@ export class IndividualReceiptComponent implements OnInit {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveSchedule(this._formType, this._transactionType).subscribe(res => {
+      this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
+          console.log('res: ', res);
           this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
             const message: any = {
               formType: this._formType,
@@ -244,6 +255,18 @@ export class IndividualReceiptComponent implements OnInit {
 
             this._messageService.sendMessage(message);
           });
+
+          this._receiptService
+            .aggregateAmount(
+              res.report_id,
+              res.transaction_type,
+              res.contribution_date,
+              res.entity_id,
+              res.contribution_amount
+            )
+            .subscribe(resp => {
+              console.log('resp: ', resp);
+            });
 
           this.frmIndividualReceipt.reset();
 

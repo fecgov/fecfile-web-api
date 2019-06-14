@@ -10,6 +10,8 @@ import { environment } from '../../../../environments/environment';
  * Try adding the ngModel attribute to the input fields and then using that like in the documentation.
  * https://angular.io/api/forms/NgModel#description
  * Then getting the value on change for the field.
+ *
+ * Also send email to Kelric to have it documented Praveen is using my computer.
  */
 
 @Injectable({
@@ -26,7 +28,8 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    // const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    const url: string = 'http://localhost:3000/data';
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -44,7 +47,7 @@ export class IndividualReceiptService {
   }
 
   /**
-   * Saves a schedule a.
+   * Saves a schedule.
    *
    * @param      {string}  formType  The form type
    */
@@ -55,10 +58,9 @@ export class IndividualReceiptService {
     const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
+    const formData: FormData = new FormData();
 
     let httpOptions = new HttpHeaders();
-    let params = new HttpParams();
-    let formData: FormData = new FormData();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -70,55 +72,63 @@ export class IndividualReceiptService {
       formData.append('report_id', reportType.reportid);
     }
 
-    // formData.append('report_id', reportType.reportId);
-    formData.append('transaction_type', '15');
-    formData.append('line_number', '11AI');
-    formData.append('first_name', receipt.ContributorFirstName);
-    formData.append('last_name', receipt.ContributorLastName);
-    formData.append('state', receipt.ContributorState);
-    formData.append('city', receipt.ContributorCity);
-    formData.append('zip_code', receipt.ContributorZip);
-    formData.append('occupation', receipt.ContributorOccupation);
-    formData.append('employer', receipt.ContributorEmployer);
-    formData.append('contribution_amount', receipt.ContributionAmount);
-    formData.append('contribution_date', receipt.ContributionDate);
-    formData.append('entity_type', receipt.EntityType);
-    if (receipt.ContributorMiddleName !== null) {
-      if (typeof receipt.ContributorMiddleName === 'string') {
-        formData.append('middle_name', receipt.ContributorMiddleName);
+    for (const [key, value] of Object.entries(receipt)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
       }
-    }
-    if (receipt.ContributorPrefix !== null) {
-      if (typeof receipt.ContributorPrefix === 'string') {
-        formData.append('prefix', receipt.ContributorPrefix);
-      }
-    }
-    if (receipt.ContributorSuffix !== null) {
-      if (typeof receipt.ContributorSuffix === 'string') {
-        formData.append('suffix', receipt.ContributorSuffix);
-      }
-    }
-    formData.append('street_1', receipt.ContributorStreet1);
-    if (receipt.ContributorStreet2 !== null) {
-      if (typeof receipt.ContributorStreet2 === 'string') {
-        formData.append('street_2', receipt.ContributorStreet2);
-      }
-    }
-    if (receipt.MemoText !== null) {
-      if (typeof receipt.MemoText === 'string') {
-        formData.append('memo_text', receipt.MemoText);
-      }
-    }
-    if (receipt.MemoCode !== null) {
-      if (typeof receipt.MemoCode === 'string') {
-        formData.append('memo_code', receipt.MemoCode);
-      }
-    }
-    if (receipt.ContributionPurposeDescription !== null) {
-      if (typeof receipt.ContributionPurposeDescription === 'string') {
-        formData.append('purpose_description', receipt.ContributionPurposeDescription);
-      }
-    }
+    }    
+
+    // // formData.append('report_id', reportType.reportId);
+    // formData.append('transaction_type', '15');
+    // formData.append('line_number', '11AI');
+    // formData.append('first_name', receipt.ContributorFirstName);
+    // formData.append('last_name', receipt.ContributorLastName);
+    // formData.append('state', receipt.ContributorState);
+    // formData.append('city', receipt.ContributorCity);
+    // formData.append('zip_code', receipt.ContributorZip);
+    // formData.append('occupation', receipt.ContributorOccupation);
+    // formData.append('employer', receipt.ContributorEmployer);
+    // formData.append('contribution_amount', receipt.ContributionAmount);
+    // formData.append('contribution_date', receipt.ContributionDate);
+    // formData.append('entity_type', receipt.EntityType);
+    // if (receipt.ContributorMiddleName !== null) {
+    //   if (typeof receipt.ContributorMiddleName === 'string') {
+    //     formData.append('middle_name', receipt.ContributorMiddleName);
+    //   }
+    // }
+    // if (receipt.ContributorPrefix !== null) {
+    //   if (typeof receipt.ContributorPrefix === 'string') {
+    //     formData.append('prefix', receipt.ContributorPrefix);
+    //   }
+    // }
+    // if (receipt.ContributorSuffix !== null) {
+    //   if (typeof receipt.ContributorSuffix === 'string') {
+    //     formData.append('suffix', receipt.ContributorSuffix);
+    //   }
+    // }
+    // formData.append('street_1', receipt.ContributorStreet1);
+    // if (receipt.ContributorStreet2 !== null) {
+    //   if (typeof receipt.ContributorStreet2 === 'string') {
+    //     formData.append('street_2', receipt.ContributorStreet2);
+    //   }
+    // }
+    // if (receipt.MemoText !== null) {
+    //   if (typeof receipt.MemoText === 'string') {
+    //     formData.append('memo_text', receipt.MemoText);
+    //   }
+    // }
+    // if (receipt.MemoCode !== null) {
+    //   if (typeof receipt.MemoCode === 'string') {
+    //     formData.append('memo_code', receipt.MemoCode);
+    //   }
+    // }
+    // if (receipt.ContributionPurposeDescription !== null) {
+    //   if (typeof receipt.ContributionPurposeDescription === 'string') {
+    //     formData.append('purpose_description', receipt.ContributionPurposeDescription);
+    //   }
+    // }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
@@ -258,6 +268,15 @@ export class IndividualReceiptService {
     });
   }
 
+  /**
+   * Returns aggregate total for contributor.
+   *
+   * @param      {number}  reportId            The report identifier
+   * @param      {string}  transactionType     The transaction type
+   * @param      {string}  contributionDate    The contribution date
+   * @param      {string}  entityId            The entity identifier
+   * @param      {number}  contributionAmount  The contribution amount
+   */
   public aggregateAmount(
     reportId: number,
     transactionType: string,
@@ -267,7 +286,13 @@ export class IndividualReceiptService {
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/sa/aggregate_amount`;
-    const data: any = {};
+    const data: any = {
+      report_id: reportId,
+      transaction_type: transactionType,
+      contribution_date: contributionDate,
+      entity_id: entityId,
+      contribution_amount: contributionAmount
+    };
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);

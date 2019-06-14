@@ -42,7 +42,7 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
-                  <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
+                  <ng-container *ngIf="!col?.validation?.required && !col.readOnly"> (Optional) </ng-container>
                 </label>
                 <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
                   <ng-container *ngIf="col.inputGroup">
@@ -73,6 +73,7 @@
                       [type]="col.type === 'date' ? col.type : 'text'"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
+                      [attr.readOnly]="col?.readOnly ? col?.readOnly : null"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -131,7 +132,7 @@
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea class="form-control" rows="5" name="{{ col.name }}" [formControlName]="col.name"></textarea>
                 </ng-container>
-                <ng-container *ngIf="col.type === 'select' && col.name === 'ContributorState'">
+                <ng-container *ngIf="col.type === 'select' && col.name === 'state'">
                   <ng-select
                     class="state-select"
                     [formControlName]="col.name"
