@@ -59,16 +59,22 @@ export class IndividualReceiptService {
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
     const formData: FormData = new FormData();
-
+    
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    /**
+     * This has to be removed. 
+     * I'm not hard coding anything any more.
+     * Or this has to be changed to just lower case.  This is not a 
+     * good practice at all.  Please do better then this.
+     */
     formData.append('cmte_id', committeeDetails.committeeid);
     // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
+    if (reportType.hasOwnProperty('reportId'))) {
       formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
+    } else if (reportType.hasOwnProperty('reportid') {
       formData.append('report_id', reportType.reportid);
     }
 
@@ -79,56 +85,6 @@ export class IndividualReceiptService {
         }
       }
     }    
-
-    // // formData.append('report_id', reportType.reportId);
-    // formData.append('transaction_type', '15');
-    // formData.append('line_number', '11AI');
-    // formData.append('first_name', receipt.ContributorFirstName);
-    // formData.append('last_name', receipt.ContributorLastName);
-    // formData.append('state', receipt.ContributorState);
-    // formData.append('city', receipt.ContributorCity);
-    // formData.append('zip_code', receipt.ContributorZip);
-    // formData.append('occupation', receipt.ContributorOccupation);
-    // formData.append('employer', receipt.ContributorEmployer);
-    // formData.append('contribution_amount', receipt.ContributionAmount);
-    // formData.append('contribution_date', receipt.ContributionDate);
-    // formData.append('entity_type', receipt.EntityType);
-    // if (receipt.ContributorMiddleName !== null) {
-    //   if (typeof receipt.ContributorMiddleName === 'string') {
-    //     formData.append('middle_name', receipt.ContributorMiddleName);
-    //   }
-    // }
-    // if (receipt.ContributorPrefix !== null) {
-    //   if (typeof receipt.ContributorPrefix === 'string') {
-    //     formData.append('prefix', receipt.ContributorPrefix);
-    //   }
-    // }
-    // if (receipt.ContributorSuffix !== null) {
-    //   if (typeof receipt.ContributorSuffix === 'string') {
-    //     formData.append('suffix', receipt.ContributorSuffix);
-    //   }
-    // }
-    // formData.append('street_1', receipt.ContributorStreet1);
-    // if (receipt.ContributorStreet2 !== null) {
-    //   if (typeof receipt.ContributorStreet2 === 'string') {
-    //     formData.append('street_2', receipt.ContributorStreet2);
-    //   }
-    // }
-    // if (receipt.MemoText !== null) {
-    //   if (typeof receipt.MemoText === 'string') {
-    //     formData.append('memo_text', receipt.MemoText);
-    //   }
-    // }
-    // if (receipt.MemoCode !== null) {
-    //   if (typeof receipt.MemoCode === 'string') {
-    //     formData.append('memo_code', receipt.MemoCode);
-    //   }
-    // }
-    // if (receipt.ContributionPurposeDescription !== null) {
-    //   if (typeof receipt.ContributionPurposeDescription === 'string') {
-    //     formData.append('purpose_description', receipt.ContributionPurposeDescription);
-    //   }
-    // }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
