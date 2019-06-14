@@ -53,7 +53,12 @@
               {{ formEndDate | date: 'MM/dd/yyyy' }}
             </div>
             <div>
-              Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              <ng-container *ngIf="reportOverDue">
+                Over due by {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              </ng-container>
+              <ng-container *ngIf="!reportOverDue">
+                Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              </ng-container>
               <a class="btn btn-link btn-edit" (click)="editFrom()">
                 <i class="edit-icon" aria-hidden="true"></i>
                 <span class="sr-only">Click to edit date.</span>
