@@ -9,6 +9,7 @@ import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
+import { FilterTypes } from '../transactions.component';
 
 
 /**
@@ -652,14 +653,14 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     if (message) {
       if (message.key) {
         switch (message.key) {
-          case 'state':
+          case FilterTypes.state:
             for (const st of this.states) {
               if (st.code === message.value) {
                 st.selected = false;
               }
             }
             break;
-          case 'category':
+          case FilterTypes.category:
             for (const categoryGroup of this.transactionCategories) {
               for (const categoryType of categoryGroup.options) {
                 if (categoryType.text === message.value) {
@@ -668,13 +669,16 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
               }
             }
             break;
-          case 'date':
+          case FilterTypes.date:
             this.filterDateFrom = null;
             this.filterDateTo = null;
             break;
-          case 'amount':
+          case FilterTypes.amount:
             this.filterAmountMin = null;
             this.filterAmountMax = null;
+            break;
+          case FilterTypes.memoCode:
+            this.filterMemoCode = false;
             break;
           default:
             console.log('unexpected key for remove filter = ' + message.key);

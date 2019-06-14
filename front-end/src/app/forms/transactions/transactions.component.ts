@@ -12,6 +12,15 @@ export enum ActiveView {
   edit = 'edit'
 }
 
+export enum FilterTypes {
+  keyword = 'keyword',
+  category = 'category',
+  amount = 'amount',
+  date = 'date',
+  state = 'state',
+  memoCode = 'memoCode'
+}
+
 /**
  * The parent component for transactions.
  */
@@ -43,6 +52,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public isShowFilters = false;
   public searchText = '';
   public searchTextArray = [];
+  public tagArray: any = [];
 
   /**
    * Subscription for applying filters to the transactions obtained from
@@ -73,7 +83,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .subscribe(
 
         (message: any) => {
-          this.filters = message.filters;
+          // this.filters = message.filters;
+          this.determineTags(message);
 
           if (message.isClearKeyword) {
             this.clearSearch();
@@ -144,6 +155,135 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
+   * Based on the filter settings and search string, determine the "tags" to show.
+   */
+  private determineTags(message: any) {
+
+    const filters = this.filters = message.filters;
+
+    // new and changed added filters should go at the end.
+    // unchanged should appear in the beginning.
+
+    if (filters.filterCategories.length > 0) {
+      const categoryGroup = [];
+
+      // is tag showing? Then modify it is the curr position
+      // TODO put type strings in constants file as an enumeration
+      // They are also used in the filter component as well.
+
+      let categoryTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.category) {
+          categoryTag = true;
+          for (const cat of filters.filterCategories) {
+            categoryGroup.push(cat);
+          }
+          tag.group = categoryGroup;
+        }
+      }
+      // If tag is not already showing, add it to the tag array.
+      if (!categoryTag) {
+        for (const cat of filters.filterCategories) {
+          categoryGroup.push(cat);
+        }
+        this.tagArray.push({type: FilterTypes.category, prefix: 'Type', group: categoryGroup});
+      }
+    }
+
+
+    // Date
+
+    if (filters.filterDateFrom && filters.filterDateTo) {
+      const dateGroup = [];
+      dateGroup.push(
+        {
+          filterDateFrom: filters.filterDateFrom,
+          filterDateTo: filters.filterDateTo
+        });
+      // is tag showing? Then modify it is the curr position
+      let dateTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.date) {
+          dateTag = true;
+          tag.group = dateGroup;
+        }
+      }
+      if (!dateTag) {
+        this.tagArray.push({type: FilterTypes.date, prefix: 'Date', group: dateGroup});
+      }
+    }
+
+
+    // Amount
+    if (filters.filterAmountMin && filters.filterAmountMax) {
+      const amountGroup = [];
+      amountGroup.push(
+        {
+          filterAmountMin: filters.filterAmountMin,
+          filterAmountMax: filters.filterAmountMax
+        });
+      // is tag showing? Then modify it is the curr position
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.amount) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({type: FilterTypes.amount, prefix: 'Amount', group: amountGroup});
+      }
+    }
+
+    // State
+    if (this.filters.filterStates.length > 0) {
+      const stateGroup = [];
+
+      // is tag showing? Then modify it is the curr position
+      // TODO put type strings in constants file as an enumeration
+      // They are also used in the filter component as well.
+
+      let stateTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.state) {
+          stateTag = true;
+          for (const cat of filters.filterStates) {
+            stateGroup.push(cat);
+          }
+          tag.group = stateGroup;
+        }
+      }
+      // If tag is not already showing, add it to the tag array.
+      if (!stateTag) {
+        for (const cat of filters.filterStates) {
+          stateGroup.push(cat);
+        }
+        this.tagArray.push({type: FilterTypes.state, prefix: null, group: stateGroup});
+      }
+    }
+
+    // Memo Code
+    if (this.filters.filterMemoCode) {
+      // if memo tag showing, do nothing.  If not showing, add it.
+      let memoTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.memoCode) {
+          memoTag = true;
+          break;
+        }
+      }
+      if (!memoTag) {
+        this.tagArray.push({type: FilterTypes.memoCode, prefix: null, group: ['Memo Code']});
+      }
+    }
+
+    console.log('tagArray: ' + JSON.stringify(this.tagArray));
+
+    this.filters = filters;
+  }
+
+
+  /**
    * Search transactions.
    */
   public search() {
@@ -156,6 +296,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     // TODO emit search message to the table transactions component
     if (this.searchText) {
       this.searchTextArray.push(this.searchText);
+      this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: [this.searchText]});
       this.searchText = '';
     }
     this.doSearch();
@@ -168,6 +309,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public clearSearch() {
     this.searchTextArray = [];
+    this.tagArray = [];
     this.searchText = '';
     this.doSearch();
   }
@@ -178,9 +320,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    *
    * @param index index in the array
    */
-  public removeSearchText(index: number) {
-    this.searchTextArray.splice(index, 1);
-    this.doSearch();
+  public removeSearchText(tagText: string) {
+    const index = this.searchTextArray.indexOf(tagText);
+    if (index !== -1) {
+      this.searchTextArray.splice(index, 1);
+      this.doSearch();
+    }
   }
 
 
@@ -189,7 +334,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public removeStateFilter(index: number, state: string) {
     this.filters.filterStates.splice(index, 1);
-    this.removeFilter('state', state);
+    this.removeFilter(FilterTypes.state, state);
   }
 
 
@@ -198,7 +343,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public removeCategoryFilter(index: number, category: string) {
     this.filters.filterCategories.splice(index, 1);
-    this.removeFilter('category', category);
+    this.removeFilter(FilterTypes.category, category);
   }
 
 
@@ -218,7 +363,13 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public removeAmountFilter() {
     this.filters.filterAmountMin = null;
     this.filters.filterAmountMax = null;
-    this.removeFilter('amount', null);
+    this.removeFilter(FilterTypes.amount, null);
+  }
+
+
+  public removeMemoFilter() {
+    this.filters.filterMemoCode = false;
+    this.removeFilter(FilterTypes.memoCode, null);
   }
 
 
@@ -231,6 +382,108 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   private removeFilter(key: string, value: string) {
     this._transactionsMessageService.sendRemoveFilterMessage({key: key, value: value});
     this.doSearch();
+  }
+
+
+  /**
+   * When a user clicks the close filter tag, delete the tag from the
+   * tagsArray and inform the filter component to reset the filter setting.
+   * 
+   * @param type filter type
+   * @param index position in the array if the filter type can have multiples
+   * @param tagText the text displayed on the tag
+   */
+  public removeTag(type: FilterTypes, index: number, tagText: string) {
+    switch (type) {
+      case FilterTypes.category:
+        this.removeCategoryFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.state:
+        this.removeStateFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.date:
+        this.removeDateFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.amount:
+        this.removeAmountFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.keyword:
+        this.removeSearchText(tagText);
+        this.removeSearchTagArrayItem(tagText);
+        break;
+      case FilterTypes.memoCode:
+        this.removeMemoFilter();
+        this.removeTagArrayItem(type);
+        break;
+      default:
+        console.log('unexpected type received for remove tag');
+    }
+  }
+
+  /**
+   * Remove the search keyword form the tagArray.
+   */
+  private removeSearchTagArrayItem(tagText: string) {
+    let i = 0;
+    for (const tag of this.tagArray) {
+      if (tag.type === FilterTypes.keyword) {
+        if (tag.group) {
+          if (tag.group.length > 0) {
+            if (tag.group[0] === tagText) {
+              this.tagArray.splice(i, 1);
+            }
+          }
+        }
+      }
+      i++;
+    }
+  }
+
+
+  /**
+   * Remove the entire object form the tagArray.
+   */
+  private removeTagArrayItem(type: FilterTypes) {
+    let i = 0;
+    for (const tag of this.tagArray) {
+      if (tag.type === type) {
+        break;
+      }
+      i++;
+    }
+    this.tagArray.splice(i, 1);
+  }
+
+
+  /**
+   * An item in the tagsArray may have a group as an array where 1 item in the group array
+   * is to be removed. If no group items exist after removing, the entire object
+   * will be removed from the tagsArray.
+   * 
+   * @param type filter type
+   * @param index index of the group array to remove
+   */
+  private removeTagArrayGroupItem(type: FilterTypes, index: number) {
+    let i = 0;
+    for (const tag of this.tagArray) {
+      if (tag.type === type) {
+        if (tag.group) {
+          if (tag.group.length > 0) {
+            tag.group.splice(index, 1);
+          }
+        }
+        // If no tags in the group, delete the item from the tagArray.
+        if (tag.group.length === 0) {
+          this.tagArray.splice(i, 1);
+        }
+        break;
+      }
+      i++;
+    }
   }
 
 

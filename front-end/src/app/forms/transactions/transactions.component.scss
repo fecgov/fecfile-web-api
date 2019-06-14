@@ -59,7 +59,7 @@
 
     .transactions__btn-container {
       height: 100%;
-      padding: 1em;
+      padding: 1em 1em 0 1em;
     }
 
     // .transactions__btn-search-wrapper {
@@ -75,21 +75,31 @@
     //   float: left;
     // }
 
-    .transactions__tag_wrapper {
-      // background-color: #e8e8e8;
-      width: fit-content;
-      .transactions__tag_group {
-        // margin-right: 7px;
-        background-color: lightgrey;
-        // padding: 20px 10px;
-        border-radius: 2px;
-        float: left;
-        margin: 3px;
-      }
-      .transactions__tag_btn {
-        margin: 15px 10px 15px 10px;
+    .transactions__tag-outer-wrapper {
+      display: inline-block;
+      width: 100%;
+      .transactions__tag_wrapper {
+        // background-color: #e8e8e8;
+        // width: fit-content;
+        .transactions__tag_group {
+          // margin-right: 7px;
+          background-color: lightgrey;
+          // padding: 20px 10px;
+          border-radius: 2px;
+          float: left;
+          // margin: 3px;
+          margin: 5px 20px 0px 0px;
+        }
+        .transactions__tag_btn {
+          margin: 6px;
+          // margin: 2px 20px 0px 0px;
+        }
+        .transactions__close-tag {
+          padding-right: .25em;
+        }
       }
     }
+
 
     .transactions__btn-search-filter {
       margin: 3px;
