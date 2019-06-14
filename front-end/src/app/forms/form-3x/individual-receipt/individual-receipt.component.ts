@@ -81,13 +81,9 @@ export class IndividualReceiptComponent implements OnInit {
         // this.hiddenFields = res.data.hiddenFields;
         // this.states = res.data.states;
 
-        console.log('res: ', res);
-
         this.formFields = res.formFields;
         this.hiddenFields = res.hiddenFields;
         this.states = res.states;
-
-        console.log('this.states: ', this.states);
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -190,20 +186,6 @@ export class IndividualReceiptComponent implements OnInit {
         ]);
 
         this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
-      }
-    }
-
-    if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['contribution_amount']) {
-        this.frmIndividualReceipt.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
-
-        this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
-      }
-
-      if (this.frmIndividualReceipt.controls['contribution_aggregate']) {
-        this.frmIndividualReceipt.controls['contribution_aggregate'].setValidators([floatingPoint()]);
-
-        this.frmIndividualReceipt.controls['contribution_aggregate'].updateValueAndValidity();
       }
     }
   }
