@@ -268,20 +268,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
         }
 
-        this._transactionsService.mockAddUIFileds(res);
-        // this._transactionsService.mockApplyRestoredTransaction(res);
-        // this._transactionsService.mockApplyFilters(res, this.filters);
+        this._transactionsService.addUIFileds(res);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
-
-        // this.transactionsModel = this._transactionsService.sortTransactions(
-        //   transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
-
         this.transactionsModel = transactionsModelL;
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
-        // this.config.totalItems = res.itemsPerPage * res['totalPages'];
         this.allTransactionsSelected = false;
       });
   }
@@ -315,7 +308,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsService.getUserDeletedTransactions(this.formType)
       .subscribe((res: GetTransactionsResponse) => {
 
-        this._transactionsService.mockAddUIFileds(res);
+        this._transactionsService.addUIFileds(res);
         this._transactionsService.mockApplyFilters(res, this.filters);
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
