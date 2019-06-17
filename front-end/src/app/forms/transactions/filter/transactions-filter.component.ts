@@ -85,6 +85,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideAmountFilter: boolean;
+  public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
   public isHideItemizationFilter: boolean;
@@ -94,11 +95,14 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
+  public filterAggregateAmountMin: number;
+  public filterAggregateAmountMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
   public filterMemoCode = false;
   public dateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
+  public aggregateAmountFilterValidation: ValidationErrorModel;
 
   /**
    * Subscription for removing selected filters.
@@ -117,7 +121,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.removeFilterSubscription = this._transactionsMessageService.getRemoveFilterMessage()
       .subscribe(
         (message: any) => {
-          this.removeFilter(message);
+          if (message) {
+            if (message.removeAll) {
+              this.clearFilters();
+            } else {
+              this.removeFilter(message);
+            }
+          }
         }
       );
   }
@@ -134,10 +144,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterDateTo = null;
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterAggregateAmountMin = null;
+    this.filterAggregateAmountMax = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
     this.isHideAmountFilter = true;
+    this.isHideAggregateAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
     this.isHideItemizationFilter = true;
@@ -182,6 +195,14 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleAmountFilterItem() {
     this.isHideAmountFilter = !this.isHideAmountFilter;
+  }
+
+
+  /**
+   * Toggle visibility of the Aggregate Amount filter
+   */
+  public toggleAggregateAmountFilterItem() {
+    this.isHideAggregateAmountFilter = !this.isHideAggregateAmountFilter;
   }
 
 
@@ -333,15 +354,22 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
     }
     filters.filterCategories = filterCategories;
-    // filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
+    filters.filterAggregateAmountMin = this.filterAggregateAmountMin;
+    filters.filterAggregateAmountMax = this.filterAggregateAmountMax;
 
     if (this.filterAmountMin !== null) {
       modified = true;
     }
     if (this.filterAmountMax !== null) {
+      modified = true;
+    }
+    if (this.filterAggregateAmountMin !== null) {
+      modified = true;
+    }
+    if (this.filterAggregateAmountMax !== null) {
       modified = true;
     }
 
@@ -363,7 +391,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     for (const I of this.itemizations) {
       if (I.selected) {
         filterItemizations.push(I.code);
-        // filterItemizations.push(I.itemization_code); // should it be itemization_code - smahal
+        // smahal: It appears property code does not exist and  it be itemization_code.
+        // Holding off on the change per Mahendra's request.
+        // filterItemizations.push(I.itemization_code);
         modified = true;
       }
     }
@@ -377,7 +407,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   /**
    * Clear all filter values.
    */
-  public clearFilters() {
+  private clearFilters() {
 
     this.initValidationErrors();
 
@@ -403,12 +433,21 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterAggregateAmountMin = null;
+    this.filterAggregateAmountMax = null;
+
     this.filterDateFrom = null;
     this.filterDateTo = null;
     this.filterMemoCode = false;
+  }
 
-    // get transactions without any filters applied.
-    this.applyFilters(true);
+
+  /**
+   * Clear all filter values and apply them by running the search.
+   */
+  public clearAndApplyFilters() {
+        this.clearFilters();
+        this.applyFilters(true);
   }
 
 
@@ -568,6 +607,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
         this.isHideAmountFilter = !(this.filterAmountMin > 0 && this.filterAmountMax > 0);
 
+        this.filterAggregateAmountMin = this.cachedFilters.filterAggregateAmountMin;
+        this.filterAggregateAmountMax = this.cachedFilters.filterAggregateAmountMax;
+        this.isHideAggregateAmountFilter = !(this.filterAggregateAmountMin > 0 && this.filterAggregateAmountMax > 0);
+
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
         // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
@@ -593,6 +636,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   private initValidationErrors() {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
+    this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
   }
 
 
@@ -643,6 +687,25 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    if (this.filterAggregateAmountMin !== null && this.filterAggregateAmountMax === null) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Maximum Aggregate Amount is required';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+    if (this.filterAggregateAmountMax !== null && this.filterAggregateAmountMin === null) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Minimum Aggregate Amount is required';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+    if (this.filterAggregateAmountMin > this.filterAggregateAmountMax) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+
     return true;
   }
 
@@ -679,6 +742,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
           case FilterTypes.amount:
             this.filterAmountMin = null;
             this.filterAmountMax = null;
+            break;
+          case FilterTypes.aggregateAmount:
+            this.filterAggregateAmountMin = null;
+            this.filterAggregateAmountMax = null;
             break;
           case FilterTypes.memoCode:
             this.filterMemoCode = false;

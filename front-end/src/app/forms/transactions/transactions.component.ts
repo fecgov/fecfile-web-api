@@ -16,6 +16,7 @@ export enum FilterTypes {
   keyword = 'keyword',
   category = 'category',
   amount = 'amount',
+  aggregateAmount = 'aggregateAmount',
   date = 'date',
   state = 'state',
   memoCode = 'memoCode',
@@ -84,14 +85,13 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .subscribe(
 
         (message: any) => {
-          // this.filters = message.filters;
           this.determineTags(message);
 
           if (message.isClearKeyword) {
             this.clearSearch();
+          } else {
+            this.doSearch();
           }
-
-          this.doSearch();
         }
       );
 
@@ -222,7 +222,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           filterAmountMin: filters.filterAmountMin,
           filterAmountMax: filters.filterAmountMax
         });
-      // is tag showing? Then modify it is the curr position
       let amtTag = false;
       for (const tag of this.tagArray) {
         if (tag.type === FilterTypes.amount) {
@@ -231,7 +230,30 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       }
       if (!amtTag) {
-        this.tagArray.push({type: FilterTypes.amount, prefix: 'Amount', group: amountGroup});
+        this.tagArray.push({type: FilterTypes.amount,
+          prefix: 'Amount', group: amountGroup});
+      }
+    }
+
+
+    // Aggregate Amount
+    if (filters.filterAggregateAmountMin && filters.filterAggregateAmountMax) {
+      const amountGroup = [];
+      amountGroup.push(
+        {
+          filterAggregateAmountMin: filters.filterAggregateAmountMin,
+          filterAggregateAmountMax: filters.filterAggregateAmountMax
+        });
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.aggregateAmount) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({type: FilterTypes.aggregateAmount,
+          prefix: 'Aggregate Amount', group: amountGroup});
       }
     }
 
@@ -335,13 +357,29 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Clear the search filters
+   * Clear the keyword search items
    */
   public clearSearch() {
     this.searchTextArray = [];
     this.tagArray = [];
     this.searchText = '';
     this.doSearch();
+  }
+
+
+    /**
+   * Clear the keyword search items
+   */
+  public clearSearchAndFilters() {
+
+    // send a message to remove the filters from UI.
+    this._transactionsMessageService.sendRemoveFilterMessage({removeAll: true});
+
+    // And reset the filter model for the search.
+    this.filters = new TransactionFilterModel();
+
+    // then clear the keywords and run the search without filters or search keywords.
+    this.clearSearch();
   }
 
 
@@ -397,6 +435,16 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
 
+  /**
+   * Remove the Aggregate Amount filter tag and inform the filter component to clear it.
+   */
+  public removeAggregateAmountFilter() {
+    this.filters.filterAggregateAmountMin = null;
+    this.filters.filterAggregateAmountMax = null;
+    this.removeFilter(FilterTypes.aggregateAmount, null);
+  }
+
+
   public removeMemoFilter() {
     this.filters.filterMemoCode = false;
     this.removeFilter(FilterTypes.memoCode, null);
@@ -427,7 +475,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   /**
    * When a user clicks the close filter tag, delete the tag from the
    * tagsArray and inform the filter component to reset the filter setting.
-   * 
+   *
    * @param type filter type
    * @param index position in the array if the filter type can have multiples
    * @param tagText the text displayed on the tag
@@ -448,6 +496,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         break;
       case FilterTypes.amount:
         this.removeAmountFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.aggregateAmount:
+        this.removeAggregateAmountFilter();
         this.removeTagArrayItem(type);
         break;
       case FilterTypes.keyword:
@@ -506,7 +558,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * An item in the tagsArray may have a group as an array where 1 item in the group array
    * is to be removed. If no group items exist after removing, the entire object
    * will be removed from the tagsArray.
-   * 
+   *
    * @param type filter type
    * @param index index of the group array to remove
    */

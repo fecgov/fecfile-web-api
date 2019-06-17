@@ -95,7 +95,7 @@
           <label for="filter-amount-min">Minimum</label>
           <div class="input-group transactions__filter-multi-input">
             <div class="input-group-prepend">
-              <span class="input-group-text" id="filter-min-amount">
+              <span class="input-group-text" id="filter-amount-min">
                   <i class="dollar-sign-icon" aria-hidden="true"></i>
               </span>
             </div>
@@ -130,6 +130,55 @@
           </div>          
         </div>
       </div> 
+
+      <div class="card">
+          <div class="card-header transactions__filter-title" (click)="toggleAggregateAmountFilterItem()">
+            Aggregate Amount
+            <i class="float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideAggregateAmountFilter)">
+            </i>
+          </div>
+          <div class="card-body" [@openClose]="!isHideAggregateAmountFilter ? 'open' : 'closed'">
+            <div *ngIf="aggregateAmountFilterValidation.isError" class="text-error text-center">
+              {{ aggregateAmountFilterValidation.message }}
+            </div>            
+            <label for="filter-aggregate-amount-min">Minimum</label>
+            <div class="input-group transactions__filter-multi-input">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="">
+                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                type="number"
+                min="0" value="0"
+                name="minAggreateAmount"
+                [(ngModel)]="filterAggregateAmountMin"
+                class="form-control"
+                id="filter-aggregate-amount-min"
+                aria-label="Filter Min Aggregate Amount"
+              >                        
+            </div>
+            <label for="filter-aggregate-amount-max">Maximum</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="">
+                    <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                type="number"
+                name="maxAggregateAmount"
+                min="0" value="0"
+                [(ngModel)]="filterAggregateAmountMax"
+                class="form-control"
+                id="filter-aggregate-amount-max"
+                aria-label="Filter Max Aggregate Amount"
+              >                        
+            </div>          
+          </div>
+        </div> 
+
       <div class="card">
         <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
           State
@@ -199,7 +248,7 @@
       <div class="btn-row">
         <a
           class="btn btn-secondary-gray"
-          (click)="clearFilters()"
+          (click)="clearAndApplyFilters()"
         >
           Clear Filters
         </a>
