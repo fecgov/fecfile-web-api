@@ -390,10 +390,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
-        filterItemizations.push(I.code);
-        // smahal: It appears property code does not exist and  it be itemization_code.
-        // Holding off on the change per Mahendra's request.
-        // filterItemizations.push(I.itemization_code);
+        filterItemizations.push(I.itemization_code);
         modified = true;
       }
     }
@@ -752,7 +749,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             break;
           case FilterTypes.itemizations:
             for (const itemization of this.itemizations) {
-              if (itemization.itemization_code === message.value) { // smahal should it be itemization_code
+              if (itemization.itemization_code === message.value) {
                 itemization.selected = false;
               }
             }
