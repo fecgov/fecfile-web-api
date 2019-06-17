@@ -1864,6 +1864,336 @@ def summary_receipts(args):
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
+def summary_disbursements_for_sumamry_table(args):
+    try:
+        
+        XXIAI_amount = 0
+        XXIAII_amount = 0
+        XXIB_amount = 0
+        XXI_amount = 0
+        XXII_amount = 0
+        XXIII_amount = 0
+        XXIV_amount = 0
+        XXV_amount = 0
+        XXVI_amount = 0
+        XXVII_amount = 0
+        XXVIIIA_amount = 0
+        XXVIIIB_amount = 0
+        XXVIIIC_amount = 0
+        XXVIII_amount = 0
+        XXIX_amount = 0
+        XXXAI_amount = 0
+        XXXAII_amount = 0
+        XXXB_amount = 0
+        XXX_amount = 0
+        XXXI_amount = 0
+        XXXII_amount = 0       
+
+        XXIAI_amount_ytd = 0
+        XXIAII_amount_ytd = 0
+        XXIB_amount_ytd = 0
+        XXI_amount_ytd = 0
+        XXII_amount_ytd = 0
+        XXIII_amount_ytd = 0
+        XXIV_amount_ytd = 0
+        XXV_amount_ytd = 0
+        XXVI_amount_ytd = 0
+        XXVII_amount_ytd = 0
+        XXVIIIA_amount_ytd = 0
+        XXVIIIB_amount_ytd = 0
+        XXVIIIC_amount_ytd = 0
+        XXVIII_amount_ytd = 0
+        XXIX_amount_ytd = 0
+        XXXAI_amount_ytd = 0
+        XXXAII_amount_ytd = 0
+        XXXB_amount_ytd = 0
+        XXX_amount_ytd = 0
+        XXXI_amount_ytd = 0
+        XXXII_amount_ytd = 0               
+
+        '''
+        if len(args) == 2:
+            cmte_id = args[0]
+            report_id = args[1]
+            sql_output = period_disbursements_sql(cmte_id, report_id)
+        else:
+            cmte_id = args[0]
+            calendar_start_dt = args[1]
+            calendar_end_dt = args[2]
+            sql_output = calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt)
+        '''
+        calendar_start_dt = args[0]
+        calendar_end_dt = args[1]
+        cmte_id = args[2]
+        report_id = args[3]
+
+        sql_output = period_disbursements_sql(cmte_id, report_id )
+        for row in sql_output:
+            data_row = list(row)
+            if data_row[0] == '21AI':
+                XXIAI_amount = XXIAI_amount + data_row[1]
+                XXIAI_amount_ytd = data_row[2]
+            if data_row[0] == '21AII':
+                XXIAII_amount = XXIAII_amount + data_row[1]
+                XXIAII_amount_ytd = data_row[2]
+            if data_row[0] == '21B':
+                XXIB_amount = XXIB_amount + data_row[1]
+                XXIB_amount_ytd = data_row[2]
+            if data_row[0] == '22':
+                XXII_amount = XXII_amount + data_row[1]
+                XXII_amount_ytd = data_row[2]
+            if data_row[0] == '23':
+                XXIII_amount = XXIII_amount + data_row[1]
+                XXIII_amount_ytd = XXIV_amount
+            if data_row[0] == '24':
+                XXIV_amount = XXIV_amount + data_row[1]
+                XXIV_amount_ytd = XXIV_amount
+            if data_row[0] == '25':
+                XXV_amount = XXV_amount + data_row[1]
+                XXV_amount_ytd = data_row[2]
+            if data_row[0] == '26':
+                XXVI_amount = XXVI_amount + data_row[1]
+                XXVI_amount_ytd = data_row[2]
+            if data_row[0] == '27':
+                XXVII_amount = XXVII_amount + data_row[1]
+                XXVII_amount_ytd = data_row[2]
+            if data_row[0] == '28A':
+                XXVIIIA_amount = XXVIIIA_amount + data_row[1]
+                XXVIIIA_amount_ytd = data_row[2]
+            if data_row[0] == '28B':
+                XXVIIIB_amount = XXVIIIB_amount + data_row[1]
+                XXVIIIB_amount_ytd = data_row[2]
+            if data_row[0] == '28C':
+                XXVIIIC_amount = XXVIIIC_amount + data_row[1]
+                XXVIIIC_amount_ytd = data_row[2]
+            if data_row[0] == '29':
+                XXIX_amount = XXIX_amount + data_row[1]
+                XXIX_amount_ytd = data_row[2]
+            if data_row[0] == '30AI':
+                XXXAI_amount = XXXAI_amount + data_row[1]
+                XXXAI_amount_ytd = data_row[2]
+            if data_row[0] == '30AII':
+                XXXAII_amount = XXXAII_amount + data_row[1]
+                XXXAII_amount_ytd = data_row[2]
+            if data_row[0] == '30B':
+                XXXB_amount = XXXB_amount + data_row[1]
+                XXXB_amount_ytd = data_row[2]
+
+        XXI_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
+        XXI_amount_ytd = XXIAI_amount_ytd + XXIAII_amount_ytd + XXIB_amount_ytd
+
+        XXVIII_amount = XXVIIIA_amount + XXVIIIB_amount + XXVIIIC_amount
+        XXVIII_amount_ytd = XXVIIIA_amount_ytd + XXVIIIB_amount_ytd + XXVIIIC_amount_ytd
+        
+        XXX_amount = XXXAI_amount + XXXAII_amount + XXXB_amount
+        XXX_amount_ytd = XXXAI_amount_ytd + XXXAII_amount_ytd + XXXB_amount_ytd
+
+        XXXI_amount = XXI_amount + XXII_amount + XXIII_amount + XXIV_amount + XXV_amount + XXVI_amount + XXVII_amount + XXVIII_amount + XXIX_amount + XXX_amount
+        XXXI_amount_ytd = XXI_amount_ytd + XXII_amount_ytd + XXIII_amount_ytd + XXIV_amount_ytd + XXV_amount_ytd + XXVI_amount_ytd + XXVII_amount_ytd + XXVIII_amount_ytd + XXIX_amount_ytd + XXX_amount_ytd
+
+        XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
+        XXXII_amount_ytd = XXXI_amount_ytd - XXIAII_amount_ytd - XXXAII_amount_ytd
+
+        summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount, 'amt_ytd':XXXI_amount_ytd},
+                                {'line_item':'21', 'level':1, 'description':'Operating Expenditures', 'amt':XXI_amount, 'amt_ytd':XXI_amount_ytd},
+                                {'line_item':'21AI', 'level':2, 'description':'Total Individual Contributions', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
+                                {'line_item':'21AII', 'level':2, 'description':'Itemized Individual Contributions', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
+                                {'line_item':'21B', 'level':2, 'description':'Unitemized Individual Contributions', 'amt':XXIB_amount, 'amt_ytd':XXIB_amount_ytd},
+                                {'line_item':'22', 'level':1, 'description':'Party Committee Contributions', 'amt':XXII_amount, 'amt_ytd':XXII_amount_ytd},
+                                {'line_item':'23', 'level':1, 'description':'Other Committee Contributions', 'amt':XXIII_amount, 'amt_ytd':XXIII_amount_ytd},
+                                {'line_item':'24', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XXIV_amount, 'amt_ytd':XXIV_amount_ytd},
+                                {'line_item':'25', 'level':1, 'description':'All Loans Received', 'amt':XXV_amount, 'amt_ytd':XXV_amount_ytd},
+                                {'line_item':'27', 'level':1, 'description':'Loan Repayments Received', 'amt':XXVII_amount, 'amt_ytd':XXVII_amount_ytd},
+                                {'line_item':'26', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XXVI_amount, 'amt_ytd':XXVI_amount_ytd},
+                                {'line_item':'28', 'level':1, 'description':'Candidate Refunds', 'amt':XXVIII_amount, 'amt_ytd':XXVIII_amount_ytd},
+                                {'line_item':'28A', 'level':2, 'description':'Other Receipts', 'amt':XXVIIIA_amount, 'amt_ytd':XXVIIIA_amount_ytd},
+                                {'line_item':'28B', 'level':2, 'description':'Total Transfers', 'amt':XXVIIIB_amount, 'amt_ytd':XXVIIIB_amount_ytd},
+                                {'line_item':'28C', 'level':2, 'description':'Non-Federal Transfers', 'amt':XXVIIIC_amount, 'amt_ytd':XXVIIIC_amount_ytd},
+                                {'line_item':'29', 'level':1, 'description':'Levin Funds', 'amt':XXIX_amount, 'amt_ytd':XXIX_amount_ytd},
+                                {'line_item':'30', 'level':1, 'description':'Total Federal Receipts', 'amt':XXX_amount, 'amt_ytd':XXX_amount_ytd},
+                                {'line_item':'30AI', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAI_amount, 'amt_ytd':XXXAI_amount_ytd},
+                                {'line_item':'30AII', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXAII_amount, 'amt_ytd':XXXAII_amount_ytd},
+                                {'line_item':'30B', 'level':2, 'description':'Total Federal Receipts', 'amt':XXXB_amount, 'amt_ytd':XXXB_amount_ytd},
+                                {'line_item':'32', 'level':1, 'description':'Total Federal Receipts', 'amt':XXXII_amount, 'amt_ytd':XXXII_amount_ytd},
+                                ]
+
+        # summary_disbursement = {'21AI': XXIAI_amount,
+        #             '21AII': XXIAII_amount,
+        #             '21B': XXIB_amount,
+        #             '21': XXI_amount,
+        #             '22': XXII_amount,
+        #             '23': XXIII_amount,
+        #             '24': XXIV_amount,
+        #             '25': XXV_amount,
+        #             '26': XXVI_amount,
+        #             '27': XXVII_amount,
+        #             '28A': XXVIIIA_amount,
+        #             '28B': XXVIIIB_amount,
+        #             '28C': XXVIIIC_amount,
+        #             '28': XXVIII_amount,
+        #             '29': XXIX_amount,
+        #             '30AI': XXXAI_amount,
+        #             '30AII': XXXAII_amount,
+        #             '30B': XXXB_amount,
+        #             '30': XXX_amount,
+        #             '31': XXXI_amount,
+        #             '32': XXXII_amount
+        #                 }    
+        return summary_disbursement_list
+    except Exception as e:
+        raise Exception('The summary_receipts API is throwing the error: ' + str(e))
+
+def summary_receipts_for_sumamry_table(args):
+    try:
+        XIAI_amount = 0
+        XIAII_amount = 0
+        XIA_amount = 0
+        XIB_amount = 0
+        XIC_amount = 0
+        XID_amount = 0
+        XII_amount = 0
+        XIII_amount = 0
+        XIV_amount = 0
+        XV_amount = 0
+        XVI_amount = 0
+        XVII_amount = 0
+        XVIIIA_amount = 0
+        XVIIIB_amount = 0
+        XVIII_amount = 0
+        XIX_amount = 0
+        XX_amount = 0
+        
+        XIAI_amount_ytd = 0
+        XIAII_amount_ytd = 0
+        XIA_amount_ytd = 0
+        XIB_amount_ytd = 0
+        XIC_amount_ytd = 0
+        XID_amount_ytd = 0
+        XII_amount_ytd = 0
+        XIII_amount_ytd = 0
+        XIV_amount_ytd = 0
+        XV_amount_ytd = 0
+        XVI_amount_ytd = 0
+        XVII_amount_ytd = 0
+        XVIIIA_amount_ytd = 0
+        XVIIIB_amount_ytd = 0
+        XVIII_amount_ytd = 0
+        XIX_amount_ytd = 0
+        XX_amount_ytd = 0
+
+        '''
+        if len(args) == 2:
+            cmte_id = args[0]
+            report_id = args[1]
+            sql_output = period_receipts_sql(cmte_id, report_id)
+        else:
+            cmte_id = args[0]
+            calendar_start_dt = args[1]
+            calendar_end_dt = args[2]
+            sql_output = calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt)
+        '''    
+        print("args = ", args)
+        calendar_start_dt = args[0]
+        calendar_end_dt = args[1]
+        print("calendar_start_dt =", calendar_start_dt)
+        cmte_id = args[2]
+        report_id = args[3]
+
+        sql_output = period_receipts_sql(cmte_id, report_id )
+        for row in sql_output:
+            data_row = list(row)
+            if data_row[0] == '11AI':
+                XIAI_amount = XIAI_amount + data_row[1]
+                XIAI_amount_ytd = data_row[2]
+            if data_row[0] == '11AII':
+                XIAII_amount = XIAII_amount + data_row[1]
+                XIAII_amount_ytd = data_row[2]
+            if data_row[0] == '11B':
+                XIB_amount = XIB_amount + data_row[1]
+                XIB_amount_ytd = data_row[2]
+            if data_row[0] == '11C':
+                XIC_amount = XIC_amount + data_row[1]
+                XIC_amount_ytd = data_row[2]
+            if data_row[0] == '12':
+                XII_amount = XII_amount + data_row[1]
+                XII_amount_ytd = data_row[2]
+            if data_row[0] == '13':
+                XIII_amount = XIII_amount + data_row[1]
+                XIII_amount_ytd = data_row[2]
+            if data_row[0] == '14':
+                XIV_amount = XIV_amount + data_row[1]
+                XIV_amount_ytd = data_row[2]
+            if data_row[0] == '15':
+                XV_amount = XV_amount + data_row[1]
+                XV_amount_ytd = data_row[2]
+            if data_row[0] == '16':
+                XVI_amount = XVI_amount + data_row[1]
+                XVI_amount_ytd = data_row[2]
+            if data_row[0] == '17':
+                XVII_amount = XVII_amount + data_row[1]
+                XVII_amount_ytd = data_row[2]
+            if data_row[0] == '18A':
+                XVIIIA_amount = XVIIIA_amount + data_row[1]
+                XVIIIA_amount_ytd = data_row[2]
+            if data_row[0] == '18B':
+                XVIIIB_amount = XVIIIB_amount + data_row[1]
+                XVIIIB_amount_ytd = data_row[2]
+
+        XIA_amount = XIAI_amount + XIAII_amount
+        XIA_amount_ytd = XIAI_amount_ytd + XIAII_amount_ytd
+
+        XID_amount = XIA_amount + XIB_amount + XIC_amount
+        XID_amount_ytd = XIA_amount_ytd + XIB_amount_ytd + XIC_amount_ytd
+
+        XVIII_amount = XVIIIA_amount + XVIIIB_amount
+        VIII_amount_ytd = XVIIIA_amount_ytd + XVIIIB_amount_ytd
+
+        XIX_amount =  XID_amount + XII_amount + XIII_amount + XIV_amount + XV_amount + XVI_amount + XVII_amount + XVIII_amount
+        XIX_amount_ytd =  XID_amount_ytd + XII_amount_ytd + XIII_amount_ytd + XIV_amount_ytd + XV_amount_ytd + XVI_amount_ytd + XVII_amount_ytd + XVIII_amount_ytd
+
+        XX_amount = XIX_amount - XVIII_amount
+        XX_amount_ytd = XIX_amount_ytd - XVIII_amount_ytd
+
+        summary_receipt_list = [ {'line_item':'19', 'level':1, 'description':'Total Receipts', 'amt':XIX_amount, 'amt_ytd':XIX_amount_ytd},
+                                {'line_item':'11D', 'level':1, 'description':'Total Contributions', 'amt':XID_amount, 'amt_ytd':XID_amount_ytd},
+                                {'line_item':'11A', 'level':2, 'description':'Total Individual Contributions', 'amt':XIA_amount, 'amt_ytd':XIA_amount_ytd},
+                                {'line_item':'11AI', 'level':3, 'description':'Itemized Individual Contributions', 'amt':XIAI_amount, 'amt_ytd':XIAI_amount_ytd},
+                                {'line_item':'11AII', 'level':3, 'description':'Unitemized Individual Contributions', 'amt':XIAII_amount, 'amt_ytd':XIAII_amount_ytd},
+                                {'line_item':'11B', 'level':2, 'description':'Party Committee Contributions', 'amt':XIB_amount, 'amt_ytd':XIB_amount_ytd},
+                                {'line_item':'11C', 'level':2, 'description':'Other Committee Contributions', 'amt':XIC_amount, 'amt_ytd':XIC_amount_ytd},
+                                {'line_item':'12', 'level':1, 'description':'Transfers From Affiliated Committees', 'amt':XII_amount, 'amt_ytd':XII_amount_ytd},
+                                {'line_item':'13', 'level':1, 'description':'All Loans Received', 'amt':XIII_amount,  'amt_ytd':XIII_amount_ytd},
+                                {'line_item':'14', 'level':1, 'description':'Loan Repayments Received', 'amt':XIV_amount, 'amt_ytd':XIV_amount_ytd},
+                                {'line_item':'15', 'level':1, 'description':'Offsets to Operating Expenditures', 'amt':XV_amount,  'amt_ytd':XV_amount_ytd},
+                                {'line_item':'16', 'level':1, 'description':'Candidate Refunds', 'amt':XVI_amount, 'amt_ytd':XVI_amount_ytd},
+                                {'line_item':'17', 'level':1, 'description':'Other Receipts', 'amt':XVII_amount, 'amt_ytd':XVII_amount_ytd},
+                                {'line_item':'18', 'level':1, 'description':'Total Transfers', 'amt':XVIII_amount, 'amt_ytd':XVIII_amount_ytd},
+                                {'line_item':'18A', 'level':2, 'description':'Non-Federal Transfers', 'amt':XVIIIA_amount, 'amt_ytd':XVIIIA_amount_ytd},
+                                {'line_item':'18B', 'level':2, 'description':'Levin Funds', 'amt':XVIIIB_amount, 'amt_ytd':XVIIIB_amount_ytd},
+                                {'line_item':'20', 'level':1, 'description':'Total Federal Receipts', 'amt':XX_amount, 'amt_ytd':XX_amount_ytd},
+                                ]
+        # summary_receipt = {'11AI': XIAI_amount,
+        #             '11AII': XIAII_amount,
+        #             '11A': XIA_amount,
+        #             '11B': XIB_amount,
+        #             '11C': XIC_amount,
+        #             '11D': XID_amount,
+        #             '12': XII_amount,
+        #             '13': XIII_amount,
+        #             '14': XIV_amount,
+        #             '15': XV_amount,
+        #             '16': XVI_amount,
+        #             '17': XVII_amount,
+        #             '18A': XVIIIA_amount,
+        #             '18B': XVIIIB_amount,
+        #             '18': XVIII_amount,
+        #             '19': XIX_amount,
+        #             '20': XX_amount
+        #                 }    
+        return summary_receipt_list
+    except Exception as e:
+        raise Exception('The summary_receipts API is throwing the error: ' + str(e))
+
 @api_view(['GET'])
 def summary_table(request):
     try:
@@ -1878,28 +2208,29 @@ def summary_table(request):
         report_id = check_report_id(request.query_params.get('report_id'))
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
 
-        period_args = [cmte_id, report_id]
-        period_receipt = summary_receipts(period_args)
-        period_disbursement = summary_disbursements(period_args)
-
+        period_args = [date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31),  cmte_id, report_id]
+        period_receipt = summary_receipts_for_sumamry_table(period_args)
+        period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+        
+        '''
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
-        calendar_receipt = summary_receipts(calendar_args)
+        ##calendar_receipt = summary_receipts(calendar_args)
         calendar_disbursement = summary_disbursements(calendar_args)
+        '''
 
         cash_summary = {'Beginning COH': 0,
                         'Ending COH': 0,
                         'Debts/Loans owed to committee': 0,
                         'Debts/Loans owed by committee': 0}
 
-        forms_obj = {'Total Raised': {'period_receipts': period_receipt,
-                                'calendar_receipts': calendar_receipt},
-                    'Total Spent': {'period_disbursements': period_disbursement,
-                                    'calendar_disbursements': calendar_disbursement},
+        forms_obj = {'Total Raised': {'period_receipts': period_receipt},
+                    'Total Spent': {'period_disbursements': period_disbursement},
                     'Cash summary': cash_summary}
                         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The summary_table API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 
 """
 ******************************************************************************************************************************
@@ -2159,3 +2490,20 @@ def get_report_info(request):
 END - Report info api - CORE APP
 ******************************************************************************************************************************
 """
+
+@api_view(['PUT'])
+def print_preview_pdf(request):
+    cmte_id = request.user.username
+    report_id = request.data.get('reportid')
+
+    try:
+        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
+        if not printresp.ok:
+            return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+        else:
+            dictprint = printresp.json()
+            merged_dict = {**create_json_data, **dictprint}
+            return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+    except Exception:
+        raise
