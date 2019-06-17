@@ -13,7 +13,9 @@
                      "required": true,
                      "max":"30",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "197px"
                },
                {  
                   "text":"Contributor First Name",
@@ -25,12 +27,10 @@
                      "required": true,
                      "max":"20",
                      "alphaNumeric":true
-                  }
-               }
-            ]
-         },
-         {  
-            "cols":[  
+                  },
+                  "height": "40px",
+                  "width": "197px"                  
+               },
                {  
                   "text":"Contributor Middle Name",
                   "infoIcon":null,
@@ -41,8 +41,14 @@
                      "required": false,
                      "max":"20",
                      "alphaNumeric":true
-                  }
-               },
+                  },
+                  "height": "40px",
+                  "width": "197px" 
+               }               
+            ]
+         },
+         {  
+            "cols":[  
                {  
                   "text":"Contributor Prefix",
                   "infoIcon":null,
@@ -53,7 +59,9 @@
                      "required": false,
                      "max":"10",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "98.35px"                   
                },
                {  
                   "text":"Contributor Suffix",
@@ -65,9 +73,14 @@
                      "required": false,
                      "max":"10",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "98.35px"  
                }
             ]
+         },
+         {
+           "seperator": true
          },
          {  
             "cols":[  
@@ -81,7 +94,9 @@
                      "required": true,
                      "max":"34",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "275px"  
                },
                {  
                   "text":"Contributor Street 2",
@@ -93,7 +108,9 @@
                      "required": false,
                      "max":"34",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "275px"                    
                }
             ]
          },
@@ -109,7 +126,9 @@
                      "required": true,
                      "max":"30",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "197px"     
                },
                {  
                   "text":"Contributor State",
@@ -121,7 +140,9 @@
                      "required": true,
                      "max":"2",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "98px" 
                },
                {  
                   "text":"Contributor Zip",
@@ -133,10 +154,50 @@
                      "required": true,
                      "max":"9",
                      "alphaNumeric":true
-                  }
+                  },
+                  "height": "40px",
+                  "width": "98px" 
                }
             ]
          },
+         {
+            "seperator": true
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Employer",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributorEmployer",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38",
+                     "alphaNumeric":true
+                  },
+                  "height": "40px",
+                  "width": "200px" 
+               },
+               {  
+                  "text":"Contributor Occupation",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"ContributorOccupation",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38",
+                     "alphaNumeric":true
+                  },
+                  "height": "40px",
+                  "width": "200px"                   
+               }
+            ]
+         },   
+         {
+            "seperator": true
+         },               
          {  
             "cols":[  
                {  
@@ -173,34 +234,6 @@
                   "validation":{  
                      "required": false,
                      "max":"12",
-                     "alphaNumeric":true
-                  }
-               }
-            ]
-         },
-         {  
-            "cols":[  
-               {  
-                  "text":"Contributor Employer",
-                  "infoIcon": true,
-                  "infoText":"Request language from RAD",
-                  "name":"ContributorEmployer",
-                  "type":"text",
-                  "validation":{  
-                     "required": true,
-                     "max":"38",
-                     "alphaNumeric":true
-                  }
-               },
-               {  
-                  "text":"Contributor Occupation",
-                  "infoIcon": true,
-                  "infoText":"Request language from RAD",
-                  "name":"ContributorOccupation",
-                  "type":"text",
-                  "validation":{  
-                     "required": true,
-                     "max":"38",
                      "alphaNumeric":true
                   }
                }

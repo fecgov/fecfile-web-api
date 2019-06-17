@@ -71,6 +71,7 @@
                     <input
                       class="form-control"
                       [type]="col.type === 'date' ? col.type : 'text'"
+                      [style.width]="col.width"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
