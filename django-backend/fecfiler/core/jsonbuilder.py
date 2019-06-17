@@ -248,7 +248,7 @@ def get_list_report(report_id, cmte_id):
 
 
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_expenditure_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -445,7 +445,7 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
 
 
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -627,7 +627,7 @@ Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SP
 ******************************************************************************************************************************
 """
 
-@api_view(["POST"])
+#api_view(["POST"])
 def create_f3x_partner_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -827,7 +827,7 @@ Generate Returned or Bonused Receipt  Json file API - CORE APP - SPRINT 12 - FNE
 #         raise
 
 
-@api_view(["POST"])
+#api_view(["POST"])
 def create_f3x_returned_bounced_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -964,7 +964,7 @@ FNE-909 REATTRIBUTION AND REATTRIBUTION MEMO SPRINT 12 YESWANTH TELLA
 
 """
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_reattribution_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -1141,7 +1141,7 @@ Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API -
 **************************************************************************************************************************************
 
 """
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_inkind_bitcoin_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
@@ -1310,3 +1310,24 @@ def create_inkind_bitcoin_f3x_json_file(request):
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+
+*************************************************************************************************************************************************************
+"""
+@api_view(["POST"])
+def create_json_builders(request):
+    transaction_type_identifier = str(request.post.GET('transactionTypeIdentifier'))
+    if transaction_type_identifier == 'IK_REC':
+        create_f3x_json_file(request)
+
+    elif transaction_type_identifier == 'PAR_CON':
+        create_f3x_partner_json_file(request)
+
+    elif transaction_type_identifier == 'RET_REC':
+        create_f3x_returned_bounced_json_file(request)
+
+    elif transaction_type_identifier == 'REATT_FROM':
+        create_f3x_reattribution_json_file(request)
+
+    elif transaction_type_identifier == 'IK_BC_REC':
+        create_inkind_bitcoin_f3x_json_file(request)

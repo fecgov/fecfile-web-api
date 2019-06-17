@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^core/get_Statuss$', views.get_Statuss, name='get_Statuss'),
     url(r'^core/get_ItemizationIndicators$', views.get_ItemizationIndicators, name='get_ItemizationIndicators'),    
     #url(r'^core/build_form3x_json_file$', jsonbuilder.build_form3x_json_file, name='build_form3x_json_file'),
-    #url(r'^core/build_form3x_json_file$', jsonbuilder.build_form3x_json_file, name='build_form3x_json_file'),
     url(r'^core/create_f3x_partner_json_file$', jsonbuilder.create_f3x_partner_json_file, name='create_f3x_partner_json_file'),
     url(r'^core/create_f3x_json_file$', jsonbuilder.create_f3x_json_file, name='create_f3x_json_file'),
     url(r'^core/create_f3x_returned_bounced_json_file$', jsonbuilder.create_f3x_returned_bounced_json_file, name='create_f3x_returned_bounced_json_file'),
@@ -32,4 +31,5 @@ urlpatterns = [
     url(r'^core/create_inkind_bitcoin_f3x_json_file$', jsonbuilder.create_inkind_bitcoin_f3x_json_file, name='create_inkind_bitcoin_f3x_json_file'),
     url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
     #url(r'^core/create_tribal_json_file$', jsonbuilder.create_tribal_json_file, name='create_tribal_json_file'),
+    url(r'^core/json_builders$', jsonbuilder.create_json_builders, name='create_json_builders'),
 ]
