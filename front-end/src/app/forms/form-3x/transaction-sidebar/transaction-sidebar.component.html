@@ -20,9 +20,14 @@
             {{ categoryType?.text }}
           </button>
         </div>
-        <span class="float-right amount" style="padding:.75em">
-          $0.00
-        </span>
+        <ng-container *ngIf="categoryType?.value === 'receipts'">
+          <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+        </ng-container>
+        <ng-container *ngIf="categoryType?.value !== 'receipts'">
+          <span class="float-right amount">
+            $0.00
+          </span>
+        </ng-container>
       </li>
     </ul>
   </section>
@@ -42,7 +47,7 @@
           Summary
         </button>
       </div>
-      <ng-container *ngIf="step!=='step_3'">
+      <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row">
           <button type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
             Sign &amp; Submit
