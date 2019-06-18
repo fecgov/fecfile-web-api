@@ -1604,6 +1604,7 @@ def check_calendar_year(calendar_year):
         return calendar_year
     except Exception as e:
         raise
+
 def period_receipts_sql(cmte_id, report_id):
     try:
         with connection.cursor() as cursor:
@@ -1611,6 +1612,16 @@ def period_receipts_sql(cmte_id, report_id):
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_receipts_sql function is throwing an error: ' + str(e))
+
+def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id ):
+    try:
+        with connection.cursor() as cursor:
+            #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute("SELECT line_number, contribution_amount, ( select sum(contribution_amount) as contribution_amount_ytd FROM public.sched_a t2 WHERE T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The period_receipts_for_summary_table_sql function is throwing an error: ' + str(e))
 
 def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
     try:
@@ -1627,6 +1638,16 @@ def period_disbursements_sql(cmte_id, report_id):
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_disbursements_sql function is throwing an error: ' + str(e))
+
+def period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id):
+    try:
+        with connection.cursor() as cursor:
+            #cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute("SELECT line_number, expenditure_amount, ( select sum(expenditure_amount) as expenditure_amount_ytd FROM public.sched_b t2 WHERE T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+            return cursor.fetchall()
+    except Exception as e:
+        raise Exception('The period_disbursements_for_summary_table_sql function is throwing an error: ' + str(e))
+
 
 def calendar_disbursements_sql(cmte_id, calendar_start_dt, calendar_end_dt):
     try:
@@ -1927,7 +1948,7 @@ def summary_disbursements_for_sumamry_table(args):
         cmte_id = args[2]
         report_id = args[3]
 
-        sql_output = period_disbursements_sql(cmte_id, report_id )
+        sql_output = period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
             if data_row[0] == '21AI':
@@ -2099,7 +2120,7 @@ def summary_receipts_for_sumamry_table(args):
         cmte_id = args[2]
         report_id = args[3]
 
-        sql_output = period_receipts_sql(cmte_id, report_id )
+        sql_output = period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
             if data_row[0] == '11AI':
