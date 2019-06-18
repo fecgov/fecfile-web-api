@@ -838,33 +838,6 @@ END  - Partnership Memo Json - CORE APP
 Generate Returned or Bonused Receipt  Json file API - CORE APP - SPRINT 12 - FNE -920 - BY YESWANTH TELLA
 ***********************************************************************************************************************************************
 """
-
-# def get_entity_sched_a_data(report_id, cmte_id):
-#     try:
-#         # GET all rows from schedA table
-#         forms_obj = []
-#         query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-#                          FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-#         #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 #forms_obj.append(data_row)
-#                 data_row = list(row)
-#                 #schedA_list = data_row[0]
-#                 forms_obj = data_row[0]
-#                 for d in forms_obj:
-#                     for i in d:
-#                         if not d[i]:
-#                             d[i] = ''
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
-
-
 #api_view(["POST"])
 def create_f3x_returned_bounced_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
@@ -968,14 +941,12 @@ def create_f3x_returned_bounced_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_out_list
-            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-
+           
             #import ipdb;ipdb.set_trace()
 
             bucket = conn.get_bucket("dev-efile-repo")
             k = Key(bucket)
             print(k)
-
             k.content_type = "application/json"
             k.set_contents_from_string(json.dumps(data_obj, indent=4))           
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
@@ -987,9 +958,7 @@ def create_f3x_returned_bounced_json_file(request):
             vfiles = {}
             #vfiles["json_file"] = open(tmp_filename, 'rb')
 
-            #res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
-            #print(res,'hererr kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkiiiiiiik',vfiles["json_file"])
-            # import ipdb; ipdb.set_trace()
+            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
             return Response('Success', status=status.HTTP_200_OK)
             
         else:
@@ -1368,16 +1337,18 @@ def create_inkind_bitcoin_f3x_json_file(request):
             k.set_contents_from_string(json.dumps(data_obj, indent=4))            
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
             tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
+           
+
             vdata = {}
-            #data_obj['data']['form_type'] = "F3X"
+            data_obj['data']['form_type'] = "F3X"
             print('tmp_filename')
             json.dump(data_obj, open(tmp_filename, 'w'))  
             vfiles = {}
             vfiles["json_file"] = open(tmp_filename, 'rb')
             #print('tmp_filename')
-            print("vfiles",vfiles)
-            print ("tmp_filename= ", tmp_filename)
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            #print("vfiles",vfiles)
+            #print ("tmp_filename= ", tmp_filename)
+            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=temp_filename)
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -1387,6 +1358,12 @@ def create_inkind_bitcoin_f3x_json_file(request):
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
 """
+
+
+s3 = boto3.client('s3')
+       s3.upload_file(md5_directory + 'all_pages.pdf', current_app.config['AWS_FECFILE_COMPONENTS_BUCKET_NAME'],
+md5_directory+'all_pages.pdf',ExtraArgs={'ContentType': "application/pdf", 'ACL': "public-read"})
+
 
 *************************************************************************************************************************************************************
 """
