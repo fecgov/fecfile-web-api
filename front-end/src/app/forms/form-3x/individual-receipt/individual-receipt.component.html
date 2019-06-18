@@ -28,7 +28,12 @@
       <ng-container *ngFor="let row of formFields">
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-            <div class="col" *ngFor="let col of row.cols">
+            <div class="col-md-3" *ngFor="let col of row.cols" [ngClass]="
+              {
+                'col-md-3': col.name !== 'street_1' && col.name !== 'street_2',
+                'col-md-4': col.name === 'street_1' || col.name === 'street_2'
+              }
+            ">
               <div class="form-group">
                 <label for="{{ col.name }}">
                   {{ col.text }}
@@ -69,9 +74,10 @@
                   </ng-container>
                   <ng-container *ngIf="!col.inputGroup">
                     <input
-                      class="form-control"
+                      style="display: block;"
+                      [style.width]="col?.width"
+                      [style.height]="col.height"
                       [type]="col.type === 'date' ? col.type : 'text'"
-                      [style.width]="col.width"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
@@ -132,7 +138,7 @@
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea class="form-control" rows="5" name="{{ col.name }}" [formControlName]="col.name"></textarea>
                 </ng-container>
-                <ng-container *ngIf="col.type === 'select' && col.name === 'ContributorState'">
+                <ng-container *ngIf="col.type === 'select' && col.name === 'state'">
                   <ng-select
                     class="state-select"
                     [formControlName]="col.name"

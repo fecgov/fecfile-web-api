@@ -74,13 +74,17 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        // this.formFields = res.data.formFields;
+        // this.formRows = res.data.formRows;
         // this.hiddenFields = res.data.hiddenFields;
         // this.states = res.data.states;
 
+        console.log('res: ', res);
+
         this.formFields = res.formFields;
         this.hiddenFields = res.hiddenFields;
-        this.states = res.states;        
+        this.states = res.states;      
+
+        console.log('this.formRows: ', this.formFields);  
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -114,11 +118,13 @@ export class IndividualReceiptComponent implements OnInit {
     const formGroup: any = [];
 
     fields.forEach(el => {
-      if (el.hasOwnProperty('cols')) {
-        el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-        });
-      }
+      //if (!el.labelRow) {
+        if (el.hasOwnProperty('cols')) {
+          el.cols.forEach(e => {
+            formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          });
+        }        
+      //}
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
