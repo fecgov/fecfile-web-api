@@ -1414,7 +1414,8 @@ def trash_restore_transactions(request):
         transaction_id = _action.get('transaction_id', '')
 
         action = _action.get('action', '')
-        _delete = 'Y' if action == 'trash' else 'N'
+        _delete = 'Y' if action == 'trash' else ''
+        print(report_id)
         try:
             trash_restore_sql_transaction( 
                 report_id,
@@ -1434,9 +1435,10 @@ def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
             # cursor.execute("""UPDATE public.entity SET delete_ind = 'Y', last_update_date = %s WHERE entity_id = '""" + entity_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
             _sql = """
             UPDATE public.sched_a 
-            SET delete_ind = {}
-            WHERE report_id = {}
-            AND transaction_id = {}""".format(_delete, report_id, transaction_id)
+            SET delete_ind = '{}'
+            WHERE report_id = '{}'
+            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
+            print(_sql)
             cursor.execute(_sql)
             if (cursor.rowcount == 0):
                 raise Exception(
