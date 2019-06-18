@@ -16,6 +16,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime, date
 import boto3
+from boto3.s3.transfer import S3Transfer
 from botocore.exceptions import ClientError
 import boto
 from boto.s3.key import Key
@@ -348,21 +349,30 @@ def create_f3x_expenditure_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SB':[]}
             data_obj['data']['schedules']['SB'] = response_expenditure_receipt_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_'+str(report_id)+'.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
-            # import ipdb; ipdb.set_trace()
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            # tmp_filename = '/tmp/' + committeeid + '_'+str(report_id)+'expenditure.json'
+            # vdata = {}
+            # # vdata['form_type'] = "F3X"
+            # # vdata['committeeid'] = comm_info.committeeid
+            # json.dump(data_obj, open(tmp_filename, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            # # res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
+            # # import ipdb; ipdb.set_trace()
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid + '_'+str(report_id)+'expenditure.json'
+            tmp_path='/tmp/'+tmp_filename
+           
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             return Response('', status=status.HTTP_200_OK)
             
         else:
@@ -613,24 +623,35 @@ def create_f3x_json_file(request):
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
-            vdata = {}
-            #data_obj['data']['form_type'] = "F3X"
-            print('tmp_filename')
-            json.dump(data_obj, open(tmp_filename, 'w'))  
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print('tmp_filename')
-            #import ipdb; ipdb.set_trace()
-            print("vfiles",vfiles)
-            print ("tmp_filename= ", tmp_filename)
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            # tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
+            # vdata = {}
+            # #data_obj['data']['form_type'] = "F3X"
+            # print('tmp_filename')
+            # json.dump(data_obj, open(tmp_filename, 'w'))  
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            # #print('tmp_filename')
+            # #import ipdb; ipdb.set_trace()
+            # print("vfiles",vfiles)
+            # print ("tmp_filename= ", tmp_filename)
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid + '_'+str(report_id)+'Inkind.json'
+            tmp_path='/tmp/'+tmp_filename
+            json.dump(data_obj, open(tmp_path, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
+            # res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION + "send_data" , data=data_obj) #files=vfiles
+            # print()
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -801,22 +822,31 @@ def create_f3x_partner_json_file(request):
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_PARTNER.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            print(vfiles)
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            # tmp_filename = '/tmp/' + committeeid + '_f3x_PARTNER.json'
+            # vdata = {}
+            # # vdata['form_type'] = "F3X"
+            # # vdata['committeeid'] = comm_info.committeeid
+            # json.dump(data_obj, open(tmp_filename, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            # print(vfiles)
+            # res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
             # import ipdb; ipdb.set_trace()
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_PARTNER.json'
+            tmp_path='/tmp/'+tmp_filename
+           
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -944,21 +974,27 @@ def create_f3x_returned_bounced_json_file(request):
            
             #import ipdb;ipdb.set_trace()
 
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))           
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_RETURNED.json'
-            vdata = {}
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))           
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_RETURNED.json'
+            tmp_path='/tmp/'+tmp_filename
+            # vdata = {}
             # vdata['form_type'] = "F3X"
             # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            #vfiles["json_file"] = open(tmp_filename, 'rb')
+            json.dump(data_obj, open(tmp_path, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
 
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
+            # res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION + "send_data" , data=data_obj) #files=vfiles
+            # print()
             return Response('Success', status=status.HTTP_200_OK)
             
         else:
@@ -1135,21 +1171,31 @@ def create_f3x_reattribution_json_file(request):
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_REATTRIBUTION.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            print(vfiles)
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            # tmp_filename = '/tmp/' + committeeid + '_f3x_REATTRIBUTION.json'
+            # vdata = {}
+            # # vdata['form_type'] = "F3X"
+            # # vdata['committeeid'] = comm_info.committeeid
+            # json.dump(data_obj, open(tmp_filename, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            # print(vfiles)
+            # res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_REATTRIBUTION.json'
+            tmp_path='/tmp/'+tmp_filename
+            
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             # import ipdb; ipdb.set_trace()
             return Response(res.text, status=status.HTTP_200_OK)
             
@@ -1330,25 +1376,35 @@ def create_inkind_bitcoin_f3x_json_file(request):
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
             #import ipdb;ipdb.set_trace()
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
+            # bucket = conn.get_bucket("dev-efile-repo")
+            # k = Key(bucket)
+            # print(k)
+            # k.content_type = "application/json"
+            # k.set_contents_from_string(json.dumps(data_obj, indent=4))            
+            # url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+            # tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
            
 
-            vdata = {}
-            data_obj['data']['form_type'] = "F3X"
-            print('tmp_filename')
-            json.dump(data_obj, open(tmp_filename, 'w'))  
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print('tmp_filename')
-            #print("vfiles",vfiles)
-            #print ("tmp_filename= ", tmp_filename)
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=temp_filename)
+            # vdata = {}
+            # data_obj['data']['form_type'] = "F3X"
+            # print('tmp_filename')
+            # json.dump(data_obj, open(tmp_filename, 'w'))  
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            # #print('tmp_filename')
+            # #print("vfiles",vfiles)
+            # #print ("tmp_filename= ", tmp_filename)
+            # res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=temp_filename)
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_Inkindbitcoin.json'
+            tmp_path='/tmp/'+tmp_filename
+            
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
