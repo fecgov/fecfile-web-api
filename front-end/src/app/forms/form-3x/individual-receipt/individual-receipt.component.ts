@@ -217,13 +217,27 @@ export class IndividualReceiptComponent implements OnInit {
   public contributionAmountChange(e): void {
     console.log('contributionAmountChange: ');
     console.log('e: ', e);
+    const contributionAmount: string = e.target.value;
+
+    console.log('contributionAmount: ', contributionAmount);
+
+    // this._receiptService
+    //   .aggregateAmount(
+    //     res.report_id,
+    //     res.transaction_type,
+    //     res.contribution_date,
+    //     res.entity_id,
+    //     res.contribution_amount
+    //   )
+    //   .subscribe(resp => {
+    //     console.log('resp: ', resp);
+    //   });    
   }
 
   /**
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
-    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
@@ -253,17 +267,17 @@ export class IndividualReceiptComponent implements OnInit {
             this._messageService.sendMessage(message);
           });
 
-          this._receiptService
-            .aggregateAmount(
-              res.report_id,
-              res.transaction_type,
-              res.contribution_date,
-              res.entity_id,
-              res.contribution_amount
-            )
-            .subscribe(resp => {
-              console.log('resp: ', resp);
-            });
+          // this._receiptService
+          //   .aggregateAmount(
+          //     res.report_id,
+          //     res.transaction_type,
+          //     res.contribution_date,
+          //     res.entity_id,
+          //     res.contribution_amount
+          //   )
+          //   .subscribe(resp => {
+          //     console.log('resp: ', resp);
+          //   });
 
           this.frmIndividualReceipt.reset();
 
