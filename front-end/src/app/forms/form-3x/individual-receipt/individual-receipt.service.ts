@@ -71,7 +71,7 @@ export class IndividualReceiptService {
      */
     formData.append('cmte_id', committeeDetails.committeeid);
     // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId'))) {
+    if (reportType.hasOwnProperty('reportId')) {
       formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
       formData.append('report_id', reportType.reportid);
