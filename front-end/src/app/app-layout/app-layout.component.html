@@ -44,16 +44,23 @@
           </div>
           <div class="committee-name">
             {{ committeeName }}
-          </div>
+          </div> 
         </div>
         <div class="float-right">
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
-              Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
-              {{ formEndDate | date: 'MM/dd/yyyy' }}
-            </div>
-            <div>
-              Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              <div>
+                Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
+                {{ formEndDate | date: 'MM/dd/yyyy' }}
+              </div>              
+              <ng-container *ngIf="reportOverDue">
+                <span class="text-error">
+                  Over due by {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+                </span>
+              </ng-container>
+              <ng-container *ngIf="!reportOverDue">
+                Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+              </ng-container>
               <a class="btn btn-link btn-edit" (click)="editFrom()">
                 <i class="edit-icon" aria-hidden="true"></i>
                 <span class="sr-only">Click to edit date.</span>

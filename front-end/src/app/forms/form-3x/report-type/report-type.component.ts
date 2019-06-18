@@ -11,6 +11,7 @@ import {
   ViewEncapsulation,
   DoCheck
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
@@ -33,7 +34,8 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   selector: 'f3x-report-type',
   templateUrl: './report-type.component.html',
   styleUrls: ['./report-type.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [DatePipe]
 })
 export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
@@ -74,7 +76,8 @@ export class ReportTypeComponent implements OnInit {
     private _formService: FormsService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _datePipe: DatePipe
   ) {}
 
   ngOnInit(): void {
@@ -124,6 +127,7 @@ export class ReportTypeComponent implements OnInit {
       email2: '',
       additionalEmail1: '',
       additionalEmail2: '',
+      overDue: false
     };
  }
 
@@ -287,12 +291,12 @@ export class ReportTypeComponent implements OnInit {
       const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
       this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
 
-      this._form3xReportTypeDetails.cvgStartDate = this._formatDate(this._fromDateSelected);
-      this._form3xReportTypeDetails.cvgEndDate = this._formatDate(this._toDateSelected);
-      this._form3xReportTypeDetails.dueDate = this._formatDate(this._dueDate);
+      this._form3xReportTypeDetails.cvgStartDate = this._datePipe.transform(this._fromDateSelected,'MM/dd/yyyy');
+      this._form3xReportTypeDetails.cvgEndDate = this._datePipe.transform(this._toDateSelected,'MM/dd/yyyy');
+      this._form3xReportTypeDetails.dueDate = this._datePipe.transform(this._dueDate,'MM/dd/yyyy');
       this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
       this._form3xReportTypeDetails.election_state = this._selectedElectionState;
-      this._form3xReportTypeDetails.election_date = this._formatDate(this._selectedElectionDate);
+      this._form3xReportTypeDetails.election_date = this._datePipe.transform(this._selectedElectionDate,'MM/dd/yyyy');
       this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
       this._form3xReportTypeDetails.daysUntilDue = this._calcDaysUntilReportDue(this._dueDate);
       this._form3xReportTypeDetails.email1 = committeeDetails.email_on_file;
@@ -300,6 +304,16 @@ export class ReportTypeComponent implements OnInit {
       this._form3xReportTypeDetails.additionalEmail1 = '';
       this._form3xReportTypeDetails.additionalEmail2 = '';
       this._form3xReportTypeDetails.formType = '3X';
+
+      const today: any = new Date();
+      const formattedToday: any = this._datePipe.transform(today, 'MM/dd/yyyy');
+      const reportDueDate: any = this._datePipe.transform(this._dueDate,'MM/dd/yyyy');
+
+      if (reportDueDate < formattedToday) {
+        this._form3xReportTypeDetails.overDue = true;
+      } else {
+        this._form3xReportTypeDetails.overDue = false;
+      }
 
       window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
 
@@ -529,25 +543,6 @@ export class ReportTypeComponent implements OnInit {
   }
 
   /**
-   * Changes format of date from m/d/yyyy to yyyy-m-d.
-   *
-   * @param      {string}  date    The date
-   * @return     {string}  The new formatted date.
-   */
-  private _formatDate(date: string): string {
-    try {
-      const dateArr = date.split('-');
-      const month: string = dateArr[1];
-      const day: string = dateArr[2];
-      const year: string = dateArr[0].replace('2018', '2019');
-
-      return `${month}/${day}/${year}`;
-    } catch (e) {
-      return '';
-    }
-  }
-
-  /**
    * Calculates the days until report due.
    *
    * @param      {any}     reportDueDate  The report due date
@@ -561,12 +556,15 @@ export class ReportTypeComponent implements OnInit {
     const dueDateArr = reportDueDate.split('-');
     let dueDate: any = '';
 
-    const dueDateMonth = parseInt(dueDateArr[1]) - 1;
-    const dueDateDay = parseInt(dueDateArr[2]);
-    const dueDateYear = parseInt(dueDateArr[0]);
-    const day = new Date(dueDateYear, dueDateMonth, dueDateDay);
+    const dueDateMonth = parseInt(dueDateArr[1]) - 1; // Month
+    const dueDateDay = parseInt(dueDateArr[2]); // Day
+    const dueDateYear = parseInt(dueDateArr[0]); // Year
+    const modifiedReportDueDate = new Date(dueDateYear, dueDateMonth, dueDateDay);
 
-    dueDate = Math.round(Math.abs((today.getTime() - day.getTime()) / oneDay));
+    const formattedDateToday: any = this._datePipe.transform(today,'MM/dd/yyyy');
+    const formattedDueDate: any = this._datePipe.transform(reportDueDate,'MM/dd/yyyy');    
+
+    dueDate = Math.round(Math.abs((today.getTime() - modifiedReportDueDate.getTime()) / oneDay));
 
     return dueDate;
   }
