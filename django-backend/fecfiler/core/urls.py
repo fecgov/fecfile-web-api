@@ -32,4 +32,6 @@ urlpatterns = [
     url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
     #url(r'^core/create_tribal_json_file$', jsonbuilder.create_tribal_json_file, name='create_tribal_json_file'),
     url(r'^core/json_builders$', jsonbuilder.create_json_builders, name='create_json_builders'),
+    url(r'^core/print_preview_pdf$', views.print_preview_pdf, name='print_preview_pdf'),
+
 ]
