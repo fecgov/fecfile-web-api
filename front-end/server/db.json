@@ -119,8 +119,9 @@
                   "infoIcon":null,
                   "infoText":null,
                   "name":"zip",
-                  "type":"number",
+                  "type":"text",
                   "validation":{  
+                     "alphanumeric": true,
                      "required": true,
                      "max":"9"
                   }

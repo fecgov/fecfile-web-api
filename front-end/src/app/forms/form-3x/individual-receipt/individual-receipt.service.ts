@@ -11,7 +11,6 @@ import { environment } from '../../../../environments/environment';
  * https://angular.io/api/forms/NgModel#description
  * Then getting the value on change for the field.
  *
- * Also send email to Kelric to have it documented Praveen is using my computer.
  */
 
 @Injectable({
@@ -74,7 +73,7 @@ export class IndividualReceiptService {
     // With Edit Report Functionality
     if (reportType.hasOwnProperty('reportId'))) {
       formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid') {
+    } else if (reportType.hasOwnProperty('reportid')) {
       formData.append('report_id', reportType.reportid);
     }
 

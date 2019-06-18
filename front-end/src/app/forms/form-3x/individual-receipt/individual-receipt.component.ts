@@ -140,9 +140,11 @@ export class IndividualReceiptComponent implements OnInit {
     /**
      * Adds alphanumeric validation for the zip code field.
      */
-    if (fieldName === 'ContributorZip') {
-      formValidators.push(alphaNumeric());
-    }
+
+    //  console.log('fieldName: ', fieldName);
+    // if (fieldName === 'zip') {
+    //   formValidators.push([alphaNumeric(), Validators.required]);
+    // }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -162,6 +164,13 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
+        } else if (validation === 'alphanumeric') {
+          if (fieldName === 'zip') {
+            console.log('alphanumeric for zip: ');
+          }
+          if (validators[validation]) {
+            formValidators.push(alphaNumeric());
+          }          
         }
       }
     }
@@ -205,10 +214,16 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  public contributionAmountChange(e): void {
+    console.log('contributionAmountChange: ');
+    console.log('e: ', e);
+  }
+
   /**
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
