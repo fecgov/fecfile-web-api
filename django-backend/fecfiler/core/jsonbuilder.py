@@ -16,6 +16,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime, date
 import boto3
+from boto3.s3.transfer import S3Transfer
 from botocore.exceptions import ClientError
 import boto
 from boto.s3.key import Key
@@ -42,14 +43,17 @@ Generate Expenditures data Json file API - CORE APP - SPRINT 12 - FNE 769  - BY 
 ******************************************************************************************************************************
 """
 
-def get_entity_expenditure_id(report_id, cmte_id):
+def get_entity_expenditure_id(report_id, cmte_id, type_identifier = None):
     try:
         # GET all rows from schedB table
         forms_obj = []
-        query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date
+        query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date, transaction_type_identifier
                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s""" 
         #AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
+        if type_identifier:
+            query_string = query_string + "AND transaction_type_identifier = '"+str(type_identifier)+"'"
+        
         with connection.cursor() as cursor:
             # import pdb;pdb.set_trace()
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
@@ -248,12 +252,13 @@ def get_list_report(report_id, cmte_id):
 
 
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_expenditure_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         # import ipdb;ipdb.set_trace()
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -344,21 +349,15 @@ def create_f3x_expenditure_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SB':[]}
             data_obj['data']['schedules']['SB'] = response_expenditure_receipt_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_'+str(report_id)+'.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
-            # import ipdb; ipdb.set_trace()
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid + '_'+str(report_id)+'expenditure.json'
+            tmp_path='/tmp/'+tmp_filename
+           
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             return Response('', status=status.HTTP_200_OK)
             
         else:
@@ -381,16 +380,19 @@ Generate In kind Receipt and out Kind transaction Json file API - CORE APP - SPR
 ******************************************************************************************************************************
 
 """
-def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None):
+def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None, type_identifier = None):
     try:
         # GET all rows from schedA table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s """
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
+        if type_identifier:
+            query_string = query_string + "AND transaction_type_identifier = '"+str(type_identifier)+"'"
+        query_string = query_string + "AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"
         with connection.cursor() as cursor:
             if not transaction_id:
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
@@ -412,16 +414,21 @@ def get_entity_sched_a_data(report_id, cmte_id, transaction_id=None):
     except Exception:
         raise
 
-def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
+def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None, type_identifier = None):
     try:
         # GET all rows from schedB table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s """
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
+        
+        if type_identifier:
+            query_string = query_string + "AND transaction_type_identifier = '"+str(type_identifier)+"'"
+        query_string = query_string + "AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"
+
         with connection.cursor() as cursor:
             if not transaction_id:
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
@@ -445,11 +452,12 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id=None):
 
 
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
@@ -471,7 +479,14 @@ def create_f3x_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
+                if txn_type_identifier:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'],None,type_identifier=txn_type_identifier)
+                else:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                
+                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -513,7 +528,12 @@ def create_f3x_json_file(request):
 
 
                     
-                    entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    #entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    if txn_type_identifier:
+                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'],\
+                        type_identifier=txn_type_identifier)
+                    else:
+                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -586,26 +606,19 @@ def create_f3x_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': [],}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
-            # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
-            #import ipdb;ipdb.set_trace()
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
-            vdata = {}
-            #data_obj['data']['form_type'] = "F3X"
-            print('tmp_filename')
-            json.dump(data_obj, open(tmp_filename, 'w'))  
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print('tmp_filename')
-            #import ipdb; ipdb.set_trace()
-            print("vfiles",vfiles)
-            print ("tmp_filename= ", tmp_filename)
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+           
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid + '_'+str(report_id)+'Inkind.json'
+            tmp_path='/tmp/'+tmp_filename
+            json.dump(data_obj, open(tmp_path, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
+            # res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION + "send_data" , data=data_obj) #files=vfiles
+            # print()
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -627,11 +640,12 @@ Generate Partnership Receipet and Partnership Memo Json file API - CORE APP - SP
 ******************************************************************************************************************************
 """
 
-@api_view(["POST"])
+#api_view(["POST"])
 def create_f3x_partner_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -649,7 +663,13 @@ def create_f3x_partner_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
+                if txn_type_identifier:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'],None,type_identifier=txn_type_identifier)
+                else:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -689,7 +709,13 @@ def create_f3x_partner_json_file(request):
 
                     #response_dict_receipt['child'] = []
 
-                    entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    #entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if txn_type_identifier:
+                        entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'],\
+                                                                 type_identifier=txn_type_identifier)
+                    else:
+                        entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -762,23 +788,16 @@ def create_f3x_partner_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
-            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_PARTNER.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            print(vfiles)
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=data_obj, files=vfiles)
-            # import ipdb; ipdb.set_trace()
+           
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_PARTNER.json'
+            tmp_path='/tmp/'+tmp_filename
+           
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -800,38 +819,12 @@ END  - Partnership Memo Json - CORE APP
 Generate Returned or Bonused Receipt  Json file API - CORE APP - SPRINT 12 - FNE -920 - BY YESWANTH TELLA
 ***********************************************************************************************************************************************
 """
-
-# def get_entity_sched_a_data(report_id, cmte_id):
-#     try:
-#         # GET all rows from schedA table
-#         forms_obj = []
-#         query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date
-#                          FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-#         #AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
-#             for row in cursor.fetchall():
-#                 #forms_obj.append(data_row)
-#                 data_row = list(row)
-#                 #schedA_list = data_row[0]
-#                 forms_obj = data_row[0]
-#                 for d in forms_obj:
-#                     for i in d:
-#                         if not d[i]:
-#                             d[i] = ''
-#         if forms_obj is None:
-#             pass
-#             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
-#         return forms_obj
-#     except Exception:
-#         raise
-
-
-@api_view(["POST"])
+#api_view(["POST"])
 def create_f3x_returned_bounced_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -846,10 +839,16 @@ def create_f3x_returned_bounced_json_file(request):
             report_info = get_list_report(report_id, committeeid)
             #response_inkind_receipt_list = []
             response_inkind_out_list = []
+
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
 
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                if txn_type_identifier:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'],None,type_identifier=txn_type_identifier)
+                else:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -923,24 +922,22 @@ def create_f3x_returned_bounced_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_out_list
-            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_RETURNED.json'
-            vdata = {}
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_RETURNED.json'
+            tmp_path='/tmp/'+tmp_filename
+            # vdata = {}
             # vdata['form_type'] = "F3X"
             # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            print(vfiles)
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
-            # import ipdb; ipdb.set_trace()
-            return Response(res.text, status=status.HTTP_200_OK)
+            json.dump(data_obj, open(tmp_path, 'w'))
+            # vfiles = {}
+            # vfiles["json_file"] = open(tmp_filename, 'rb')
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
+            # res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + settings.DATA_RECEIVE_API_VERSION + "send_data" , data=data_obj) #files=vfiles
+            # print()
+            return Response('Success', status=status.HTTP_200_OK)
             
         else:
             return Response({"FEC Error 007":"This user does not have a submitted CommInfo object"}, status=status.HTTP_400_BAD_REQUEST)
@@ -964,11 +961,12 @@ FNE-909 REATTRIBUTION AND REATTRIBUTION MEMO SPRINT 12 YESWANTH TELLA
 
 """
 
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_f3x_reattribution_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -986,7 +984,12 @@ def create_f3x_reattribution_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
+                if txn_type_identifier:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'],None,type_identifier=txn_type_identifier)
+                else:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1027,7 +1030,14 @@ def create_f3x_reattribution_json_file(request):
 
 
                     #response_dict_receipt['child'] = []
-                    entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    #entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+
+                    if txn_type_identifier:
+                        entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'],\
+                                                             type_identifier=txn_type_identifier)
+                    else:
+                        entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -1102,22 +1112,17 @@ def create_f3x_reattribution_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': []}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
-            # data_obj['data']['Schedule']['SA'] = response_inkind_out_list
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + '_f3x_REATTRIBUTION.json'
-            vdata = {}
-            # vdata['form_type'] = "F3X"
-            # vdata['committeeid'] = comm_info.committeeid
-            json.dump(data_obj, open(tmp_filename, 'w'))
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            print(vfiles)
-            res = requests.post("https://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+           
+
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_REATTRIBUTION.json'
+            tmp_path='/tmp/'+tmp_filename
+            
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
             # import ipdb; ipdb.set_trace()
             return Response(res.text, status=status.HTTP_200_OK)
             
@@ -1141,11 +1146,12 @@ Generate In kind Bitcoin Receipt and Inkind Bitcoin  transaction Json file API -
 **************************************************************************************************************************************
 
 """
-@api_view(["POST"])
+#@api_view(["POST"])
 def create_inkind_bitcoin_f3x_json_file(request):
     #creating a JSON file so that it is handy for all the public API's   
     try:
         report_id = request.POST.get('report_id')
+        txn_type_identifier = request.POST.get('txn_type_identifier')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
@@ -1167,7 +1173,13 @@ def create_inkind_bitcoin_f3x_json_file(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 print (f3_i['report_id'])
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
+                if txn_type_identifier:
+                        entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'],\
+                                                             type_identifier=txn_type_identifier)
+                else:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 if not entity_id_list:
                     continue
                 print ("we got the data")
@@ -1209,7 +1221,14 @@ def create_inkind_bitcoin_f3x_json_file(request):
 
 
                     
-                    entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    #entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if txn_type_identifier:
+                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'],\
+                        type_identifier=txn_type_identifier)
+                    else:
+                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
 
                     if not entity_id_child_list:
                         response_inkind_receipt_list.append(response_dict_receipt)
@@ -1282,26 +1301,16 @@ def create_inkind_bitcoin_f3x_json_file(request):
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': [],}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
-            # data_obj['data']['Schedule']['SB'] = response_inkind_out_list
-            #import ipdb;ipdb.set_trace()
-            bucket = conn.get_bucket("dev-efile-repo")
-            k = Key(bucket)
-            print(k)
-            k.content_type = "application/json"
-            k.set_contents_from_string(json.dumps(data_obj, indent=4))            
-            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-            tmp_filename = '/tmp/' + committeeid + str(report_id)+'_.json'
-            vdata = {}
-            #data_obj['data']['form_type'] = "F3X"
-            print('tmp_filename')
-            json.dump(data_obj, open(tmp_filename, 'w'))  
-            vfiles = {}
-            vfiles["json_file"] = open(tmp_filename, 'rb')
-            #print('tmp_filename')
-            #import ipdb; ipdb.set_trace()
-            print("vfiles",vfiles)
-            print ("tmp_filename= ", tmp_filename)
-            res = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/send_data" , data=vdata, files=vfiles)
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'-'+ str(report_id)+'_f3x_Inkindbitcoin.json'
+            tmp_path='/tmp/'+tmp_filename
+            
+            json.dump(data_obj, open(tmp_path, 'w'))
+           
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
             return Response(res.text, status=status.HTTP_200_OK)
             
         else:
@@ -1310,3 +1319,22 @@ def create_inkind_bitcoin_f3x_json_file(request):
     except CommitteeInfo.DoesNotExist:
         return Response({"FEC Error 009":"An unexpected error occurred while processing your request"}, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+
+*************************************************************************************************************************************************************
+"""
+@api_view(["POST"])
+def create_json_builders(request):
+    #import ipdb;ipdb.set_trace()
+    transaction_type_identifier = str(request.POST.get('txn_type_identifier'))
+    if transaction_type_identifier == 'IK_REC':
+        create_f3x_json_file(request)
+    elif transaction_type_identifier == 'PAR_CON':
+        create_f3x_partner_json_file(request)
+    elif transaction_type_identifier == 'RET_REC':
+        create_f3x_returned_bounced_json_file(request)
+    elif transaction_type_identifier == 'REATT_FROM':
+        create_f3x_reattribution_json_file(request)
+    elif transaction_type_identifier == 'IK_BC_REC':
+        create_inkind_bitcoin_f3x_json_file(request)
+    return Response('Success', status=status.HTTP_200_OK)
