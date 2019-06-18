@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionsMessageService } from '../service/transactions-message.service';
@@ -8,6 +8,8 @@ import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
+import { Subscription } from 'rxjs/Subscription';
+import { FilterTypes } from '../transactions.component';
 
 
 /**
@@ -69,7 +71,7 @@ import { TransactionsFilterTypeComponent } from './filter-type/transactions-filt
     ]),
   ]
 })
-export class TransactionsFilterComponent implements OnInit {
+export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
   @Input()
   public formType: string;
@@ -83,20 +85,29 @@ export class TransactionsFilterComponent implements OnInit {
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideAmountFilter: boolean;
+  public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
   public isHideItemizationFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
-  public itemizations: any =[];
+  public itemizations: any = [];
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
+  public filterAggregateAmountMin: number;
+  public filterAggregateAmountMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
   public filterMemoCode = false;
   public dateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
+  public aggregateAmountFilterValidation: ValidationErrorModel;
+
+  /**
+   * Subscription for removing selected filters.
+   */
+  private removeFilterSubscription: Subscription;
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
@@ -106,7 +117,20 @@ export class TransactionsFilterComponent implements OnInit {
   constructor(
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService
-  ) {}
+  ) {
+    this.removeFilterSubscription = this._transactionsMessageService.getRemoveFilterMessage()
+      .subscribe(
+        (message: any) => {
+          if (message) {
+            if (message.removeAll) {
+              this.clearFilters();
+            } else {
+              this.removeFilter(message);
+            }
+          }
+        }
+      );
+  }
 
 
   /**
@@ -120,10 +144,13 @@ export class TransactionsFilterComponent implements OnInit {
     this.filterDateTo = null;
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterAggregateAmountMin = null;
+    this.filterAggregateAmountMax = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
     this.isHideAmountFilter = true;
+    this.isHideAggregateAmountFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
     this.isHideItemizationFilter = true;
@@ -136,6 +163,14 @@ export class TransactionsFilterComponent implements OnInit {
       this.getStates();
       this.getItemizations();
     }
+  }
+
+
+  /**
+   * A method to run when component is destroyed.
+   */
+  public ngOnDestroy(): void {
+    this.removeFilterSubscription.unsubscribe();
   }
 
 
@@ -160,6 +195,14 @@ export class TransactionsFilterComponent implements OnInit {
    */
   public toggleAmountFilterItem() {
     this.isHideAmountFilter = !this.isHideAmountFilter;
+  }
+
+
+  /**
+   * Toggle visibility of the Aggregate Amount filter
+   */
+  public toggleAggregateAmountFilterItem() {
+    this.isHideAggregateAmountFilter = !this.isHideAggregateAmountFilter;
   }
 
 
@@ -195,7 +238,7 @@ export class TransactionsFilterComponent implements OnInit {
 
 
   /**
-   * Determine the state for scrolling.  The category tye wasn't displaying 
+   * Determine the state for scrolling.  The category tye wasn't displaying
    * properly in edge with animation.  If edge, don't apply the state with animation.
    */
   public determineScrollState() {
@@ -273,7 +316,7 @@ export class TransactionsFilterComponent implements OnInit {
    * Send filter values to the table transactions component.
    * Set the filters.show to true indicating the filters have been altered.
    */
-  public applyFilters() {
+  public applyFilters(isClearKeyword: boolean) {
 
     if (!this.validateFilters()) {
       return;
@@ -311,15 +354,22 @@ export class TransactionsFilterComponent implements OnInit {
       }
     }
     filters.filterCategories = filterCategories;
-    // filters.filterCategoriesText = this.filterCategoriesText;
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
+    filters.filterAggregateAmountMin = this.filterAggregateAmountMin;
+    filters.filterAggregateAmountMax = this.filterAggregateAmountMax;
 
     if (this.filterAmountMin !== null) {
       modified = true;
     }
     if (this.filterAmountMax !== null) {
+      modified = true;
+    }
+    if (this.filterAggregateAmountMin !== null) {
+      modified = true;
+    }
+    if (this.filterAggregateAmountMax !== null) {
       modified = true;
     }
 
@@ -337,26 +387,24 @@ export class TransactionsFilterComponent implements OnInit {
       modified = true;
     }
 
-    // Itemization
-   
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
-        filterItemizations.push(I.code);
+        filterItemizations.push(I.itemization_code);
         modified = true;
       }
     }
     filters.filterItemizations = filterItemizations;
 
     filters.show = modified;
-    this._transactionsMessageService.sendApplyFiltersMessage(filters);
+    this._transactionsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
   }
 
 
   /**
    * Clear all filter values.
    */
-  public clearFilters() {
+  private clearFilters() {
 
     this.initValidationErrors();
 
@@ -379,15 +427,26 @@ export class TransactionsFilterComponent implements OnInit {
     for (const s of this.itemizations) {
       s.selected = false;
     }
-    
+
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterAggregateAmountMin = null;
+    this.filterAggregateAmountMax = null;
+
     this.filterDateFrom = null;
     this.filterDateTo = null;
     this.filterMemoCode = false;
   }
 
-  
+
+  /**
+   * Clear all filter values and apply them by running the search.
+   */
+  public clearAndApplyFilters() {
+        this.clearFilters();
+        this.applyFilters(true);
+  }
+
 
   /**
    * Clear any hightlighted types as result of the scroll to input.
@@ -501,7 +560,7 @@ export class TransactionsFilterComponent implements OnInit {
 
           let itemizationExist = false;
           if (res.data) {
-            console.log("res.data", res.data);
+            console.log('res.data', res.data);
             if (res.data) {
               itemizationExist = true;
               for (const s of res.data) {
@@ -510,7 +569,7 @@ export class TransactionsFilterComponent implements OnInit {
                 if (this.cachedFilters.filterItemizations) {
                   if (this.cachedFilters.filterItemizations.includes(s.code)) {
                     s.selected = true;
-                    this.isHideStateFilter = false;
+                    this.isHideItemizationFilter = false;
                   } else {
                     s.selected = false;
                   }
@@ -520,7 +579,7 @@ export class TransactionsFilterComponent implements OnInit {
           }
           if (itemizationExist) {
             this.itemizations = res.data;
-            console.log("this.itemizations", this.itemizations);
+            console.log('this.itemizations', this.itemizations);
           } else {
             this.itemizations = [];
           }
@@ -545,6 +604,10 @@ export class TransactionsFilterComponent implements OnInit {
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
         this.isHideAmountFilter = !(this.filterAmountMin > 0 && this.filterAmountMax > 0);
 
+        this.filterAggregateAmountMin = this.cachedFilters.filterAggregateAmountMin;
+        this.filterAggregateAmountMax = this.cachedFilters.filterAggregateAmountMax;
+        this.isHideAggregateAmountFilter = !(this.filterAggregateAmountMin > 0 && this.filterAggregateAmountMax > 0);
+
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
         // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
@@ -553,6 +616,8 @@ export class TransactionsFilterComponent implements OnInit {
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
         // Note state and type apply filters are handled after server call to get values.
+
+        // TODO itenized was left out and needs to be added.
 
       }
     } else {
@@ -568,6 +633,7 @@ export class TransactionsFilterComponent implements OnInit {
   private initValidationErrors() {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
+    this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
   }
 
 
@@ -578,6 +644,7 @@ export class TransactionsFilterComponent implements OnInit {
    * @returns true if valid.
    */
   private validateFilters(): boolean {
+
     this.initValidationErrors();
     if (this.filterDateFrom !== null && this.filterDateTo === null) {
       this.dateFilterValidation.isError = true;
@@ -617,7 +684,81 @@ export class TransactionsFilterComponent implements OnInit {
       return false;
     }
 
+    if (this.filterAggregateAmountMin !== null && this.filterAggregateAmountMax === null) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Maximum Aggregate Amount is required';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+    if (this.filterAggregateAmountMax !== null && this.filterAggregateAmountMin === null) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Minimum Aggregate Amount is required';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+    if (this.filterAggregateAmountMin > this.filterAggregateAmountMax) {
+      this.aggregateAmountFilterValidation.isError = true;
+      this.aggregateAmountFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideAggregateAmountFilter = false;
+      return false;
+    }
+
     return true;
+  }
+
+
+  /**
+   * Process the message received to remove the filter.
+   * 
+   * @param message contains details on the filter to remove
+   */
+  private removeFilter(message: any) {
+    if (message) {
+      if (message.key) {
+        switch (message.key) {
+          case FilterTypes.state:
+            for (const st of this.states) {
+              if (st.code === message.value) {
+                st.selected = false;
+              }
+            }
+            break;
+          case FilterTypes.category:
+            for (const categoryGroup of this.transactionCategories) {
+              for (const categoryType of categoryGroup.options) {
+                if (categoryType.text === message.value) {
+                  categoryType.selected = false;
+                }
+              }
+            }
+            break;
+          case FilterTypes.date:
+            this.filterDateFrom = null;
+            this.filterDateTo = null;
+            break;
+          case FilterTypes.amount:
+            this.filterAmountMin = null;
+            this.filterAmountMax = null;
+            break;
+          case FilterTypes.aggregateAmount:
+            this.filterAggregateAmountMin = null;
+            this.filterAggregateAmountMax = null;
+            break;
+          case FilterTypes.memoCode:
+            this.filterMemoCode = false;
+            break;
+          case FilterTypes.itemizations:
+            for (const itemization of this.itemizations) {
+              if (itemization.itemization_code === message.value) {
+                itemization.selected = false;
+              }
+            }
+            break;
+          default:
+            console.log('unexpected key for remove filter = ' + message.key);
+        }
+      }
+    }
   }
 
 }

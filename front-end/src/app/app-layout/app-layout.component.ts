@@ -35,6 +35,7 @@ export class AppLayoutComponent implements OnInit {
   public sideBarClass: string = null;
   public toggleMenu: boolean = false;
   public dueDate: string = null;
+  public reportOverDue: boolean = false;
 
   private _step: string = null;
 
@@ -170,6 +171,10 @@ export class AppLayoutComponent implements OnInit {
             this.dueDate = formInfo.dueDate;
           } else if (formInfo.hasOwnProperty('duedate')) {
             this.dueDate = formInfo.duedate;
+          }
+
+          if (formInfo.hasOwnProperty('overDue')) {
+            this.reportOverDue = formInfo.overDue;
           }
 
           if (this._step !== 'step_1') {

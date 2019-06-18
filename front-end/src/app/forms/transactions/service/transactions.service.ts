@@ -79,8 +79,6 @@ export class TransactionsService {
       filters: TransactionFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    // let params = new HttpParams();
-    const formData: FormData = new FormData();
     const url = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -88,46 +86,12 @@ export class TransactionsService {
 
     const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
-        const request: any = {};
-
-    /////////////////////////////////
-    /////////////////////////////////
-    /////////////////////////////////
-
-    // This is a temp patch/fix for and issue where
-    // report ID is not in local storage when user clicks
-    // View Transactions from the Individual Receipt compoent.
-    // It is here for development purposes only.  Not for production.
-
-    // if (reportId === '0') {
-    //   console.log('WARNING: Using default Report ID 1206963 for development reasons as no value ' +
-    //     'was present in localStorage for form_F3X_report_type from IndividualReceiptComponent');
-    //   reportId = '431'; // '1206963';
-    // }
-
-    /////////////////////////////////
-    /////////////////////////////////
-    //////////////////////////////////
-
+    const request: any = {};
     request.reportid = reportId;
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
-
-    // if (filters) {
-    //   request.filters = filters;
-    //   if (request.filters.keywords) {
-    //     const keywordsEdited = [];
-    //     for (const keyword of request.filters.keywords) {
-    //       // replace ` and " with ' for backend.
-    //       let kw = keyword.replace(/\"/g, `'`);
-    //       kw = kw.replace(/`/g, `'`);
-    //       keywordsEdited.push(kw);
-    //     }
-    //     request.filters.keywords = keywordsEdited;
-    //   }
-    // }
 
     if (filters) {
       request.filters = filters;
@@ -149,10 +113,10 @@ export class TransactionsService {
 
       request.filters = emptyFilters;
     }
-     
-    console.log(" Transaction Table request = ", request);
-    console.log(" Transaction Table httpOptions = ", httpOptions);
-  
+
+    console.log(' Transaction Table request = ', request);
+    console.log(' Transaction Table httpOptions = ', httpOptions);
+
     return this._http
     .post(
       `${environment.apiUrl}${url}`,
@@ -169,21 +133,13 @@ export class TransactionsService {
         }
         return false;
     }));
-
-
-    // return this._http
-    // .get(
-    //     `${environment.apiUrl}${url}`,
-    //     {
-    //       headers: httpOptions,
-    //       params
-    //     }
-    //   );
   }
 
 
   /**
    * Map server fields from the response to the model.
+   *
+   * TODO The API should be changed to pass the property names expected by the front end.
    */
   public mapFromServerFields(serverData: any) {
     if (!serverData || !Array.isArray(serverData)) {
@@ -225,6 +181,8 @@ export class TransactionsService {
    *
    * TODO Too many places where fields names are referenced when converting
    * from/to server names.  Need to consolidate.
+   *
+   * TODO The API should be changed to pass the property names expected by the front end.
    */
   public mapToSingleServerName(appFieldName: string) {
 
@@ -281,9 +239,8 @@ export class TransactionsService {
         break;
       case 'itemized':
         name = 'itemized';
-        break;        
+        break;
       default:
-        // name = name;;
     }
     return name ? name : '';
   }
@@ -291,6 +248,8 @@ export class TransactionsService {
 
   /**
    * Map front-end model fields to server fields.
+   *
+   * TODO The API should be changed to pass the property names expected by the front end.
    */
   public mapToServerFields(model: TransactionModel) {
 
@@ -334,12 +293,10 @@ export class TransactionsService {
    * Some data from the server is formatted for display in the UI.  Users will search
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added later.
-   * 
-   * This may be neeeded.
    *
    * @param response the server data
    */
-  public mockAddUIFileds(response: any) {
+  public addUIFileds(response: any) {
     if (!response) {
       return;
     }
@@ -512,25 +469,51 @@ export class TransactionsService {
    * @param      {String}   formType      The form type of the transaction to get
    * @return     {Observable}             An Observable of type `any` containing the transactions
    */
-  public getUserDeletedTransactions(formType: string): Observable<any> {
+  public getUserDeletedTransactions(
+      formType: string,
+      reportId: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean,
+      filters: TransactionFilterModel): Observable<any> {
+
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    let params = new HttpParams();
     const url = '';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('formType', formType);
+    const request: any = {};
+    request.reportid = reportId;
+    request.page = page;
+    request.itemsPerPage = itemsPerPage;
+    request.sortColumnName = sortColumnName;
+    request.descending = descending;
 
-    // return this._http
-    //  .get(
-    //     `${environment.apiUrl}${url}`,
-    //     {
-    //       headers: httpOptions,
-    //       params
-    //     }
-    //   );
+    if (filters) {
+      request.filters = filters;
+      if (request.filters.keywords) {
+        const keywordsEdited = [];
+        for (const keyword of request.filters.keywords) {
+          // replace ` and " with ' for backend.
+          let kw = keyword.replace(/\"/g, `'`);
+          kw = kw.replace(/`/g, `'`);
+          keywordsEdited.push(kw);
+        }
+        request.filters.keywords = keywordsEdited;
+      } else {
+        request.filters.keywords = [];
+      }
+    } else {
+      const emptyFilters: any = {};
+      emptyFilters.keywords = [];
+
+      request.filters = emptyFilters;
+    }
+
+
 
     const mockResponse: GetTransactionsResponse = {
       transactions: this.mockRestoreTrxArray,
@@ -676,20 +659,11 @@ export class TransactionsService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/get_ItemizationIndicators';
     let httpOptions =  new HttpHeaders();
-    let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     return this._http
-        /*.get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions,
-            params
-          }
-        );*/
-
         .get(
           `${environment.apiUrl}${url}`,
           {

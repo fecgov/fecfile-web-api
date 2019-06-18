@@ -71,8 +71,8 @@
                 Filter
               </button>               
               <div class="input-group pl-0 transactions__trx-search">
-                <div class="input-group-append" (click)="clearSearch()" 
-                    ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
+                <div class="input-group-append" (click)="clearSearchAndFilters()" 
+                    ngbTooltip="Clear Keywords and Filters" tooltipClass="form-tooltip">
                   <span class="input-group-text" id="">
                     <i class="fas fa-eraser text-grey" aria-hidden="true"></i>
                   </span>
@@ -93,18 +93,193 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="transactions__btn-container">
-              <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+              <div class="transactions__tag-outer-wrapper">
+                  <div id="button-container" class="transactions__tag_wrapper">
+                      <div *ngFor="let tag of tagArray">
+                        <div *ngIf="tag.group.length > 0" class="transactions__tag_group">
+                          <span *ngFor="let gTag of tag.group; let i = index">
+                            <button 
+                              class="btn transactions__tag_btn transactions__btn-search-filter"
+                              (click)="removeTag(tag.type, i, gTag)">
+                              <i class="fas fa-window-close transactions__close-tag"></i>
+                                <span *ngIf="tag.type !== 'amount' &&
+                                             tag.type !== 'aggregateAmount' && 
+                                             tag.type !== 'date'"
+                                >
+                                  <span *ngIf="tag.prefix">{{tag.prefix}}: </span>{{gTag}}
+                                </span>
+                                <span *ngIf="tag.type === 'date'">{{tag.prefix}}:
+                                    {{ gTag.filterDateFrom | date: 'MM/dd/yyyy'}} - 
+                                    {{ gTag.filterDateTo | date: 'MM/dd/yyyy'}}
+                                </span>                              
+                                <span *ngIf="tag.type === 'amount'">{{tag.prefix}}:
+                                    {{ gTag.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
+                                    {{ gTag.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                                </span>
+                                <span *ngIf="tag.type === 'aggregateAmount'">{{tag.prefix}}:
+                                    {{ gTag.filterAggregateAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
+                                    {{ gTag.filterAggregateAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                                </span>
+                            </button>
+                            <span class="transactions__btn-search-filter-join" 
+                              *ngIf="i < (tag.group.length -1 )">
+                                or
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- <br>
+              <hr>
+              <br> -->
+
+              <!-- <div style="display: inline-block">
+                <div id="button-container" class="transactions__tag_wrapper">
+                  <div *ngIf="searchTextArray.length > 0" class="transactions__tag_group">
+                    <span *ngFor="let searchTextItem of searchTextArray; let i = index">
+                      <button 
+                        class="btn transactions__tag_btn transactions__btn-search-filter"
+                        (click)="removeSearchText(i)">
+                        <i class="fas fa-window-close"></i>
+                        {{ searchTextItem }}
+                      </button>
+                      <span class="transactions__btn-search-filter-join" 
+                        *ngIf="i < (searchTextArray.length -1 )">
+                          or
+                      </span>
+                    </span>
+                  </div>
+                  <div *ngIf="filters.filterCategories && filters.filterCategories.length > 0" 
+                      class="transactions__tag_group">
+                    <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
+                      <button
+                        class="btn transactions__tag_btn transactions__btn-search-filter"
+                        (click)="removeCategoryFilter(i, categoryZ)">
+                        <i class="fas fa-window-close"></i>
+                        Type: {{ categoryZ }}
+                      </button>
+                      <span class="transactions__btn-search-filter-join" 
+                        *ngIf="i < (filters.filterCategories.length -1 )">
+                          or
+                      </span>
+                    </span>
+                  </div> 
+                  <div *ngIf="filters.filterDateFrom  && filters.filterDateTo"
+                      class="transactions__tag_group">
+                    <button
+                      class="btn transactions__tag_btn transactions__btn-search-filter"
+                      (click)="removeDateFilter()">
+                      <i class="fas fa-window-close"></i>
+                      Date: {{ filters.filterDateFrom | date: 'MM/dd/yyyy'}} - 
+                              {{ filters.filterDateTo | date: 'MM/dd/yyyy'}}
+                    </button>
+                  </div>
+                  <div *ngIf="filters.filterStates && filters.filterStates.length > 0" 
+                      class="transactions__tag_group">
+                    <span *ngFor="let state of filters.filterStates; let i = index">
+                      <button
+                        class="btn transactions__tag_btn transactions__btn-search-filter"
+                        (click)="removeStateFilter(i, state)">
+                        <i class="fas fa-window-close"></i>
+                        {{ state }}
+                      </button>
+                      <span class="transactions__btn-search-filter-join" 
+                        *ngIf="i < (filters.filterStates.length -1 )">
+                          or
+                      </span>
+                    </span>                   
+                  </div>
+                  <div *ngIf="filters.filterAmountMin > 0 && filters.filterAmountMax > 0"
+                      class="transactions__tag_group">
+                    <button
+                      class="btn transactions__tag_btn transactions__btn-search-filter"
+                      (click)="removeAmountFilter()">
+                      <i class="fas fa-window-close"></i>
+                      Amount: {{ filters.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
+                              {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    </button>
+                  </div>                    
+                </div> -->
+                                
+
+                <!-- <div id="" class="transactions__tag_wrapper">
+                  <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
+                    <button
+                      class="btn transactions__tag_btn transactions__btn-search-filter"
+                      (click)="removeCategoryFilter(i, categoryZ)">
+                      <i class="fas fa-window-close"></i>
+                      Type: {{ categoryZ }}
+                    </button>
+                    <span class="transactions__btn-search-filter-join" 
+                      *ngIf="i < (filters.filterCategories.length -1 )">
+                        or
+                    </span>
+                  </span>
+                </div>
+              </div> -->
+
+
+              <!-- <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+                <div class="tag__category">
+                  <button
+                    class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                    (click)="removeSearchText(i)">
+                    <i class="fas fa-window-close"></i>
+                    {{ searchTextItem }}
+                  </button>
+                  <span class="transactions__btn-search-filter-join" 
+                    *ngIf="i < (searchTextArray.length -1 )">
+                      or
+                  </span>
+                </div>
+              </div> -->
+
+              <!-- <div *ngFor="let categoryZ of filters.filterCategories; let i = index">
                 <button
                   class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeSearchText(i)">
+                  (click)="removeCategoryFilter(i, categoryZ)">
                   <i class="fas fa-window-close"></i>
-                  {{ searchTextItem }}
+                  Type: {{ categoryZ }}
                 </button>
                 <span class="transactions__btn-search-filter-join" 
-                  *ngIf="i < (searchTextArray.length -1 )">
+                  *ngIf="i < (filters.filterCategories.length -1 )">
                     or
                 </span>
-              </div>
+              </div> -->
+
+
+              <!-- <div *ngIf="filters.filterDateFrom  && filters.filterDateTo">
+                <button
+                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                  (click)="removeDateFilter()">
+                  <i class="fas fa-window-close"></i>
+                  Date: {{ filters.filterDateFrom | date: 'MM/dd/yyyy'}} - 
+                          {{ filters.filterDateTo | date: 'MM/dd/yyyy'}}
+                </button>
+              </div>  -->
+              <!-- <div *ngFor="let state of filters.filterStates; let i = index">
+                <button
+                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                  (click)="removeStateFilter(i, state)">
+                  <i class="fas fa-window-close"></i>
+                  {{ state }}
+                </button>
+                <span class="transactions__btn-search-filter-join" 
+                  *ngIf="i < (filters.filterStates.length -1 )">
+                    or
+                </span>
+              </div>  -->
+              <!-- <div *ngIf="filters.filterAmountMin > 0 && filters.filterAmountMax > 0">
+                <button
+                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                  (click)="removeAmountFilter()">
+                  <i class="fas fa-window-close"></i>
+                  Amount: {{ filters.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
+                          {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                </button>
+              </div>  -->
             </div>          
           </div>
         </div>
