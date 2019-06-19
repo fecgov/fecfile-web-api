@@ -28,12 +28,7 @@
       <ng-container *ngFor="let row of formFields">
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-            <div class="col-md-3" *ngFor="let col of row.cols" [ngClass]="
-              {
-                'col-md-3': col.name !== 'street_1' && col.name !== 'street_2',
-                'col-md-4': col.name === 'street_1' || col.name === 'street_2'
-              }
-            ">
+            <div [class]="row.colClassName" *ngFor="let col of row.cols">
               <div class="form-group">
                 <label for="{{ col.name }}">
                   {{ col.text }}
@@ -49,7 +44,7 @@
                   </button>
                   <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
                 </label>
-                <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
+                <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'checkbox'">
                   <ng-container *ngIf="col.inputGroup">
                     <div class="input-group">
                       <div class="input-group-prepend">
@@ -59,7 +54,7 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col.type === 'date' ? col.type : 'text'"
+                        [type]="col.type"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
@@ -77,7 +72,7 @@
                       style="display: block;"
                       [style.width]="col?.width"
                       [style.height]="col.height"
-                      [type]="col.type === 'date' ? col.type : 'text'"
+                      [type]="col.type"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
