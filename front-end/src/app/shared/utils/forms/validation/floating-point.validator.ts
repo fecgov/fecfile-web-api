@@ -1,7 +1,7 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 
 /**
- * Custom validator to validate input for floating point numbers.
+ * Custom validator to validate input for floating point numbers with optional comma.
  *
  * @param      {Object}  control     The control
  * @param      {String}  key         The key
