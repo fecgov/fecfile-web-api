@@ -43,6 +43,7 @@ public recycleBinView = ActiveView.recycleBin;
 public isShowFilters = false;
 public searchText = '';
 public searchTextArray = [];
+public viewMode = '';
 
 /**
  * Subscription for applying filters to the reports obtained from
@@ -71,6 +72,7 @@ private readonly filtersLSK = 'reports.filters';
     var dateObj = new Date();
     this.currentYear = dateObj.getUTCFullYear();
     this.clearSearch();
+    this.viewMode = 'tab1';
     
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");

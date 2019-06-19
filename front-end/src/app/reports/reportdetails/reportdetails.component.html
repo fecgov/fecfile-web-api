@@ -4,7 +4,8 @@
             {{determineItemRange()}} of {{config.totalItems}}
         </div>
     </div>            
-    <table class="table table-striped table-hover table__sortable forms__trx-table">
+    <!--<table class="table table-striped table-hover table__sortable forms__trx-table">-->
+    <table class="table table-striped table-hover table__sortable transactions__table">     
         <thead>
             <tr>
                 <!--<th class="forms__trx-table-checkbox">
@@ -45,7 +46,7 @@
                 <th 
                     [@fadeInOut] *ngIf="isColumnVisible('filed_date')"
                     [class]="getSortClass('filed_date')" 
-                    (click)="changeSortDirection('filed_date')">Filed/Saved Date
+                    (click)="changeSortDirection('filed_date')">Filed/Saved Date Time
                 </th>                        
                                                                     
                <!-- <th class="bulk_action">
@@ -83,7 +84,7 @@
                 <td *ngIf="isColumnVisible('amend_ind')"></td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}</td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
-                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy') : (report.last_update_date| date: 'MM/dd/yyyy')}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy@hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy@hh:mm:ss')}}</td>
 
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
@@ -92,12 +93,16 @@
                             <i class="fas fa-trash-restore"></i>
                         </button>                     
                     </div>
-                    <div *ngIf="isReportViewActive()" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown">
+
+                    <div [@fadeInOut] *ngIf="isReportViewActive()" class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown"> 
+
                         <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+
+
+                        <div id="forms__trx-dropdown-action1" *ngIf="report.form_type !== 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -115,7 +120,7 @@
                             </button>
                         </div>
 
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type !== 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action2" *ngIf="report.form_type !== 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -130,7 +135,7 @@
                             </button>
                         </div>
 
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action3" *ngIf="report.form_type === 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -142,7 +147,7 @@
                             </button>
                         </div>
 
-                        <div id="forms__trx-dropdown-action" *ngIf="report.form_type === 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action4" *ngIf="report.form_type === 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -159,6 +164,7 @@
                                 <i class="fas fa-trash"></i>Trash
                             </button>
                         </div>
+
                     </div>
                 </td>
             </tr>

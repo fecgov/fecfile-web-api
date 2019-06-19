@@ -1,90 +1,161 @@
-.report-table-container {
+@import '../../shared/scss/global';
 
-    .forms__trx-table {
-      width: 100%;
+.report-table-container {
+  padding-right: 10px;
+  margin-bottom: 15px;
+  padding-left: 5px;
+  margin-top: 15px;
+  .transactions__page-item-range {
+    padding: .5em .1em 0 0 ;
+  }
+
+  .transactions__table {
+    width: 100%;
+    .transactions__amount {
+      text-align: right;
     }
-  
-    .forms__trx-table-checkbox {
-      width: 3%;
-    }
-  
-    .forms__trx-table-pagination-container {
-      padding: 1em;
-    }  
-  
-    /** hide the dropdown caret **/
-    .dropdown-toggle:after {
-      border: none;
-    }  
-  
-    #forms__trx-dropdown-action > button > i {
-      padding-right: 3px;
-    }
-  
-    .bulk_action {
+  }
+
+  .transactions__table-checkbox {
+    width: 3%;
+  }
+
+  .transactions__table-pagination-container {
+    padding: 1em;
+  }  
+
+  /** hide the dropdown caret **/
+  .dropdown-toggle:after {
+    border: none;
+  }  
+
+  #transactions__dropdown-action > button > i {
+    padding-right: 3px;
+  }
+
+  .bulk_action {
+    text-align: left;
+  }
+
+  .transactions__bulk_action_btn[disabled] {
+    background:#6c757d;
+    border-color: #6c757d;
+  }
+
+  .dropdown-menu {
+    min-width: 6em;
+  }  
+
+  .transactions__item-range {
+    font-size: 13px;
+    color: grey;
+    margin: 0 5px;
+  }
+
+  .transactions__total-amount {
+    float: left;
+  }
+
+  .transactions__total-amount-val {
+    float: right;
+  }
+
+  .transactions__total-amount-tip {
+    color: #112E51;
+    padding-left: 3px;
+    float: right;
+  }
+
+  .transactions__tooltip {
+    top: 0;
+    width: 300px;
+    .tooltip-inner {
+      max-width: 300px;
       text-align: left;
-    }
-  
-    .dropdown-menu {
-      min-width: 6em;
-    }  
-  
-    .forms__trx-item-range {
-      font-size: 13px;
-      color: grey;
-      margin: 0 5px;
-    }
-  
-    .forms__trx-total-amount > i {
-      color: #112E51;
-      padding-left: 3px;
-    }
-  
-    .forms__trx-total-amount-container {
-      margin: 1.5em 0;
-    }
-  
-  
-    /* style ngx-pagination - start */
-    /* override some styling where use of !important is made. */
-  
-    .ngx-pagination .current{
-      padding: 0.1875rem 0.625rem;
-      background: #9B9B9B !important;;
-      color: #fefefe;
-      cursor: default;
-    }
-  
-    .ngx-pagination a, .ngx-pagination button {
-      color: #9B9B9B !important;;
-      display: block;
-      padding: 0.1875rem 0.625rem;
-      border-radius: 0;
-    }	
-  
-    /* style ngx-pagination - end */
-  
-  
-    .column-options-modal {
-  
-      #btn-cancel {
-        background-color: #cccccc;
+      a {
+        color: $white;
+        text-decoration: none;
+        &:hover {
+          text-decoration: underline;
+        }
       }
-  
-      .btn-modal-footer {
-        width: 6em;
+      .external-link-icon {
+        margin-left: 5px;
       }
-  
-      .row{
-        height: 3em;
+    }
+  }
+
+  // .transactions__total-amount-container {
+  //   margin: 1.5em 0;
+  // }
+
+
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
+
+  .ngx-pagination .current{
+    padding: 0.1875rem 0.625rem;
+    background: #9B9B9B !important;;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a, .ngx-pagination button {
+    color: #9B9B9B !important;;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }	
+
+  /* style ngx-pagination - end */
+
+
+  .column-options-modal {
+
+    #transactions__pin-modal-header {
+      background-color: $crusta;
+    }
+
+    .btn-modal-footer {
+      width: 6em;
+    }
+
+    .row{
+      height: 3em;
+    }
+
+    input[type="checkbox" i]:disabled, .disabled-column-option{
+      color: #cccccc;
+    } 
+
+    input[type=checkbox] {
+      transform: scale(1.5);
+    }
+  }
+}
+
+.dropdown-menu {
+  min-width: 0px !important;
+  &.show {
+    .dropdown-item {
+      &:focus,
+      &:hover,
+      &:active,
+      &:visited {
+        background-color: $white;
+        color: $black;
+        cursor: pointer;
+        outline: none;
       }
-  
-      input[type="checkbox" i]:disabled, .disabled-column-option{
-        color: #cccccc;
-      } 
-  
-      input[type=checkbox] {
-        transform: scale(1.5);
+      &:hover {
+        text-decoration: underline;
       }
+    }
+  }
+  }
+
+  .dropdown-toggle {
+    &:after {
+      display:none;
     }
   }

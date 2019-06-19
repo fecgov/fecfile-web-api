@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
+
 /**
  * A message service for sending and receiving messages of any type
  * between transaction components.
@@ -16,6 +17,7 @@ export class TransactionsMessageService {
   private doKeywordFilterSearchSubject = new Subject<any>();
   private editTransactionSubject = new Subject<any>();
   private showTransactionsSubject = new Subject<any>();
+  private removeFilterSubject = new Subject<any>();
 
 
   /**
@@ -135,6 +137,32 @@ export class TransactionsMessageService {
 
   public getShowTransactionsMessage(): Observable<any> {
     return this.showTransactionsSubject.asObservable();
+  }
+
+  /**
+   * A publisher uses this method to send a message to the Transactions Filter
+   * Component to remove a filter.
+   *
+   * @param message
+   */
+  public sendRemoveFilterMessage(message: any) {
+    this.removeFilterSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Remove Filter message.
+   */
+  public clearRemoveFilterMessage() {
+    this.removeFilterSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Remove Filter message.
+   */
+  public getRemoveFilterMessage(): Observable<any> {
+    return this.removeFilterSubject.asObservable();
   }
 
 }

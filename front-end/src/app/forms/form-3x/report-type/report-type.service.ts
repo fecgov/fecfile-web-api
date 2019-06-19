@@ -92,8 +92,12 @@ export class ReportTypeService {
       }
     }
 
-    if (form3xReportType.election_date.length >= 1) {
-      formData.append('date_of_election', form3xReportType.election_date);
+    if (form3xReportType.election_date !== null) {
+      if (typeof form3xReportType.election_date === 'string') {
+        if (form3xReportType.election_date.length >= 1) {
+          formData.append('date_of_election', form3xReportType.election_date);
+        }        
+      }
     }
 
     if (form3xReportType.election_state !== null) {
@@ -103,8 +107,6 @@ export class ReportTypeService {
         }
       }
     }
-
-    console.log(" access_type =", access_type);
 
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
