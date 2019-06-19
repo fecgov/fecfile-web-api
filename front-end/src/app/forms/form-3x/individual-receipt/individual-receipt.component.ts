@@ -217,15 +217,22 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  /**
+   * Updates the contribution aggregate field once contribution ammount is entered.
+   *
+   * @param      {Object}  e       The event object.
+   */
   public contributionAmountChange(e): void {
-    console.log('contributionAmountChange: ');
-    console.log('e: ', e);
     const contributionAmount: string = e.target.value;
     const contributionAggregate: string = this.frmIndividualReceipt.get('contribution_aggregate').value;
     const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
     const value: string = this._decimalPipe.transform(total, '.2-2');
 
     this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+
+    /**
+     * TODO: To be implemented in the future.
+     */
 
     // this._receiptService
     //   .aggregateAmount(
@@ -263,7 +270,6 @@ export class IndividualReceiptComponent implements OnInit {
 
       this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
-          console.log('res: ', res);
           this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
             const message: any = {
               formType: this._formType,
@@ -272,18 +278,6 @@ export class IndividualReceiptComponent implements OnInit {
 
             this._messageService.sendMessage(message);
           });
-
-          this._receiptService
-            .aggregateAmount(
-              res.report_id,
-              res.transaction_type,
-              res.contribution_date,
-              res.entity_id,
-              res.contribution_amount
-            )
-            .subscribe(resp => {
-              console.log('resp: ', resp);
-            });
 
           this.frmIndividualReceipt.reset();
 
