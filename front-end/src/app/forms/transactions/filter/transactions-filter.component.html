@@ -230,10 +230,10 @@
             <ul class="transactions__filter-type-list">
               <li *ngFor="let itemization of itemizations">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="{{ itemization?.itemization_code }}" 
+                  <input class="form-check-input" type="checkbox" id="{{ itemization?.itemized }}" 
                     [(ngModel)]="itemization.selected">
-                  <label class="form-check-label" for="{{ itemization?.itemization_code }}">
-                    {{ itemization?.itemization_code }} - {{ itemization?.itemization_desc}}</label>
+                  <label class="form-check-label" for="{{ itemization?.itemized }}">
+                    {{ itemization?.itemized }} - {{ itemization?.itemization_desc}}</label>
                  </div>
               </li>
             </ul>

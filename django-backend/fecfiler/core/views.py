@@ -1370,6 +1370,9 @@ def filter_get_all_trans(request, param_string):
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
+        if 'filterItemizations' in f_key:
+            itemized_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND itemized In " + itemized_tuple
         
         if 'filterMemoCode' in f_key:
             if str(value_d).lower() == 'true':
@@ -1389,6 +1392,7 @@ def filter_get_all_trans(request, param_string):
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
+        print("request.data: ", request.data)
         cmte_id = request.user.username
         param_string = ""
         page_num = int(request.data.get('page', 1))
@@ -1412,11 +1416,11 @@ def get_all_transactions(request):
         keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
             'transaction_date', 'transaction_amount','aggregate_amt','purpose_description', 
-            'occupation', 'employer', 'memo_code', 'memo_text']
+            'occupation', 'employer', 'memo_code', 'memo_text', 'itemized']
         search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
             'street_1', 'street_2', 'city', 'state', 'zip_code', 
             'transaction_date', 'transaction_amount','aggregate_amt', 'purpose_description', 
-            'occupation', 'employer', 'memo_code', 'memo_text']
+            'occupation', 'employer', 'memo_code', 'memo_text', 'itemized']
         if search_string:
             for key in search_keys:
                 if not param_string:
@@ -1467,7 +1471,7 @@ def get_all_transactions(request):
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
-        # print(trans_query_string)
+        print("trans_query_string: ",trans_query_string)
         # import ipdb;ipdb.set_trace()
         if sortcolumn and sortcolumn != 'default':
             trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
@@ -1590,6 +1594,7 @@ def get_all_deleted_transactions(request):
 END - GET ALL DELETED TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
+
 """
 ******************************************************************************************************************************
 GET SUMMARY TABLE API - CORE APP - SPRINT 10 - FNE 720 - BY PRAVEEN JINKA
@@ -2413,11 +2418,11 @@ def get_ItemizationIndicators(request):
       
         data = """{
                     "data":  [{
-                            "itemization_code": "I",
+                            "itemized": "I",
                             "itemization_desc": "Itemized"
                         },
                        {
-                            "itemization_code": "U",
+                            "itemized": "U",
                             "itemization_desc": "UnItemized"
                         }]
                   }

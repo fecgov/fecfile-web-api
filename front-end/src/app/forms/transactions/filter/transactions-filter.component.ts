@@ -386,16 +386,19 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
     }
-
+    console.log("itemizations = ", this.itemizations)
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
-        filterItemizations.push(I.itemization_code);
+        console.log("I.itemized", I.itemized);
+        filterItemizations.push(I.itemized);
+        console.log ("itemization tag found...");
         modified = true;
       }
     }
     filters.filterItemizations = filterItemizations;
-
+    console.log("filters.filterItemizations =", filters.filterItemizations);
+    
     filters.show = modified;
     this._transactionsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
   }
@@ -553,39 +556,39 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   }
 
   private getItemizations() {
-    // TODO using this service to get states until available in another API.
+    // TODO using this service to get Itemizations until available in another API.
     this._transactionsService
       .getItemizations()
         .subscribe(res => {
 
           let itemizationExist = false;
           if (res.data) {
-            console.log('res.data', res.data);
-            if (res.data) {
+              console.log("res.data", res.data);
               itemizationExist = true;
               for (const s of res.data) {
-                // check for states selected in the filter cache
+                // check for Itemizations selected in the filter cache
                 // TODO scroll to first check item
-                if (this.cachedFilters.filterItemizations) {
-                  if (this.cachedFilters.filterItemizations.includes(s.code)) {
-                    s.selected = true;
-                    this.isHideItemizationFilter = false;
-                  } else {
-                    s.selected = false;
+                if (this.cachedFilters) {
+                  if (this.cachedFilters.filterItemizations) {
+                    if (this.cachedFilters.filterItemizations.includes(s.itemized)) {
+                      s.selected = true;
+                      this.isHideItemizationFilter = false;
+                    } else {
+                      s.selected = false;
+                    }
                   }
                 }
               }
-            }
+
           }
           if (itemizationExist) {
             this.itemizations = res.data;
-            console.log('this.itemizations', this.itemizations);
+            console.log("this.itemizations", this.itemizations);
           } else {
             this.itemizations = [];
           }
         });
   }
-
 
   /**
    * Get the filters from the cache.
@@ -618,6 +621,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         // Note state and type apply filters are handled after server call to get values.
 
         // TODO itenized was left out and needs to be added.
+        this.itemizations = this.cachedFilters.filterItemizations;
 
       }
     } else {
