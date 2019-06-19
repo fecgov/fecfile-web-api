@@ -259,34 +259,39 @@
             ]
          },
          {
-            "cols": [{
-               "text": "Memo Text",
-               "infoIcon": true,
-               "infoText": "Request language from RAD",
-               "name": "memo_text",
-               "type": "text",
-               "validation": {
-                  "required": false,
-                  "max": "100",
-                  "alphaNumeric": true
-               }
-            }]
-         },
-         {
-            "cols": [{
-               "text": "Contribution Purpose Description",
-               "infoIcon": true,
-               "infoText": "Request language from RAD",
-               "name": "purpose_description",
-               "type": "text",
-               "validation": {
-                  "required": false,
-                  "max": "100",
-                  "alphaNumeric": true
+            "colClassName": "col-md-5",
+            "cols": [
+               {
+                  "text": "Memo Text",
+                  "infoIcon": true,
+                  "infoText": "Request language from RAD",
+                  "name": "memo_text",
+                  "type": "textarea",
+                  "validation": {
+                     "required": false,
+                     "max": "100",
+                     "alphaNumeric": true
+                  },
+                  "scroll": true,
+                  "height": "135px",
+                  "width": "400px"
                },
-               "width": "24px",
-               "height": "24px"
-            }]
+               {
+                  "text": "Contribution Purpose Description",
+                  "infoIcon": true,
+                  "infoText": "Request language from RAD",
+                  "name": "purpose_description",
+                  "type": "textarea",
+                  "validation": {
+                     "required": false,
+                     "max": "100",
+                     "alphaNumeric": true
+                  },
+                  "scroll": true,
+                  "height": "135px",
+                  "width": "400px"                  
+               }
+            ]
          }
       ],
       "hiddenFields": [{
