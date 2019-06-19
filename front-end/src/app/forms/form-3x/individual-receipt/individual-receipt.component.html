@@ -74,6 +74,7 @@
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [attr.readOnly]="col?.readOnly ? col?.readOnly : null"
+                      [attr.value]="col?.value ? col.value : null"
                       [formControlName]="col?.name"
                       (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="

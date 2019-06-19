@@ -162,6 +162,7 @@
                   "name":"contribution_aggregate",
                   "readOnly": true,
                   "type":"text",
+                  "value": "0.00",
                   "validation":{  
                      "required": false,
                      "max":"12",

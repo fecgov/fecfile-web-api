@@ -11,6 +11,7 @@ import {
   ViewEncapsulation,
   ViewChild
 } from '@angular/core';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -29,7 +30,7 @@ import { contributionDate } from '../../../shared/utils/forms/validation/contrib
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
-  providers: [NgbTooltipConfig],
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe ],
   encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit {
@@ -60,7 +61,9 @@ export class IndividualReceiptComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _utilService: UtilService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _currencyPipe: CurrencyPipe,
+    private _decimalPipe: DecimalPipe
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -218,8 +221,11 @@ export class IndividualReceiptComponent implements OnInit {
     console.log('contributionAmountChange: ');
     console.log('e: ', e);
     const contributionAmount: string = e.target.value;
+    const contributionAggregate: string = this.frmIndividualReceipt.get('contribution_aggregate').value;
+    const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
+    const value: string = this._decimalPipe.transform(total, '.2-2');
 
-    console.log('contributionAmount: ', contributionAmount);
+    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
 
     // this._receiptService
     //   .aggregateAmount(
@@ -267,17 +273,17 @@ export class IndividualReceiptComponent implements OnInit {
             this._messageService.sendMessage(message);
           });
 
-          // this._receiptService
-          //   .aggregateAmount(
-          //     res.report_id,
-          //     res.transaction_type,
-          //     res.contribution_date,
-          //     res.entity_id,
-          //     res.contribution_amount
-          //   )
-          //   .subscribe(resp => {
-          //     console.log('resp: ', resp);
-          //   });
+          this._receiptService
+            .aggregateAmount(
+              res.report_id,
+              res.transaction_type,
+              res.contribution_date,
+              res.entity_id,
+              res.contribution_amount
+            )
+            .subscribe(resp => {
+              console.log('resp: ', resp);
+            });
 
           this.frmIndividualReceipt.reset();
 

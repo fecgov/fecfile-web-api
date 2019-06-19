@@ -8,7 +8,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  */
 export function floatingPoint(): ValidatorFn {
 	return (control: AbstractControl): { [key: string]: any } => {
-		const regex: any = new RegExp(/^[+-]?\d+(\.\d+)?$/g);
+		const regex: any = new RegExp(/^[0-9.,]+$/g);
 		const text: string = control.value;
 
 		if (text) {
