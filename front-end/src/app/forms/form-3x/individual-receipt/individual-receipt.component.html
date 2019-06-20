@@ -53,7 +53,8 @@
                         </span>
                       </div>
                       <input
-                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"                        
                         [type]="col?.type"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
