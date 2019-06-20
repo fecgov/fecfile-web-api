@@ -1,14 +1,16 @@
 @import '../../scss/global';
 
 .signee-container {
+  padding-left: 15px;
+  padding-right: 15px;
   .grid-row {
     margin-left: 0;
     margin-right: 0;
     .grid-row__col {
       padding-left: 0;
       padding-right: 0;
-      padding-top: 10px;
-      padding-bottom: 10px;
+      padding-top: 15px;
+      padding-bottom: 15px;
 
       input[type='text'],
           input[type='date'],
