@@ -44,7 +44,7 @@
                   </button>
                   <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
                 </label>
-                <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'checkbox'">
+                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date' || col?.type === 'checkbox'">
                   <ng-container *ngIf="col.inputGroup">
                     <div class="input-group">
                       <div class="input-group-prepend">
@@ -54,7 +54,7 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col.type"
+                        [type]="col?.type"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
@@ -70,8 +70,8 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       [style.width]="col?.width"
-                      [style.height]="col.height"
-                      [type]="col.type"
+                      [style.height]="col?.height"
+                      [type]="col?.type"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
@@ -87,41 +87,41 @@
                     class="error-text"
                     *ngIf="
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
-                      frmIndividualReceipt.get(col.name).invalid
+                      frmIndividualReceipt.get(col?.name).invalid
                     "
                   >
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors?.maxlength">
+                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors?.maxlength">
                       <div
                         class="text-error text-left"
                         *ngIf="
-                          frmIndividualReceipt.get(col.name).errors.maxlength?.requiredLength <
-                          frmIndividualReceipt.get(col.name).errors.maxlength?.actualLength
+                          frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength <
+                          frmIndividualReceipt.get(col?.name).errors.maxlength?.actualLength
                         "
                       >
-                        Only {{ frmIndividualReceipt.get(col.name).errors.maxlength?.requiredLength }} characters
+                        Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
                         allowed.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonAlphaNumeric"
+                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonAlphaNumeric"
                       >
                         Alphanumeric characters only.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.nonFloatingPoint"
+                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonFloatingPoint"
                       >
                         Only numerical values are allowed.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col.name).errors">
+                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col.name).errors?.contributionDateInvalid"
+                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.contributionDateInvalid"
                       >
                         Entered date is outside of the report coverage period. Please enter transactions for this
                         coverage period only.
@@ -129,16 +129,16 @@
                     </ng-container>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="col.type === 'textarea'">
+                <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea 
-                    [style.height]="col.height"
-                    [style.width]="col.width"
+                    [style.height]="col?.height"
+                    [style.width]="col?.width"
                     [style.overflow]="col.scroll ? col.scroll : null"
-                    [name]="col.name" 
-                    [formControlName]="col.name"
+                    [name]="col?.name" 
+                    [formControlName]="col?.name"
                   ></textarea>
                 </ng-container>
-                <ng-container *ngIf="col.type === 'select' && col.name === 'state'">
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
                     class="state-select"
                     [formControlName]="col?.name"
