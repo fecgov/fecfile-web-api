@@ -1,7 +1,7 @@
 {
    "data": {
       "formFields": [{
-            "colClassName": "col-md-3",
+            "colClassName": "col col-md-3",
             "cols": [{
                   "text": "Contributor Last Name",
                   "infoIcon": false,
@@ -13,7 +13,7 @@
                      "max": "30",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "197px"
                },
                {
@@ -27,7 +27,7 @@
                      "max": "20",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "197px"
                },
                {
@@ -41,13 +41,13 @@
                      "max": "20",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "197px"
                }
             ]
          },
          {
-            "colClassName": "col-md-3",
+            "colClassName": "col col-md-3",
             "cols": [{
                   "text": "Contributor Prefix",
                   "infoIcon": false,
@@ -59,7 +59,7 @@
                      "max": "10",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "98.35px"
                },
                {
@@ -73,7 +73,7 @@
                      "max": "10",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "98.35px"
                }
             ]
@@ -82,7 +82,7 @@
             "seperator": true
          },
          {
-            "colClassName": "col-md-4",
+            "colClassName": "col col-md-4",
             "cols": [{
                   "text": "Contributor Street 1",
                   "infoIcon": false,
@@ -94,7 +94,7 @@
                      "max": "34",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "275px"
                },
                {
@@ -108,13 +108,13 @@
                      "max": "34",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "275px"
                }
             ]
          },
          {
-            "colClassName": "col-md-3",
+            "colClassName": "col col-md-3",
             "cols": [{
                   "text": "Contributor City",
                   "infoIcon": false,
@@ -126,7 +126,7 @@
                      "max": "30",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "197px"
                },
                {
@@ -140,7 +140,7 @@
                      "max": "2",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "98px"
                },
                {
@@ -154,7 +154,7 @@
                      "max": "9",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "98px"
                }
             ]
@@ -163,7 +163,7 @@
             "seperator": true
          },
          {
-            "colClassName": "col-md-3",
+            "colClassName": "col col-md-3",
             "cols": [{
                   "text": "Contributor Employer",
                   "infoIcon": true,
@@ -175,7 +175,7 @@
                      "max": "38",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "200px"
                },
                {
@@ -189,7 +189,7 @@
                      "max": "38",
                      "alphaNumeric": true
                   },
-                  "height": "40px",
+                  "height": "30px",
                   "width": "200px"
                }
             ]
@@ -198,7 +198,7 @@
             "seperator": true
          },
          {
-            "colClassName": "col-md-3",
+            "colClassName": "col col-md-3",
             "cols": [{
                   "text": "Contribution Date",
                   "infoIcon": true,
@@ -212,7 +212,7 @@
                      "contributionDate": true
                   },
                   "width": "154px",
-                  "height": "40px"
+                  "height": "30px"
                },
                {
                   "text": "Contribution Amount",
@@ -226,7 +226,7 @@
                      "dollarAmount": true
                   },
                   "width": "154px",
-                  "height": "40px"
+                  "height": "30px"
                },
                {
                   "text": "Contribution Aggregate",
@@ -240,7 +240,7 @@
                      "alphaNumeric": true
                   },
                   "width": "196px",
-                  "height": "40px"
+                  "height": "30px"
                },
                {
                   "text": "Memo Code",
@@ -259,7 +259,7 @@
             ]
          },
          {
-            "colClassName": "col-md-5",
+            "colClassName": "col col-md-5",
             "cols": [
                {
                   "text": "Memo Text",

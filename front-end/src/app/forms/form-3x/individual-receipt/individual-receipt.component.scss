@@ -9,6 +9,9 @@
         display: block;
         margin: 0 auto;
         width: 96%;
+        h1 {
+          font-family: sans-serif;
+        }
         @include clearfix();
         .btn-options {
           color: $shuttleGray;
@@ -76,8 +79,8 @@
             }
           }
           label {
-            font-family: 'Karla Regular';
-            font-size: 12px;
+            font-family: 'sans-serif';
+            font-size: 13px;
           }
           .ng-select.transaction-type-select,
           .ng-select.transaction-category-select {
@@ -103,8 +106,8 @@
           }
           .ng-select.state-select {
             .ng-select-container {
-              height: 45px;
-              width: 300px;
+              height: 30px;
+              width: 235px;
             }
           }
           .ng-dropdown-panel {

@@ -30,7 +30,7 @@
           <ng-container *ngIf="row.cols | isArray">
             <div [class]="row.colClassName" *ngFor="let col of row.cols">
               <div class="form-group">
-                <label for="{{ col.name }}" style="display: block;">
+                <label [for]="col?.name" style="display: block;">
                   {{ col.text }}
                   <button
                     type="button"
@@ -142,9 +142,9 @@
                 <ng-container *ngIf="col.type === 'select' && col.name === 'state'">
                   <ng-select
                     class="state-select"
-                    [formControlName]="col.name"
+                    [formControlName]="col?.name"
                     [ngClass]="
-                      frmIndividualReceipt.get(col.name)?.invalid &&
+                      frmIndividualReceipt.get(col?.name)?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                         ? 'input-field-error'
                         : ''
