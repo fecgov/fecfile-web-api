@@ -82,29 +82,12 @@
             font-family: 'sans-serif';
             font-size: 13px;
           }
-          .ng-select.transaction-type-select,
-          .ng-select.transaction-category-select {
-            width: 360px;
-            .ng-select-container {
-              .ng-value-container {
-                .ng-placeholder {
-                  color: $black;
-                  font-weight: bold;
-                }
-              }
-            }
-          }
-          .ng-select.transaction-type-select {
-            .ng-dropdown-panel-items {
-              .ng-option-disabled {
-                &.ng-optgroup {
-                  color: $black;
-                  font-weight: bold;
-                }
-              }
-            }
-          }
           .ng-select.state-select {
+            &.state-select-error {
+              .ng-select-container {
+                border: 1px solid $red;
+              }
+            }
             .ng-select-container {
               height: 30px;
               width: 235px;
