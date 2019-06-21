@@ -2,6 +2,13 @@
 
 .individual-receipt-container {
   padding-right: 10px;
+  .row {
+    margin-left: 0;
+    margin-right: 0;    
+    .col-md-12 {
+      padding-left: 5px;
+    }
+  }
   form {
     margin-bottom: 15px;
     header {
@@ -53,8 +60,6 @@
     section {
       .row {
         margin-bottom: 20px;
-        margin-left: 0;
-        margin-right: 0;
         .col {
           &.info-text {
             padding-top: 45px;
