@@ -22,7 +22,7 @@ urlpatterns = [
         views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
     url(r'^core/trash_restore_transactions$',
         views.trash_restore_transactions, name='trash_restore_transactions'),
-    url(r'^core/summary_table$', views.summary_table, name='summary_table'),
+    url(r'^core/get_summary_table$', views.get_summary_table, name='get_summary_table'),
     url(r'^core/thirdNavTransactionTypes$', views.get_thirdNavigationTransactionTypes,
         name='get_thirdNavigationTransactionTypes'),
     url(r'^core/get_FormTypes$', views.get_FormTypes, name='get_FormTypes'),

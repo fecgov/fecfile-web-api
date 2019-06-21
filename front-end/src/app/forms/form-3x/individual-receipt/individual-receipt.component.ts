@@ -21,6 +21,7 @@ import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/For
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -57,7 +58,8 @@ export class IndividualReceiptComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _utilService: UtilService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _reportTypeService: ReportTypeService,
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -296,4 +298,19 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
   }
+  public printPreview(): void {
+    this._reportTypeService
+    .printPreviewPdf('3X')
+    .subscribe(res => {
+      if(res) {
+            console.log("Accessing SignComponent printPriview res ...",res);
+            if (res.printpriview_fileurl !== null) {
+              window.open(res.printpriview_fileurl, '_blank');
+            }
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });
+}
 }

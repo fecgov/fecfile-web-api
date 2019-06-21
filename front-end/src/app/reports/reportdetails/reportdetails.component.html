@@ -31,7 +31,7 @@
                 <th 
                     [@fadeInOut] *ngIf="isColumnVisible('amend_ind')"
                     [class]="getSortClass('amend_ind')" 
-                    (click)="changeSortDirection('amend_ind')">Amendment Indicator
+                    (click)="changeSortDirection('amend_ind')">Amendment <br /> Indicator
                 </th>   
                 <th 
                     [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')"    
@@ -84,7 +84,7 @@
                 <td *ngIf="isColumnVisible('amend_ind')"></td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}</td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
-                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy@hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy@hh:mm:ss')}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss')}}</td>
 
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
