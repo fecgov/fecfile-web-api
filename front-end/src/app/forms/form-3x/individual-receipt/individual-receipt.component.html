@@ -49,16 +49,17 @@
                   <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
                 </label>
                 <ng-container *ngIf="col?.type === 'text' || col?.type === 'date' || col?.type === 'checkbox'">
-                  <ng-container *ngIf="col.inputGroup">
-                    <div class="input-group">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i [class]="col.inputIcon" aria-hidden="true"></i>
-                        </span>
-                      </div>
+                    <div [ngClass]="{'input-group': col.inputGroup}">
+                      <ng-container *ngIf="col.inputGroup">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i [class]="col.inputIcon" aria-hidden="true"></i>
+                          </span>
+                        </div>                        
+                      </ng-container>
                       <input
                         [style.width]="col?.width"
-                        [style.height]="col?.height"                        
+                        [style.height]="col?.height"
                         [type]="col?.type"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
@@ -69,26 +70,9 @@
                             ? 'input-field-error'
                             : ''
                         "
+                        (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                       />
                     </div>
-                  </ng-container>
-                  <ng-container *ngIf="!col.inputGroup">
-                    <input
-                      [style.width]="col?.width"
-                      [style.height]="col?.height"
-                      [type]="col?.type"
-                      [name]="col?.name"
-                      [maxlength]="col?.validation?.max"
-                      [formControlName]="col?.name"
-                      [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'input-field-error'
-                          : ''
-                      "
-                      (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                    />
-                  </ng-container>
                   <div
                     class="error-text"
                     *ngIf="
