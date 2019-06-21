@@ -1366,6 +1366,8 @@ def filter_get_all_trans(request, param_string):
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
+        if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
+            param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
@@ -1532,7 +1534,7 @@ def get_all_transactions(request):
         if sortcolumn and sortcolumn != 'default':
             trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
         elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date DESC""" 
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
