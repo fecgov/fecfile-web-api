@@ -86,6 +86,7 @@
                           ? 'input-field-error'
                           : ''
                       "
+                      (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     />
                   </ng-container>
                   <div

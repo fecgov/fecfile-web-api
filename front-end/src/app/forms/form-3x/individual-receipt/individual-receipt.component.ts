@@ -222,6 +222,10 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  public memoCodeChange(e): void {
+    console.log('memoCodeChange: ');
+  }
+
   /**
    * Vaidates the form on submit.
    */
