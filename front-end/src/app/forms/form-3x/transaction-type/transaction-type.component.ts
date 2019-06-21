@@ -8,6 +8,7 @@ import { form3x_data } from '../../../shared/interfaces/FormsService/FormsServic
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { TransactionTypeService } from './transaction-type.service';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -46,7 +47,8 @@ export class TransactionTypeComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
     private _messageService: MessageService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService,
+    private _reportTypeService: ReportTypeService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -197,4 +199,19 @@ export class TransactionTypeComponent implements OnInit {
       step: 'step_1'
     });
   }
+  public printPreview(): void {
+    this._reportTypeService
+    .printPreviewPdf('3X')
+    .subscribe(res => {
+      if(res) {
+            console.log("Accessing SignComponent printPriview res ...",res);
+            if (res.printpriview_fileurl !== null) {
+              window.open(res.printpriview_fileurl, '_blank');
+            }
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });
+      }
 }
