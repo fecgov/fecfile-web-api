@@ -649,7 +649,7 @@ export class SignComponent implements OnInit {
   }
 
   public printPreview(): void {
-    if (this.formType === '3X'){
+    if (this.formType === '99'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
     } else if (this.formType === '3X'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
