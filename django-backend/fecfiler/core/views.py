@@ -1366,6 +1366,8 @@ def filter_get_all_trans(request, param_string):
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
+        if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
+            param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
         if 'filterStates' in f_key:
             state_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND state In " + state_tuple
