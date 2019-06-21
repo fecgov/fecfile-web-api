@@ -1534,7 +1534,7 @@ def get_all_transactions(request):
         if sortcolumn and sortcolumn != 'default':
             trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
         elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date DESC""" 
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
