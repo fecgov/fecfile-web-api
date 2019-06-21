@@ -43,6 +43,7 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
+  private _memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
@@ -182,27 +183,35 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if (this.frmIndividualReceipt.controls['ContributionDate']) {
-        this.frmIndividualReceipt.controls['ContributionDate'].setValidators([
-          contributionDate(cvgStartDate, cvgEndDate),
+      if (this._memoCode) {
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['ContributionDate'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+      } else {
+        if (this.frmIndividualReceipt.controls['contribution_date']) {
+          this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+            contributionDate(cvgStartDate, cvgEndDate),
+            Validators.required
+          ]);
+
+          this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        }        
       }
     }
 
     if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['ContributionAmount']) {
-        this.frmIndividualReceipt.controls['ContributionAmount'].setValidators([floatingPoint(), Validators.required]);
+      if (this.frmIndividualReceipt.controls['contribution_amount']) {
+        this.frmIndividualReceipt.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
 
-        this.frmIndividualReceipt.controls['ContributionAmount'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
       }
 
-      if (this.frmIndividualReceipt.controls['ContributionAggregate']) {
-        this.frmIndividualReceipt.controls['ContributionAggregate'].setValidators([floatingPoint()]);
+      if (this.frmIndividualReceipt.controls['contribution_aggregate']) {
+        this.frmIndividualReceipt.controls['contribution_aggregate'].setValidators([floatingPoint()]);
 
-        this.frmIndividualReceipt.controls['ContributionAggregate'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_aggregate'].updateValueAndValidity();
       }
     }
   }
@@ -222,8 +231,20 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  /**
+   * Updates value of _memoCode variable.
+   *
+   * @param      {Object}  e      The event object.
+   */
   public memoCodeChange(e): void {
-    console.log('memoCodeChange: ');
+    const { checked } = e.target;
+
+    if (checked) {
+      this._memoCode = checked;
+    } else {
+      this._validateContributionDate();
+      this._memoCode = checked;
+    }
   }
 
   /**
@@ -234,7 +255,7 @@ export class IndividualReceiptComponent implements OnInit {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
-        if (field === 'ContributionDate') {
+        if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
