@@ -6,12 +6,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 
-/**
- * Try adding the ngModel attribute to the input fields and then using that like in the documentation.
- * https://angular.io/api/forms/NgModel#description
- * Then getting the value on change for the field.
- *
- */
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +21,7 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    // const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
-    const url: string = 'http://localhost:3000/data';
+    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();

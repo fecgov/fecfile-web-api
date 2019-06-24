@@ -44,7 +44,7 @@
                   </button>
                   <ng-container *ngIf="!col?.validation?.required && !col.readOnly"> (Optional) </ng-container>
                 </label>
-                <ng-container *ngIf="col.type === 'text' || col.type === 'date'">
+                <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
                   <ng-container *ngIf="col.inputGroup">
                     <div class="input-group">
                       <div class="input-group-prepend">
@@ -70,7 +70,7 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       class="form-control"
-                      [type]="col?.type"
+                      [type]="col?.name === 'contribution_amount' ? 'text' : col?.type"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
                       [attr.readOnly]="col?.readOnly ? col?.readOnly : null"
