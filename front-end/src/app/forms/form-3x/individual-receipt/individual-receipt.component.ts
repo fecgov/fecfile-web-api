@@ -65,7 +65,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService,
+    private _reportTypeService: ReportTypeService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -329,9 +329,10 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
   }
-  public printPreview(): void {
+  
+   public printPreview(): void {
     this._reportTypeService
-    .printPreviewPdf('3X')
+    .printPreviewPdf('3X','PrintPreviewPDF')
     .subscribe(res => {
       if(res) {
             console.log("Accessing SignComponent printPriview res ...",res);
@@ -343,5 +344,5 @@ export class IndividualReceiptComponent implements OnInit {
         (error) => {
           console.log('error: ', error);
         });
-}
+  }
 }

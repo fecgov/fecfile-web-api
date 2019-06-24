@@ -670,22 +670,39 @@ export class SignComponent implements OnInit {
         }
 
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-
-        this._formsService
-          .PreviewForm_Preview_sign_Screen({}, this.formType)
-          .subscribe(res => {
-            if(res) {
-                console.log("Accessing SignComponent printPriview res ...",res);
-                window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+        if (this.formType === '99'){
+          this._formsService
+            .PreviewForm_Preview_sign_Screen({}, this.formType)
+            .subscribe(res => {
+              if(res) {
+                  console.log("Accessing SignComponent printPriview res ...",res);
+                  window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+                  }
+                },
+                (error) => {
+                  console.log('error: ', error);
+                });
+       } else if (this.formType === '3X'){
+        this._reportTypeService
+        .printPreviewPdf('3X', "PrintPreviewPDF")
+        .subscribe(newres => {
+          if(newres) {
+                console.log("Accessing Signee F3x  printPriview res ...",newres);
+               
+                if (newres.results.pdf_url !== null) {
+                  console.log("newres.results.pdf_url = ",newres.results.pdf_url);
+                  window.open(newres.results.pdf_url, '_blank');
                 }
-              },
-              (error) => {
-                console.log('error: ', error);
-              });
-      }        
+              }
+            },
+            (error) => {
+              console.log('error: ', error);
+            });/*  */
+       }
+      }
     }
     else {
-
+      if (this.formType === '99'){
         this._formsService
         .PreviewForm_Preview_sign_Screen({}, this.formType)
         .subscribe(res => {
@@ -697,10 +714,27 @@ export class SignComponent implements OnInit {
           (error) => {
             console.log('error: ', error);
           });
+        } else if (this.formType === '3X'){
+          this._reportTypeService
+          .printPreviewPdf('3X', "PrintPreviewPDF")
+          .subscribe(newres => {
+            if(newres) {
+                  console.log("Accessing Signee F3x  printPriview res ...",newres);
+                 
+                  if (newres.results.pdf_url !== null) {
+                    console.log("res.results.pdf_url] = ",newres.results.pdf_url);
+                    window.open(newres.results.pdf_url, '_blank');
+                  }
+                }
+              },
+              (error) => {
+                console.log('error: ', error);
+              });/*  */
+        }
     }
 
    }
-
+  
    public clearWarnMsg(): void {
 
     //this.frmSaved=false;

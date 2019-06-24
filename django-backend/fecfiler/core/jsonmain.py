@@ -297,7 +297,7 @@ def get_list_report(report_id, cmte_id):
 def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
-        report_id = request.POST.get('report_id')
+        report_id = request.query_params.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
@@ -565,29 +565,56 @@ def task_sched_a(request):
     return data_obj
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
-    data_obj = task_sched_a(request)
-    # Check for partnership
-    # sche_b_data = task_sched_b(request)
-    # if data_obj and sche_b_data:
-    if data_obj:
-        # data_obj['data']['schedules']['SB'] = sche_b_data
-        # Check for returned bounced
-        report_id = request.POST.get('report_id')
-        committeeid = request.user.username
-        client = boto3.client('s3')
-        transfer = S3Transfer(client)
+    try:
+        print("you are here ...")
+        data_obj = task_sched_a(request)
+        # Check for partnership
+        # sche_b_data = task_sched_b(request)
+        # if data_obj and sche_b_data:
 
-        tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
-        tmp_path='/tmp/'+tmp_filename
-       
-        json.dump(data_obj, open(tmp_path, 'w'), indent=4)
-       
-        transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
-        return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
-    else:
-        return Response('Error', status=status.HTTP_400_BAD_REQUEST)
+        if data_obj:
+            # data_obj['data']['schedules']['SB'] = sche_b_data
+            # Check for returned bounced
+            report_id = request.query_params.get('report_id')
+            call_from = request.query_params.get('call_from')
+            committeeid = request.user.username
+
+            print("report_id", report_id)
+            print("call_from", call_from)
+            print("committeeid", committeeid)
+            
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
+            tmp_path='/tmp/'+tmp_filename
+        
+            json.dump(data_obj, open(tmp_path, 'w'), indent=4)
+        
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+            if call_from == "PrintPreviewPDF":
+                data_obj = {'report_id':report_id}
+                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+                printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
+                if not printresp.ok:
+                    return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    dictprint = printresp.json()
+                    merged_dict = {**create_json_data, **dictprint}
+                    return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+
+            #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
+        else:
+            return Response('Error', status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
 

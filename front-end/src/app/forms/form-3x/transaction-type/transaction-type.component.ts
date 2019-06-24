@@ -200,8 +200,9 @@ export class TransactionTypeComponent implements OnInit {
     });
   }
   public printPreview(): void {
+    console.log("Calling F3X printPreview ...");
     this._reportTypeService
-    .printPreviewPdf('3X')
+    .printPreviewPdf('3X','PrintPreviewPDF')
     .subscribe(res => {
       if(res) {
             console.log("Accessing SignComponent printPriview res ...",res);

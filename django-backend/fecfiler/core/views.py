@@ -2266,7 +2266,7 @@ def get_summary_table(request):
         report_id = check_report_id(request.query_params.get('report_id'))
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
 
-        period_args = [date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31),  cmte_id, report_id]
+        period_args = [datetime.date(int(calendar_year), 1, 1), datetime.date(int(calendar_year), 12, 31),  cmte_id, report_id]
         period_receipt = summary_receipts_for_sumamry_table(period_args)
         period_disbursement = summary_disbursements_for_sumamry_table(period_args)
         
@@ -2275,7 +2275,10 @@ def get_summary_table(request):
         calendar_receipt = summary_receipts(calendar_args)
         calendar_disbursement = summary_disbursements(calendar_args)
         '''
-        
+        coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
+        coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
+        coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+
         cash_summary = {'COH AS OF JANUARY 1': coh_bop_ytd,
                         'BEGINNING CASH ON HAND': coh_bop,
                         'ENDING CASH ON HAND': coh_cop,
@@ -2288,8 +2291,7 @@ def get_summary_table(request):
                         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response('The summary_table API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
-
+        return Response('The get_summary_table API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 ******************************************************************************************************************************
@@ -2625,7 +2627,7 @@ END - Report info api - CORE APP
 ******************************************************************************************************************************
 """
 
-@api_view(['PUT'])
+@api_view(['GET'])
 def print_preview_pdf(request):
     cmte_id = request.user.username
     report_id = request.data.get('reportid')
@@ -2635,12 +2637,13 @@ def print_preview_pdf(request):
                 'report_id':report_id,
         }
 
-        json_builder_resp = requests.post(settings.JSON_BUILDER_URL + settings.NXG_FEC_JSON_BUILDER_API_VERSION, data=data_obj)
-        
+        json_builder_resp = requests.post(settings.JSON_BUILDER_URL, data=data_obj)
+        print("json_builder_resp = ", json_builder_resp)
+
         bucket_name = 'dev-efile-repo'
         client = boto3.client('s3')
         transfer = S3Transfer(client)
-
+        #s3.download_file(bucket_name , s3_file_path, save_as)
         transfer.download_file(bucket_name , json_builder_resp, json_builder_resp)
         with open(save_as) as f:
             print(json_builder_resp.read())
@@ -2655,3 +2658,4 @@ def print_preview_pdf(request):
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
     except Exception:
         raise
+
