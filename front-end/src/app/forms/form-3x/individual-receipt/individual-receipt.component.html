@@ -42,7 +42,7 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
-                  <ng-container *ngIf="!col?.validation?.required"> (Optional) </ng-container>
+                  <ng-container *ngIf="!col?.validation?.required && !col.readOnly"> (Optional) </ng-container>
                 </label>
                 <ng-container *ngIf="col.type === 'text' || col.type === 'date' || col.type === 'number'">
                   <ng-container *ngIf="col.inputGroup">
@@ -54,7 +54,7 @@
                       </div>
                       <input
                         class="form-control"
-                        [type]="col.type === 'date' ? col.type : 'text'"
+                        [type]="col?.type"
                         [name]="col?.name"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
@@ -70,10 +70,13 @@
                   <ng-container *ngIf="!col.inputGroup">
                     <input
                       class="form-control"
-                      [type]="col.type === 'date' ? col.type : 'text'"
+                      [type]="col?.name === 'contribution_amount' ? 'text' : col?.type"
                       [name]="col?.name"
                       [maxlength]="col?.validation?.max"
+                      [attr.readOnly]="col?.readOnly ? col?.readOnly : null"
+                      [attr.value]="col?.value ? col.value : null"
                       [formControlName]="col?.name"
+                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -131,7 +134,7 @@
                 <ng-container *ngIf="col.type === 'textarea'">
                   <textarea class="form-control" rows="5" name="{{ col.name }}" [formControlName]="col.name"></textarea>
                 </ng-container>
-                <ng-container *ngIf="col.type === 'select' && col.name === 'ContributorState'">
+                <ng-container *ngIf="col.type === 'select' && col.name === 'state'">
                   <ng-select
                     class="state-select"
                     [formControlName]="col.name"
