@@ -2266,7 +2266,7 @@ def get_summary_table(request):
         report_id = check_report_id(request.query_params.get('report_id'))
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
 
-        period_args = [date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31),  cmte_id, report_id]
+        period_args = [datetime.date(int(calendar_year), 1, 1), datetime.date(int(calendar_year), 12, 31),  cmte_id, report_id]
         period_receipt = summary_receipts_for_sumamry_table(period_args)
         period_disbursement = summary_disbursements_for_sumamry_table(period_args)
         
@@ -2275,7 +2275,10 @@ def get_summary_table(request):
         calendar_receipt = summary_receipts(calendar_args)
         calendar_disbursement = summary_disbursements(calendar_args)
         '''
-        
+        coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
+        coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
+        coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+
         cash_summary = {'COH AS OF JANUARY 1': coh_bop_ytd,
                         'BEGINNING CASH ON HAND': coh_bop,
                         'ENDING CASH ON HAND': coh_cop,
@@ -2288,8 +2291,7 @@ def get_summary_table(request):
                         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response('The summary_table API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
-
+        return Response('The get_summary_table API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 ******************************************************************************************************************************
