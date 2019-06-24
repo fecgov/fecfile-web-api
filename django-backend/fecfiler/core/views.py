@@ -1483,13 +1483,11 @@ def get_all_transactions(request):
         #     order_string = "transaction_id"
         # import ipdb;ipdb.set_trace()
         keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
-            'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount','aggregate_amt','purpose_description', 
-            'occupation', 'employer', 'memo_code', 'memo_text', 'itemized']
+            'street_1', 'street_2', 'city', 'state', 'zip_code','purpose_description', 
+            'occupation', 'employer', 'memo_text', 'itemized']
         search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
-            'street_1', 'street_2', 'city', 'state', 'zip_code', 
-            'transaction_date', 'transaction_amount','aggregate_amt', 'purpose_description', 
-            'occupation', 'employer', 'memo_code', 'memo_text', 'itemized']
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 'purpose_description', 
+            'occupation', 'employer', 'memo_text', 'itemized']
         if search_string:
             for key in search_keys:
                 if not param_string:
