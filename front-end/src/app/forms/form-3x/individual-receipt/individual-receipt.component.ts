@@ -74,17 +74,17 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        // this.formRows = res.data.formRows;
-        // this.hiddenFields = res.data.hiddenFields;
-        // this.states = res.data.states;
+        this.formFields = res.data.formFields;
+        this.hiddenFields = res.data.hiddenFields;
+        this.states = res.data.states;
 
-        console.log('res: ', res);
+        // console.log('res: ', res);
 
-        this.formFields = res.formFields;
-        this.hiddenFields = res.hiddenFields;
-        this.states = res.states;      
+        // this.formFields = res.formFields;
+        // this.hiddenFields = res.hiddenFields;
+        // this.states = res.states;      
 
-        console.log('this.formRows: ', this.formFields);  
+        console.log('this.formFields: ', this.formFields);  
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
