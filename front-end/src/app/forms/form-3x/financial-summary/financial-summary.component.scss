@@ -100,3 +100,57 @@
       display:none;
     }
   }
+  .summary_text_level_1{
+    background-color: #979A9A  !important;
+    padding-left: 50px;
+  }
+  .summary_text_level_2{
+    background-color: #D0D3D4    !important;
+    padding-left: 100px;
+  }
+  .summary_text_level_3{
+    background-color: #ffffff  !important;
+    padding-left: 150px;
+  }
+  .summary_text_level_4{
+    background-color: #ffffff  !important;
+    padding-left: 200px;
+    font-style: italic !important;
+  }
+  .summary_table_text{
+    background-color: #ffffff !important;
+    //width: 1200px;
+    //border:none;
+    //height:40px;
+    border-spacing: 0.25px !important;
+    border: 1px !important;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    //border-spacing: .25px 0.25px !important;
+    table-layout: fixed ;
+    width: 100% ;
+  }
+  .summary_text_amt{
+    text-align: right;
+  }
+  .summary_text_amt_level_1{
+    background-color: #979A9A  !important;
+    text-align: right;
+  }
+  .summary_text_amt_level_2{
+    background-color: #D0D3D4    !important;
+    text-align: right;
+  }
+  .summary_text_amt_level_3{
+    background-color: #ffffff  !important;
+    text-align: right;
+  }
+  .summary_text_amt_level_4{
+    background-color: #ffffff  !important;
+    text-align: right;
+  }
+  .td{
+    width: 33% ;
+  }

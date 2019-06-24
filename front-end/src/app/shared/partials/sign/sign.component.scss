@@ -1,12 +1,16 @@
 @import '../../scss/global';
 
 .signee-container {
+  padding-left: 15px;
+  padding-right: 15px;
   .grid-row {
     margin-left: 0;
     margin-right: 0;
     .grid-row__col {
       padding-left: 0;
       padding-right: 0;
+      padding-top: 15px;
+      padding-bottom: 15px;
 
       input[type='text'],
           input[type='date'],
@@ -35,7 +39,8 @@
       display: block;
       width: 100%;
       border-bottom: 1px solid $bombay;
-      padding-bottom: .75em;
+      padding-bottom: .50em;
+      padding-top: .50em;
       margin-bottom: 1em;
       .header__text {
         display: block;
