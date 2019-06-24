@@ -40,18 +40,7 @@ export class FinancialSummaryComponent implements OnInit {
   ngOnInit(): void {
     this.viewMode = 'tab1';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        this.reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        this.reportId = form3XReportType.reportid;
-      }
-    }
-
-    console.log(" FinancialSummaryComponent this.reportId = ", this.reportId );
-
+   
     this._financialSummaryService
     .getSummaryDetails('3X')
     .subscribe(res => {
@@ -72,6 +61,17 @@ export class FinancialSummaryComponent implements OnInit {
           console.log('error: ', error);
         });
 
+
+        const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+        if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+          if (form3XReportType.hasOwnProperty('reportId')) {
+            this.reportId = form3XReportType.reportId;
+          } else if (form3XReportType.hasOwnProperty('reportid')) {
+            this.reportId = form3XReportType.reportid;
+          }
+        }      
+        console.log(" FinancialSummaryComponent this.reportId = ", this.reportId );
   }
 
   /**
@@ -87,7 +87,7 @@ export class FinancialSummaryComponent implements OnInit {
   
   public printPreview(): void {
     this._reportTypeService
-    .printPreviewPdf('3X')
+    .printPreviewPdf('3X', "PrintPreviewPDF")
     .subscribe(res => {
       if(res) {
             console.log("Accessing FinancialSummaryComponent printPriview res ...",res);

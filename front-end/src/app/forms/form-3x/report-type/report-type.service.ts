@@ -229,8 +229,12 @@ export class ReportTypeService {
       }
     }
 
-    if (form3xReportType.election_date.length >= 1) {
-      formData.append('date_of_election', form3xReportType.election_date);
+    if (form3xReportType.election_date !== null) {
+      if (typeof form3xReportType.election_date === 'string') {
+        if (form3xReportType.election_date.length >= 1) {
+          formData.append('date_of_election', form3xReportType.election_date);
+        }        
+      }
     }
 
     if (form3xReportType.election_state !== null) {
@@ -328,11 +332,16 @@ export class ReportTypeService {
         }));
       }
   }
-  public printPreviewPdf(formType: string): Observable<any> {
+
+  public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    let url: string = '/core/print_preview_pdf';
+    let printPreviewPDFUrl: string = '/core/create_json_builders';
+    //let printPreviewPDFUrl: string = '/core/create_json_builders_test';
+    
+    let saveReportUrl: string = '/core/reports';
 
+    
     let params = new HttpParams();
     let formData: FormData = new FormData();
 
@@ -348,6 +357,10 @@ export class ReportTypeService {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       console.log("backup object form3xReportType = ", form3xReportType);
     }
+
+    params = params.append('report_id', form3xReportType.reportId);
+    params = params.append('form_type', `F${formType}`);
+    params = params.append('call_from', callFrom);
 
     formData.append('form_type', `F${formType}`);
     formData.append('report_id', form3xReportType.reportId);
@@ -386,8 +399,12 @@ export class ReportTypeService {
       }
     }
 
-    if (form3xReportType.election_date.length >= 1) {
-      formData.append('date_of_election', form3xReportType.election_date);
+    if (form3xReportType.election_date !== null) {
+      if (typeof form3xReportType.election_date === 'string') {
+        if (form3xReportType.election_date.length >= 1) {
+          formData.append('date_of_election', form3xReportType.election_date);
+        }        
+      }
     }
 
     if (form3xReportType.election_state !== null) {
@@ -433,11 +450,34 @@ export class ReportTypeService {
         }
       }
     }
-    
+
+      
     return this._http
-        .put(`${environment.apiUrl}${url}`, formData, {
-          headers: httpOptions
-        })
+    .put(`${environment.apiUrl}${saveReportUrl}`, formData, {
+      headers: httpOptions
+    })
+    .pipe(
+      map(res => {
+        if (res) {
+          console.log("Form 3X save res = ", res);
+           if (res['reportid']) {
+              console.log(" Form 3X report updated with res = ", res);
+
+              return this._http
+              .get(
+                  `${environment.apiUrl}${printPreviewPDFUrl}`,
+                  {
+                  headers: httpOptions,
+                  params
+                  }
+              );
+          }
+          //return res;
+          console.log("Form 3X report updated successfully... ");
+        }
+        console.log("Form 3X report not updated successfully... ");
+      })
+    );
    
   }
 
