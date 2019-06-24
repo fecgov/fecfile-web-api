@@ -1682,7 +1682,7 @@ def check_calendar_year(calendar_year):
 def period_receipts_sql(cmte_id, report_id):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0) FROM public.sched_a WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_receipts_sql function is throwing an error: ' + str(e))
@@ -1691,7 +1691,7 @@ def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cm
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, contribution_amount, ( select sum(contribution_amount) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0), ( select sum(contribution_amount) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
 
             return cursor.fetchall()
     except Exception as e:
@@ -1701,7 +1701,7 @@ def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cm
 def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE memo_code IS NULL AND cmte_id = %s AND delete_ind is distinct from 'Y' AND contribution_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
+            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0) FROM public.sched_a WHERE memo_code IS NULL AND cmte_id = %s AND delete_ind is distinct from 'Y' AND contribution_date BETWEEN %s AND %s", [cmte_id, calendar_start_dt, calendar_end_dt])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The calendar_receipts_sql function is throwing an error: ' + str(e))
@@ -1709,7 +1709,7 @@ def calendar_receipts_sql(cmte_id, calendar_start_dt, calendar_end_dt):
 def period_disbursements_sql(cmte_id, report_id):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(expenditure_amount,0) FROM public.sched_b WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_disbursements_sql function is throwing an error: ' + str(e))
@@ -1718,17 +1718,7 @@ def period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_d
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, expenditure_amount, ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE T2.memo_code IS NULL AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
-            return cursor.fetchall()
-    except Exception as e:
-        raise Exception('The period_disbursements_for_summary_table_sql function is throwing an error: ' + str(e))
-
-
-def period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id):
-    try:
-        with connection.cursor() as cursor:
-            #cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, expenditure_amount, ( select sum(expenditure_amount) as expenditure_amount_ytd FROM public.sched_b t2 WHERE T2.cmte_id = T1.cmte_id AND t2.line_number = t1.line_number AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE T2.memo_code IS NULL AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_disbursements_for_summary_table_sql function is throwing an error: ' + str(e))
