@@ -44,13 +44,14 @@ class NoOPError(Exception):
 """
 def get_entity_sched_a_data(report_id, cmte_id, transaction_id):
     try:
-        # GET all rows from schedA table
+        # GET all rows from schedA table 
+ 
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL """
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
         # if type_identifier:
         #     query_string = query_string + "AND transaction_type_identifier = '"+str(type_identifier)+"'"
@@ -342,6 +343,7 @@ def task_sched_a(request):
                             response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                             response_dict_receipt['entityType'] = ''
                             response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                            response_dict_receipt['contributorOranizationName'] = ''
 
                             response_dict_receipt['contributorLastName'] = ''
                             response_dict_receipt['contributorFirstName'] = ''
@@ -357,6 +359,8 @@ def task_sched_a(request):
                             response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
                             response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
                             response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                            response_dict_receipt['donorFecCommitteId'] = entity_obj['donor_cmte_id']
+                            response_dict_receipt['donorFecCommitteName'] = entity_obj['donor_cmte_name']   
                             response_dict_receipt['contributorEmployer'] = ''
                             response_dict_receipt['contributorOccupation'] = ''
                             response_dict_receipt['memoCode'] = entity_obj['memo_code']
@@ -371,6 +375,7 @@ def task_sched_a(request):
                             response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                             response_dict_receipt['entityType'] = list_entity['entity_type']
                             response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                            response_dict_receipt['contributorOranizationName'] = list_entity['entity_name']
 
                             response_dict_receipt['contributorLastName'] = list_entity['last_name']
                             response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -388,6 +393,8 @@ def task_sched_a(request):
                             response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                             response_dict_receipt['contributorEmployer'] = list_entity['employer']
                             response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                            response_dict_receipt['donorFecCommitteId'] = entity_obj['donor_cmte_id']
+                            response_dict_receipt['donorFecCommitteName'] = entity_obj['donor_cmte_name']
                             response_dict_receipt['memoCode'] = entity_obj['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj['memo_text']
 
@@ -411,6 +418,7 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = ''
                                     response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['payeeOranizationName'] = ''
 
                                     response_dict_out['payeeLastName'] = ''
                                     response_dict_out['payeeFirstName'] = ''
@@ -437,6 +445,7 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = list_child_entity['entity_type']
                                     response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['payeeOranizationName'] = list_child_entity['entity_name']
 
                                     response_dict_out['payeeLastName'] = list_child_entity['last_name']
                                     response_dict_out['payeeFirstName'] = list_child_entity['first_name']
@@ -472,7 +481,8 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = ''
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']   
+                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['contributorOranizationName'] = ''
 
                                     response_dict_out['contributorLastName'] = ''
                                     response_dict_out['contributorFirstName'] = ''
@@ -488,6 +498,8 @@ def task_sched_a(request):
                                     response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
                                     response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
                                     response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
+                                    response_dict_out['donorFecCommitteId'] = entity_child_obj['donor_cmte_id']
+                                    response_dict_out['donorFecCommitteName'] = entity_child_obj['donor_cmte_name']
                                     response_dict_out['contributorEmployer'] = ''
                                     response_dict_out['contributorOccupation'] = ''
                                     response_dict_out['memoCode'] = entity_child_obj['memo_code']
@@ -500,7 +512,8 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = list_child_entity['entity_type']
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']   
+                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['contributorOranizationName'] = list_child_entity['entity_name']   
 
                                     response_dict_out['contributorLastName'] = list_child_entity['last_name']
                                     response_dict_out['contributorFirstName'] = list_child_entity['first_name']
@@ -515,6 +528,8 @@ def task_sched_a(request):
                                     response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
                                     response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
+                                    response_dict_out['donorFecCommitteId'] = entity_child_obj['donor_cmte_id']
+                                    response_dict_out['donorFecCommitteName'] = entity_child_obj['donor_cmte_name']
                                     response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
                                     response_dict_out['contributorEmployer'] = list_child_entity['employer']
                                     response_dict_out['contributorOccupation'] = list_child_entity['occupation']
