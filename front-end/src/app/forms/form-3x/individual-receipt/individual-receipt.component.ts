@@ -5,9 +5,6 @@ import {
   Input,
   OnInit,
   Output,
-  OnChanges,
-  Renderer,
-  SimpleChanges,
   ViewEncapsulation,
   ViewChild
 } from '@angular/core';
@@ -25,13 +22,12 @@ import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/For
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
-  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe ],
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit {
@@ -48,6 +44,7 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
+  private _memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
@@ -64,8 +61,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
-    private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService
+    private _decimalPipe: DecimalPipe,    
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -85,14 +81,6 @@ export class IndividualReceiptComponent implements OnInit {
         this.formFields = res.data.formFields;
         this.hiddenFields = res.data.hiddenFields;
         this.states = res.data.states;
-
-        // console.log('res: ', res);
-
-        // this.formFields = res.formFields;
-        // this.hiddenFields = res.hiddenFields;
-        // this.states = res.states;      
-
-        console.log('this.formFields: ', this.formFields);  
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -151,11 +139,9 @@ export class IndividualReceiptComponent implements OnInit {
     /**
      * Adds alphanumeric validation for the zip code field.
      */
-
-    //  console.log('fieldName: ', fieldName);
-    // if (fieldName === 'zip') {
-    //   formValidators.push([alphaNumeric(), Validators.required]);
-    // }
+    if (fieldName === 'ContributorZip') {
+      formValidators.push(alphaNumeric());
+    }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -175,13 +161,6 @@ export class IndividualReceiptComponent implements OnInit {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
-        } else if (validation === 'alphanumeric') {
-          if (fieldName === 'zip') {
-            console.log('alphanumeric for zip: ');
-          }
-          if (validators[validation]) {
-            formValidators.push(alphaNumeric());
-          }          
         }
       }
     }
@@ -199,13 +178,35 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if (this.frmIndividualReceipt.controls['contribution_date']) {
+      if (this._memoCode) {
         this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-          contributionDate(cvgStartDate, cvgEndDate),
           Validators.required
         ]);
 
         this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+      } else {
+        if (this.frmIndividualReceipt.controls['contribution_date']) {
+          this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+            contributionDate(cvgStartDate, cvgEndDate),
+            Validators.required
+          ]);
+
+          this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        }        
+      }
+    }
+
+    if (this.frmIndividualReceipt) {
+      if (this.frmIndividualReceipt.controls['contribution_amount']) {
+        this.frmIndividualReceipt.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
+
+        this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
+      }
+
+      if (this.frmIndividualReceipt.controls['contribution_aggregate']) {
+        this.frmIndividualReceipt.controls['contribution_aggregate'].setValidators([floatingPoint()]);
+
+        this.frmIndividualReceipt.controls['contribution_aggregate'].updateValueAndValidity();
       }
     }
   }
@@ -225,7 +226,7 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
-  /**
+ /**
    * Updates the contribution aggregate field once contribution ammount is entered.
    *
    * @param      {Object}  e       The event object.
@@ -253,6 +254,22 @@ export class IndividualReceiptComponent implements OnInit {
     //   .subscribe(resp => {
     //     console.log('resp: ', resp);
     //   });    
+  }
+
+  /**
+   * Updates value of _memoCode variable.
+   *
+   * @param      {Object}  e      The event object.
+   */
+  public memoCodeChange(e): void {
+    const { checked } = e.target;
+
+    if (checked) {
+      this._memoCode = checked;
+    } else {
+      this._validateContributionDate();
+      this._memoCode = checked;
+    }
   }
 
   /**
@@ -338,25 +355,5 @@ export class IndividualReceiptComponent implements OnInit {
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
-  }
-  
-  public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing IndividualReceiptComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
-
   }
 }
