@@ -683,15 +683,16 @@ export class SignComponent implements OnInit {
                   console.log('error: ', error);
                 });
        } else if (this.formType === '3X'){
+        this._reportTypeService.signandSaveSubmitReport('3X','Saved');
         this._reportTypeService
         .printPreviewPdf('3X', "PrintPreviewPDF")
-        .subscribe(newres => {
-          if(newres) {
-                console.log("Accessing Signee F3x  printPriview res ...",newres);
+        .subscribe(res => {
+          if(res) {
+                console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
                
-                if (newres.results.pdf_url !== null) {
-                  console.log("newres.results.pdf_url = ",newres.results.pdf_url);
-                  window.open(newres.results.pdf_url, '_blank');
+                if (res['results.pdf_url'] !== null) {
+                  console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                  window.open(res.results.pdf_url, '_blank');
                 }
               }
             },
@@ -715,21 +716,23 @@ export class SignComponent implements OnInit {
             console.log('error: ', error);
           });
         } else if (this.formType === '3X'){
-          this._reportTypeService
-          .printPreviewPdf('3X', "PrintPreviewPDF")
-          .subscribe(newres => {
-            if(newres) {
-                  console.log("Accessing Signee F3x  printPriview res ...",newres);
-                 
-                  if (newres.results.pdf_url !== null) {
-                    console.log("res.results.pdf_url] = ",newres.results.pdf_url);
-                    window.open(newres.results.pdf_url, '_blank');
+            this._reportTypeService.signandSaveSubmitReport('3X','Saved');
+            this._reportTypeService
+            .printPreviewPdf('3X', "PrintPreviewPDF")
+            .subscribe(res => {
+              if(res) {
+                    console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
+                   
+                    if (res['results.pdf_url'] !== null) {
+                      console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                      window.open(res.results.pdf_url, '_blank');
+                    }
                   }
-                }
-              },
-              (error) => {
-                console.log('error: ', error);
-              });/*  */
+                },
+                (error) => {
+                  console.log('error: ', error);
+                });/*  */
+        
         }
     }
 

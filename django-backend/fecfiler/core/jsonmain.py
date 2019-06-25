@@ -570,7 +570,15 @@ def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
     try:
-        print("you are here ...")
+
+        report_id = request.query_params.get('report_id')
+        call_from = request.query_params.get('call_from')
+        committeeid = request.user.username
+
+        print("report_id", report_id)
+        print("call_from", call_from)
+        print("committeeid", committeeid)
+
         data_obj = task_sched_a(request)
         # Check for partnership
         # sche_b_data = task_sched_b(request)
@@ -579,13 +587,6 @@ def create_json_builders(request):
         if data_obj:
             # data_obj['data']['schedules']['SB'] = sche_b_data
             # Check for returned bounced
-            report_id = request.query_params.get('report_id')
-            call_from = request.query_params.get('call_from')
-            committeeid = request.user.username
-
-            print("report_id", report_id)
-            print("call_from", call_from)
-            print("committeeid", committeeid)
             
             client = boto3.client('s3')
             transfer = S3Transfer(client)
@@ -611,7 +612,7 @@ def create_json_builders(request):
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
         else:
-            return Response('Error', status=status.HTTP_400_BAD_REQUEST)
+            return Response('The create_json_builders is throwing an error', status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
