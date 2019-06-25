@@ -1385,10 +1385,6 @@ def filter_get_all_trans(request, param_string):
         if 'filterItemizations' in f_key:
             itemized_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND itemized In " + itemized_tuple
-        
-        if 'filterMemoCode' in f_key:
-            if str(value_d).lower() == 'true':
-                param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
     return param_string
 
 # def get_aggregate_amount(transaction_id):
@@ -1534,6 +1530,10 @@ def get_all_transactions(request):
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
+        filters_post = request.data.get('filters', {})
+        memo_code_d = filters_post.get('filterMemoCode', False)
+        if str(memo_code_d).lower() == 'true':
+            param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
         
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
