@@ -330,19 +330,23 @@ export class IndividualReceiptComponent implements OnInit {
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
   }
   
-   public printPreview(): void {
+  public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
     this._reportTypeService
-    .printPreviewPdf('3X','PrintPreviewPDF')
+    .printPreviewPdf('3X', "PrintPreviewPDF")
     .subscribe(res => {
       if(res) {
-            console.log("Accessing SignComponent printPriview res ...",res);
-            if (res.printpriview_fileurl !== null) {
-              window.open(res.printpriview_fileurl, '_blank');
+            console.log("Accessing IndividualReceiptComponent printPriview res ...",res);
+           
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
             }
           }
         },
         (error) => {
           console.log('error: ', error);
-        });
+        });/*  */
+
   }
 }
