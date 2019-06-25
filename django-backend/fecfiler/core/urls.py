@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^core/get_ItemizationIndicators$',
         views.get_ItemizationIndicators, name='get_ItemizationIndicators'),
     url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
-    url(r'^core/json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
+    url(r'^core/create_json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
     url(r'^core/print_preview_pdf$', views.print_preview_pdf, name='print_preview_pdf'),
     url(r'^core/reports$', views.reports, name='reports'),
 
