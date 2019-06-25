@@ -298,7 +298,7 @@ def get_list_report(report_id, cmte_id):
 def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
-        report_id = request.query_params.get('report_id')
+        report_id = request.data.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
@@ -580,14 +580,14 @@ def task_sched_a(request):
     return data_obj
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
     try:
 
-        report_id = request.query_params.get('report_id')
-        call_from = request.query_params.get('call_from')
+        report_id = request.data.get('report_id')
+        call_from = request.data.get('call_from')
         committeeid = request.user.username
 
         print("report_id", report_id)
@@ -616,6 +616,9 @@ def create_json_builders(request):
                 data_obj = {'report_id':report_id}
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
 
+                resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
+                '''
                 printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
                 if not printresp.ok:
@@ -624,6 +627,20 @@ def create_json_builders(request):
                     dictprint = printresp.json()
                     merged_dict = {**create_json_data, **dictprint}
                     return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                '''    
+            elif call_from == "Submit":
+                data_obj = {'report_id':report_id}
+                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+
+            if not printresp.ok:
+                return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                dictprint = printresp.json()
+                merged_dict = {**create_json_data, **dictprint}
+                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+        
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
         else:
