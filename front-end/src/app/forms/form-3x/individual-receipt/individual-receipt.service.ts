@@ -22,7 +22,6 @@ export class IndividualReceiptService {
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
-    // const url: string = "http://localhost:3000/data";
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
