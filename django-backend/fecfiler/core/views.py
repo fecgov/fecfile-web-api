@@ -1691,8 +1691,7 @@ def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cm
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0), ( select sum(contribution_amount) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
-
+            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0), ( select COALESCE(sum(contribution_amount),0) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_receipts_for_summary_table_sql function is throwing an error: ' + str(e))
