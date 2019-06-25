@@ -125,6 +125,7 @@
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea 
+                    class="form-control"
                     [style.height]="col?.height"
                     [style.width]="col?.width"
                     [style.overflow]="col.scroll ? col.scroll : null"
@@ -134,7 +135,7 @@
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
-                    class="state-select"
+                    class="state-select"                
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
