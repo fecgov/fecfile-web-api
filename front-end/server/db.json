@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
    "data": {
       "formFields": [{
@@ -154,6 +155,135 @@
                   },
                   "height": "30px",
                   "width": "98px"
+=======
+{  
+   "data":{  
+      "formFields":[  
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Last Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"last_name",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"30"
+                  }
+               },
+               {  
+                  "text":"Contributor First Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"first_name",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"20"
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Middle Name",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"middle_name",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"20"
+                  }
+               },
+               {  
+                  "text":"Contributor Prefix",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"prefix",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"10"
+                  }
+               },
+               {  
+                  "text":"Contributor Sufix",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"sufix",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"10"
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor Street 1",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"street_1",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"34"
+                  }
+               },
+               {  
+                  "text":"Contributor Street 2",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"street_2",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"34"
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Contributor City",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"city",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"30"
+                  }
+               },
+               {  
+                  "text":"Contributor State",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"state",
+                  "type":"select",
+                  "validation":{  
+                     "required": true,
+                     "max":"2"
+                  }
+               },
+               {  
+                  "text":"Contributor Zip",
+                  "infoIcon":null,
+                  "infoText":null,
+                  "name":"zip",
+                  "type":"text",
+                  "validation":{  
+                     "alphanumeric": true,
+                     "required": true,
+                     "max":"9"
+                  }
+>>>>>>> develop
                }
             ],
             "seperator": true
@@ -163,10 +293,17 @@
             "cols": [{
                   "text": "Contributor Employer",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "employer",
                   "type": "text",
                   "validation": {
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"contribution_date",
+                  "type":"date",
+                  "validation":{  
+>>>>>>> develop
                      "required": true,
                      "max": "38",
                      "alphaNumeric": true
@@ -177,6 +314,7 @@
                {
                   "text": "Contributor Occupation",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "occupation",
                   "type": "text",
@@ -187,6 +325,30 @@
                   },
                   "height": "30px",
                   "width": "200px"
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"contribution_amount",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"12",
+                     "dollarAmount": true
+                  }
+               },
+               {  
+                  "text":"Contribution Aggregate",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"contribution_aggregate",
+                  "readOnly": true,
+                  "type":"text",
+                  "value": "0.00",
+                  "validation":{  
+                     "required": false,
+                     "max":"12",
+                     "dollarAmount": true
+                  }
+>>>>>>> develop
                }
             ],
             "seperator": true
@@ -196,6 +358,7 @@
             "cols": [{
                   "text": "Contribution Date",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "contribution_date",
                   "type": "date",
@@ -207,10 +370,20 @@
                   },
                   "width": "154px",
                   "height": "30px"
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"employer",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38"
+                  }
+>>>>>>> develop
                },
                {
                   "text": "Contribution Amount",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "contribution_amount",
                   "type": "text",
@@ -235,10 +408,35 @@
                   },
                   "width": "196px",
                   "height": "30px"
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"occupation",
+                  "type":"text",
+                  "validation":{  
+                     "required": true,
+                     "max":"38"
+                  }
+               }
+            ]
+         },
+         {  
+            "cols":[  
+               {  
+                  "text":"Memo Code",
+                  "infoIcon": true,
+                  "infoText":"Request language from RAD",
+                  "name":"memo_code",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"1"
+                  }
+>>>>>>> develop
                },
                {
                   "text": "Memo Code",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "memo_code",
                   "type": "checkbox",
@@ -249,6 +447,15 @@
                   },
                   "width": "24px",
                   "height": "24px"
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"memo_text",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"100"
+                  }
+>>>>>>> develop
                }
             ]
          },
@@ -273,6 +480,7 @@
                {
                   "text": "Contribution Purpose Description",
                   "infoIcon": true,
+<<<<<<< HEAD
                   "infoText": "Request language from RAD",
                   "name": "purpose_description",
                   "type": "textarea",
@@ -284,10 +492,20 @@
                   "scroll": true,
                   "height": "135px",
                   "width": "400px"                  
+=======
+                  "infoText":"Request language from RAD",
+                  "name":"purpose_description",
+                  "type":"text",
+                  "validation":{  
+                     "required": false,
+                     "max":"100"
+                  }
+>>>>>>> develop
                }
             ]
          }
       ],
+<<<<<<< HEAD
       "hiddenFields": [{
             "type": "hidden",
             "name": "entity_type",
@@ -317,6 +535,38 @@
             "type": "hidden",
             "name": "TransactionTypeCode",
             "value": "15"
+=======
+      "hiddenFields":[  
+         {  
+            "type":"hidden",
+            "name":"entity_type",
+            "value":"IND"
+         },
+         {  
+            "type":"hidden",
+            "name":"line_number",
+            "value":"11A"
+         },
+         {  
+            "type":"hidden",
+            "name":"transaction_id",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"backReference_tran_id_number",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"back_reference_sched_name",
+            "value":null
+         },
+         {  
+            "type":"hidden",
+            "name":"transaction_type",
+            "value":"15"
+>>>>>>> develop
          }
       ],
       "states": [{

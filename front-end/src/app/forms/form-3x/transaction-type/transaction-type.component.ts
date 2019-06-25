@@ -8,6 +8,7 @@ import { form3x_data } from '../../../shared/interfaces/FormsService/FormsServic
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { TransactionTypeService } from './transaction-type.service';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -46,7 +47,8 @@ export class TransactionTypeComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
     private _messageService: MessageService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService,
+    private _reportTypeService: ReportTypeService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -196,5 +198,25 @@ export class TransactionTypeComponent implements OnInit {
       direction: 'previous',
       step: 'step_1'
     });
+  }
+  
+  public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
+    this._reportTypeService
+    .printPreviewPdf('3X', "PrintPreviewPDF")
+    .subscribe(res => {
+      if(res) {
+            console.log("Accessing TransactionTypeComponent printPriview res ...",res);
+           
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
+            }
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });/*  */
+
   }
 }

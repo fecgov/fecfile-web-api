@@ -10,6 +10,8 @@ export class TransactionFilterModel {
     filterCategories: string[];
     filterAmountMin: number;
     filterAmountMax: number;
+    filterAggregateAmountMin: number;
+    filterAggregateAmountMax: number;
     filterDateFrom: Date;
     filterDateTo: Date;
     filterMemoCode: boolean;

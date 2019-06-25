@@ -68,18 +68,6 @@
             display: block;
             padding-bottom: 0.75em;
           }
-          input[type='text'],
-          input[type='date'],
-          input[type='number'] {
-            border: 1px solid $ghost;
-            border-radius: .25rem;
-            height: 30px;
-            padding-left: 5px;
-            padding-right: 5px;
-            &.input-field-error {
-              border: 1px solid $red;
-            }
-          }
           textarea {
             &.form-control {
               overflow: scroll;
@@ -100,7 +88,7 @@
               }
             }
             .ng-select-container {
-              height: 30px;
+              height: 45px;
               width: 235px;
               .ng-input {
                 input[type='text'] {

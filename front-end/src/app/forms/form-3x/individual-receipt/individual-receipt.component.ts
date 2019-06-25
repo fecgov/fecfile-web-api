@@ -8,6 +8,7 @@ import {
   ViewEncapsulation,
   ViewChild
 } from '@angular/core';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -26,7 +27,7 @@ import { contributionDate } from '../../../shared/utils/forms/validation/contrib
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
-  providers: [NgbTooltipConfig],
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit {
@@ -58,7 +59,9 @@ export class IndividualReceiptComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _utilService: UtilService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _currencyPipe: CurrencyPipe,
+    private _decimalPipe: DecimalPipe,    
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -75,17 +78,11 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        // this.formRows = res.data.formRows;
-        // this.hiddenFields = res.data.hiddenFields;
-        // this.states = res.data.states;
+        this.formFields = res.data.formFields;
+        this.hiddenFields = res.data.hiddenFields;
+        this.states = res.data.states;
 
-        console.log('res: ', res);
-
-        this.formFields = res.formFields;
-        this.hiddenFields = res.hiddenFields;
-        this.states = res.states;      
-
-        console.log('this.formRows: ', this.formFields);  
+        console.log('this.hiddenFields: ', this.hiddenFields);
 
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
@@ -231,6 +228,36 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+ /**
+   * Updates the contribution aggregate field once contribution ammount is entered.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public contributionAmountChange(e): void {
+    const contributionAmount: string = e.target.value;
+    const contributionAggregate: string = e.target.value;
+    const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
+    const value: string = this._decimalPipe.transform(total, '.2-2');
+
+    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+
+    /**
+     * TODO: To be implemented in the future.
+     */
+
+    // this._receiptService
+    //   .aggregateAmount(
+    //     res.report_id,
+    //     res.transaction_type,
+    //     res.contribution_date,
+    //     res.entity_id,
+    //     res.contribution_amount
+    //   )
+    //   .subscribe(resp => {
+    //     console.log('resp: ', resp);
+    //   });    
+  }
+
   /**
    * Updates value of _memoCode variable.
    *
@@ -268,7 +295,7 @@ export class IndividualReceiptComponent implements OnInit {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveSchedule(this._formType, this._transactionType).subscribe(res => {
+      this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
           this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
             const message: any = {
