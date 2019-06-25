@@ -1,7 +1,7 @@
 @import '../../../shared/scss/global';
 
 .financial-summary-container {
-  padding-left: 5px;
+  padding-left: 10px;
   padding-right: 5px;
   padding-top: 5px;
   .grid-row {
@@ -125,7 +125,7 @@
     border-spacing: 0.25px !important;
     border: 1px !important;
     padding-left: 50px;
-    padding-right: 50px;
+    padding-right: 100px;
     padding-top: 10px;
     padding-bottom: 10px;
     //border-spacing: .25px 0.25px !important;
@@ -154,3 +154,6 @@
   .td{
     width: 33% ;
   }
+  .space { margin:0; padding:0; height:15px; } // height as desired
+
+ 

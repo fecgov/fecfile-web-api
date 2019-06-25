@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service'
-
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 @Component({
   selector: 'app-submit',
   templateUrl: './submit.component.html',
@@ -16,7 +16,8 @@ export class SubmitComponent implements OnInit {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _reportTypeService: ReportTypeService,
   ) { }
 
   ngOnInit() {
@@ -31,6 +32,22 @@ export class SubmitComponent implements OnInit {
           if (this.form_type ==='99'){
             localStorage.removeItem(`form_${this.form_type}_details`);
           } else if (this.form_type ==='3X'){
+
+            this._reportTypeService.submitForm('3X', "Submit")
+            .subscribe(res => {
+              if(res) {
+                    console.log("Accessing SubmitComponent F3x submi res ...",res);
+                   
+                    /*if (res['results.pdf_url'] !== null) {
+                      console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                      window.open(res.results.pdf_url, '_blank');
+                    }*/
+                  }
+                },
+                (error) => {
+                  console.log('error: ', error);
+                });/*  */
+
             localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
             localStorage.removeItem(`form_${this.form_type}_report_type`);
           }
