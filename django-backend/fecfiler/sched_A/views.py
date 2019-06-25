@@ -681,3 +681,7 @@ def report_end_date(report_id, cmte_id):
 END - AGGREGATE AMOUNT API - SCHED_A APP
 ******************************************************************************************************************************
 """
+
+@api_view(['POST'])
+def create_transadtion(request):
+    pass
