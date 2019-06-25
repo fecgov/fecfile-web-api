@@ -86,6 +86,14 @@ export class IndividualReceiptComponent implements OnInit {
         this.hiddenFields = res.data.hiddenFields;
         this.states = res.data.states;
 
+        // console.log('res: ', res);
+
+        // this.formFields = res.formFields;
+        // this.hiddenFields = res.hiddenFields;
+        // this.states = res.states;      
+
+        console.log('this.formFields: ', this.formFields);  
+
         if (this.formFields.length >= 1) {
           this._setForm(this.formFields);
         }
@@ -118,11 +126,13 @@ export class IndividualReceiptComponent implements OnInit {
     const formGroup: any = [];
 
     fields.forEach(el => {
-      if (el.hasOwnProperty('cols')) {
-        el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-        });
-      }
+      //if (!el.labelRow) {
+        if (el.hasOwnProperty('cols')) {
+          el.cols.forEach(e => {
+            formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          });
+        }        
+      //}
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -222,7 +232,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = this.frmIndividualReceipt.get('contribution_aggregate').value;
+    const contributionAggregate: string = e.target.value;
     const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
     const value: string = this._decimalPipe.transform(total, '.2-2');
 
