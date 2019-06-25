@@ -5,24 +5,37 @@
   margin-right: auto;
   min-height: 500px;
   position: relative;
-  .search-field-container {
-    padding: 5px 15px 0 15px;
-    position: relative;
-    .input-group {
-      .form-control {
-      border: none !important;
-      }
-      .input-group-append {
-        .input-group-text {
-        background-color: white !important;
-          .search-icon {
-            left: 205px !important;
 
-          }
-        }
-      }
-    }
-  }
+ 
+ .search {
+  margin: auto;
+  width: 100%;
+  position: relative;
+  display: inline-block;
+ }
+ .search input {
+  @include make-text-input(175px, 1.5em, 1em, 1em);
+  margin: auto;
+  width: 90%;
+  height: 40px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+ }
+ .search input {
+   text-indent: 5px;
+   padding-right: 30px;
+   box-sizing: border-box;
+ }
+ .search .fa-search {
+   color: $shuttleGray;
+   position: absolute;
+   top: 10px;
+   right: 20px;
+ }
+
+  // }
+  
   section {
     .form-sidebar__links {
       list-style-type: none;

@@ -1,113 +1,122 @@
 <!--<div class="forms__wizard" > -->
-<div class="transactions__main-container" >  
-  <div class="transactions__sidebar" *ngIf="showSideBar">
-     <app-reportsidebar
-          title="Filter Options"
-          (status)='onNotify($event)'
-          [specialreports]="specialreports"
-     >
-      </app-reportsidebar>
-  </div>
-
-  <!--<div class="form__container"></div>-->
-  <div class="transactions__container">
-      <div class="form__content">
-        <header>
-            <div class="header-container">
-              <h1 class="pb-1 m-3 border-bottom">Reports</h1>
-            </div>
-          </header>      
-          <div>      
-          <div class="grid-row">
-               <div class="grid-row__col grid-row__col--12">
-                 <div class="transactions__btn-container">                 
-                    <button [@fadeInOut] *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
-                    <i class="thumbtack-icon"></i>Pin Columns
-                    </button> &nbsp;&nbsp;&nbsp;
-        
-                    <button  class="btn btn-primary" (click)="showFilter()">
-                    <i class="fas fa-filter"></i> Filter
-                    </button> &nbsp;&nbsp;&nbsp;
-
-                    <button class="btn btn-primary" (click)="recycleReports()">
-                    <i class="fas fa-recycle"></i> Recycle
-                    </button>      
-
-                    <!--<div class="input-group pl-0 transactions__trx-search">
-                        <div class="input-group-append" (click)="clearSearch()" 
-                            ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
-                          <span class="input-group-text" id="">
-                            <i class="fas fa-eraser text-grey" aria-hidden="true"></i>
-                          </span>
-                        </div>                
-                        <input class="form-control py-1" type="text" placeholder="Search All" 
-                          [(ngModel)]="searchText" aria-label="Search">
-                        <div class="input-group-append" (click)="search()"
-                            ngbTooltip="Search All" tooltipClass="form-tooltip">
-                          <span class="input-group-text" id="">
-                            <i class="search-icon text-grey" aria-hidden="true"></i>
-                          </span>
-                        </div>
-                     </div>              
-                   </div> -->
-                 </div>
-          </div>   
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="transactions__btn-container">
-                <div *ngFor="let searchTextItem of searchTextArray; let i = index">
-                  <button
-                    class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                    (click)="removeSearchText(i)">
-                    <i class="fas fa-window-close"></i>
-                    {{ searchTextItem }}
-                  </button>
-                  <span class="transactions__btn-search-filter-join" 
-                    *ngIf="i < (searchTextArray.length -1 )">
-                      and
-                  </span>
-                </div>
-              </div>          
-            </div>
-          </div>             
-          <div class="grid-row">
-                <div class="grid-row__col grid-row__col--12">
-                    <div class="transactions__btn-container"> 
-                    <ngb-tabset  type="pills" width=400px>
-                       <ngb-tab class="btn btn-primary">
-                         <!--<ngb-tab title="Current Year ({{currentYear}})">-->
-                          <ng-template class="btn btn-primary" ngbTabTitle><b>Reporting Year ({{currentYear}})</b></ng-template> 
-                          <ng-template ngbTabContent>
-                              <app-reportdetails
-                              title="Report for Current Year"
-                              (status)='onNotify($event)'
-                              [reports]="reports"
-                              tableType="{{reportsView}}"
-                              view="current"
-                              existingReportId="{{existingReportId}}"
-                            ></app-reportdetails>
-                          </ng-template>
-                        </ngb-tab>
-                        <ngb-tab>
-                          <ng-template class="btn btn-primary" ngbTabTitle><b>Archives</b></ng-template>
-                          <ng-template ngbTabContent> 
-                            <app-reportdetails
-                            title="Report for Archives"
-                            (status)='onNotify($event)'
-                            [reports]="reports"
-                            tableType="{{reportsView}}"
-                            view="archieve"
-                            existingReportId="{{existingReportId}}"
-                          ></app-reportdetails>
-                          </ng-template>
-                        </ngb-tab>
-                       
-                    </ngb-tabset>
+  <div class="transactions__main-container" >  
+    <div class="transactions__sidebar" *ngIf="showSideBar">
+       <app-reportsidebar
+            title="Filter Options"
+            (status)='onNotify($event)'
+            [specialreports]="specialreports"
+       >
+        </app-reportsidebar>
+    </div>
+  
+    <!--<div class="form__container"></div>-->
+    <div class="transactions__container">
+        <div class="header-content">
+          <header>
+              <div class="header-container">
+                <h1 class="pb-1 m-3 border-bottom">Reports</h1>
+              </div>
+            </header>      
+            <div>      
+            <div class="grid-row">
+                 <div class="grid-row__col grid-row__col--12">
+                   <div class="transactions__btn-container">                 
+                     <!-- <button [@fadeInOut] *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
+                      <i class="thumbtack-icon"></i>Pin Columns
+                      </button> &nbsp;&nbsp;&nbsp;-->
+          
+                      <button  class="btn btn-primary" (click)="showFilter()">
+                      <i class="fas fa-filter"></i> Filter
+                      </button> &nbsp;&nbsp;&nbsp;
+  
+                      <button class="btn btn-primary" (click)="recycleReports()">
+                      <i class="fas fa-recycle"></i> Recycle
+                      </button>      
+  
+                      <!--<div class="input-group pl-0 transactions__trx-search">
+                          <div class="input-group-append" (click)="clearSearch()" 
+                              ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
+                            <span class="input-group-text" id="">
+                              <i class="fas fa-eraser text-grey" aria-hidden="true"></i>
+                            </span>
+                          </div>                
+                          <input class="form-control py-1" type="text" placeholder="Search All" 
+                            [(ngModel)]="searchText" aria-label="Search">
+                          <div class="input-group-append" (click)="search()"
+                              ngbTooltip="Search All" tooltipClass="form-tooltip">
+                            <span class="input-group-text" id="">
+                              <i class="search-icon text-grey" aria-hidden="true"></i>
+                            </span>
+                          </div>
+                       </div>              
+                     </div> -->
                    </div>
-                 </div>
-          </div>  
-        </div> 
-      <div>         
-  </div> <!-- ./form__container -->
-
-</div> <!-- ./forms__wizard -->
+            </div>   
+            </div>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="transactions__btn-container">
+                  <div *ngFor="let searchTextItem of searchTextArray; let i = index">
+                    <button
+                      class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                      (click)="removeSearchText(i)">
+                      <i class="fas fa-window-close"></i>
+                      {{ searchTextItem }}
+                    </button>
+                    <span class="transactions__btn-search-filter-join" 
+                      *ngIf="i < (searchTextArray.length -1 )">
+                        and
+                    </span>
+                  </div>
+                </div>          
+              </div>
+            </div>             
+               <div class="row">
+              <div class="col text-center">
+                <button
+                  type="button"
+                  (click)="viewMode = 'tab1'"
+                  [ngClass]="viewMode === 'tab1' ? 'btn btn-block btn-primary' : 'btn btn-block btn-link btn-secondary-gray'"
+                >
+                <h3>Current Year ({{currentYear}})</h3>
+                </button>
+              </div>
+     
+              <div class="col text-center">
+                <button
+                  type="button"
+                  (click)="viewMode = 'tab2'"
+                  [ngClass]="viewMode === 'tab2' ? 'btn btn-block btn-primary' : 'btn btn-block btn-link btn-secondary-gray'"
+                >
+                <h3>Archives</h3>
+                </button>
+              </div>
+            </div>
+            <div class="tab-container" [ngSwitch]="viewMode">
+              <div id="tab1" *ngSwitchCase="'tab1'" >
+                  <app-reportdetails
+                    (status)='onNotify($event)'
+                    [reports]="reports"
+                    tableType="{{reportsView}}"
+                    view="current"
+                    existingReportId="{{existingReportId}}"
+                  ></app-reportdetails>
+              </div> 
+            </div> 
+            <div class="tab-container" [ngSwitch]="viewMode">
+              <div id="tab2" *ngSwitchCase="'tab2'">
+                  <app-reportdetails
+                      (status)='onNotify($event)'
+                      [reports]="reports"
+                      tableType="{{reportsView}}"
+                      view="archieve"
+                      existingReportId="{{existingReportId}}"
+                  ></app-reportdetails>
+              </div> 
+            </div>                     
+          </div> 
+       
+    </div> <!-- ./form__container -->
+  
+  </div> <!-- ./forms__wizard -->
+  

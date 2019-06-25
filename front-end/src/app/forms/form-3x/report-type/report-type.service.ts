@@ -229,8 +229,12 @@ export class ReportTypeService {
       }
     }
 
-    if (form3xReportType.election_date.length >= 1) {
-      formData.append('date_of_election', form3xReportType.election_date);
+    if (form3xReportType.election_date !== null) {
+      if (typeof form3xReportType.election_date === 'string') {
+        if (form3xReportType.election_date.length >= 1) {
+          formData.append('date_of_election', form3xReportType.election_date);
+        }        
+      }
     }
 
     if (form3xReportType.election_state !== null) {
@@ -328,4 +332,40 @@ export class ReportTypeService {
         }));
       }
   }
+
+  public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url: string = '/core/create_json_builders';
+    //let url: string = '/core/create_json_builders_test';
+    
+    let params = new HttpParams();
+    console.log("printForm formType = ", formType);
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (form3xReportType === null)
+    {
+      console.log("get backup object");
+      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+      console.log("backup object form3xReportType = ", form3xReportType);
+    }
+
+    params = params.append('report_id', form3xReportType.reportId);
+    params = params.append('form_type', `F${formType}`);
+    params = params.append('call_from', callFrom);
+
+          
+   return this._http
+        .get(
+                  `${environment.apiUrl}${url}`,
+                  {
+                  headers: httpOptions,
+                  params
+                  }
+              );
+   }
+  
 }

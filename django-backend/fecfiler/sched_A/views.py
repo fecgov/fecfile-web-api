@@ -247,7 +247,7 @@ def find_aggregate_date(form_type, contribution_date):
 def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE memo_code IS NULL AND entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
             aggregate_amt = cursor.fetchone()[0]
         return aggregate_amt
     except Exception as  e:
@@ -256,7 +256,7 @@ def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_
 def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT contribution_amount, transaction_id, report_id, line_number, contribution_date FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' ORDER BY contribution_date ASC, create_date ASC""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""SELECT contribution_amount, transaction_id, report_id, line_number, contribution_date, memo_code FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' ORDER BY contribution_date ASC, create_date ASC""", [entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as  e:
@@ -274,10 +274,11 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             transactions_list = list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id)
             aggregate_amount = 0
             for transaction in transactions_list:
-                aggregate_amount = aggregate_amount + transaction[0]
+                if transaction[5] is None:
+                    aggregate_amount = aggregate_amount + transaction[0]
                 if str(report_id) == str(transaction[2]):
                     if contribution_date <= transaction[4]:
-                        if aggregate_amount <= itemization_value:
+                        if aggregate_amount <= itemization_value and transaction[5] is None:
                             put_sql_linenumber_schedA(cmte_id, report_id, "11AII", transaction[1], entity_id, aggregate_amount)
                         else:
                             put_sql_linenumber_schedA(cmte_id, report_id, "11AI", transaction[1], entity_id, aggregate_amount)
