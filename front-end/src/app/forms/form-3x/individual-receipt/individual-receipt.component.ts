@@ -232,7 +232,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = this.frmIndividualReceipt.get('contribution_aggregate').value;
+    const contributionAggregate: string = e.target.value;
     const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
     const value: string = this._decimalPipe.transform(total, '.2-2');
 

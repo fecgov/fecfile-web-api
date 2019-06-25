@@ -58,12 +58,13 @@
                         </div>                        
                       </ng-container>
                       <input 
+                        class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
                         [type]="col?.type"
                         [name]="col?.name"
-                        [readonly]="col?.name === 'contribution_aggregate' ? true : null"
-                        [attr.value]="col?.name === 'contribution_aggregate' ? '0.00' : null"
+                        [readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                        [value]="col?.name === 'contribution_aggregate' ? '0.00' : null"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
