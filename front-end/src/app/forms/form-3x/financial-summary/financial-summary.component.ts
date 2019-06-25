@@ -86,6 +86,7 @@ export class FinancialSummaryComponent implements OnInit {
   }
   
   public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
     this._reportTypeService
     .printPreviewPdf('3X', "PrintPreviewPDF")
     .subscribe(res => {
@@ -103,8 +104,10 @@ export class FinancialSummaryComponent implements OnInit {
         });/*  */
 
   }
+  
   public viewTransactions(): void {
         this._router.navigate([`/forms/transactions/${this._formType}/${this.reportId}`]);
   }
   
 }
+
