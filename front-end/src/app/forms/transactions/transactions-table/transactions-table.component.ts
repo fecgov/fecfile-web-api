@@ -228,11 +228,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
-    // smahal: quick fix for sortCol issue not retrived from cache
-    // if (!sortedCol) {
-    //   this.setSortDefault();
-    //   sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-    // }
+    // smahal: quick fix for sortCol issue not retrieved from cache
+    if (!sortedCol) {
+      this.setSortDefault();
+      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    }
 
     if (sortedCol) {
       if (sortedCol.descending === undefined || sortedCol.descending === null) {
@@ -242,10 +242,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // temp fix for sprint 13 demo
-    if (this.currentSortedColumnName === 'default') {
-      this.currentSortedColumnName = 'name';
-    }
+    // // temp fix for sprint 13 demo
+    // if (this.currentSortedColumnName === 'default') {
+    //   this.currentSortedColumnName = 'name';
+    // }
 
     const serverSortColumnName = this._transactionsService.
       mapToSingleServerName(this.currentSortedColumnName);
@@ -256,17 +256,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
 
-        // because the backend receives 'default' as the column name
-        // AND because 'default' is not a column known to this component in
-        // this.sortableColumns, we must tell it make the name column appear sorted.
-        // Ideally the columns name and direction sorted should come back in the response
-        // from the API call.  TODO do this in other sprint/release.
-        // Or change the API interface to accept a flag for default rather than using
-        // the column name.
+        // // because the backend receives 'default' as the column name
+        // // AND because 'default' is not a column known to this component in
+        // // this.sortableColumns, we must tell it make the name column appear sorted.
+        // // Ideally the columns name and direction sorted should come back in the response
+        // // from the API call.  TODO do this in other sprint/release.
+        // // Or change the API interface to accept a flag for default rather than using
+        // // the column name.
 
-        if (this.currentSortedColumnName === 'default') {
-          this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
-        }
+        // if (this.currentSortedColumnName === 'default') {
+        //   this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
+        // }
 
         this._transactionsService.addUIFileds(res);
 
