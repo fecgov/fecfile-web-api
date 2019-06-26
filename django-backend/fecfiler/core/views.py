@@ -1137,36 +1137,44 @@ END - ENTITIES API - CORE APP
 """
 ******************************************************************************************************************************
 SEARCH ENTITY API- CORE APP - SPRINT 7 - FNE 588 - BY PRAVEEN JINKA
+MODIFIED - CORE APP - SPRINT 15 - FNE 1222 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 """
 ************************************************ FUNCTIONS - ENTITIES **********************************************************
 """
 @api_view(['GET'])
-def search_entities(request):
+############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
+def autolookup_search_contacts(request):
+
     try:
-        cmte_id = request.user.username
+        commmitte_id = request.user.username
         param_string = ""
         order_string = ""
+        search_string = ""
+        query_string = ""
 
-        parameters = [cmte_id]
         for key, value in request.query_params.items():
-            order_string += key + ","
+            order_string = str(key)
+            if key in ['entity_name', 'first_name', 'last_name']:
+                parameters = [commmitte_id]
+                param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
+                query_string = """SELECT json_agg(t) FROM (SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
+                                                    FROM public.entity WHERE cmte_id = %s""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                parameters.append(value + '%')
+            elif key in ['cmte_id', 'cmte_name']:
+                param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
+                query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
+                                                    FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
+                parameters = [value + '%']
+            else:
+                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
 
-            if key == 'entity_name':
-                param_string = param_string + " AND LOWER(entity_name) LIKE LOWER(%s)"
-            elif key == 'first_name':
-                param_string = param_string + " AND LOWER(first_name) LIKE LOWER(%s)"
-            elif key == 'last_name':
-                param_string = param_string + " AND LOWER(last_name) LIKE LOWER(%s)"
-
-            parameters.append(value + '%')
-
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
-                                                    FROM public.entity WHERE cmte_id = %s""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string[:-1]
+        if query_string == "":
+            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
+        
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", parameters)
-            # print(cursor.query)
+            cursor.execute(query_string, parameters)
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
@@ -1176,7 +1184,7 @@ def search_entities(request):
             status_value = status.HTTP_204_NO_CONTENT
         return Response(forms_obj, status=status_value)
     except Exception as e:
-        return Response("The search_entities API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("The autolookup_search_contacts API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 """
 *****************************************************************************************************************************
 END - SEARCH ENTITIES API - CORE APP
@@ -2374,8 +2382,8 @@ def get_thirdNavigationTransactionTypes(request):
         # period_disbursement = summary_disbursements(period_args)
 
         period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
-        period_receipt = summary_receipts_for_summary_table(period_args)
-        period_disbursement = summary_disbursements_for_summary_table(period_args)
+        period_receipt = summary_receipts_for_sumamry_table(period_args)
+        period_disbursement = summary_disbursements_for_sumamry_table(period_args)
 
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
         coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
