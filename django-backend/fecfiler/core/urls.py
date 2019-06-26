@@ -14,7 +14,7 @@ urlpatterns = [
         views.get_dynamic_forms_fields, name='get_dynamic_forms_fields'),
     url(r'^core/create_json_file$', views.create_json_file, name='create_json_file'),
     url(r'^core/entities$', views.entities, name='entities'),
-    url(r'^core/search_entities$', views.search_entities, name='search_entities'),
+    url(r'^core/autolookup_search_contacts$', views.autolookup_search_contacts, name='autolookup_search_contacts'),
     url(r'^core/get_all_transactions$',
         views.get_all_transactions, name='get_all_transactions'),
     url(r'^core/state$', views.state, name='state'),
