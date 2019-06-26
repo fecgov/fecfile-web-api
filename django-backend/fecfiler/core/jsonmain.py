@@ -578,6 +578,7 @@ def create_json_builders(request):
 
         report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
+        form_type = request.data.get('form_type')
         committeeid = request.user.username
 
         print("report_id", report_id)
@@ -602,14 +603,17 @@ def create_json_builders(request):
             json.dump(data_obj, open(tmp_path, 'w'), indent=4)
         
             transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
             if call_from == "PrintPreviewPDF":
-                data_obj = {'report_id':report_id}
+                data_obj = {'form_type':form_type}
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
 
+                print("data_obj = ", data_obj)
+                print("file_obj = ", file_obj)
                 resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
             elif call_from == "Submit":
-                data_obj = {'report_id':report_id}
+                data_obj = request
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
 
                 resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
@@ -628,6 +632,3 @@ def create_json_builders(request):
 
     except Exception as e:
         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
- 

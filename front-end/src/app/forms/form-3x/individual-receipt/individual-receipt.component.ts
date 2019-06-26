@@ -114,13 +114,11 @@ export class IndividualReceiptComponent implements OnInit {
     const formGroup: any = [];
 
     fields.forEach(el => {
-      //if (!el.labelRow) {
-        if (el.hasOwnProperty('cols')) {
-          el.cols.forEach(e => {
-            formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-          });
-        }        
-      //}
+      if (el.hasOwnProperty('cols')) {
+        el.cols.forEach(e => {
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+        });
+      }        
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -233,8 +231,12 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = e.target.value;
-    const total: number = parseInt(contributionAmount) + parseInt(contributionAggregate);
+    const contributionAggregate: string = '0.00';
+    /**
+     * TODO: Look into why read only input returns null.
+     */
+    // this.frmIndividualReceipt.get('contribution_aggregate').value;
+    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
     const value: string = this._decimalPipe.transform(total, '.2-2');
 
     this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
