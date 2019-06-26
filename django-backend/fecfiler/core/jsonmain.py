@@ -624,10 +624,10 @@ def create_json_builders(request):
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
         else:
-            return Response('The create_json_builders is throwing an error', status=status.HTTP_400_BAD_REQUEST)
+            return Response('error for json builder', status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-
+ 
