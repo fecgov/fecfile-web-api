@@ -22,12 +22,18 @@ export class FinancialSummaryService {
   public getSummaryDetails(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/get_summary_table`;
-    const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    if (reportType === null || typeof reportType === 'undefined' ){
+      console.log("this._form3XReportType is null");
+      reportType = JSON.parse(localStorage.getItem(`form_${reportType}_report_type_backup`));
+      console.log("this._form3XReportType = ", reportType);
+    }
 
     // With Edit Report Functionality
     if (reportType.hasOwnProperty('reportId')) {

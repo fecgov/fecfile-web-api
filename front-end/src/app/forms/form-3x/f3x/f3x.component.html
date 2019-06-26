@@ -1,5 +1,6 @@
 <div class="forms__wizard" *ngIf="!loadingData">
-  <div class="form__sidebar" *ngIf="step !== 'financial_summary'">
+  <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
+  <div class="form__sidebar" >
     <div [hidden]="step !== 'step_1'">
       <report-type-sidebar
         title="Report Coverage Dates"
@@ -10,8 +11,8 @@
       >
       </report-type-sidebar>
     </div>
-    <div *ngIf="step === 'step_2' || step === 'step_3'">
-      <transaction-sidebar
+    <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary'">
+    <transaction-sidebar
         [step]="step"
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"

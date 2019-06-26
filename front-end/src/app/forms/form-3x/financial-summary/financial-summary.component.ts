@@ -23,6 +23,9 @@ export class FinancialSummaryComponent implements OnInit {
   public tab3Data: any = {};
   public viewMode: string = '';
   public reportId: string='';
+  public step: string = '';
+
+  private _form3XReportType: any = {};
 
   private _formType: string='';
   constructor(
@@ -40,17 +43,9 @@ export class FinancialSummaryComponent implements OnInit {
   ngOnInit(): void {
     this.viewMode = 'tab1';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+    this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        this.reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        this.reportId = form3XReportType.reportid;
-      }
-    }
-
-    console.log(" FinancialSummaryComponent this.reportId = ", this.reportId );
+    console.log("this.step = ", this.step);
 
     this._financialSummaryService
     .getSummaryDetails('3X')
@@ -72,6 +67,8 @@ export class FinancialSummaryComponent implements OnInit {
           console.log('error: ', error);
         });
 
+
+      
   }
 
   /**
@@ -86,8 +83,9 @@ export class FinancialSummaryComponent implements OnInit {
   }
   
   public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
     this._reportTypeService
-    .printPreviewPdf('3X')
+    .printPreviewPdf('3X', "PrintPreviewPDF")
     .subscribe(res => {
       if(res) {
             console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
@@ -103,8 +101,26 @@ export class FinancialSummaryComponent implements OnInit {
         });/*  */
 
   }
+
   public viewTransactions(): void {
-        this._router.navigate([`/forms/transactions/${this._formType}/${this.reportId}`]);
+    this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined' ){
+      console.log("this._form3XReportType is null");
+      this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+      console.log("this._form3XReportType = ", this._form3XReportType);
+    }
+
+    if (typeof this._form3XReportType === 'object' && this._form3XReportType !== null) {
+      if (this._form3XReportType.hasOwnProperty('reportId')) {
+        this.reportId = this._form3XReportType.reportId;
+      } else if (this._form3XReportType.hasOwnProperty('reportid')) {
+        this.reportId = this._form3XReportType.reportid;
+      }
+    }      
+    console.log(" FinancialSummaryComponent this.reportId = ", this.reportId );
+    this._router.navigate([`/forms/transactions/${this._formType}/${this.reportId}`]);
   }
   
 }
+

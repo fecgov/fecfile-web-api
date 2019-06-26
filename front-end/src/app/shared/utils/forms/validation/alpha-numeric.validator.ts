@@ -14,7 +14,7 @@ export function alphaNumeric(): ValidatorFn {
 		if (text) {
 			if (text.length >= 1) {
 				if (!regex.test(text)) {
-					return { nonAlphanumeric: true };
+					return { nonAlphaNumeric: true };
 				}
 			}
 		}
