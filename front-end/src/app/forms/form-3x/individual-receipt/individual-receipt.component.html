@@ -48,7 +48,7 @@
                   </button>
                   <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'"> (Optional) </ng-container>
                 </label>
-                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date' || col?.type === 'checkbox'">
+                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
                     <div [ngClass]="{'input-group': col?.inputGroup}">
                       <ng-container *ngIf="col?.inputGroup">
                         <div class="input-group-prepend">
@@ -122,6 +122,24 @@
                       </div>
                     </ng-container>
                   </div>
+                </ng-container>
+                <ng-container *ngIf="col?.type === 'checkbox'">
+                  <input 
+                    class="form-control"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [attr.type]="col?.type"
+                    [attr.name]="col?.name"
+                    [attr.value]="col?.value"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmIndividualReceipt.get(col?.name)?.invalid &&
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    "
+                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                  />                  
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea 
