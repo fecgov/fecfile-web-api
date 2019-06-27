@@ -268,9 +268,11 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (checked) {
       this._memoCode = checked;
+      this.frmIndividualReceipt.controls['memo_code'].setValue(1);
     } else {
       this._validateContributionDate();
       this._memoCode = checked;
+      this.frmIndividualReceipt.controls['memo_code'].setValue(0);
     }
   }
 
@@ -278,6 +280,8 @@ export class IndividualReceiptComponent implements OnInit {
    * Vaidates the form on submit.
    */
   public doValidateReceipt() {
+    console.log('doValidateReceipt: ');
+    console.log('this.frmIndividualReceipt: ', this.frmIndividualReceipt);
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 

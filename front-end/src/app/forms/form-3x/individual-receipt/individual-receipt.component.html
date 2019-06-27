@@ -130,7 +130,7 @@
                     [style.height]="col?.height"
                     [attr.type]="col?.type"
                     [attr.name]="col?.name"
-                    [attr.value]="col?.value"
+                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
