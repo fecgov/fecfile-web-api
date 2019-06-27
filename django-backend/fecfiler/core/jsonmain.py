@@ -622,8 +622,8 @@ def create_json_builders(request):
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
                 dictprint = resp.json()
-                merged_dict = {**create_json_data, **dictprint}
-                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                #merged_dict = {**create_json_data, **dictprint}
+                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
         
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
