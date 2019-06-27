@@ -14,7 +14,7 @@ urlpatterns = [
         views.get_dynamic_forms_fields, name='get_dynamic_forms_fields'),
     url(r'^core/create_json_file$', views.create_json_file, name='create_json_file'),
     url(r'^core/entities$', views.entities, name='entities'),
-    url(r'^core/search_entities$', views.search_entities, name='search_entities'),
+    url(r'^core/autolookup_search_contacts$', views.autolookup_search_contacts, name='autolookup_search_contacts'),
     url(r'^core/get_all_transactions$',
         views.get_all_transactions, name='get_all_transactions'),
     url(r'^core/state$', views.state, name='state'),
@@ -22,7 +22,7 @@ urlpatterns = [
         views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
     url(r'^core/trash_restore_transactions$',
         views.trash_restore_transactions, name='trash_restore_transactions'),
-    url(r'^core/summary_table$', views.summary_table, name='summary_table'),
+    url(r'^core/get_summary_table$', views.get_summary_table, name='get_summary_table'),
     url(r'^core/thirdNavTransactionTypes$', views.get_thirdNavigationTransactionTypes,
         name='get_thirdNavigationTransactionTypes'),
     url(r'^core/get_FormTypes$', views.get_FormTypes, name='get_FormTypes'),
@@ -33,7 +33,9 @@ urlpatterns = [
     url(r'^core/get_ItemizationIndicators$',
         views.get_ItemizationIndicators, name='get_ItemizationIndicators'),
     url(r'^core/get_report_info$', views.get_report_info, name='get_report_info'),
-    url(r'^core/json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
+    url(r'^core/create_json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
     url(r'^core/print_preview_pdf$', views.print_preview_pdf, name='print_preview_pdf'),
+    url(r'^core/reports$', views.reports, name='reports'),
+
 
 ]

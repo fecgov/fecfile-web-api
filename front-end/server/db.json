@@ -1,3 +1,161 @@
+<<<<<<< HEAD
+{
+   "data": {
+      "formFields": [{
+            "colClassName": "col col-md-3",
+            "cols": [{
+                  "text": "Contributor Last Name",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "last_name",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "30",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "197px"
+               },
+               {
+                  "text": "Contributor First Name",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "first_name",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "20",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "197px"
+               },
+               {
+                  "text": "Contributor Middle Name",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "middle_name",
+                  "type": "text",
+                  "validation": {
+                     "required": false,
+                     "max": "20",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "197px"
+               }
+            ]
+         },
+         {
+            "colClassName": "col col-md-3",
+            "cols": [{
+                  "text": "Contributor Prefix",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "prefix",
+                  "type": "text",
+                  "validation": {
+                     "required": false,
+                     "max": "10",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "98.35px"
+               },
+               {
+                  "text": "Contributor Suffix",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "sufix",
+                  "type": "text",
+                  "validation": {
+                     "required": false,
+                     "max": "10",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "98.35px"
+               }
+            ],
+            "seperator": true
+         },
+         {
+            "colClassName": "col col-md-4",
+            "cols": [{
+                  "text": "Contributor Street 1",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "street_1",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "34",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "275px"
+               },
+               {
+                  "text": "Contributor Street 2",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "street_2",
+                  "type": "text",
+                  "validation": {
+                     "required": false,
+                     "max": "34",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "275px"
+               }
+            ]
+         },
+         {
+            "colClassName": "col col-md-3",
+            "cols": [{
+                  "text": "Contributor City",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "city",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "30",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "197px"
+               },
+               {
+                  "text": "Contributor State",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "state",
+                  "type": "select",
+                  "validation": {
+                     "required": true,
+                     "max": "2",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "98px"
+               },
+               {
+                  "text": "Contributor Zip",
+                  "infoIcon": false,
+                  "infoText": null,
+                  "name": "zip",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "9",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "98px"
+=======
 {  
    "data":{  
       "formFields":[  
@@ -7,24 +165,22 @@
                   "text":"Contributor Last Name",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorLastName",
+                  "name":"last_name",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"30",
-                     "alphaNumeric":true
+                     "max":"30"
                   }
                },
                {  
                   "text":"Contributor First Name",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorFirstName",
+                  "name":"first_name",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"20",
-                     "alphaNumeric":true
+                     "max":"20"
                   }
                }
             ]
@@ -35,36 +191,33 @@
                   "text":"Contributor Middle Name",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorMiddleName",
+                  "name":"middle_name",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"20",
-                     "alphaNumeric":true
+                     "max":"20"
                   }
                },
                {  
                   "text":"Contributor Prefix",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorPrefix",
+                  "name":"prefix",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"10",
-                     "alphaNumeric":true
+                     "max":"10"
                   }
                },
                {  
-                  "text":"Contributor Suffix",
+                  "text":"Contributor Sufix",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorSuffix",
+                  "name":"sufix",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"10",
-                     "alphaNumeric":true
+                     "max":"10"
                   }
                }
             ]
@@ -75,24 +228,22 @@
                   "text":"Contributor Street 1",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorStreet1",
+                  "name":"street_1",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"34",
-                     "alphaNumeric":true
+                     "max":"34"
                   }
                },
                {  
                   "text":"Contributor Street 2",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorStreet2",
+                  "name":"street_2",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"34",
-                     "alphaNumeric":true
+                     "max":"34"
                   }
                }
             ]
@@ -103,61 +254,81 @@
                   "text":"Contributor City",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorCity",
+                  "name":"city",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"30",
-                     "alphaNumeric":true
+                     "max":"30"
                   }
                },
                {  
                   "text":"Contributor State",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorState",
+                  "name":"state",
                   "type":"select",
                   "validation":{  
                      "required": true,
-                     "max":"2",
-                     "alphaNumeric":true
+                     "max":"2"
                   }
                },
                {  
                   "text":"Contributor Zip",
                   "infoIcon":null,
                   "infoText":null,
-                  "name":"ContributorZip",
-                  "type":"number",
+                  "name":"zip",
+                  "type":"text",
                   "validation":{  
+                     "alphanumeric": true,
                      "required": true,
-                     "max":"9",
-                     "alphaNumeric":true
+                     "max":"9"
                   }
+>>>>>>> develop
                }
-            ]
+            ],
+            "seperator": true
          },
-         {  
-            "cols":[  
-               {  
-                  "text":"Contribution Date",
+         {
+            "colClassName": "col col-md-3",
+            "cols": [{
+                  "text": "Contributor Employer",
                   "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "employer",
+                  "type": "text",
+                  "validation": {
+=======
                   "infoText":"Request language from RAD",
-                  "name":"ContributionDate",
+                  "name":"contribution_date",
                   "type":"date",
                   "validation":{  
+>>>>>>> develop
                      "required": true,
-                     "max": null,
-                     "date": true,
-                     "contributionDate": true
-                  }
+                     "max": "38",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "200px"
                },
-               {  
-                  "text":"Contribution Amount",
+               {
+                  "text": "Contributor Occupation",
                   "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "occupation",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "38",
+                     "alphaNumeric": true
+                  },
+                  "height": "30px",
+                  "width": "200px"
+=======
                   "infoText":"Request language from RAD",
-                  "name":"ContributionAmount",
-                  "type":"number",
+                  "name":"contribution_amount",
+                  "type":"text",
                   "validation":{  
                      "required": true,
                      "max":"12",
@@ -168,40 +339,82 @@
                   "text":"Contribution Aggregate",
                   "infoIcon": true,
                   "infoText":"Request language from RAD",
-                  "name":"ContributionAggregate",
-                  "type":"number",
+                  "name":"contribution_aggregate",
+                  "readOnly": true,
+                  "type":"text",
+                  "value": "0.00",
                   "validation":{  
                      "required": false,
                      "max":"12",
-                     "alphaNumeric":true
+                     "dollarAmount": true
                   }
+>>>>>>> develop
                }
-            ]
+            ],
+            "seperator": true
          },
-         {  
-            "cols":[  
-               {  
-                  "text":"Contributor Employer",
+         {
+            "colClassName": "col col-md-3",
+            "cols": [{
+                  "text": "Contribution Date",
                   "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "contribution_date",
+                  "type": "date",
+                  "validation": {
+                     "required": true,
+                     "max": null,
+                     "date": true,
+                     "contributionDate": true
+                  },
+                  "width": "154px",
+                  "height": "30px"
+=======
                   "infoText":"Request language from RAD",
-                  "name":"ContributorEmployer",
+                  "name":"employer",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"38",
-                     "alphaNumeric":true
+                     "max":"38"
                   }
+>>>>>>> develop
                },
-               {  
-                  "text":"Contributor Occupation",
+               {
+                  "text": "Contribution Amount",
                   "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "contribution_amount",
+                  "type": "text",
+                  "validation": {
+                     "required": true,
+                     "max": "12",
+                     "dollarAmount": true
+                  },
+                  "width": "154px",
+                  "height": "30px"
+               },
+               {
+                  "text": "Contribution Aggregate",
+                  "infoIcon": true,
+                  "infoText": "Request language from RAD",
+                  "name": "contribution_aggregate",
+                  "type": "text",
+                  "validation": {
+                     "required": false,
+                     "max": "12",
+                     "alphaNumeric": true
+                  },
+                  "width": "196px",
+                  "height": "30px"
+=======
                   "infoText":"Request language from RAD",
-                  "name":"ContributorOccupation",
+                  "name":"occupation",
                   "type":"text",
                   "validation":{  
                      "required": true,
-                     "max":"38",
-                     "alphaNumeric":true
+                     "max":"38"
                   }
                }
             ]
@@ -212,321 +425,393 @@
                   "text":"Memo Code",
                   "infoIcon": true,
                   "infoText":"Request language from RAD",
-                  "name":"MemoCode",
+                  "name":"memo_code",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"1",
-                     "alphaNumeric":true
+                     "max":"1"
                   }
+>>>>>>> develop
                },
-               {  
-                  "text":"Memo Text",
+               {
+                  "text": "Memo Code",
                   "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "memo_code",
+                  "type": "checkbox",
+                  "validation": {
+                     "required": false,
+                     "max": "1",
+                     "alphaNumeric": true
+                  },
+                  "width": "24px",
+                  "height": "24px"
+=======
                   "infoText":"Request language from RAD",
-                  "name":"MemoText",
+                  "name":"memo_text",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"100",
-                     "alphaNumeric":true
+                     "max":"100"
                   }
+>>>>>>> develop
                }
             ]
          },
-         {  
-            "cols":[  
-               {  
-                  "text":"Contribution Purpose Description",
+         {
+            "colClassName": "col col-md-5",
+            "cols": [
+               {
+                  "text": "Memo Text",
                   "infoIcon": true,
+                  "infoText": "Request language from RAD",
+                  "name": "memo_text",
+                  "type": "textarea",
+                  "validation": {
+                     "required": false,
+                     "max": "100",
+                     "alphaNumeric": true
+                  },
+                  "scroll": true,
+                  "height": "135px",
+                  "width": "400px"
+               },
+               {
+                  "text": "Contribution Purpose Description",
+                  "infoIcon": true,
+<<<<<<< HEAD
+                  "infoText": "Request language from RAD",
+                  "name": "purpose_description",
+                  "type": "textarea",
+                  "validation": {
+                     "required": false,
+                     "max": "100",
+                     "alphaNumeric": true
+                  },
+                  "scroll": true,
+                  "height": "135px",
+                  "width": "400px"                  
+=======
                   "infoText":"Request language from RAD",
-                  "name":"ContributionPurposeDescription",
+                  "name":"purpose_description",
                   "type":"text",
                   "validation":{  
                      "required": false,
-                     "max":"100",
-                     "alphaNumeric":true
+                     "max":"100"
                   }
+>>>>>>> develop
                }
             ]
          }
       ],
+<<<<<<< HEAD
+      "hiddenFields": [{
+            "type": "hidden",
+            "name": "entity_type",
+            "value": "IND"
+         },
+         {
+            "type": "hidden",
+            "name": "line_number",
+            "value": "11A"
+         },
+         {
+            "type": "hidden",
+            "name": "transaction_id",
+            "value": null
+         },
+         {
+            "type": "hidden",
+            "name": "back_reference_tran_id_number",
+            "value": null
+         },
+         {
+            "type": "hidden",
+            "name": "back_reference_sched_name",
+            "value": null
+         },
+         {
+            "type": "hidden",
+            "name": "TransactionTypeCode",
+            "value": "15"
+=======
       "hiddenFields":[  
          {  
             "type":"hidden",
-            "name":"EntityType",
+            "name":"entity_type",
             "value":"IND"
          },
          {  
             "type":"hidden",
-            "name":"LineNumber",
+            "name":"line_number",
             "value":"11A"
          },
          {  
             "type":"hidden",
-            "name":"TransactionId",
+            "name":"transaction_id",
             "value":null
          },
          {  
             "type":"hidden",
-            "name":"BackReferenceTranIdNumber",
+            "name":"backReference_tran_id_number",
             "value":null
          },
          {  
             "type":"hidden",
-            "name":"BackReferenceSchedName",
+            "name":"back_reference_sched_name",
             "value":null
          },
          {  
             "type":"hidden",
-            "name":"TransactionTypeCode",
+            "name":"transaction_type",
             "value":"15"
+>>>>>>> develop
          }
       ],
-      "states":[  
-         {  
-            "name":"Alabama",
-            "code":"AL"
+      "states": [{
+            "name": "Alabama",
+            "code": "AL"
          },
-         {  
-            "name":"Alaska",
-            "code":"AK"
+         {
+            "name": "Alaska",
+            "code": "AK"
          },
-         {  
-            "name":"Arizona",
-            "code":"AZ"
+         {
+            "name": "Arizona",
+            "code": "AZ"
          },
-         {  
-            "name":"Arkansas",
-            "code":"AR"
+         {
+            "name": "Arkansas",
+            "code": "AR"
          },
-         {  
-            "name":"California",
-            "code":"CA"
+         {
+            "name": "California",
+            "code": "CA"
          },
-         {  
-            "name":"Colorado",
-            "code":"CO"
+         {
+            "name": "Colorado",
+            "code": "CO"
          },
-         {  
-            "name":"Connecticut",
-            "code":"CT"
+         {
+            "name": "Connecticut",
+            "code": "CT"
          },
-         {  
-            "name":"Delaware",
-            "code":"DE"
+         {
+            "name": "Delaware",
+            "code": "DE"
          },
-         {  
-            "name":"District Of Columbia",
-            "code":"DC"
+         {
+            "name": "District Of Columbia",
+            "code": "DC"
          },
-         {  
-            "name":"Florida",
-            "code":"FL"
+         {
+            "name": "Florida",
+            "code": "FL"
          },
-         {  
-            "name":"Georgia",
-            "code":"GA"
+         {
+            "name": "Georgia",
+            "code": "GA"
          },
-         {  
-            "name":"Guam",
-            "code":"GU"
+         {
+            "name": "Guam",
+            "code": "GU"
          },
-         {  
-            "name":"Hawaii",
-            "code":"HI"
+         {
+            "name": "Hawaii",
+            "code": "HI"
          },
-         {  
-            "name":"Idaho",
-            "code":"ID"
+         {
+            "name": "Idaho",
+            "code": "ID"
          },
-         {  
-            "name":"Illinois",
-            "code":"IL"
+         {
+            "name": "Illinois",
+            "code": "IL"
          },
-         {  
-            "name":"Indiana",
-            "code":"IN"
+         {
+            "name": "Indiana",
+            "code": "IN"
          },
-         {  
-            "name":"Iowa",
-            "code":"IA"
+         {
+            "name": "Iowa",
+            "code": "IA"
          },
-         {  
-            "name":"Kansas",
-            "code":"KS"
+         {
+            "name": "Kansas",
+            "code": "KS"
          },
-         {  
-            "name":"Kentucky",
-            "code":"KY"
+         {
+            "name": "Kentucky",
+            "code": "KY"
          },
-         {  
-            "name":"Louisiana",
-            "code":"LA"
+         {
+            "name": "Louisiana",
+            "code": "LA"
          },
-         {  
-            "name":"Maine",
-            "code":"ME"
+         {
+            "name": "Maine",
+            "code": "ME"
          },
-         {  
-            "name":"Maryland",
-            "code":"MD"
+         {
+            "name": "Maryland",
+            "code": "MD"
          },
-         {  
-            "name":"Massachusetts",
-            "code":"MA"
+         {
+            "name": "Massachusetts",
+            "code": "MA"
          },
-         {  
-            "name":"Michigan",
-            "code":"MI"
+         {
+            "name": "Michigan",
+            "code": "MI"
          },
-         {  
-            "name":"Minnesota",
-            "code":"MN"
+         {
+            "name": "Minnesota",
+            "code": "MN"
          },
-         {  
-            "name":"Mississippi",
-            "code":"MS"
+         {
+            "name": "Mississippi",
+            "code": "MS"
          },
-         {  
-            "name":"Missouri",
-            "code":"MO"
+         {
+            "name": "Missouri",
+            "code": "MO"
          },
-         {  
-            "name":"Montana",
-            "code":"MT"
+         {
+            "name": "Montana",
+            "code": "MT"
          },
-         {  
-            "name":"Nebraska",
-            "code":"NE"
+         {
+            "name": "Nebraska",
+            "code": "NE"
          },
-         {  
-            "name":"Nevada",
-            "code":"NV"
+         {
+            "name": "Nevada",
+            "code": "NV"
          },
-         {  
-            "name":"New Hampshire",
-            "code":"NH"
+         {
+            "name": "New Hampshire",
+            "code": "NH"
          },
-         {  
-            "name":"New Jersey",
-            "code":"NJ"
+         {
+            "name": "New Jersey",
+            "code": "NJ"
          },
-         {  
-            "name":"New Mexico",
-            "code":"NM"
+         {
+            "name": "New Mexico",
+            "code": "NM"
          },
-         {  
-            "name":"New York",
-            "code":"NY"
+         {
+            "name": "New York",
+            "code": "NY"
          },
-         {  
-            "name":"North Carolina",
-            "code":"NC"
+         {
+            "name": "North Carolina",
+            "code": "NC"
          },
-         {  
-            "name":"North Dakota",
-            "code":"ND"
+         {
+            "name": "North Dakota",
+            "code": "ND"
          },
-         {  
-            "name":"Ohio",
-            "code":"OH"
+         {
+            "name": "Ohio",
+            "code": "OH"
          },
-         {  
-            "name":"Oklahoma",
-            "code":"OK"
+         {
+            "name": "Oklahoma",
+            "code": "OK"
          },
-         {  
-            "name":"Oregon",
-            "code":"OR"
+         {
+            "name": "Oregon",
+            "code": "OR"
          },
-         {  
-            "name":"Pennsylvania",
-            "code":"PA"
+         {
+            "name": "Pennsylvania",
+            "code": "PA"
          },
-         {  
-            "name":"Puerto Rico",
-            "code":"PR"
+         {
+            "name": "Puerto Rico",
+            "code": "PR"
          },
-         {  
-            "name":"Rhode Island",
-            "code":"RI"
+         {
+            "name": "Rhode Island",
+            "code": "RI"
          },
-         {  
-            "name":"South Carolina",
-            "code":"SC"
+         {
+            "name": "South Carolina",
+            "code": "SC"
          },
-         {  
-            "name":"South Dakota",
-            "code":"SD"
+         {
+            "name": "South Dakota",
+            "code": "SD"
          },
-         {  
-            "name":"Tennessee",
-            "code":"TN"
+         {
+            "name": "Tennessee",
+            "code": "TN"
          },
-         {  
-            "name":"Texas",
-            "code":"TX"
+         {
+            "name": "Texas",
+            "code": "TX"
          },
-         {  
-            "name":"Utah",
-            "code":"UT"
+         {
+            "name": "Utah",
+            "code": "UT"
          },
-         {  
-            "name":"Vermont",
-            "code":"VT"
+         {
+            "name": "Vermont",
+            "code": "VT"
          },
-         {  
-            "name":"Virginia",
-            "code":"VA"
+         {
+            "name": "Virginia",
+            "code": "VA"
          },
-         {  
-            "name":"U.S. Virgin Islands",
-            "code":"VI"
+         {
+            "name": "U.S. Virgin Islands",
+            "code": "VI"
          },
-         {  
-            "name":"Washington",
-            "code":"WA"
+         {
+            "name": "Washington",
+            "code": "WA"
          },
-         {  
-            "name":"West Virginia",
-            "code":"WV"
+         {
+            "name": "West Virginia",
+            "code": "WV"
          },
-         {  
-            "name":"Wisconsin",
-            "code":"WI"
+         {
+            "name": "Wisconsin",
+            "code": "WI"
          },
-         {  
-            "name":"Wyoming",
-            "code":"WY"
+         {
+            "name": "Wyoming",
+            "code": "WY"
          },
-         {  
-            "name":"Foreign Countries",
-            "code":"ZZ"
+         {
+            "name": "Foreign Countries",
+            "code": "ZZ"
          },
-         {  
-            "name":"American Samoa",
-            "code":"AS"
+         {
+            "name": "American Samoa",
+            "code": "AS"
          },
-         {  
-            "name":"Northern Mariana Islands",
-            "code":"MP"
+         {
+            "name": "Northern Mariana Islands",
+            "code": "MP"
          },
-         {  
-            "name":"United States",
-            "code":"US"
+         {
+            "name": "United States",
+            "code": "US"
          },
-         {  
-            "name":"Armed Forces Americas",
-            "code":"AA"
+         {
+            "name": "Armed Forces Americas",
+            "code": "AA"
          },
-         {  
-            "name":"Armed Forces Europe",
-            "code":"AE"
+         {
+            "name": "Armed Forces Europe",
+            "code": "AE"
          },
-         {  
-            "name":"Armed Forces Pacific",
-            "code":"AP"
+         {
+            "name": "Armed Forces Pacific",
+            "code": "AP"
          }
       ]
    }

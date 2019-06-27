@@ -118,111 +118,112 @@ def get_summary_dict(form3x_header_data):
     form3x_data_string ='{'
     form3x_data_string = form3x_data_string + '"cashOnHandYear": 2019,'
     form3x_data_string = form3x_data_string + '"colA": {'
-    form3x_data_string = form3x_data_string + '"6b_cashOnHandBeginning": '+ str(form3x_header_data['coh_bop']) + ','
-    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data['ttl_receipts_sum_page_per']) + ','
-    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data['subttl_sum_page_per']) + ','
-    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data['ttl_disb_sum_page_per']) + ','
-    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data['coh_cop']) + ','
-    form3x_data_string = form3x_data_string + '"9_debtsTo":'+ str(form3x_header_data['debts_owed_to_cmte']) + ','
-    form3x_data_string = form3x_data_string + '"10_debtsBy":'+ str(form3x_header_data['debts_owed_by_cmte']) + ','
-    form3x_data_string = form3x_data_string + '"11ai_Itemized":'+ str(form3x_header_data['indv_item_contb_per']) + ','
-    form3x_data_string = form3x_data_string + '"11aii_Unitemized":'+ str(form3x_header_data['indv_unitem_contb_per']) + ','
-    form3x_data_string = form3x_data_string + '"11aiii_Total":'+ str(form3x_header_data['ttl_indv_contb']) + ','
-    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_per_i']) + ','
-    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data['other_pol_cmte_contb_per_i']) + ','
-    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data['ttl_contb_col_ttl_per']) + ','
-    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_from_affiliated_pty_per']) + ','
-    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data['all_loans_received_per']) + ','
-    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data['loan_repymts_received_per']) + ','
-    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data['offsets_to_op_exp_per_i']) + ','
-    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data['fed_cand_contb_ref_per']) + ','
-    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data['other_fed_receipts_per']) + ','
-    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data['tranf_from_nonfed_acct_per']) + ','
-    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data['tranf_from_nonfed_levin_per']) + ','
-    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data['ttl_nonfed_tranf_per']) + ','
-    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data['ttl_receipts_per']) + ','
-    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data['ttl_fed_receipts_per']) + ','
-    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data['shared_fed_op_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data['shared_nonfed_op_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data['other_fed_op_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data['ttl_op_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_to_affliliated_cmte_per']) + ','
-    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data['fed_cand_cmte_contb_per']) + ','
-    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data['indt_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"25_coordinatedExpenditureMadeByPartyCommittees":'+ str(form3x_header_data['coord_exp_by_pty_cmte_per']) + ','
-    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data['loan_repymts_made_per']) + ','
-    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data['loans_made_per']) + ','
-    form3x_data_string = form3x_data_string + '"28a_individualsPersons":'+ str(form3x_header_data['indv_contb_ref_per']) + ','
-    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_per_ii']) + ','
-    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data['other_pol_cmte_contb_per_ii']) + ','
-    form3x_data_string = form3x_data_string + '"28d_totalContributionsRefunds":'+ str(form3x_header_data['ttl_contb_ref_per_i']) + ','
-    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data['other_disb_per']) + ','
-    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_fedShare":'+ str(form3x_header_data['shared_fed_actvy_fed_shr_per']) + ','
-    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFed":'+ str(form3x_header_data['shared_fed_actvy_nonfed_per']) + ','
-    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data['non_alloc_fed_elect_actvy_per']) + ','
-    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data['ttl_fed_elect_actvy_per']) + ','
-    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data['ttl_disb_per']) + ','
-    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data['ttl_fed_disb_per']) + ','
-    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data['ttl_contb_per']) + ','
-    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_per_ii']) + ','
-    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data['net_contb_per']) + ','
-    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data['ttl_fed_op_exp_per']) + ','
-    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data['offsets_to_op_exp_per_ii']) + ','
-    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data['net_op_exp_per'])
+    form3x_data_string = form3x_data_string + '"6b_cashOnHandBeginning": '+ str(form3x_header_data.get('coh_bop', 0)) + ','
+    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data.get('ttl_receipts_sum_page_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data.get('subttl_sum_page_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data.get('ttl_disb_sum_page_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data.get('coh_cop', 0)) + ','
+    form3x_data_string = form3x_data_string + '"9_debtsTo":'+ str(form3x_header_data.get('debts_owed_to_cmte', 0)) + ','
+    form3x_data_string = form3x_data_string + '"10_debtsBy":'+ str(form3x_header_data.get('debts_owed_by_cmte', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11ai_Itemized":'+ str(form3x_header_data.get('indv_item_contb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11aii_Unitemized":'+ str(form3x_header_data.get('indv_unitem_contb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11aiii_Total":'+ str(form3x_header_data.get('ttl_indv_contb', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data.get('pol_pty_cmte_contb_per_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data.get('other_pol_cmte_contb_per_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data.get('ttl_contb_col_ttl_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data.get('tranf_from_affiliated_pty_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data.get('all_loans_received_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data.get('loan_repymts_received_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data.get('offsets_to_op_exp_per_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data.get('fed_cand_contb_ref_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data.get('other_fed_receipts_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data.get('tranf_from_nonfed_acct_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data.get('tranf_from_nonfed_levin_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data.get('ttl_nonfed_tranf_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data.get('ttl_receipts_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data.get('ttl_fed_receipts_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data.get('shared_fed_op_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data.get('shared_nonfed_op_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data.get('other_fed_op_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data.get('ttl_op_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data.get('tranf_to_affliliated_cmte_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data.get('fed_cand_cmte_contb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data.get('indt_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"25_coordinatedExpenditureMadeByPartyCommittees":'+ str(form3x_header_data.get('coord_exp_by_pty_cmte_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data.get('loan_repymts_made_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data.get('loans_made_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28a_individualsPersons":'+ str(form3x_header_data.get('indv_contb_ref_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data.get('pol_pty_cmte_contb_per_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data.get('other_pol_cmte_contb_per_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28d_totalContributionsRefunds":'+ str(form3x_header_data.get('ttl_contb_ref_per_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data.get('other_disb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_fedShare":'+ str(form3x_header_data.get('shared_fed_actvy_fed_shr_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFed":'+ str(form3x_header_data.get('shared_fed_actvy_nonfed_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data.get('non_alloc_fed_elect_actvy_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data.get('ttl_fed_elect_actvy_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data.get('ttl_disb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data.get('ttl_fed_disb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data.get('ttl_contb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data.get('ttl_contb_ref_per_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data.get('net_contb_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data.get('ttl_fed_op_exp_per', 0)) + ','
+    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data.get('offsets_to_op_exp_per_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data.get('net_op_exp_per'))
     form3x_data_string = form3x_data_string + '},'
     form3x_data_string = form3x_data_string + '"colB": {'
-    form3x_data_string = form3x_data_string + '"6a_cashOnHandJan_1":'+ str(form3x_header_data['coh_begin_calendar_yr'])+','
-    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data['ttl_receipts_sum_page_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data['subttl_sum_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data['ttl_disb_sum_page_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data['coh_coy']) + ','
-    form3x_data_string = form3x_data_string + '"11ai_itemized":'+ str(form3x_header_data['indv_item_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"11aii_unitemized":'+ str(form3x_header_data['indv_unitem_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"11aiii_total":'+ str(form3x_header_data['ttl_indv_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_ytd_i']) + ','
-    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data['other_pol_cmte_contb_ytd_i']) + ','
-    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data['ttl_contb_col_ttl_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_from_affiliated_pty_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data['all_loans_received_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data['loan_repymts_received_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data['offsets_to_op_exp_ytd_i']) + ','
-    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data['fed_cand_cmte_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data['other_fed_receipts_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data['tranf_from_nonfed_acct_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data['tranf_from_nonfed_levin_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data['ttl_nonfed_tranf_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data['ttl_receipts_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data['ttl_fed_receipts_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data['shared_fed_op_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data['shared_nonfed_op_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data['other_fed_op_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data['ttl_op_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data['tranf_to_affilitated_cmte_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data['fed_cand_cmte_contb_ref_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data['indt_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"25_coordinatedExpendituresMadeByPartyCommittees":'+ str(form3x_header_data['coord_exp_by_pty_cmte_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data['loan_repymts_made_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data['loans_made_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"28a_individualPersons":'+ str(form3x_header_data['indv_contb_ref_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data['pol_pty_cmte_contb_ytd_ii']) + ','
-    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data['other_pol_cmte_contb_ytd_ii']) + ','
-    form3x_data_string = form3x_data_string + '"28d_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_ytd_i']) + ','
-    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data['other_disb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_federalShare":'+ str(form3x_header_data['shared_fed_actvy_fed_shr_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFederal":'+ str(form3x_header_data['shared_fed_actvy_nonfed_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data['non_alloc_fed_elect_actvy_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data['ttl_fed_elect_actvy_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data['ttl_disb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data['ttl_fed_disb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data['ttl_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data['ttl_contb_ref_ytd_ii']) + ','
-    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data['net_contb_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data['ttl_fed_op_exp_ytd']) + ','
-    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data['offsets_to_op_exp_ytd_ii']) + ','
-    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data['net_op_exp_ytd'])
+    form3x_data_string = form3x_data_string + '"6a_cashOnHandJan_1":'+ str(form3x_header_data.get('coh_begin_calendar_yr', 0))+','
+    form3x_data_string = form3x_data_string + '"6c_totalReceipts":'+ str(form3x_header_data.get('ttl_receipts_sum_page_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"6d_subtotal":'+ str(form3x_header_data.get('subttl_sum_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"7_totalDisbursements":'+ str(form3x_header_data.get('ttl_disb_sum_page_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"8_cashOnHandAtClose":'+ str(form3x_header_data.get('coh_coy', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11ai_itemized":'+ str(form3x_header_data.get('indv_item_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11aii_unitemized":'+ str(form3x_header_data.get('indv_unitem_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11aiii_total":'+ str(form3x_header_data.get('ttl_indv_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11b_politicalPartyCommittees":'+ str(form3x_header_data.get('pol_pty_cmte_contb_ytd_i')) + ','
+    form3x_data_string = form3x_data_string + '"11c_otherPoliticalCommitteesPACs":'+ str(form3x_header_data.get('other_pol_cmte_contb_ytd_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"11d_totalContributions":'+ str(form3x_header_data.get('ttl_contb_col_ttl_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"12_transfersFromAffiliatedOtherPartyCommittees":'+ str(form3x_header_data.get('tranf_from_affiliated_pty_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"13_allLoansReceived":'+ str(form3x_header_data.get('all_loans_received_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"14_loanRepaymentsReceived":'+ str(form3x_header_data.get('loan_repymts_received_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"15_offsetsToOperatingExpendituresRefunds":'+ str(form3x_header_data.get('offsets_to_op_exp_ytd_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"16_refundsOfFederalContributions":'+ str(form3x_header_data.get('fed_cand_cmte_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"17_otherFederalReceiptsDividends":'+ str(form3x_header_data.get('other_fed_receipts_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18a_transfersFromNonFederalAccount_h3":'+ str(form3x_header_data.get('tranf_from_nonfed_acct_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18b_transfersFromNonFederalLevin_h5":'+ str(form3x_header_data.get('tranf_from_nonfed_levin_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"18c_totalNonFederalTransfers":'+ str(form3x_header_data.get('ttl_nonfed_tranf_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"19_totalReceipts":'+ str(form3x_header_data.get('ttl_receipts_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"20_totalFederalReceipts":'+ str(form3x_header_data.get('ttl_fed_receipts_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21ai_federalShare":'+ str(form3x_header_data.get('shared_fed_op_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21aii_nonFederalShare":'+ str(form3x_header_data.get('shared_nonfed_op_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21b_otherFederalOperatingExpenditures":'+ str(form3x_header_data.get('other_fed_op_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"21c_totalOperatingExpenditures":'+ str(form3x_header_data.get('ttl_op_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"22_transfersToAffiliatedOtherPartyCommittees":'+ str(form3x_header_data.get('tranf_to_affilitated_cmte_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"23_contributionsToFederalCandidatesCommittees":'+ str(form3x_header_data.get('fed_cand_cmte_contb_ref_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"24_independentExpenditures":'+ str(form3x_header_data.get('indt_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"25_coordinatedExpendituresMadeByPartyCommittees":'+ str(form3x_header_data.get('coord_exp_by_pty_cmte_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"26_loanRepayments":'+ str(form3x_header_data.get('loan_repymts_made_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"27_loansMade":'+ str(form3x_header_data.get('loans_made_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28a_individualPersons":'+ str(form3x_header_data.get('indv_contb_ref_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28b_politicalPartyCommittees":'+ str(form3x_header_data.get('pol_pty_cmte_contb_ytd_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28c_otherPoliticalCommittees":'+ str(form3x_header_data.get('other_pol_cmte_contb_ytd_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"28d_totalContributionRefunds":'+ str(form3x_header_data.get('ttl_contb_ref_ytd_i', 0)) + ','
+    form3x_data_string = form3x_data_string + '"29_otherDisbursements":'+ str(form3x_header_data.get('other_disb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30ai_sharedFederalActivity_h6_federalShare":'+ str(form3x_header_data.get('shared_fed_actvy_fed_shr_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30aii_sharedFederalActivity_h6_nonFederal":'+ str(form3x_header_data.get('shared_fed_actvy_nonfed_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30b_nonAllocable_100_federalElectionActivity":'+ str(form3x_header_data.get('non_alloc_fed_elect_actvy_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"30c_totalFederalElectionActivity":'+ str(form3x_header_data.get('ttl_fed_elect_actvy_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"31_totalDisbursements":'+ str(form3x_header_data.get('ttl_disb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"32_totalFederalDisbursements":'+ str(form3x_header_data.get('ttl_fed_disb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"33_totalContributions":'+ str(form3x_header_data.get('ttl_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"34_totalContributionRefunds":'+ str(form3x_header_data.get('ttl_contb_ref_ytd_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"35_netContributions":'+ str(form3x_header_data.get('net_contb_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"36_totalFederalOperatingExpenditures":'+ str(form3x_header_data.get('ttl_fed_op_exp_ytd', 0)) + ','
+    form3x_data_string = form3x_data_string + '"37_offsetsToOperatingExpenditures":'+ str(form3x_header_data.get('offsets_to_op_exp_ytd_ii', 0)) + ','
+    form3x_data_string = form3x_data_string + '"38_netOperatingExpenditures":'+ str(form3x_header_data.get('net_op_exp_ytd', 0))
     form3x_data_string = form3x_data_string + '}'
     form3x_data_string = form3x_data_string + '}'
     return form3x_data_string
+
 
 def get_committee_master_values(cmte_id):
     try:
@@ -297,7 +298,7 @@ def get_list_report(report_id, cmte_id):
 def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
-        report_id = request.POST.get('report_id')
+        report_id = request.data.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
@@ -554,9 +555,13 @@ def task_sched_a(request):
         
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
-            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+            summary_d = {i:(k if k else 0) for i, k in f_3x_list[0].items()}
+            f=get_summary_dict(summary_d)
+            data_obj['data']['summary'] = json.loads(f)
+            #data_obj['data']['summary'] = json.loads(json.dumps(get_summary_dict(f_3x_list[0])))
             data_obj['data']['schedules'] = {'SA': [],}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
+           
            
             
     except Exception as e:
@@ -569,25 +574,61 @@ def task_sched_a(request):
 def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
-    data_obj = task_sched_a(request)
-    # Check for partnership
-    # sche_b_data = task_sched_b(request)
-    # if data_obj and sche_b_data:
-    if data_obj:
-        # data_obj['data']['schedules']['SB'] = sche_b_data
-        # Check for returned bounced
-        report_id = request.POST.get('report_id')
+    try:
+
+        report_id = request.data.get('report_id')
+        call_from = request.data.get('call_from')
+        form_type = request.data.get('form_type')
         committeeid = request.user.username
-        client = boto3.client('s3')
-        transfer = S3Transfer(client)
 
-        tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
-        tmp_path='/tmp/'+tmp_filename
-       
-        json.dump(data_obj, open(tmp_path, 'w'), indent=4)
-       
-        transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
-        return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
-    else:
-        return Response('Error', status=status.HTTP_400_BAD_REQUEST)
+        print("report_id", report_id)
+        print("call_from", call_from)
+        print("committeeid", committeeid)
 
+        data_obj = task_sched_a(request)
+        # Check for partnership
+        # sche_b_data = task_sched_b(request)
+        # if data_obj and sche_b_data:
+
+        if data_obj:
+            # data_obj['data']['schedules']['SB'] = sche_b_data
+            # Check for returned bounced
+            
+            client = boto3.client('s3')
+            transfer = S3Transfer(client)
+
+            tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
+            tmp_path='/tmp/'+tmp_filename
+        
+            json.dump(data_obj, open(tmp_path, 'w'), indent=4)
+        
+            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
+            if call_from == "PrintPreviewPDF":
+                data_obj = {'form_type':form_type}
+                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+                print("data_obj = ", data_obj)
+                print("file_obj = ", file_obj)
+                resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
+            elif call_from == "Submit":
+                data_obj = request
+                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+
+            if not resp.ok:
+                return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                dictprint = resp.json()
+                #merged_dict = {**create_json_data, **dictprint}
+                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
+        
+
+            #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
+        else:
+            return Response('error for json builder', status=status.HTTP_404_BAD_REQUEST)
+
+    except Exception as e:
+        return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
