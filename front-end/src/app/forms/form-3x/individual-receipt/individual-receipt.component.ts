@@ -36,19 +36,21 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
 
-  public formFields: any = [];
+  public checkBoxVal: boolean = false;
   public frmIndividualReceipt: FormGroup;
+  public formFields: any = [];
+  public formVisible: boolean = false;
   public hiddenFields: any = [];
   public testForm: FormGroup;
-  public formVisible: boolean = false;
   public states: any = [];
 
   private _formType: string = '';
-  private _memoCode: boolean = false;
+  public  memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
+  private _formSubmitted: boolean = false;
 
   constructor(
     private _http: HttpClient,
@@ -176,7 +178,7 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if (this._memoCode) {
+      if(this.memoCode) {
         this.frmIndividualReceipt.controls['contribution_date'].setValidators([
           Validators.required
         ]);
@@ -259,7 +261,7 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Updates value of _memoCode variable.
+   * Updates vaprivate _memoCode variable.
    *
    * @param      {Object}  e      The event object.
    */
@@ -267,11 +269,11 @@ export class IndividualReceiptComponent implements OnInit {
     const { checked } = e.target;
 
     if (checked) {
-      this._memoCode = checked;
+      this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(1);
     } else {
       this._validateContributionDate();
-      this._memoCode = checked;
+      this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(0);
     }
   }
@@ -308,10 +310,12 @@ export class IndividualReceiptComponent implements OnInit {
             };
 
             this._messageService.sendMessage(message);
-          });
+          });  
 
+          this._formSubmitted = true;
+          this.memoCode = false;
           this.frmIndividualReceipt.reset();
-
+          
           localStorage.removeItem(`form_${this._formType}_receipt`);
 
           window.scrollTo(0, 0);
