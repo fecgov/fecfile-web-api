@@ -318,14 +318,14 @@ def task_sched_a(request):
             f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
+            reponse_sched_b_data=[]
             response_inkind_out_list = []
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 #print (f3_i['report_id'])
 
                 entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
-
-                #print('parent sched A trans:',len(entity_id_list))
+                #entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
                 
                 #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
 
@@ -542,6 +542,70 @@ def task_sched_a(request):
                         response_inkind_receipt_list.append(response_dict_receipt)
                 else:
                     response_inkind_receipt_list = []
+
+
+                # if entity_id_sched_b_list:
+                #     for entity_obj_b in entity_id_sched_b_list:
+                #         response_dict_out = {}
+                #         response_dict_receipt = {}
+                #         list_entity_b = get_list_entity(entity_obj_b['entity_id'], entity_obj_b['cmte_id'])
+                #         if not list_entity_b:
+                #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+                #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+                #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+                #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+                #             response_dict_receipt['entityType'] = ''
+                #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+                #             response_dict_receipt['payeeOranizationName'] = ''
+
+                #             response_dict_receipt['payeeLastName'] = ''
+                #             response_dict_receipt['payeeFirstName'] = ''
+                #             response_dict_receipt['payeeMiddleName'] = ''
+                #             response_dict_receipt['payeePrefix'] = ''
+                #             response_dict_receipt['payeeSuffix'] = ''
+                #             response_dict_receipt['payeeStreet1'] = ''
+                #             response_dict_receipt['payeeStreet2'] = ''
+                #             response_dict_receipt['payeeCity'] = ''
+                #             response_dict_receipt['payeeState'] = ''
+                #             response_dict_receipt['payeezip'] = ''
+                #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+                #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                #             response_dict_receipt['categoryCode'] = '15G'
+                #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+                #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+                #                     # continue # Needs a fail condition implemented
+                #         else:
+                #             list_entity_b = list_entity_b[0]
+                #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+                #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+                #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+                #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+                #             response_dict_receipt['entityType'] = list_entity_b['entity_type']
+                #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+                #             response_dict_receipt['payeeOranizationName'] = list_entity_b['entity_name']
+
+                #             response_dict_receipt['payeeLastName'] = list_entity_b['last_name']
+                #             response_dict_receipt['payeeFirstName'] = list_entity_b['first_name']
+                #             response_dict_receipt['payeeMiddleName'] = list_entity_b['middle_name']
+                #             response_dict_receipt['payeePrefix'] = list_entity_b['prefix']
+                #             response_dict_receipt['payeeSuffix'] = list_entity_b['suffix']
+                #             response_dict_receipt['payeeStreet1'] = list_entity_b['street_1']
+                #             response_dict_receipt['payeeStreet2'] = list_entity_b['street_2']
+                #             response_dict_receipt['payeeCity'] = list_entity_b['city']
+                #             response_dict_receipt['payeeState'] = list_entity_b['state']
+                #             response_dict_receipt['payeezip'] = list_entity_b['zip_code']
+                #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+                #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                #             response_dict_receipt['categoryCode'] = '15G'
+                #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+                #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+                #         reponse_sched_b_data.append(response_dict_receipt)
+                # else:
+                #     reponse_sched_b_data = []
+
+
             #import ipdb;ipdb.set_trace()
             # get_list_entity(entity_id, comm_info.committeeid)
            
@@ -573,7 +637,8 @@ def task_sched_a(request):
             data_obj['data']['formType'] = "F3X"
             data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
             data_obj['data']['schedules'] = {'SA': [],}
-            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
+            #data_obj['data']['schedules']['SB'] = reponse_sched_b_data
            
             
     except Exception as e:
@@ -582,65 +647,92 @@ def task_sched_a(request):
     return data_obj
 
 
+# @api_view(["POST"])
+# def create_json_builders(request):
+#     #import ipdb;ipdb.set_trace()
+#     # Check for Inkind
+#     try:
+
+#         report_id = request.data.get('report_id')
+#         call_from = request.data.get('call_from')
+#         form_type = request.data.get('form_type')
+#         committeeid = request.user.username
+
+#         print("report_id", report_id)
+#         print("call_from", call_from)
+#         print("committeeid", committeeid)
+
+#         data_obj = task_sched_a(request)
+#         # Check for partnership
+#         # sche_b_data = task_sched_b(request)
+#         # if data_obj and sche_b_data:
+
+#         if data_obj:
+#             # data_obj['data']['schedules']['SB'] = sche_b_data
+#             # Check for returned bounced
+            
+#             client = boto3.client('s3')
+#             transfer = S3Transfer(client)
+
+#             tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
+#             tmp_path='/tmp/'+tmp_filename
+        
+#             json.dump(data_obj, open(tmp_path, 'w'), indent=4)
+        
+#             transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+
+#             if call_from == "PrintPreviewPDF":
+#                 data_obj = {'form_type':form_type}
+#                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+#                 print("data_obj = ", data_obj)
+#                 print("file_obj = ", file_obj)
+#                 resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+
+#             elif call_from == "Submit":
+#                 data_obj = request
+#                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+
+#                 resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+
+#             if not resp.ok:
+#                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+#             else:
+#                 dictprint = resp.json()
+#                 #merged_dict = {**create_json_data, **dictprint}
+#                 return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
+        
+
+#             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
+#         else:
+#             return Response('error for json builder', status=status.HTTP_404_BAD_REQUEST)
+
+#     except Exception as e:
+#         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["POST"])
 def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
-    try:
-
-        report_id = request.data.get('report_id')
-        call_from = request.data.get('call_from')
-        form_type = request.data.get('form_type')
+    data_obj = task_sched_a(request)
+    # Check for partnership
+    # sche_b_data = task_sched_b(request)
+    # if data_obj and sche_b_data:
+    if data_obj:
+        # data_obj['data']['schedules']['SB'] = sche_b_data
+        # Check for returned bounced
+        report_id = request.POST.get('report_id')
         committeeid = request.user.username
+        client = boto3.client('s3')
+        transfer = S3Transfer(client)
 
-        print("report_id", report_id)
-        print("call_from", call_from)
-        print("committeeid", committeeid)
-
-        data_obj = task_sched_a(request)
-        # Check for partnership
-        # sche_b_data = task_sched_b(request)
-        # if data_obj and sche_b_data:
-
-        if data_obj:
-            # data_obj['data']['schedules']['SB'] = sche_b_data
-            # Check for returned bounced
-            
-            client = boto3.client('s3')
-            transfer = S3Transfer(client)
-
-            tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
-            tmp_path='/tmp/'+tmp_filename
-        
-            json.dump(data_obj, open(tmp_path, 'w'), indent=4)
-        
-            transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
-
-            if call_from == "PrintPreviewPDF":
-                data_obj = {'form_type':form_type}
-                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
-
-                print("data_obj = ", data_obj)
-                print("file_obj = ", file_obj)
-                resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
-
-            elif call_from == "Submit":
-                data_obj = request
-                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
-
-                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
-
-            if not resp.ok:
-                return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
-            else:
-                dictprint = resp.json()
-                #merged_dict = {**create_json_data, **dictprint}
-                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
-        
-
-            #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
-        else:
-            return Response('error for json builder', status=status.HTTP_404_BAD_REQUEST)
-
-    except Exception as e:
-        return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+        tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
+        tmp_path='/tmp/'+tmp_filename
+       
+        json.dump(data_obj, open(tmp_path, 'w'), indent=4)
+       
+        transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
+        return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
+    else:
+        return Response('Error', status=status.HTTP_400_BAD_REQUEST)
