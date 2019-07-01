@@ -28,15 +28,16 @@ export class SubmitComponent implements OnInit {
     this._messageService
       .getMessage()
       .subscribe(res => {
+        console.log("SubmitComponent res =", res);
         if(res.form_submitted) {
           if (this.form_type ==='99'){
             localStorage.removeItem(`form_${this.form_type}_details`);
           } else if (this.form_type ==='3X'){
-
+            console.log("Accessing SubmitComponent F3x submit Data Receiver API ");
             this._reportTypeService.submitForm('3X', "Submit")
             .subscribe(res => {
               if(res) {
-                    console.log("Accessing SubmitComponent F3x submi res ...",res);
+                    console.log("Accessing SubmitComponent F3x submit res ...",res);
                     if (res['status'] === 'Accepted') {
                       this.FEC_Id = res['submissionId'];
                     }
@@ -51,7 +52,26 @@ export class SubmitComponent implements OnInit {
           }
 
           localStorage.removeItem(`form_${this.form_type}_saved`);
+        } else if (this.form_type ==='3X'){
+          console.log(" SubmitComponent F3X res", res); 
+          console.log("Accessing SubmitComponent F3x submit Data Receiver API ");
+          this._reportTypeService.submitForm('3X', "Submit")
+          .subscribe(res => {
+            if(res) {
+                  console.log("Accessing SubmitComponent F3x submit res ...",res);
+                  if (res['status'] === 'Accepted') {
+                    this.FEC_Id = res['submissionId'];
+                  }
+                }
+              },
+              (error) => {
+                console.log('error: ', error);
+              });/*  */
+
+          localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
+          localStorage.removeItem(`form_${this.form_type}_report_type`);
         }
+
       });
 
     this._router
