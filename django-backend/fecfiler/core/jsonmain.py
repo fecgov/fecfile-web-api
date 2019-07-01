@@ -286,11 +286,12 @@ def get_list_report(report_id, cmte_id):
         forms_obj = None
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
         if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+            raise NoOPError('The Report ID: {} does not exist or is deleted'.format(report_id))   
         return forms_obj
     except Exception:
         raise
@@ -299,352 +300,352 @@ def get_list_report(report_id, cmte_id):
 #api_view(["POST"])
 def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
-    try:
-        report_id = request.query_params.get('report_id')
-        #import ipdb;ipdb.set_trace()
-        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
-        #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
-        comm_info = True
-        if comm_info:
-            committeeid = request.user.username
-            # serializer = CommitteeInfoSerializer(comm_info)
-            comm_info_obj = get_committee_master_values(committeeid)
-            header = {
-                "version":"8.3",
-                "softwareName":"ABC Inc",
-                "softwareVersion":"1.02 Beta",
-                "additionalInfomation":"Any other useful information"
-            }
-            f_3x_list = get_f3x_report_data(committeeid, report_id)
-            report_info = get_list_report(report_id, committeeid)
-            response_inkind_receipt_list = []
-            reponse_sched_b_data=[]
-            response_inkind_out_list = []
-            response_dict_receipt = {}
-            for f3_i in f_3x_list:
-                #print (f3_i['report_id'])
+    # try:
+    report_id = request.query_params.get('report_id')
+    #import ipdb;ipdb.set_trace()
+    #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+    #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+    comm_info = True
+    if comm_info:
+        committeeid = request.user.username
+        # serializer = CommitteeInfoSerializer(comm_info)
+        comm_info_obj = get_committee_master_values(committeeid)
+        header = {
+            "version":"8.3",
+            "softwareName":"ABC Inc",
+            "softwareVersion":"1.02 Beta",
+            "additionalInfomation":"Any other useful information"
+        }
+        f_3x_list = get_f3x_report_data(committeeid, report_id)
+        report_info = get_list_report(report_id, committeeid)
+        response_inkind_receipt_list = []
+        reponse_sched_b_data=[]
+        response_inkind_out_list = []
+        response_dict_receipt = {}
+        for f3_i in f_3x_list:
+            #print (f3_i['report_id'])
 
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
-                #entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
-                
-                #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
-
-                if entity_id_list:
-                    
-                    print ("we got the data")
-                    #import ipdb;ipdb.set_trace()
-                    # comm_id = Committee.objects.get(committeeid=request.user.username)
-                    for entity_obj in entity_id_list:
-                        response_dict_out = {}
-                        response_dict_receipt = {}
-                        list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
-                        if not list_entity:
-                            response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
-                            response_dict_receipt['transactionId'] = entity_obj['transaction_id']
-                            response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
-                            response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
-                            response_dict_receipt['entityType'] = ''
-                            response_dict_receipt['lineNumber'] = entity_obj['line_number']
-                            response_dict_receipt['contributorOranizationName'] = ''
-
-                            response_dict_receipt['contributorLastName'] = ''
-                            response_dict_receipt['contributorFirstName'] = ''
-                            response_dict_receipt['contributorMiddleName'] = ''
-                            response_dict_receipt['contributorPrefix'] = ''
-                            response_dict_receipt['contributorSuffix'] = ''
-                            response_dict_receipt['contributorStreet1 '] = ''
-                            response_dict_receipt['contributorStreet2'] = ''
-                            response_dict_receipt['contributorCity'] = ''
-                            response_dict_receipt['contributorState'] = ''
-                            response_dict_receipt['contributorZip'] = ''
-                            response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                            response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
-                            response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
-                            response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
-                            response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
-                            response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name']   
-                            response_dict_receipt['contributorEmployer'] = ''
-                            response_dict_receipt['contributorOccupation'] = ''
-                            response_dict_receipt['memoCode'] = entity_obj['memo_code']
-                            response_dict_receipt['memoDescription'] = entity_obj['memo_text']
-
-                            # continue # Needs a fail condition implemented
-                        else:
-                            list_entity = list_entity[0]
-                            response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
-                            response_dict_receipt['transactionId'] = entity_obj['transaction_id']
-                            response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
-                            response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
-                            response_dict_receipt['entityType'] = list_entity['entity_type']
-                            response_dict_receipt['lineNumber'] = entity_obj['line_number']
-                            response_dict_receipt['contributorOranizationName'] = list_entity['entity_name']
-
-                            response_dict_receipt['contributorLastName'] = list_entity['last_name']
-                            response_dict_receipt['contributorFirstName'] = list_entity['first_name']
-                            response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
-                            response_dict_receipt['contributorPrefix'] = list_entity['prefix']
-                            response_dict_receipt['contributorSuffix'] = list_entity['suffix']
-                            response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
-                            response_dict_receipt['contributorStreet2'] = list_entity['street_2']
-                            response_dict_receipt['contributorCity'] = list_entity['city']
-                            response_dict_receipt['contributorState'] = list_entity['state']
-                            response_dict_receipt['contributorZip'] = list_entity['zip_code']
-                            response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                            response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
-                            response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
-                            response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
-                            response_dict_receipt['contributorEmployer'] = list_entity['employer']
-                            response_dict_receipt['contributorOccupation'] = list_entity['occupation']
-                            response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
-                            response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name']
-                            response_dict_receipt['memoCode'] = entity_obj['memo_code']
-                            response_dict_receipt['memoDescription'] = entity_obj['memo_text']
-
-
-                        
-                        # entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
-                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
-
-                        if entity_id_child_list:
-
-                            response_dict_receipt['child'] = []
-                            #print('Child sched B trans:' + entity_obj['transaction_id'] + ', length:',len(entity_id_list))
-                            for entity_child_obj in entity_id_child_list:
-                                response_dict_out = {}
-                                list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
-                                if not list_child_entity:
-                                    
-                                    response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
-                                    response_dict_out['transactionId'] = entity_child_obj['transaction_id']
-                                    response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
-                                    response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
-                                    response_dict_out['entityType'] = ''
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
-                                    response_dict_out['payeeOranizationName'] = ''
-
-                                    response_dict_out['payeeLastName'] = ''
-                                    response_dict_out['payeeFirstName'] = ''
-                                    response_dict_out['payeeMiddleName'] = ''
-                                    response_dict_out['payeePrefix'] = ''
-                                    response_dict_out['payeeSuffix'] = ''
-                                    response_dict_out['payeeStreet1'] = ''
-                                    response_dict_out['payeeStreet2'] = ''
-                                    response_dict_out['payeeCity'] = ''
-                                    response_dict_out['payeeState'] = ''
-                                    response_dict_out['payeezip'] = ''
-                                    response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                                    response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
-                                    response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
-                                    response_dict_out['categoryCode'] = '15G'
-                                    response_dict_out['memoCode'] = entity_child_obj['memo_code']
-                                    response_dict_out['memoDescription'] = entity_child_obj['memo_text']
-                                    # continue # Needs a fail condition implemented
-                                else:
-                                    list_child_entity = list_child_entity[0]
-                                    response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
-                                    response_dict_out['transactionId'] = entity_child_obj['transaction_id']
-                                    response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
-                                    response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
-                                    response_dict_out['entityType'] = list_child_entity['entity_type']
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
-                                    response_dict_out['payeeOranizationName'] = list_child_entity['entity_name']
-
-                                    response_dict_out['payeeLastName'] = list_child_entity['last_name']
-                                    response_dict_out['payeeFirstName'] = list_child_entity['first_name']
-                                    response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
-                                    response_dict_out['payeePrefix'] = list_child_entity['prefix']
-                                    response_dict_out['payeeSuffix'] = list_child_entity['suffix']
-                                    response_dict_out['payeeStreet1'] = list_child_entity['street_1']
-                                    response_dict_out['payeeStreet2'] = list_child_entity['street_2']
-                                    response_dict_out['payeeCity'] = list_child_entity['city']
-                                    response_dict_out['payeeState'] = list_child_entity['state']
-                                    response_dict_out['payeezip'] = list_child_entity['zip_code']
-                                    response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                                    response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
-                                    response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
-                                    response_dict_out['categoryCode'] = '15G'
-                                    response_dict_out['memoCode'] = entity_child_obj['memo_code']
-                                    response_dict_out['memoDescription'] = entity_child_obj['memo_text']
-                                response_dict_receipt['child'].append(response_dict_out)
-                            # print(entity_obj['transaction_id'])
-                        
-                        entity_id_child_list_a = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
-
-                        if entity_id_child_list_a: 
-                            if not 'child' in response_dict_receipt:
-                                response_dict_receipt['child'] = []
-                            #print('Child sched A trans:' + entity_obj['transaction_id'] + ', length:',len(entity_id_list))
-                            for entity_child_obj in entity_id_child_list_a:
-                                response_dict_out = {}
-                                list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
-                                if not list_child_entity:
-                                    response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
-                                    response_dict_out['transactionId'] = entity_child_obj['transaction_id']
-                                    response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
-                                    response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
-                                    response_dict_out['entityType'] = ''
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
-                                    response_dict_out['contributorOranizationName'] = ''
-
-                                    response_dict_out['contributorLastName'] = ''
-                                    response_dict_out['contributorFirstName'] = ''
-                                    response_dict_out['contributorMiddleName'] = ''
-                                    response_dict_out['contributorPrefix'] = ''
-                                    response_dict_out['contributorSuffix'] = ''
-                                    response_dict_out['contributorStreet1 '] = ''
-                                    response_dict_out['contributorStreet2'] = ''
-                                    response_dict_out['contributorCity'] = ''
-                                    response_dict_out['contributorState'] = ''
-                                    response_dict_out['contributorZip'] = ''
-                                    response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                                    response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
-                                    response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
-                                    response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
-                                    response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
-                                    response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
-                                    response_dict_out['contributorEmployer'] = ''
-                                    response_dict_out['contributorOccupation'] = ''
-                                    response_dict_out['memoCode'] = entity_child_obj['memo_code']
-                                    response_dict_out['memoDescription'] = entity_child_obj['memo_text']
-                                    # continue # Needs a fail condition implemented
-                                else:
-                                    list_child_entity = list_child_entity[0]
-                                    response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
-                                    response_dict_out['transactionId'] = entity_child_obj['transaction_id']
-                                    response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
-                                    response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
-                                    response_dict_out['entityType'] = list_child_entity['entity_type']
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
-                                    response_dict_out['contributorOranizationName'] = list_child_entity['entity_name']   
-
-                                    response_dict_out['contributorLastName'] = list_child_entity['last_name']
-                                    response_dict_out['contributorFirstName'] = list_child_entity['first_name']
-                                    response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
-                                    response_dict_out['contributorPrefix'] = list_child_entity['prefix']
-                                    response_dict_out['contributorSuffix'] = list_child_entity['suffix']
-                                    response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
-                                    response_dict_out['contributorStreet2'] = list_child_entity['street_2']
-                                    response_dict_out['contributorCity'] = list_child_entity['city']
-                                    response_dict_out['contributorState'] = list_child_entity['state']
-                                    response_dict_out['contributorZip'] = list_child_entity['zip_code']
-                                    response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                                    response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
-                                    response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
-                                    response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
-                                    response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
-                                    response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
-                                    response_dict_out['contributorEmployer'] = list_child_entity['employer']
-                                    response_dict_out['contributorOccupation'] = list_child_entity['occupation']
-                                    response_dict_out['memoCode'] = entity_child_obj['memo_code']
-                                    response_dict_out['memoDescription'] = entity_child_obj['memo_text']
-                                response_dict_receipt['child'].append(response_dict_out)
-
-                        response_inkind_receipt_list.append(response_dict_receipt)
-                else:
-                    response_inkind_receipt_list = []
-
-
-                # if entity_id_sched_b_list:
-                #     for entity_obj_b in entity_id_sched_b_list:
-                #         response_dict_out = {}
-                #         response_dict_receipt = {}
-                #         list_entity_b = get_list_entity(entity_obj_b['entity_id'], entity_obj_b['cmte_id'])
-                #         if not list_entity_b:
-                #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
-                #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
-                #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
-                #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
-                #             response_dict_receipt['entityType'] = ''
-                #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
-                #             response_dict_receipt['payeeOranizationName'] = ''
-
-                #             response_dict_receipt['payeeLastName'] = ''
-                #             response_dict_receipt['payeeFirstName'] = ''
-                #             response_dict_receipt['payeeMiddleName'] = ''
-                #             response_dict_receipt['payeePrefix'] = ''
-                #             response_dict_receipt['payeeSuffix'] = ''
-                #             response_dict_receipt['payeeStreet1'] = ''
-                #             response_dict_receipt['payeeStreet2'] = ''
-                #             response_dict_receipt['payeeCity'] = ''
-                #             response_dict_receipt['payeeState'] = ''
-                #             response_dict_receipt['payeezip'] = ''
-                #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
-                #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
-                #             response_dict_receipt['categoryCode'] = '15G'
-                #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
-                #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
-                #                     # continue # Needs a fail condition implemented
-                #         else:
-                #             list_entity_b = list_entity_b[0]
-                #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
-                #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
-                #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
-                #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
-                #             response_dict_receipt['entityType'] = list_entity_b['entity_type']
-                #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
-                #             response_dict_receipt['payeeOranizationName'] = list_entity_b['entity_name']
-
-                #             response_dict_receipt['payeeLastName'] = list_entity_b['last_name']
-                #             response_dict_receipt['payeeFirstName'] = list_entity_b['first_name']
-                #             response_dict_receipt['payeeMiddleName'] = list_entity_b['middle_name']
-                #             response_dict_receipt['payeePrefix'] = list_entity_b['prefix']
-                #             response_dict_receipt['payeeSuffix'] = list_entity_b['suffix']
-                #             response_dict_receipt['payeeStreet1'] = list_entity_b['street_1']
-                #             response_dict_receipt['payeeStreet2'] = list_entity_b['street_2']
-                #             response_dict_receipt['payeeCity'] = list_entity_b['city']
-                #             response_dict_receipt['payeeState'] = list_entity_b['state']
-                #             response_dict_receipt['payeezip'] = list_entity_b['zip_code']
-                #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-                #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
-                #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
-                #             response_dict_receipt['categoryCode'] = '15G'
-                #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
-                #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
-                #         reponse_sched_b_data.append(response_dict_receipt)
-                # else:
-                #     reponse_sched_b_data = []
-
-
-            #import ipdb;ipdb.set_trace()
-            # get_list_entity(entity_id, comm_info.committeeid)
-           
-            data_obj = {}
-            data_obj['header'] = header
-            comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
-            comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
-            comm_info_obj['reportCode'] = f3_i['report_type']
-            comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
-            comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
-            if not f3_i['date_of_election']:
-                comm_info_obj['electionDate'] = ''
-            else:
-                comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-            if not f3_i['cvg_start_dt']:
-                comm_info_obj['coverageStartDate'] = ''
-            else:
-                comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-            if not f3_i['cvg_end_dt']:
-                comm_info_obj['coverageEndDate'] = ''
-            else:
-                comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-            if not f3_i['date_signed']:
-                comm_info_obj['dateSigned'] = ''
-            else:
-                comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
-        
-            data_obj['data'] = comm_info_obj
-            data_obj['data']['formType'] = "F3X"
-            data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
-            data_obj['data']['schedules'] = {'SA': [],}
-            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
-            #data_obj['data']['schedules']['SB'] = reponse_sched_b_data
-           
+            entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
+            #entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
             
-    except Exception as e:
-        print (str(e))
-        return False
-    return data_obj
+            #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
+
+            if entity_id_list:
+                
+                print ("we got the data")
+                #import ipdb;ipdb.set_trace()
+                # comm_id = Committee.objects.get(committeeid=request.user.username)
+                for entity_obj in entity_id_list:
+                    response_dict_out = {}
+                    response_dict_receipt = {}
+                    list_entity = get_list_entity(entity_obj['entity_id'], entity_obj['cmte_id'])
+                    if not list_entity:
+                        response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                        response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                        response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                        response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                        response_dict_receipt['entityType'] = ''
+                        response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                        response_dict_receipt['contributorOranizationName'] = ''
+
+                        response_dict_receipt['contributorLastName'] = ''
+                        response_dict_receipt['contributorFirstName'] = ''
+                        response_dict_receipt['contributorMiddleName'] = ''
+                        response_dict_receipt['contributorPrefix'] = ''
+                        response_dict_receipt['contributorSuffix'] = ''
+                        response_dict_receipt['contributorStreet1 '] = ''
+                        response_dict_receipt['contributorStreet2'] = ''
+                        response_dict_receipt['contributorCity'] = ''
+                        response_dict_receipt['contributorState'] = ''
+                        response_dict_receipt['contributorZip'] = ''
+                        response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                        response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                        response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
+                        response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                        response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
+                        response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name']   
+                        response_dict_receipt['contributorEmployer'] = ''
+                        response_dict_receipt['contributorOccupation'] = ''
+                        response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                        response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+                        # continue # Needs a fail condition implemented
+                    else:
+                        list_entity = list_entity[0]
+                        response_dict_receipt['transactionTypeCode'] = entity_obj['transaction_type']
+                        response_dict_receipt['transactionId'] = entity_obj['transaction_id']
+                        response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj['back_ref_transaction_id']
+                        response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
+                        response_dict_receipt['entityType'] = list_entity['entity_type']
+                        response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                        response_dict_receipt['contributorOranizationName'] = list_entity['entity_name']
+
+                        response_dict_receipt['contributorLastName'] = list_entity['last_name']
+                        response_dict_receipt['contributorFirstName'] = list_entity['first_name']
+                        response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
+                        response_dict_receipt['contributorPrefix'] = list_entity['prefix']
+                        response_dict_receipt['contributorSuffix'] = list_entity['suffix']
+                        response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
+                        response_dict_receipt['contributorStreet2'] = list_entity['street_2']
+                        response_dict_receipt['contributorCity'] = list_entity['city']
+                        response_dict_receipt['contributorState'] = list_entity['state']
+                        response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                        response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                        response_dict_receipt['contributionAmount'] = round(entity_obj['contribution_amount'],2)
+                        response_dict_receipt['contributionAggregate'] = round(entity_obj['aggregate_amt'],2)
+                        response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
+                        response_dict_receipt['contributorEmployer'] = list_entity['employer']
+                        response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                        response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
+                        response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name']
+                        response_dict_receipt['memoCode'] = entity_obj['memo_code']
+                        response_dict_receipt['memoDescription'] = entity_obj['memo_text']
+
+
+                    
+                    # entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                    entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if entity_id_child_list:
+
+                        response_dict_receipt['child'] = []
+                        #print('Child sched B trans:' + entity_obj['transaction_id'] + ', length:',len(entity_id_list))
+                        for entity_child_obj in entity_id_child_list:
+                            response_dict_out = {}
+                            list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                            if not list_child_entity:
+                                
+                                response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                                response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                                response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                                response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                                response_dict_out['entityType'] = ''
+                                response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                response_dict_out['payeeOranizationName'] = ''
+
+                                response_dict_out['payeeLastName'] = ''
+                                response_dict_out['payeeFirstName'] = ''
+                                response_dict_out['payeeMiddleName'] = ''
+                                response_dict_out['payeePrefix'] = ''
+                                response_dict_out['payeeSuffix'] = ''
+                                response_dict_out['payeeStreet1'] = ''
+                                response_dict_out['payeeStreet2'] = ''
+                                response_dict_out['payeeCity'] = ''
+                                response_dict_out['payeeState'] = ''
+                                response_dict_out['payeezip'] = ''
+                                response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                                response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
+                                response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                                response_dict_out['categoryCode'] = '15G'
+                                response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                                response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                                # continue # Needs a fail condition implemented
+                            else:
+                                list_child_entity = list_child_entity[0]
+                                response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                                response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                                response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                                response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                                response_dict_out['entityType'] = list_child_entity['entity_type']
+                                response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                response_dict_out['payeeOranizationName'] = list_child_entity['entity_name']
+
+                                response_dict_out['payeeLastName'] = list_child_entity['last_name']
+                                response_dict_out['payeeFirstName'] = list_child_entity['first_name']
+                                response_dict_out['payeeMiddleName'] = list_child_entity['middle_name']
+                                response_dict_out['payeePrefix'] = list_child_entity['prefix']
+                                response_dict_out['payeeSuffix'] = list_child_entity['suffix']
+                                response_dict_out['payeeStreet1'] = list_child_entity['street_1']
+                                response_dict_out['payeeStreet2'] = list_child_entity['street_2']
+                                response_dict_out['payeeCity'] = list_child_entity['city']
+                                response_dict_out['payeeState'] = list_child_entity['state']
+                                response_dict_out['payeezip'] = list_child_entity['zip_code']
+                                response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                                response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
+                                response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                                response_dict_out['categoryCode'] = '15G'
+                                response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                                response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                            response_dict_receipt['child'].append(response_dict_out)
+                        # print(entity_obj['transaction_id'])
+                    
+                    entity_id_child_list_a = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+
+                    if entity_id_child_list_a: 
+                        if not 'child' in response_dict_receipt:
+                            response_dict_receipt['child'] = []
+                        #print('Child sched A trans:' + entity_obj['transaction_id'] + ', length:',len(entity_id_list))
+                        for entity_child_obj in entity_id_child_list_a:
+                            response_dict_out = {}
+                            list_child_entity = get_list_entity(entity_child_obj['entity_id'], entity_child_obj['cmte_id'])
+                            if not list_child_entity:
+                                response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                                response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                                response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                                response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                                response_dict_out['entityType'] = ''
+                                response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                response_dict_out['contributorOranizationName'] = ''
+
+                                response_dict_out['contributorLastName'] = ''
+                                response_dict_out['contributorFirstName'] = ''
+                                response_dict_out['contributorMiddleName'] = ''
+                                response_dict_out['contributorPrefix'] = ''
+                                response_dict_out['contributorSuffix'] = ''
+                                response_dict_out['contributorStreet1 '] = ''
+                                response_dict_out['contributorStreet2'] = ''
+                                response_dict_out['contributorCity'] = ''
+                                response_dict_out['contributorState'] = ''
+                                response_dict_out['contributorZip'] = ''
+                                response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                                response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
+                                response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
+                                response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
+                                response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
+                                response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
+                                response_dict_out['contributorEmployer'] = ''
+                                response_dict_out['contributorOccupation'] = ''
+                                response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                                response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                                # continue # Needs a fail condition implemented
+                            else:
+                                list_child_entity = list_child_entity[0]
+                                response_dict_out['transactionTypeCode'] = entity_child_obj['transaction_type']
+                                response_dict_out['transactionId'] = entity_child_obj['transaction_id']
+                                response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
+                                response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
+                                response_dict_out['entityType'] = list_child_entity['entity_type']
+                                response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                response_dict_out['contributorOranizationName'] = list_child_entity['entity_name']   
+
+                                response_dict_out['contributorLastName'] = list_child_entity['last_name']
+                                response_dict_out['contributorFirstName'] = list_child_entity['first_name']
+                                response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
+                                response_dict_out['contributorPrefix'] = list_child_entity['prefix']
+                                response_dict_out['contributorSuffix'] = list_child_entity['suffix']
+                                response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
+                                response_dict_out['contributorStreet2'] = list_child_entity['street_2']
+                                response_dict_out['contributorCity'] = list_child_entity['city']
+                                response_dict_out['contributorState'] = list_child_entity['state']
+                                response_dict_out['contributorZip'] = list_child_entity['zip_code']
+                                response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                                response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
+                                response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
+                                response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
+                                response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
+                                response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
+                                response_dict_out['contributorEmployer'] = list_child_entity['employer']
+                                response_dict_out['contributorOccupation'] = list_child_entity['occupation']
+                                response_dict_out['memoCode'] = entity_child_obj['memo_code']
+                                response_dict_out['memoDescription'] = entity_child_obj['memo_text']
+                            response_dict_receipt['child'].append(response_dict_out)
+
+                    response_inkind_receipt_list.append(response_dict_receipt)
+            else:
+                response_inkind_receipt_list = []
+
+
+            # if entity_id_sched_b_list:
+            #     for entity_obj_b in entity_id_sched_b_list:
+            #         response_dict_out = {}
+            #         response_dict_receipt = {}
+            #         list_entity_b = get_list_entity(entity_obj_b['entity_id'], entity_obj_b['cmte_id'])
+            #         if not list_entity_b:
+            #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+            #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+            #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+            #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+            #             response_dict_receipt['entityType'] = ''
+            #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+            #             response_dict_receipt['payeeOranizationName'] = ''
+
+            #             response_dict_receipt['payeeLastName'] = ''
+            #             response_dict_receipt['payeeFirstName'] = ''
+            #             response_dict_receipt['payeeMiddleName'] = ''
+            #             response_dict_receipt['payeePrefix'] = ''
+            #             response_dict_receipt['payeeSuffix'] = ''
+            #             response_dict_receipt['payeeStreet1'] = ''
+            #             response_dict_receipt['payeeStreet2'] = ''
+            #             response_dict_receipt['payeeCity'] = ''
+            #             response_dict_receipt['payeeState'] = ''
+            #             response_dict_receipt['payeezip'] = ''
+            #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+            #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+            #             response_dict_receipt['categoryCode'] = '15G'
+            #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+            #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+            #                     # continue # Needs a fail condition implemented
+            #         else:
+            #             list_entity_b = list_entity_b[0]
+            #             response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+            #             response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+            #             response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+            #             response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+            #             response_dict_receipt['entityType'] = list_entity_b['entity_type']
+            #             response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+            #             response_dict_receipt['payeeOranizationName'] = list_entity_b['entity_name']
+
+            #             response_dict_receipt['payeeLastName'] = list_entity_b['last_name']
+            #             response_dict_receipt['payeeFirstName'] = list_entity_b['first_name']
+            #             response_dict_receipt['payeeMiddleName'] = list_entity_b['middle_name']
+            #             response_dict_receipt['payeePrefix'] = list_entity_b['prefix']
+            #             response_dict_receipt['payeeSuffix'] = list_entity_b['suffix']
+            #             response_dict_receipt['payeeStreet1'] = list_entity_b['street_1']
+            #             response_dict_receipt['payeeStreet2'] = list_entity_b['street_2']
+            #             response_dict_receipt['payeeCity'] = list_entity_b['city']
+            #             response_dict_receipt['payeeState'] = list_entity_b['state']
+            #             response_dict_receipt['payeezip'] = list_entity_b['zip_code']
+            #             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+            #             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+            #             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+            #             response_dict_receipt['categoryCode'] = '15G'
+            #             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+            #             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+            #         reponse_sched_b_data.append(response_dict_receipt)
+            # else:
+            #     reponse_sched_b_data = []
+
+
+        #import ipdb;ipdb.set_trace()
+        # get_list_entity(entity_id, comm_info.committeeid)
+       
+        data_obj = {}
+        data_obj['header'] = header
+        comm_info_obj['changeOfAddress'] = f3_i['cmte_addr_chg_flag'] if f3_i['cmte_addr_chg_flag'] else ''
+        comm_info_obj['electionState'] = f3_i['state_of_election'] if f3_i['state_of_election'] else ''
+        comm_info_obj['reportCode'] = f3_i['report_type']
+        comm_info_obj['amendmentIndicator'] = f3_i['amend_ind']
+        comm_info_obj['amendmentNumber'] = report_info[0]['amend_number']
+        if not f3_i['date_of_election']:
+            comm_info_obj['electionDate'] = ''
+        else:
+            comm_info_obj['electionDate'] = datetime.strptime(f3_i['date_of_election'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+        if not f3_i['cvg_start_dt']:
+            comm_info_obj['coverageStartDate'] = ''
+        else:
+            comm_info_obj['coverageStartDate'] = datetime.strptime(f3_i['cvg_start_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+        if not f3_i['cvg_end_dt']:
+            comm_info_obj['coverageEndDate'] = ''
+        else:
+            comm_info_obj['coverageEndDate'] = datetime.strptime(f3_i['cvg_end_dt'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+        if not f3_i['date_signed']:
+            comm_info_obj['dateSigned'] = ''
+        else:
+            comm_info_obj['dateSigned'] = datetime.strptime(f3_i['date_signed'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+
+        data_obj['data'] = comm_info_obj
+        data_obj['data']['formType'] = "F3X"
+        data_obj['data']['summary'] = json.loads(get_summary_dict(f_3x_list[0]))
+        data_obj['data']['schedules'] = {'SA': [],}
+        data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
+        #data_obj['data']['schedules']['SB'] = reponse_sched_b_data
+               
+                
+        # except Exception as e:
+        #     print (str(e))
+        #     return False
+        return data_obj
 
 
 # @api_view(["POST"])
