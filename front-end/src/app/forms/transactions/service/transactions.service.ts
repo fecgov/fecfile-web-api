@@ -528,26 +528,26 @@ export class TransactionsService {
   }
 
 
-  /**
-   * Restore the transaction from the Recyling Bin back to the Transactions Table.
-   *
-   * @param trx the transaction to restore
-   */
-  public restoreTransaction(trx: TransactionModel): Observable<any> {
+  // /**
+  //  * Restore the transaction from the Recyling Bin back to the Transactions Table.
+  //  *
+  //  * @param trx the transaction to restore
+  //  */
+  // public restoreTransaction(trx: TransactionModel): Observable<any> {
 
 
-    // mocking the server API until it is ready.
+  //   // mocking the server API until it is ready.
 
-    const index = this.mockRestoreTrxArray.findIndex(
-      item => item.transaction_id === trx.transactionId);
+  //   const index = this.mockRestoreTrxArray.findIndex(
+  //     item => item.transaction_id === trx.transactionId);
 
-    if (index !== -1) {
-      this.mockRestoreTrxArray.splice(index, 1);
-      this.mockRecycleBinArray.push(this.mapToServerFields(trx));
-    }
+  //   if (index !== -1) {
+  //     this.mockRestoreTrxArray.splice(index, 1);
+  //     this.mockRecycleBinArray.push(this.mapToServerFields(trx));
+  //   }
 
-    return Observable.of('');
-  }
+  //   return Observable.of('');
+  // }
 
 
   /**
@@ -670,5 +670,50 @@ export class TransactionsService {
             headers: httpOptions
           }
         );
+   }
+
+   /**
+    * Trash or restore tranactions to/from the Recycling Bin.
+    * 
+    * @param action the action to be applied to the transactions (e.g. trash, restore)
+    * @param reportId the unique identifier for the Report
+    * @param transactions the transactions to trash or restore
+    */
+   public trashOrRestoreTransactions(action: string, reportId: string, transactions: Array<TransactionModel>) {
+
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/core/trash_restore_transactions';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    const actions = [];
+    for (const trx of transactions) {
+      actions.push({
+        action: action,
+        report_id: reportId,
+        transaction_id: trx.transactionId
+      });
+    }
+    request.actions = actions;
+
+    return this._http
+    .put(
+      `${environment.apiUrl}${url}`,
+      request,
+      {
+        headers: httpOptions
+      }
+    )
+    .pipe(map(res => {
+        if (res) {
+          console.log('Trash Restore response: ', res);
+          return res;
+        }
+        return false;
+    }));
+
    }
 }

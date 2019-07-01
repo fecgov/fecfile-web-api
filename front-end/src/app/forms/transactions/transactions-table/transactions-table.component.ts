@@ -228,7 +228,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
-    // smahal: quick fix for sortCol issue not retrieved from cache
+    // smahal: quick fix for sortCol issue not retrived from cache
     if (!sortedCol) {
       this.setSortDefault();
       sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -566,7 +566,38 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Trash all transactions selected by the user.
    */
   public trashAllSelected(): void {
-    alert('Trash all transactions is not yet supported');
+    // alert('Trash all transactions is not yet supported');
+
+    let trxIds = '';
+    const selectedTransactions: Array<TransactionModel> = [];
+    for (const trx of this.transactionsModel) {
+      if (trx.selected) {
+        selectedTransactions.push(trx);
+        trxIds += trx.transactionId + ', ';
+      }
+    }
+
+    // trxIds.trimRight();
+    // trxIds = trxIds.trimRight();
+    trxIds = trxIds.substr(0, trxIds.length - 2);
+
+    this._dialogService
+    .confirm('You are about to delete these transactions. ' + trxIds,
+      ConfirmModalComponent,
+      'Caution!')
+    .then(res => {
+      if (res === 'okay') {
+        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
+          .subscribe((res: GetTransactionsResponse) => {
+            this.getTransactionsPage(this.config.currentPage);
+            this._dialogService
+              .confirm('Transaction has been successfully deleted and sent to the recycle bin. '
+                + trxIds,
+                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+          });
+      } else if (res === 'cancel') {
+      }
+    });
   }
 
 
@@ -615,8 +646,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to trash
    */
-  public trashTransaction(): void {
-    alert('Trash transaction is not yet supported');
+  public trashTransaction(trx: TransactionModel): void {
+
+    this._dialogService
+    .confirm('You are about to delete this transaction ' + trx.transactionId + '.',
+      ConfirmModalComponent,
+      'Caution!')
+    .then(res => {
+      if (res === 'okay') {
+        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, [trx])
+          .subscribe((res: GetTransactionsResponse) => {
+            this.getTransactionsPage(this.config.currentPage);
+            this._dialogService
+              .confirm('Transaction has been successfully deleted and sent to the recycle bin.'
+                + trx.transactionId,
+                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+          });
+      } else if (res === 'cancel') {
+      }
+    });
   }
 
 
@@ -633,7 +681,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'Caution!')
       .then(res => {
         if (res === 'okay') {
-          this._transactionsService.restoreTransaction(trx)
+          // this._transactionsService.restoreTransaction(trx)
+          //   .subscribe((res: GetTransactionsResponse) => {
+          this._transactionsService.trashOrRestoreTransactions('restore', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService
