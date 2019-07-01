@@ -130,15 +130,15 @@
                     [style.height]="col?.height"
                     [attr.type]="col?.type"
                     [attr.name]="col?.name"
-                    [attr.value]="col?.value"
+                    [checked]="col?.name === 'memo_code' ? memoCode : null"
                     [formControlName]="col?.name"
+                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                         ? 'input-field-error'
                         : ''
                     "
-                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                   />                  
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
