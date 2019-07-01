@@ -48,7 +48,7 @@
                   </button>
                   <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'"> (Optional) </ng-container>
                 </label>
-                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date' || col?.type === 'checkbox'">
+                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
                     <div [ngClass]="{'input-group': col?.inputGroup}">
                       <ng-container *ngIf="col?.inputGroup">
                         <div class="input-group-prepend">
@@ -61,10 +61,10 @@
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
-                        [type]="col?.type"
-                        [name]="col?.name"
-                        [readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                        [value]="col?.name === 'contribution_aggregate' ? '0.00' : null"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"
+                        [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                        [attr.value]="col?.name === 'contribution_aggregate' ? '0.00' : null"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
@@ -123,12 +123,31 @@
                     </ng-container>
                   </div>
                 </ng-container>
+                <ng-container *ngIf="col?.type === 'checkbox'">
+                  <input 
+                    class="form-control"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [attr.type]="col?.type"
+                    [attr.name]="col?.name"
+                    [checked]="col?.name === 'memo_code' ? memoCode : null"
+                    [formControlName]="col?.name"
+                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    [ngClass]="
+                      frmIndividualReceipt.get(col?.name)?.invalid &&
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    "
+                  />                  
+                </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea 
                     [style.height]="col?.height"
                     [style.width]="col?.width"
                     [style.overflow]="col.scroll ? col.scroll : null"
-                    [name]="col?.name" 
+                    [attr.name]="col?.name" 
+                    [attr.maxlength]="col?.validation?.max"
                     [formControlName]="col?.name"
                   ></textarea>
                 </ng-container>

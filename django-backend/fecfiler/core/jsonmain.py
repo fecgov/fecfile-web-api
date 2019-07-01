@@ -622,13 +622,13 @@ def create_json_builders(request):
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
             else:
                 dictprint = resp.json()
-                merged_dict = {**create_json_data, **dictprint}
-                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                #merged_dict = {**create_json_data, **dictprint}
+                return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
         
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
         else:
-            return Response('The create_json_builders is throwing an error', status=status.HTTP_400_BAD_REQUEST)
+            return Response('error for json builder', status=status.HTTP_404_BAD_REQUEST)
 
     except Exception as e:
         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)

@@ -51,16 +51,10 @@ export class FinancialSummaryComponent implements OnInit {
     .getSummaryDetails('3X')
     .subscribe(res => {
       if(res) {
-            console.log("Accessing FinancialSummaryComponent res ...",res);
-            
+            console.log("Accessing FinancialSummaryComponent res ...",res);            
             this.tab1Data=res["Total Raised"];
             this.tab2Data=res["Total Spent"];
             this.tab3Data=res["Cash summary"];
-
-            console.log("Accessing FinancialSummaryComponent this.tab1Data ...",this.tab1Data);
-            console.log("Accessing FinancialSummaryComponent this.tab2Data ...",this.tab2Data);
-            console.log("Accessing FinancialSummaryComponent this.tab3Data ...",this.tab3Data);
-
           }
         },
         (error) => {
@@ -106,9 +100,7 @@ export class FinancialSummaryComponent implements OnInit {
     this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
     if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined' ){
-      console.log("this._form3XReportType is null");
       this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-      console.log("this._form3XReportType = ", this._form3XReportType);
     }
 
     if (typeof this._form3XReportType === 'object' && this._form3XReportType !== null) {

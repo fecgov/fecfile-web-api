@@ -29,10 +29,8 @@ export class FinancialSummaryService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    if (reportType === null || typeof reportType === 'undefined' ){
-      console.log("this._form3XReportType is null");
-      reportType = JSON.parse(localStorage.getItem(`form_${reportType}_report_type_backup`));
-      console.log("this._form3XReportType = ", reportType);
+    if (reportType === null || reportType === 'undefined' ){
+      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
     // With Edit Report Functionality
