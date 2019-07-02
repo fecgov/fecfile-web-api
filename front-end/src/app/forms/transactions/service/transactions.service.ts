@@ -62,12 +62,17 @@ export class TransactionsService {
     this._datePipe = new DatePipe('en-US');
   }
 
-
   /**
-   * Gets the transactions for the form type.
-   *
-   * @param      {String}   formType      The form type of the transaction to get
-   * @return     {Observable}             The form being retreived.
+   * Gets the transactions by Report ID.
+   * 
+   * @param formType
+   * @param reportId
+   * @param page
+   * @param itemsPerPage
+   * @param sortColumnName
+   * @param descending
+   * @param filters
+   * @return     {Observable}
    */
   public getFormTransactions(
       formType: string,
@@ -84,7 +89,7 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
+    // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
     request.reportid = reportId;
@@ -118,21 +123,111 @@ export class TransactionsService {
     console.log(' Transaction Table httpOptions = ', httpOptions);
 
     return this._http
-    .post(
-      `${environment.apiUrl}${url}`,
-      request,
-      {
-        headers: httpOptions
-      }
-    )
-    .pipe(map(res => {
-        if (res) {
-          console.log('Transaction Table res: ', res);
-
-          return res;
+      .post(
+        `${environment.apiUrl}${url}`,
+        request,
+        {
+          headers: httpOptions
         }
-        return false;
-    }));
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('Transaction Table res: ', res);
+
+            return res;
+          }
+          return false;
+      }));
+  }
+
+  /**
+   * Get the transactions for the user's Recycling Bin by Report ID.
+   * These are transactions "trashed" by the user.
+   *
+   * @param formType
+   * @param reportId
+   * @param page
+   * @param itemsPerPage
+   * @param sortColumnName
+   * @param descending
+   * @param filters
+   * @return     {Observable}
+   */
+  public getUserDeletedTransactions(
+    formType: string,
+    reportId: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filters: TransactionFilterModel): Observable<any> {
+
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/core/get_all_deleted_transactions';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.reportid = reportId;
+    request.page = page;
+    request.itemsPerPage = itemsPerPage;
+    request.sortColumnName = sortColumnName;
+    request.descending = descending;
+
+    if (filters) {
+      request.filters = filters;
+      if (request.filters.keywords) {
+        const keywordsEdited = [];
+        for (const keyword of request.filters.keywords) {
+          // replace ` and " with ' for backend.
+          let kw = keyword.replace(/\"/g, `'`);
+          kw = kw.replace(/`/g, `'`);
+          keywordsEdited.push(kw);
+        }
+        request.filters.keywords = keywordsEdited;
+      } else {
+        request.filters.keywords = [];
+      }
+    } else {
+      const emptyFilters: any = {};
+      emptyFilters.keywords = [];
+
+      request.filters = emptyFilters;
+    }
+
+    // For mock response - remove after API is verified
+    // const mockResponse: GetTransactionsResponse = {
+    //   transactions: this.mockRestoreTrxArray,
+    //   totalAmount: 0,
+    //   totalTransactionCount: this.mockRestoreTrxArray.length,
+
+    //   // remove after API is renamed.
+    //   itemsPerPage: 5,
+    //   'total pages': 0
+    // };
+    // return Observable.of(mockResponse);
+
+    console.log(' Transaction Recycle Bin Table request = ', request);
+    console.log(' Transaction Recycle Bin Table httpOptions = ', httpOptions);
+
+    return this._http
+      .post(
+        `${environment.apiUrl}${url}`,
+        request,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('Transaction Recycle Bin Table res: ', res);
+
+            return res;
+          }
+          return false;
+      }));
   }
 
 
@@ -463,69 +558,7 @@ export class TransactionsService {
   }
 
 
-  /**
-   * Gets the transactions for the form.
-   *
-   * @param      {String}   formType      The form type of the transaction to get
-   * @return     {Observable}             An Observable of type `any` containing the transactions
-   */
-  public getUserDeletedTransactions(
-      formType: string,
-      reportId: string,
-      page: number,
-      itemsPerPage: number,
-      sortColumnName: string,
-      descending: boolean,
-      filters: TransactionFilterModel): Observable<any> {
 
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    const url = '';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const request: any = {};
-    request.reportid = reportId;
-    request.page = page;
-    request.itemsPerPage = itemsPerPage;
-    request.sortColumnName = sortColumnName;
-    request.descending = descending;
-
-    if (filters) {
-      request.filters = filters;
-      if (request.filters.keywords) {
-        const keywordsEdited = [];
-        for (const keyword of request.filters.keywords) {
-          // replace ` and " with ' for backend.
-          let kw = keyword.replace(/\"/g, `'`);
-          kw = kw.replace(/`/g, `'`);
-          keywordsEdited.push(kw);
-        }
-        request.filters.keywords = keywordsEdited;
-      } else {
-        request.filters.keywords = [];
-      }
-    } else {
-      const emptyFilters: any = {};
-      emptyFilters.keywords = [];
-
-      request.filters = emptyFilters;
-    }
-
-
-
-    const mockResponse: GetTransactionsResponse = {
-      transactions: this.mockRestoreTrxArray,
-      totalAmount: 0,
-      totalTransactionCount: this.mockRestoreTrxArray.length,
-
-      // remove after API is renamed.
-      itemsPerPage: 5,
-      'total pages': 0
-    };
-    return Observable.of(mockResponse);
-  }
 
 
   // /**

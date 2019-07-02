@@ -242,11 +242,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // // temp fix for sprint 13 demo
-    // if (this.currentSortedColumnName === 'default') {
-    //   this.currentSortedColumnName = 'name';
-    // }
-
     const serverSortColumnName = this._transactionsService.
       mapToSingleServerName(this.currentSortedColumnName);
 
@@ -255,18 +250,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         serverSortColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
-
-        // // because the backend receives 'default' as the column name
-        // // AND because 'default' is not a column known to this component in
-        // // this.sortableColumns, we must tell it make the name column appear sorted.
-        // // Ideally the columns name and direction sorted should come back in the response
-        // // from the API call.  TODO do this in other sprint/release.
-        // // Or change the API interface to accept a flag for default rather than using
-        // // the column name.
-
-        // if (this.currentSortedColumnName === 'default') {
-        //   this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
-        // }
 
         this._transactionsService.addUIFileds(res);
 
@@ -287,10 +270,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 */
   public getRecyclingPage(page: number): void {
 
-    this.calculateNumberOfPages();
+    this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    // smahal: quick fix for sortCol issue not retrived from cache
+    if (!sortedCol) {
+      this.setSortDefault();
+      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    }
 
     if (sortedCol) {
       if (sortedCol.descending === undefined || sortedCol.descending === null) {
@@ -300,13 +289,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // temp fix for sprint 13 demo
-    if (this.currentSortedColumnName === 'default') {
-      this.currentSortedColumnName = 'name';
-    }
-
     const serverSortColumnName = this._transactionsService.
-    mapToSingleServerName(this.currentSortedColumnName);
+      mapToSingleServerName(this.currentSortedColumnName);
 
     this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
       page, this.config.itemsPerPage,
@@ -314,18 +298,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe((res: GetTransactionsResponse) => {
 
         this._transactionsService.addUIFileds(res);
-        this._transactionsService.mockApplyFilters(res, this.filters);
-        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
-        this.transactionsModel = this._transactionsService.sortTransactions(
-          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+        this.transactionsModel = res.transactions;
 
-        this.config.totalItems = res.totalTransactionCount;
+        // handle non-numeric amounts
+        // TODO handle this server side in API
+        for (const model of this.transactionsModel) {
+          model.amount = model.amount ? model.amount : 0;
+          model.aggregate = model.aggregate ? model.aggregate : 0;
+        }
 
-        // If a row was deleted, the current page may be greated than the last page
-        // as result of the delete.
-        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
-          ? this.numberOfPages : page;
+        this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.allTransactionsSelected = false;
       });
   }
 
