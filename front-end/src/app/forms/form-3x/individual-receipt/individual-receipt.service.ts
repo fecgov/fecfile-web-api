@@ -47,7 +47,12 @@ export class IndividualReceiptService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    
+    if (reportType === null || typeof reportType=== 'undefined' ){
+      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }
+
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
     const formData: FormData = new FormData();
@@ -104,7 +109,12 @@ export class IndividualReceiptService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    const reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (reportType === null || typeof reportType=== 'undefined' ){
+      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }
+
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
 

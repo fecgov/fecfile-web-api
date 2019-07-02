@@ -76,6 +76,11 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
+    if (this._reportType === null || typeof this._reportType === 'undefined' ){
+      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+    }
+
+
     this.frmIndividualReceipt = this._fb.group({});
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
@@ -344,7 +349,12 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public viewTransactions(): void {
     let reportId = '0';
-    const form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined' ){
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+    }
+
     console.log('viewTransactions form3XReportType', form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
