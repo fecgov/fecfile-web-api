@@ -83,7 +83,7 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id):
         forms_obj = []
         if not transaction_id:
             query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL """
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s """
         else:
             query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
@@ -542,7 +542,7 @@ def task_sched_a(request):
                         response_inkind_receipt_list.append(response_dict_receipt)
                 else:
                     response_inkind_receipt_list = []
-
+                #import ipdb;ipdb.set_trace()
                 if entity_id_sched_b_list:
                     for entity_obj_b in entity_id_sched_b_list:
                         response_dict_out = {}
