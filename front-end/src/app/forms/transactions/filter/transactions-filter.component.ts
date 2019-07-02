@@ -753,7 +753,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             break;
           case FilterTypes.itemizations:
             for (const itemization of this.itemizations) {
-              if (itemization.itemization_code === message.value) {
+              if (itemization.itemized === message.value) {
                 itemization.selected = false;
               }
             }
