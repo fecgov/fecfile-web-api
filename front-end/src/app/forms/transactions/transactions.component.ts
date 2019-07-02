@@ -169,9 +169,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       const categoryGroup = [];
 
       // is tag showing? Then modify it is the curr position
-      // TODO put type strings in constants file as an enumeration
-      // They are also used in the filter component as well.
-
       let categoryTag = false;
       for (const tag of this.tagArray) {
         if (tag.type === FilterTypes.category) {
@@ -189,6 +186,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
         this.tagArray.push({type: FilterTypes.category, prefix: 'Type', group: categoryGroup});
       }
+    } else {
+      this.removeTagArrayItem(FilterTypes.category);
     }
 
 
@@ -282,6 +281,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
         this.tagArray.push({type: FilterTypes.state, prefix: null, group: stateGroup});
       }
+    } else {
+      this.removeTagArrayItem(FilterTypes.state);
     }
 
     // Memo Code
@@ -325,6 +326,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           }
           this.tagArray.push({type: FilterTypes.itemizations, prefix: 'Itemized', group: itemizedGroup});
         }
+      } else {
+        this.removeTagArrayItem(FilterTypes.itemizations);
       }
     }
 
@@ -544,13 +547,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   private removeTagArrayItem(type: FilterTypes) {
     let i = 0;
+    let typeFound = false;
     for (const tag of this.tagArray) {
       if (tag.type === type) {
+        typeFound = true;
         break;
       }
       i++;
     }
-    this.tagArray.splice(i, 1);
+    if (typeFound) {
+      this.tagArray.splice(i, 1);
+    }
   }
 
 
