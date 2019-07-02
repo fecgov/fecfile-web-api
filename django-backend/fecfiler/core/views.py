@@ -1383,7 +1383,7 @@ def filter_get_all_trans(request, param_string):
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
         if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
-        # The below code was added by Praveen. This is added to reuse this function in get_all_deleted_transactions API.
+        # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
         if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
             param_string = param_string + " AND last_update_date >= '" + value_d +"' AND last_update_date <= '" + filt_dict['filterDeletedDateTo'] +"'"
         # End of Addition
@@ -1623,12 +1623,12 @@ END - STATE API - CORE APP
 """
 """
 ******************************************************************************************************************************
-GET ALL DELETED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
+GET ALL TRASHED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
 REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 744 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 @api_view(['POST'])
-def get_all_deleted_transactions(request):
+def get_all_trashed_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
@@ -1683,13 +1683,36 @@ def get_all_deleted_transactions(request):
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL"
 
-        trans_query_string = """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", last_update_date as "deletedDate", transaction_amount as "amount", aggregate_amt as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized from all_transactions_view
+        trans_query_string = """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", last_update_date as "deletedDate", COALESCE(transaction_amount,0) as "amount", COALESCE(aggregate_amt,0) as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind = 'Y'"""
 
         if sortcolumn and sortcolumn != 'default':
-            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+            sortcolumn_dict = {'transactionTypeId': 'transaction_type',
+                                'type': 'transaction_type_desc',
+                                'transactionId': 'transaction_id',
+                                'name': 'name',
+                                'street': 'street_1',
+                                'street2': 'street_2',
+                                'city': 'city',
+                                'state': 'state',
+                                'zip': 'zip_code',
+                                'date': 'transaction_date',
+                                'deletedDate': 'last_update_date',
+                                'amount': 'COALESCE(transaction_amount,0)',
+                                'aggregate': 'COALESCE(aggregate_amt,0)',
+                                'purposeDescription': 'purpose_description',
+                                'contributorOccupation': 'occupation',
+                                'contributorEmployer': 'employer',
+                                'memoCode': 'memo_code',
+                                'memoText': 'memo_text',
+                                'itemized': 'itemized'}
+            if sortcolumn in sortcolumn_dict:
+                sorttablecolumn = sortcolumn_dict[sortcolumn]
+            else:
+                sorttablecolumn = 'name ASC, transaction_date'
+            trans_query_string = trans_query_string + """ ORDER BY """+ sorttablecolumn + """ """ + descending
         elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date ASC"""
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
@@ -1701,7 +1724,7 @@ def get_all_deleted_transactions(request):
                 else:
                     for d in forms_obj:
                         for i in d:
-                            if not d[i]:
+                            if d[i] in [None, '', ""]:
                                 d[i] = ''
                     status_value = status.HTTP_200_OK
 
@@ -1714,11 +1737,11 @@ def get_all_deleted_transactions(request):
                     'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         return Response(json_result, status=status_value)
     except Exception as e:
-        return Response("The get_all_deleted_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("The get_all_trashed_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 ******************************************************************************************************************************
-END - GET ALL DELETED TRANSACTIONS API - CORE APP
+END - GET ALL TRASHED TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
 
