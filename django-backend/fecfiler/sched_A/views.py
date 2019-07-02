@@ -45,6 +45,15 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type']
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = ['16']
 
+# list of valid line numbers
+VALID_TRANSACTION_TYPES = ['15', '18G', '17A']
+
+TRANSACTION_TYPES_LINE_NUM_MAP = {
+    '15': ['11AI', '11AII']  # private contribution
+    '18G': ['12'],  # transfer regular transaction
+    '17A': ['16'],  # refund regular transaction
+}
+
 
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
@@ -70,6 +79,19 @@ def check_transaction_id(transaction_id):
         return transaction_id
     except Exception:
         raise
+
+
+def validate_transaction_type(data):
+    """
+    check line number and transaction types are both valid and compatible
+    """
+    if not data.get('transaction_type') in VALID_TRANSACTION_TYPES:
+        raise Exception('Non-valid transaction type detected.')
+    elif not data.get('line_number') in TRANSACTION_TYPES_LINE_NUM_MAP.get(
+            data.get('transaction_type')):
+        raise Exception('Line number does not match transaction type.')
+    else:
+        pass
 
 
 def check_mandatory_fields_SA(data, list_mandatory_fields):
@@ -118,6 +140,7 @@ def check_decimal(value):
 def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name):
     """persist one sched_a item."""
     try:
+        print(line_number)
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name)
@@ -335,6 +358,10 @@ def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_
 def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id):
     """
     load all transactions for an entity within a time window
+    return value: a list of transction_records [
+       (contribution_amount, transaction_id, report_id, line_number, contribution_date),
+       ....
+    ]
     """
     try:
         with connection.cursor() as cursor:
@@ -613,6 +640,8 @@ def schedA(request):
     """
     sched_a api supporting POST, GET, DELETE, PUT
     """
+
+    # create new transactions and children transactions if any
     if request.method == 'POST':
         try:
             cmte_id = request.user.username
