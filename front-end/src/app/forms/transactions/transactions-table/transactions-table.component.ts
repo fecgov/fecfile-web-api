@@ -289,12 +289,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    const serverSortColumnName = this._transactionsService.
-      mapToSingleServerName(this.currentSortedColumnName);
+    // const serverSortColumnName = this._transactionsService.
+    //   mapToSingleServerName(this.currentSortedColumnName);
 
     this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
       page, this.config.itemsPerPage,
-      serverSortColumnName, sortedCol.descending, this.filters)
+      // serverSortColumnName,
+      this.currentSortedColumnName,
+      sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
 
         this._transactionsService.addUIFileds(res);
