@@ -1628,7 +1628,7 @@ REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 744 - B
 ******************************************************************************************************************************
 """
 @api_view(['POST'])
-def get_all_deleted_transactions(request):
+def get_all_trashed_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
@@ -1687,9 +1687,32 @@ def get_all_deleted_transactions(request):
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind = 'Y'"""
 
         if sortcolumn and sortcolumn != 'default':
-            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+            sortcolumn_dict = {'transactionTypeId': 'transaction_type',
+                                'type': 'transaction_type_desc',
+                                'transactionId': 'transaction_id',
+                                'name': 'name',
+                                'street': 'street_1',
+                                'street2': 'street_2',
+                                'city': 'city',
+                                'state': 'state',
+                                'zip': 'zip_code',
+                                'date': 'transaction_date',
+                                'deletedDate': 'last_update_date',
+                                'amount': 'transaction_amount',
+                                'aggregate': 'aggregate_amt',
+                                'purposeDescription': 'purpose_description',
+                                'contributorOccupation': 'occupation',
+                                'contributorEmployer': 'employer',
+                                'memoCode': 'memo_code',
+                                'memoText': 'memo_text',
+                                'itemized': 'itemized'}
+            if sortcolumn in sortcolumn_dict:
+                sorttablecolumn = sortcolumn_dict[sortcolumn]
+            else:
+                sorttablecolumn = 'name ASC, transaction_date'
+            trans_query_string = trans_query_string + """ ORDER BY """+ sorttablecolumn + """ """ + descending
         elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date ASC"""
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
