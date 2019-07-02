@@ -1383,6 +1383,10 @@ def filter_get_all_trans(request, param_string):
             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
         if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
+        # The below code was added by Praveen. This is added to reuse this function in get_all_deleted_transactions API.
+        if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
+            param_string = param_string + " AND last_update_date >= '" + value_d +"' AND last_update_date <= '" + filt_dict['filterDeletedDateTo'] +"'"
+        # End of Addition
         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
         if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
@@ -1620,50 +1624,98 @@ END - STATE API - CORE APP
 """
 ******************************************************************************************************************************
 GET ALL DELETED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
+REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 744 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
-@api_view(['GET'])
+@api_view(['POST'])
 def get_all_deleted_transactions(request):
     try:
         cmte_id = request.user.username
         param_string = ""
-        for key, value in request.query_params.items():
-            try:
-                check_value = int(value)
-                param_string = param_string + " AND " + key + "=" + str(value)
-            except Exception as e:
-                if key == 'transaction_date':
-                    transaction_date = date_format(request.query_params.get('transaction_date'))
-                    param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
-                else:
-                    param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        params = request.data.get('filters', {})
+        keywords = params.get('keywords')
+        report_id = request.data.get('reportid')
+        if str(descending).lower() == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
 
-        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end))total_transaction_amount from all_transactions_view
-        #                     where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
-        # with connection.cursor() as cursor:
-        #     cursor.execute(query_string)
-        #     result = cursor.fetchone()
-        #     count = result[0]
-        #     sum_trans = result[1]
-            
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, purpose_description, occupation, employer, memo_code, memo_text, itemized from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """'""" + param_string + """ AND delete_ind = 'Y'"""
+        keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code','purpose_description', 
+            'occupation', 'employer', 'memo_text']
+        search_keys = ['transaction_type','transaction_type_desc', 'transaction_id', 'name', 
+            'street_1', 'street_2', 'city', 'state', 'zip_code', 'purpose_description', 
+            'occupation', 'employer', 'memo_text']
+        if search_string:
+            for key in search_keys:
+                if not param_string:
+                    param_string = param_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                else:
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+        keywords_string = ''
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+                    else:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+            keywords_string = keywords_string + " )"
+        param_string = param_string + keywords_string
+        param_string = filter_get_all_trans(request, param_string)
+
+        filters_post = request.data.get('filters', {})
+        memo_code_d = filters_post.get('filterMemoCode', False)
+        if str(memo_code_d).lower() == 'true':
+            param_string = param_string + " AND memo_code IS NOT NULL"
+
+        trans_query_string = """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", last_update_date as "deletedDate", transaction_amount as "amount", aggregate_amt as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized from all_transactions_view
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind = 'Y'"""
+
+        if sortcolumn and sortcolumn != 'default':
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        elif sortcolumn == 'default':
+            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        status_value = status.HTTP_200_OK
-        if forms_obj is None:
-            forms_obj =[]
-            status_value = status.HTTP_204_NO_CONTENT
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_200_OK
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                    status_value = status.HTTP_200_OK
 
-        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
-        json_result = { 'transactions': forms_obj}
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 'totalTransactionCount': total_count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         return Response(json_result, status=status_value)
-
     except Exception as e:
-        return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("The get_all_deleted_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 """
 ******************************************************************************************************************************
 END - GET ALL DELETED TRANSACTIONS API - CORE APP
