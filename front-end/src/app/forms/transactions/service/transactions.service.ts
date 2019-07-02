@@ -164,7 +164,7 @@ export class TransactionsService {
 
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/core/get_all_deleted_transactions';
+    const url = '/core/get_all_trashed_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
