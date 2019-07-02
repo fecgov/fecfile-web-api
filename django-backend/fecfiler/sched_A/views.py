@@ -97,7 +97,6 @@ def validate_transaction_type(data):
     """
     check line number and transaction types are both valid and compatible
     """
-    print('type:{}'.format(data.get('transaction_type')))
     if not data.get('transaction_type') in VALID_TRANSACTION_TYPES:
         raise Exception('Invalid transaction type detected.')
     elif not data.get('line_number') in TRANSACTION_TYPES_LINE_NUM_MAP.get(
@@ -114,7 +113,6 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
     try:
         errors = []
         for field in list_mandatory_fields:
-            print('mand_field:{} - {}'.format(field, data.get(field)))
             if not(field in data and check_null_value(data.get(field))):
                 errors.append(field)
         # if len(error) > 0:
@@ -155,7 +153,6 @@ def check_decimal(value):
 def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name):
     """persist one sched_a item."""
     try:
-        print(line_number)
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name)
