@@ -45,13 +45,15 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type']
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = ['16']
 
-# list of valid line numbers
-VALID_TRANSACTION_TYPES = ['15', '18G', '17A']
+# list of valid line numbers - this list will grow as we add more types
+VALID_TRANSACTION_TYPES = ['15', '18G', '17Z']
 
+# map if transaction_type to line_numbers -
+# this list will grow as we add more types
 TRANSACTION_TYPES_LINE_NUM_MAP = {
-    '15': ['11AI', '11AII']  # private contribution
-    '18G': ['12'],  # transfer regular transaction
-    '17A': ['16'],  # refund regular transaction
+    '15': ['11AI', '11AII'],
+    '18G': ['12'],
+    '17Z': ['16'],
 }
 
 
@@ -71,6 +73,8 @@ def get_next_transaction_id(trans_char):
 def check_transaction_id(transaction_id):
     """validate transaction id against trsaction types, e.g. SA20190627000000094"""
     try:
+        # is this list expandable:not sure we should have more types????
+        # TODO: ???
         transaction_type_list = ["SA", ]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
@@ -81,12 +85,21 @@ def check_transaction_id(transaction_id):
         raise
 
 
+def validate_sa_data(data):
+    """
+    validate: 1. mandatory sa fields; 2. valid line number and transaction types
+    """
+    check_mandatory_fields_SA(data, MANDATORY_FIELDS_SCHED_A)
+    validate_transaction_type(data)
+
+
 def validate_transaction_type(data):
     """
     check line number and transaction types are both valid and compatible
     """
+    print('type:{}'.format(data.get('transaction_type')))
     if not data.get('transaction_type') in VALID_TRANSACTION_TYPES:
-        raise Exception('Non-valid transaction type detected.')
+        raise Exception('Invalid transaction type detected.')
     elif not data.get('line_number') in TRANSACTION_TYPES_LINE_NUM_MAP.get(
             data.get('transaction_type')):
         raise Exception('Line number does not match transaction type.')
@@ -101,6 +114,7 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
     try:
         errors = []
         for field in list_mandatory_fields:
+            print('mand_field:{} - {}'.format(field, data.get(field)))
             if not(field in data and check_null_value(data.get(field))):
                 errors.append(field)
         # if len(error) > 0:
@@ -115,6 +129,7 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
         raise
 
 # TODO: isinstance is a lighter way if checking data type
+# if not isinstance(value, Decimal): raise Exception
 
 
 def check_decimal(value):
@@ -448,7 +463,10 @@ def put_sql_linenumber_schedA(cmte_id, report_id, line_number, transaction_id, e
 def post_schedA(datum):
     """save sched_a item and the associated entities."""
     try:
-        check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        validate_sa_data(datum)
+
+        # save entities rirst
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
@@ -458,6 +476,8 @@ def post_schedA(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
+
+        # continue to save transaction
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
         # datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
@@ -478,6 +498,7 @@ def post_schedA(datum):
                 remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedA function is throwing an error: ' + str(e))
+        # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
@@ -644,6 +665,7 @@ def schedA(request):
     # create new transactions and children transactions if any
     if request.method == 'POST':
         try:
+            # TODO: can people enter sa items for different cmte_id???
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception('Missing Input: Report_id is mandatory')
