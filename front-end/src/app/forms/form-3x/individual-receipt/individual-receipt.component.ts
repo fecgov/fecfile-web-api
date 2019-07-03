@@ -51,6 +51,8 @@ export class IndividualReceiptComponent implements OnInit {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _formSubmitted: boolean = false;
+  private readonly _contributionAggregateValue: number = 0.00;
+  private readonly _memoCodeValue: string = 'X';
 
   constructor(
     private _http: HttpClient,
@@ -238,7 +240,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = '0.00';
+    const contributionAggregate: string = String(this._contributionAggregateValue);
     /**
      * TODO: Look into why read only input returns null.
      */
@@ -295,8 +297,6 @@ export class IndividualReceiptComponent implements OnInit {
         } else {
           if (field === 'memo_code') {
             if (this.memoCode) {
-              console.log('this.memoCode: ', this.memoCode);
-              console.log('memo_code is checked: ');
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             } 
           } else {
@@ -331,8 +331,8 @@ export class IndividualReceiptComponent implements OnInit {
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue('0.00');
-          this.frmIndividualReceipt.controls['memo_code'].setValue('X');
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(this._contributionAggregateValue);
+          this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
           
           localStorage.removeItem(`form_${this._formType}_receipt`);
 
