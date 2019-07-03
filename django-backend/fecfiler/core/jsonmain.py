@@ -597,6 +597,8 @@ def task_sched_a(request):
                             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
                             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                            response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
+                            #response_dict_receipt['beneficiaryCommitteeName'] =  comm_info_obj.get('committeeName')
                             response_dict_receipt['categoryCode'] = '15G'
                             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
