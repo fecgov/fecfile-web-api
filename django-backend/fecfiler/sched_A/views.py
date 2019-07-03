@@ -343,6 +343,10 @@ def find_form_type(report_id, cmte_id):
 
 
 def find_aggregate_date(form_type, contribution_date):
+    """
+    calculate aggregate start, end dates
+    # TODO: do we need checking form_type here.
+    """
     try:
         aggregate_start_date = None
         if form_type == "F3X":
@@ -356,6 +360,9 @@ def find_aggregate_date(form_type, contribution_date):
 
 
 def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id):
+    """
+    query aggregate amount based on start/end date, transaction_type, entity_id and cmte_id
+    """
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
@@ -402,6 +409,7 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             transactions_list = list_all_transactions_entity(
                 aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id)
             aggregate_amount = 0
+            # TODO: can we move the linenumber update out of the 'for loop'
             for transaction in transactions_list:
                 aggregate_amount = aggregate_amount + transaction[0]
                 if str(report_id) == str(transaction[2]):
