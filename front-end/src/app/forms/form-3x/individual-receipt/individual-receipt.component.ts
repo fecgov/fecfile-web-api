@@ -292,7 +292,14 @@ export class IndividualReceiptComponent implements OnInit {
         if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
-          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          if (field === 'memo_code') {
+            if (this.memoCode) {
+              console.log('memo_code is checked: ');
+              receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+            } 
+          } else {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          }
         }
       }
 
@@ -304,15 +311,23 @@ export class IndividualReceiptComponent implements OnInit {
 
       this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
-          this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
-            const message: any = {
-              formType: this._formType,
-              totals: resp
-            };
+          if (res.hasOwnProperty('memo_code')) {
+            console.log('typeof res.memo_code: ', typeof res.memo_code);
+            console.log('res.memo_code: ', res.memo_code);
+            if (typeof res.memo_code === 'string') {
+              if (res.memo_code === null) {
+                this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
+                  const message: any = {
+                    formType: this._formType,
+                    totals: resp
+                  };
 
-            this._messageService.sendMessage(message);
-          });  
-
+                  this._messageService.sendMessage(message);
+                });                
+              }
+            }
+          }
+  
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
