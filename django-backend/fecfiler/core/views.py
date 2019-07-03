@@ -2708,3 +2708,159 @@ def print_preview_pdf(request):
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
     except Exception:
         raise
+"""
+*********************************************************************************************************************************************
+end print priview api
+*********************************************************************************************************************************************
+"""
+"""
+**********************************************************************************************************************************************
+Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
+**********************************************************************************************************************************************
+"""
+# def filter_get_all_trans(request, param_string):
+#     if request.method == 'GET':
+#         return param_string
+#     # import ipdb;ipdb.set_trace()
+#     filt_dict = request.data.get('filters', {})
+#     for f_key, value_d in filt_dict.items():
+#         if not value_d or value_d == 'null':
+#             continue
+#         if 'filterCategories' in f_key:
+#             cat_tuple = "('"+"','".join(value_d)+"')"
+#             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+#         if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
+#             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
+#         # The below code was added by Praveen. This is added to reuse this function in get_all_deleted_transactions API.
+#         if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
+#             param_string = param_string + " AND last_update_date >= '" + value_d +"' AND last_update_date <= '" + filt_dict['filterDeletedDateTo'] +"'"
+#         # End of Addition
+#         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
+#             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
+#         if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
+#             param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
+#         if 'filterStates' in f_key:
+#             state_tuple = "('"+"','".join(value_d)+"')"
+#             param_string = param_string + " AND state In " + state_tuple
+#         if 'filterItemizations' in f_key:
+#             itemized_tuple = "('"+"','".join(value_d)+"')"
+#             param_string = param_string + " AND itemized In " + itemized_tuple
+#     return param_string
+
+# def get_aggregate_amount(transaction_id):
+#     try:
+#         with connection.cursor() as cursor:
+#             cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE transaction_id = %s AND delete_ind is distinct FROM 'Y'""", [transaction_id])
+#             aggregate_amt = cursor.fetchone()[0]
+#         return aggregate_amt
+#     except Exception as  e:
+#         return False
+#         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
+
+@api_view(['GET', 'POST'])
+def create_contacts_view(request):
+    try:
+        # print("request.data: ", request.data)
+        cmte_id = request.user.username
+        param_string = ""
+        page_num = int(request.data.get('page', 1))
+        #descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        # import ipdb;ipdb.set_trace()
+        #params = request.data.get('filters', {})
+        keywords = params.get('keywords')
+        report_id = request.data.get('reportid')
+        if str(descending).lower() == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
+
+        keys = ['cmte_id', 'id', 'name', 'occupation', 'employer' ]
+        search_keys = ['cmte_id', 'id', 'name', 'occupation', 'employer']
+        if search_string:
+            for key in search_keys:
+                if not param_string:
+                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                else:
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+        keywords_string = ''
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+                    else:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+            keywords_string = keywords_string + " )"
+        param_string = param_string + keywords_string
+        #param_string = filter_get_all_trans(request, param_string)
+        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_contacts_view
+
+        #                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                         
+        # with connection.cursor() as cursor:
+        #     cursor.execute(query_string)
+        #     result = cursor.fetchone()
+        #     count = result[0]
+        #     sum_trans = result[1]
+        # filters_post = request.data.get('filters', {})
+        # memo_code_d = filters_post.get('filterMemoCode', False)
+        # if str(memo_code_d).lower() == 'true':
+        #     param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+        
+        trans_query_string = """SELECT cmte_id, id, name, occupation, employer from all_contacts_view
+
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    # + """ ORDER BY """ + order_string
+        # print("trans_query_string: ",trans_query_string)
+        # import ipdb;ipdb.set_trace()
+        if sortcolumn and sortcolumn != 'default':
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        elif sortcolumn == 'default':
+            trans_query_string = trans_query_string + """ ORDER BY name ASC""" #transaction_date  ASC
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_200_OK
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                      
+                    status_value = status.HTTP_200_OK
+        
+        #import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+        return Response(json_result, status=status_value)
+    except Exception as e:
+        return Response("The contact_views API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+*****************************************************************************************************************************
+END - GET ALL TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
