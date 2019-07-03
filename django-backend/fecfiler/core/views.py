@@ -2720,44 +2720,6 @@ end print priview api
 Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
 """
-# def filter_get_all_trans(request, param_string):
-#     if request.method == 'GET':
-#         return param_string
-#     # import ipdb;ipdb.set_trace()
-#     filt_dict = request.data.get('filters', {})
-#     for f_key, value_d in filt_dict.items():
-#         if not value_d or value_d == 'null':
-#             continue
-#         if 'filterCategories' in f_key:
-#             cat_tuple = "('"+"','".join(value_d)+"')"
-#             param_string = param_string + " AND transaction_type_desc In " + cat_tuple
-#         if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
-#             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
-#         # The below code was added by Praveen. This is added to reuse this function in get_all_deleted_transactions API.
-#         if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
-#             param_string = param_string + " AND last_update_date >= '" + value_d +"' AND last_update_date <= '" + filt_dict['filterDeletedDateTo'] +"'"
-#         # End of Addition
-#         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
-#             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
-#         if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
-#             param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
-#         if 'filterStates' in f_key:
-#             state_tuple = "('"+"','".join(value_d)+"')"
-#             param_string = param_string + " AND state In " + state_tuple
-#         if 'filterItemizations' in f_key:
-#             itemized_tuple = "('"+"','".join(value_d)+"')"
-#             param_string = param_string + " AND itemized In " + itemized_tuple
-#     return param_string
-
-# def get_aggregate_amount(transaction_id):
-#     try:
-#         with connection.cursor() as cursor:
-#             cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE transaction_id = %s AND delete_ind is distinct FROM 'Y'""", [transaction_id])
-#             aggregate_amt = cursor.fetchone()[0]
-#         return aggregate_amt
-#     except Exception as  e:
-#         return False
-#         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 @api_view(['GET', 'POST'])
 def create_contacts_view(request):
@@ -2770,7 +2732,7 @@ def create_contacts_view(request):
         sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
-        import ipdb;ipdb.set_trace()
+        #import ipdb;ipdb.set_trace()
         params = request.data.get('filters', {})
         keywords = params.get('keywords')
         if str(descending).lower() == 'true':
