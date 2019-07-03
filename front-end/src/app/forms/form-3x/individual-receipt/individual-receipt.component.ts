@@ -275,6 +275,7 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (checked) {
       this.memoCode = checked;
+      console.log('this.memoCode: ', this.memoCode);
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
@@ -294,6 +295,7 @@ export class IndividualReceiptComponent implements OnInit {
         } else {
           if (field === 'memo_code') {
             if (this.memoCode) {
+              console.log('this.memoCode: ', this.memoCode);
               console.log('memo_code is checked: ');
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             } 
@@ -314,7 +316,7 @@ export class IndividualReceiptComponent implements OnInit {
           if (res.hasOwnProperty('memo_code')) {
             console.log('typeof res.memo_code: ', typeof res.memo_code);
             console.log('res.memo_code: ', res.memo_code);
-            if (typeof res.memo_code === 'string') {
+            if (typeof res.memo_code === 'object') {
               if (res.memo_code === null) {
                 this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
                   const message: any = {
@@ -331,6 +333,8 @@ export class IndividualReceiptComponent implements OnInit {
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue('0.00');
+          this.frmIndividualReceipt.controls['memo_code'].setValue('X');
           
           localStorage.removeItem(`form_${this._formType}_receipt`);
 
