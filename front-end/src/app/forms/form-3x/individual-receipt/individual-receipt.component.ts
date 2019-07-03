@@ -314,8 +314,6 @@ export class IndividualReceiptComponent implements OnInit {
       this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
           if (res.hasOwnProperty('memo_code')) {
-            console.log('typeof res.memo_code: ', typeof res.memo_code);
-            console.log('res.memo_code: ', res.memo_code);
             if (typeof res.memo_code === 'object') {
               if (res.memo_code === null) {
                 this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
