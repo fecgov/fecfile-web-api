@@ -185,7 +185,7 @@
   .transactions__container {
     padding-right: 10px;
     margin-bottom: 15px;
-    padding-left: 5px;
+    //padding-left: 5px;
     margin-top: 15px;
     .grid-row {
       margin-left: 0;
@@ -201,7 +201,7 @@
         display: block;
         margin: 0 auto;
         width: 96%;
-        padding: .75em 0 .25em 0;
+        //padding: .75em 0 .25em 0;
         @include clearfix();
         .btn-options {
           color: $shuttleGray;
@@ -218,7 +218,7 @@
 
     .transactions__btn-container {
       height: 100%;
-      padding: 1em;
+      //padding: 1em;
     }
 
     .transactions__btn-search-filter {
@@ -350,3 +350,5 @@
       display:none;
     }
   }
+
+  .space { margin:0; padding:0; height:15px; } // height as desired

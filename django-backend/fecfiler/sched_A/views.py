@@ -359,8 +359,10 @@ def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_
     """
     try:
         with connection.cursor() as cursor:
+
             cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
                            entity_id, transaction_type, cmte_id, aggregate_start_date, aggregate_end_date])
+
             aggregate_amt = cursor.fetchone()[0]
         return aggregate_amt
     except Exception as e:
