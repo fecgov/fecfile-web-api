@@ -73,8 +73,6 @@ def get_next_transaction_id(trans_char):
 def check_transaction_id(transaction_id):
     """validate transaction id against trsaction types, e.g. SA20190627000000094"""
     try:
-        # is this list expandable:not sure we should have more types????
-        # TODO: ???
         transaction_type_list = ["SA", ]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
@@ -134,11 +132,9 @@ def check_decimal(value):
     """
     validate a value is decimal
     """
-
-    try:
-        check_value = Decimal(value)
+    if isinstance(value, Decimal):
         return value
-    except Exception as e:
+    else:
         raise Exception(
             'Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}'.format(value))
 
@@ -381,6 +377,7 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
        (contribution_amount, transaction_id, report_id, line_number, contribution_date),
        ....
     ]
+    return items are sorted by contribution_date in ASC order
     """
     try:
         with connection.cursor() as cursor:
@@ -396,6 +393,14 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
 def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type, entity_id, cmte_id, report_id):
     """
     helper function for updating private contribution line number based on aggrgate amount
+    the aggregate amount is a contribution_date-based on incremental update, the line number
+    is updated accordingly:
+
+    e.g.
+    date, contribution_amount, aggregate_amount, line_number
+    1/1/2018, 50, 50, 11AII
+    2/1/2018, 60, 110, 11AII
+    3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
     """
     try:
         itemization_transaction_type_list = ["15", ]
@@ -406,12 +411,12 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             form_type = find_form_type(report_id, cmte_id)
             aggregate_start_date, aggregate_end_date = find_aggregate_date(
                 form_type, contribution_date)
+            # make sure transaction list comes back sorted by contribution_date ASC
             transactions_list = list_all_transactions_entity(
                 aggregate_start_date, aggregate_end_date, transaction_type, entity_id, cmte_id)
             aggregate_amount = 0
-            # TODO: can we move the linenumber update out of the 'for loop'
             for transaction in transactions_list:
-                aggregate_amount = aggregate_amount + transaction[0]
+                aggregate_amount += transaction[0]
                 if str(report_id) == str(transaction[2]):
                     if contribution_date <= transaction[4]:
                         if aggregate_amount <= itemization_value:
@@ -426,7 +431,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
 
 
 def put_sql_linenumber_schedA(cmte_id, report_id, line_number, transaction_id, entity_id, aggregate_amount):
-    """update line number
+    """
+    update line number
     """
     try:
         with connection.cursor() as cursor:
@@ -670,7 +676,6 @@ def schedA(request):
     # create new transactions and children transactions if any
     if request.method == 'POST':
         try:
-            # TODO: can people enter sa items for different cmte_id???
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception('Missing Input: Report_id is mandatory')
