@@ -82,10 +82,10 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id):
         # GET all rows from schedB table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s """
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier, beneficiary_cmte_id
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL"""
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier, beneficiary_cmte_id
                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
         
         # if type_identifier:
@@ -602,8 +602,8 @@ def task_sched_a(request):
                             response_dict_receipt['categoryCode'] = '15G'
                             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
-
-                    reponse_sched_b_data.append(response_dict_receipt)
+                         
+                        reponse_sched_b_data.append(response_dict_receipt)
                 else:
                     reponse_sched_b_data = []
 
