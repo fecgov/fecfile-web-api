@@ -124,17 +124,15 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
     except:
         raise
 
-# TODO: isinstance is a lighter way if checking data type
-# if not isinstance(value, Decimal): raise Exception
-
 
 def check_decimal(value):
     """
     validate a value is decimal
     """
-    if isinstance(value, Decimal):
+    try:
+        Decimal(value)
         return value
-    else:
+    except:
         raise Exception(
             'Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}'.format(value))
 
