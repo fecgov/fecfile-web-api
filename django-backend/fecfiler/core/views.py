@@ -1357,9 +1357,7 @@ def create_json_file(request):
     except Exception as e:
         return Response("The create_json_file API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-
 """
-
 ******************************************************************************************************************************
 END - GET ALL TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
@@ -1385,7 +1383,7 @@ def filter_get_all_trans(request, param_string):
             param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
         # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
         if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
-            param_string = param_string + " AND last_update_date >= '" + value_d +"' AND last_update_date <= '" + filt_dict['filterDeletedDateTo'] +"'"
+            param_string = param_string + " AND date(last_update_date) >= '" + value_d +"' AND date(last_update_date) <= '" + filt_dict['filterDeletedDateTo'] +"'"
         # End of Addition
         if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
             param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
@@ -1685,7 +1683,7 @@ def get_all_trashed_transactions(request):
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL"
 
-        trans_query_string = """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", last_update_date as "deletedDate", COALESCE(transaction_amount,0) as "amount", COALESCE(aggregate_amt,0) as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized from all_transactions_view
+        trans_query_string = """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", date(last_update_date) as "deletedDate", COALESCE(transaction_amount,0) as "amount", COALESCE(aggregate_amt,0) as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind = 'Y'"""
 
         if sortcolumn and sortcolumn != 'default':
