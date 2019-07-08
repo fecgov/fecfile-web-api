@@ -45,13 +45,13 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
-  public  memoCode: boolean = false;
+  public memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
   private _formSubmitted: boolean = false;
-  private readonly _contributionAggregateValue: number = 0.00;
+  private readonly _contributionAggregateValue: number = 0.0;
   private readonly _memoCodeValue: string = 'X';
 
   constructor(
@@ -65,7 +65,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
-    private _decimalPipe: DecimalPipe,    
+    private _decimalPipe: DecimalPipe
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -78,10 +78,9 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    if (this._reportType === null || typeof this._reportType === 'undefined' ){
+    if (this._reportType === null || typeof this._reportType === 'undefined') {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }
-
 
     this.frmIndividualReceipt = this._fb.group({});
 
@@ -127,7 +126,7 @@ export class IndividualReceiptComponent implements OnInit {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
-      }        
+      }
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -146,7 +145,7 @@ export class IndividualReceiptComponent implements OnInit {
     /**
      * Adds alphanumeric validation for the zip code field.
      */
-    if (fieldName === 'ContributorZip') {
+    if (fieldName === 'zip_code') {
       formValidators.push(alphaNumeric());
     }
 
@@ -185,10 +184,8 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if(this.memoCode) {
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-          Validators.required
-        ]);
+      if (this.memoCode) {
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
 
         this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
       } else {
@@ -199,7 +196,7 @@ export class IndividualReceiptComponent implements OnInit {
           ]);
 
           this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
-        }        
+        }
       }
     }
 
@@ -233,7 +230,7 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
- /**
+  /**
    * Updates the contribution aggregate field once contribution ammount is entered.
    *
    * @param      {Object}  e       The event object.
@@ -264,7 +261,7 @@ export class IndividualReceiptComponent implements OnInit {
     //   )
     //   .subscribe(resp => {
     //     console.log('resp: ', resp);
-    //   });    
+    //   });
   }
 
   /**
@@ -298,7 +295,7 @@ export class IndividualReceiptComponent implements OnInit {
           if (field === 'memo_code') {
             if (this.memoCode) {
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
-            } 
+            }
           } else {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
           }
@@ -323,17 +320,17 @@ export class IndividualReceiptComponent implements OnInit {
                   };
 
                   this._messageService.sendMessage(message);
-                });                
+                });
               }
             }
           }
-  
+
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(this._contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-          
+
           localStorage.removeItem(`form_${this._formType}_receipt`);
 
           window.scrollTo(0, 0);
@@ -364,7 +361,7 @@ export class IndividualReceiptComponent implements OnInit {
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    if (form3XReportType === null || typeof form3XReportType === 'undefined' ){
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }
 
