@@ -16,6 +16,7 @@ export interface GetTransactionsResponse {
   transactions: TransactionModel[];
   totalAmount: number;
   totalTransactionCount: number;
+  totalPages: number;
 
   // remove after API is renamed.
   itemsPerPage: number;

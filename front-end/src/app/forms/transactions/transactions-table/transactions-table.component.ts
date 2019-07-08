@@ -258,6 +258,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.numberOfPages = res.totalPages;
         this.allTransactionsSelected = false;
       });
   }
@@ -294,10 +295,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
       page, this.config.itemsPerPage,
-      // serverSortColumnName,
       this.currentSortedColumnName,
       sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
+
+        this.transactionsModel = [];
+
+        // fixes an issue where no items shown when current page != 1 and new filter
+        // result has only 1 page.
+        if (res.totalPages === 1) {
+          this.config.currentPage = 1;
+        }
 
         this._transactionsService.addUIFileds(res);
 
@@ -305,12 +313,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         // handle non-numeric amounts
         // TODO handle this server side in API
-        for (const model of this.transactionsModel) {
-          model.amount = model.amount ? model.amount : 0;
-          model.aggregate = model.aggregate ? model.aggregate : 0;
-        }
+        // for (const model of this.transactionsModel) {
+        //   model.amount = model.amount ? model.amount : 0;
+        //   model.aggregate = model.aggregate ? model.aggregate : 0;
+        // }
 
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.numberOfPages = res.totalPages;
         this.allTransactionsSelected = false;
       });
   }
@@ -752,7 +761,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     let start = 0;
     let end = 0;
-    this.numberOfPages = 0;
+    // this.numberOfPages = 0;
     this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
@@ -762,15 +771,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
       && this.transactionsModel.length > 0) {
-      this.calculateNumberOfPages();
+      // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
-        end = this.transactionsModel.length;
+        // end = this.transactionsModel.length;
+        end = this.config.totalItems;
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
         start = (end - this.config.itemsPerPage) + 1;
       }
+      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
+      // if (end > this.transactionsModel.length) {
+      //   end = this.transactionsModel.length;
+      // }
     }
     this.firstItemOnPage = start;
     this.lastItemOnPage = end;
