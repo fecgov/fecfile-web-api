@@ -1568,8 +1568,10 @@ def get_all_transactions(request):
                 else:
                     for d in forms_obj:
                         for i in d:
-                            if not d[i]:
+                            if not d[i] and i not in ['transaction_amount', 'aggregate_amt']:
                                 d[i] = ''
+                            elif not d[i]:
+                                d[i] = 0
                         #agg_amount = get_aggregate_amount(d['transaction_id'])
                         #d['aggregate_amount'] =round(agg_amount, 2)   
                     status_value = status.HTTP_200_OK
@@ -1772,7 +1774,7 @@ def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cm
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0), ( select COALESCE(sum(contribution_amount),0) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(contribution_amount,0), ( select COALESCE(sum(contribution_amount),0) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.memo_code IS NULL AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_receipts_for_summary_table_sql function is throwing an error: ' + str(e))
@@ -1798,7 +1800,7 @@ def period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_d
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute("SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE T2.memo_code IS NULL AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
+            cursor.execute("SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE t2.memo_code IS NULL AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'", [calendar_start_dt, calendar_end_dt, cmte_id, report_id])
             return cursor.fetchall()
     except Exception as e:
         raise Exception('The period_disbursements_for_summary_table_sql function is throwing an error: ' + str(e))
@@ -2731,3 +2733,105 @@ def print_preview_pdf(request):
             return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
     except Exception:
         raise
+"""
+*********************************************************************************************************************************************
+end print priview api
+*********************************************************************************************************************************************
+"""
+"""
+**********************************************************************************************************************************************
+Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
+**********************************************************************************************************************************************
+"""
+
+@api_view(['GET', 'POST'])
+def create_contacts_view(request):
+    try:
+        # print("request.data: ", request.data)
+        cmte_id = request.user.username
+        param_string = ""
+        page_num = int(request.data.get('page', 1))
+        descending = request.data.get('descending', 'false')
+        sortcolumn = request.data.get('sortColumnName')
+        itemsperpage = request.data.get('itemsPerPage', 5)
+        search_string = request.data.get('search')
+        #import ipdb;ipdb.set_trace()
+        params = request.data.get('filters', {})
+        keywords = params.get('keywords')
+        if str(descending).lower() == 'true':
+            descending = 'DESC'
+        else:
+            descending = 'ASC'
+
+        keys = ['cmte_id', 'id', 'type', 'name', 'occupation', 'employer' ]
+        search_keys = ['cmte_id', 'id', 'type', 'name', 'occupation', 'employer']
+        if search_string:
+            for key in search_keys:
+                if not param_string:
+                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                else:
+                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+            param_string = param_string + " )"
+        keywords_string = ''
+        if keywords:
+            for key in keys:
+                for word in keywords:
+                    if '"' in word:
+                        continue
+                    elif "'" in word:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+                    else:
+                        if not keywords_string:
+                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                        else:
+                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+            keywords_string = keywords_string + " )"
+        param_string = param_string + keywords_string
+        
+        
+        trans_query_string = """SELECT cmte_id, id,type, name, occupation, employer from all_contacts_view
+                                    where cmte_id='""" + cmte_id + """' """ + param_string 
+        # print("trans_query_string: ",trans_query_string)
+        # import ipdb;ipdb.set_trace()
+        if sortcolumn and sortcolumn != 'default':
+            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+        elif sortcolumn == 'default':
+            trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+                forms_obj = data_row[0]
+                if forms_obj is None:
+                    forms_obj =[]
+                    status_value = status.HTTP_200_OK
+                else:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i]:
+                                d[i] = ''
+                      
+                    status_value = status.HTTP_200_OK
+        
+        #import ipdb; ipdb.set_trace()
+        total_count = len(forms_obj)
+        paginator = Paginator(forms_obj, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        forms_obj = paginator.page(page_num)
+        json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
+                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+        return Response(json_result, status=status_value)
+    except Exception as e:
+        return Response("The contact_views API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+*****************************************************************************************************************************
+END - GET ALL TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""

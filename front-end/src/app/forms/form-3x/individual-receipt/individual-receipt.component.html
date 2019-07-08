@@ -1,5 +1,5 @@
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt" (ngSubmit)="doValidateReceipt()">
+  <form [formGroup]="frmIndividualReceipt" >
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -64,7 +64,7 @@
                         [attr.type]="col?.type"
                         [attr.name]="col?.name"
                         [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                        [attr.value]="col?.name === 'contribution_aggregate' ? '0.00' : null"
+                        [attr.value]="col?.value"
                         [maxlength]="col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
@@ -130,6 +130,7 @@
                     [style.height]="col?.height"
                     [attr.type]="col?.type"
                     [attr.name]="col?.name"
+                    [attr.value]="col?.value"
                     [checked]="col?.name === 'memo_code' ? memoCode : null"
                     [formControlName]="col?.name"
                     (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
@@ -188,7 +189,7 @@
               <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
-              <button class="btn btn-secondary btn-right" type="submit">
+              <button class="btn btn-secondary btn-right" (click)="doValidateReceipt()">
                 Save &amp; Add Transaction
               </button>
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
