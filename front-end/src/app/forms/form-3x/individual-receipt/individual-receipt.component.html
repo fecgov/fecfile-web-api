@@ -1,5 +1,5 @@
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt" (ngSubmit)="doValidateReceipt()">
+  <form [formGroup]="frmIndividualReceipt" >
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -189,7 +189,7 @@
               <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
-              <button class="btn btn-secondary btn-right" type="submit">
+              <button class="btn btn-secondary btn-right" (click)="doValidateReceipt()">
                 Save &amp; Add Transaction
               </button>
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">

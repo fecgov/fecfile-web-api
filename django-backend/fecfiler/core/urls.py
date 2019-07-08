@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^core/create_json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
     url(r'^core/print_preview_pdf$', views.print_preview_pdf, name='print_preview_pdf'),
     url(r'^core/reports$', views.reports, name='reports'),
+    url(r'^core/create_contacts_view$', views.create_contacts_view, name='create_contacts_view'), 
 
 
 ]
