@@ -249,7 +249,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         page, this.config.itemsPerPage,
         serverSortColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
+
         this.transactionsModel = [];
+
+        // fixes an issue where no items shown when current page != 1 and new filter
+        // result has only 1 page.
+        if (res.totalPages === 1) {
+          this.config.currentPage = 1;
+        }
 
         this._transactionsService.addUIFileds(res);
 
