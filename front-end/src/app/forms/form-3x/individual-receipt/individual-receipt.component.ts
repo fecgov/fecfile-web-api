@@ -41,11 +41,11 @@ export class IndividualReceiptComponent implements OnInit {
   public formFields: any = [];
   public formVisible: boolean = false;
   public hiddenFields: any = [];
+  public memoCode: boolean = false;
   public testForm: FormGroup;
   public states: any = [];
 
   private _formType: string = '';
-  public memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
@@ -241,11 +241,12 @@ export class IndividualReceiptComponent implements OnInit {
     /**
      * TODO: Look into why read only input returns null.
      */
-    // this.frmIndividualReceipt.get('contribution_aggregate').value;
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
+    if (!this.memoCode) {
+      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+      const value: string = this._decimalPipe.transform(total, '.2-2');
 
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+      this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+    }
 
     /**
      * TODO: To be implemented in the future.
