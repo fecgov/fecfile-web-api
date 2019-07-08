@@ -88,7 +88,7 @@ def validate_sa_data(data):
     validate: 1. mandatory sa fields; 2. valid line number and transaction types
     """
     check_mandatory_fields_SA(data, MANDATORY_FIELDS_SCHED_A)
-    validate_transaction_type(data)
+    # validate_transaction_type(data)
 
 
 def validate_transaction_type(data):
