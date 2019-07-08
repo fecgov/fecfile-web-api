@@ -18,6 +18,7 @@ export enum FilterTypes {
   amount = 'amount',
   aggregateAmount = 'aggregateAmount',
   date = 'date',
+  deletedDate = 'deletedDate',
   state = 'state',
   memoCode = 'memoCode',
   itemizations = 'itemizations'
@@ -47,7 +48,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   public formType = '';
   public reportId = '0';
-  public view: string = ActiveView.transactions;
+  public view: ActiveView = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
   public editView = ActiveView.edit;
@@ -594,6 +595,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showRecycleBin() {
     this.view = ActiveView.recycleBin;
+
+      // Inform the filter component of the view change
+      this._transactionsMessageService.sendSwitchFilterViewMessage(ActiveView.recycleBin);
   }
 
 
@@ -602,6 +606,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showTransactions() {
     this.view = ActiveView.transactions;
+
+    // Inform the filter component of the view change
+    this._transactionsMessageService.sendSwitchFilterViewMessage(ActiveView.transactions);
   }
 
 

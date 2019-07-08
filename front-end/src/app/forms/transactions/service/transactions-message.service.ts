@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
+import { ActiveView } from '../transactions.component';
 
 
 /**
@@ -18,6 +19,7 @@ export class TransactionsMessageService {
   private editTransactionSubject = new Subject<any>();
   private showTransactionsSubject = new Subject<any>();
   private removeFilterSubject = new Subject<any>();
+  private switchFilterViewSubject = new Subject<any>();
 
 
   /**
@@ -163,6 +165,33 @@ export class TransactionsMessageService {
    */
   public getRemoveFilterMessage(): Observable<any> {
     return this.removeFilterSubject.asObservable();
+  }
+
+
+  /**
+   * A publisher uses this method to send a message to the Transactions Filter
+   * Component to change the filter fields for the particular type of table view shown.
+   *
+   * @param message
+   */
+  public sendSwitchFilterViewMessage(message: ActiveView) {
+    this.switchFilterViewSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Switch Filter View message.
+   */
+  public clearSwitchFilterViewMessage() {
+    this.switchFilterViewSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Switch Filter View message.
+   */
+  public getSwitchFilterViewMessage(): Observable<ActiveView> {
+    return this.switchFilterViewSubject.asObservable();
   }
 
 }

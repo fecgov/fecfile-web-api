@@ -9,7 +9,7 @@ import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
-import { FilterTypes } from '../transactions.component';
+import { FilterTypes, ActiveView } from '../transactions.component';
 
 
 /**
@@ -84,6 +84,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
+  public isHideDeletedDateFilter: boolean;
   public isHideAmountFilter: boolean;
   public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
@@ -99,8 +100,11 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterAggregateAmountMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
+  public filterDeletedDateFrom: Date = null;
+  public filterDeletedDateTo: Date = null;
   public filterMemoCode = false;
   public dateFilterValidation: ValidationErrorModel;
+  public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
   public aggregateAmountFilterValidation: ValidationErrorModel;
 
@@ -109,10 +113,16 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   private removeFilterSubscription: Subscription;
 
+  /**
+   * Subscription for switch filters for ActiveView of the traansaction table.
+   */
+  private switchFilterViewSubscription: Subscription;
+
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
   private msEdge = true;
+  private view = ActiveView.transactions;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -130,6 +140,23 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
           }
         }
       );
+
+      this.switchFilterViewSubscription = this._transactionsMessageService.getSwitchFilterViewMessage()
+      .subscribe(
+        (message: ActiveView) => {
+          switch (message) {
+            case ActiveView.transactions:
+              this.view = message;
+              break;
+            case ActiveView.recycleBin:
+              this.view = message;
+              break;
+            default:
+              this.view = ActiveView.transactions;
+              console.log('unexpected ActiveView received: ' + message);
+          }
+        }
+      );
   }
 
 
@@ -142,6 +169,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
+    this.filterDeletedDateFrom = null;
+    this.filterDeletedDateTo = null;
     this.filterAmountMin = null;
     this.filterAmountMax = null;
     this.filterAggregateAmountMin = null;
@@ -149,6 +178,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
+    this.isHideDeletedDateFilter = true;
     this.isHideAmountFilter = true;
     this.isHideAggregateAmountFilter = true;
     this.isHideStateFilter = true;
@@ -171,6 +201,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.removeFilterSubscription.unsubscribe();
+    this.switchFilterViewSubscription.unsubscribe();
   }
 
 
@@ -189,6 +220,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideDateFilter = !this.isHideDateFilter;
   }
 
+
+  /**
+   * Toggle visibility of the Deleted Date filter
+   */
+  public toggleDeletedDateFilterItem() {
+    this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
+  }
 
   /**
    * Toggle visibility of the Amount filter
@@ -382,22 +420,31 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       modified = true;
     }
 
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
     if (this.filterMemoCode) {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
     }
-    console.log("itemizations = ", this.itemizations)
+    console.log('itemizations = ', this.itemizations)
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
-        console.log("I.itemized", I.itemized);
+        console.log('I.itemized', I.itemized);
         filterItemizations.push(I.itemized);
-        console.log ("itemization tag found...");
+        console.log ('itemization tag found...');
         modified = true;
       }
     }
     filters.filterItemizations = filterItemizations;
-    console.log("filters.filterItemizations =", filters.filterItemizations);
+    console.log('filters.filterItemizations =', filters.filterItemizations);
     
     filters.show = modified;
     this._transactionsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
@@ -438,6 +485,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
+    this.filterDeletedDateFrom = null;
+    this.filterDeletedDateTo = null;
     this.filterMemoCode = false;
   }
 
@@ -448,6 +497,22 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public clearAndApplyFilters() {
         this.clearFilters();
         this.applyFilters(true);
+  }
+
+
+  /**
+   * Check if the view to show is Transactions.
+   */
+  public isTransactionViewActive() {
+    return this.view === ActiveView.transactions ? true : false;
+  }
+
+
+  /**
+   * Check if the view to show is Recycle Bin.
+   */
+  public isRecycleBinViewActive() {
+    return this.view === ActiveView.recycleBin ? true : false;
   }
 
 
@@ -613,8 +678,11 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        // this.isHideDateFilter = (this.filterDateFrom === null && this.filterDateFrom === null);
         this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
+
+        this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
+        this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
+        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateFrom) ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
@@ -636,6 +704,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   private initValidationErrors() {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
+    this.deletedDateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
     this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
   }
@@ -668,6 +737,26 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.isHideDateFilter = false;
       return false;
     }
+
+    if (this.filterDeletedDateFrom !== null && this.filterDeletedDateTo === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'To Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Date must preceed To Date';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+
 
     if (this.filterAmountMin !== null && this.filterAmountMax === null) {
       this.amountFilterValidation.isError = true;
@@ -739,6 +828,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
           case FilterTypes.date:
             this.filterDateFrom = null;
             this.filterDateTo = null;
+            break;
+          case FilterTypes.deletedDate:
+            this.filterDeletedDateFrom = null;
+            this.filterDeletedDateTo = null;
             break;
           case FilterTypes.amount:
             this.filterAmountMin = null;
