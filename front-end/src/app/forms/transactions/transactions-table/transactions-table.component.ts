@@ -228,7 +228,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
-    // smahal: quick fix for sortCol issue not retrieved from cache
+    // smahal: quick fix for sortCol issue not retrived from cache
     if (!sortedCol) {
       this.setSortDefault();
       sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -242,11 +242,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // // temp fix for sprint 13 demo
-    // if (this.currentSortedColumnName === 'default') {
-    //   this.currentSortedColumnName = 'name';
-    // }
-
     const serverSortColumnName = this._transactionsService.
       mapToSingleServerName(this.currentSortedColumnName);
 
@@ -254,19 +249,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         page, this.config.itemsPerPage,
         serverSortColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
+
         this.transactionsModel = [];
 
-        // // because the backend receives 'default' as the column name
-        // // AND because 'default' is not a column known to this component in
-        // // this.sortableColumns, we must tell it make the name column appear sorted.
-        // // Ideally the columns name and direction sorted should come back in the response
-        // // from the API call.  TODO do this in other sprint/release.
-        // // Or change the API interface to accept a flag for default rather than using
-        // // the column name.
-
-        // if (this.currentSortedColumnName === 'default') {
-        //   this.currentSortedColumnName = this._tableService.changeSortDirection('name', this.sortableColumns);
-        // }
+        // fixes an issue where no items shown when current page != 1 and new filter
+        // result has only 1 page.
+        if (res.totalPages === 1) {
+          this.config.currentPage = 1;
+        }
 
         this._transactionsService.addUIFileds(res);
 
@@ -275,6 +265,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.numberOfPages = res.totalPages;
         this.allTransactionsSelected = false;
       });
   }
@@ -287,10 +278,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 */
   public getRecyclingPage(page: number): void {
 
-    this.calculateNumberOfPages();
+    this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+
+    // smahal: quick fix for sortCol issue not retrived from cache
+    if (!sortedCol) {
+      this.setSortDefault();
+      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    }
 
     if (sortedCol) {
       if (sortedCol.descending === undefined || sortedCol.descending === null) {
@@ -300,32 +297,37 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // temp fix for sprint 13 demo
-    if (this.currentSortedColumnName === 'default') {
-      this.currentSortedColumnName = 'name';
-    }
-
-    const serverSortColumnName = this._transactionsService.
-    mapToSingleServerName(this.currentSortedColumnName);
+    // const serverSortColumnName = this._transactionsService.
+    //   mapToSingleServerName(this.currentSortedColumnName);
 
     this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
       page, this.config.itemsPerPage,
-      serverSortColumnName, sortedCol.descending, this.filters)
+      this.currentSortedColumnName,
+      sortedCol.descending, this.filters)
       .subscribe((res: GetTransactionsResponse) => {
 
+        this.transactionsModel = [];
+
+        // fixes an issue where no items shown when current page != 1 and new filter
+        // result has only 1 page.
+        if (res.totalPages === 1) {
+          this.config.currentPage = 1;
+        }
+
         this._transactionsService.addUIFileds(res);
-        this._transactionsService.mockApplyFilters(res, this.filters);
-        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
 
-        this.transactionsModel = this._transactionsService.sortTransactions(
-          transactionsModelL, this.currentSortedColumnName, sortedCol.descending);
+        this.transactionsModel = res.transactions;
 
-        this.config.totalItems = res.totalTransactionCount;
+        // handle non-numeric amounts
+        // TODO handle this server side in API
+        // for (const model of this.transactionsModel) {
+        //   model.amount = model.amount ? model.amount : 0;
+        //   model.aggregate = model.aggregate ? model.aggregate : 0;
+        // }
 
-        // If a row was deleted, the current page may be greated than the last page
-        // as result of the delete.
-        this.config.currentPage = (page > this.numberOfPages && this.numberOfPages !== 0)
-          ? this.numberOfPages : page;
+        this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.numberOfPages = res.totalPages;
+        this.allTransactionsSelected = false;
       });
   }
 
@@ -566,7 +568,38 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Trash all transactions selected by the user.
    */
   public trashAllSelected(): void {
-    alert('Trash all transactions is not yet supported');
+    // alert('Trash all transactions is not yet supported');
+
+    let trxIds = '';
+    const selectedTransactions: Array<TransactionModel> = [];
+    for (const trx of this.transactionsModel) {
+      if (trx.selected) {
+        selectedTransactions.push(trx);
+        trxIds += trx.transactionId + ', ';
+      }
+    }
+
+    // trxIds.trimRight();
+    // trxIds = trxIds.trimRight();
+    trxIds = trxIds.substr(0, trxIds.length - 2);
+
+    this._dialogService
+    .confirm('You are about to delete these transactions. ' + trxIds,
+      ConfirmModalComponent,
+      'Caution!')
+    .then(res => {
+      if (res === 'okay') {
+        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
+          .subscribe((res: GetTransactionsResponse) => {
+            this.getTransactionsPage(this.config.currentPage);
+            this._dialogService
+              .confirm('Transaction has been successfully deleted and sent to the recycle bin. '
+                + trxIds,
+                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+          });
+      } else if (res === 'cancel') {
+      }
+    });
   }
 
 
@@ -615,8 +648,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to trash
    */
-  public trashTransaction(): void {
-    alert('Trash transaction is not yet supported');
+  public trashTransaction(trx: TransactionModel): void {
+
+    this._dialogService
+    .confirm('You are about to delete this transaction ' + trx.transactionId + '.',
+      ConfirmModalComponent,
+      'Caution!')
+    .then(res => {
+      if (res === 'okay') {
+        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, [trx])
+          .subscribe((res: GetTransactionsResponse) => {
+            this.getTransactionsPage(this.config.currentPage);
+            this._dialogService
+              .confirm('Transaction has been successfully deleted and sent to the recycle bin.'
+                + trx.transactionId,
+                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+          });
+      } else if (res === 'cancel') {
+      }
+    });
   }
 
 
@@ -633,7 +683,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'Caution!')
       .then(res => {
         if (res === 'okay') {
-          this._transactionsService.restoreTransaction(trx)
+          // this._transactionsService.restoreTransaction(trx)
+          //   .subscribe((res: GetTransactionsResponse) => {
+          this._transactionsService.trashOrRestoreTransactions('restore', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService
@@ -716,7 +768,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     let start = 0;
     let end = 0;
-    this.numberOfPages = 0;
+    // this.numberOfPages = 0;
     this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
@@ -726,15 +778,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
       && this.transactionsModel.length > 0) {
-      this.calculateNumberOfPages();
+      // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
-        end = this.transactionsModel.length;
+        // end = this.transactionsModel.length;
+        end = this.config.totalItems;
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
         start = (end - this.config.itemsPerPage) + 1;
       }
+      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
+      // if (end > this.transactionsModel.length) {
+      //   end = this.transactionsModel.length;
+      // }
     }
     this.firstItemOnPage = start;
     this.lastItemOnPage = end;

@@ -18,6 +18,7 @@ export enum FilterTypes {
   amount = 'amount',
   aggregateAmount = 'aggregateAmount',
   date = 'date',
+  deletedDate = 'deletedDate',
   state = 'state',
   memoCode = 'memoCode',
   itemizations = 'itemizations'
@@ -47,7 +48,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   public formType = '';
   public reportId = '0';
-  public view: string = ActiveView.transactions;
+  public view: ActiveView = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
   public editView = ActiveView.edit;
@@ -169,9 +170,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       const categoryGroup = [];
 
       // is tag showing? Then modify it is the curr position
-      // TODO put type strings in constants file as an enumeration
-      // They are also used in the filter component as well.
-
       let categoryTag = false;
       for (const tag of this.tagArray) {
         if (tag.type === FilterTypes.category) {
@@ -189,6 +187,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
         this.tagArray.push({type: FilterTypes.category, prefix: 'Type', group: categoryGroup});
       }
+    } else {
+      this.removeTagArrayItem(FilterTypes.category);
     }
 
 
@@ -282,6 +282,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
         this.tagArray.push({type: FilterTypes.state, prefix: null, group: stateGroup});
       }
+    } else {
+      this.removeTagArrayItem(FilterTypes.state);
     }
 
     // Memo Code
@@ -325,6 +327,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
           }
           this.tagArray.push({type: FilterTypes.itemizations, prefix: 'Itemized', group: itemizedGroup});
         }
+      } else {
+        this.removeTagArrayItem(FilterTypes.itemizations);
       }
     }
 
@@ -544,13 +548,17 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   private removeTagArrayItem(type: FilterTypes) {
     let i = 0;
+    let typeFound = false;
     for (const tag of this.tagArray) {
       if (tag.type === type) {
+        typeFound = true;
         break;
       }
       i++;
     }
-    this.tagArray.splice(i, 1);
+    if (typeFound) {
+      this.tagArray.splice(i, 1);
+    }
   }
 
 
@@ -587,6 +595,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showRecycleBin() {
     this.view = ActiveView.recycleBin;
+
+      // Inform the filter component of the view change
+      this._transactionsMessageService.sendSwitchFilterViewMessage(ActiveView.recycleBin);
   }
 
 
@@ -595,6 +606,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showTransactions() {
     this.view = ActiveView.transactions;
+
+    // Inform the filter component of the view change
+    this._transactionsMessageService.sendSwitchFilterViewMessage(ActiveView.transactions);
   }
 
 
