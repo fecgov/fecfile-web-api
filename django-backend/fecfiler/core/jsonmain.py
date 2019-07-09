@@ -657,7 +657,7 @@ def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
     try:
-
+        print(" request = ", request)
         report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         form_type = request.data.get('form_type')
@@ -695,9 +695,26 @@ def create_json_builders(request):
                 resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
             elif call_from == "Submit":
-                data_obj = request
+                #data_obj = request
+                data_obj = {'call_from': request.data.get('call_from'),
+                            'committeeId': request.data.get('committeeId'),
+                            'password': request.data.get('password'),
+                            'formType': request.data.get('formType'),
+                            'newAmendIndicator': request.data.get('newAmendIndicator'),
+                            'report_id': request.data.get('report_id'),
+                            'reportSequence': request.data.get('reportSequence'),
+                            'emailAddress1': request.data.get('emailAddress1'),
+                            'reportType': request.data.get('reportType'),
+                            'coverageStartDate': request.data.get('coverageStartDate'),
+                            'coverageEndDate': request.data.get('coverageEndDate'),
+                            'originalFECId': request.data.get('originalFECId'),
+                            'backDoorCode': request.data.get('backDoorCode'),
+                            'emailAddress2': request.data.get('emailAddress2'),
+                            'wait': request.data.get('wait')
+                            }
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
-
+                print("data_obj = ", data_obj)
+                print("file_obj = ", file_obj)
                 resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
 
             if not resp.ok:
