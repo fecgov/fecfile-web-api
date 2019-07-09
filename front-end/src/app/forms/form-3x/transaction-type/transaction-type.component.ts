@@ -201,6 +201,9 @@ export class TransactionTypeComponent implements OnInit {
   }
   
   public printPreview(): void {
+    this.frmSubmitted=false;
+    this.transactionCategorySelected=false;
+    
     this._reportTypeService.signandSaveSubmitReport('3X','Saved');
     this._reportTypeService
     .printPreviewPdf('3X', "PrintPreviewPDF")
@@ -218,5 +221,10 @@ export class TransactionTypeComponent implements OnInit {
           console.log('error: ', error);
         });/*  */
 
+        this.status.emit({
+          form: {},
+          direction: '',
+          step: 'step_2'
+        });
   }
 }
