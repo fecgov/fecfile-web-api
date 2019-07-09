@@ -49,6 +49,7 @@ export class SubmitComponent implements OnInit {
 
             localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
             localStorage.removeItem(`form_${this.form_type}_report_type`);
+            localStorage.removeItem('F3X_submit_backup');
           }
 
           localStorage.removeItem(`form_${this.form_type}_saved`);
@@ -70,6 +71,7 @@ export class SubmitComponent implements OnInit {
 
           localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
           localStorage.removeItem(`form_${this.form_type}_report_type`);
+          localStorage.removeItem('F3X_submit_backup');
         }
 
       });
