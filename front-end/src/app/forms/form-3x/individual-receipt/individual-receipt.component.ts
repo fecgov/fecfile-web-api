@@ -22,6 +22,7 @@ import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/For
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -65,7 +66,8 @@ export class IndividualReceiptComponent implements OnInit {
     private _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
-    private _decimalPipe: DecimalPipe
+    private _decimalPipe: DecimalPipe,
+    private _reportTypeService: ReportTypeService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -386,5 +388,25 @@ export class IndividualReceiptComponent implements OnInit {
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
+  }
+
+  public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
+    this._reportTypeService
+    .printPreviewPdf('3X', "PrintPreviewPDF")
+    .subscribe(res => {
+      if(res) {
+            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
+           
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
+            }
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });/*  */
+
   }
 }
