@@ -22,7 +22,6 @@ import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/For
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -37,19 +36,23 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
 
-  public formFields: any = [];
+  public checkBoxVal: boolean = false;
   public frmIndividualReceipt: FormGroup;
-  public hiddenFields: any = [];
-  public testForm: FormGroup;
+  public formFields: any = [];
   public formVisible: boolean = false;
+  public hiddenFields: any = [];
+  public memoCode: boolean = false;
+  public testForm: FormGroup;
   public states: any = [];
 
   private _formType: string = '';
-  private _memoCode: boolean = false;
   private _reportType: any = {};
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
+  private _formSubmitted: boolean = false;
+  private readonly _contributionAggregateValue: number = 0.0;
+  private readonly _memoCodeValue: string = 'X';
 
   constructor(
     private _http: HttpClient,
@@ -62,8 +65,7 @@ export class IndividualReceiptComponent implements OnInit {
     private _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
-    private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService,    
+    private _decimalPipe: DecimalPipe
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -76,10 +78,9 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    if (this._reportType === null || typeof this._reportType === 'undefined' ){
+    if (this._reportType === null || typeof this._reportType === 'undefined') {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }
-
 
     this.frmIndividualReceipt = this._fb.group({});
 
@@ -125,7 +126,7 @@ export class IndividualReceiptComponent implements OnInit {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
         });
-      }        
+      }
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -144,7 +145,7 @@ export class IndividualReceiptComponent implements OnInit {
     /**
      * Adds alphanumeric validation for the zip code field.
      */
-    if (fieldName === 'ContributorZip') {
+    if (fieldName === 'zip_code') {
       formValidators.push(alphaNumeric());
     }
 
@@ -183,10 +184,8 @@ export class IndividualReceiptComponent implements OnInit {
       const cvgStartDate: string = this._reportType.cvgStartDate;
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
-      if (this._memoCode) {
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-          Validators.required
-        ]);
+      if (this.memoCode) {
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
 
         this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
       } else {
@@ -197,7 +196,7 @@ export class IndividualReceiptComponent implements OnInit {
           ]);
 
           this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
-        }        
+        }
       }
     }
 
@@ -231,22 +230,23 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
- /**
+  /**
    * Updates the contribution aggregate field once contribution ammount is entered.
    *
    * @param      {Object}  e       The event object.
    */
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = '0.00';
+    const contributionAggregate: string = String(this._contributionAggregateValue);
     /**
      * TODO: Look into why read only input returns null.
      */
-    // this.frmIndividualReceipt.get('contribution_aggregate').value;
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
+    if (!this.memoCode) {
+      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+      const value: string = this._decimalPipe.transform(total, '.2-2');
 
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+      this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+    }
 
     /**
      * TODO: To be implemented in the future.
@@ -262,11 +262,11 @@ export class IndividualReceiptComponent implements OnInit {
     //   )
     //   .subscribe(resp => {
     //     console.log('resp: ', resp);
-    //   });    
+    //   });
   }
 
   /**
-   * Updates value of _memoCode variable.
+   * Updates vaprivate _memoCode variable.
    *
    * @param      {Object}  e      The event object.
    */
@@ -274,10 +274,11 @@ export class IndividualReceiptComponent implements OnInit {
     const { checked } = e.target;
 
     if (checked) {
-      this._memoCode = checked;
+      this.memoCode = checked;
+      console.log('this.memoCode: ', this.memoCode);
     } else {
       this._validateContributionDate();
-      this._memoCode = checked;
+      this.memoCode = checked;
     }
   }
 
@@ -292,7 +293,13 @@ export class IndividualReceiptComponent implements OnInit {
         if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else {
-          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          if (field === 'memo_code') {
+            if (this.memoCode) {
+              receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+            }
+          } else {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          }
         }
       }
 
@@ -304,16 +311,26 @@ export class IndividualReceiptComponent implements OnInit {
 
       this._receiptService.saveSchedule(this._formType).subscribe(res => {
         if (res) {
-          this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
-            const message: any = {
-              formType: this._formType,
-              totals: resp
-            };
+          if (res.hasOwnProperty('memo_code')) {
+            if (typeof res.memo_code === 'object') {
+              if (res.memo_code === null) {
+                this._receiptService.getSchedule(this._formType, res).subscribe(resp => {
+                  const message: any = {
+                    formType: this._formType,
+                    totals: resp
+                  };
 
-            this._messageService.sendMessage(message);
-          });
+                  this._messageService.sendMessage(message);
+                });
+              }
+            }
+          }
 
+          this._formSubmitted = true;
+          this.memoCode = false;
           this.frmIndividualReceipt.reset();
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(this._contributionAggregateValue);
+          this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
 
@@ -345,7 +362,7 @@ export class IndividualReceiptComponent implements OnInit {
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    if (form3XReportType === null || typeof form3XReportType === 'undefined' ){
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }
 
@@ -369,25 +386,5 @@ export class IndividualReceiptComponent implements OnInit {
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
-  }
-
-  public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing IndividualReceiptComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
-
   }
 }
