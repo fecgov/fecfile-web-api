@@ -68,9 +68,14 @@ export class SignComponent implements OnInit {
 
     if (this.formType === '3X'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      if (this._form_details === null || typeof this._form_details === 'undefined' ){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+       }
     } else if (this.formType === '99'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
     }
+
+    console.log ("this._form_details = ", this._form_details);
 
     this._setForm();
 
@@ -92,14 +97,19 @@ export class SignComponent implements OnInit {
       if(form_99_details) {
         this.typeSelected = form_99_details.reason;
       }
-    }  else if(this.formType === '3X') {
-      const form_3X_report_type: any = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
-      console.log("form_3X_report_type", form_3X_report_type);
-      if(form_3X_report_type) {
-        if (form_3X_report_type.hasOwnProperty('reportType')) {
-          this.typeSelected = form_3X_report_type.reportType;
-        }      
-      }
+    }else if(this.formType === '3X') {
+       let form_3X_report_type: any = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+       if (form_3X_report_type === null || typeof form_3X_report_type === 'undefined' ){
+          form_3X_report_type = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        }   
+
+        if(form_3X_report_type) {
+          if (form_3X_report_type.hasOwnProperty('reportType')) {
+            this.typeSelected = form_3X_report_type.reportType + "(" + form_3X_report_type.reportTypeDescription + ")" ;
+          }  else if (form_3X_report_type.hasOwnProperty('reporttype')) {
+            this.typeSelected = form_3X_report_type.reporttype + "(" + form_3X_report_type.reporttypedescription + ")" ;
+          }        
+        }
     }
   }
 
@@ -167,6 +177,7 @@ export class SignComponent implements OnInit {
   }
 
   private _setForm(): void {
+    
     if(this._form_details) {
       if(this.formType === '99') {
         this.typeSelected = this._form_details.reason;
@@ -182,25 +193,49 @@ export class SignComponent implements OnInit {
           }
         }
       } else if(this.formType === '3X') {
-        console.log("this._form_details =", this._form_details);
-        //this.typeSelected = this._form_details.reportType;
+        if(this._form_details) {
+          if (this._form_details.hasOwnProperty('reportType')) {
+            this.typeSelected = `${this._form_details.reportType} (${this._form_details.reportTypeDescription})` ;
 
-        if(this._form_details.reportType) {
-          if (this._form_details.reportType.hasOwnProperty('reportType')) {
-            this.typeSelected = this._form_details.reportType.reportType;
-          }      
+          } else if (this._form_details.hasOwnProperty('reporttype')) {
+            this.typeSelected = `${this._form_details.reporttype} (${this._form_details.reporttypedescription})` ;
+          }   
+        } 
+
+        if(this._form_details.hasOwnProperty('additionalEmail1')){
+          if(this._form_details.additionalEmail1.length >= 1) {
+            if(this._form_details.additionalEmail1 === '-') {
+              this._form_details.additionalEmail1 = '';
+            }
+         }
+        }else if(this._form_details.hasOwnProperty('additionalemail1')){
+          if(this._form_details.additionalemail1 !== null){
+            if(this._form_details.additionalemail1.length >= 1) {
+              if(this._form_details.additionalemail1 === '-') {
+                this._form_details.additionalemail1 = '';
+              }
+          }
+         } else {
+          this._form_details.additionalemail1 = '';
+         }
         }
 
-        if(this._form_details.additionalEmail1.length >= 1) {
-          if(this._form_details.additionalEmail1 === '-') {
-            this._form_details.additionalEmail1 = '';
+        if(this._form_details.hasOwnProperty('additionalEmail2')){
+          if(this._form_details.additionalEmail2.length >= 1) {
+            if(this._form_details.additionalEmail2 === '-') {
+              this._form_details.additionalEmail2 = '';
+            }
           }
-        }
-
-        if(this._form_details.additionalEmail2.length >= 1) {
-          if(this._form_details.additionalEmail2 === '-') {
-            this._form_details.additionalEmail2 = '';
-          }
+        } else if(this._form_details.hasOwnProperty('additionalemail2')){
+          if(this._form_details.additionalemail2 !== null){
+            if(this._form_details.additionalemail2.length >= 1) {
+              if(this._form_details.additionalemail2 === '-') {
+                this._form_details.additionalemail2 = '';
+              }
+            }
+          } else {
+            this._form_details.additionalemail2 = '';
+          }  
         }
       }
       if(this.formType === '99') {
@@ -213,14 +248,26 @@ export class SignComponent implements OnInit {
           agreement: [false, Validators.requiredTrue]
         });
       } else if(this.formType === '3X') {
-        this.frmSignee = this._fb.group({
-          signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
-          additional_email_1: [this._form_details.additionalEmail1, Validators.email],
-          additional_email_2: [this._form_details.additionalEmail2, Validators.email],
-          confirm_email_1: [this._form_details.additionalEmail1, Validators.email],
-          confirm_email_2: [this._form_details.additionalEmail2, Validators.email],
-          agreement: [false, Validators.requiredTrue]
-        });
+        if(this._form_details.hasOwnProperty('additionalEmail1')){
+          this.frmSignee = this._fb.group({
+            signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
+            additional_email_1: [this._form_details.additionalEmail1, Validators.email],
+            additional_email_2: [this._form_details.additionalEmail2, Validators.email],
+            confirm_email_1: [this._form_details.additionalEmail1, Validators.email],
+            confirm_email_2: [this._form_details.additionalEmail2, Validators.email],
+            agreement: [false, Validators.requiredTrue]
+         });
+        } else if(this._form_details.hasOwnProperty('additionalemail1')){
+          this.frmSignee = this._fb.group({
+            signee: [`${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`, Validators.required],
+            additional_email_1: [this._form_details.additionalemail1, Validators.email],
+            additional_email_2: [this._form_details.additionalemail2, Validators.email],
+            confirm_email_1: [this._form_details.additionalemail1, Validators.email],
+            confirm_email_2: [this._form_details.additionalemail2, Validators.email],
+            agreement: [false, Validators.requiredTrue]
+          });
+       }
+
       }
 
     } else {
@@ -278,6 +325,11 @@ export class SignComponent implements OnInit {
 
     if (this.formType === '3X'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+
+      if (this._form_details === null || typeof this._form_details === 'undefined' ){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+       }   
+
       const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
     }  if (this.formType === '99'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
@@ -291,15 +343,24 @@ export class SignComponent implements OnInit {
       this.frmSignee.controls.additional_email_2.valid) {
 
       this.validateAdditionalEmails();
+
       if ( !this.additionalEmail1Invalid && !this.additionalEmail2Invalid){
 
         this.frmSaved = true;
         if (this.formType === '99'){
           this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
           this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
-        } else  if (this.formType === '3X'){
-          this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
-          this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+        } else if (this.formType === '3X'){
+          if(this._form_details.hasOwnProperty('additionalEmail1')){
+            this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
+          } else if(this._form_details.hasOwnProperty('additionalemail1')){
+            this._form_details.additionalemail1 = this.frmSignee.get('additional_email_1').value;
+          }   
+          if(this._form_details.hasOwnProperty('additionalEmail2')){
+            this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+          } else if(this._form_details.hasOwnProperty('additionalemail2')){
+            this._form_details.additionalemail2 = this.frmSignee.get('additional_email_2').value;
+          }  
         }
 
         if (this.formType === '99'){
@@ -309,7 +370,6 @@ export class SignComponent implements OnInit {
         }
 
         if (this.formType === '3X'){
-          console.log("saveForm called form3x  saved...");
            this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved')
           .subscribe(res => {
             if(res) {
@@ -354,11 +414,15 @@ export class SignComponent implements OnInit {
    *
    */
   public doSubmitForm(): void {
-    console.log("doSubmitForm called ...");
     let doSubmitFormSaved: boolean = false;
     if (this.formType === '3X'){
       let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+
+      if (this._form_details === null || typeof this._form_details === 'undefined' ){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+      }
+
       doSubmitFormSaved=formSaved;
     } else if (this.formType === '99'){
       let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
@@ -385,7 +449,7 @@ export class SignComponent implements OnInit {
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
       } else if (this.formType === '3X'){
          localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
-      }
+       }
          
       if(this.frmSignee.invalid) {
         if(this.frmSignee.get('agreement').value) {
@@ -435,7 +499,6 @@ export class SignComponent implements OnInit {
             });
           }
           else if (this.formType === '3X'){
-            console.log("doSubmitForm called form3x not saved...");
             this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted')
             .subscribe(res => {
              if(res) {
@@ -491,7 +554,6 @@ export class SignComponent implements OnInit {
                   }
                 }); 
               } else if (this.formType === '3X'){
-                console.log("doSubmitForm called form3x saved...");
                 this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted')
                 .subscribe(res => {
                  if(res) {
@@ -539,7 +601,16 @@ export class SignComponent implements OnInit {
         this._form_details.additional_email_1 = e.target.value;
        } else if (this.formType === '3X'){
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
-        this._form_details.additionalEmail1 = e.target.value;
+       
+        if (this._form_details === null || typeof this._form_details === 'undefined' ){
+          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        }
+
+        if(this._form_details.hasOwnProperty('additionalEmail1')){
+          this._form_details.additionalEmail1 = e.target.value;
+        } else if(this._form_details.hasOwnProperty('additionalemail1')){
+          this._form_details.additionalemail1 = e.target.value;
+        }
        }
 
        
@@ -564,11 +635,18 @@ export class SignComponent implements OnInit {
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
         this._form_details.additional_email_2 = e.target.value;
        } else if (this.formType === '3X'){
+        
         this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
-        this._form_details.additionalEmail2 = e.target.value;
-       } 
+        if (this._form_details === null || typeof this._form_details === 'undefined' ){
+          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        }
 
-       
+        if(this._form_details.hasOwnProperty('additionalEmail2')){
+          this._form_details.additionalEmail2 = e.target.value;
+        } else if(this._form_details.hasOwnProperty('additionalemail2')){
+          this._form_details.additionalemail2 = e.target.value;
+        }
+       } 
 
        if (this.formType === '99'){
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
@@ -653,6 +731,9 @@ export class SignComponent implements OnInit {
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
     } else if (this.formType === '3X'){
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      if (this._form_details === null || typeof this._form_details === 'undefined' ){
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+      }
     } 
 
     if(this.frmSignee.controls.signee.valid && this.frmSignee.controls.additional_email_1.valid &&
@@ -665,8 +746,19 @@ export class SignComponent implements OnInit {
           this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
           this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
         } else if (this.formType === '3X'){
-          this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
-          this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+          
+          if(this._form_details.hasOwnProperty('additionalEmail1')){
+            this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
+          } else if(this._form_details.hasOwnProperty('additionalemail1')){
+            this._form_details.additionalemail1 = this.frmSignee.get('additional_email_1').value;
+          }
+
+          if(this._form_details.hasOwnProperty('additionalEmail2')){
+            this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+          } else if(this._form_details.hasOwnProperty('additionalemail2')){
+            this._form_details.additionalemail2 = this.frmSignee.get('additional_email_2').value;
+          }
+
         }
 
         localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
@@ -675,7 +767,6 @@ export class SignComponent implements OnInit {
             .PreviewForm_Preview_sign_Screen({}, this.formType)
             .subscribe(res => {
               if(res) {
-                  console.log("Accessing SignComponent printPriview res ...",res);
                   window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
                   }
                 },
@@ -688,8 +779,6 @@ export class SignComponent implements OnInit {
         .printPreviewPdf('3X', "PrintPreviewPDF")
         .subscribe(res => {
           if(res) {
-                console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-               
                 if (res['results.pdf_url'] !== null) {
                   console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
                   window.open(res.results.pdf_url, '_blank');
@@ -708,7 +797,6 @@ export class SignComponent implements OnInit {
         .PreviewForm_Preview_sign_Screen({}, this.formType)
         .subscribe(res => {
          if(res) {
-            console.log("Accessing SignComponent printPriview res ...",res);
             window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
            }
           },
@@ -721,8 +809,6 @@ export class SignComponent implements OnInit {
             .printPreviewPdf('3X', "PrintPreviewPDF")
             .subscribe(res => {
               if(res) {
-                    console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-                   
                     if (res['results.pdf_url'] !== null) {
                       console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
                       window.open(res.results.pdf_url, '_blank');

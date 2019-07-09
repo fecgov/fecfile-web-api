@@ -37,8 +37,11 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    this._messageService.getMessage().subscribe(res => {
+   
+    console.log("check total receipts value...");
+     this._messageService.getMessage().subscribe(res => {
       if (res) {
+        console.log("res =", res);
         if (res.hasOwnProperty('formType')) {
           if (typeof res.formType === 'string') {
             if (res.formType === this._formType) {
@@ -48,6 +51,7 @@ export class TransactionSidebarComponent implements OnInit {
                   if (res.totals.hasOwnProperty('Receipts')) {
                     if (typeof res.totals.Receipts === 'number') {
                       this.receiptsTotal = res.totals.Receipts;
+                      console.log("this.receiptsTotal", this.receiptsTotal);
                     }
                   }
                 }
