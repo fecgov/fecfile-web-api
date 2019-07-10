@@ -696,8 +696,7 @@ def create_json_builders(request):
 
             elif call_from == "Submit":
                 #data_obj = request
-                data_obj = {'call_from': request.data.get('call_from'),
-                            'committeeId': request.data.get('committeeId'),
+                data_obj = {'committeeId': request.data.get('committeeId'),
                             'password': request.data.get('password'),
                             'formType': request.data.get('formType'),
                             'newAmendIndicator': request.data.get('newAmendIndicator'),
@@ -715,7 +714,7 @@ def create_json_builders(request):
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
                 print("data_obj = ", data_obj)
                 print("file_obj = ", file_obj)
-                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/upload_filing" , data=data_obj, files=file_obj)
 
             if not resp.ok:
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
