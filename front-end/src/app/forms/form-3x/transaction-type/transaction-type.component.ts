@@ -202,8 +202,9 @@ export class TransactionTypeComponent implements OnInit {
   
   public printPreview(): void {
     this.frmSubmitted=false;
-    this.transactionCategorySelected=false;
-    
+    this.transactionCategorySelected=true;
+    this.transactionTypeFailed=false;
+
     this._reportTypeService.signandSaveSubmitReport('3X','Saved');
     this._reportTypeService
     .printPreviewPdf('3X', "PrintPreviewPDF")
