@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
-
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 
 @Component({
@@ -125,6 +125,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
+    private _reportTypeService: ReportTypeService,
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -544,8 +545,26 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Print all transactions selected by the user.
    */
   public printAllSelected(): void {
-    alert('Print all transactions is not yet supported');
-  }
+    //alert('Print all transactions is not yet supported');
+
+      this._reportTypeService.signandSaveSubmitReport('3X','Saved');
+      this._reportTypeService
+      .printPreviewPdf('3X', "PrintPreviewPDF")
+      .subscribe(res => {
+        if(res) {
+              console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
+             
+              if (res['results.pdf_url'] !== null) {
+                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                window.open(res.results.pdf_url, '_blank');
+              }
+            }
+          },
+          (error) => {
+            console.log('error: ', error);
+          });/*  */
+  
+    }
 
 
   /**
