@@ -18,8 +18,8 @@ urlpatterns = [
     url(r'^core/get_all_transactions$',
         views.get_all_transactions, name='get_all_transactions'),
     url(r'^core/state$', views.state, name='state'),
-    url(r'^core/get_all_deleted_transactions$',
-        views.get_all_deleted_transactions, name='get_all_deleted_transactions'),
+    url(r'^core/get_all_trashed_transactions$',
+        views.get_all_trashed_transactions, name='get_all_trashed_transactions'),
     url(r'^core/trash_restore_transactions$',
         views.trash_restore_transactions, name='trash_restore_transactions'),
     url(r'^core/get_summary_table$', views.get_summary_table, name='get_summary_table'),
@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^core/create_json_builders$', jsonmain.create_json_builders, name='create_json_builders'),
     url(r'^core/print_preview_pdf$', views.print_preview_pdf, name='print_preview_pdf'),
     url(r'^core/reports$', views.reports, name='reports'),
+    url(r'^core/create_contacts_view$', views.create_contacts_view, name='create_contacts_view'), 
 
 
 ]

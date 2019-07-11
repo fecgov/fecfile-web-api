@@ -1,8 +1,6 @@
 <div class="transaction-type-container">
   <form
     [formGroup]="frmOption"
-    (ngSubmit)="doValidateOption()"
-    (blur)="doValidateOption()"
   >
     <header>
       <div class="header-content">
@@ -157,7 +155,7 @@
           </button>
           <button
             class="btn btn-primary btn-right"
-            type="submit"
+            (click)="doValidateOption()"
           >
             Next
           </button>

@@ -47,10 +47,10 @@ def get_entity_sched_a_data(report_id, cmte_id, transaction_id):
         # GET all rows from schedA table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL """
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
         # if type_identifier:
         #     query_string = query_string + "AND transaction_type_identifier = '"+str(type_identifier)+"'"
@@ -82,10 +82,10 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id):
         # GET all rows from schedB table
         forms_obj = []
         if not transaction_id:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
-                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL """
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier, beneficiary_cmte_id
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL"""
         else:
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier, beneficiary_cmte_id
                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s """
         
         # if type_identifier:
@@ -316,12 +316,14 @@ def task_sched_a(request):
             f_3x_list = get_f3x_report_data(committeeid, report_id)
             report_info = get_list_report(report_id, committeeid)
             response_inkind_receipt_list = []
+            reponse_sched_b_data = []
             response_inkind_out_list = []
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 #print (f3_i['report_id'])
 
                 entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
+                entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
 
                 #print('parent sched A trans:',len(entity_id_list))
                 
@@ -343,6 +345,7 @@ def task_sched_a(request):
                             response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                             response_dict_receipt['entityType'] = ''
                             response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                            response_dict_receipt['contributorOranizationName'] = ''
 
                             response_dict_receipt['contributorLastName'] = ''
                             response_dict_receipt['contributorFirstName'] = ''
@@ -360,6 +363,8 @@ def task_sched_a(request):
                             response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                             response_dict_receipt['contributorEmployer'] = ''
                             response_dict_receipt['contributorOccupation'] = ''
+                            response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
+                            response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name'] 
                             response_dict_receipt['memoCode'] = entity_obj['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj['memo_text']
 
@@ -372,6 +377,7 @@ def task_sched_a(request):
                             response_dict_receipt['backReferenceScheduleName'] = entity_obj['back_ref_sched_name']
                             response_dict_receipt['entityType'] = list_entity['entity_type']
                             response_dict_receipt['lineNumber'] = entity_obj['line_number']
+                            response_dict_receipt['contributorOranizationName'] = list_entity['entity_name']
 
                             response_dict_receipt['contributorLastName'] = list_entity['last_name']
                             response_dict_receipt['contributorFirstName'] = list_entity['first_name']
@@ -389,6 +395,8 @@ def task_sched_a(request):
                             response_dict_receipt['contributionPurposeDescription'] = entity_obj['purpose_description']
                             response_dict_receipt['contributorEmployer'] = list_entity['employer']
                             response_dict_receipt['contributorOccupation'] = list_entity['occupation']
+                            response_dict_receipt['donorFecCommitteeId'] = entity_obj['donor_cmte_id']
+                            response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name'] 
                             response_dict_receipt['memoCode'] = entity_obj['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj['memo_text']
 
@@ -412,6 +420,7 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = ''
                                     response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['payeeOranizationName'] = ''
 
                                     response_dict_out['payeeLastName'] = ''
                                     response_dict_out['payeeFirstName'] = ''
@@ -438,6 +447,7 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = list_child_entity['entity_type']
                                     response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['payeeOranizationName'] = list_child_entity['entity_name']
 
                                     response_dict_out['payeeLastName'] = list_child_entity['last_name']
                                     response_dict_out['payeeFirstName'] = list_child_entity['first_name']
@@ -473,7 +483,8 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = ''
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']   
+                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['contributorOranizationName'] = ''    
 
                                     response_dict_out['contributorLastName'] = ''
                                     response_dict_out['contributorFirstName'] = ''
@@ -491,6 +502,8 @@ def task_sched_a(request):
                                     response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
                                     response_dict_out['contributorEmployer'] = ''
                                     response_dict_out['contributorOccupation'] = ''
+                                    response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
+                                    response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
                                     response_dict_out['memoCode'] = entity_child_obj['memo_code']
                                     response_dict_out['memoDescription'] = entity_child_obj['memo_text']
                                     # continue # Needs a fail condition implemented
@@ -501,8 +514,9 @@ def task_sched_a(request):
                                     response_dict_out['backReferenceTransactionIdNumber'] = entity_child_obj['back_ref_transaction_id']
                                     response_dict_out['backReferenceScheduleName'] = entity_child_obj['back_ref_sched_name']
                                     response_dict_out['entityType'] = list_child_entity['entity_type']
-                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']   
-
+                                    response_dict_out['lineNumber'] = entity_child_obj['line_number']
+                                    response_dict_out['contributorOranizationName'] = list_child_entity['entity_name'] 
+                                    
                                     response_dict_out['contributorLastName'] = list_child_entity['last_name']
                                     response_dict_out['contributorFirstName'] = list_child_entity['first_name']
                                     response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
@@ -519,6 +533,8 @@ def task_sched_a(request):
                                     response_dict_out['contributionPurposeDescription'] = entity_child_obj['purpose_description']
                                     response_dict_out['contributorEmployer'] = list_child_entity['employer']
                                     response_dict_out['contributorOccupation'] = list_child_entity['occupation']
+                                    response_dict_out['donorFecCommitteeId'] = entity_child_obj['donor_cmte_id']
+                                    response_dict_out['donorFecCommitteeName'] = entity_child_obj['donor_cmte_name']
                                     response_dict_out['memoCode'] = entity_child_obj['memo_code']
                                     response_dict_out['memoDescription'] = entity_child_obj['memo_text']
                                 response_dict_receipt['child'].append(response_dict_out)
@@ -526,6 +542,71 @@ def task_sched_a(request):
                         response_inkind_receipt_list.append(response_dict_receipt)
                 else:
                     response_inkind_receipt_list = []
+                #import ipdb;ipdb.set_trace()
+                if entity_id_sched_b_list:
+                    for entity_obj_b in entity_id_sched_b_list:
+                        response_dict_out = {}
+                        response_dict_receipt = {}
+                        list_entity_b = get_list_entity(entity_obj_b['entity_id'], entity_obj_b['cmte_id'])
+                        if not list_entity_b:
+                            response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+                            response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+                            response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+                            response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+                            response_dict_receipt['entityType'] = ''
+                            response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+                            response_dict_receipt['payeeOranizationName'] = ''
+
+                            response_dict_receipt['payeeLastName'] = ''
+                            response_dict_receipt['payeeFirstName'] = ''
+                            response_dict_receipt['payeeMiddleName'] = ''
+                            response_dict_receipt['payeePrefix'] = ''
+                            response_dict_receipt['payeeSuffix'] = ''
+                            response_dict_receipt['payeeStreet1'] = ''
+                            response_dict_receipt['payeeStreet2'] = ''
+                            response_dict_receipt['payeeCity'] = ''
+                            response_dict_receipt['payeeState'] = ''
+                            response_dict_receipt['payeezip'] = ''
+                            response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                            response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+                            response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                            response_dict_receipt['categoryCode'] = '15G'
+                            response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+                            response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+                                # continue # Needs a fail condition implemented
+                        else:
+                            list_entity_b = list_entity_b[0]
+                            response_dict_receipt['transactionTypeCode'] = entity_obj_b['transaction_type']
+                            response_dict_receipt['transactionId'] = entity_obj_b['transaction_id']
+                            response_dict_receipt['backReferenceTransactionIdNumber'] = entity_obj_b['back_ref_transaction_id']
+                            response_dict_receipt['backReferenceScheduleName'] = entity_obj_b['back_ref_sched_name']
+                            response_dict_receipt['entityType'] = list_entity_b['entity_type']
+                            response_dict_receipt['lineNumber'] = entity_obj_b['line_number']
+                            response_dict_receipt['payeeOranizationName'] = list_entity_b['entity_name']
+
+                            response_dict_receipt['payeeLastName'] = list_entity_b['last_name']
+                            response_dict_receipt['payeeFirstName'] = list_entity_b['first_name']
+                            response_dict_receipt['payeeMiddleName'] = list_entity_b['middle_name']
+                            response_dict_receipt['payeePrefix'] = list_entity_b['prefix']
+                            response_dict_receipt['payeeSuffix'] = list_entity_b['suffix']
+                            response_dict_receipt['payeeStreet1'] = list_entity_b['street_1']
+                            response_dict_receipt['payeeStreet2'] = list_entity_b['street_2']
+                            response_dict_receipt['payeeCity'] = list_entity_b['city']
+                            response_dict_receipt['payeeState'] = list_entity_b['state']
+                            response_dict_receipt['payeezip'] = list_entity_b['zip_code']
+                            response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
+                            response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
+                            response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                            response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
+                            #response_dict_receipt['beneficiaryCommitteeName'] =  comm_info_obj.get('committeeName')
+                            response_dict_receipt['categoryCode'] = '15G'
+                            response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
+                            response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
+                         
+                        reponse_sched_b_data.append(response_dict_receipt)
+                else:
+                    reponse_sched_b_data = []
+
             #import ipdb;ipdb.set_trace()
             # get_list_entity(entity_id, comm_info.committeeid)
            
@@ -559,8 +640,9 @@ def task_sched_a(request):
             f=get_summary_dict(summary_d)
             data_obj['data']['summary'] = json.loads(f)
             #data_obj['data']['summary'] = json.loads(json.dumps(get_summary_dict(f_3x_list[0])))
-            data_obj['data']['schedules'] = {'SA': [],}
-            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list 
+            data_obj['data']['schedules'] = {'SA': [], 'SB':[]}
+            data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
+            data_obj['data']['schedules']['SB'] = reponse_sched_b_data
            
            
             
@@ -575,7 +657,7 @@ def create_json_builders(request):
     #import ipdb;ipdb.set_trace()
     # Check for Inkind
     try:
-
+        print(" request = ", request)
         report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         form_type = request.data.get('form_type')
@@ -613,10 +695,28 @@ def create_json_builders(request):
                 resp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
             elif call_from == "Submit":
-                data_obj = request
+                #data_obj = request
+                data_obj = {'committeeId': request.data.get('committeeId'),
+                            'password': request.data.get('password'),
+                            'formType': request.data.get('formType'),
+                            'newAmendIndicator': request.data.get('newAmendIndicator'),
+                            'report_id': request.data.get('report_id'),
+                            'reportSequence': request.data.get('reportSequence'),
+                            'emailAddress1': request.data.get('emailAddress1'),
+                            'reportType': request.data.get('reportType'),
+                            'coverageStartDate': request.data.get('coverageStartDate'),
+                            'coverageEndDate': request.data.get('coverageEndDate'),
+                            'originalFECId': request.data.get('originalFECId'),
+                            'backDoorCode': request.data.get('backDoorCode'),
+                            'emailAddress2': request.data.get('emailAddress2'),
+                            'wait': request.data.get('wait')
+                            }
                 file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+                print("data_obj = ", data_obj)
+                print("file_obj = ", file_obj)
 
-                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/receiver/v1/upload_filing" , data=data_obj, files=file_obj)
+                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/api/v1/upload_filing" , data=data_obj, files=file_obj)
+
 
             if not resp.ok:
                 return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
