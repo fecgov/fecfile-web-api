@@ -61,10 +61,30 @@ export class ReportTypeService {
     }
 
     formData.append('form_type', `F${formType}`);
-    formData.append('report_type', form3xReportType.reportType);
-    formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
-    formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
-    formData.append('due_dt', form3xReportType.dueDate);
+
+    if (form3xReportType.hasOwnProperty('reportType')) {
+      formData.append('report_type', form3xReportType.reportType);
+    } else if (form3xReportType.hasOwnProperty('reporttype')) {
+      formData.append('report_type', form3xReportType.reporttype);
+    }
+
+    if (form3xReportType.hasOwnProperty('cvgStartDate')) {
+      formData.append('cvg_end_dt', form3xReportType.cvgStartDate);
+    } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
+      formData.append('cvg_end_dt', form3xReportType.cvgstartdate)
+    }
+
+    if (form3xReportType.hasOwnProperty('cvgEndDate')) {
+      formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
+    } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
+      formData.append('cvg_end_dt', form3xReportType.cvgenddate);
+    }
+
+    if (form3xReportType.hasOwnProperty('dueDate')) {
+      formData.append('due_dt', form3xReportType.dueDate);
+    } else if (form3xReportType.hasOwnProperty('duedate')) {
+      formData.append('due_dt', form3xReportType.duedate);
+    }
 
     if (form3xReportType.hasOwnProperty('amend_Indicator')) {
       if (typeof form3xReportType.amend_Indicator === 'string') {
@@ -523,8 +543,13 @@ export class ReportTypeService {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       console.log("backup object form3xReportType = ", form3xReportType);
     }
+    
+    if (form3xReportType.hasOwnProperty('reportId')) {
+      formData.append('report_id', form3xReportType.reportId);
+    } else if (form3xReportType.hasOwnProperty('reportid')) {   
+      formData.append('report_id', form3xReportType.reportid);
+    }
 
-    formData.append('report_id', form3xReportType.reportId);
     formData.append('form_type', `F${formType}`);
     formData.append('call_from', callFrom);
           
