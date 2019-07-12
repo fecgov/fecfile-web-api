@@ -69,9 +69,9 @@ export class ReportTypeService {
     }
 
     if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('cvg_end_dt', form3xReportType.cvgStartDate);
+      formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('cvg_end_dt', form3xReportType.cvgstartdate)
+      formData.append('cvg_start_dt', form3xReportType.cvgstartdate)
     }
 
     if (form3xReportType.hasOwnProperty('cvgEndDate')) {
