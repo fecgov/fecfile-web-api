@@ -2761,8 +2761,8 @@ def create_contacts_view(request):
         else:
             descending = 'ASC'
 
-        keys = ['cmte_id', 'id', 'type', 'name', 'occupation', 'employer' ]
-        search_keys = ['cmte_id', 'id', 'type', 'name', 'occupation', 'employer']
+        keys = ['id', 'type', 'name', 'occupation', 'employer' ]
+        search_keys = ['id', 'type', 'name', 'occupation', 'employer']
         if search_string:
             for key in search_keys:
                 if not param_string:
@@ -2790,7 +2790,7 @@ def create_contacts_view(request):
         param_string = param_string + keywords_string
         
         
-        trans_query_string = """SELECT cmte_id, id,type, name, occupation, employer from all_contacts_view
+        trans_query_string = """SELECT id, type, name, occupation, employer from all_contacts_view
                                     where cmte_id='""" + cmte_id + """' """ + param_string 
         # print("trans_query_string: ",trans_query_string)
         # import ipdb;ipdb.set_trace()
