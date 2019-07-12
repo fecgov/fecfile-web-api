@@ -486,7 +486,7 @@ def task_sched_a(request):
                         
 
                                     response_dict_out['benificiaryCandidateMiddleName'] = list_child_entity['middle_name']
-                                    response_dict_out['benificiaryCandidatePrefix'] = list_child_entity['preffix']
+                                    response_dict_out['benificiaryCandidatePrefix'] = list_child_entity['prefix']
                                     response_dict_out['benificiaryCandidateSuffix'] = list_child_entity['suffix']
                                     response_dict_out['benificiaryCandidateOffice'] = entity_child_obj['beneficiary_cand_office']
                                     response_dict_out['benificiaryCandidateState'] = entity_child_obj['beneficiary_cand_state']
@@ -648,8 +648,8 @@ def task_sched_a(request):
                         
 
                             response_dict_receipt['benificiaryCandidateMiddleName'] = list_entity_b['middle_name']
-                            response_dict_receipt['benificiaryCandidatePrefix'] = list_entity_b['preffix']
-                            response_dict_receipt['benificiaryCandidateSuffix'] = entity_obj_b['suffix']
+                            response_dict_receipt['benificiaryCandidatePrefix'] = list_entity_b['prefix']
+                            response_dict_receipt['benificiaryCandidateSuffix'] = list_entity_b['suffix']
                             response_dict_receipt['benificiaryCandidateOffice'] = entity_obj_b['beneficiary_cand_office']
                             response_dict_receipt['benificiaryCandidateState'] = entity_obj_b['beneficiary_cand_state']
                             response_dict_receipt['benificiaryCandidateDistrict'] = entity_obj_b['beneficiary_cand_district']
