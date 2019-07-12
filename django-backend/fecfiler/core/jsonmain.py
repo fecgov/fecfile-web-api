@@ -769,7 +769,7 @@ def create_json_builders(request):
                 print("data_obj = ", data_obj)
                 print("file_obj = ", file_obj)
 
-                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/api/v1/upload_filing" , data=data_obj, files=file_obj)
+                resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL + "/v1/upload_filing" , data=data_obj, files=file_obj)
 
 
             if not resp.ok:
