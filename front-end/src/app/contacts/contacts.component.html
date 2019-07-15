@@ -1,18 +1,10 @@
 <div class="contacts__main-container">
-  <div class="contacts__sidebar">
-   <!-- <div class="contacts__sidebar_categories">
-      <app-transaction-categories [hidden]="isShowFilters"
-        title="Transaction Categories"
-        (status)='onNotify($event)'>
-      </app-transaction-categories>
-    </div>-->
-    <div class="contacts__sidebar_filters">
+    <div class="contacts__sidebar_filters"  *ngIf="showSideBar">
       <app-contacts-filter [hidden]="!isShowFilters" 
         title="Filters"
         [formType]="formType">
       </app-contacts-filter>
     </div>
-  </div>
   <div class="contacts__container">
     <header>
       <div class="header-content">
