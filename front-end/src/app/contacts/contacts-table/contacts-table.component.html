@@ -36,11 +36,11 @@
               <button class="dropdown-item" (click)="printAllSelected()">
                 <i class="print-icon"></i> Print
               </button>
-              <button class="dropdown-item" (click)="exportAllSelected()">
-                <i class="file-export-icon"></i> Export
+              <button class="dropdown-item" (click)="viewActivityAllSelected()">
+                <i class="file-export-icon"></i> View Activity
               </button>
-              <button class="dropdown-item" (click)="linkAllSelected()">
-                <i class="link-icon"></i> Link
+              <button class="dropdown-item" (click)="exportAllSelected()">
+                <i class="link-icon"></i> Export
               </button>
               <button class="dropdown-item" (click)="trashAllSelected()">
                 <i class="trash-icon"></i> Trash
@@ -80,16 +80,16 @@
             </button>
             <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
               <button class="dropdown-item" (click)="viewContact(cnt)">
-                <i class="copy-icon"></i> View
+                <i class="view-icon"></i> View
               </button>
               <button class="dropdown-item" (click)="editContact(cnt)">
-                <i class="link-icon"></i> Edit
+                <i class="edit-icon"></i> Edit
               </button>
               <button class="dropdown-item" (click)="viewActivity(cnt)">
                 <i class="view-icon"></i> View Activity
               </button>
               <button class="dropdown-item" (click)="cloneContact(cnt)">
-                <i class="edit-icon"></i> Clone
+                <i class="link-icon"></i> Clone
               </button>
               <button class="dropdown-item" (click)="trashContact(cnt)">
                 <i class="trash-icon"></i> Trash
