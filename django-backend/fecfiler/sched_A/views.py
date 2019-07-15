@@ -43,7 +43,7 @@ MANDATORY_FIELDS_SCHED_A = ['report_id', 'cmte_id', 'line_number',
 MANDATORY_FIELDS_AGGREGATE = ['transaction_type']
 
 # list of transaction_type for child sched_b items
-CHILD_SCHED_B_TYPES = ['16']
+CHILD_SCHED_B_TYPES = []
 
 # list of valid line numbers - this list will grow as we add more types
 VALID_TRANSACTION_TYPES = ['15', '18G', '17Z']
@@ -56,6 +56,8 @@ TRANSACTION_TYPES_LINE_NUM_MAP = {
     '17Z': ['16'],
 }
 
+# list of all transaction type identifiers that should have single column storage in DB
+SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC', 'OTH_REC', 'IND_RECNT', 'PTY_RCNT', 'PAC_RCNT', 'TRI_RCNT', 'IND_NP_RECNT', 'TRI_NP_RCNT', 'PTY_NP_RCNT', 'PAC_NP_RCNT', 'IND_HQ_ACCNT', 'TRI_HQ_ACCNT', 'PTY_HQ_ACCNT', 'PAC_HQ_ACCNT', 'IND_CO_ACCNT', 'TRI_CO_ACCNT', 'PTY_CO_ACCNT', 'PAC_CO_ACCNT', 'IND_CAREY', 'OT_COM_CAREY', 'BU_LAB_CAREY', 'PAR_CON', 'PAR_MEMO', 'REATT_FROM', 'REATT_TO', 'JF_TRAN', 'IND_JF_MEM', 'PTY_JF_MEM', 'PAC_JF_MEM', 'TRI_JF_MEM', 'JF_TRAN_R', 'IND_JF_R_MEM', 'PAC_JF_R_MEM', 'TRI_JF_R_MEM', 'JF_TRAN_C', 'IND_JF_C_MEM', 'PAC_JF_C_MEM', 'TRI_JF_C_MEM', 'JF_TRAN_H', 'IND_JF_H_MEM', 'PAC_JF_H_MEM', 'TRI_JF_H_MEM']
 
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
@@ -144,13 +146,13 @@ def check_decimal(value):
 # TODO: update this function to take one argument of data_dic
 
 
-def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name):
+def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
     """persist one sched_a item."""
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", [cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.datetime.now(), donor_cmte_id, donor_cmte_name])
+            cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", [cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.datetime.now(), donor_cmte_id, donor_cmte_name, transaction_type_identifier])
     except Exception:
         raise
 
@@ -163,7 +165,7 @@ def get_list_all_schedA(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from schedA table
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name
+            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" +
@@ -201,7 +203,7 @@ def get_list_schedA(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
@@ -239,7 +241,7 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
 
             # GET child rows from schedA table
 
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
@@ -266,15 +268,15 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
         raise
 
 
-def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name):
+def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
     """
     uopdate a schedule_a item
     """
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_id, report_id, cmte_id])
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier, transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception(
                     'The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
@@ -495,20 +497,24 @@ def post_schedA(datum):
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
-        try:
-            post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
-                'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'))
-        except Exception as e:
-            if 'entity_id' in datum:
-                entity_data = put_entities(prev_entity_list[0])
-            else:
-                get_data = {
-                    'cmte_id': datum.get(cmte_id),
-                    'entity_id': entity_id
-                }
-                remove_entities(get_data)
-            raise Exception(
-                'The post_sql_schedA function is throwing an error: ' + str(e))
+        # verifying the transaction type and based on the type storing the data
+        if datum.get('transaction_type_identifier') in SINGLE_TRANSACTION_SCHEDA_LIST:
+            try:
+                post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
+                    'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
+            except Exception as e:
+                if 'entity_id' in datum:
+                    entity_data = put_entities(prev_entity_list[0])
+                else:
+                    get_data = {
+                        'cmte_id': datum.get(cmte_id),
+                        'entity_id': entity_id
+                    }
+                    remove_entities(get_data)
+                raise Exception(
+                    'The post_sql_schedA function is throwing an error: ' + str(e))
+        else:
+            raise Exception('The transaction_type_identifier specified is not in the accepted list. Input received:' + datum.get('transaction_type_identifier') + '. Allowed Inputs: {}'.format(','.join(SINGLE_TRANSACTION_SCHEDA_LIST)))
         # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
@@ -570,20 +576,25 @@ def put_schedA(datum):
             entity_data = post_entities(datum)
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
-        try:
-            put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
-                'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'))
-        except Exception as e:
-            if flag:
-                entity_data = put_entities(prev_entity_list[0])
-            else:
-                get_data = {
-                    'cmte_id': datum.get('cmte_id'),
-                    'entity_id': entity_id
-                }
-                remove_entities(get_data)
-            raise Exception(
-                'The put_sql_schedA function is throwing an error: ' + str(e))
+        # verifying the transaction type and based on the type storing the data
+        if datum.get('transaction_type_identifier') in SINGLE_TRANSACTION_SCHEDA_LIST:
+            try:
+                put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
+                    'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
+            except Exception as e:
+                if flag:
+                    entity_data = put_entities(prev_entity_list[0])
+                else:
+                    get_data = {
+                        'cmte_id': datum.get('cmte_id'),
+                        'entity_id': entity_id
+                    }
+                    remove_entities(get_data)
+                raise Exception(
+                    'The put_sql_schedA function is throwing an error: ' + str(e))
+        else:
+            raise Exception('The transaction_type_identifier specified is not in the accepted list. Input received:' + datum.get('transaction_type_identifier') + '. Allowed Inputs: {}'.format(','.join(SINGLE_TRANSACTION_SCHEDA_LIST)))
+        # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
@@ -632,6 +643,7 @@ def schedA_sql_dict(data):
         datum = {
             'line_number': data.get('line_number'),
             'transaction_type': data.get('transaction_type'),
+            'transaction_type_identifier': data.get('transaction_type_identifier'),
             'back_ref_sched_name': data.get('back_ref_sched_name'),
             'contribution_date': date_format(data.get('contribution_date')),
             'contribution_amount': check_decimal(data.get('contribution_amount')),
@@ -676,6 +688,8 @@ def schedA(request):
     # create new transactions and children transactions if any
     if request.method == 'POST':
         try:
+            if not('transaction_type_identifier' in request.data and check_null_value(request.data.get('transaction_type_identifier'))):
+                raise Exception('Missing Input: transaction_type_identifier is mandatory')
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception('Missing Input: Report_id is mandatory')
@@ -690,42 +704,42 @@ def schedA(request):
             datum['cmte_id'] = cmte_id
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
-                datum['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
-                data = put_schedA(datum)
-            else:
-                data = post_schedA(datum)
+            # if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            #     datum['transaction_id'] = check_transaction_id(
+            #         request.data.get('transaction_id'))
+            #     data = put_schedA(datum)
+            # else:
+            data = post_schedA(datum)
             # Associating child transactions to parent and storing them to DB
-            if 'child' in request.data:
-                children = check_type_list(request.data.get('child'))
-                if len(children) > 0:
-                    child_output = []
-                    for child in children:
-                        transaction_type = child.get('transaction_type')
-                        if transaction_type in CHILD_SCHED_B_TYPES:
-                            child_datum = schedB_sql_dict(child)
-                        else:
-                            child_datum = schedA_sql_dict(child)
+            # if 'child' in request.data:
+            #     children = check_type_list(request.data.get('child'))
+            #     if len(children) > 0:
+            #         child_output = []
+            #         for child in children:
+            #             transaction_type = child.get('transaction_type')
+            #             if transaction_type in CHILD_SCHED_B_TYPES:
+            #                 child_datum = schedB_sql_dict(child)
+            #             else:
+            #                 child_datum = schedA_sql_dict(child)
 
-                        child_datum['back_ref_transaction_id'] = data.get(
-                            'transaction_id')
-                        child_datum['report_id'] = report_id
-                        child_datum['cmte_id'] = cmte_id
-                        if 'entity_id' in child and check_null_value(child.get('entity_id')):
-                            child_datum['entity_id'] = child.get('entity_id')
-                        if 'transaction_id' in child and check_null_value(child.get('transaction_id')):
-                            child_datum['transaction_id'] = check_transaction_id(
-                                child.get('transaction_id'))
-                            if transaction_type in CHILD_SCHED_B_TYPES:
-                                child_data = put_schedB(child_datum)
-                            else:
-                                child_data = put_schedA(child_datum)
-                        else:
-                            if transaction_type in CHILD_SCHED_B_TYPES:
-                                child_data = post_schedB(child_datum)
-                            else:
-                                child_data = post_schedA(child_datum)
+            #             child_datum['back_ref_transaction_id'] = data.get(
+            #                 'transaction_id')
+            #             child_datum['report_id'] = report_id
+            #             child_datum['cmte_id'] = cmte_id
+            #             if 'entity_id' in child and check_null_value(child.get('entity_id')):
+            #                 child_datum['entity_id'] = child.get('entity_id')
+            #             if 'transaction_id' in child and check_null_value(child.get('transaction_id')):
+            #                 child_datum['transaction_id'] = check_transaction_id(
+            #                     child.get('transaction_id'))
+            #                 if transaction_type in CHILD_SCHED_B_TYPES:
+            #                     child_data = put_schedB(child_datum)
+            #                 else:
+            #                     child_data = put_schedA(child_datum)
+            #             else:
+            #                 if transaction_type in CHILD_SCHED_B_TYPES:
+            #                     child_data = post_schedB(child_datum)
+            #                 else:
+            #                     child_data = post_schedA(child_datum)
             output = get_schedA(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -765,10 +779,13 @@ def schedA(request):
     if request.method == 'PUT':
 
         try:
-            if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-                datum = schedB_sql_dict(request.data)
-            else:
-                datum = schedA_sql_dict(request.data)
+            if not('transaction_type_identifier' in request.data and check_null_value(request.data.get('transaction_type_identifier'))):
+                raise Exception('Missing Input: transaction_type_identifier is mandatory')
+
+            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+            #     datum = schedB_sql_dict(request.data)
+            # else:
+            datum = schedA_sql_dict(request.data)
 
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
@@ -788,12 +805,12 @@ def schedA(request):
 
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
-            if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-                data = put_schedB(datum)
-                output = get_schedB(data)
-            else:
-                data = put_schedA(datum)
-                output = get_schedA(data)
+            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+            #     data = put_schedB(datum)
+            #     output = get_schedB(data)
+            # else:
+            data = put_schedA(datum)
+            output = get_schedA(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
