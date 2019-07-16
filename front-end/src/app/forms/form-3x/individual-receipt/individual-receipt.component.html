@@ -1,5 +1,5 @@
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt" >
+  <form [formGroup]="frmIndividualReceipt">
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -30,6 +30,13 @@
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
       <ng-container *ngFor="let row of formFields">
+        <ng-container *ngIf="row?.fieldset">
+          <div class="row">
+            <div [class]="row?.colClassName">
+              {{ row?.label }}
+            </div>
+          </div>
+        </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
             <div [class]="row.colClassName" *ngFor="let col of row.cols">
@@ -46,37 +53,39 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
-                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'"> (Optional) </ng-container>
+                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                    (Optional)
+                  </ng-container>
                 </label>
                 <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
-                    <div [ngClass]="{'input-group': col?.inputGroup}">
-                      <ng-container *ngIf="col?.inputGroup">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">
-                            <i [class]="col?.inputIcon" aria-hidden="true"></i>
-                          </span>
-                        </div>                        
-                      </ng-container>
-                      <input 
-                        class="form-control"
-                        [style.width]="col?.width"
-                        [style.height]="col?.height"
-                        [attr.type]="col?.type"
-                        [attr.name]="col?.name"
-                        [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                        [attr.value]="col?.value"
-                        [maxlength]="col?.validation?.max"
-                        [formControlName]="col?.name"
-                        (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
-                        [ngClass]="
-                          frmIndividualReceipt.get(col?.name)?.invalid &&
-                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                            ? 'input-field-error'
-                            : ''
-                        "
-                        (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                      />
-                    </div>
+                  <div [ngClass]="{ 'input-group': col?.inputGroup }">
+                    <ng-container *ngIf="col?.inputGroup">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                    </ng-container>
+                    <input
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    />
+                  </div>
                   <div
                     class="error-text"
                     *ngIf="
@@ -124,7 +133,7 @@
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'checkbox'">
-                  <input 
+                  <input
                     class="form-control"
                     [style.width]="col?.width"
                     [style.height]="col?.height"
@@ -140,21 +149,21 @@
                         ? 'input-field-error'
                         : ''
                     "
-                  />                  
+                  />
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
-                  <textarea 
+                  <textarea
                     [style.height]="col?.height"
                     [style.width]="col?.width"
                     [style.overflow]="col.scroll ? col.scroll : null"
-                    [attr.name]="col?.name" 
+                    [attr.name]="col?.name"
                     [attr.maxlength]="col?.validation?.max"
                     [formControlName]="col?.name"
                   ></textarea>
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
-                    class="state-select"                
+                    class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -169,16 +178,18 @@
                   </ng-select>
                 </ng-container>
               </div>
-            </div> <!-- ./col -->
+            </div>
+            <!-- ./col -->
           </ng-container>
-        </div> <!-- ./row -->
+        </div>
+        <!-- ./row -->
         <ng-container *ngIf="row.seperator">
           <div class="row">
             <div class="col-md-12">
-             <hr /> 
+              <hr />
             </div>
           </div>
-        </ng-container>         
+        </ng-container>
       </ng-container>
     </section>
     <footer>

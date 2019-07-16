@@ -6,7 +6,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -21,7 +20,8 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    // const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    const url: string = 'http://localhost:3000/data';
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -48,23 +48,23 @@ export class IndividualReceiptService {
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    
-    if (reportType === null || typeof reportType=== 'undefined' ){
+
+    if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
     const formData: FormData = new FormData();
-    
+
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     /**
-     * This has to be removed. 
+     * This has to be removed.
      * I'm not hard coding anything any more.
-     * Or this has to be changed to just lower case.  This is not a 
+     * Or this has to be changed to just lower case.  This is not a
      * good practice at all.  Please do better then this.
      */
     formData.append('cmte_id', committeeDetails.committeeid);
@@ -81,7 +81,7 @@ export class IndividualReceiptService {
           formData.append(key, value);
         }
       }
-    }    
+    }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
@@ -111,7 +111,7 @@ export class IndividualReceiptService {
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (reportType === null || typeof reportType=== 'undefined' ){
+    if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 

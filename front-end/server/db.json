@@ -1,6 +1,11 @@
 {
    "data": {
       "formFields": [{
+         "fieldset": true,
+         "colClassName": "col col-md-12",
+         "label": "Contributor Information:"
+      },
+      {
          "colClassName": "col col-md-4",
          "seperator": false,
          "cols": [{
