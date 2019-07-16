@@ -244,15 +244,11 @@ export class IndividualReceiptComponent implements OnInit {
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
     const contributionAggregate: string = String(this._contributionAggregateValue);
-    /**
-     * TODO: Look into why read only input returns null.
-     */
-    if (!this.memoCode) {
-      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-      const value: string = this._decimalPipe.transform(total, '.2-2');
 
-      this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
-    }
+    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+    const value: string = this._decimalPipe.transform(total, '.2-2');
+
+    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
 
     /**
      * TODO: To be implemented in the future.
@@ -281,7 +277,6 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (checked) {
       this.memoCode = checked;
-      console.log('this.memoCode: ', this.memoCode);
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
@@ -332,10 +327,15 @@ export class IndividualReceiptComponent implements OnInit {
             }
           }
 
+          const contributionAggregateValue: string = this._decimalPipe.transform(
+            this._contributionAggregateValue,
+            '.2-2'
+          );
+
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(this._contributionAggregateValue);
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
