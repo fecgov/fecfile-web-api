@@ -251,6 +251,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         const contactsModelL = this._contactsService.mapFromServerFields(res.contacts);
         this.contactsModel = contactsModelL;
 
+        this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
         this.allContactsSelected = false;
       });
@@ -311,7 +312,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         //   model.aggregate = model.aggregate ? model.aggregate : 0;
         // }
 
-        this.config.totalItems = res.totalContactCount ? res.totalContactCount : 0;
+        this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
         this.allContactsSelected = false;
       });
@@ -368,7 +369,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   public isColumnVisible(colName: string): boolean {
     const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      console.log(sortableCol);
       return sortableCol.visible;
     } else {
       return false;
@@ -511,6 +511,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 	 * Determine if pagination should be shown.
 	 */
   public showPagination(): boolean {
+    console.log("this.config.totalItems =", this.config.totalItems);
+    console.log("this.config.itemsPerPage =", this.config.itemsPerPage);
+    
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }

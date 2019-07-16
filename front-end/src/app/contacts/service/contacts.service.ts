@@ -15,7 +15,7 @@ import { map } from 'rxjs/operators';
 export interface GetContactsResponse {
   contacts: ContactModel[];
   totalAmount: number;
-  totalContactCount: number;
+  totalcontactsCount: number;
   totalPages: number;
 
   // remove after API is renamed.

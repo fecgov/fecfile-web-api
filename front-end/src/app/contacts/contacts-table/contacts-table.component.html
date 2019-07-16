@@ -9,14 +9,14 @@
       <tr>
         <th class="contacts__table-checkbox">
             <!-- *ngIf="isContactViewActive()" -->
-          <input [@fadeInOut]  [(ngModel)]="allContactsSelected" type="checkbox"
+        <input [@fadeInOut]  [(ngModel)]="allContactsSelected" type="checkbox"
             (change)="changeAllContactsSelected()">
         </th>
          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">Id
+        <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">ID
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('employer')" [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
         </th>
@@ -75,7 +75,7 @@
           </div>
           <div [@fadeInOut] *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
-            <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
               <i class="ellipsis-icon"></i>
             </button>
             <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -105,6 +105,7 @@
         <td *ngIf="isColumnVisible('id')"></td>
         <td *ngIf="isColumnVisible('employer')"></td>
         <td *ngIf="isColumnVisible('occupation')"></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
@@ -186,6 +187,10 @@
                 </div>
               </div>
             </div>
+            <div class="col-md">
+              &nbsp;
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveColumnOptions()">
