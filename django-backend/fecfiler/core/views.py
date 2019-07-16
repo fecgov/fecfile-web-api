@@ -1167,11 +1167,16 @@ def autolookup_search_contacts(request):
                 query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
                                                     FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
                 parameters = [value + '%']
+            elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
+                param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
+                query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
+                                                    FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
+                parameters = [value + '%']
             else:
-                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
+                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
-            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
+            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
         
         with connection.cursor() as cursor:
             cursor.execute(query_string, parameters)
