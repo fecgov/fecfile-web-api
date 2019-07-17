@@ -44,6 +44,7 @@ export class IndividualReceiptComponent implements OnInit {
   public hiddenFields: any = [];
   public memoCode: boolean = false;
   public testForm: FormGroup;
+  public titles: any = [];
   public states: any = [];
 
   private _formType: string = '';
@@ -88,12 +89,32 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        this.formFields = res.data.formFields;
-        this.hiddenFields = res.data.hiddenFields;
-        this.states = res.data.states;
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-        if (this.formFields.length >= 1) {
-          this._setForm(this.formFields);
+                this._setForm(this.formFields);
+              }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
+              }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
+                console.log('this.titles: ', this.titles);
+              }
+            }
+          }
         }
       }
     });
