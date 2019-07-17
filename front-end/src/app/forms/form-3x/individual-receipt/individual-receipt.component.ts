@@ -111,7 +111,6 @@ export class IndividualReceiptComponent implements OnInit {
             if (res.data.hasOwnProperty('titles')) {
               if (Array.isArray(res.data.titles)) {
                 this.titles = res.data.titles;
-                console.log('this.titles: ', this.titles);
               }
             }
           }
