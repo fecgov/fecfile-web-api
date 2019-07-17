@@ -113,9 +113,9 @@ export class IndividualReceiptComponent implements OnInit {
                 this.titles = res.data.titles;
               }
             }
-          }
-        }
-      }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
     });
   }
 
