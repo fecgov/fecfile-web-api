@@ -1,10 +1,11 @@
 {
    "data": {
-      "formFields": [{
+      "titles": [{
          "fieldset": true,
          "colClassName": "col col-md-12 fieldset",
-         "label": "Contributor Information:"
-      },
+         "label": "Contributor Information:"         
+      }],
+      "formFields": [,
       {
          "colClassName": "col col-md-4",
          "seperator": false,
