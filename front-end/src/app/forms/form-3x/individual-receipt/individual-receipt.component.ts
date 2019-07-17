@@ -44,6 +44,7 @@ export class IndividualReceiptComponent implements OnInit {
   public hiddenFields: any = [];
   public memoCode: boolean = false;
   public testForm: FormGroup;
+  public titles: any = [];
   public states: any = [];
 
   private _formType: string = '';
@@ -88,14 +89,33 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        this.formFields = res.data.formFields;
-        this.hiddenFields = res.data.hiddenFields;
-        this.states = res.data.states;
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-        if (this.formFields.length >= 1) {
-          this._setForm(this.formFields);
-        }
-      }
+                this._setForm(this.formFields);
+              }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
+              }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
+              }
+            }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
     });
   }
 
@@ -113,6 +133,10 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
+  }
+
+  public debug(obj: any): void {
+    console.log('obj: ', obj);
   }
 
   /**
@@ -391,22 +415,21 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
+    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
+    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
+      res => {
+        if (res) {
+          console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
 
+          if (res['results.pdf_url'] !== null) {
+            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+            window.open(res.results.pdf_url, '_blank');
+          }
+        }
+      },
+      error => {
+        console.log('error: ', error);
+      }
+    ); /*  */
   }
 }
