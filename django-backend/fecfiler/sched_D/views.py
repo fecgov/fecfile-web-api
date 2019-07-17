@@ -183,19 +183,13 @@ def schedD_sql_dict(data):
     filter data and build sched_d dictionary
     """
     valid_fields = [
-        'cmte_id',
-        'report_id',
         'transaction_type_identifier',
-        'transaction_id',
         'creditor_entity_id',
         'purpose',
         'beginning_balance',
         'incurred_amount',
         'payment_amount',
         'balance_at_close',
-        'delete_ind',
-        'create_date',
-        'last_update_date'
     ]
     try:
         return {k: v for k, v in data.items if k in valid_fields}
