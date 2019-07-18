@@ -5,7 +5,7 @@
          "colClassName": "col col-md-12 fieldset",
          "label": "Contributor Information:"         
       }],
-      "formFields": [,
+      "formFields": [
       {
          "colClassName": "col col-md-4",
          "seperator": false,
