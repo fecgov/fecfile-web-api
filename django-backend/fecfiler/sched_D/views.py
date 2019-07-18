@@ -272,15 +272,15 @@ def post_schedD(datum):
         validate_sd_data(datum)
 
         # save entities rirst
-        if 'creditor_entity_id' in datum:
-            get_data = {
-                'cmte_id': datum.get('cmte_id'),
-                'entity_id': datum.get('creditor_entity_id')
-            }
-            prev_entity_list = get_entities(get_data)
-            entity_data = put_entities(datum)
-        else:
-            entity_data = post_entities(datum)
+        # if 'creditor_entity_id' in datum:
+        #     get_data = {
+        #         'cmte_id': datum.get('cmte_id'),
+        #         'entity_id': datum.get('creditor_entity_id')
+        #     }
+        #     prev_entity_list = get_entities(get_data)
+        #     entity_data = put_entities(datum)
+        # else:
+        #     entity_data = post_entities(datum)
 
         # continue to save transaction
         creditor_entity_id = entity_data.get('creditor_entity_id')
