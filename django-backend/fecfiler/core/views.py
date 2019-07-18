@@ -359,12 +359,7 @@ def get_list_report(report_id, cmte_id):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from Reports table
-            '''
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date 
-                                            FROM public.reports WHERE cmte_id = %s AND delete_ind is distinct from 'Y' AND report_id = %s"""
-            '''
-
+            
             query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
                                       FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
 
@@ -1744,7 +1739,82 @@ def get_all_trashed_transactions(request):
 END - GET ALL TRASHED TRANSACTIONS API - CORE APP
 ******************************************************************************************************************************
 """
+"""
+******************************************************************************************************************************
+GET ALL DELETE TRANSACTIONS API-- CORE APP- SPRINT-17 -BY YESWANTH KUMAR TELLA 
+******************************************************************************************************************************
+"""
+def get_SA_from_transaction_data(trans_id):
+    try:
+        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
+                     FROM public.sched_a WHERE transaction_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [trans_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+   
+        return forms_obj
+    except Exception:
+        raise
 
+def get_list_report_data(report_id, cmte_id):
+    try:
+        query_string = """SELECT report_id, form_type, amend_ind, status, amend_number, cmte_id, report_type
+                     FROM public.reports WHERE report_id = %s AND cmte_id = %s """
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            raise NoOPError('The report ID: {} does not exist or is deleted'.format(report_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+@api_view(['POST'])
+def delete_trashed_transactions(request):
+    try:
+    #import ipdb;ipdb.set_trace()
+        trans_id = request.data.get('transaction_id')
+        committeeid = request.user.username
+        message='Transaction deleted successfully' 
+        sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
+        print(sched_a_obj)
+        if sched_a_obj:
+           
+            report_info = get_list_report_data(sched_a_obj['report_id'], committeeid)[0]
+            #print(report_info)
+            if report_info and report_info['status'] == 'Submitted':
+               message = 'The transaction report is submitted.'
+            elif report_info and report_info['status'] == None:
+                message = 'The transaction report is None.'
+            else:
+                try:
+
+                    with connection.cursor() as cursor:
+                        cursor.execute("""Delete FROM public.sched_a where transaction_id = '"""+ trans_id + """'; """)
+                        #message = 'Transaction deleted successfully'
+                except Exception as e:
+                    print(e)
+                    message = 'Error in deleting the transaction'
+
+        json_result = {'message':message}
+        return Response(json_result, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response('The delete_trashed_transactions API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+******************************************************************************************************************************
+END - GET ALL TRASHED TRANSACTIONS API - CORE APP
+******************************************************************************************************************************
+"""
 """
 ******************************************************************************************************************************
 GET SUMMARY TABLE API - CORE APP - SPRINT 10 - FNE 720 - BY PRAVEEN JINKA
@@ -2830,6 +2900,6 @@ def create_contacts_view(request):
 
 """
 *****************************************************************************************************************************
-END - GET ALL TRANSACTIONS API - CORE APP
+END - Contacts API - CORE APP
 ******************************************************************************************************************************
 """
