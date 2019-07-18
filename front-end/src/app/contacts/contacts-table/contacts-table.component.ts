@@ -2,26 +2,23 @@ import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } fro
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { TransactionModel } from '../model/transaction.model';
+import { ContactModel } from '../model/contacts.model';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
+import { ContactsService, GetContactsResponse } from '../service/contacts.service';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
-import { ActiveView } from '../transactions.component';
-import { TransactionsMessageService } from '../service/transactions-message.service';
+import { ActiveView } from '../contacts.component';
+import { ContactsMessageService } from '../service/contacts-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { TransactionFilterModel } from '../model/transaction-filter.model';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-
+import { ContactFilterModel } from '../model/contacts-filter.model';
 
 @Component({
-  selector: 'app-transactions-table',
-  templateUrl: './transactions-table.component.html',
+  selector: 'app-contacts-table',
+  templateUrl: './contacts-table.component.html',
   styleUrls: [
-    './transactions-table.component.scss',
-    '../../../shared/partials/confirm-modal/confirm-modal.component.scss'
+    './contacts-table.component.scss'
   ],
   encapsulation: ViewEncapsulation.None,
   animations: [
@@ -36,7 +33,7 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
     ])
   ]
 })
-export class TransactionsTableComponent implements OnInit, OnDestroy {
+export class ContactsTableComponent implements OnInit, OnDestroy {
 
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
@@ -50,9 +47,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   @Input()
   public tableType: string;
 
-  public transactionsModel: Array<TransactionModel>;
+  public contactsModel: Array<ContactModel>;
   public totalAmount: number;
-  public transactionsView = ActiveView.transactions;
+  public contactsView = ActiveView.contacts;
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
@@ -64,27 +61,27 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public config: PaginationInstance;
   public numberOfPages = 0;
 
-  private filters: TransactionFilterModel;
+  private filters: ContactFilterModel;
   // private keywords = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
 
   // Local Storage Keys
-  private readonly transactionSortableColumnsLSK =
-    'transactions.trx.sortableColumn';
+  private readonly contactSortableColumnsLSK =
+    'contacts.ctn.sortableColumn';
   private readonly recycleSortableColumnsLSK =
-    'transactions.recycle.sortableColumn';
-  private readonly transactionCurrentSortedColLSK =
-    'transactions.trx.currentSortedColumn';
+    'contacts.recycle.sortableColumn';
+  private readonly contactCurrentSortedColLSK =
+    'contacts.ctn.currentSortedColumn';
   private readonly recycleCurrentSortedColLSK =
-    'transactions.recycle.currentSortedColumn';
-  private readonly transactionPageLSK =
-    'transactions.trx.page';
+    'contacts.recycle.currentSortedColumn';
+  private readonly contactPageLSK =
+    'contacts.ctn.page';
   private readonly recyclePageLSK =
-    'transactions.recycle.page';
+    'contacts.recycle.page';
   private readonly filtersLSK =
-    'transactions.filters';
+    'contacts.filters';
 
   /**.
 	 * Array of columns to be made sortable.
@@ -111,32 +108,31 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
   /**
    * Subscription for running the keyword and filter search
-   * to the transactions obtained from the server.
+   * to the contacts obtained from the server.
    */
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
   private readonly maxColumnOption = 5;
-  private allTransactionsSelected: boolean;
+  private allContactsSelected: boolean;
 
   constructor(
-    private _transactionsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService,
+    private _contactsService: ContactsService,
+    private _contactsMessageService: ContactsMessageService,
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _reportTypeService: ReportTypeService,
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage()
+    this.showPinColumnsSubscription = this._contactsMessageService.getShowPinColumnMessage()
       .subscribe(
         message => {
           this.showPinColumns();
         }
       );
 
-    this.keywordFilterSearchSubscription = this._transactionsMessageService.getDoKeywordFilterSearchMessage()
+    this.keywordFilterSearchSubscription = this._contactsMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
-        (filters: TransactionFilterModel) => {
+        (filters: ContactFilterModel) => {
 
           if (filters) {
             this.filters = filters;
@@ -154,18 +150,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
-
-    // reportId is converted to String when used as @Input().  Convert back to Number.
-    // If it can't be converted, make it 0.
-    // this.reportId = isNaN(this.reportId) ? Number(this.reportId) : this.reportId;
-
-    // if (typeof this.reportId === 'string') {
-    //   this.reportId = Number(this.reportId);
-    // }
-    // this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
-
+    console.log("Contacts table ngOnInit ...");
     const paginateConfig: PaginationInstance = {
-      id: 'forms__trx-table-pagination',
+      id: 'forms__ctn-table-pagination',
       itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
@@ -195,18 +182,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-	 * The Transactions for a given page.
+	 * The Contacts for a given page.
 	 *
-	 * @param page the page containing the transactions to get
+	 * @param page the page containing the contacts to get
 	 */
   public getPage(page: number): void {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    console.log (" ContactsTableComponent getPage this.tableType", this.tableType);
 
     switch (this.tableType) {
-      case this.transactionsView:
-        this.getTransactionsPage(page);
+      case this.contactsView:
+        this.getContactsPage(page);
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
@@ -218,18 +206,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-	 * The Transactions for a given page.
+	 * The Contacts for a given page.
 	 *
-	 * @param page the page containing the transactions to get
+	 * @param page the page containing the contacts to get
 	 */
-  public getTransactionsPage(page: number): void {
-
+  public getContactsPage(page: number): void {
+    console.log(" getContactsPage calling ...");
     this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel =
       this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
 
-    // smahal: quick fix for sortCol issue not retrived from cache
     if (!sortedCol) {
       this.setSortDefault();
       sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -243,15 +230,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    const serverSortColumnName = this._transactionsService.
+    const serverSortColumnName = this._contactsService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._transactionsService.getFormTransactions(this.formType, this.reportId,
+    this._contactsService.getContacts(this.formType, this.reportId,
         page, this.config.itemsPerPage,
         serverSortColumnName, sortedCol.descending, this.filters)
-      .subscribe((res: GetTransactionsResponse) => {
-
-        this.transactionsModel = [];
+      .subscribe((res: GetContactsResponse) => {
+        console.log(" getContactsPage res =", res)
+        this.contactsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
         // result has only 1 page.
@@ -259,23 +246,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.config.currentPage = 1;
         }
 
-        this._transactionsService.addUIFileds(res);
+        this._contactsService.addUIFileds(res);
 
-        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
-        this.transactionsModel = transactionsModelL;
+        const contactsModelL = this._contactsService.mapFromServerFields(res.contacts);
+        this.contactsModel = contactsModelL;
 
-        this.totalAmount = res.totalAmount ? res.totalAmount : 0;
-        this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
-        this.allTransactionsSelected = false;
+        this.allContactsSelected = false;
       });
   }
 
 
   /**
-	 * The Transactions for the recycling bin.
+	 * The Contacts for the recycling bin.
 	 *
-	 * @param page the page containing the transactions to get
+	 * @param page the page containing the contacts to get
 	 */
   public getRecyclingPage(page: number): void {
 
@@ -298,16 +284,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // const serverSortColumnName = this._transactionsService.
+    // const serverSortColumnName = this._contactsService.
     //   mapToSingleServerName(this.currentSortedColumnName);
 
-    this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
+    this._contactsService.getUserDeletedContacts(this.formType, this.reportId,
       page, this.config.itemsPerPage,
       this.currentSortedColumnName,
       sortedCol.descending, this.filters)
-      .subscribe((res: GetTransactionsResponse) => {
+      .subscribe((res: GetContactsResponse) => {
 
-        this.transactionsModel = [];
+        this.contactsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
         // result has only 1 page.
@@ -315,20 +301,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           this.config.currentPage = 1;
         }
 
-        this._transactionsService.addUIFileds(res);
+        this._contactsService.addUIFileds(res);
 
-        this.transactionsModel = res.transactions;
+        this.contactsModel = res.contacts;
 
         // handle non-numeric amounts
         // TODO handle this server side in API
-        // for (const model of this.transactionsModel) {
+        // for (const model of this.contactsModel) {
         //   model.amount = model.amount ? model.amount : 0;
         //   model.aggregate = model.aggregate ? model.aggregate : 0;
         // }
 
-        this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
+        this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
-        this.allTransactionsSelected = false;
+        this.allContactsSelected = false;
       });
   }
 
@@ -525,6 +511,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 	 * Determine if pagination should be shown.
 	 */
   public showPagination(): boolean {
+    console.log("this.config.totalItems =", this.config.totalItems);
+    console.log("this.config.itemsPerPage =", this.config.itemsPerPage);
+    
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
@@ -534,86 +523,68 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * View all transactions selected by the user.
+   * View all contacts selected by the user.
    */
   public viewAllSelected(): void {
-    alert('View all transactions is not yet supported');
+    alert('View all contacts is not yet supported');
   }
 
 
   /**
-   * Print all transactions selected by the user.
+   * Print all contacts selected by the user.
    */
   public printAllSelected(): void {
-    //alert('Print all transactions is not yet supported');
-
-      this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-      this._reportTypeService
-      .printPreviewPdf('3X', "PrintPreviewPDF")
-      .subscribe(res => {
-        if(res) {
-              console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-             
-              if (res['results.pdf_url'] !== null) {
-                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-                window.open(res.results.pdf_url, '_blank');
-              }
-            }
-          },
-          (error) => {
-            console.log('error: ', error);
-          });/*  */
-  
-    }
+    alert('Print all contacts is not yet supported');
+  }
 
 
   /**
-   * Export all transactions selected by the user.
+   * Export all contacts selected by the user.
    */
   public exportAllSelected(): void {
-    alert('Export all transactions is not yet supported');
+    alert('Export all contacts is not yet supported');
   }
 
 
   /**
-   * Link all transactions selected by the user.
+   * Link all contacts selected by the user.
    */
   public linkAllSelected(): void {
-    alert('Link multiple transaction requirements have not been finalized');
+    alert('Link multiple contact requirements have not been finalized');
   }
 
 
   /**
-   * Trash all transactions selected by the user.
+   * Trash all contacts selected by the user.
    */
   public trashAllSelected(): void {
-    // alert('Trash all transactions is not yet supported');
+    // alert('Trash all contacts is not yet supported');
 
-    let trxIds = '';
-    const selectedTransactions: Array<TransactionModel> = [];
-    for (const trx of this.transactionsModel) {
-      if (trx.selected) {
-        selectedTransactions.push(trx);
-        trxIds += trx.transactionId + ', ';
+    let ctnIds = '';
+    const selectedContacts: Array<ContactModel> = [];
+    for (const ctn of this.contactsModel) {
+      if (ctn.selected) {
+        selectedContacts.push(ctn);
+        ctnIds += ctn.id + ', ';
       }
     }
 
-    // trxIds.trimRight();
-    // trxIds = trxIds.trimRight();
-    trxIds = trxIds.substr(0, trxIds.length - 2);
+    // ctnIds.trimRight();
+    // ctnIds = ctnIds.trimRight();
+    ctnIds = ctnIds.substr(0, ctnIds.length - 2);
 
     this._dialogService
-    .confirm('You are about to delete these transactions. ' + trxIds,
+    .confirm('You are about to delete these contacts. ' + ctnIds,
       ConfirmModalComponent,
       'Caution!')
     .then(res => {
       if (res === 'okay') {
-        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
-          .subscribe((res: GetTransactionsResponse) => {
-            this.getTransactionsPage(this.config.currentPage);
+        this._contactsService.trashOrRestoreContacts('trash', this.reportId, this.contactsModel)
+          .subscribe((res: GetContactsResponse) => {
+            this.getContactsPage(this.config.currentPage);
             this._dialogService
-              .confirm('Transaction has been successfully deleted and sent to the recycle bin. '
-                + trxIds,
+              .confirm('Contact has been successfully deleted and sent to the recycle bin. '
+                + ctnIds,
                 ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
           });
       } else if (res === 'cancel') {
@@ -623,64 +594,72 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Clone the transaction selected by the user.
+   * Clone the contact selected by the user.
    *
-   * @param trx the Transaction to clone
+   * @param ctn the Contact to clone
    */
-  public cloneTransaction(): void {
-    alert('Clone transaction is not yet supported');
+  public cloneContact(ctn: ContactModel): void {
+    alert('Clone Contact is not yet supported');
   }
 
 
   /**
-   * Link the transaction selected by the user.
+   * Link the contact selected by the user.
    *
-   * @param trx the Transaction to link
+   * @param ctn the Contact to link
    */
-  public linkTransaction(): void {
+  public linkContact(ctn: ContactModel): void {
     alert('Link requirements have not been finalized');
   }
 
 
   /**
-   * View the transaction selected by the user.
+   * View the contact selected by the user.
    *
-   * @param trx the Transaction to view
+   * @param ctn the Contact to view
    */
-  public viewTransaction(): void {
-    alert('View transaction is not yet supported');
+  public viewContact(ctn: ContactModel): void {
+    alert('View Contact is not yet supported');
+  }
+
+/**
+   * View the contact selected by the user.
+   *
+   * @param ctn the Contact to view
+   */
+  public viewActivity(ctn: ContactModel): void {
+    alert('View Activity is not yet supported');
+  }
+
+  /**
+   * Edit the contact selected by the user.
+   *
+   * @param ctn the Contact to edit
+   */
+  public editContact(ctn: ContactModel): void {
+    alert('Edit Contact is not yet supported');
   }
 
 
   /**
-   * Edit the transaction selected by the user.
+   * Trash the contact selected by the user.
    *
-   * @param trx the Transaction to edit
+   * @param ctn the Contact to trash
    */
-  public editTransaction(trx: TransactionModel): void {
-    this._transactionsMessageService.sendEditTransactionMessage(trx);
-  }
-
-
-  /**
-   * Trash the transaction selected by the user.
-   *
-   * @param trx the Transaction to trash
-   */
-  public trashTransaction(trx: TransactionModel): void {
+  public trashContact(ctn: ContactModel): void {
 
     this._dialogService
-    .confirm('You are about to delete this transaction ' + trx.transactionId + '.',
+    .confirm('You are about to delete this contact ' + ctn.id + '.',
       ConfirmModalComponent,
       'Caution!')
     .then(res => {
       if (res === 'okay') {
-        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, [trx])
-          .subscribe((res: GetTransactionsResponse) => {
-            this.getTransactionsPage(this.config.currentPage);
+        this._contactsService.trashOrRestoreContacts('trash', this.reportId, [ctn])
+          .subscribe((res: GetContactsResponse) => {
+            this.getContactsPage(this.config.currentPage);
             this._dialogService
-              .confirm('Transaction has been successfully deleted and sent to the recycle bin.'
-                + trx.transactionId,
+              .confirm('Contact has been successfully deleted and sent to the recycle bin.'
+                + ctn.id,
                 ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
           });
       } else if (res === 'cancel') {
@@ -690,25 +669,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Restore a trashed transaction from the recyle bin.
+   * Restore a trashed contact from the recyle bin.
    *
-   * @param trx the Transaction to restore
+   * @param ctn the Contact to restore
    */
-  public restoreTransaction(trx: TransactionModel): void {
+  public restoreContact(ctn: ContactModel): void {
 
     this._dialogService
-      .confirm('You are about to restore transaction ' + trx.transactionId + '.',
+      .confirm('You are about to restore contact ' + ctn.id + '.',
         ConfirmModalComponent,
         'Caution!')
       .then(res => {
         if (res === 'okay') {
-          // this._transactionsService.restoreTransaction(trx)
-          //   .subscribe((res: GetTransactionsResponse) => {
-          this._transactionsService.trashOrRestoreTransactions('restore', this.reportId, [trx])
-            .subscribe((res: GetTransactionsResponse) => {
+          // this._contactsService.restoreContact(ctn)
+          //   .subscribe((res: GetContactsResponse) => {
+          this._contactsService.trashOrRestoreContacts('restore', this.reportId, [ctn])
+            .subscribe((res: GetContactsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService
-                .confirm('Transaction ' + trx.transactionId + ' has been restored!',
+                .confirm('Contact ' + ctn.id + ' has been restored!',
                   ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
             });
         } else if (res === 'cancel') {
@@ -718,39 +697,39 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Delete selected transactions from the the recyle bin.
+   * Delete selected contacts from the the recyle bin.
    *
-   * @param trx the Transaction to delete
+   * @param ctn the Contact to delete
    */
   public deleteRecyleBin(): void {
 
     let beforeMessage = '';
     // if (this.bulkActionCounter === 1) {
     //   let id = '';
-    //   for (const trx of this.transactionsModel) {
-    //     if (trx.selected) {
-    //       id = trx.transactionId;
+    //   for (const ctn of this.contactsModel) {
+    //     if (ctn.selected) {
+    //       id = ctn.id;
     //     }
     //   }
     //   beforeMessage = (id !== '') ?
-    //     'Are you sure you want to permanently delete Transaction ' + id + '?' :
-    //     'Are you sure you want to permanently delete this Transaction?';
+    //     'Are you sure you want to permanently delete Contact ' + id + '?' :
+    //     'Are you sure you want to permanently delete this Contact?';
     // } else {
-    //   beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+    //   beforeMessage = 'Are you sure you want to permanently delete these contacts?';
     // }
 
-    const selectedTransactions: Array<TransactionModel> = [];
-    for (const trx of this.transactionsModel) {
-      if (trx.selected) {
-        selectedTransactions.push(trx);
+    const selectedContacts: Array<ContactModel> = [];
+    for (const ctn of this.contactsModel) {
+      if (ctn.selected) {
+        selectedContacts.push(ctn);
       }
     }
 
-    if (selectedTransactions.length === 1) {
-      beforeMessage = 'Are you sure you want to permanently delete Transaction ' +
-        selectedTransactions[0].transactionId + '?';
+    if (selectedContacts.length === 1) {
+      beforeMessage = 'Are you sure you want to permanently delete Contact ' +
+        selectedContacts[0].id + '?';
     } else {
-      beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+      beforeMessage = 'Are you sure you want to permanently delete these contacts?';
     }
 
     this._dialogService
@@ -759,15 +738,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'Caution!')
       .then(res => {
         if (res === 'okay') {
-          this._transactionsService.deleteRecycleBinTransaction(selectedTransactions)
-            .subscribe((res: GetTransactionsResponse) => {
+          this._contactsService.deleteRecycleBinContact(selectedContacts)
+            .subscribe((res: GetContactsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
 
               let afterMessage = '';
-              if (selectedTransactions.length === 1) {
-                  afterMessage = `Transaction ${selectedTransactions[0].transactionId} has been successfully deleted`;
+              if (selectedContacts.length === 1) {
+                  afterMessage = `Contact ${selectedContacts[0].id} has been successfully deleted`;
               } else {
-                afterMessage = 'Transactions have been successfully deleted.';
+                afterMessage = 'Contacts have been successfully deleted.';
               }
               this._dialogService
                 .confirm(afterMessage,
@@ -791,16 +770,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
-    if (!this.transactionsModel) {
+    if (!this.contactsModel) {
       return '0';
     }
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.transactionsModel.length > 0) {
+      && this.contactsModel.length > 0) {
       // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
-        // end = this.transactionsModel.length;
+        // end = this.contactsModel.length;
         end = this.config.totalItems;
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
@@ -808,8 +787,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         start = (end - this.config.itemsPerPage) + 1;
       }
       // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.transactionsModel.length) {
-      //   end = this.transactionsModel.length;
+      // if (end > this.contactsModel.length) {
+      //   end = this.contactsModel.length;
       // }
     }
     this.firstItemOnPage = start;
@@ -828,13 +807,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Check/Uncheck all transactions in the table.
+   * Check/Uncheck all contacts in the table.
    */
-  public changeAllTransactionsSelected() {
+  public changeAllContactsSelected() {
 
     // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
-    // transactions for the current page.
+    // contacts for the current page.
 
     // Until the server is ready for pagination,
     // we are getting the entire set of tranactions (> 500)
@@ -842,29 +821,29 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // on the current page.
 
     this.bulkActionCounter = 0;
-    // for (const t of this.transactionsModel) {
-    //   t.selected = this.allTransactionsSelected;
-    //   if (this.allTransactionsSelected) {
+    // for (const t of this.contactsModel) {
+    //   t.selected = this.allContactsSelected;
+    //   if (this.allContactsSelected) {
     //     this.bulkActionCounter++;
     //   }
     // }
 
     // TODO replace this with the commented code above when server pagination is ready.
     for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
-      this.transactionsModel[i].selected = this.allTransactionsSelected;
-      if (this.allTransactionsSelected) {
+      this.contactsModel[i].selected = this.allContactsSelected;
+      if (this.allContactsSelected) {
         this.bulkActionCounter++;
       }
     }
-    this.bulkActionDisabled = !this.allTransactionsSelected;
+    this.bulkActionDisabled = !this.allContactsSelected;
   }
 
 
   /**
-   * Check if the view to show is Transactions.
+   * Check if the view to show is Contacts.
    */
-  public isTransactionViewActive() {
-    return this.tableType === this.transactionsView ? true : false;
+  public isContactViewActive() {
+    return this.tableType === this.contactsView ? true : false;
   }
 
 
@@ -888,15 +867,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     if (e.target.checked) {
       this.bulkActionCounter++;
     } else {
-      this.allTransactionsSelected = false;
+      this.allContactsSelected = false;
       if (this.bulkActionCounter > 0) {
         this.bulkActionCounter--;
       }
     }
 
-    // Transaction View shows bulk action when more than 1 checked
+    // Contact View shows bulk action when more than 1 checked
     // Recycle Bin shows delete action when 1 or more checked.
-    const count = this.isTransactionViewActive() ? 1 : 0;
+    const count = this.isContactViewActive() ? 1 : 0;
     this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
   }
 
@@ -907,10 +886,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private getCachedValues() {
     this.applyFiltersCache();
     switch (this.tableType) {
-      case this.transactionsView:
-        this.applyColCache(this.transactionSortableColumnsLSK);
-        this.applyCurrentSortedColCache(this.transactionCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.transactionPageLSK);
+      case this.contactsView:
+        this.applyColCache(this.contactSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.contactCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.contactPageLSK);
         break;
       case this.recycleBinView:
         this.applyColCache(this.recycleSortableColumnsLSK);
@@ -925,15 +904,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Columns selected in the PIN dialog from the transactions view
+   * Columns selected in the PIN dialog from the contacts view
    * need to be applied to the Recycling Bin table.
    */
   private applyColumnsSelected() {
-    const key = this.transactionSortableColumnsLSK;
+    const key = this.contactSortableColumnsLSK;
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
-      const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
-      for (const col of trxCols) {
+      const ctnCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
+      for (const col of ctnCols) {
         this._tableService.getColumnByName(col.colName,
           this.sortableColumns).visible = col.visible;
       }
@@ -1016,9 +995,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private setCachedValues() {
 
     switch (this.tableType) {
-      case this.transactionsView:
-        this.setCacheValuesforView(this.transactionSortableColumnsLSK,
-          this.transactionCurrentSortedColLSK, this.transactionPageLSK);
+      case this.contactsView:
+        this.setCacheValuesforView(this.contactSortableColumnsLSK,
+          this.contactCurrentSortedColLSK, this.contactPageLSK);
         break;
       case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK,
@@ -1040,11 +1019,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private setCacheValuesforView(columnsKey: string, sortedColKey: string,
     pageKey: string) {
 
-    // shared between trx and recycle tables
+    // shared between ctn and recycle tables
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
 
-    // shared between trx and recycle tables
+    // shared between ctn and recycle tables
     localStorage.setItem(this.filtersLSK,
       JSON.stringify(this.filters));
 
@@ -1063,26 +1042,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    // sort column names must match the domain model names
-    // Mahendra FNE-914
-    // const defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-
-    // const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
-    // const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
-    //   'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
-
-    const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
-    const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
-      'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
-
+    
+    const defaultSortColumns = ['name', 'type', 'id', 'employer', 'occupation'];
+    
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
     }
-    for (const field of otherSortColumns) {
-      this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
-    }
-    this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
+    
+    //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
 
@@ -1096,15 +1064,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // this.currentSortedColumnName = this._tableService.setSortDirection('default',
     //   this.sortableColumns, false);
 
-    // When default, the backend will sort by name and transaction date
+    // When default, the backend will sort by name and contact date
     this.currentSortedColumnName = 'default';
   }
 
 
   private calculateNumberOfPages(): void {
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
-      if (this.transactionsModel && this.transactionsModel.length > 0) {
-        this.numberOfPages = this.transactionsModel.length / this.config.itemsPerPage;
+      if (this.contactsModel && this.contactsModel.length > 0) {
+        this.numberOfPages = this.contactsModel.length / this.config.itemsPerPage;
         this.numberOfPages = Math.ceil(this.numberOfPages);
       }
     }

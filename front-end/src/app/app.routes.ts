@@ -26,8 +26,7 @@ import { ReportheaderComponent } from './reports/reportheader/reportheader.compo
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
-
-
+import { ContactsComponent} from './contacts/contacts.component';
 
 export const AppRoutes: Routes = [
 	{
@@ -55,7 +54,7 @@ export const AppRoutes: Routes = [
 			{ path: 'tools_create_backup', component: ToolsCreateBackupComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'users', component: UsersComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  { path: 'settings', component: SettingsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
-		  { path: 'contributors', component: ContributorsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+		  { path: 'contacts', component: ContactsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
 		  {
         path: 'forms/form/:form_id', component: FormsComponent, pathMatch: 'full', canActivate: [CanActivateGuard], canDeactivate: [CanDeactivateGuardService],
         children: [
