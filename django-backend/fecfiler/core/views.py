@@ -1798,7 +1798,7 @@ def delete_trashed_transactions(request):
                 try:
 
                     with connection.cursor() as cursor:
-                        cursor.execute("""Delete FROM public.sched_a where transaction_id = '"""+ trans_id + """'; """)
+                        cursor.execute("""Delete FROM public.sched_a where transaction_id = %s;""",[trans_id])
                         #message = 'Transaction deleted successfully'
                 except Exception as e:
                     print(e)
