@@ -184,10 +184,10 @@ def deployToK8s(String version, String environment, String deployment, String re
       --namespace=${environment} \
       set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
     """
-  if (environment == "dev" ){
+  if (environment == "dev" || environment == "qa" ){
     sh """ 
       kubectl \
-        --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile-eks-cluster4 \
+        --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile4 \
         --namespace=${environment} \
         set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
     """

@@ -47,6 +47,7 @@ export class IndividualReceiptComponent implements OnInit {
   public hiddenFields: any = [];
   public memoCode: boolean = false;
   public testForm: FormGroup;
+  public titles: any = [];
   public states: any = [];
 
   private _formType: string = '';
@@ -92,14 +93,33 @@ export class IndividualReceiptComponent implements OnInit {
 
     this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
       if (res) {
-        this.formFields = res.data.formFields;
-        this.hiddenFields = res.data.hiddenFields;
-        this.states = res.data.states;
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-        if (this.formFields.length >= 1) {
-          this._setForm(this.formFields);
-        }
-      }
+                this._setForm(this.formFields);
+              }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
+              }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
+              }
+            }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
     });
   }
 
@@ -117,6 +137,10 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
+  }
+
+  public debug(obj: any): void {
+    console.log('obj: ', obj);
   }
 
   /**
@@ -244,15 +268,11 @@ export class IndividualReceiptComponent implements OnInit {
   public contributionAmountChange(e): void {
     const contributionAmount: string = e.target.value;
     const contributionAggregate: string = String(this._contributionAggregateValue);
-    /**
-     * TODO: Look into why read only input returns null.
-     */
-    if (!this.memoCode) {
-      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-      const value: string = this._decimalPipe.transform(total, '.2-2');
 
-      this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
-    }
+    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+    const value: string = this._decimalPipe.transform(total, '.2-2');
+
+    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
 
     /**
      * TODO: To be implemented in the future.
@@ -281,7 +301,6 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (checked) {
       this.memoCode = checked;
-      console.log('this.memoCode: ', this.memoCode);
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
@@ -332,10 +351,15 @@ export class IndividualReceiptComponent implements OnInit {
             }
           }
 
+          const contributionAggregateValue: string = this._decimalPipe.transform(
+            this._contributionAggregateValue,
+            '.2-2'
+          );
+
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(this._contributionAggregateValue);
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
@@ -410,44 +434,7 @@ export class IndividualReceiptComponent implements OnInit {
       error => {
         console.log('error: ', error);
       }
-    );
-  }
-
-  /**
-   * @deprecated
-   */
-  public receiveTypeaheadData(contact: any, fieldName: string): void {
-    console.log('entity selected by typeahead is ' + contact);
-
-    if (fieldName === 'first_name') {
-      this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
-      this.frmIndividualReceipt.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
-    }
-
-    if (fieldName === 'last_name') {
-      this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
-      this.frmIndividualReceipt.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
-    }
-
-    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
-  }
-
-  /**
-   * Format an entity to display in the type ahead.
-   * 
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadItem(result: any) {
-    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+    ); /*  */
   }
 
   /**
@@ -527,5 +514,4 @@ export class IndividualReceiptComponent implements OnInit {
       return x;
     }
   };
-
 }

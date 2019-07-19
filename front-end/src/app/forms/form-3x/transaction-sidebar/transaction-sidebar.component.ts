@@ -26,7 +26,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _router: Router
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -34,6 +35,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    console.log("transactionCategories =", this.transactionCategories);
   }
 
   ngDoCheck(): void {
@@ -75,6 +77,7 @@ export class TransactionSidebarComponent implements OnInit {
   public selectItem(e): void {
     this.itemSelected = e.target.value;
 
+
     this.status.emit({
       form: this._formType,
       transactionCategory: e.target.value
@@ -84,5 +87,10 @@ export class TransactionSidebarComponent implements OnInit {
       form: this._formType,
       transactionCategory: e.target.value
     });
+
+    if (localStorage.getItem('Transaction_Table_Screen') === 'Yes' || localStorage.getItem('Summary_Screen') === 'Yes'){
+      this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'step_2', transactionCategory: e.target.value} });
+    }
+    
   }
 }

@@ -33,7 +33,14 @@
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
-      <ng-container *ngFor="let row of formFields">
+      <ng-container *ngFor="let row of formFields; let i = index">
+        <ng-container *ngIf="titles[i]?.fieldset">
+          <div class="row">
+            <div [class]="titles[i]?.colClassName">
+              {{ titles[i]?.label }}
+            </div>
+          </div>
+        </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
             <div [class]="row.colClassName" *ngFor="let col of row.cols">
