@@ -12,7 +12,7 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
-import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
@@ -23,6 +23,9 @@ import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numer
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -67,7 +70,8 @@ export class IndividualReceiptComponent implements OnInit {
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService,
+    private _typeaheadService: TypeaheadService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -391,22 +395,137 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
+    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
+    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
+      res => {
+        if (res) {
+          console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
 
+          if (res['results.pdf_url'] !== null) {
+            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+            window.open(res.results.pdf_url, '_blank');
+          }
+        }
+      },
+      error => {
+        console.log('error: ', error);
+      }
+    );
   }
+
+  /**
+   * @deprecated
+   */
+  public receiveTypeaheadData(contact: any, fieldName: string): void {
+    console.log('entity selected by typeahead is ' + contact);
+
+    if (fieldName === 'first_name') {
+      this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
+    }
+
+    if (fieldName === 'last_name') {
+      this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
+    }
+
+    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+  }
+
+  /**
+   * Format an entity to display in the type ahead.
+   * 
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadItem(result: any) {
+    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+  }
+
+  /**
+   * Populate the fields in the form with the values from the selected contact.
+   *
+   * @param $event The mouse event having selected the contact from the typeahead options.
+   */
+  public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
+    const contact = $event.item;
+
+    // TODO there is a known issue where the first name is not getting updated in the UI.
+
+    this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+  }
+
+  /**
+   * Search for entities/contacts when last name input value changes.
+   */
+  searchLastName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        return this._typeaheadService.getContacts(searchText, 'last_name');
+      })
+    );
+
+  /**
+   * Search for entities/contacts when first name input value changes.
+   */
+  searchFirstName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        return this._typeaheadService.getContacts(searchText, 'first_name');
+      })
+    );
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the last name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterLastName = (x: { last_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.last_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the first name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterFirstName = (x: { first_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
 }
