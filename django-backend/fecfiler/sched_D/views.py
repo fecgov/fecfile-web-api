@@ -27,7 +27,7 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_D = ['report_id', 'cmte_id']
+MANDATORY_FIELDS_SCHED_D = ['report_id', 'cmte_id', 'transaction_id']
 # Create your views here.
 
 
@@ -53,8 +53,10 @@ def schedD(request):
     if request.method == 'POST':
         try:
             cmte_id = request.user.username
+            print('*****')
+            print(request.data)
             if not('report_id' in request.data):
-                raise Exception('Missing Input: Report_id is mandatory')
+                raise Exception('Missing Input: report_id is mandatory')
             # handling null,none value of report_id
             if not (check_null_value(request.data.get('report_id'))):
                 report_id = "0"
@@ -64,10 +66,11 @@ def schedD(request):
             datum = schedD_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
-            if 'creditor_entity_id' in request.data and check_null_value(
-                    request.data.get('creditor_entity_id')):
-                datum['creditor_entity_id'] = request.data.get(
-                    'creditor_entity_id')
+            print(datum)
+            # if 'creditor_entity_id' in request.data and check_null_value(
+            #         request.data.get('creditor_entity_id')):
+            #     datum['creditor_entity_id'] = request.data.get(
+            #         'creditor_entity_id')
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -80,7 +83,7 @@ def schedD(request):
             output = get_schedD(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response("The schedA API - POST is throwing an exception: "
+            return Response("The schedD API - POST is throwing an exception: "
                             + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'GET':
@@ -191,8 +194,10 @@ def schedD_sql_dict(data):
         'payment_amount',
         'balance_at_close',
     ]
+    # for k, v in data.items:
+    #     print(k, v)
     try:
-        return {k: v for k, v in data.items if k in valid_fields}
+        return {k: v for k, v in data.items() if k in valid_fields}
     except:
         raise Exception('invalid request data.')
 
@@ -269,6 +274,8 @@ def post_schedD(datum):
     """save sched_d item and the associated entities."""
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        transaction_id = get_next_transaction_id('SD')
+        datum['transaction_id'] = transaction_id
         validate_sd_data(datum)
 
         # save entities rirst
@@ -283,23 +290,23 @@ def post_schedD(datum):
         #     entity_data = post_entities(datum)
 
         # continue to save transaction
-        creditor_entity_id = entity_data.get('creditor_entity_id')
-        datum['creditor_entity_id'] = creditor_entity_id
+        # creditor_entity_id = entity_data.get('creditor_entity_id')
+        # datum['creditor_entity_id'] = creditor_entity_id
         # datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
-        trans_char = "SD"
-        transaction_id = get_next_transaction_id(trans_char)
-        datum['transaction_id'] = transaction_id
+        # trans_char = "SD"
+        # transaction_id = get_next_transaction_id(trans_char)
+        # datum['transaction_id'] = transaction_id
         try:
-            post_sql_schedD(transaction_id, datum)
+            post_sql_schedD(datum)
         except Exception as e:
-            if 'creditor_entity_id' in datum:
-                entity_data = put_entities(prev_entity_list[0])
-            else:
-                get_data = {
-                    'cmte_id': datum.get('cmte_id'),
-                    'entity_id': creditor_entity_id
-                }
-                remove_entities(get_data)
+            # if 'creditor_entity_id' in datum:
+            #     entity_data = put_entities(prev_entity_list[0])
+            # else:
+            #     get_data = {
+            #         'cmte_id': datum.get('cmte_id'),
+            #         'entity_id': creditor_entity_id
+            #     }
+            #     remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedD function is throwing an error: ' + str(e))
         # update line number based on aggregate amount info
@@ -310,7 +317,8 @@ def post_schedD(datum):
         raise
 
 
-def post_sql_schedD(transaction_id, data):
+def post_sql_schedD(data):
+    print(data)
     try:
         _sql = """
         INSERT INTO public.sched_d (cmte_id,
@@ -324,19 +332,19 @@ def post_sql_schedD(transaction_id, data):
                                     payment_amount,
                                     balance_at_close,
                                     create_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
-            data.get('cmte_id', ''),
-            data.get('report_id', ''),
+            data.get('cmte_id'),
+            data.get('report_id'),
             data.get('transaction_type_identifier', ''),
-            transaction_id,
+            data.get('transaction_id'),
             data.get('creditor_entity_id', ''),
             data.get('purpose', ''),
-            data.get('beginning_balance', ''),
-            data.get('incurred_amount', ''),
-            data.get('payment_amount', ''),
-            data.get('balance_at_close', ''),
+            data.get('beginning_balance', None),
+            data.get('incurred_amount', None),
+            data.get('payment_amount', None),
+            data.get('balance_at_close', None),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -463,7 +471,7 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
             incurred_amount, 
             payment_amount, 
             last_update_date
-            FROM public.sched_d WHERE report_id = ? AND cmte_id = ? AND transaction_id = ? AND delete_ind is distinct from 'Y'
+            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'
             """
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +

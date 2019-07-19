@@ -100,7 +100,7 @@ def schedC_sql_dict(data):
 
 
 def put_schedC(data):
-       """
+    """
     update sched_c item
     here we are assuming entity_id are always referencing something already in our DB
     """
@@ -115,8 +115,9 @@ def put_schedC(data):
         return data
     except:
         raise
-    
-def put_sql_schedC(data)    
+
+
+def put_sql_schedC(data):
     """
     uopdate a schedule_c item
     """
@@ -150,31 +151,31 @@ def put_sql_schedC(data)
               WHERE transaction_id = ? AND report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
         """
     _v = (
-            data.get('transaction_type',''),
-            data.get('transaction_type_identifier',''),
-            data.get('entity_id',''),
-            data.get('election_code',''),
-            data.get('election_other_description',''),
-            data.get('loan_amount_original',''),
-            data.get('loan_payment_to_date',''),
-            data.get('loan_balance',''),
-            data.get('loan_incurred_date',''),
-            data.get('loan_due_date',''),
-            data.get('loan_intrest_rate',''),
-            data.get('is_loan_secured',''),
-            data.get('is_personal_funds',''),
-            data.get('lender_cmte_id',''),
-            data.get('lender_cand_id',''),
-            data.get('lender_cand_last_name',''),
-            data.get('lender_cand_first_name',''),
-            data.get('lender_cand_middle_name',''),
-            data.get('lender_cand_prefix',''),
-            data.get('lender_cand_suffix',''),
-            data.get('lender_cand_office',''),
-            data.get('lender_cand_state',''),
-            data.get('lender_cand_district',''),
-            data.get('memo_code',''),
-            data.get('memo_text',''),
+            data.get('transaction_type', ''),
+            data.get('transaction_type_identifier', ''),
+            data.get('entity_id', ''),
+            data.get('election_code', ''),
+            data.get('election_other_description', ''),
+            data.get('loan_amount_original', ''),
+            data.get('loan_payment_to_date', ''),
+            data.get('loan_balance', ''),
+            data.get('loan_incurred_date', ''),
+            data.get('loan_due_date', ''),
+            data.get('loan_intrest_rate', ''),
+            data.get('is_loan_secured', ''),
+            data.get('is_personal_funds', ''),
+            data.get('lender_cmte_id', ''),
+            data.get('lender_cand_id', ''),
+            data.get('lender_cand_last_name', ''),
+            data.get('lender_cand_first_name', ''),
+            data.get('lender_cand_middle_name', ''),
+            data.get('lender_cand_prefix', ''),
+            data.get('lender_cand_suffix', ''),
+            data.get('lender_cand_office', ''),
+            data.get('lender_cand_state', ''),
+            data.get('lender_cand_district', ''),
+            data.get('memo_code', ''),
+            data.get('memo_text', ''),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -182,8 +183,9 @@ def put_sql_schedC(data)
           )
     do_transaction(_sql, _v)
 
+
 def post_schedC(data):
-        """
+    """
     function for handling POST request for sc1, need to:
     1. generatye new transaction_id
     2. validate data
@@ -240,36 +242,36 @@ def post_sql_schedC(data):
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
         _v = (
-            data.get('cmte_id','')
-            data.get('report_id','')
-            data.get('line_number','')
-            data.get('transaction_type','')
-            data.get('transaction_type_identifier','')
-            data.get('transaction_id','')
-            data.get('entity_id','')
-            data.get('election_code','')
-            data.get('election_other_description','')
-            data.get('loan_amount_original','')
-            data.get('loan_payment_to_date','')
-            data.get('loan_balance','')
-            data.get('loan_incurred_date','')
-            data.get('loan_due_date','')
-            data.get('loan_intrest_rate','')
-            data.get('is_loan_secured','')
-            data.get('is_personal_funds','')
-            data.get('lender_cmte_id','')
-            data.get('lender_cand_id','')
-            data.get('lender_cand_last_name','')
-            data.get('lender_cand_first_name','')
-            data.get('lender_cand_middle_name','')
-            data.get('lender_cand_prefix','')
-            data.get('lender_cand_suffix','')
-            data.get('lender_cand_office','')
-            data.get('lender_cand_state','')
-            data.get('lender_cand_district','')
-            data.get('memo_code','')
-            data.get('memo_text','')
-            data.get('delete_ind','')
+            data.get('cmte_id', ''),
+            data.get('report_id', ''),
+            data.get('line_number', ''),
+            data.get('transaction_type', ''),
+            data.get('transaction_type_identifier', ''),
+            data.get('transaction_id', ''),
+            data.get('entity_id', ''),
+            data.get('election_code', ''),
+            data.get('election_other_description', ''),
+            data.get('loan_amount_original', ''),
+            data.get('loan_payment_to_date', ''),
+            data.get('loan_balance', ''),
+            data.get('loan_incurred_date', ''),
+            data.get('loan_due_date', ''),
+            data.get('loan_intrest_rate', ''),
+            data.get('is_loan_secured', ''),
+            data.get('is_personal_funds', ''),
+            data.get('lender_cmte_id', ''),
+            data.get('lender_cand_id', ''),
+            data.get('lender_cand_last_name', ''),
+            data.get('lender_cand_first_name', ''),
+            data.get('lender_cand_middle_name', ''),
+            data.get('lender_cand_prefix', ''),
+            data.get('lender_cand_suffix', ''),
+            data.get('lender_cand_office', ''),
+            data.get('lender_cand_state', ''),
+            data.get('lender_cand_district', ''),
+            data.get('memo_code', ''),
+            data.get('memo_text', ''),
+            data.get('delete_ind', ''),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -277,6 +279,7 @@ def post_sql_schedC(data):
             cursor.execute(_sql, _v)
     except Exception:
         raise
+
 
 def get_schedC(data):
     """
@@ -293,16 +296,115 @@ def get_schedC(data):
         return forms_obj
     except:
         raise
-    
-def get_list_schedC(report_d, cmte_id, transacrtion_id):
-    pass
+
 
 def get_list_all_schedC(report_id, cmte_id):
-    pass
+
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type,
+            transaction_type_identifier,
+            transaction_id,
+            entity_id,
+            election_code,
+            election_other_description,
+            loan_amount_original,
+            loan_payment_to_date,
+            loan_balance,
+            loan_incurred_date,
+            loan_due_date,
+            loan_intrest_rate,
+            is_loan_secured,
+            is_personal_funds,
+            lender_cmte_id,
+            lender_cand_id,
+            lender_cand_last_name,
+            lender_cand_first_name,
+            lender_cand_middle_name,
+            lender_cand_prefix,
+            lender_cand_suffix,
+            lender_cand_office,
+            lender_cand_state,
+            lender_cand_district,
+            memo_code,
+            memo_text,
+            last_update_date
+            FROM public.sched_c
+            WHERE report_id = ? AND cmte_id = ?
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            schedC2_list = cursor.fetchone()[0]
+            if schedC2_list is None:
+                raise NoOPError('No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(
+                    report_id, cmte_id))
+            merged_list = []
+            for dictC2 in schedC2_list:
+                merged_list.append(dictC2)
+        return merged_list
+    except Exception:
+        raise
+
+
+def get_list_schedC(report_id, cmte_id, transaction_id):
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type,
+            transaction_type_identifier,
+            transaction_id,
+            entity_id,
+            election_code,
+            election_other_description,
+            loan_amount_original,
+            loan_payment_to_date,
+            loan_balance,
+            loan_incurred_date,
+            loan_due_date,
+            loan_intrest_rate,
+            is_loan_secured,
+            is_personal_funds,
+            lender_cmte_id,
+            lender_cand_id,
+            lender_cand_last_name,
+            lender_cand_first_name,
+            lender_cand_middle_name,
+            lender_cand_prefix,
+            lender_cand_suffix,
+            lender_cand_office,
+            lender_cand_state,
+            lender_cand_district,
+            memo_code,
+            memo_text,
+            last_update_date
+            FROM public.sched_c
+            WHERE report_id = ? AND cmte_id = ? AND transaction_id = ?
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedC2_list = cursor.fetchone()[0]
+            if schedC2_list is None:
+                raise NoOPError('No sched_c2 transaction found for report_id {} and cmte_id: {}'.format(
+                    report_id, cmte_id))
+            merged_list = []
+            for dictC2 in schedC2_list:
+                merged_list.append(dictC2)
+        return merged_list
+    except Exception:
+        raise
 
 
 def delete_schedC(data):
-        """
+    """
     function for handling delete request for sc
     """
     try:
@@ -519,7 +621,7 @@ def put_schedC1(data):
     except:
         raise
     
-def put_sql_schedC1(data)    
+def put_sql_schedC1(data):    
     """
     uopdate a schedule_c2 item
     """
@@ -1056,7 +1158,7 @@ def put_sql_schedC2(data):
 
 
 def validate_sc2_data(data):
-    """validate sc2 json data""""
+    """validate sc2 json data"""
     check_mandatory_fields_SC2(data)
 
 
@@ -1127,7 +1229,7 @@ def post_sql_schedC2(data):
             data.get('cmte_id', ''),
             data.get('report_id', ''),
             data.get('transaction_type_identifier', ''),
-            data.get('transaction_id', '')
+            data.get('transaction_id', ''),
             data.get('guarantor_entity_id', ''),
             data.get('guaranteed_amount', ''),
             datetime.datetime.now(),
