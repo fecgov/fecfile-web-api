@@ -61,4 +61,33 @@ export class TypeaheadService {
             );
        }
 
+
+
+     /**
+      * TODO move to a shared service if applicable
+      */
+    public getContributionAggregate(reportId: string, entityId: number,
+            transactionTypeIdentifier: string): Observable<any> {
+        const token: string = JSON.parse(this._cookieService.get('user'));
+        const url = '/sa/contribution_aggregate';
+        let httpOptions =  new HttpHeaders();
+        let params = new HttpParams();
+
+        httpOptions = httpOptions.append('Content-Type', 'application/json');
+        httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+        params = params.append('report_id', reportId);
+        params = params.append('entity_id', entityId.toString());
+        params = params.append('transaction_type_identifier', transactionTypeIdentifier);
+
+        return this._http
+            .get(
+              `${environment.apiUrl}${url}`,
+              {
+                headers: httpOptions,
+                params
+              }
+            );
+       }
+
 }
