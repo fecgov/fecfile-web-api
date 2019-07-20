@@ -773,7 +773,7 @@ def create_json_builders(request):
                             'emailAddress2': request.data.get('emailAddress2'),
                             'wait': request.data.get('wait')
                             }
-                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+                file_obj = {'fecDataFile': ('data.json', open(tmp_path, 'rb'), 'application/json')}
                 print("data_obj = ", data_obj)
                 print("file_obj = ", file_obj)
 
