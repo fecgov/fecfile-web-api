@@ -438,6 +438,43 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
+   * @deprecated
+   */
+  public receiveTypeaheadData(contact: any, fieldName: string): void {
+    console.log('entity selected by typeahead is ' + contact);
+
+    if (fieldName === 'first_name') {
+      this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
+    }
+
+    if (fieldName === 'last_name') {
+      this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
+    }
+
+    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+  }
+
+  /**
+   * Format an entity to display in the type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadItem(result: any) {
+    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+  }
+
+  /**
    * Populate the fields in the form with the values from the selected contact.
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
@@ -459,6 +496,33 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+
+    // TODO put in provate method as it's common to viewtransaction()
+    let reportId = '0';
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+    }
+
+    console.log('viewTransactions form3XReportType', form3XReportType);
+
+    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+      if (form3XReportType.hasOwnProperty('reportId')) {
+        reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
+      }
+    }
+    // TODO put in provate method as it's common to viewtransaction() - END
+
+    this._typeaheadService.getContributionAggregate(reportId, contact.entity_id, 'INDV_REC').subscribe(res => {
+      this.frmIndividualReceipt.patchValue(
+        // { contribution_aggregate: res.contribution_aggregate }, { onlySelf: true });
+        { contribution_aggregate: 123456.99 },
+        { onlySelf: true }
+      );
+    });
   }
 
   /**
