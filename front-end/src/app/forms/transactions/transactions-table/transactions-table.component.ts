@@ -10,11 +10,13 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { ActiveView } from '../transactions.component';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-
 
 @Component({
   selector: 'app-transactions-table',
@@ -26,18 +28,12 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate(500, style({ opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate(0, style({ opacity: 0 }))
-      ])
+      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
+      transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
   ]
 })
 export class TransactionsTableComponent implements OnInit, OnDestroy {
-
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
@@ -69,37 +65,29 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
-
   // Local Storage Keys
-  private readonly transactionSortableColumnsLSK =
-    'transactions.trx.sortableColumn';
-  private readonly recycleSortableColumnsLSK =
-    'transactions.recycle.sortableColumn';
-  private readonly transactionCurrentSortedColLSK =
-    'transactions.trx.currentSortedColumn';
-  private readonly recycleCurrentSortedColLSK =
-    'transactions.recycle.currentSortedColumn';
-  private readonly transactionPageLSK =
-    'transactions.trx.page';
-  private readonly recyclePageLSK =
-    'transactions.recycle.page';
-  private readonly filtersLSK =
-    'transactions.filters';
+  private readonly transactionSortableColumnsLSK = 'transactions.trx.sortableColumn';
+  private readonly recycleSortableColumnsLSK = 'transactions.recycle.sortableColumn';
+  private readonly transactionCurrentSortedColLSK = 'transactions.trx.currentSortedColumn';
+  private readonly recycleCurrentSortedColLSK = 'transactions.recycle.currentSortedColumn';
+  private readonly transactionPageLSK = 'transactions.trx.page';
+  private readonly recyclePageLSK = 'transactions.recycle.page';
+  private readonly filtersLSK = 'transactions.filters';
 
   /**.
-	 * Array of columns to be made sortable.
-	 */
+   * Array of columns to be made sortable.
+   */
   private sortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * A clone of the sortableColumns for reverting user
+   * A clone of the sortableColumns for reverting user
    * column options on a Cancel.
-	 */
+   */
   private cloneSortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * Identifies the column currently sorted by name.
-	 */
+   * Identifies the column currently sorted by name.
+   */
   private currentSortedColumnName: string;
 
   /**
@@ -108,7 +96,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private showPinColumnsSubscription: Subscription;
 
-
   /**
    * Subscription for running the keyword and filter search
    * to the transactions obtained from the server.
@@ -116,7 +103,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private readonly maxColumnOption = 5;
+  private maxColumnOption = 6;
+  private readonly maxColumnOptionReadOnly = 6;
   private allTransactionsSelected: boolean;
 
   constructor(
@@ -125,36 +113,29 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _reportTypeService: ReportTypeService,
+    private _reportTypeService: ReportTypeService
   ) {
-    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage()
-      .subscribe(
-        message => {
-          this.showPinColumns();
-        }
-      );
+    this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
+      this.showPinColumns();
+    });
 
-    this.keywordFilterSearchSubscription = this._transactionsMessageService.getDoKeywordFilterSearchMessage()
-      .subscribe(
-        (filters: TransactionFilterModel) => {
-
-          if (filters) {
-            this.filters = filters;
-            if (filters.formType) {
-              this.formType = filters.formType;
-            }
+    this.keywordFilterSearchSubscription = this._transactionsMessageService
+      .getDoKeywordFilterSearchMessage()
+      .subscribe((filters: TransactionFilterModel) => {
+        if (filters) {
+          this.filters = filters;
+          if (filters.formType) {
+            this.formType = filters.formType;
           }
-          this.getPage(this.config.currentPage);
         }
-      );
+        this.getPage(this.config.currentPage);
+      });
   }
-
 
   /**
    * Initialize the component.
    */
   public ngOnInit(): void {
-
     // reportId is converted to String when used as @Input().  Convert back to Number.
     // If it can't be converted, make it 0.
     // this.reportId = isNaN(this.reportId) ? Number(this.reportId) : this.reportId;
@@ -183,7 +164,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
   }
 
-
   /**
    * A method to run when component is destroyed.
    */
@@ -193,14 +173,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription.unsubscribe();
   }
 
-
   /**
-	 * The Transactions for a given page.
-	 *
-	 * @param page the page containing the transactions to get
-	 */
+   * The Transactions for a given page.
+   *
+   * @param page the page containing the transactions to get
+   */
   public getPage(page: number): void {
-
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
 
@@ -216,18 +194,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
-	 * The Transactions for a given page.
-	 *
-	 * @param page the page containing the transactions to get
-	 */
+   * The Transactions for a given page.
+   *
+   * @param page the page containing the transactions to get
+   */
   public getTransactionsPage(page: number): void {
-
     this.config.currentPage = page;
 
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    let sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
 
     // smahal: quick fix for sortCol issue not retrived from cache
     if (!sortedCol) {
@@ -243,14 +221,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    const serverSortColumnName = this._transactionsService.
-      mapToSingleServerName(this.currentSortedColumnName);
+    const serverSortColumnName = this._transactionsService.mapToSingleServerName(this.currentSortedColumnName);
 
-    this._transactionsService.getFormTransactions(this.formType, this.reportId,
-        page, this.config.itemsPerPage,
-        serverSortColumnName, sortedCol.descending, this.filters)
+    this._transactionsService
+      .getFormTransactions(
+        this.formType,
+        this.reportId,
+        page,
+        this.config.itemsPerPage,
+        serverSortColumnName,
+        sortedCol.descending,
+        this.filters
+      )
       .subscribe((res: GetTransactionsResponse) => {
-
         this.transactionsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
@@ -271,18 +254,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
   }
 
-
   /**
-	 * The Transactions for the recycling bin.
-	 *
-	 * @param page the page containing the transactions to get
-	 */
+   * The Transactions for the recycling bin.
+   *
+   * @param page the page containing the transactions to get
+   */
   public getRecyclingPage(page: number): void {
-
     this.config.currentPage = page;
 
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    let sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
 
     // smahal: quick fix for sortCol issue not retrived from cache
     if (!sortedCol) {
@@ -301,12 +284,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // const serverSortColumnName = this._transactionsService.
     //   mapToSingleServerName(this.currentSortedColumnName);
 
-    this._transactionsService.getUserDeletedTransactions(this.formType, this.reportId,
-      page, this.config.itemsPerPage,
-      this.currentSortedColumnName,
-      sortedCol.descending, this.filters)
+    this._transactionsService
+      .getUserDeletedTransactions(
+        this.formType,
+        this.reportId,
+        page,
+        this.config.itemsPerPage,
+        this.currentSortedColumnName,
+        sortedCol.descending,
+        this.filters
+      )
       .subscribe((res: GetTransactionsResponse) => {
-
         this.transactionsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
@@ -332,23 +320,21 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
   }
 
-
   /**
-	 * Wrapper method for the table service to set the class for sort column styling.
-	 *
-	 * @param colName the column to apply the class
-	 * @returns string of classes for CSS styling sorted/unsorted classes
-	 */
+   * Wrapper method for the table service to set the class for sort column styling.
+   *
+   * @param colName the column to apply the class
+   * @returns string of classes for CSS styling sorted/unsorted classes
+   */
   public getSortClass(colName: string): string {
     return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
   }
 
-
   /**
-	 * Change the sort direction of the table column.
-	 *
-	 * @param colName the column name of the column to sort
-	 */
+   * Change the sort direction of the table column.
+   *
+   * @param colName the column name of the column to sort
+   */
   public changeSortDirection(colName: string): void {
     this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
 
@@ -356,7 +342,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // call server for page data in new direction
     this.getPage(this.config.currentPage);
   }
-
 
   /**
    * Get the SortableColumnModel by name.
@@ -373,7 +358,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     return new SortableColumnModel('', false, false, false, false);
   }
 
-
   /**
    * Determine if the column is to be visible in the table.
    *
@@ -389,7 +373,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Set the visibility of a column in the table.
    *
@@ -402,7 +385,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortableCol.visible = visible;
     }
   }
-
 
   /**
    * Set the checked property of a column in the table.
@@ -419,7 +401,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    *
    * @param colName Determine if the checkbox column option should be disabled.
@@ -427,14 +408,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public disableOption(colName: string): boolean {
     const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      if (!sortableCol.checked && this.columnOptionCount >
-        (this.maxColumnOption - 1)) {
+      if (!sortableCol.checked && this.columnOptionCount > this.maxColumnOption - 1) {
         return true;
       }
     }
     return false;
   }
-
 
   /**
    * Toggle the visibility of a column in the table.
@@ -443,19 +422,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param e the click event
    */
   public toggleVisibility(colName: string, e: any) {
-
     if (!this.sortableColumns) {
       return;
     }
 
-    // only permit 5 checked at a time
+    // only permit the max checked at a time
     if (e.target.checked === true) {
       this.columnOptionCount = 0;
       for (const col of this.sortableColumns) {
         if (col.checked) {
           this.columnOptionCount++;
         }
-        if (this.columnOptionCount > 5) {
+        if (this.columnOptionCount > this.maxColumnOptionReadOnly) {
           this.setColumnChecked(colName, false);
           e.target.checked = false;
           this.columnOptionCount--;
@@ -469,12 +447,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.applyDisabledColumnOptions();
   }
 
-
   /**
    * Disable the unchecked column options if the max is met.
    */
   private applyDisabledColumnOptions() {
-    if (this.columnOptionCount > (this.maxColumnOption - 1)) {
+    if (this.columnOptionCount > this.maxColumnOption - 1) {
       for (const col of this.sortableColumns) {
         col.disabled = !col.checked;
       }
@@ -485,19 +462,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Save the columns to show selected by the user.
    */
   public saveColumnOptions() {
-
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, col.checked);
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
     this.columnOptionsModal.hide();
   }
-
 
   /**
    * Cancel the request to save columns options.
@@ -507,23 +481,21 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
   }
 
-
   /**
    * Toggle checking all types.
    *
    * @param e the click event
    */
   public toggleAllTypes(e: any) {
-    const checked = (e.target.checked) ? true : false;
+    const checked = e.target.checked ? true : false;
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, checked);
     }
   }
 
-
   /**
-	 * Determine if pagination should be shown.
-	 */
+   * Determine if pagination should be shown.
+   */
   public showPagination(): boolean {
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
@@ -532,7 +504,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     return false;
   }
 
-
   /**
    * View all transactions selected by the user.
    */
@@ -540,32 +511,29 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert('View all transactions is not yet supported');
   }
 
-
   /**
    * Print all transactions selected by the user.
    */
   public printAllSelected(): void {
     //alert('Print all transactions is not yet supported');
 
-      this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-      this._reportTypeService
-      .printPreviewPdf('3X', "PrintPreviewPDF")
-      .subscribe(res => {
-        if(res) {
-              console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-             
-              if (res['results.pdf_url'] !== null) {
-                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-                window.open(res.results.pdf_url, '_blank');
-              }
-            }
-          },
-          (error) => {
-            console.log('error: ', error);
-          });/*  */
-  
-    }
+    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
+    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
+      res => {
+        if (res) {
+          console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
 
+          if (res['results.pdf_url'] !== null) {
+            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+            window.open(res.results.pdf_url, '_blank');
+          }
+        }
+      },
+      error => {
+        console.log('error: ', error);
+      }
+    ); /*  */
+  }
 
   /**
    * Export all transactions selected by the user.
@@ -574,14 +542,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert('Export all transactions is not yet supported');
   }
 
-
   /**
    * Link all transactions selected by the user.
    */
   public linkAllSelected(): void {
     alert('Link multiple transaction requirements have not been finalized');
   }
-
 
   /**
    * Trash all transactions selected by the user.
@@ -603,24 +569,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     trxIds = trxIds.substr(0, trxIds.length - 2);
 
     this._dialogService
-    .confirm('You are about to delete these transactions. ' + trxIds,
-      ConfirmModalComponent,
-      'Caution!')
-    .then(res => {
-      if (res === 'okay') {
-        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
-          .subscribe((res: GetTransactionsResponse) => {
-            this.getTransactionsPage(this.config.currentPage);
-            this._dialogService
-              .confirm('Transaction has been successfully deleted and sent to the recycle bin. '
-                + trxIds,
-                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-          });
-      } else if (res === 'cancel') {
-      }
-    });
+      .confirm('You are about to delete these transactions. ' + trxIds, ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getTransactionsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trxIds,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
   }
-
 
   /**
    * Clone the transaction selected by the user.
@@ -631,7 +598,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert('Clone transaction is not yet supported');
   }
 
-
   /**
    * Link the transaction selected by the user.
    *
@@ -640,7 +606,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public linkTransaction(): void {
     alert('Link requirements have not been finalized');
   }
-
 
   /**
    * View the transaction selected by the user.
@@ -651,7 +616,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     alert('View transaction is not yet supported');
   }
 
-
   /**
    * Edit the transaction selected by the user.
    *
@@ -661,33 +625,32 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
-
   /**
    * Trash the transaction selected by the user.
    *
    * @param trx the Transaction to trash
    */
   public trashTransaction(trx: TransactionModel): void {
-
     this._dialogService
-    .confirm('You are about to delete this transaction ' + trx.transactionId + '.',
-      ConfirmModalComponent,
-      'Caution!')
-    .then(res => {
-      if (res === 'okay') {
-        this._transactionsService.trashOrRestoreTransactions('trash', this.reportId, [trx])
-          .subscribe((res: GetTransactionsResponse) => {
-            this.getTransactionsPage(this.config.currentPage);
-            this._dialogService
-              .confirm('Transaction has been successfully deleted and sent to the recycle bin.'
-                + trx.transactionId,
-                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-          });
-      } else if (res === 'cancel') {
-      }
-    });
+      .confirm('You are about to delete this transaction ' + trx.transactionId + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions('trash', this.reportId, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getTransactionsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin.' + trx.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
   }
-
 
   /**
    * Restore a trashed transaction from the recyle bin.
@@ -695,27 +658,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to restore
    */
   public restoreTransaction(trx: TransactionModel): void {
-
     this._dialogService
-      .confirm('You are about to restore transaction ' + trx.transactionId + '.',
-        ConfirmModalComponent,
-        'Caution!')
+      .confirm('You are about to restore transaction ' + trx.transactionId + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
           // this._transactionsService.restoreTransaction(trx)
           //   .subscribe((res: GetTransactionsResponse) => {
-          this._transactionsService.trashOrRestoreTransactions('restore', this.reportId, [trx])
+          this._transactionsService
+            .trashOrRestoreTransactions('restore', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
-              this._dialogService
-                .confirm('Transaction ' + trx.transactionId + ' has been restored!',
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+              this._dialogService.confirm(
+                'Transaction ' + trx.transactionId + ' has been restored!',
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
             });
         } else if (res === 'cancel') {
         }
       });
   }
-
 
   /**
    * Delete selected transactions from the the recyle bin.
@@ -723,7 +687,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to delete
    */
   public deleteRecyleBin(): void {
-
     let beforeMessage = '';
     // if (this.bulkActionCounter === 1) {
     //   let id = '';
@@ -747,56 +710,52 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
 
     if (selectedTransactions.length === 1) {
-      beforeMessage = 'Are you sure you want to permanently delete Transaction ' +
-        selectedTransactions[0].transactionId + '?';
+      beforeMessage =
+        'Are you sure you want to permanently delete Transaction ' + selectedTransactions[0].transactionId + '?';
     } else {
       beforeMessage = 'Are you sure you want to permanently delete these transactions?';
     }
 
-    this._dialogService
-      .confirm(beforeMessage,
-        ConfirmModalComponent,
-        'Caution!')
-      .then(res => {
-        if (res === 'okay') {
-          this._transactionsService.deleteRecycleBinTransaction(selectedTransactions)
-            .subscribe((res: GetTransactionsResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
+    this._dialogService.confirm(beforeMessage, ConfirmModalComponent, 'Caution!').then(res => {
+      if (res === 'okay') {
+        this._transactionsService
+          .deleteRecycleBinTransaction(selectedTransactions)
+          .subscribe((res: GetTransactionsResponse) => {
+            this.getRecyclingPage(this.config.currentPage);
 
-              let afterMessage = '';
-              if (selectedTransactions.length === 1) {
-                  afterMessage = `Transaction ${selectedTransactions[0].transactionId} has been successfully deleted`;
-              } else {
-                afterMessage = 'Transactions have been successfully deleted.';
-              }
-              this._dialogService
-                .confirm(afterMessage,
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-           });
-        } else if (res === 'cancel') {
-        }
-      });
+            let afterMessage = '';
+            if (selectedTransactions.length === 1) {
+              afterMessage = `Transaction ${selectedTransactions[0].transactionId} has been successfully deleted`;
+            } else {
+              afterMessage = 'Transactions have been successfully deleted.';
+            }
+            this._dialogService.confirm(
+              afterMessage,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          });
+      } else if (res === 'cancel') {
+      }
+    });
   }
-
-
 
   /**
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-
     let start = 0;
     let end = 0;
     // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
-      this.config.currentPage : 1;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
 
     if (!this.transactionsModel) {
       return '0';
     }
 
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.transactionsModel.length > 0) {
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && this.transactionsModel.length > 0) {
       // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
@@ -805,7 +764,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
-        start = (end - this.config.itemsPerPage) + 1;
+        start = end - this.config.itemsPerPage + 1;
       }
       // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
       // if (end > this.transactionsModel.length) {
@@ -817,7 +776,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     return start + ' - ' + end;
   }
 
-
   /**
    * Show the option to select/deselect columns in the table.
    */
@@ -826,12 +784,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.columnOptionsModal.show();
   }
 
-
   /**
    * Check/Uncheck all transactions in the table.
    */
   public changeAllTransactionsSelected() {
-
     // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
     // transactions for the current page.
@@ -850,7 +806,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // }
 
     // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
+    for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
       this.transactionsModel[i].selected = this.allTransactionsSelected;
       if (this.allTransactionsSelected) {
         this.bulkActionCounter++;
@@ -859,7 +815,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.bulkActionDisabled = !this.allTransactionsSelected;
   }
 
-
   /**
    * Check if the view to show is Transactions.
    */
@@ -867,14 +822,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     return this.tableType === this.transactionsView ? true : false;
   }
 
-
   /**
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
     return this.tableType === this.recycleBinView ? true : false;
   }
-
 
   /**
    * Check for multiple rows checked in the table
@@ -884,7 +837,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param the event payload from the click
    */
   public checkForMultiChecked(e: any): void {
-
     if (e.target.checked) {
       this.bulkActionCounter++;
     } else {
@@ -897,9 +849,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // Transaction View shows bulk action when more than 1 checked
     // Recycle Bin shows delete action when 1 or more checked.
     const count = this.isTransactionViewActive() ? 1 : 0;
-    this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
+    this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
   }
-
 
   /**
    * Get cached values from session.
@@ -923,7 +874,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Columns selected in the PIN dialog from the transactions view
    * need to be applied to the Recycling Bin table.
@@ -934,12 +884,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     if (localStorage.getItem(key) != null) {
       const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
       for (const col of trxCols) {
-        this._tableService.getColumnByName(col.colName,
-          this.sortableColumns).visible = col.visible;
+        this._tableService.getColumnByName(col.colName, this.sortableColumns).visible = col.visible;
       }
     }
   }
-
 
   /**
    * Apply the filters from the cache.
@@ -953,7 +901,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.filters = null;
     }
   }
-
 
   /**
    * Get the column and their settings from the cache and apply it to the component.
@@ -969,66 +916,68 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Get the current sorted column from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentSortedColCache(key: string) {
-    const currentSortedColumnJson: string | null =
-      localStorage.getItem(key);
+    const currentSortedColumnJson: string | null = localStorage.getItem(key);
     let currentSortedColumnL: SortableColumnModel = null;
     if (currentSortedColumnJson) {
       currentSortedColumnL = JSON.parse(currentSortedColumnJson);
 
       // sort by the column direction previously set
-      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName,
-        this.sortableColumns, currentSortedColumnL.descending);
+      this.currentSortedColumnName = this._tableService.setSortDirection(
+        currentSortedColumnL.colName,
+        this.sortableColumns,
+        currentSortedColumnL.descending
+      );
     } else {
       this.setSortDefault();
     }
   }
-
 
   /**
    * Get the current page from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentPageCache(key: string) {
-    const currentPageCache: string =
-      localStorage.getItem(key);
-      if (currentPageCache) {
-        if (this._utilService.isNumber(currentPageCache)) {
-          this.config.currentPage = this._utilService.toInteger(currentPageCache);
-        } else {
-          this.config.currentPage = 1;
-        }
+    const currentPageCache: string = localStorage.getItem(key);
+    if (currentPageCache) {
+      if (this._utilService.isNumber(currentPageCache)) {
+        this.config.currentPage = this._utilService.toInteger(currentPageCache);
       } else {
         this.config.currentPage = 1;
       }
+    } else {
+      this.config.currentPage = 1;
+    }
   }
-
 
   /**
    * Retrieve the cahce values from local storage and set the
    * component's class variables.
    */
   private setCachedValues() {
-
     switch (this.tableType) {
       case this.transactionsView:
-        this.setCacheValuesforView(this.transactionSortableColumnsLSK,
-          this.transactionCurrentSortedColLSK, this.transactionPageLSK);
+        this.setCacheValuesforView(
+          this.transactionSortableColumnsLSK,
+          this.transactionCurrentSortedColLSK,
+          this.transactionPageLSK
+        );
         break;
       case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
-          this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+        this.setCacheValuesforView(
+          this.recycleSortableColumnsLSK,
+          this.recycleCurrentSortedColLSK,
+          this.recyclePageLSK
+        );
         break;
       default:
         break;
     }
   }
-
 
   /**
    * Set the currently sorted column and current page in the cache.
@@ -1037,19 +986,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param sortedColKey currently sorted column key for the cache
    * @param pageKey current page key from the cache
    */
-  private setCacheValuesforView(columnsKey: string, sortedColKey: string,
-    pageKey: string) {
+  private setCacheValuesforView(columnsKey: string, sortedColKey: string, pageKey: string) {
+    // shared between trx and recycle tables
+    localStorage.setItem(columnsKey, JSON.stringify(this.sortableColumns));
 
     // shared between trx and recycle tables
-    localStorage.setItem(columnsKey,
-      JSON.stringify(this.sortableColumns));
+    localStorage.setItem(this.filtersLSK, JSON.stringify(this.filters));
 
-    // shared between trx and recycle tables
-    localStorage.setItem(this.filtersLSK,
-      JSON.stringify(this.filters));
-
-    const currentSortedCol = this._tableService.getColumnByName(
-      this.currentSortedColumnName, this.sortableColumns);
+    const currentSortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
     localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
 
     if (currentSortedCol) {
@@ -1058,22 +1002,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     localStorage.setItem(pageKey, this.config.currentPage.toString());
   }
 
-
   /**
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    // sort column names must match the domain model names
-    // Mahendra FNE-914
-    // const defaultSortColumns = ['type', 'transactionId', 'name', 'date', 'amount'];
-
-    // const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
-    // const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
-    //   'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
-
-    const defaultSortColumns = ['type', 'name', 'date', 'amount', 'aggregate'];
-    const otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'purposeDescription',
-      'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText'];
+    const defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+    const otherSortColumns = [
+      'transactionId',
+      'street',
+      'city',
+      'state',
+      'zip',
+      'purposeDescription',
+      'contributorEmployer',
+      'contributorOccupation',
+      'memoText'
+    ];
 
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
@@ -1085,21 +1029,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-
   /**
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
-    // this.currentSortedColumnName = this._tableService.setSortDirection('name',
-    //   this.sortableColumns, false);
-
-    // this.currentSortedColumnName = this._tableService.setSortDirection('default',
-    //   this.sortableColumns, false);
-
     // When default, the backend will sort by name and transaction date
     this.currentSortedColumnName = 'default';
   }
-
 
   private calculateNumberOfPages(): void {
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
@@ -1109,5 +1045,4 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       }
     }
   }
-
 }

@@ -43,7 +43,7 @@
           (click)="changeSortDirection('contributorOccupation')">Contributor Occupation
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
-          (click)="changeSortDirection('memoCode')">Memo Code
+          (click)="changeSortDirection('memoCode')">Memo
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
           (click)="changeSortDirection('memoText')">Memo Text/Description
@@ -55,7 +55,7 @@
           Amount
         </th>        
         <th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
-          (click)="changeSortDirection('aggregate')">Aggregate Amount
+          (click)="changeSortDirection('aggregate')">Aggregate
         </th>
         <th class="bulk_action">
           <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
@@ -200,7 +200,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" id="transactions__pin-modal-header">
-          <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+          <h4 class="modal-title pull-left">Column Options (Select up to {{maxColumnOptionReadOnly}})</h4>
           <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
             <span aria-hidden="true">×</span>
           </button>
