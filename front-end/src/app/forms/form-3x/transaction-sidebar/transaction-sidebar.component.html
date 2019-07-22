@@ -5,7 +5,7 @@
 
     <div class="search">
       <span class="fa fa-search"></span>
-      <input type="text" placeholder="Search by Type">
+      <input type="text" placeholder="Search by Type" />
     </div>
 
     <!-- <div class="search-field-container">
@@ -14,12 +14,13 @@
         <span class="search-icon" aria-hidden="true"></span>
       </div>
     </div> -->
-
   </header>
   <section>
     <ul class="form-sidebar__links">
-      <li [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
-        *ngFor="let categoryType of transactionCategories">
+      <li
+        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        *ngFor="let categoryType of transactionCategories"
+      >
         <div class="float-left">
           <button type="button" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
             <i class="plus-icon" aria-hidden="true"></i>
@@ -48,14 +49,23 @@
     </div>
     <div class="form-sidebar__btns">
       <div class="btn-row">
-        <button type="button" class="btn btn-secondary-gray" [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'financial_summary' }">
+        <button
+          type="button"
+          class="btn btn-secondary-gray"
+          [routerLink]="['/forms/form/', '3X']"
+          [queryParams]="{ step: 'financial_summary' }"
+        >
           Summary
         </button>
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row">
-          <button type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
+          <button
+            type="button"
+            class="btn btn-secondary-gray"
+            [routerLink]="['/forms/form/', '3X']"
+            [queryParams]="{ step: 'step_5' }"
+          >
             Sign &amp; Submit
           </button>
         </div>
