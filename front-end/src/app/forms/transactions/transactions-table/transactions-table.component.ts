@@ -553,7 +553,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Trash (send to Recycling Bin) all transactions selected by the user.
    */
   public trashAllSelected(): void {
-
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
@@ -563,20 +562,27 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       }
     }
 
-    // trxIds.trimRight();
-    // trxIds = trxIds.trimRight();
     trxIds = trxIds.substr(0, trxIds.length - 2);
 
     this._dialogService
-      .confirm('You are about to delete these transactions. ' + trxIds, ConfirmModalComponent, 'Caution!')
+      .confirm('You are about to delete these transactions.   ' + trxIds, ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
           this._transactionsService
             .trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
             .subscribe((res: GetTransactionsResponse) => {
               this.getTransactionsPage(this.config.currentPage);
+
+              let afterMessage = '';
+              if (selectedTransactions.length === 1) {
+                afterMessage = `Transaction ${selectedTransactions[0].transactionId}
+                  has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + trxIds;
+              }
+
               this._dialogService.confirm(
-                'Transaction has been successfully deleted and sent to the recycle bin. ' + trxIds,
+                afterMessage,
                 ConfirmModalComponent,
                 'Success!',
                 false,
@@ -639,7 +645,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             .subscribe((res: GetTransactionsResponse) => {
               this.getTransactionsPage(this.config.currentPage);
               this._dialogService.confirm(
-                'Transaction has been successfully deleted and sent to the recycle bin.' + trx.transactionId,
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transactionId,
                 ConfirmModalComponent,
                 'Success!',
                 false,
@@ -686,33 +692,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to delete
    */
   public deleteRecyleBin(): void {
-    let beforeMessage = '';
-    // if (this.bulkActionCounter === 1) {
-    //   let id = '';
-    //   for (const trx of this.transactionsModel) {
-    //     if (trx.selected) {
-    //       id = trx.transactionId;
-    //     }
-    //   }
-    //   beforeMessage = (id !== '') ?
-    //     'Are you sure you want to permanently delete Transaction ' + id + '?' :
-    //     'Are you sure you want to permanently delete this Transaction?';
-    // } else {
-    //   beforeMessage = 'Are you sure you want to permanently delete these transactions?';
-    // }
-
+    let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
         selectedTransactions.push(trx);
+        trxIds += trx.transactionId + ', ';
       }
     }
+    trxIds = trxIds.substr(0, trxIds.length - 2);
 
+    let beforeMessage = '';
     if (selectedTransactions.length === 1) {
-      beforeMessage =
-        'Are you sure you want to permanently delete Transaction ' + selectedTransactions[0].transactionId + '?';
+      beforeMessage = `Are you sure you want to permanently delete
+       Transaction ${selectedTransactions[0].transactionId}?`;
     } else {
-      beforeMessage = 'Are you sure you want to permanently delete these transactions?';
+      beforeMessage = 'Are you sure you want to permanently delete these transactions?   ' + trxIds;
     }
 
     this._dialogService.confirm(beforeMessage, ConfirmModalComponent, 'Caution!').then(res => {
@@ -726,7 +721,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             if (selectedTransactions.length === 1) {
               afterMessage = `Transaction ${selectedTransactions[0].transactionId} has been successfully deleted`;
             } else {
-              afterMessage = 'Transactions have been successfully deleted.';
+              afterMessage = 'Transactions have been successfully deleted.   ' + trxIds;
             }
             this._dialogService.confirm(
               afterMessage,
