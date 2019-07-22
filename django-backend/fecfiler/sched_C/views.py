@@ -28,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_C2 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_C1 = ['cmte_id', 'report_id',
-    'line_number', 'transaction_type', 'transaction_id']
+                             'line_number', 'transaction_type', 'transaction_id']
 MANDATORY_FIELDS_SCHED_C = ['cmte_id', 'report_id',
-    'line_number', 'transaction_type', 'transaction_id']
+                            'line_number', 'transaction_type', 'transaction_id']
 
 
 def check_transaction_id(transaction_id):
@@ -94,7 +94,7 @@ def schedC_sql_dict(data):
             'memo_text',
     ]
     try:
-        return {k: v for k, v in data.items if k in valid_fields}
+        return {k: v for k, v in data.items() if k in valid_fields}
     except:
         raise Exception('invalid request data.')
 
@@ -122,33 +122,33 @@ def put_sql_schedC(data):
     uopdate a schedule_c item
     """
     _sql = """UPDATE public.sched_c
-              SET transaction_type = ?,
-                  transaction_type_identifier = ?,
-                  entity_id = ?,
-                  election_code = ?,
-                  election_other_description = ?,
-                  loan_amount_original = ?,
-                  loan_payment_to_date = ?,
-                  loan_balance = ?,
-                  loan_incurred_date = ?,
-                  loan_due_date = ?,
-                  loan_intrest_rate = ?,
-                  is_loan_secured = ?,
-                  is_personal_funds = ?,
-                  lender_cmte_id = ?,
-                  lender_cand_id = ?,
-                  lender_cand_last_name = ?,
-                  lender_cand_first_name = ?,
-                  lender_cand_middle_name = ?,
-                  lender_cand_prefix = ?,
-                  lender_cand_suffix = ?,
-                  lender_cand_office = ?,
-                  lender_cand_state = ?,
-                  lender_cand_district = ?,
-                  memo_code = ?,
-                  memo_text = ?,
-                  last_update_date = ?
-              WHERE transaction_id = ? AND report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
+              SET transaction_type = %s,
+                  transaction_type_identifier = %s,
+                  entity_id = %s,
+                  election_code = %s,
+                  election_other_description = %s,
+                  loan_amount_original = %s,
+                  loan_payment_to_date = %s,
+                  loan_balance = %s,
+                  loan_incurred_date = %s,
+                  loan_due_date = %s,
+                  loan_intrest_rate = %s,
+                  is_loan_secured = %s,
+                  is_personal_funds = %s,
+                  lender_cmte_id = %s,
+                  lender_cand_id = %s,
+                  lender_cand_last_name = %s,
+                  lender_cand_first_name = %s,
+                  lender_cand_middle_name = %s,
+                  lender_cand_prefix = %s,
+                  lender_cand_suffix = %s,
+                  lender_cand_office = %s,
+                  lender_cand_state = %s,
+                  lender_cand_district = %s,
+                  memo_code = %s,
+                  memo_text = %s,
+                  last_update_date = %s
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (
             data.get('transaction_type', ''),
@@ -239,7 +239,7 @@ def post_sql_schedC(data):
             memo_code,
             memo_text,
             create_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """
         _v = (
             data.get('cmte_id', ''),
@@ -335,7 +335,7 @@ def get_list_all_schedC(report_id, cmte_id):
             memo_text,
             last_update_date
             FROM public.sched_c
-            WHERE report_id = ? AND cmte_id = ?
+            WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
@@ -387,7 +387,7 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
             memo_text,
             last_update_date
             FROM public.sched_c
-            WHERE report_id = ? AND cmte_id = ? AND transaction_id = ?
+            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
@@ -410,7 +410,7 @@ def delete_schedC(data):
     try:
         # check_mandatory_fields_SC2(data)
         delete_sql_schedC1(data.get('cmte_id'), data.get(
-            'report_id'). data.get('transaction_id'))
+            'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
@@ -421,7 +421,7 @@ def delete_sql_schedC(cmte_id, report_id, transaction_id):
     """
     _sql = """UPDATE public.sched_c
             SET delete_ind = 'Y' 
-            WHERE transaction_id = ? AND report_id = ? AND cmte_id = ?
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
     do_transaction(_sql, _v)
@@ -470,7 +470,7 @@ def schedC(request):
             }
             if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
@@ -491,14 +491,14 @@ def schedC(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.query_params.get('transaction_id'))
+                    request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC(data)
@@ -579,7 +579,7 @@ def schedC1_sql_dict(data):
             'authorized_signed_date',
     ]
     try:
-        return {k: v for k, v in data.items if k in valid_fields}
+        return {k: v for k, v in data.items() if k in valid_fields}
     except:
         raise Exception('invalid request data.')
 
@@ -627,43 +627,43 @@ def put_sql_schedC1(data):
     """
     _sql = """UPDATE public.sched_c1
               SET
-                line_number = ?,
-                transaction_type = ?,
-                transaction_type_identifier = ?,
-                transaction_id = ?,
-                lender_entity_id = ?,
-                loan_amount = ?,
-                loan_intrest_rate = ?,
-                loan_incurred_date = ?,
-                loan_due_date = ?,
-                is_loan_restructured = ?,
-                original_loan_date = ?,
-                credit_amount_this_draw = ?,
-                total_outstanding_balance = ?,
-                other_parties_liable = ?,
-                pledged_collateral_ind = ?,
-                pledge_collateral_desc = ?,
-                pledge_collateral_amount=?,
-                perfected_intrest_ind=?,
-                future_income_ind=?,
-                future_income_desc=?,
-                future_income_estimate=?,
-                depository_account_established_date=?,
-                depository_account_location=?,
-                depository_account_street_1=?,
-                depository_account_street_2=?,
-                depository_account_city=?,
-                depository_account_state=?,
-                depository_account_zip=?,
-                depository_account_auth_date=?,
-                basis_of_loan_desc=?,
-                treasurer_entity_id =?,
-                treasurer_signed_date=?,
-                authorized_entity_id=?,
-                authorized_entity_title = ?,
-                authorized_signed_date = ?,
-                last_update_date = ?
-              WHERE transaction_id = ? AND report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
+                line_number = %s,
+                transaction_type = %s,
+                transaction_type_identifier = %s,
+                transaction_id = %s,
+                lender_entity_id = %s,
+                loan_amount = %s,
+                loan_intrest_rate = %s,
+                loan_incurred_date = %s,
+                loan_due_date = %s,
+                is_loan_restructured = %s,
+                original_loan_date = %s,
+                credit_amount_this_draw = %s,
+                total_outstanding_balance = %s,
+                other_parties_liable = %s,
+                pledged_collateral_ind = %s,
+                pledge_collateral_desc = %s,
+                pledge_collateral_amount=%s,
+                perfected_intrest_ind=%s,
+                future_income_ind=%s,
+                future_income_desc=%s,
+                future_income_estimate=%s,
+                depository_account_established_date=%s,
+                depository_account_location=%s,
+                depository_account_street_1=%s,
+                depository_account_street_2=%s,
+                depository_account_city=%s,
+                depository_account_state=%s,
+                depository_account_zip=%s,
+                depository_account_auth_date=%s,
+                basis_of_loan_desc=%s,
+                treasurer_entity_id =%s,
+                treasurer_signed_date=%s,
+                authorized_entity_id=%s,
+                authorized_entity_title = %s,
+                authorized_signed_date = %s,
+                last_update_date = %s
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (
             data.get('line_number'),
@@ -780,46 +780,46 @@ def post_sql_schedC1(data):
             authorized_entity_title,
             authorized_signed_date,
             create_date)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
             data.get('line_number'),
             data.get('transaction_type'),
-            data.get('transaction_type_identifier',''),
-            data.get('transaction_id',''),
-            data.get('lender_entity_id',''),
-            data.get('loan_amount',''),
+            data.get('transaction_type_identifier', ''),
+            data.get('transaction_id', ''),
+            data.get('lender_entity_id', ''),
+            data.get('loan_amount', None),
             data.get('loan_intrest_rate',''),
-            data.get('loan_incurred_date',''),
-            data.get('loan_due_date',''),
+            data.get('loan_incurred_date', None),
+            data.get('loan_due_date', None),
             data.get('is_loan_restructured',''),
-            data.get('original_loan_date',''),
-            data.get('credit_amount_this_draw',''),
+            data.get('original_loan_date', None),
+            data.get('credit_amount_this_draw', None),
             data.get('total_outstanding_balance',''),
             data.get('other_parties_liable',''),
             data.get('pledged_collateral_ind',''),
             data.get('pledge_collateral_desc',''),
-            data.get('pledge_collateral_amount',''),
+            data.get('pledge_collateral_amount',None),
             data.get('perfected_intrest_ind',''),
             data.get('future_income_ind',''),
             data.get('future_income_desc',''),
-            data.get('future_income_estimate',''),
-            data.get('depository_account_established_date',''),
+            data.get('future_income_estimate',None),
+            data.get('depository_account_established_date',None),
             data.get('depository_account_location',''),
             data.get('depository_account_street_1',''),
             data.get('depository_account_street_2',''),
             data.get('depository_account_city',''),
             data.get('depository_account_state',''),
             data.get('depository_account_zip',''),
-            data.get('depository_account_auth_date',''),
+            data.get('depository_account_auth_date',None),
             data.get('basis_of_loan_desc',''),
             data.get('treasurer_entity_id',''),
-            data.get('treasurer_signed_date',''),
+            data.get('treasurer_signed_date',None),
             data.get('authorized_entity_id',''),
             data.get('authorized_entity_title',''),
-            data.get('authorized_signed_date',''),
+            data.get('authorized_signed_date',None),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -885,7 +885,7 @@ def get_list_all_schedC1(report_id, cmte_id):
             authorized_signed_date,
             last_update_date
             FROM public.sched_c1
-            WHERE report_id = ? AND cmte_id = ?
+            WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
@@ -944,7 +944,7 @@ def get_list_schedC1(report_id, cmte_id, transaction_id):
             authorized_signed_date,
             last_update_date
             FROM public.sched_c1
-            WHERE report_id = ? AND cmte_id = ? AND transaction_id = ?
+            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
@@ -967,7 +967,7 @@ def delete_schedC1(data):
     try:
         # check_mandatory_fields_SC2(data)
         delete_sql_schedC1(data.get('cmte_id'), data.get(
-            'report_id'). data.get('transaction_id'))
+            'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
@@ -978,7 +978,7 @@ def delete_sql_schedC1(cmte_id, report_id, transaction_id):
     """
     _sql = """UPDATE public.sched_c1
             SET delete_ind = 'Y' 
-            WHERE transaction_id = ? AND report_id = ? AND cmte_id = ?
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
     do_transaction(_sql, _v)
@@ -1002,9 +1002,12 @@ def schedC1(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
+            print(cmte_id)
+            print(report_id)
             datum = schedC1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            print(datum)
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -1027,7 +1030,7 @@ def schedC1(request):
             }
             if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
@@ -1048,14 +1051,14 @@ def schedC1(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.query_params.get('transaction_id'))
+                    request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC1(data)
@@ -1130,7 +1133,7 @@ def put_schedC2(data):
         except Exception as e:
             raise Exception(
                 'The put_sql_schedD function is throwing an error: ' + str(e))
-        return datum
+        return data
     except:
         raise
 
@@ -1140,11 +1143,11 @@ def put_sql_schedC2(data):
     uopdate a schedule_c2 item
     """
     _sql = """UPDATE public.sched_c2
-            SET transaction_type_identifier = ?,
-                guarantor_entity_id = ?,
-                guaranteed_amount = ?,
-                last_update_date = ?
-            WHERE transaction_id = ? AND report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
+            SET transaction_type_identifier = %s,
+                guarantor_entity_id = %s,
+                guaranteed_amount = %s,
+                last_update_date = %s
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (data.get('transaction_type_identifier', ''),
           data.get('guarantor_entity_id', ''),
@@ -1223,7 +1226,7 @@ def post_sql_schedC2(data):
                                     guarantor_entity_id,
                                     guaranteed_amount,
                                     create_date)
-        VALUES (?,?,?,?,?,?,?)
+        VALUES (%s,%s,%s,%s,%s,%s,%s)
         """
         _v = (
             data.get('cmte_id', ''),
@@ -1262,7 +1265,7 @@ def delete_schedC2(data):
     try:
         check_mandatory_fields_SC2(data)
         delete_sql_schedC2(data.get('cmte_id'), data.get(
-            'report_id'). data.get('transaction_id'))
+            'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
@@ -1270,7 +1273,7 @@ def delete_schedC2(data):
 def delete_sql_schedC2(cmte_id, report_id, transaction_id):
     _sql = """UPDATE public.sched_c2
             SET delete_ind = 'Y' 
-            WHERE transaction_id = ? AND report_id = ? AND cmte_id = ?
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
     _v = (transaction_id, report_id, cmte_id)
     do_transaction(_sql, _v)
@@ -1288,7 +1291,7 @@ def get_list_all_schedC2(report_id, cmte_id):
             guaranteed_amount,
             last_update_date
             FROM public.sched_c2
-            WHERE report_id = ? AND cmte_id = ?
+            WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
@@ -1331,7 +1334,7 @@ def get_list_schedC2(report_id, cmte_id, transaction_id):
             guaranteed_amount,
             last_update_date
             FROM public.sched_c2
-            WHERE report_id = ? AND cmte_id = ? AND transaction_id = ?
+            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
 
@@ -1357,7 +1360,7 @@ def schedC2_sql_dict(data):
         'guaranteed_amount',
     ]
     try:
-        return {k: v for k, v in data.items if k in valid_fields}
+        return {k: v for k, v in data.items() if k in valid_fields}
     except:
         raise Exception('invalid request data.')
 
@@ -1382,6 +1385,8 @@ def schedC2(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
+            print(cmte_id)
+            print(report_id)
             datum = schedC2_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -1391,6 +1396,7 @@ def schedC2(request):
                     request.data.get('transaction_id'))
                 data = put_schedC2(datum)
             else:
+                print(datum)
                 data = post_schedC2(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -1407,7 +1413,7 @@ def schedC2(request):
             }
             if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
@@ -1428,23 +1434,24 @@ def schedC2(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.query_params.get('transaction_id'))
+                    request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC2(data)
             return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')), status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response("The schedD API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The schedC2 API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         try:
+            datum = schedC2_sql_dict(request.data)
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
             else:

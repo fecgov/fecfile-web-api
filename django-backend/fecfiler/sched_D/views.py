@@ -53,8 +53,6 @@ def schedD(request):
     if request.method == 'POST':
         try:
             cmte_id = request.user.username
-            print('*****')
-            print(request.data)
             if not('report_id' in request.data):
                 raise Exception('Missing Input: report_id is mandatory')
             # handling null,none value of report_id
@@ -66,7 +64,6 @@ def schedD(request):
             datum = schedD_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
-            print(datum)
             # if 'creditor_entity_id' in request.data and check_null_value(
             #         request.data.get('creditor_entity_id')):
             #     datum['creditor_entity_id'] = request.data.get(
@@ -91,9 +88,9 @@ def schedD(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.data:
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
@@ -107,21 +104,21 @@ def schedD(request):
             return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
         except Exception as e:
             logger.debug(e)
-            return Response("The schedA API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The schedD API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         try:
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+            if 'report_id' in request.data:
                 data['report_id'] = check_report_id(
-                    request.query_params.get('report_id'))
+                    request.data.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.query_params.get('transaction_id'))
+                    request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedD(data)
@@ -153,7 +150,7 @@ def schedD(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedA(datum)
+            data = put_schedD(datum)
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -165,17 +162,18 @@ def schedD(request):
 
 
 def delete_schedD(data):
+
     try:
-        delete_sql_schedA(data.get('cmte_id'), data.get(
-            'report_id'). data.get('transaction_id'))
+        delete_sql_schedD(data.get('cmte_id'), data.get(
+            'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
 def delete_sql_schedD(cmte_id, report_id, transaction_id):
     _sql = """UPDATE public.sched_d
-    SET delete_ind = 'Y' 
-    WHERE transaction_id = ? AND report_id = ? AND cmte_id = ?
+    SET delete_ind = 'Y'
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s;
     """
     _v = (transaction_id, report_id, cmte_id)
     do_transaction(_sql, _v)
@@ -194,8 +192,6 @@ def schedD_sql_dict(data):
         'payment_amount',
         'balance_at_close',
     ]
-    # for k, v in data.items:
-    #     print(k, v)
     try:
         return {k: v for k, v in data.items() if k in valid_fields}
     except:
@@ -318,7 +314,6 @@ def post_schedD(datum):
 
 
 def post_sql_schedD(data):
-    print(data)
     try:
         _sql = """
         INSERT INTO public.sched_d (cmte_id,
@@ -358,16 +353,16 @@ def put_sql_schedD(data):
     """
     uopdate a schedule_d item
     """
-    _sql = """UPDATE public.sched_a
-            SET transaction_type_identifier = ?,
-                creditor_entity_id = ?,
-                purpose = ?,
-                beginning_balance = ?,
-                balance_at_close = ?,
-                incurred_amount = ?,
-                payment_amount = ?,
-                last_update_date = ?
-            WHERE transaction_id = ? AND report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
+    _sql = """UPDATE public.sched_d
+            SET transaction_type_identifier = %s,
+                creditor_entity_id = %s,
+                purpose = %s,
+                beginning_balance = %s,
+                balance_at_close = %s,
+                incurred_amount = %s,
+                payment_amount = %s,
+                last_update_date = %s
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y';
         """
     _v = (data.get('transaction_type_identifier', ''),
           data.get('creditor_entity_id', ''),
@@ -387,7 +382,6 @@ def put_sql_schedD(data):
 def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
-            # Insert data into schedA table
             cursor.execute(sql, values)
             if (cursor.rowcount == 0):
                 raise Exception(
@@ -429,7 +423,7 @@ def get_list_all_schedD(report_id, cmte_id):
             incurred_amount, 
             payment_amount, 
             last_update_date
-            FROM public.sched_d WHERE report_id = ? AND cmte_id = ? AND delete_ind is distinct from 'Y'
+            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y';
             """
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
@@ -461,17 +455,18 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            query_string = """SELECT cmte_id, 
-            report_id, 
-            transaction_type_identifier, 
-            transaction_id, 
-            creditor_entity_id, 
-            beginning_balance, 
-            balance_at_close, 
-            incurred_amount, 
-            payment_amount, 
+            query_string = """SELECT cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            creditor_entity_id,
+            beginning_balance,
+            balance_at_close,
+            incurred_amount,
+            payment_amount,
             last_update_date
-            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'
+            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
+            AND transaction_id = %s AND delete_ind is distinct from 'Y';
             """
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
