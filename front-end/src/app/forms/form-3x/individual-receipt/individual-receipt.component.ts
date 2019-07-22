@@ -294,6 +294,19 @@ export class IndividualReceiptComponent implements OnInit {
             if (this.memoCode) {
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             }
+          }
+          if (field === 'last_name' || field === 'first_name') {
+            // TODO Possible detfect with typeahead setting field as the entity object
+            // rather than the string defined by the inputFormatter();
+            // If an object is received, find the value on the object by fields type
+            // otherwise use the string value.  This is not desired and this patch
+            // should be removed if the issue is resolved.
+            const typeAheadField = this.frmIndividualReceipt.get(field).value;
+            if (typeof typeAheadField !== 'string') {
+              receiptObj[field] = typeAheadField[field];
+            } else {
+              receiptObj[field] = typeAheadField;
+            }
           } else {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
           }
