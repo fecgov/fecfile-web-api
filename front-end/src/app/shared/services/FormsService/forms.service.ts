@@ -574,15 +574,15 @@ export class FormsService {
 
   public formHasUnsavedData(formType: string): boolean {
       let formSaved: any = JSON.parse(localStorage.getItem(`form_${formType}_saved`));
+      if (formSaved.hasOwnProperty('saved')) {
+        if(formSaved !== null) {
+          let formStatus: boolean = formSaved.saved;
 
-      if(formSaved !== null) {
-        let formStatus: boolean = formSaved.saved;
-
-        if(!formStatus) {
-          return true;
+          if(!formStatus) {
+            return true;
+          }
         }
-      }
-
+      }  
       return false;
   }
 

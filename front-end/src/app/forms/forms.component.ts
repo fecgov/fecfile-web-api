@@ -56,26 +56,27 @@ export class FormsComponent implements OnInit {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-    if (this._formsService.formHasUnsavedData(this.formType)) {
-      let result: boolean = null;
+      if (this._formsService.formHasUnsavedData(this.formType)) {
+        let result: boolean = null;
+        console.log(" form not saved...");
+        result = await this._dialogService
+          .confirm('', ConfirmModalComponent)
+          .then(res => {
+            let val: boolean = null;
 
-      result = await this._dialogService
-        .confirm('', ConfirmModalComponent)
-        .then(res => {
-          let val: boolean = null;
+            if(res === 'okay') {
+              val = true;
+            } else if(res === 'cancel') {
+              val = false;
+            }
 
-          if(res === 'okay') {
-            val = true;
-          } else if(res === 'cancel') {
-            val = false;
-          }
+            return val;
+          });
 
-          return val;
-        });
-
-      return result;
-    } else {
-      return true;
+        return result;
+      } else {
+        console.log("Not any unsaved data...");
+        return true;
     }
   }
 }

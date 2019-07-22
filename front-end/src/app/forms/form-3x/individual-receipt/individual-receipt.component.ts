@@ -24,6 +24,7 @@ import { floatingPoint } from '../../../shared/utils/forms/validation/floating-p
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
+
 @Component({
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
@@ -76,7 +77,9 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
+    localStorage.setItem('Receipts_Entry_Screen', 'Yes');
+    
     this._messageService.clearMessage();
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
@@ -133,6 +136,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
+    localStorage.removeItem('form_3X_saved');
   }
 
   public debug(obj: any): void {
@@ -359,13 +363,14 @@ export class IndividualReceiptComponent implements OnInit {
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
-
+          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
           window.scrollTo(0, 0);
         }
       });
     } else {
       this.frmIndividualReceipt.markAsDirty();
       this.frmIndividualReceipt.markAsTouched();
+      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':false}));
       window.scrollTo(0, 0);
     }
   }
@@ -386,6 +391,11 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public viewTransactions(): void {
     let reportId = '0';
+
+    if (this.frmIndividualReceipt.touched || this.frmIndividualReceipt.dirty){
+      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':false}));
+    }
+    
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
     if (form3XReportType === null || typeof form3XReportType === 'undefined') {
@@ -410,6 +420,8 @@ export class IndividualReceiptComponent implements OnInit {
       // reportId = '1206963';
     }
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
+    localStorage.setItem(`form_${this._formType}_view_transaction_screen`,'Yes');
+    localStorage.setItem('Transaction_Table_Screen', 'Yes');
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
   }
