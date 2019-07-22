@@ -1,3 +1,7 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt">
     <header>
@@ -67,6 +71,7 @@
                       </div>
                     </ng-container>
                     <input
+                      *ngIf="col?.name !== 'first_name' && col?.name !== 'last_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -84,6 +89,59 @@
                           : ''
                       "
                       (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    />
+
+                    <!-- <app-typeahead
+                      *ngIf="col?.name === 'first_name' || col?.name === 'last_name'"
+                      [fieldName]="col?.name"
+                      [columnProperties]="col"
+                      (selectedItem)="receiveTypeaheadData($event)"
+                    >
+                    </app-typeahead> -->
+
+                    <input
+                      *ngIf="col?.name === 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-last-name"
+                      [ngbTypeahead]="searchLastName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterLastName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                    <input
+                      *ngIf="col?.name === 'first_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-first-name"
+                      [ngbTypeahead]="searchFirstName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterFirstName"
+                      (selectItem)="handleSelectedItem($event)"
                     />
                   </div>
                   <div

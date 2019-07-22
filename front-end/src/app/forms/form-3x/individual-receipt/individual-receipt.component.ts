@@ -12,7 +12,7 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
-import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
@@ -23,7 +23,9 @@ import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numer
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -37,6 +39,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
+  @Input() transactionType = '';
 
   public checkBoxVal: boolean = false;
   public frmIndividualReceipt: FormGroup;
@@ -56,6 +59,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _formSubmitted: boolean = false;
   private readonly _contributionAggregateValue: number = 0.0;
   private readonly _memoCodeValue: string = 'X';
+  private _selectedEntityId: number;
 
   constructor(
     private _http: HttpClient,
@@ -69,7 +73,8 @@ export class IndividualReceiptComponent implements OnInit {
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService,
+    private _typeaheadService: TypeaheadService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -77,9 +82,9 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
+    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
-    
+
     this._messageService.clearMessage();
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
@@ -261,37 +266,6 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Updates the contribution aggregate field once contribution ammount is entered.
-   *
-   * @param      {Object}  e       The event object.
-   */
-  public contributionAmountChange(e): void {
-    const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = String(this._contributionAggregateValue);
-
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
-
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
-
-    /**
-     * TODO: To be implemented in the future.
-     */
-
-    // this._receiptService
-    //   .aggregateAmount(
-    //     res.report_id,
-    //     res.transaction_type,
-    //     res.contribution_date,
-    //     res.entity_id,
-    //     res.contribution_amount
-    //   )
-    //   .subscribe(resp => {
-    //     console.log('resp: ', resp);
-    //   });
-  }
-
-  /**
    * Updates vaprivate _memoCode variable.
    *
    * @param      {Object}  e      The event object.
@@ -322,6 +296,19 @@ export class IndividualReceiptComponent implements OnInit {
             if (this.memoCode) {
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             }
+          }
+          if (field === 'last_name' || field === 'first_name') {
+            // TODO Possible detfect with typeahead setting field as the entity object
+            // rather than the string defined by the inputFormatter();
+            // If an object is received, find the value on the object by fields type
+            // otherwise use the string value.  This is not desired and this patch
+            // should be removed if the issue is resolved.
+            const typeAheadField = this.frmIndividualReceipt.get(field).value;
+            if (typeof typeAheadField !== 'string') {
+              receiptObj[field] = typeAheadField[field];
+            } else {
+              receiptObj[field] = typeAheadField;
+            }
           } else {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
           }
@@ -331,6 +318,12 @@ export class IndividualReceiptComponent implements OnInit {
       this.hiddenFields.forEach(el => {
         receiptObj[el.name] = el.value;
       });
+
+      // If entity ID exist, the transaction will be added to the existing entity by the API
+      // Otherwise it will create a new Entity.
+      if (this._selectedEntityId) {
+        receiptObj.entity_id = this._selectedEntityId;
+      }
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
@@ -361,16 +354,17 @@ export class IndividualReceiptComponent implements OnInit {
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+          this._selectedEntityId = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
-          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
+          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
           window.scrollTo(0, 0);
         }
       });
     } else {
       this.frmIndividualReceipt.markAsDirty();
       this.frmIndividualReceipt.markAsTouched();
-      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':false}));
+      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
     }
   }
@@ -390,28 +384,7 @@ export class IndividualReceiptComponent implements OnInit {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    let reportId = '0';
-
-    if (this.frmIndividualReceipt.touched || this.frmIndividualReceipt.dirty){
-      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':false}));
-    }
-    
-    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
-      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-    }
-
-    console.log('viewTransactions form3XReportType', form3XReportType);
-
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        reportId = form3XReportType.reportid;
-      }
-    }
-
+    let reportId = this.getReportIdFromStorage();
     console.log('reportId', reportId);
 
     if (!reportId) {
@@ -420,7 +393,7 @@ export class IndividualReceiptComponent implements OnInit {
       // reportId = '1206963';
     }
     console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
-    localStorage.setItem(`form_${this._formType}_view_transaction_screen`,'Yes');
+    localStorage.setItem(`form_${this._formType}_view_transaction_screen`, 'Yes');
     localStorage.setItem('Transaction_Table_Screen', 'Yes');
 
     this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
@@ -443,5 +416,165 @@ export class IndividualReceiptComponent implements OnInit {
         console.log('error: ', error);
       }
     ); /*  */
+  }
+
+  /**
+   * @deprecated
+   */
+  public receiveTypeaheadData(contact: any, fieldName: string): void {
+    console.log('entity selected by typeahead is ' + contact);
+
+    if (fieldName === 'first_name') {
+      this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
+    }
+
+    if (fieldName === 'last_name') {
+      this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+      this.frmIndividualReceipt.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
+    }
+
+    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+  }
+
+  /**
+   * Format an entity to display in the type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadItem(result: any) {
+    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+  }
+
+  /**
+   * Populate the fields in the form with the values from the selected contact.
+   *
+   * @param $event The mouse event having selected the contact from the typeahead options.
+   */
+  public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
+    const contact = $event.item;
+
+    this._selectedEntityId = contact.entity_id;
+    this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+
+    let transactionTypeIdentifier = '';
+    // Use this if transaction_tye_identifier is to come from dynamic form data
+    // currently it's called to early to detect type changes as it happens in step 1 / report type
+    // for (const field of this.hiddenFields) {
+    //   if (field.name === 'transaction_type_identifier') {
+    //     transactionTypeIdentifier = field.value;
+    //   }
+    // }
+
+    // default to indiv-receipt for sprint 17 - use input field in sprint 18.
+    transactionTypeIdentifier = 'INDV_REC';
+    console.log('transaction type from input is ' + this.transactionType);
+
+    const reportId = this.getReportIdFromStorage();
+    this._receiptService
+      .getContributionAggregate(reportId, contact.entity_id, transactionTypeIdentifier)
+      .subscribe(res => {
+        this.frmIndividualReceipt.patchValue(
+          { contribution_aggregate: res.contribution_aggregate },
+          { onlySelf: true }
+        );
+      });
+  }
+
+  /**
+   * Search for entities/contacts when last name input value changes.
+   */
+  searchLastName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        return this._typeaheadService.getContacts(searchText, 'last_name');
+      })
+    );
+
+  /**
+   * Search for entities/contacts when first name input value changes.
+   */
+  searchFirstName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        return this._typeaheadService.getContacts(searchText, 'first_name');
+      })
+    );
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the last name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterLastName = (x: { last_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.last_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the first name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterFirstName = (x: { first_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * Obtain the Report ID from local storage.
+   */
+  private getReportIdFromStorage() {
+    let reportId = '0';
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+    }
+
+    console.log('viewTransactions form3XReportType', form3XReportType);
+
+    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+      if (form3XReportType.hasOwnProperty('reportId')) {
+        reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
+      }
+    }
+    return reportId;
   }
 }
