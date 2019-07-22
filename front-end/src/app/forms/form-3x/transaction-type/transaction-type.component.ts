@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -18,7 +18,6 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
   encapsulation: ViewEncapsulation.None
 })
 export class TransactionTypeComponent implements OnInit {
-
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() transactionCategory: string = null;
@@ -32,7 +31,7 @@ export class TransactionTypeComponent implements OnInit {
   public secondaryOptions: any = [];
   public transactionType: string = null;
   public transactionTypeText: string = null;
-  public transactionTypeFailed : boolean = false;
+  public transactionTypeFailed: boolean = false;
   public transactionCategorySelected: boolean = false;
   public tranasctionCategoryVal: string = '';
 
@@ -73,7 +72,10 @@ export class TransactionTypeComponent implements OnInit {
 
     if (this.transactionCategory && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
       this._setSecondaryTransactionCategories();
-    } else if (this.transactionCategory && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
+    } else if (
+      this.transactionCategory &&
+      localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null
+    ) {
       const transactionObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
       if (transactionObj.mainTransactionTypeText !== this.transactionCategory) {
@@ -89,7 +91,6 @@ export class TransactionTypeComponent implements OnInit {
     this.frmSubmitted = true;
 
     if (this.frmOption.valid) {
-
       if (localStorage.getItem(`form_${this._formType}_temp_transaction_type`) !== null) {
         const transObj: any = JSON.parse(localStorage.getItem(`form_${this._formType}_temp_transaction_type`));
 
@@ -107,7 +108,6 @@ export class TransactionTypeComponent implements OnInit {
       });
       return 1;
     } else {
-
       if (!this.tranasctionCategoryVal) {
         this.transactionCategorySelected = false;
       } else {
@@ -132,12 +132,13 @@ export class TransactionTypeComponent implements OnInit {
    * @param      {Boolean}  opened  The opened
    */
   public pannelChange(opened: boolean): void {
-    if (opened) { // panel is closed
+    if (opened) {
+      // panel is closed
       this.transactionType = '';
       this.transactionTypeText = '';
       this.frmOption.controls['secondaryOption'].setValue('');
       this.transactionCategorySelected = true;
-      this.transactionTypeFailed = true;      
+      this.transactionTypeFailed = true;
     }
   }
 
@@ -154,24 +155,30 @@ export class TransactionTypeComponent implements OnInit {
     this.transactionType = val;
     this.transactionTypeText = childOption.text;
 
+    // TODO once get_transaction_category API provides special trans_type code, add this.
+    // set it on the obj in _setSecondaryTransactionCategories for local storage.
+    // Then get it from LS when calling getContributionAggregate in individualRecept.
+    //  OR
+    // Pass it as input to indiv receipt just like transactionTypeText
+    // this.transactionTypeCode = childOption.code;
+
     this.frmOption.controls['secondaryOption'].setValue(val);
 
     this.transactionTypeFailed = false;
   }
 
-
   /**
    * Sets the secondary transaction categories.
    */
   private _setSecondaryTransactionCategories(): void {
-    this._mainTransactionCategory = this.transactionCategories.filter(el => (el.value === this.transactionCategory));
+    this._mainTransactionCategory = this.transactionCategories.filter(el => el.value === this.transactionCategory);
     const mainTransactionTypeText: string = this._mainTransactionCategory[0].text;
     const mainTransactionTypeValue: string = this._mainTransactionCategory[0].value;
     const transactionObj: any = {
       mainTransactionTypeText,
       mainTransactionTypeValue,
-      'transactionType': '',
-      'childTransactionType': ''
+      transactionType: '',
+      childTransactionType: ''
     };
 
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
@@ -199,33 +206,33 @@ export class TransactionTypeComponent implements OnInit {
       step: 'step_1'
     });
   }
-  
+
   public printPreview(): void {
-    this.frmSubmitted=false;
-    this.transactionCategorySelected=true;
-    this.transactionTypeFailed=false;
+    this.frmSubmitted = false;
+    this.transactionCategorySelected = true;
+    this.transactionTypeFailed = false;
 
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing TransactionTypeComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
+    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
+    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
+      res => {
+        if (res) {
+          console.log('Accessing TransactionTypeComponent printPriview res ...', res);
+
+          if (res['results.pdf_url'] !== null) {
+            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+            window.open(res.results.pdf_url, '_blank');
           }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
+        }
+      },
+      error => {
+        console.log('error: ', error);
+      }
+    ); /*  */
 
-        this.status.emit({
-          form: {},
-          direction: '',
-          step: 'step_2'
-        });
+    this.status.emit({
+      form: {},
+      direction: '',
+      step: 'step_2'
+    });
   }
 }
