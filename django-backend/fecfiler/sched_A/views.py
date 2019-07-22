@@ -23,8 +23,12 @@ from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB)
 
+# TODO: adding earmarked transactions: one sched_a and one generated sched_b transactions
+
 # Create your views here.
 logger = logging.getLogger(__name__)
+
+
 
 """
 ********************************************************************************************************************************
