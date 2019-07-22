@@ -591,19 +591,40 @@ export class TransactionsService {
    */
   public deleteRecycleBinTransaction(transactions: Array<TransactionModel>): Observable<any> {
 
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/core/delete_trashed_transactions';
 
-    // mocking the server API until it is ready.
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    const request: any = {};
+    // until API supports multiple transactions, only pass a single
+    // Use this code when API is ready.
+    // const transactionIds = [];
+    // for (const trx of transactions) {
+    //   transactionIds.push({
+    //     transaction_id: trx.transactionId
+    //   });
+    // }
+    // request.transactionIds = transactionIds;
+
+    // delete this once API is ready for multiple transactions.
     for (const trx of transactions) {
-      const index = this.mockRestoreTrxArray.findIndex(
-        item => item.transaction_id === trx.transactionId);
-
-      if (index !== -1) {
-        this.mockRestoreTrxArray.splice(index, 1);
-      }
+      request.transaction_id = trx.transactionId;
     }
 
-    return Observable.of('');
+    return this._http
+      .post(
+        `${environment.apiUrl}${url}`,
+        request,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          return false;
+      }));
   }
 
 
@@ -748,6 +769,6 @@ export class TransactionsService {
         }
         return false;
     }));
-
    }
+
 }
