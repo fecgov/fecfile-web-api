@@ -104,7 +104,8 @@ export class TransactionTypeComponent implements OnInit {
         direction: 'next',
         step: 'step_3',
         previousStep: 'step_2',
-        transactionTypeText: this.transactionTypeText
+        transactionTypeText: this.transactionTypeText,
+        transactionType: this.transactionType
       });
       return 1;
     } else {
@@ -154,13 +155,6 @@ export class TransactionTypeComponent implements OnInit {
 
     this.transactionType = val;
     this.transactionTypeText = childOption.text;
-
-    // TODO once get_transaction_category API provides special trans_type code, add this.
-    // set it on the obj in _setSecondaryTransactionCategories for local storage.
-    // Then get it from LS when calling getContributionAggregate in individualRecept.
-    //  OR
-    // Pass it as input to indiv receipt just like transactionTypeText
-    // this.transactionTypeCode = childOption.code;
 
     this.frmOption.controls['secondaryOption'].setValue(val);
 
