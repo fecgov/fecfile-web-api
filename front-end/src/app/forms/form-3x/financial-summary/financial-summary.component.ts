@@ -44,8 +44,7 @@ export class FinancialSummaryComponent implements OnInit {
     this.viewMode = 'tab1';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.step = this._activatedRoute.snapshot.queryParams.step;
-    localStorage.setItem('Summary_Screen', 'Yes');
-
+    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
     console.log("this.step = ", this.step);
 
     this._financialSummaryService
@@ -120,6 +119,7 @@ export class FinancialSummaryComponent implements OnInit {
    */
   public ngOnDestroy(): void {
     localStorage.removeItem('Summary_Screen');
+    localStorage.removeItem(`form_${this._formType}_summary_screen`);
   }
 }
 
