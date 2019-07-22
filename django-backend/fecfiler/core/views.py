@@ -3139,7 +3139,30 @@ def get_f3x_report_data(cmte_id, report_id):
     except Exception:
         raise
 
-def get_col_a_value(k, actual_vals):
+
+def get_a_sum(cmte_id, report_id, clm_type):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT SUM(line_number)  FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
+            total_sum = cursor.fetchone()[0]
+        return total_sum
+    except Exception as  e:
+         return False
+         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
+
+
+def get_b_sum(cmte_id, report_id, clm_type):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT SUM(line_number)  FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
+            total_sum = cursor.fetchone()[0]
+        return total_sum
+    except Exception as  e:
+         return False
+         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
+
+
+def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
     if not k or k == '0' or k not in col_a or not col_a[k] or col_a[k] == '0':
         return 0
@@ -3147,7 +3170,9 @@ def get_col_a_value(k, actual_vals):
         if not col_a[k]:
             return get_col_a_value(col_a[k], actual_vals)
         else:
-            val += actual_vals[col_name_value_dict['colA'][k]]
+            #val += actual_vals[col_name_value_dict['colA'][k]]
+            total_sum  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
+            val += total_sum
     else:
         k_l = k.replace(' ','').split('+')
         for cl_n in k_ls:
@@ -3155,18 +3180,22 @@ def get_col_a_value(k, actual_vals):
                 val += (get_col_a_value(cl_n.split('-')[0], actual_vals)) - (get_col_a_value(cl_n.split('-')[1], actual_vals))
             else:
                 val += get_col_a_value(cl_n, actual_vals)
+                #total_sum  = get_a_sum(cmte_id, report_id)
+                #val += get_col_a_value(cl_n, actual_vals)
+                
     return val
 
 
-def get_col_b_value(k, actual_vals):
+def get_col_b_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
     if not k or k == '0' or k not in col_b or not col_b[k] or col_b[k] == '0':
         return 0
     elif len(k.replace(' ','').split('+')) == 1:
         if not col_b[k]:
-            return get_col_b_value(col_b[k], actual_vals)
+            return get_col_b_value(col_b[k], actual_vals, )
         else:
-            val += actual_vals[col_name_value_dict['colB'][k]]
+            #val += actual_vals[col_name_value_dict['colB'][k]]
+            total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
     else:
         k_l = k.replace(' ','').split('+')
         for cl_n in k_ls:
@@ -3190,10 +3219,10 @@ def prepare_json_builders_data(request):
         col_b = column_names_dict['colB']
         values_dict = {}
         for c_name in col_a:
-            values_dict[c_name] = get_col_a_value(col_a[c_name], summary_d)
+            values_dict[c_name] = get_col_a_value(col_a[c_name], summary_d, cmte_id, report_id)
         for d_name in col_b:
             print(d_name,'cma')
-            values_dict[d_name] = get_col_b_value(col_b[d_name], summary_d)
+            values_dict[d_name] = get_col_b_value(col_b[d_name], summary_d, cmte_id, report_id)
         #import ipdb;ipdb.set_trace()
         print(values_dict,'dict')
         update_str = str(values_dict)
