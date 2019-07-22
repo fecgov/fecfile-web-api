@@ -2908,3 +2908,304 @@ def create_contacts_view(request):
 END - Contacts API - CORE APP
 ******************************************************************************************************************************
 """
+
+dict_names = {
+    "ColA":["6b_cashOnHandBeginning",
+    "6c_totalReceipts",
+    "6d_subtotal",
+    "7_totalDisbursements",
+    "8_cashOnHandAtClose",
+    "9_debtsTo",
+    "10_debtsBy",
+    "11ai_Itemized",
+    "11aii_Unitemized",
+    "11aiii_Total",
+    "11b_politicalPartyCommittees",
+    "11c_otherPoliticalCommitteesPACs",
+    "11d_totalContributions",
+    "12_transfersFromAffiliatedOtherPartyCommittees",
+    "13_allLoansReceived",
+    "14_loanRepaymentsReceived",
+    "15_offsetsToOperatingExpendituresRefunds",
+    "16_refundsOfFederalContributions",
+    "17_otherFederalReceiptsDividends",
+    "18a_transfersFromNonFederalAccount_h3",
+    "18b_transfersFromNonFederalLevin_h5",
+    "18c_totalNonFederalTransfers",
+    "19_totalReceipts",
+    "20_totalFederalReceipts",
+    "21ai_federalShare",
+    "21aii_nonFederalShare",
+    "21b_otherFederalOperatingExpenditures",
+    "21c_totalOperatingExpenditures",
+    "22_transfersToAffiliatedOtherPartyCommittees",
+    "23_contributionsToFederalCandidatesCommittees",
+    "24_independentExpenditures",
+    "25_coordinatedExpenditureMadeByPartyCommittees",
+    "26_loanRepayments",
+    "27_loansMade",
+    "28a_individualsPersons",
+    "28b_politicalPartyCommittees",
+    "28c_otherPoliticalCommittees",
+    "28d_totalContributionsRefunds",
+    "29_otherDisbursements",
+    "30ai_sharedFederalActivity_h6_fedShare",
+    "30aii_sharedFederalActivity_h6_nonFed",
+    "30b_nonAllocable_100_federalElectionActivity",
+    "30c_totalFederalElectionActivity",
+    "31_totalDisbursements",
+    "32_totalFederalDisbursements",
+    "33_totalContributions",
+    "34_totalContributionRefunds",
+    "35_netContributions",
+    "36_totalFederalOperatingExpenditures",
+    "37_offsetsToOperatingExpenditures",
+    "38_netOperatingExpenditures",],
+    "ColB":[  "6a_cashOnHandJan_1",
+    "6c_totalReceipts",
+    "6d_subtotal",
+    "7_totalDisbursements",
+    "8_cashOnHandAtClose",
+    "11ai_itemized",
+    "11aii_unitemized",
+    "11aiii_total",
+    "11b_politicalPartyCommittees",
+    "11c_otherPoliticalCommitteesPACs",
+    "11d_totalContributions",
+    "12_transfersFromAffiliatedOtherPartyCommittees",
+    "13_allLoansReceived",
+    "14_loanRepaymentsReceived",
+    "15_offsetsToOperatingExpendituresRefunds",
+    "16_refundsOfFederalContributions",
+    "17_otherFederalReceiptsDividends",
+    "18a_transfersFromNonFederalAccount_h3",
+    "18b_transfersFromNonFederalLevin_h5",
+    "18c_totalNonFederalTransfers",
+    "19_totalReceipts",
+    "20_totalFederalReceipts",
+    "21ai_federalShare",
+    "21aii_nonFederalShare",
+    "21b_otherFederalOperatingExpenditures",
+    "21c_totalOperatingExpenditures",
+    "22_transfersToAffiliatedOtherPartyCommittees",
+    "23_contributionsToFederalCandidatesCommittees",
+    "24_independentExpenditures",
+    "25_coordinatedExpendituresMadeByPartyCommittees",
+    "26_loanRepayments",
+    "27_loansMade",
+    "28a_individualPersons",
+    "28b_politicalPartyCommittees",
+    "28c_otherPoliticalCommittees",
+    "28d_totalContributionRefunds",
+    "29_otherDisbursements",
+    "30ai_sharedFederalActivity_h6_federalShare",
+    "30aii_sharedFederalActivity_h6_nonFederal",
+    "30b_nonAllocable_100_federalElectionActivity",
+    "30c_totalFederalElectionActivity",
+    "31_totalDisbursements",
+    "32_totalFederalDisbursements",
+    "33_totalContributions",
+    "34_totalContributionRefunds",
+    "35_netContributions",
+    "36_totalFederalOperatingExpenditures",
+    "37_offsetsToOperatingExpenditures",
+    "38_netOperatingExpenditures"]
+}
+
+column_names_dict = {'colA': {'coh_bop': '6b', 'ttl_receipts_sum_page_per': '6c', 'subttl_sum_page_per': '6d', 'ttl_disb_sum_page_per': '7', 'coh_cop': '8', 'debts_owed_to_cmte': '9', 'debts_owed_by_cmte': '10', 'indv_item_contb_per': '11ai', 'indv_unitem_contb_per': '11aii', 'ttl_indv_contb': '11aiii', 'pol_pty_cmte_contb_per_i': '11b', 'other_pol_cmte_contb_per_i': '11c', 'ttl_contb_col_ttl_per': '11d', 'tranf_from_affiliated_pty_per': '12', 'all_loans_received_per': '13', 'loan_repymts_received_per': '14', 'offsets_to_op_exp_per_i': '15', 'fed_cand_contb_ref_per': '16', 'other_fed_receipts_per': '17', 'tranf_from_nonfed_acct_per': '18a', 'tranf_from_nonfed_levin_per': '18b', 'ttl_nonfed_tranf_per': '18c', 'ttl_receipts_per': '19', 'ttl_fed_receipts_per': '20', 'shared_fed_op_exp_per': '21ai', 'shared_nonfed_op_exp_per': '21aii', 'other_fed_op_exp_per': '21b', 'ttl_op_exp_per': '21c', 'tranf_to_affliliated_cmte_per': '22', 'fed_cand_cmte_contb_per': '23', 'indt_exp_per': '24', 'coord_exp_by_pty_cmte_per': '25', 'loan_repymts_made_per': '26', 'loans_made_per': '27', 'indv_contb_ref_per': '28a', 'pol_pty_cmte_contb_per_ii': '28b', 'other_pol_cmte_contb_per_ii': '28c', 'ttl_contb_ref_per_i': '28d', 'other_disb_per': '29', 'shared_fed_actvy_fed_shr_per': '30ai', 'shared_fed_actvy_nonfed_per': '30aii', 'non_alloc_fed_elect_actvy_per': '30b', 'ttl_fed_elect_actvy_per': '30c', 'ttl_disb_per': '31', 'ttl_fed_disb_per': '32', 'ttl_contb_per': '33', 'ttl_contb_ref_per_ii': '34', 'net_contb_per': '35', 'ttl_fed_op_exp_per': '36', 'offsets_to_op_exp_per_ii': '37', 'net_op_exp_per': '38'}, 
+'colB': {'coh_begin_calendar_yr': '6a', 'ttl_receipts_sum_page_ytd': '6c', 'subttl_sum_ytd': '6d', 'ttl_disb_sum_page_ytd': '7', 'coh_coy': '8', 'indv_item_contb_ytd': '11ai', 'indv_unitem_contb_ytd': '11aii', 'ttl_indv_contb_ytd': '11aiii', 'pol_pty_cmte_contb_ytd_i': '11b', 'other_pol_cmte_contb_ytd_i': '11c', 'ttl_contb_col_ttl_ytd': '11d', 'tranf_from_affiliated_pty_ytd': '12', 'all_loans_received_ytd': '13', 'loan_repymts_received_ytd': '14', 'offsets_to_op_exp_ytd_i': '15', 'fed_cand_cmte_contb_ytd': '16', 'other_fed_receipts_ytd': '17', 'tranf_from_nonfed_acct_ytd': '18a', 'tranf_from_nonfed_levin_ytd': '18b', 'ttl_nonfed_tranf_ytd': '18c', 'ttl_receipts_ytd': '19', 'ttl_fed_receipts_ytd': '20', 'shared_fed_op_exp_ytd': '21ai', 'shared_nonfed_op_exp_ytd': '21aii', 'other_fed_op_exp_ytd': '21b', 'ttl_op_exp_ytd': '21c', 'tranf_to_affilitated_cmte_ytd': '22', 'fed_cand_cmte_contb_ref_ytd': '23', 'indt_exp_ytd': '24_independentExpenditures', 'coord_exp_by_pty_cmte_ytd': '25', 'loan_repymts_made_ytd': '26', 'loans_made_ytd': '27', 'indv_contb_ref_ytd': '28a', 'pol_pty_cmte_contb_ytd_ii': '28b', 'other_pol_cmte_contb_ytd_ii': '28c', 'ttl_contb_ref_ytd_i': '28d', 'other_disb_ytd': '29', 'shared_fed_actvy_fed_shr_ytd': '30ai', 'shared_fed_actvy_nonfed_ytd': '30aii', 'non_alloc_fed_elect_actvy_ytd': '30b', 'ttl_fed_elect_actvy_ytd': '30c', 'ttl_disb_ytd': '31', 'ttl_fed_disb_ytd': '32', 'ttl_contb_ytd': '33', 'ttl_contb_ref_ytd_ii': '34', 'net_contb_ytd': '35', 'ttl_fed_op_exp_ytd': '36', 'offsets_to_op_exp_ytd_ii': '37', 'net_op_exp_ytd': '38'}}
+
+col_a = {
+"6b":"",
+"6c":"19",
+"6d":"6b + 6c",             
+"7":"31",
+"8":"6d - 7",
+"9":"0",
+"10":"0",
+"11ai":"",
+"11aii":"",
+"11aiii":"11ai + 11aii",
+"11b":"",   
+"11c":"",   
+"11d":"11aiii + 11b + 11c",
+"12":"",    
+"13":"",
+"14":"",
+"15":"",
+"16":"",    
+"17":"",
+"18a":"0",
+"18b":"0",
+"18c":"18a+18b",
+"19":"11d+12+13+14+15+16+17+18c",
+"20":"19 - 18c",
+"21ai":"0",
+"21aii":"0",
+"21b":"",
+"21c":"21ai + 21aii + 21b",
+"22":"",    
+"23":"",    
+"24":"",
+"25":"0",
+"26":"",    
+"27":"",    
+"28a":"",   
+"28b":"",   
+"28c":"",   
+"28d":"28a + 28b + 28c",
+"29":"",
+"30ai":"0",
+"30aii":"0",
+"30b":"",   
+"30c":"30ai + 30aii + 30b",
+"31":"21c + 22 - 27 + 28d + 29",
+"32":"31 - 21aii + 30aii",
+"33":"11d",
+"34":"28d",
+"35":"11d - 28d",
+"36":"21ai + 21b",
+"37":"15",
+"38":"36 - 37",
+}
+    
+col_b = {
+"6c":"19",
+"6d":"6a + 6c",
+"7":"30",
+"8":"6d - 7",
+"11ai":"",  
+"11aii":"", 
+"11aiii":"11ai + 11aii",
+"11b":"",   
+"11c":"",   
+"11d":" 11aiii + 11b + 11c",
+"12":"",    
+"13":"",    
+"14":"",    
+"15":"",    
+"16":"",    
+"17":"",    
+"18a":"",   
+"18b":"",   
+"18c":"18a + 18b",
+"19":"11d + 12 + 13 + 14 + 15 + 16 + 17 + 18c",
+"20":"19 - 18c",
+"21ai":"",  
+"21aii":"", 
+"21b":"",   
+"21c":"21ai + 21aii + 21b",
+"22":"",    
+"23":"",    
+"24":"",    
+"25":"",    
+"26":"",    
+"27":"",    
+"28a":"",   
+"28b":"",   
+"28c":"",   
+"28d":"28a + 28b + 28c",
+"29":"",    
+"30ai":"0",
+"30aii":"0",
+"30b":"",
+"30c":"30ai+30aii+30b",
+"31":"21c + 22 - 27 + 28d + 29",
+"32":"31 - 21aii + 30aii",
+"33":"11d",
+"34":"28d",
+"35":"11d - 28d",
+"36":"21ai + 21b",
+"37":"15",
+"38":"36 - 37"
+}
+
+col_name_value_dict = {'colA': {'6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per', '7': 'ttl_disb_sum_page_per', '8': 'coh_cop', '9': 'debts_owed_to_cmte', '10': 'debts_owed_by_cmte', '11ai': 'indv_item_contb_per', '11aii': 'indv_unitem_contb_per', '11aiii': 'ttl_indv_contb', '11b': 'pol_pty_cmte_contb_per_i', '11c': 'other_pol_cmte_contb_per_i', '11d': 'ttl_contb_col_ttl_per', '12': 'tranf_from_affiliated_pty_per', '13': 'all_loans_received_per', '14': 'loan_repymts_received_per', '15': 'offsets_to_op_exp_per_i', '16': 'fed_cand_contb_ref_per', '17': 'other_fed_receipts_per', '18a': 'tranf_from_nonfed_acct_per', '18b': 'tranf_from_nonfed_levin_per', '18c': 'ttl_nonfed_tranf_per', '19': 'ttl_receipts_per', '20': 'ttl_fed_receipts_per', '21ai': 'shared_fed_op_exp_per', '21aii': 'shared_nonfed_op_exp_per', '21b': 'other_fed_op_exp_per', '21c': 'ttl_op_exp_per', '22': 'tranf_to_affliliated_cmte_per', '23': 'fed_cand_cmte_contb_per', '24': 'indt_exp_per', '25': 'coord_exp_by_pty_cmte_per', '26': 'loan_repymts_made_per', '27': 'loans_made_per', '28a': 'indv_contb_ref_per', '28b': 'pol_pty_cmte_contb_per_ii', '28c': 'other_pol_cmte_contb_per_ii', '28d': 'ttl_contb_ref_per_i', '29': 'other_disb_per', '30ai': 'shared_fed_actvy_fed_shr_per', '30aii': 'shared_fed_actvy_nonfed_per', '30b': 'non_alloc_fed_elect_actvy_per', '30c': 'ttl_fed_elect_actvy_per', '31': 'ttl_disb_per', '32': 'ttl_fed_disb_per', '33': 'ttl_contb_per', '34': 'ttl_contb_ref_per_ii', '35': 'net_contb_per', '36': 'ttl_fed_op_exp_per', '37': 'offsets_to_op_exp_per_ii', '38': 'net_op_exp_per'}, 
+'colB': {'6a': 'coh_begin_calendar_yr', '6c': 'ttl_receipts_sum_page_ytd', '6d': 'subttl_sum_ytd', '7': 'ttl_disb_sum_page_ytd', '8': 'coh_coy', '11ai': 'indv_item_contb_ytd', '11aii': 'indv_unitem_contb_ytd', '11aiii': 'ttl_indv_contb_ytd', '11b': 'pol_pty_cmte_contb_ytd_i', '11c': 'other_pol_cmte_contb_ytd_i', '11d': 'ttl_contb_col_ttl_ytd', '12': 'tranf_from_affiliated_pty_ytd', '13': 'all_loans_received_ytd', '14': 'loan_repymts_received_ytd', '15': 'offsets_to_op_exp_ytd_i', '16': 'fed_cand_cmte_contb_ytd', '17': 'other_fed_receipts_ytd', '18a': 'tranf_from_nonfed_acct_ytd', '18b': 'tranf_from_nonfed_levin_ytd', '18c': 'ttl_nonfed_tranf_ytd', '19': 'ttl_receipts_ytd', '20': 'ttl_fed_receipts_ytd', '21ai': 'shared_fed_op_exp_ytd', '21aii': 'shared_nonfed_op_exp_ytd', '21b': 'other_fed_op_exp_ytd', '21c': 'ttl_op_exp_ytd', '22': 'tranf_to_affilitated_cmte_ytd', '23': 'fed_cand_cmte_contb_ref_ytd', '24_independentExpenditures': 'indt_exp_ytd', '25': 'coord_exp_by_pty_cmte_ytd', '26': 'loan_repymts_made_ytd', '27': 'loans_made_ytd', '28a': 'indv_contb_ref_ytd', '28b': 'pol_pty_cmte_contb_ytd_ii', '28c': 'other_pol_cmte_contb_ytd_ii', '28d': 'ttl_contb_ref_ytd_i', '29': 'other_disb_ytd', '30ai': 'shared_fed_actvy_fed_shr_ytd', '30aii': 'shared_fed_actvy_nonfed_ytd', '30b': 'non_alloc_fed_elect_actvy_ytd', '30c': 'ttl_fed_elect_actvy_ytd', '31': 'ttl_disb_ytd', '32': 'ttl_fed_disb_ytd', '33': 'ttl_contb_ytd', '34': 'ttl_contb_ref_ytd_ii', '35': 'net_contb_ytd', '36': 'ttl_fed_op_exp_ytd', '37': 'offsets_to_op_exp_ytd_ii', '38': 'net_op_exp_ytd'}}
+
+def get_f3x_report_data(cmte_id, report_id):
+    try:
+        query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+        forms_obj = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+def get_col_a_value(k, actual_vals):
+    val = 0
+    if not k or k == '0' or k not in col_a or not col_a[k] or col_a[k] == '0':
+        return 0
+    elif len(k.replace(' ','').split('+')) == 1:
+        if not col_a[k]:
+            return get_col_a_value(col_a[k], actual_vals)
+        else:
+            val += actual_vals[col_name_value_dict['colA'][k]]
+    else:
+        k_l = k.replace(' ','').split('+')
+        for cl_n in k_ls:
+            if '-' in cl_n:
+                val += (get_col_a_value(cl_n.split('-')[0], actual_vals)) - (get_col_a_value(cl_n.split('-')[1], actual_vals))
+            else:
+                val += get_col_a_value(cl_n, actual_vals)
+    return val
+
+
+def get_col_b_value(k, actual_vals):
+    val = 0
+    if not k or k == '0' or k not in col_b or not col_b[k] or col_b[k] == '0':
+        return 0
+    elif len(k.replace(' ','').split('+')) == 1:
+        if not col_b[k]:
+            return get_col_b_value(col_b[k], actual_vals)
+        else:
+            val += actual_vals[col_name_value_dict['colB'][k]]
+    else:
+        k_l = k.replace(' ','').split('+')
+        for cl_n in k_ls:
+            if '-' in cl_n:
+                val += (get_col_b_value(cl_n.split('-')[0], actual_vals)) - (get_col_b_value(cl_n.split('-')[1], actual_vals))
+            else:
+                val += get_col_b_value(cl_n, actual_vals)
+    return val
+
+
+@api_view(['POST'])
+def prepare_json_builders_data(request):
+    try:
+        # print("request.data: ", request.data)
+        cmte_id = request.user.username
+        param_string = ""
+        report_id = request.data.get('report_id')
+        f_3x_list = get_f3x_report_data(cmte_id, report_id)
+        summary_d = {i:(k if k else 0) for i, k in f_3x_list[0].items()}
+        col_a = column_names_dict['colA']
+        col_b = column_names_dict['colB']
+        values_dict = {}
+        for c_name in col_a:
+            values_dict[c_name] = get_col_a_value(col_a[c_name], summary_d)
+        for d_name in col_b:
+            print(d_name,'cma')
+            values_dict[d_name] = get_col_b_value(col_b[d_name], summary_d)
+        #import ipdb;ipdb.set_trace()
+        print(values_dict,'dict')
+        update_str = str(values_dict)
+        update_str = update_str[1:-1].replace(':', '=').replace("'", '')
+
+        with connection.cursor() as cursor:
+            query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+            update_query = """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
+            cursor.execute(update_query)
+        status_value = status.HTTP_200_OK
+            
+        return Response({'Response':'Success'}, status=status_value)
+    except Exception as e:
+        return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

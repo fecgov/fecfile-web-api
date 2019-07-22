@@ -38,6 +38,6 @@ urlpatterns = [
     url(r'^core/reports$', views.reports, name='reports'),
     url(r'^core/create_contacts_view$', views.create_contacts_view, name='create_contacts_view'),
     url(r'^core/delete_trashed_transactions$', views.delete_trashed_transactions, name='delete_trashed_transactions'), 
-
+    url(r'^core/prepare_json_builders_data$', views.prepare_json_builders_data, name='prepare_json_builders_data'), 
 
 ]
