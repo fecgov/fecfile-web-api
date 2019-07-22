@@ -39,6 +39,7 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
+  @Input() transactionType = '';
 
   public checkBoxVal: boolean = false;
   public frmIndividualReceipt: FormGroup;
@@ -58,6 +59,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _formSubmitted: boolean = false;
   private readonly _contributionAggregateValue: number = 0.0;
   private readonly _memoCodeValue: string = 'X';
+  private _selectedEntityId: number;
 
   constructor(
     private _http: HttpClient,
@@ -317,6 +319,12 @@ export class IndividualReceiptComponent implements OnInit {
         receiptObj[el.name] = el.value;
       });
 
+      // If entity ID exist, the transaction will be added to the existing entity by the API
+      // Otherwise it will create a new Entity.
+      if (this._selectedEntityId) {
+        receiptObj.entity_id = this._selectedEntityId;
+      }
+
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
       this._receiptService.saveSchedule(this._formType).subscribe(res => {
@@ -346,6 +354,7 @@ export class IndividualReceiptComponent implements OnInit {
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+          this._selectedEntityId = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -453,6 +462,8 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
+
+    this._selectedEntityId = contact.entity_id;
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -466,10 +477,28 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
 
+    let transactionTypeIdentifier = '';
+    // Use this if transaction_tye_identifier is to come from dynamic form data
+    // currently it's called to early to detect type changes as it happens in step 1 / report type
+    // for (const field of this.hiddenFields) {
+    //   if (field.name === 'transaction_type_identifier') {
+    //     transactionTypeIdentifier = field.value;
+    //   }
+    // }
+
+    // default to indiv-receipt for sprint 17 - use input field in sprint 18.
+    transactionTypeIdentifier = 'INDV_REC';
+    console.log('transaction type from input is ' + this.transactionType);
+
     const reportId = this.getReportIdFromStorage();
-    this._receiptService.getContributionAggregate(reportId, contact.entity_id, 'INDV_REC').subscribe(res => {
-      this.frmIndividualReceipt.patchValue({ contribution_aggregate: 123456.99 }, { onlySelf: true });
-    });
+    this._receiptService
+      .getContributionAggregate(reportId, contact.entity_id, transactionTypeIdentifier)
+      .subscribe(res => {
+        this.frmIndividualReceipt.patchValue(
+          { contribution_aggregate: res.contribution_aggregate },
+          { onlySelf: true }
+        );
+      });
   }
 
   /**
