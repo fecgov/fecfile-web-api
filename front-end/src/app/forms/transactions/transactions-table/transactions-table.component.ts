@@ -550,10 +550,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Trash all transactions selected by the user.
+   * Trash (send to Recycling Bin) all transactions selected by the user.
    */
   public trashAllSelected(): void {
-    // alert('Trash all transactions is not yet supported');
 
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
