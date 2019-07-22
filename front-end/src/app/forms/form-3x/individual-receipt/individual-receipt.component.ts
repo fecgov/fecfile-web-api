@@ -261,37 +261,6 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
-   * Updates the contribution aggregate field once contribution ammount is entered.
-   *
-   * @param      {Object}  e       The event object.
-   */
-  public contributionAmountChange(e): void {
-    const contributionAmount: string = e.target.value;
-    const contributionAggregate: string = String(this._contributionAggregateValue);
-
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
-
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
-
-    /**
-     * TODO: To be implemented in the future.
-     */
-
-    // this._receiptService
-    //   .aggregateAmount(
-    //     res.report_id,
-    //     res.transaction_type,
-    //     res.contribution_date,
-    //     res.entity_id,
-    //     res.contribution_amount
-    //   )
-    //   .subscribe(resp => {
-    //     console.log('resp: ', resp);
-    //   });
-  }
-
-  /**
    * Updates vaprivate _memoCode variable.
    *
    * @param      {Object}  e      The event object.
@@ -389,23 +358,7 @@ export class IndividualReceiptComponent implements OnInit {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    let reportId = '0';
-    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
-      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-    }
-
-    console.log('viewTransactions form3XReportType', form3XReportType);
-
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        reportId = form3XReportType.reportid;
-      }
-    }
-
+    let reportId = this.getReportIdFromStorage();
     console.log('reportId', reportId);
 
     if (!reportId) {
@@ -481,9 +434,6 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
-
-    // TODO there is a known issue where the first name is not getting updated in the UI.
-
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -497,31 +447,9 @@ export class IndividualReceiptComponent implements OnInit {
     this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    // TODO put in provate method as it's common to viewtransaction()
-    let reportId = '0';
-    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
-      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-    }
-
-    console.log('viewTransactions form3XReportType', form3XReportType);
-
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        reportId = form3XReportType.reportid;
-      }
-    }
-    // TODO put in provate method as it's common to viewtransaction() - END
-
-    this._typeaheadService.getContributionAggregate(reportId, contact.entity_id, 'INDV_REC').subscribe(res => {
-      this.frmIndividualReceipt.patchValue(
-        // { contribution_aggregate: res.contribution_aggregate }, { onlySelf: true });
-        { contribution_aggregate: 123456.99 },
-        { onlySelf: true }
-      );
+    const reportId = this.getReportIdFromStorage();
+    this._receiptService.getContributionAggregate(reportId, contact.entity_id, 'INDV_REC').subscribe(res => {
+      this.frmIndividualReceipt.patchValue({ contribution_aggregate: 123456.99 }, { onlySelf: true });
     });
   }
 
@@ -578,4 +506,27 @@ export class IndividualReceiptComponent implements OnInit {
       return x;
     }
   };
+
+  /**
+   * Obtain the Report ID from local storage.
+   */
+  private getReportIdFromStorage() {
+    let reportId = '0';
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+    }
+
+    console.log('viewTransactions form3XReportType', form3XReportType);
+
+    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+      if (form3XReportType.hasOwnProperty('reportId')) {
+        reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
+      }
+    }
+    return reportId;
+  }
 }
