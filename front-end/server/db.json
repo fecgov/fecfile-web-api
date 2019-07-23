@@ -19,6 +19,8 @@
             "scroll": false,
             "height": "30px",
             "width": "197px",
+            "inputGroup": false,
+            "inputIcon": "",
             "validation": {
                "required": true,
                "max": 30,
