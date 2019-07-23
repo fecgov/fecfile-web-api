@@ -112,14 +112,33 @@ TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP = {
     'IK_REC_PAC': ['11C', '15Z'],
     'IK_OUT_PAC': ['21B', '20K'],
     'IK_REC': ['11A', '15K'],
-    'IK_OUT': ['21B', '20K']
+    'IK_OUT': ['21B', '20K'],
+    'CONDUIT_EARMARK': ['11A', '15I'],
+    'EARMARK_OUT': ['23', '24T'],
+    'CONDUIT_EARMARK_MEMO': ['11A', '15IM'],
+    'EARMARK_OUT_MEMO': ['23', '24IM'],
+    'PAC_EARMARK': ['11C', '18I'],
+    'PAC_EARMARK_MEMO': ['11C', '18IM'],
+    'CONDUIT_EARMARK_RECEIPT': ['11A', '15E'],
+    'CONDUIT_EARMARK_RECEIPT_MEMO': ['11A', '15EM'],
+    'PAC_EARMARK_RECEIPT': ['11C', '18E'],
+    'PAC_EARMARK_RECEIPT_MEMO': ['11C', '18EM']
 }
 
 # list of all transaction type identifiers that should have single column storage in DB
 SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC', 'OTH_REC', 'IND_RECNT', 'PTY_RCNT', 'PAC_RCNT', 'TRI_RCNT', 'IND_NP_RECNT', 'TRI_NP_RCNT', 'PTY_NP_RCNT', 'PAC_NP_RCNT', 'IND_HQ_ACCNT', 'TRI_HQ_ACCNT', 'PTY_HQ_ACCNT', 'PAC_HQ_ACCNT', 'IND_CO_ACCNT', 'TRI_CO_ACCNT', 'PTY_CO_ACCNT', 'PAC_CO_ACCNT', 'IND_CAREY', 'OT_COM_CAREY', 'BU_LAB_CAREY', 'PAR_CON', 'PAR_MEMO', 'REATT_FROM', 'REATT_TO', 'JF_TRAN', 'IND_JF_MEM', 'PTY_JF_MEM', 'PAC_JF_MEM', 'TRI_JF_MEM', 'JF_TRAN_R', 'IND_JF_R_MEM', 'PAC_JF_R_MEM', 'TRI_JF_R_MEM', 'JF_TRAN_C', 'IND_JF_C_MEM', 'PAC_JF_C_MEM', 'TRI_JF_C_MEM', 'JF_TRAN_H', 'IND_JF_H_MEM', 'PAC_JF_H_MEM', 'TRI_JF_H_MEM']
 
-#list of all transaction type identifiers that should auto generate column in sched_B table in DB
-AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {"IK_TRAN": "IK_TF_OUT", "IK_TRAN_FEA": "IK_OUT_FEA", "IK_REC_PTY": "IK_OUT_PTY", "IK_REC_PAC": "IK_OUT_PAC", "IK_REC": "IK_OUT"}
+#list of all transaction type identifiers that should auto generate sched_b item in DB
+AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {"IK_TRAN": "IK_TF_OUT", 
+                                                    "IK_TRAN_FEA": "IK_OUT_FEA",
+                                                    "IK_REC_PTY": "IK_OUT_PTY",
+                                                    "IK_REC_PAC": "IK_OUT_PAC", 
+                                                    "IK_REC": "IK_OUT",
+                                                    "CONDUIT_EARMARK": "EARMARK_OUT",
+                                                    "CONDUIT_EARMARK_MEMO", "EARMARK_OUT_MEMO",
+                                                    "PAC_EARMARK": "EARMARK_OUT",
+                                                    "PAC_EARMARK_MEMO": "EARMARK_OUT_MEMO"
+                                                    }
 
 #list of all transaction type identifiers that have itemization rule applied to it
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
@@ -547,7 +566,7 @@ def post_schedA(datum):
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         validate_sa_data(datum)
 
-        # save entities rirst
+        # save entities first
         if 'entity_id' in datum:
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
