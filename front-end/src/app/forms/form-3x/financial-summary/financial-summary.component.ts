@@ -114,6 +114,14 @@ export class FinancialSummaryComponent implements OnInit {
     this._router.navigate([`/forms/transactions/${this._formType}/${this.reportId}`]);
   }
   
+  public all_Transactions(): void {
+    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: {  step: 'step_2' } });
+  }
+
+  public expanded_Summary(): void {
+    alert("This functionality not yet implemented...!");
+  }
+
   /**
    * A method to run when component is destroyed.
    */
