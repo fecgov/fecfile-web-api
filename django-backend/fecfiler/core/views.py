@@ -1786,7 +1786,7 @@ def get_list_report_data(report_id, cmte_id):
 def delete_trashed_transactions(request):
     try:
     #import ipdb;ipdb.set_trace()
-        trans_id = request.data.get('transaction_id')
+        trans_id = request.data.get('transaction_id',[])
         committeeid = request.user.username
         message='Transaction deleted successfully' 
         sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
@@ -1803,7 +1803,7 @@ def delete_trashed_transactions(request):
                 try:
 
                     with connection.cursor() as cursor:
-                        cursor.execute("""Delete FROM public.sched_a where transaction_id = %s;""",[trans_id])
+                        cursor.execute("""Delete FROM public.sched_a where transaction_id IN %s;""",[trans_id])
                         #message = 'Transaction deleted successfully'
                 except Exception as e:
                     print(e)
@@ -3016,7 +3016,7 @@ column_names_dict = {'colA': {'coh_bop': '6b', 'ttl_receipts_sum_page_per': '6c'
 'colB': {'coh_begin_calendar_yr': '6a', 'ttl_receipts_sum_page_ytd': '6c', 'subttl_sum_ytd': '6d', 'ttl_disb_sum_page_ytd': '7', 'coh_coy': '8', 'indv_item_contb_ytd': '11ai', 'indv_unitem_contb_ytd': '11aii', 'ttl_indv_contb_ytd': '11aiii', 'pol_pty_cmte_contb_ytd_i': '11b', 'other_pol_cmte_contb_ytd_i': '11c', 'ttl_contb_col_ttl_ytd': '11d', 'tranf_from_affiliated_pty_ytd': '12', 'all_loans_received_ytd': '13', 'loan_repymts_received_ytd': '14', 'offsets_to_op_exp_ytd_i': '15', 'fed_cand_cmte_contb_ytd': '16', 'other_fed_receipts_ytd': '17', 'tranf_from_nonfed_acct_ytd': '18a', 'tranf_from_nonfed_levin_ytd': '18b', 'ttl_nonfed_tranf_ytd': '18c', 'ttl_receipts_ytd': '19', 'ttl_fed_receipts_ytd': '20', 'shared_fed_op_exp_ytd': '21ai', 'shared_nonfed_op_exp_ytd': '21aii', 'other_fed_op_exp_ytd': '21b', 'ttl_op_exp_ytd': '21c', 'tranf_to_affilitated_cmte_ytd': '22', 'fed_cand_cmte_contb_ref_ytd': '23', 'indt_exp_ytd': '24_independentExpenditures', 'coord_exp_by_pty_cmte_ytd': '25', 'loan_repymts_made_ytd': '26', 'loans_made_ytd': '27', 'indv_contb_ref_ytd': '28a', 'pol_pty_cmte_contb_ytd_ii': '28b', 'other_pol_cmte_contb_ytd_ii': '28c', 'ttl_contb_ref_ytd_i': '28d', 'other_disb_ytd': '29', 'shared_fed_actvy_fed_shr_ytd': '30ai', 'shared_fed_actvy_nonfed_ytd': '30aii', 'non_alloc_fed_elect_actvy_ytd': '30b', 'ttl_fed_elect_actvy_ytd': '30c', 'ttl_disb_ytd': '31', 'ttl_fed_disb_ytd': '32', 'ttl_contb_ytd': '33', 'ttl_contb_ref_ytd_ii': '34', 'net_contb_ytd': '35', 'ttl_fed_op_exp_ytd': '36', 'offsets_to_op_exp_ytd_ii': '37', 'net_op_exp_ytd': '38'}}
 
 col_a = {
-"6b":"",
+"6b":"cash_on_hand",
 "6c":"19",
 "6d":"6b + 6c",             
 "7":"31",
@@ -3140,10 +3140,42 @@ def get_f3x_report_data(cmte_id, report_id):
         raise
 
 
+def cash_on_hand_begining_amount(cmte_id, report_id):
+    try:
+        from datetime import date, timedelta, datetime, time
+        from dateutil.relativedelta import relativedelta
+
+        # today = date.today()
+        
+        #d = today - relativedelta(months=1)
+
+        from_date, to_date = get_cvg_dates(report_id, cmte_id)
+        #print(from_date_time,to_date_time,'datetime')
+        d = from_date - relativedelta(months=1)
+       
+        from_date_time = date(d.year, d.month, 1)
+        to_date_time = date(from_date.year, from_date.month, 1) - relativedelta(days=1)
+        # from_date_time = datetime.combine(fromdate, time(0,0,0))
+        # to_date_time = datetime.combine(todate, time(23,59,59))
+        print(from_date_time,to_date_time,'datetime')
+
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
+            if (cursor.rowcount == 0):
+                coh_cop = 0
+            else:
+                result = cursor.fetchone()
+                coh_cop = result[0]
+        return coh_cop
+    except Exception as e:
+        raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
+
+
 def get_a_sum(cmte_id, report_id, clm_type):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT SUM(line_number)  FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
+            cursor.execute("""SELECT SUM(contribution_amount)  FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
             total_sum = cursor.fetchone()[0]
         return total_sum
     except Exception as  e:
@@ -3154,8 +3186,9 @@ def get_a_sum(cmte_id, report_id, clm_type):
 def get_b_sum(cmte_id, report_id, clm_type):
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT SUM(line_number)  FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
+            cursor.execute("""SELECT SUM(expenditure_amount)  FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
             total_sum = cursor.fetchone()[0]
+            print(total_sum)
         return total_sum
     except Exception as  e:
          return False
@@ -3164,8 +3197,16 @@ def get_b_sum(cmte_id, report_id, clm_type):
 
 def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
+    if col_a[k] == 'cash_on_hand':
+        val = cash_on_hand_begining_amount(cmte_id,report_id)
+        print('cash_on_hand amttttttttttttttttttttttttttttttttttt',k, val)
+        return val
+
     if not k or k == '0' or k not in col_a or not col_a[k] or col_a[k] == '0':
-        return 0
+        #return 0
+        total_sum  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
+        val += total_sum
+    
     elif len(k.replace(' ','').split('+')) == 1:
         if not col_a[k]:
             return get_col_a_value(col_a[k], actual_vals)
@@ -3189,13 +3230,17 @@ def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
 def get_col_b_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
     if not k or k == '0' or k not in col_b or not col_b[k] or col_b[k] == '0':
-        return 0
+        #return 0
+        total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
+        val += total_sum
+    
     elif len(k.replace(' ','').split('+')) == 1:
         if not col_b[k]:
             return get_col_b_value(col_b[k], actual_vals, )
         else:
             #val += actual_vals[col_name_value_dict['colB'][k]]
             total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
+            val += total_sum
     else:
         k_l = k.replace(' ','').split('+')
         for cl_n in k_ls:
@@ -3209,7 +3254,7 @@ def get_col_b_value(k, actual_vals, cmte_id=None, report_id=None):
 @api_view(['POST'])
 def prepare_json_builders_data(request):
     try:
-        # print("request.data: ", request.data)
+        print("request.data: ", request.data)
         cmte_id = request.user.username
         param_string = ""
         report_id = request.data.get('report_id')
@@ -3223,7 +3268,7 @@ def prepare_json_builders_data(request):
         for d_name in col_b:
             print(d_name,'cma')
             values_dict[d_name] = get_col_b_value(col_b[d_name], summary_d, cmte_id, report_id)
-        #import ipdb;ipdb.set_trace()
+        import ipdb;ipdb.set_trace()
         print(values_dict,'dict')
         update_str = str(values_dict)
         update_str = update_str[1:-1].replace(':', '=').replace("'", '')
