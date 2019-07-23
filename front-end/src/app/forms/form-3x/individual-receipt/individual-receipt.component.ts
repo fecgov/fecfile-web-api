@@ -509,7 +509,11 @@ export class IndividualReceiptComponent implements OnInit {
       debounceTime(500),
       distinctUntilChanged(),
       switchMap(searchText => {
-        return this._typeaheadService.getContacts(searchText, 'last_name');
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'last_name');
+        } else {
+          return Observable.of([]);
+        }
       })
     );
 
@@ -521,7 +525,11 @@ export class IndividualReceiptComponent implements OnInit {
       debounceTime(500),
       distinctUntilChanged(),
       switchMap(searchText => {
-        return this._typeaheadService.getContacts(searchText, 'first_name');
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'first_name');
+        } else {
+          return Observable.of([]);
+        }
       })
     );
 
@@ -577,4 +585,18 @@ export class IndividualReceiptComponent implements OnInit {
     }
     return reportId;
   }
+
+  // Use this if the fields populated by the type-ahead should be disabled.
+  // public isReadOnly(name: string, type: string) {
+  //   if (name === 'contribution_aggregate' && type === 'text') {
+  //     return true;
+  //   }
+  //   if (name === 'first_name' || name === 'last_name' || name === 'prefix') {
+  //     if (this._selectedEntityId) {
+  //       console.log('this._selectedEntityId = ' + this._selectedEntityId);
+  //       return true;
+  //     }
+  //   }
+  //   return null;
+  // }
 }

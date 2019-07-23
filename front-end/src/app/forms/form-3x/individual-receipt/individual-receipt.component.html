@@ -70,18 +70,18 @@
                         </span>
                       </div>
                     </ng-container>
+                    <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
                       *ngIf="col?.name !== 'first_name' && col?.name !== 'last_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
                       [attr.type]="col?.type"
-                      [attr.name]="col?.name"
+                      [attr.name]="col?.name"                      
                       [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
                       [attr.value]="col?.value"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
-                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
