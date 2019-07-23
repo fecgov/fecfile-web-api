@@ -28,7 +28,13 @@ from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-
+"""
+some questions to discuss:
+1. remove line_number, trsaction_type from madatroy fields.
+2. expenditure purpose = ? 
+3. one sched_a each request ?
+4. one sched_a one entity each request ?
+"""
 
 """
 ********************************************************************************************************************************
@@ -41,7 +47,8 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 """
 # mandatory fields for shcedule_a records
 MANDATORY_FIELDS_SCHED_A = ['report_id', 'cmte_id', 'line_number',
-                            'transaction_type', 'contribution_date', 'contribution_amount']
+                            'transaction_type', 'contribution_date', 
+                            'contribution_amount']
 
 # madatory fields for aggregate amount api call
 MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier']
@@ -113,20 +120,62 @@ TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP = {
     'IK_OUT_PAC': ['21B', '20K'],
     'IK_REC': ['11A', '15K'],
     'IK_OUT': ['21B', '20K'],
-    'CONDUIT_EARMARK': ['11A', '15I'],
-    'EARMARK_OUT': ['23', '24T'],
-    'CONDUIT_EARMARK_MEMO': ['11A', '15IM'],
-    'EARMARK_OUT_MEMO': ['23', '24IM'],
-    'PAC_EARMARK': ['11C', '18I'],
-    'PAC_EARMARK_MEMO': ['11C', '18IM'],
-    'CONDUIT_EARMARK_RECEIPT': ['11A', '15E'],
-    'CONDUIT_EARMARK_RECEIPT_MEMO': ['11A', '15EM'],
-    'PAC_EARMARK_RECEIPT': ['11C', '18E'],
-    'PAC_EARMARK_RECEIPT_MEMO': ['11C', '18EM']
+    'CON_EM': ['11A', '15I'],
+    'EM_OUT': ['23', '24T'],
+    'CON_EM_MEMO': ['11A', '15IM'],
+    'EM_OUT_MEMO': ['23', '24IM'],
+    'PAC_EM': ['11C', '18I'],
+    'PAC_EM_MEMO': ['11C', '18IM'],
+    'CON_EM_RT': ['11A', '15E'],
+    'CON_EM_RT_M': ['11A', '15EM'],
+    'PAC_EM_RT': ['11C', '18E'],
+    'PAC_EM_RT_M': ['11C', '18EM']
 }
 
-# list of all transaction type identifiers that should have single column storage in DB
-SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC', 'OTH_REC', 'IND_RECNT', 'PTY_RCNT', 'PAC_RCNT', 'TRI_RCNT', 'IND_NP_RECNT', 'TRI_NP_RCNT', 'PTY_NP_RCNT', 'PAC_NP_RCNT', 'IND_HQ_ACCNT', 'TRI_HQ_ACCNT', 'PTY_HQ_ACCNT', 'PAC_HQ_ACCNT', 'IND_CO_ACCNT', 'TRI_CO_ACCNT', 'PTY_CO_ACCNT', 'PAC_CO_ACCNT', 'IND_CAREY', 'OT_COM_CAREY', 'BU_LAB_CAREY', 'PAR_CON', 'PAR_MEMO', 'REATT_FROM', 'REATT_TO', 'JF_TRAN', 'IND_JF_MEM', 'PTY_JF_MEM', 'PAC_JF_MEM', 'TRI_JF_MEM', 'JF_TRAN_R', 'IND_JF_R_MEM', 'PAC_JF_R_MEM', 'TRI_JF_R_MEM', 'JF_TRAN_C', 'IND_JF_C_MEM', 'PAC_JF_C_MEM', 'TRI_JF_C_MEM', 'JF_TRAN_H', 'IND_JF_H_MEM', 'PAC_JF_H_MEM', 'TRI_JF_H_MEM']
+# list of all transaction type identifiers that should
+# have single column storage in DB
+SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
+                                  'OTH_REC',
+                                  'IND_RECNT',
+                                  'PTY_RCNT',
+                                  'PAC_RCNT',
+                                  'TRI_RCNT',
+                                  'IND_NP_RECNT',
+                                  'TRI_NP_RCNT',
+                                  'PTY_NP_RCNT',
+                                  'PAC_NP_RCNT',
+                                  'IND_HQ_ACCNT',
+                                  'TRI_HQ_ACCNT',
+                                  'PTY_HQ_ACCNT',
+                                  'PAC_HQ_ACCNT',
+                                  'IND_CO_ACCNT',
+                                  'TRI_CO_ACCNT',
+                                  'PTY_CO_ACCNT',
+                                  'PAC_CO_ACCNT',
+                                  'IND_CAREY',
+                                  'OT_COM_CAREY',
+                                  'BU_LAB_CAREY',
+                                  'PAR_CON',
+                                  'PAR_MEMO',
+                                  'REATT_FROM',
+                                  'REATT_TO',
+                                  'JF_TRAN',
+                                  'IND_JF_MEM',
+                                  'PTY_JF_MEM',
+                                  'PAC_JF_MEM',
+                                  'TRI_JF_MEM',
+                                  'JF_TRAN_R',
+                                  'IND_JF_R_MEM',
+                                  'PAC_JF_R_MEM',
+                                  'TRI_JF_R_MEM',
+                                  'JF_TRAN_C',
+                                  'IND_JF_C_MEM',
+                                  'PAC_JF_C_MEM',
+                                  'TRI_JF_C_MEM',
+                                  'JF_TRAN_H',
+                                  'IND_JF_H_MEM',
+                                  'PAC_JF_H_MEM',
+                                  'TRI_JF_H_MEM']
 
 #list of all transaction type identifiers that should auto generate sched_b item in DB
 AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {"IK_TRAN": "IK_TF_OUT", 
@@ -134,10 +183,10 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {"IK_TRAN": "IK_TF_OUT",
                                                     "IK_REC_PTY": "IK_OUT_PTY",
                                                     "IK_REC_PAC": "IK_OUT_PAC", 
                                                     "IK_REC": "IK_OUT",
-                                                    "CONDUIT_EARMARK": "EARMARK_OUT",
-                                                    "CONDUIT_EARMARK_MEMO", "EARMARK_OUT_MEMO",
-                                                    "PAC_EARMARK": "EARMARK_OUT",
-                                                    "PAC_EARMARK_MEMO": "EARMARK_OUT_MEMO"
+                                                    "CON_EM": "EM_OUT",
+                                                    "CON_EM_MEMO": "EM_OUT_MEMO",
+                                                    "PAC_EM": "EM_OUT",
+                                                    "PAC_EM_MEMO": "EM_OUT_MEMO"
                                                     }
 
 #list of all transaction type identifiers that have itemization rule applied to it
@@ -199,12 +248,7 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
         for field in list_mandatory_fields:
             if not(field in data and check_null_value(data.get(field))):
                 errors.append(field)
-        # if len(error) > 0:
         if errors:
-            # string = ""
-            # for x in error:
-            #     string = string + x + ", "
-            # string = string[0:-2]
             raise Exception(
                 'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
     except:
