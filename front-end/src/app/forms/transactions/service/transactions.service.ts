@@ -247,15 +247,11 @@ export class TransactionsService {
       model.type = row.transaction_type_desc;
       model.transactionId = row.transaction_id;
       model.name = row.name;
-      // model.street = row.street_1 + (row.street_2 ? ' ' + row.street_2 : '');
       model.street = row.street_1;
       model.street2 = row.street_2;
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip_code;
-
-      // this._propertyNameConverterMap.get('zip');
-
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
       model.aggregate = row.aggregate_amt ? row.aggregate_amt : 0;
@@ -266,6 +262,7 @@ export class TransactionsService {
       model.memoText = row.memo_text;
       model.deletedDate = row.deleted_date ? row.deleted_date : null;
       model.itemized = row.itemized;
+      model.reportStatus = row.reportStatus;
       modelArray.push(model);
     }
     return modelArray;

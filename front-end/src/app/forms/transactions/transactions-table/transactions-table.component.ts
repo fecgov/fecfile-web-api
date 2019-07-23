@@ -17,6 +17,7 @@ import {
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-transactions-table',
@@ -844,6 +845,24 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // Recycle Bin shows delete action when 1 or more checked.
     const count = this.isTransactionViewActive() ? 1 : 0;
     this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
+  }
+
+  /**
+   * Determine if transactions may be trashed.
+   * Transactions tied to a Filed Report may not be trashed.
+   * Since all transactions are tied to a single report,
+   * only 1 transaction with a reportStatus of FILED is necessary to check.
+   * Loop through the array and if any are filed, none may be trashed.
+   *
+   * @returns true if Transactions are permitted to be trashed.
+   */
+  public checkIfTrashable(): boolean {
+    for (const trx of this.transactionsModel) {
+      if (trx.reportStatus === 'FILED') {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

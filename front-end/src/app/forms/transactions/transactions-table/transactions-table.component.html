@@ -77,7 +77,7 @@
               <button class="dropdown-item" (click)="linkAllSelected()">
                 <i class="link-icon"></i> Link
               </button>
-              <button class="dropdown-item" (click)="trashAllSelected()">
+              <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
                 <i class="trash-icon"></i> Trash
               </button>
             </div>
@@ -140,7 +140,7 @@
               <button class="dropdown-item" (click)="editTransaction(trx)">
                 <i class="edit-icon"></i> Edit
               </button>
-              <button class="dropdown-item" (click)="trashTransaction(trx)">
+              <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trx)">
                 <i class="trash-icon"></i> Trash
               </button>
             </div>
