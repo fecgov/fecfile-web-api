@@ -857,6 +857,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @returns true if Transactions are permitted to be trashed.
    */
   public checkIfTrashable(): boolean {
+    if (!this.transactionsModel) {
+      return false;
+    }
+    if (this.transactionsModel.length === 0) {
+      return false;
+    }
     for (const trx of this.transactionsModel) {
       if (trx.reportStatus === 'FILED') {
         return false;
