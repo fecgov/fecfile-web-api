@@ -1786,7 +1786,7 @@ def get_list_report_data(report_id, cmte_id):
 def delete_trashed_transactions(request):
     try:
     #import ipdb;ipdb.set_trace()
-        trans_id = request.data.get('transaction_id')
+        trans_id = request.data.get('transaction_id',[])
         committeeid = request.user.username
         message='Transaction deleted successfully' 
         sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
@@ -1803,7 +1803,7 @@ def delete_trashed_transactions(request):
                 try:
 
                     with connection.cursor() as cursor:
-                        cursor.execute("""Delete FROM public.sched_a where transaction_id = %s;""",[trans_id])
+                        cursor.execute("""Delete FROM public.sched_a where transaction_id IN %s;""",[trans_id])
                         #message = 'Transaction deleted successfully'
                 except Exception as e:
                     print(e)
