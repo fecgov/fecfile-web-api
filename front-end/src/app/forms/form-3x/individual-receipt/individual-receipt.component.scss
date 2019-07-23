@@ -85,6 +85,11 @@
             font-family: 'sans-serif';
             font-size: 1rem;
           }
+          .input-group-prepend {
+            .input-group-text {
+              color: $blueZodiac;
+            }
+          }
           /**
            * Custom CSS for state dropdown component.
            */
