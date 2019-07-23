@@ -569,7 +569,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           this._transactionsService
-            .trashOrRestoreTransactions('trash', this.reportId, this.transactionsModel)
+            .trashOrRestoreTransactions('trash', this.reportId, selectedTransactions)
             .subscribe((res: GetTransactionsResponse) => {
               this.getTransactionsPage(this.config.currentPage);
 
