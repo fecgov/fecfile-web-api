@@ -516,7 +516,7 @@ export class ReportTypeService {
       }
  
     }
-    formData.append('wait', 'false' );
+    formData.append('wait', 'False' );
  
     return this._http
         .post(`${environment.apiUrl}${url}`, formData, {
