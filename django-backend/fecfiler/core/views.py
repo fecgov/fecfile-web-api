@@ -2909,6 +2909,7 @@ END - Contacts API - CORE APP
 ******************************************************************************************************************************
 """
 
+
 dict_names = {
     "ColA":["6b_cashOnHandBeginning",
     "6c_totalReceipts",
@@ -2961,6 +2962,7 @@ dict_names = {
     "36_totalFederalOperatingExpenditures",
     "37_offsetsToOperatingExpenditures",
     "38_netOperatingExpenditures",],
+
     "ColB":[  "6a_cashOnHandJan_1",
     "6c_totalReceipts",
     "6d_subtotal",
@@ -3015,6 +3017,9 @@ dict_names = {
 column_names_dict = {'colA': {'coh_bop': '6b', 'ttl_receipts_sum_page_per': '6c', 'subttl_sum_page_per': '6d', 'ttl_disb_sum_page_per': '7', 'coh_cop': '8', 'debts_owed_to_cmte': '9', 'debts_owed_by_cmte': '10', 'indv_item_contb_per': '11ai', 'indv_unitem_contb_per': '11aii', 'ttl_indv_contb': '11aiii', 'pol_pty_cmte_contb_per_i': '11b', 'other_pol_cmte_contb_per_i': '11c', 'ttl_contb_col_ttl_per': '11d', 'tranf_from_affiliated_pty_per': '12', 'all_loans_received_per': '13', 'loan_repymts_received_per': '14', 'offsets_to_op_exp_per_i': '15', 'fed_cand_contb_ref_per': '16', 'other_fed_receipts_per': '17', 'tranf_from_nonfed_acct_per': '18a', 'tranf_from_nonfed_levin_per': '18b', 'ttl_nonfed_tranf_per': '18c', 'ttl_receipts_per': '19', 'ttl_fed_receipts_per': '20', 'shared_fed_op_exp_per': '21ai', 'shared_nonfed_op_exp_per': '21aii', 'other_fed_op_exp_per': '21b', 'ttl_op_exp_per': '21c', 'tranf_to_affliliated_cmte_per': '22', 'fed_cand_cmte_contb_per': '23', 'indt_exp_per': '24', 'coord_exp_by_pty_cmte_per': '25', 'loan_repymts_made_per': '26', 'loans_made_per': '27', 'indv_contb_ref_per': '28a', 'pol_pty_cmte_contb_per_ii': '28b', 'other_pol_cmte_contb_per_ii': '28c', 'ttl_contb_ref_per_i': '28d', 'other_disb_per': '29', 'shared_fed_actvy_fed_shr_per': '30ai', 'shared_fed_actvy_nonfed_per': '30aii', 'non_alloc_fed_elect_actvy_per': '30b', 'ttl_fed_elect_actvy_per': '30c', 'ttl_disb_per': '31', 'ttl_fed_disb_per': '32', 'ttl_contb_per': '33', 'ttl_contb_ref_per_ii': '34', 'net_contb_per': '35', 'ttl_fed_op_exp_per': '36', 'offsets_to_op_exp_per_ii': '37', 'net_op_exp_per': '38'}, 
 'colB': {'coh_begin_calendar_yr': '6a', 'ttl_receipts_sum_page_ytd': '6c', 'subttl_sum_ytd': '6d', 'ttl_disb_sum_page_ytd': '7', 'coh_coy': '8', 'indv_item_contb_ytd': '11ai', 'indv_unitem_contb_ytd': '11aii', 'ttl_indv_contb_ytd': '11aiii', 'pol_pty_cmte_contb_ytd_i': '11b', 'other_pol_cmte_contb_ytd_i': '11c', 'ttl_contb_col_ttl_ytd': '11d', 'tranf_from_affiliated_pty_ytd': '12', 'all_loans_received_ytd': '13', 'loan_repymts_received_ytd': '14', 'offsets_to_op_exp_ytd_i': '15', 'fed_cand_cmte_contb_ytd': '16', 'other_fed_receipts_ytd': '17', 'tranf_from_nonfed_acct_ytd': '18a', 'tranf_from_nonfed_levin_ytd': '18b', 'ttl_nonfed_tranf_ytd': '18c', 'ttl_receipts_ytd': '19', 'ttl_fed_receipts_ytd': '20', 'shared_fed_op_exp_ytd': '21ai', 'shared_nonfed_op_exp_ytd': '21aii', 'other_fed_op_exp_ytd': '21b', 'ttl_op_exp_ytd': '21c', 'tranf_to_affilitated_cmte_ytd': '22', 'fed_cand_cmte_contb_ref_ytd': '23', 'indt_exp_ytd': '24_independentExpenditures', 'coord_exp_by_pty_cmte_ytd': '25', 'loan_repymts_made_ytd': '26', 'loans_made_ytd': '27', 'indv_contb_ref_ytd': '28a', 'pol_pty_cmte_contb_ytd_ii': '28b', 'other_pol_cmte_contb_ytd_ii': '28c', 'ttl_contb_ref_ytd_i': '28d', 'other_disb_ytd': '29', 'shared_fed_actvy_fed_shr_ytd': '30ai', 'shared_fed_actvy_nonfed_ytd': '30aii', 'non_alloc_fed_elect_actvy_ytd': '30b', 'ttl_fed_elect_actvy_ytd': '30c', 'ttl_disb_ytd': '31', 'ttl_fed_disb_ytd': '32', 'ttl_contb_ytd': '33', 'ttl_contb_ref_ytd_ii': '34', 'net_contb_ytd': '35', 'ttl_fed_op_exp_ytd': '36', 'offsets_to_op_exp_ytd_ii': '37', 'net_op_exp_ytd': '38'}}
 
+#SCHED_A={11a,11b,11c, 12, 13, 14, 15 , 16, 17}
+#SCHED_B= {21b,22,23,26,27,28b,28c, 29, 30b  }
+
 col_a = {
 "6b":"cash_on_hand",
 "6c":"19",
@@ -3023,8 +3028,8 @@ col_a = {
 "8":"6d - 7",
 "9":"0",
 "10":"0",
-"11ai":"",
-"11aii":"",
+"11ai":"", #total of 11ai from sched_a
+"11aii":"", #total of 11ai from sched_a
 "11aiii":"11ai + 11aii",
 "11b":"",   
 "11c":"",   
@@ -3157,7 +3162,7 @@ def cash_on_hand_begining_amount(cmte_id, report_id):
         to_date_time = date(from_date.year, from_date.month, 1) - relativedelta(days=1)
         # from_date_time = datetime.combine(fromdate, time(0,0,0))
         # to_date_time = datetime.combine(todate, time(23,59,59))
-        print(from_date_time,to_date_time,'datetime')
+        #print(from_date_time,to_date_time,'datetime')
 
 
         with connection.cursor() as cursor:
@@ -3167,13 +3172,26 @@ def cash_on_hand_begining_amount(cmte_id, report_id):
             else:
                 result = cursor.fetchone()
                 coh_cop = result[0]
-        return coh_cop
+        return int(coh_cop)
     except Exception as e:
         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
 
 
+def get_line_num(cmte_id, report_id):
+    try:
+        with connection.cursor() as cursor:
+                cursor.execute("""SELECT distinct line_number FROM public.sched_a WHERE cmte_id = %s AND report_id = %s """,[cmte_id, report_id])
+                line_num = cursor.fetchall()
+        return line_num
+    except Exception as  e:
+         
+         return False
+         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
+
+
 def get_a_sum(cmte_id, report_id, clm_type):
     try:
+        
         with connection.cursor() as cursor:
             cursor.execute("""SELECT SUM(contribution_amount)  FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
             total_sum = cursor.fetchone()[0]
@@ -3188,7 +3206,7 @@ def get_b_sum(cmte_id, report_id, clm_type):
         with connection.cursor() as cursor:
             cursor.execute("""SELECT SUM(expenditure_amount)  FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND line_number = %s """,[cmte_id, report_id, clm_type])
             total_sum = cursor.fetchone()[0]
-            print(total_sum)
+            #print(total_sum)
         return total_sum
     except Exception as  e:
          return False
@@ -3199,21 +3217,31 @@ def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
     if col_a[k] == 'cash_on_hand':
         val = cash_on_hand_begining_amount(cmte_id,report_id)
-        print('cash_on_hand amttttttttttttttttttttttttttttttttttt',k, val)
         return val
+
 
     if not k or k == '0' or k not in col_a or not col_a[k] or col_a[k] == '0':
         #return 0
-        total_sum  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
-        val += total_sum
+        # total_sum  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
+        # val += total_sum
+        # total_sum_b  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
+        # val += total_sum_b
+        return 0
+
     
     elif len(k.replace(' ','').split('+')) == 1:
         if not col_a[k]:
             return get_col_a_value(col_a[k], actual_vals)
         else:
             #val += actual_vals[col_name_value_dict['colA'][k]]
-            total_sum  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colA'][k]])
-            val += total_sum
+            line_num = get_line_num(cmte_id, report_id)
+            #1206963
+            for ln in line_num:
+                total_sum  = get_a_sum(cmte_id, report_id,ln)
+                val += total_sum
+                total_sum_b  = get_b_sum(cmte_id, report_id,ln)
+                val += total_sum_b
+
     else:
         k_l = k.replace(' ','').split('+')
         for cl_n in k_ls:
@@ -3230,17 +3258,26 @@ def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
 def get_col_b_value(k, actual_vals, cmte_id=None, report_id=None):
     val = 0
     if not k or k == '0' or k not in col_b or not col_b[k] or col_b[k] == '0':
-        #return 0
-        total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
-        val += total_sum
+        return 0
+        # total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
+        # val += total_sum
+        # total_sum_a  = get_a_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
+        # val += total_sum_a
+
     
     elif len(k.replace(' ','').split('+')) == 1:
         if not col_b[k]:
             return get_col_b_value(col_b[k], actual_vals, )
         else:
             #val += actual_vals[col_name_value_dict['colB'][k]]
-            total_sum  = get_b_sum(cmte_id, report_id,actual_vals[col_name_value_dict['colB'][k]])
-            val += total_sum
+            line_num = get_line_num(cmte_id, report_id)
+            #1206963
+            for ln in line_num:
+                total_sum  = get_b_sum(cmte_id, report_id,ln)
+                val += total_sum
+                total_sum_a  = get_a_sum(cmte_id, report_id,ln)
+                val += total_sum_a
+
     else:
         k_l = k.replace(' ','').split('+')
         for cl_n in k_ls:
@@ -3253,23 +3290,28 @@ def get_col_b_value(k, actual_vals, cmte_id=None, report_id=None):
 
 @api_view(['POST'])
 def prepare_json_builders_data(request):
+    # implementing for only sched_a and sche_b summary.
     try:
         print("request.data: ", request.data)
         cmte_id = request.user.username
         param_string = ""
         report_id = request.data.get('report_id')
         f_3x_list = get_f3x_report_data(cmte_id, report_id)
+
         summary_d = {i:(k if k else 0) for i, k in f_3x_list[0].items()}
+        
         col_a = column_names_dict['colA']
         col_b = column_names_dict['colB']
         values_dict = {}
+        
         for c_name in col_a:
             values_dict[c_name] = get_col_a_value(col_a[c_name], summary_d, cmte_id, report_id)
         for d_name in col_b:
-            print(d_name,'cma')
+            #print(d_name,'cma')
             values_dict[d_name] = get_col_b_value(col_b[d_name], summary_d, cmte_id, report_id)
+        
+        #print(values_dict,'dict')
         import ipdb;ipdb.set_trace()
-        print(values_dict,'dict')
         update_str = str(values_dict)
         update_str = update_str[1:-1].replace(':', '=').replace("'", '')
 
@@ -3282,4 +3324,4 @@ def prepare_json_builders_data(request):
             
         return Response({'Response':'Success'}, status=status_value)
     except Exception as e:
-        return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)esponse':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
