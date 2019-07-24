@@ -868,6 +868,8 @@ def schedA(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
+            # To check if the report id exists in reports table
+            form_type = find_form_type(report_id, cmte_id)
             datum = schedA_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -930,6 +932,8 @@ def schedA(request):
                     request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
+            # To check if the report id exists in reports table
+            form_type = find_form_type(data.get('report_id'), data.get('cmte_id'))
             if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
@@ -972,6 +976,8 @@ def schedA(request):
             # end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
+            # To check if the report id exists in reports table
+            form_type = find_form_type(report_id, datum.get('cmte_id'))
             datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(request.data.get('transaction_type_identifier'))
             if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
                 datum['entity_id'] = request.data.get('entity_id')
@@ -1000,6 +1006,8 @@ def schedA(request):
                     request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
+            # To check if the report id exists in reports table
+            form_type = find_form_type(data.get('report_id'), data.get('cmte_id'))
             if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
