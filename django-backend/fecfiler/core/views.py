@@ -1786,12 +1786,14 @@ def get_list_report_data(report_id, cmte_id):
 def delete_trashed_transactions(request):
     try:
         #import ipdb;ipdb.set_trace()
+        #message_dict = {}
         committeeid = request.user.username
         for _action in request.data.get('actions', []):
             #report_id = _action.get('report_id', '')
             trans_id = _action.get('transaction_id', '')
             
             message='Transaction deleted successfully'
+            #message_dict[trans_id] = message
             sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
             print(sched_a_obj)
             if sched_a_obj:
@@ -1800,8 +1802,10 @@ def delete_trashed_transactions(request):
                 #print(report_info)
                 if report_info and report_info['status'] == 'Submitted':
                    message = 'The transaction report is submitted.'
+                   #message_dict[trans_id] = message
                 elif report_info and report_info['status'] == None:
                     message = 'The transaction report is None.'
+                    #message_dict[trans_id] = message
                 else:
                     try:
 
@@ -1811,6 +1815,8 @@ def delete_trashed_transactions(request):
                     except Exception as e:
                         print(e)
                         message = 'Error in deleting the transaction'
+                        #message_dict[trans_id] = message
+                        
 
         json_result = {'message':message}
         return Response(json_result, status=status.HTTP_201_CREATED)
@@ -2202,8 +2208,8 @@ def summary_disbursements_for_sumamry_table(args):
 
         summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount, 'amt_ytd':XXXI_amount_ytd},
                                 {'line_item':'21', 'level':2, 'description':'Operating Expenditures', 'amt':XXI_amount, 'amt_ytd':XXI_amount_ytd},
-                                {'line_item':'21AI', 'level':3, 'description':'Allocated Operating Expenditures - federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
-                                {'line_item':'21AII', 'level':3, 'description':'Allocated Operating Expenditures - non-federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
+                                {'line_item':'21AI', 'level':3, 'description':'Allocated Operating Expenditures - Federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
+                                {'line_item':'21AII', 'level':3, 'description':'Allocated Operating Expenditures - Non-Federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
                                 {'line_item':'21B', 'level':3, 'description':'Other Federal Operating Expenditures', 'amt':XXIB_amount, 'amt_ytd':XXIB_amount_ytd},
                                 {'line_item':'22', 'level':2, 'description':'Transfer From Affiliated Committees', 'amt':XXII_amount, 'amt_ytd':XXII_amount_ytd},
                                 {'line_item':'23', 'level':2, 'description':'Contributions To Other Committees', 'amt':XXIII_amount, 'amt_ytd':XXIII_amount_ytd},
