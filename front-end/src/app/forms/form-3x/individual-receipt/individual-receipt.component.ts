@@ -266,6 +266,37 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   /**
+   * Updates the contribution aggregate field once contribution ammount is entered.
+   *
+   * @param      {Object}  e       The event object.
+   */
+  public contributionAmountChange(e): void {
+    const contributionAmount: string = e.target.value;
+    const contributionAggregate: string = String(this._contributionAggregateValue);
+
+    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+    const value: string = this._decimalPipe.transform(total, '.2-2');
+
+    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+
+    /**
+     * TODO: To be implemented in the future.
+     */
+
+    // this._receiptService
+    //   .aggregateAmount(
+    //     res.report_id,
+    //     res.transaction_type,
+    //     res.contribution_date,
+    //     res.entity_id,
+    //     res.contribution_amount
+    //   )
+    //   .subscribe(resp => {
+    //     console.log('resp: ', resp);
+    //   });
+  }
+
+  /**
    * Gets the transaction type.
    */
   private _getTransactionType(): void {
@@ -290,9 +321,11 @@ export class IndividualReceiptComponent implements OnInit {
 
     if (checked) {
       this.memoCode = checked;
+      this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
+      this.frmIndividualReceipt.controls['memo_code'].setValue(null);
     }
   }
 
@@ -509,8 +542,19 @@ export class IndividualReceiptComponent implements OnInit {
     this._receiptService
       .getContributionAggregate(reportId, contact.entity_id, transactionTypeIdentifier)
       .subscribe(res => {
+        // Add the UI val and the server val.
+        // TODO uncomment when revisit.  Need to do the same when UI value changes.  See contributionAmountChange()
+        // const uiContribAggregateVal = this.frmIndividualReceipt.get('contribution_aggregate').value;
+        // let contributionAggregate = 0;
+        // if (this._utilService.isNumber(uiContribAggregateVal)) {
+        //   contributionAggregate = uiContribAggregateVal + res.contribution_aggregate;
+        // } else {
+        //   contributionAggregate = res.contribution_aggregate;
+        // }
+
         this.frmIndividualReceipt.patchValue(
           { contribution_aggregate: res.contribution_aggregate },
+          // { contribution_aggregate: contributionAggregate },
           { onlySelf: true }
         );
       });
