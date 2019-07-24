@@ -87,13 +87,13 @@ def check_mandatory_fields_SB(data, list_mandatory_fields):
 """
 **************************************************** FUNCTIONS - SCHED B TRANSACTION - work to be done*************************************************************
 """
-def post_sql_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account):
+def post_sql_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier):
 
     try:
         with connection.cursor() as cursor:
             # Insert data into schedB table
-            cursor.execute("""INSERT INTO public.sched_b (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account])
+            cursor.execute("""INSERT INTO public.sched_b (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier])
     except Exception:
         raise
 
@@ -102,7 +102,7 @@ def get_list_all_schedB(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
                             FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
@@ -131,7 +131,7 @@ def get_list_schedB(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
                             FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
@@ -161,7 +161,7 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET child rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, create_date
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
                             FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
             
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id, transaction_id])
@@ -185,13 +185,13 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
     except Exception:
         raise
 
-def put_sql_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account):
+def put_sql_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier):
 
     try:
         with connection.cursor() as cursor:
             # Insert data into schedB table
-            cursor.execute("""UPDATE public.sched_b SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, expenditure_purpose = %s, category_code = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, beneficiary_cmte_id = %s, beneficiary_cand_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, other_state = %s, other_zip = %s, nc_soft_account = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", 
-                [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_id, report_id, cmte_id])
+            cursor.execute("""UPDATE public.sched_b SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, expenditure_purpose = %s, category_code = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, beneficiary_cmte_id = %s, beneficiary_cand_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, other_state = %s, other_zip = %s, nc_soft_account = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", 
+                [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, transaction_id, report_id, cmte_id])
             # print(cursor.query)
             if (cursor.rowcount == 0):
                 raise Exception('The Transaction ID: {} does not exist in schedB table'.format(transaction_id))
@@ -241,7 +241,7 @@ def post_schedB(datum):
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
         try:
-            post_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('expenditure_date'), datum.get('expenditure_amount'), datum.get('semi_annual_refund_bundled_amount'), datum.get('expenditure_purpose'), datum.get('category_code'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('beneficiary_cmte_id'), datum.get('beneficiary_cand_id'), datum.get('other_name'), datum.get('other_street_1'), datum.get('other_street_2'), datum.get('other_city'), datum.get('other_state'), datum.get('other_zip'), datum.get('nc_soft_account'))
+            post_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('expenditure_date'), datum.get('expenditure_amount'), datum.get('semi_annual_refund_bundled_amount'), datum.get('expenditure_purpose'), datum.get('category_code'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('beneficiary_cmte_id'), datum.get('beneficiary_cand_id'), datum.get('other_name'), datum.get('other_street_1'), datum.get('other_street_2'), datum.get('other_city'), datum.get('other_state'), datum.get('other_zip'), datum.get('nc_soft_account'), datum.get('transaction_type_identifier'))
         except Exception as e:
             if 'entity_id' in datum:
                 entity_data = put_entities(prev_entity_list[0])
@@ -300,7 +300,7 @@ def put_schedB(datum):
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
         try:
-        	put_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('expenditure_date'), datum.get('expenditure_amount'), datum.get('semi_annual_refund_bundled_amount'), datum.get('expenditure_purpose'), datum.get('category_code'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('beneficiary_cmte_id'), datum.get('beneficiary_cand_id'), datum.get('other_name'), datum.get('other_street_1'), datum.get('other_street_2'), datum.get('other_city'), datum.get('other_state'), datum.get('other_zip'), datum.get('nc_soft_account'))
+        	put_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('expenditure_date'), datum.get('expenditure_amount'), datum.get('semi_annual_refund_bundled_amount'), datum.get('expenditure_purpose'), datum.get('category_code'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('beneficiary_cmte_id'), datum.get('beneficiary_cand_id'), datum.get('other_name'), datum.get('other_street_1'), datum.get('other_street_2'), datum.get('other_city'), datum.get('other_state'), datum.get('other_zip'), datum.get('nc_soft_account'), datum.get('transaction_type_identifier'))
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -331,6 +331,7 @@ def schedB_sql_dict(data):
         datum = {
             'line_number': data.get('line_number'),
             'transaction_type': data.get('transaction_type'),
+            'transaction_type_identifier': data.get('transaction_type_identifier'),
             'back_ref_sched_name': data.get('back_ref_sched_name'),
             'expenditure_date': date_format(data.get('expenditure_date')),
             'expenditure_amount': check_decimal(data.get('expenditure_amount')),

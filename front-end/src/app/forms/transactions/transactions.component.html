@@ -1,11 +1,12 @@
 <div class="transactions__main-container">
-  <div class="transactions__sidebar">
-    <div class="transactions__sidebar_categories">
-      <app-transaction-categories [hidden]="isShowFilters"
-        title="Transaction Categories"
-        (status)='onNotify($event)'>
-      </app-transaction-categories>
-    </div>
+  <div class="form__sidebar">
+      <transaction-sidebar
+        [hidden]="isShowFilters"
+        [step]="step"
+        title="Transaction Categories new"
+        [transactionCategories]="transactionCategories"
+        (status)="onNotify($event)">
+     </transaction-sidebar>
     <div class="transactions__sidebar_filters">
       <app-transactions-filter [hidden]="!isShowFilters" 
         title="Filters"

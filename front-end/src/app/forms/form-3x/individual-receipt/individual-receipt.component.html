@@ -1,5 +1,9 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt" >
+  <form [formGroup]="frmIndividualReceipt">
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -29,7 +33,14 @@
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
-      <ng-container *ngFor="let row of formFields">
+      <ng-container *ngFor="let row of formFields; let i = index">
+        <ng-container *ngIf="titles[i]?.fieldset">
+          <div class="row">
+            <div [class]="titles[i]?.colClassName">
+              {{ titles[i]?.label }}
+            </div>
+          </div>
+        </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
             <div [class]="row.colClassName" *ngFor="let col of row.cols">
@@ -46,37 +57,95 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
-                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'"> (Optional) </ng-container>
+                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                    (Optional)
+                  </ng-container>
                 </label>
                 <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
-                    <div [ngClass]="{'input-group': col?.inputGroup}">
-                      <ng-container *ngIf="col?.inputGroup">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">
-                            <i [class]="col?.inputIcon" aria-hidden="true"></i>
-                          </span>
-                        </div>                        
-                      </ng-container>
-                      <input 
-                        class="form-control"
-                        [style.width]="col?.width"
-                        [style.height]="col?.height"
-                        [attr.type]="col?.type"
-                        [attr.name]="col?.name"
-                        [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                        [attr.value]="col?.value"
-                        [maxlength]="col?.validation?.max"
-                        [formControlName]="col?.name"
-                        (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
-                        [ngClass]="
-                          frmIndividualReceipt.get(col?.name)?.invalid &&
-                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                            ? 'input-field-error'
-                            : ''
-                        "
-                        (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                      />
-                    </div>
+                  <div [ngClass]="{ 'input-group': col?.inputGroup }">
+                    <ng-container *ngIf="col?.inputGroup">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                    </ng-container>
+                    <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
+                    <!-- Now coming from the backend -->
+                    <!-- (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null" -->
+                    <input
+                      *ngIf="col?.name !== 'first_name' && col?.name !== 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"                      
+                      [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    />
+
+                    <!-- <app-typeahead
+                      *ngIf="col?.name === 'first_name' || col?.name === 'last_name'"
+                      [fieldName]="col?.name"
+                      [columnProperties]="col"
+                      (selectedItem)="receiveTypeaheadData($event)"
+                    >
+                    </app-typeahead> -->
+
+                    <input
+                      *ngIf="col?.name === 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-last-name"
+                      [ngbTypeahead]="searchLastName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterLastName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                    <input
+                      *ngIf="col?.name === 'first_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-first-name"
+                      [ngbTypeahead]="searchFirstName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterFirstName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                  </div>
                   <div
                     class="error-text"
                     *ngIf="
@@ -117,14 +186,18 @@
                         class="text-error text-left"
                         *ngIf="frmIndividualReceipt.get(col?.name).errors?.contributionDateInvalid"
                       >
-                        Entered date is outside of the report coverage period. Please enter transactions for this
-                        coverage period only.
+                        The date entered falls outside of the report coverage period. Transactions for this report
+                        should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
+                        need to add a transaction with a date that falls outside of the coverage period for this report,
+                        you will need to check the memo code box.
+                        <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                        coverage period only. -->
                       </div>
                     </ng-container>
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'checkbox'">
-                  <input 
+                  <input
                     class="form-control"
                     [style.width]="col?.width"
                     [style.height]="col?.height"
@@ -140,21 +213,21 @@
                         ? 'input-field-error'
                         : ''
                     "
-                  />                  
+                  />
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
-                  <textarea 
+                  <textarea
                     [style.height]="col?.height"
                     [style.width]="col?.width"
                     [style.overflow]="col.scroll ? col.scroll : null"
-                    [attr.name]="col?.name" 
+                    [attr.name]="col?.name"
                     [attr.maxlength]="col?.validation?.max"
                     [formControlName]="col?.name"
                   ></textarea>
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
-                    class="state-select"                
+                    class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -169,16 +242,18 @@
                   </ng-select>
                 </ng-container>
               </div>
-            </div> <!-- ./col -->
+            </div>
+            <!-- ./col -->
           </ng-container>
-        </div> <!-- ./row -->
+        </div>
+        <!-- ./row -->
         <ng-container *ngIf="row.seperator">
           <div class="row">
             <div class="col-md-12">
-             <hr /> 
+              <hr />
             </div>
           </div>
-        </ng-container>         
+        </ng-container>
       </ng-container>
     </section>
     <footer>

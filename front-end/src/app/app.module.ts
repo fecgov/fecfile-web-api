@@ -71,6 +71,9 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
+import { ContactsComponent} from './contacts/contacts.component';
+import { ContactsTableComponent } from './contacts/contacts-table/contacts-table.component';
+import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -105,6 +108,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     PreviewComponent,
     ValidateComponent,
     SignComponent,
+    TypeaheadComponent,
     SubmitComponent,
     AccountComponent,
     UsersComponent,
@@ -129,7 +133,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportheaderComponent,
     ReportdetailsComponent,
     SafeHTMLPipe,
-    ReportsFilterTypeComponent
+    ReportsFilterTypeComponent,
+    ContactsComponent,
+    ContactsTableComponent,
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

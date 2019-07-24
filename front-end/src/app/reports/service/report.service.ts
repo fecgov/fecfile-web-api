@@ -16,6 +16,7 @@ import { ActiveView } from '../reportheader/reportheader.component';
 
 export interface GetReportsResponse {
   reports: reportModel[];
+  totalreportsCount: number;
 }
 @Injectable({
   providedIn: 'root'

@@ -72,7 +72,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   //public existingReportId: string;
 
   // ngx-pagination config
-  public maxItemsPerPage = 100;
+  public maxItemsPerPage = 30;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
@@ -305,7 +305,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
           reportsModelL, this.currentSortedColumnName, sortedCol.descending);
         
         console.log(" getReportsPage this.reportsModel= ", this.reportsModel);
-      
+        this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
+        this.numberOfPages = (res.totalreportsCount > this.maxItemsPerPage)? Math.round(this.config.totalItems/this.maxItemsPerPage) : 1;
+        
+        console.log("this.numberOfPages = ", this.numberOfPages);
         this.allReportsSelected = false;
       });
 
@@ -809,31 +812,39 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
     let start = 0;
     let end = 0;
-    this.numberOfPages = 0;
+    // this.numberOfPages = 0;
     this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
     if (!this.reportsModel) {
-      return;
+      return '0';
     }
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
       && this.reportsModel.length > 0) {
-      this.calculateNumberOfPages();
+      // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
-        end = this.reportsModel.length;
+        // end = this.contactsModel.length;
+        end = this.config.totalItems;
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
         start = (end - this.config.itemsPerPage) + 1;
       }
+      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
+      // if (end > this.contactsModel.length) {
+      //   end = this.contactsModel.length;
+      // }
     }
+
     this.firstItemOnPage = start;
+    if (end > this.config.totalItems ){
+      end = this.config.totalItems
+    }
     this.lastItemOnPage = end;
     return start + ' - ' + end;
   }
-
 
   /**
    * Show the option to select/deselect columns in the table.

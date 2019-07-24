@@ -1162,11 +1162,16 @@ def autolookup_search_contacts(request):
                 query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
                                                     FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
                 parameters = [value + '%']
+            elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
+                param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
+                query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
+                                                    FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
+                parameters = [value + '%']
             else:
-                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
+                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
-            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name']")
+            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
         
         with connection.cursor() as cursor:
             cursor.execute(query_string, parameters)
@@ -2201,27 +2206,27 @@ def summary_disbursements_for_sumamry_table(args):
         XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
         XXXII_amount_ytd = XXXI_amount_ytd - XXIAII_amount_ytd - XXXAII_amount_ytd
 
-        summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'TOTAL DISBURSEMENTS', 'amt':XXXI_amount, 'amt_ytd':XXXI_amount_ytd},
-                                {'line_item':'21', 'level':2, 'description':'OPERATING EXPENDITURES', 'amt':XXI_amount, 'amt_ytd':XXI_amount_ytd},
-                                {'line_item':'21AI', 'level':3, 'description':'Allocated operating expenditures - federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
-                                {'line_item':'21AII', 'level':3, 'description':'Allocated operating expenditures - non-federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
-                                {'line_item':'21B', 'level':3, 'description':'Other federal operating expenditures', 'amt':XXIB_amount, 'amt_ytd':XXIB_amount_ytd},
-                                {'line_item':'22', 'level':2, 'description':'TRANSFERS FROM AFFILIATED COMMITTEES', 'amt':XXII_amount, 'amt_ytd':XXII_amount_ytd},
-                                {'line_item':'23', 'level':2, 'description':'CONTRIBUTIONS TO OTHER COMMITTEES', 'amt':XXIII_amount, 'amt_ytd':XXIII_amount_ytd},
-                                {'line_item':'24', 'level':2, 'description':'INDEPENDENT EXPENDITURES', 'amt':XXIV_amount, 'amt_ytd':XXIV_amount_ytd},
-                                {'line_item':'25', 'level':2, 'description':'PARTY COORDINATED EXPENDITURES', 'amt':XXV_amount, 'amt_ytd':XXV_amount_ytd},
-                                {'line_item':'27', 'level':2, 'description':'LOANS MADE', 'amt':XXVII_amount, 'amt_ytd':XXVII_amount_ytd},
-                                {'line_item':'26', 'level':2, 'description':'LOAN REPAYMENTS MADE', 'amt':XXVI_amount, 'amt_ytd':XXVI_amount_ytd},
-                                {'line_item':'28', 'level':2, 'description':'TOTAL CONTRIBUTION REFUNDS', 'amt':XXVIII_amount, 'amt_ytd':XXVIII_amount_ytd},
-                                {'line_item':'28A', 'level':3, 'description':'Individual refunds', 'amt':XXVIIIA_amount, 'amt_ytd':XXVIIIA_amount_ytd},
-                                {'line_item':'28B', 'level':3, 'description':'Political party refunds', 'amt':XXVIIIB_amount, 'amt_ytd':XXVIIIB_amount_ytd},
-                                {'line_item':'28C', 'level':3, 'description':'Other committee refunds', 'amt':XXVIIIC_amount, 'amt_ytd':XXVIIIC_amount_ytd},
-                                {'line_item':'29', 'level':2, 'description':'OTHER DISBURSEMENTS', 'amt':XXIX_amount, 'amt_ytd':XXIX_amount_ytd},
-                                {'line_item':'30', 'level':2, 'description':'TOTAL FEDERAL ELECTION ACTIVITY', 'amt':XXX_amount, 'amt_ytd':XXX_amount_ytd},
-                                {'line_item':'30AI', 'level':3, 'description':'Allocated federal election activity - federal share', 'amt':XXXAI_amount, 'amt_ytd':XXXAI_amount_ytd},
-                                {'line_item':'30AII', 'level':3, 'description':'Allocated federal election activity - Levin share', 'amt':XXXAII_amount, 'amt_ytd':XXXAII_amount_ytd},
-                                {'line_item':'30B', 'level':3, 'description':'Federal election activity - federal only', 'amt':XXXB_amount, 'amt_ytd':XXXB_amount_ytd},
-                                {'line_item':'32', 'level':2, 'description':'TOTAL FEDERAL DISBURSEMENTS', 'amt':XXXII_amount, 'amt_ytd':XXXII_amount_ytd},
+        summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount, 'amt_ytd':XXXI_amount_ytd},
+                                {'line_item':'21', 'level':2, 'description':'Operating Expenditures', 'amt':XXI_amount, 'amt_ytd':XXI_amount_ytd},
+                                {'line_item':'21AI', 'level':3, 'description':'Allocated Operating Expenditures - Federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
+                                {'line_item':'21AII', 'level':3, 'description':'Allocated Operating Expenditures - Non-Federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
+                                {'line_item':'21B', 'level':3, 'description':'Other Federal Operating Expenditures', 'amt':XXIB_amount, 'amt_ytd':XXIB_amount_ytd},
+                                {'line_item':'22', 'level':2, 'description':'Transfer From Affiliated Committees', 'amt':XXII_amount, 'amt_ytd':XXII_amount_ytd},
+                                {'line_item':'23', 'level':2, 'description':'Contributions To Other Committees', 'amt':XXIII_amount, 'amt_ytd':XXIII_amount_ytd},
+                                {'line_item':'24', 'level':2, 'description':'Independent Expenditures', 'amt':XXIV_amount, 'amt_ytd':XXIV_amount_ytd},
+                                {'line_item':'25', 'level':2, 'description':'Party Coordinated Expenditures', 'amt':XXV_amount, 'amt_ytd':XXV_amount_ytd},
+                                {'line_item':'27', 'level':2, 'description':'Loans Made', 'amt':XXVII_amount, 'amt_ytd':XXVII_amount_ytd},
+                                {'line_item':'26', 'level':2, 'description':'Loan Repayments Made', 'amt':XXVI_amount, 'amt_ytd':XXVI_amount_ytd},
+                                {'line_item':'28', 'level':2, 'description':'Total Contribution Refunds', 'amt':XXVIII_amount, 'amt_ytd':XXVIII_amount_ytd},
+                                {'line_item':'28A', 'level':3, 'description':'Individual Refunds', 'amt':XXVIIIA_amount, 'amt_ytd':XXVIIIA_amount_ytd},
+                                {'line_item':'28B', 'level':3, 'description':'Political Party Refunds', 'amt':XXVIIIB_amount, 'amt_ytd':XXVIIIB_amount_ytd},
+                                {'line_item':'28C', 'level':3, 'description':'Other Committee Refunds', 'amt':XXVIIIC_amount, 'amt_ytd':XXVIIIC_amount_ytd},
+                                {'line_item':'29', 'level':2, 'description':'Other Disbursements', 'amt':XXIX_amount, 'amt_ytd':XXIX_amount_ytd},
+                                {'line_item':'30', 'level':2, 'description':'Total Federal Election Activity', 'amt':XXX_amount, 'amt_ytd':XXX_amount_ytd},
+                                {'line_item':'30AI', 'level':3, 'description':'Allocated Federal Election Activity - Federal Share', 'amt':XXXAI_amount, 'amt_ytd':XXXAI_amount_ytd},
+                                {'line_item':'30AII', 'level':3, 'description':'Allocated Federal Election Activity - Levin Share', 'amt':XXXAII_amount, 'amt_ytd':XXXAII_amount_ytd},
+                                {'line_item':'30B', 'level':3, 'description':'Federal Election Activity - Federal Only', 'amt':XXXB_amount, 'amt_ytd':XXXB_amount_ytd},
+                                {'line_item':'32', 'level':2, 'description':'Total Federal Disbursements', 'amt':XXXII_amount, 'amt_ytd':XXXII_amount_ytd},
                                 ]
 
         # summary_disbursement = {'21AI': XXIAI_amount,
@@ -2361,23 +2366,23 @@ def summary_receipts_for_sumamry_table(args):
         XX_amount = XIX_amount - XVIII_amount
         XX_amount_ytd = XIX_amount_ytd - XVIII_amount_ytd
 
-        summary_receipt_list = [ {'line_item':'19', 'level':1, 'description':'TOTAL RECIEPTS', 'amt':XIX_amount, 'amt_ytd':XIX_amount_ytd},
-                                {'line_item':'11D', 'level':2, 'description':'TOTAL CONTRIBUTIONS', 'amt':XID_amount, 'amt_ytd':XID_amount_ytd},
-                                {'line_item':'11A', 'level':3, 'description':'Total individual contributions', 'amt':XIA_amount, 'amt_ytd':XIA_amount_ytd},
-                                {'line_item':'11AI', 'level':4, 'description':'Itemized individual contributions', 'amt':XIAI_amount, 'amt_ytd':XIAI_amount_ytd},
-                                {'line_item':'11AII', 'level':4, 'description':'Unitemized individual contributions', 'amt':XIAII_amount, 'amt_ytd':XIAII_amount_ytd},
-                                {'line_item':'11B', 'level':3, 'description':'Party committee contributions', 'amt':XIB_amount, 'amt_ytd':XIB_amount_ytd},
-                                {'line_item':'11C', 'level':3, 'description':'Other committee contributions', 'amt':XIC_amount, 'amt_ytd':XIC_amount_ytd},
-                                {'line_item':'12', 'level':2, 'description':'TRANSFERS FROM AFFILIATED COMMITTEES', 'amt':XII_amount, 'amt_ytd':XII_amount_ytd},
-                                {'line_item':'13', 'level':2, 'description':'ALL LOANS RECEIVED', 'amt':XIII_amount,  'amt_ytd':XIII_amount_ytd},
-                                {'line_item':'14', 'level':2, 'description':'LOAN REPAYMENTS RECEIVED', 'amt':XIV_amount, 'amt_ytd':XIV_amount_ytd},
-                                {'line_item':'15', 'level':2, 'description':'OFFSETS TO OPERATING EXPENDITURES', 'amt':XV_amount,  'amt_ytd':XV_amount_ytd},
-                                {'line_item':'16', 'level':2, 'description':'CANDIDATE REFUNDS', 'amt':XVI_amount, 'amt_ytd':XVI_amount_ytd},
-                                {'line_item':'17', 'level':2, 'description':'OTHER RECEIPTS', 'amt':XVII_amount, 'amt_ytd':XVII_amount_ytd},
-                                {'line_item':'18', 'level':2, 'description':'TOTAL TRANSFERS', 'amt':XVIII_amount, 'amt_ytd':XVIII_amount_ytd},
-                                {'line_item':'18A', 'level':3, 'description':'Non-federal transfers', 'amt':XVIIIA_amount, 'amt_ytd':XVIIIA_amount_ytd},
-                                {'line_item':'18B', 'level':3, 'description':'Levin funds', 'amt':XVIIIB_amount, 'amt_ytd':XVIIIB_amount_ytd},
-                                {'line_item':'20', 'level':2, 'description':'TOTAL FEDERAL RECEIPTS', 'amt':XX_amount, 'amt_ytd':XX_amount_ytd},
+        summary_receipt_list = [ {'line_item':'19', 'level':1, 'description':'Total Receipts', 'amt':XIX_amount, 'amt_ytd':XIX_amount_ytd},
+                                {'line_item':'11D', 'level':2, 'description':'Total Contributions', 'amt':XID_amount, 'amt_ytd':XID_amount_ytd},
+                                {'line_item':'11A', 'level':3, 'description':'Total Individual Contributions', 'amt':XIA_amount, 'amt_ytd':XIA_amount_ytd},
+                                {'line_item':'11AI', 'level':4, 'description':'Itemized Individual Contributions', 'amt':XIAI_amount, 'amt_ytd':XIAI_amount_ytd},
+                                {'line_item':'11AII', 'level':4, 'description':'Unitemized Individual Contributions', 'amt':XIAII_amount, 'amt_ytd':XIAII_amount_ytd},
+                                {'line_item':'11B', 'level':3, 'description':'Party Committee Contributions', 'amt':XIB_amount, 'amt_ytd':XIB_amount_ytd},
+                                {'line_item':'11C', 'level':3, 'description':'Other Committee Contributions', 'amt':XIC_amount, 'amt_ytd':XIC_amount_ytd},
+                                {'line_item':'12', 'level':2, 'description':'Transfers From Affiliated Committees', 'amt':XII_amount, 'amt_ytd':XII_amount_ytd},
+                                {'line_item':'13', 'level':2, 'description':'All Loans Received', 'amt':XIII_amount,  'amt_ytd':XIII_amount_ytd},
+                                {'line_item':'14', 'level':2, 'description':'Loan Repayments Received', 'amt':XIV_amount, 'amt_ytd':XIV_amount_ytd},
+                                {'line_item':'15', 'level':2, 'description':'Offsets To Operating Expenditures', 'amt':XV_amount,  'amt_ytd':XV_amount_ytd},
+                                {'line_item':'16', 'level':2, 'description':'Candidate Refunds', 'amt':XVI_amount, 'amt_ytd':XVI_amount_ytd},
+                                {'line_item':'17', 'level':2, 'description':'Other Receipts', 'amt':XVII_amount, 'amt_ytd':XVII_amount_ytd},
+                                {'line_item':'18', 'level':2, 'description':'Total Transfers', 'amt':XVIII_amount, 'amt_ytd':XVIII_amount_ytd},
+                                {'line_item':'18A', 'level':3, 'description':'Non-federal Transfers', 'amt':XVIIIA_amount, 'amt_ytd':XVIIIA_amount_ytd},
+                                {'line_item':'18B', 'level':3, 'description':'Levin Funds', 'amt':XVIIIB_amount, 'amt_ytd':XVIIIB_amount_ytd},
+                                {'line_item':'20', 'level':2, 'description':'Total Federal Receipts', 'amt':XX_amount, 'amt_ytd':XX_amount_ytd},
                                 ]
         # summary_receipt = {'11AI': XIAI_amount,
         #             '11AII': XIAII_amount,

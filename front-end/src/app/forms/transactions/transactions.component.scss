@@ -133,6 +133,26 @@
     }
 
   }
+  .form__sidebar {
+    background-color: $bombay;
+    display: block;
+    flex-grow: 1;
+    display: block;
+    padding-left: 0;
+    width: 100%;
+    @include media(tablet) {
+      display: block;
+      width: 100%;
+    }
+    @include media(mediumDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
+    @include media(largeDesktop) {
+      display: table-cell;
+      width: 250px;
+    }
+  }
 }
 
 
