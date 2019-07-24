@@ -590,22 +590,14 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    // const request: any = {};
-    // until API supports multiple transactions, only pass a single
-    // Use this code when API is ready.
-    const transactionIds = [];
+    const request: any = {};
+    const actions = [];
     for (const trx of transactions) {
-      transactionIds.push({
+      actions.push({
         transaction_id: trx.transactionId
       });
     }
-    // request.transactionIds = transactionIds;
-    const request = transactionIds;
-
-    // // delete this once API is ready for multiple transactions.
-    // for (const trx of transactions) {
-    //   request.transaction_id = trx.transactionId;
-    // }
+    request.actions = actions;
 
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
