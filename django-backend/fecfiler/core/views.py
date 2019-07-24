@@ -2202,8 +2202,8 @@ def summary_disbursements_for_sumamry_table(args):
 
         summary_disbursement_list = [ {'line_item':'31', 'level':1, 'description':'Total Disbursements', 'amt':XXXI_amount, 'amt_ytd':XXXI_amount_ytd},
                                 {'line_item':'21', 'level':2, 'description':'Operating Expenditures', 'amt':XXI_amount, 'amt_ytd':XXI_amount_ytd},
-                                {'line_item':'21AI', 'level':3, 'description':'Allocated Operating Expenditures - federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
-                                {'line_item':'21AII', 'level':3, 'description':'Allocated Operating Expenditures - non-federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
+                                {'line_item':'21AI', 'level':3, 'description':'Allocated Operating Expenditures - Federal', 'amt':XXIAI_amount, 'amt_ytd':XXIAI_amount_ytd},
+                                {'line_item':'21AII', 'level':3, 'description':'Allocated Operating Expenditures - Non-Federal', 'amt':XXIAII_amount, 'amt_ytd':XXIAII_amount_ytd},
                                 {'line_item':'21B', 'level':3, 'description':'Other Federal Operating Expenditures', 'amt':XXIB_amount, 'amt_ytd':XXIB_amount_ytd},
                                 {'line_item':'22', 'level':2, 'description':'Transfer From Affiliated Committees', 'amt':XXII_amount, 'amt_ytd':XXII_amount_ytd},
                                 {'line_item':'23', 'level':2, 'description':'Contributions To Other Committees', 'amt':XXIII_amount, 'amt_ytd':XXIII_amount_ytd},

@@ -156,6 +156,8 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
+  margin-top: 1px  !important;
+  //margin-bottom: 1px  !important;
 }
 .summary_text_level_2{
   background-color: #D0D3D4    !important;
@@ -163,6 +165,8 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
+  margin-top: 1px  !important;
+ // margin-bottom: 1px  !important;
 }
 .summary_text_level_3{
   background-color: #E5E7E9  !important;
@@ -170,6 +174,8 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
+  margin-top: 1px  !important;
+ // margin-bottom: 1px  !important;
 }
 .summary_text_level_4{
   background-color: #E5E7E9  !important;
@@ -178,6 +184,8 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
+  margin-top: 1px  !important;
+  //margin-bottom: 1px  !important;
 }
 .summary_table_text{
   background-color: #ffffff !important;
@@ -196,8 +204,8 @@
 
   //padding-left: 10px;
   //padding-right: 100px;
-  //padding-top: 10px;
-  //padding-bottom: 10px;
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
   //border-spacing: .25px 0.25px !important;
   table-layout: fixed ;
   width: 98% ;
@@ -213,7 +221,9 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  padding-right: 2px !important;
+  padding-right: 4px !important;
+  margin-top: 1px  !important;
+  //margin-bottom: 1px  !important;
 }
 .summary_text_amt_level_2{
   background-color: #D0D3D4    !important;
@@ -221,7 +231,9 @@
   height: 35px !important;
   padding-top: 10px;
   vertical-align: middle !important;
-  padding-right: 2px !important;
+  padding-right: 4px !important;
+  margin-top: 1px  !important;
+  //margin-bottom: 1px  !important;
 }
 .summary_text_amt_level_3{
   background-color: #E5E7E9  !important;
@@ -229,7 +241,9 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  padding-right: 2px !important;
+  padding-right: 4px !important;
+  margin-top: 1px  !important;
+  //margin-bottom: 1px  !important;
 }
 .summary_text_amt_level_4{
   background-color: #E5E7E9  !important;
@@ -237,7 +251,9 @@
   height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  padding-right: 2px !important;
+  padding-right: 4px !important;
+  margin-top: 1px  !important;
+  //padding-right: 2px !important;
 }
 
 .th{  
@@ -245,6 +261,7 @@
   vertical-align: middle !important;
   padding-top: 10px !important;
   padding-right: 10px !important;
+
 }
 
 .td{
