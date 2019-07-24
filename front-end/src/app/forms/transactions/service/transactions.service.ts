@@ -27,7 +27,6 @@ export interface GetTransactionsResponse {
   providedIn: 'root'
 })
 export class TransactionsService {
-
   // only for mock data
   private mockRestoreTrxArray = [];
   private mockTrxArray = [];
@@ -41,15 +40,9 @@ export class TransactionsService {
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
-  private _propertyNameConverterMap: Map<string, string> = new Map([
-    ['zip', 'zip_code'],
-  ]);
+  private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
-
-  constructor(
-    private _http: HttpClient,
-    private _cookieService: CookieService,
-  ) {
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {
     // mock out the recycle trx
     for (let i = 0; i < 13; i++) {
       const t1: any = this.createMockTrx();
@@ -65,7 +58,7 @@ export class TransactionsService {
 
   /**
    * Gets the transactions by Report ID.
-   * 
+   *
    * @param formType
    * @param reportId
    * @param page
@@ -76,15 +69,16 @@ export class TransactionsService {
    * @return     {Observable}
    */
   public getFormTransactions(
-      formType: string,
-      reportId: string,
-      page: number,
-      itemsPerPage: number,
-      sortColumnName: string,
-      descending: boolean,
-      filters: TransactionFilterModel): Observable<any> {
+    formType: string,
+    reportId: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filters: TransactionFilterModel
+  ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/core/get_all_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -124,21 +118,19 @@ export class TransactionsService {
     console.log(' Transaction Table httpOptions = ', httpOptions);
 
     return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        request,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
           if (res) {
             console.log('Transaction Table res: ', res);
 
             return res;
           }
           return false;
-      }));
+        })
+      );
   }
 
   /**
@@ -161,10 +153,10 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel): Observable<any> {
-
+    filters: TransactionFilterModel
+  ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/core/get_all_trashed_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -214,23 +206,20 @@ export class TransactionsService {
     console.log(' Transaction Recycle Bin Table httpOptions = ', httpOptions);
 
     return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        request,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
           if (res) {
             console.log('Transaction Recycle Bin Table res: ', res);
 
             return res;
           }
           return false;
-      }));
+        })
+      );
   }
-
 
   /**
    * Map server fields from the response to the model.
@@ -268,7 +257,6 @@ export class TransactionsService {
     return modelArray;
   }
 
-
   /**
    * Map a single field name to its server field name equivalent.
    *
@@ -278,7 +266,6 @@ export class TransactionsService {
    * TODO The API should be changed to pass the property names expected by the front end.
    */
   public mapToSingleServerName(appFieldName: string) {
-
     // TODO map field names in constructor
     let name = '';
 
@@ -338,14 +325,12 @@ export class TransactionsService {
     return name ? name : '';
   }
 
-
   /**
    * Map front-end model fields to server fields.
    *
    * TODO The API should be changed to pass the property names expected by the front end.
    */
   public mapToServerFields(model: TransactionModel) {
-
     const serverObject: any = {};
     if (!model) {
       return serverObject;
@@ -353,7 +338,7 @@ export class TransactionsService {
 
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_id = model.transactionId;
-    serverObject.name =  model.name;
+    serverObject.name = model.name;
     serverObject.street_1 = model.street;
     serverObject.street_2 = model.street2;
     serverObject.city = model.city;
@@ -381,7 +366,6 @@ export class TransactionsService {
     }
   }
 
-
   /**
    * Some data from the server is formatted for display in the UI.  Users will search
    * on the reformatted data.  For the search filter to work against the formatted data,
@@ -404,13 +388,11 @@ export class TransactionsService {
     }
   }
 
-
   /**
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: TransactionFilterModel) {
-
     if (!response.transactions) {
       return;
     }
@@ -425,16 +407,33 @@ export class TransactionsService {
       if (response.transactions.length > 0 && filters.keywords.length > 0) {
         isFilter = true;
 
-        const fields = [ 'city', 'employer', 'occupation',
-          'memo_code', 'memo_text', 'name', 'purpose_description', 'state',
-          'street_1', 'transaction_id', 'transaction_type_desc', 'aggregate',
-          'transaction_amount_ui', 'transaction_date_ui', 'deleted_date_ui', 'zip_code_ui', 'itemized'];
+        const fields = [
+          'city',
+          'employer',
+          'occupation',
+          'memo_code',
+          'memo_text',
+          'name',
+          'purpose_description',
+          'state',
+          'street_1',
+          'transaction_id',
+          'transaction_type_desc',
+          'aggregate',
+          'transaction_amount_ui',
+          'transaction_date_ui',
+          'deleted_date_ui',
+          'zip_code_ui',
+          'itemized'
+        ];
 
         for (let keyword of filters.keywords) {
           let filterType = FilterTypeEnum.contains;
           keyword = keyword.trim();
-          if ((keyword.startsWith('"') && keyword.endsWith('"')) ||
-              keyword.startsWith(`'`) && keyword.endsWith(`'`)) {
+          if (
+            (keyword.startsWith('"') && keyword.endsWith('"')) ||
+            (keyword.startsWith(`'`) && keyword.endsWith(`'`))
+          ) {
             filterType = FilterTypeEnum.exact;
             keyword = keyword.valueOf().substring(1, keyword.length - 1);
           }
@@ -472,14 +471,19 @@ export class TransactionsService {
 
     if (filters.filterAmountMin !== null && filters.filterAmountMax !== null) {
       isFilter = true;
-      if (filters.filterAmountMin >= 0 && filters.filterAmountMax >= 0 &&
-          filters.filterAmountMin <= filters.filterAmountMax) {
+      if (
+        filters.filterAmountMin >= 0 &&
+        filters.filterAmountMax >= 0 &&
+        filters.filterAmountMin <= filters.filterAmountMax
+      ) {
         const filteredAmountArray = [];
         for (const trx of response.transactions) {
           if (trx.transaction_amount) {
-            if (trx.transaction_amount >= filters.filterAmountMin &&
-              trx.transaction_amount <= filters.filterAmountMax) {
-                filteredAmountArray.push(trx);
+            if (
+              trx.transaction_amount >= filters.filterAmountMin &&
+              trx.transaction_amount <= filters.filterAmountMax
+            ) {
+              filteredAmountArray.push(trx);
             }
           }
         }
@@ -494,8 +498,7 @@ export class TransactionsService {
       for (const trx of response.transactions) {
         if (trx.transaction_date) {
           const trxDate = new Date(trx.transaction_date);
-          if (trxDate >= filterDateFromDate &&
-              trxDate <= filterDateToDate) {
+          if (trxDate >= filterDateFromDate && trxDate <= filterDateToDate) {
             isFilter = true;
             filteredDateArray.push(trx);
           }
@@ -542,7 +545,6 @@ export class TransactionsService {
     }
   }
 
-
   /**
    *
    * @param array
@@ -551,13 +553,9 @@ export class TransactionsService {
    */
   public sortTransactions(array: any, sortColumnName: string, descending: boolean) {
     const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
     return array;
   }
-
-
-
-
 
   // /**
   //  * Restore the transaction from the Recyling Bin back to the Transactions Table.
@@ -565,7 +563,6 @@ export class TransactionsService {
   //  * @param trx the transaction to restore
   //  */
   // public restoreTransaction(trx: TransactionModel): Observable<any> {
-
 
   //   // mocking the server API until it is ready.
 
@@ -580,50 +577,46 @@ export class TransactionsService {
   //   return Observable.of('');
   // }
 
-
   /**
    * Delete transactions from the Recyling Bin.
    *
    * @param transactions the transactions to delete
    */
   public deleteRecycleBinTransaction(transactions: Array<TransactionModel>): Observable<any> {
-
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/core/delete_trashed_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const request: any = {};
+    // const request: any = {};
     // until API supports multiple transactions, only pass a single
     // Use this code when API is ready.
-    // const transactionIds = [];
-    // for (const trx of transactions) {
-    //   transactionIds.push({
-    //     transaction_id: trx.transactionId
-    //   });
-    // }
-    // request.transactionIds = transactionIds;
-
-    // delete this once API is ready for multiple transactions.
+    const transactionIds = [];
     for (const trx of transactions) {
-      request.transaction_id = trx.transactionId;
+      transactionIds.push({
+        transaction_id: trx.transactionId
+      });
     }
+    // request.transactionIds = transactionIds;
+    const request = transactionIds;
+
+    // // delete this once API is ready for multiple transactions.
+    // for (const trx of transactions) {
+    //   request.transaction_id = trx.transactionId;
+    // }
 
     return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        request,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
           return false;
-      }));
+        })
+      );
   }
-
 
   /**
    * Get US States.
@@ -633,7 +626,7 @@ export class TransactionsService {
   public getStates(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/get_dynamic_forms_fields';
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -642,25 +635,20 @@ export class TransactionsService {
     params = params.append('form_type', `F${formType}`);
     params = params.append('transaction_type', transactionType);
 
-    return this._http
-        .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions,
-            params
-          }
-        );
-   }
-
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
 
   /**
    * Get transaction category types
-   * 
+   *
    * @param formType
    */
   public getTransactionCategories(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -671,16 +659,11 @@ export class TransactionsService {
 
     params = params.append('form_type', `F${formType}`);
 
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            params,
-            headers: httpOptions
-          }
-       );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      params,
+      headers: httpOptions
+    });
   }
-
 
   private createMockTrx() {
     const t1: any = {};
@@ -710,31 +693,26 @@ export class TransactionsService {
   public getItemizations(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/get_ItemizationIndicators';
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    return this._http
-        .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-        );
-   }
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
 
-   /**
-    * Trash or restore tranactions to/from the Recycling Bin.
-    * 
-    * @param action the action to be applied to the transactions (e.g. trash, restore)
-    * @param reportId the unique identifier for the Report
-    * @param transactions the transactions to trash or restore
-    */
-   public trashOrRestoreTransactions(action: string, reportId: string, transactions: Array<TransactionModel>) {
-
+  /**
+   * Trash or restore tranactions to/from the Recycling Bin.
+   *
+   * @param action the action to be applied to the transactions (e.g. trash, restore)
+   * @param reportId the unique identifier for the Report
+   * @param transactions the transactions to trash or restore
+   */
+  public trashOrRestoreTransactions(action: string, reportId: string, transactions: Array<TransactionModel>) {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_transactions';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -752,20 +730,17 @@ export class TransactionsService {
     request.actions = actions;
 
     return this._http
-    .put(
-      `${environment.apiUrl}${url}`,
-      request,
-      {
+      .put(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
-      }
-    )
-    .pipe(map(res => {
-        if (res) {
-          console.log('Trash Restore response: ', res);
-          return res;
-        }
-        return false;
-    }));
-   }
-
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            console.log('Trash Restore response: ', res);
+            return res;
+          }
+          return false;
+        })
+      );
+  }
 }
