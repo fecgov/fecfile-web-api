@@ -437,6 +437,8 @@ def task_sched_a(request):
                                     response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                                     response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
                                     response_dict_out['categoryCode'] = '15G'
+                                    response_dict_out['electionCode'] = entity_child_obj['election_code']
+                                    response_dict_out['electionOtherDescription'] = entity_child_obj['election_other_description']
                                     response_dict_out['beneficiaryCommitteeFecId'] = entity_child_obj['beneficiary_cmte_id']
                                     response_dict_out['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
                                     response_dict_out['beneficiaryCandidateFecId'] = entity_child_obj['beneficiary_cand_id']
@@ -476,6 +478,9 @@ def task_sched_a(request):
                                     response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                                     response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
+                                    response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                                    response_dict_out['electionCode'] = entity_child_obj['election_code']
+                                    response_dict_out['electionOtherDescription'] = entity_child_obj['election_other_description']
                                     response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                                     response_dict_out['categoryCode'] = '15G'
                                     response_dict_out['beneficiaryCommitteeFecId'] = entity_child_obj['beneficiary_cmte_id']
@@ -600,6 +605,8 @@ def task_sched_a(request):
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
                             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
                             response_dict_receipt['categoryCode'] = '15G'
+                            response_dict_receipt['electionCode'] =  entity_obj_b['election_code']
+                            response_dict_receipt['electionOtherDescription'] =  entity_obj_b['election_other_description']
                             response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
                             response_dict_receipt['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
                             response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
@@ -640,6 +647,8 @@ def task_sched_a(request):
                             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
                             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+                            response_dict_receipt['electionCode'] =  entity_obj_b['election_code']
+                            response_dict_receipt['electionOtherDescription'] =  entity_obj_b['election_other_description']
                             response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
                             response_dict_receipt['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
                             response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
