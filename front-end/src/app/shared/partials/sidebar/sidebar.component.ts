@@ -53,7 +53,8 @@ export class SidebarComponent implements OnInit {
               val.url.indexOf('/forms/form/') === 0 ||
               val.url.indexOf('/forms/transactions/') === 0 ||
               val.url.indexOf('/signandSubmit/3X') === 0 ||
-              val.url.indexOf('/contacts') === 0 
+              val.url.indexOf('/contacts') === 0 ||
+              val.url.indexOf('/reports') === 0 
              ) {
               this._closeNavBar();
             } else if(

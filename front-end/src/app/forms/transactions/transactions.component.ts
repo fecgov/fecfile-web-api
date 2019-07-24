@@ -5,6 +5,7 @@ import { TransactionsMessageService } from './service/transactions-message.servi
 import { TransactionFilterModel } from './model/transaction-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { TransactionModel } from './model/transaction.model';
+import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -56,6 +57,29 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public searchText = '';
   public searchTextArray = [];
   public tagArray: any = [];
+  public transactionCategories: any = [];
+
+  public currentStep: string = 'step_1';
+  public step: string = '';
+  public steps: any = {};
+  public frm: any;
+  public direction: string;
+  public previousStep: string = '';
+  public parentTransactionCategories: any = [];
+  public reportsLoading: boolean = true;
+  public reportTypes: any = [];
+  public reportTypeIndicator: any = {};
+  public reportType: any = null;
+  public selectedReportType: any = {};
+  public selectedReport: any = null;
+  public regularReports: boolean = false;
+  public specialReports: boolean = false;
+  public selectedReportInfo: any = {};
+  public transactionCategory: string = '';
+  public transactionTypeText = '';
+
+  private _step: string = '';
+  private _formType: string = '';
 
   /**
    * Subscription for applying filters to the transactions obtained from
@@ -81,6 +105,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
+    private _transactionTypeService: TransactionTypeService
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
       .subscribe(
@@ -120,6 +145,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
+    localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
+
+    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+      if (res) {
+        this.transactionCategories = res.data.transactionCategories;
+
+        console.log('this.transactionCategories: ', this.transactionCategories);
+      }
+    });
 
     // const reportIdString = this._activatedRoute.snapshot.paramMap.get('report_id');
     // this.reportId = Number(reportIdString);
@@ -151,6 +185,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
+    localStorage.removeItem('Transaction_Table_Screen');
+    localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
   }
@@ -684,5 +720,50 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.filters.keywords = this.searchTextArray;
     this._transactionsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
   }
+
+/*  public onNotify(e): void {
+    if (typeof e === 'object') {
+      if (e.hasOwnProperty('form')) {
+        if (typeof e.form === 'object') {
+          this.frm = e.form;
+
+          this.direction = e.direction;
+
+          this.previousStep = e.previousStep;
+
+          this._step = e.step;
+
+          this.currentStep = e.step;
+
+   
+          //this.canContinue();
+        } else if (typeof e.form === 'string') {
+          if (e.form === this._formType) {
+            if (e.hasOwnProperty('reportTypeRadio')) {
+              if (typeof e.reportTypeRadio === 'string') {
+                //this._setCoverageDates(e.reportTypeRadio);
+              }
+            } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
+              this.selectedReportInfo = e;
+            } else if (e.hasOwnProperty('transactionCategory')) {
+              if (typeof e.transactionCategory === 'string') {
+                this.transactionCategory = e.transactionCategory;
+              }
+            }
+          }
+        }
+      } else if (e.hasOwnProperty('direction')) {
+        if (typeof e.direction === 'string') {
+          if (e.direction === 'previous') {
+            this.direction = e.direction;
+
+            this.previousStep = e.previousStep;
+
+            this._step = e.step;
+          }
+        }
+      }
+    }
+  }*/
 
 }

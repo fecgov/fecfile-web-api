@@ -6,7 +6,6 @@ import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -48,23 +47,23 @@ export class IndividualReceiptService {
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    
-    if (reportType === null || typeof reportType=== 'undefined' ){
+
+    if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
     const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
     const formData: FormData = new FormData();
-    
+
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     /**
-     * This has to be removed. 
+     * This has to be removed.
      * I'm not hard coding anything any more.
-     * Or this has to be changed to just lower case.  This is not a 
+     * Or this has to be changed to just lower case.  This is not a
      * good practice at all.  Please do better then this.
      */
     formData.append('cmte_id', committeeDetails.committeeid);
@@ -81,7 +80,7 @@ export class IndividualReceiptService {
           formData.append(key, value);
         }
       }
-    }    
+    }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
@@ -111,7 +110,7 @@ export class IndividualReceiptService {
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (reportType === null || typeof reportType=== 'undefined' ){
+    if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
@@ -226,47 +225,82 @@ export class IndividualReceiptService {
     });
   }
 
+  // /**
+  //  * Returns aggregate total for contributor.
+  //  *
+  //  * @param      {number}  reportId            The report identifier
+  //  * @param      {string}  transactionType     The transaction type
+  //  * @param      {string}  contributionDate    The contribution date
+  //  * @param      {string}  entityId            The entity identifier
+  //  * @param      {number}  contributionAmount  The contribution amount
+  //  */
+  // public aggregateAmount(
+  //   reportId: number,
+  //   transactionType: string,
+  //   contributionDate: string,
+  //   entityId: string,
+  //   contributionAmount: number
+  // ): Observable<any> {
+  //   const token: string = JSON.parse(this._cookieService.get('user'));
+  //   const url: string = `${environment.apiUrl}/sa/aggregate_amount`;
+  //   const data: any = {
+  //     report_id: reportId,
+  //     transaction_type: transactionType,
+  //     contribution_date: contributionDate,
+  //     entity_id: entityId,
+  //     contribution_amount: contributionAmount
+  //   };
+  //   let httpOptions = new HttpHeaders();
+
+  //   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+  //   return this._http
+  //     .post(url, data, {
+  //       headers: httpOptions
+  //     })
+  //     .pipe(
+  //       map(res => {
+  //         if (res) {
+  //           console.log('res: ', res);
+  //           return res;
+  //         }
+  //         return false;
+  //       })
+  //     );
+  // }
+
   /**
    * Returns aggregate total for contributor.
    *
-   * @param      {number}  reportId            The report identifier
-   * @param      {string}  transactionType     The transaction type
-   * @param      {string}  contributionDate    The contribution date
-   * @param      {string}  entityId            The entity identifier
-   * @param      {number}  contributionAmount  The contribution amount
+   * @param      {number}  reportId                   The report identifier
+   * @param      {string}  entityId                   The entity identifier
+   * @param      {string}  transactionTypeIdentifier  The transaction type
    */
-  public aggregateAmount(
-    reportId: number,
-    transactionType: string,
-    contributionDate: string,
-    entityId: string,
-    contributionAmount: number
+    public getContributionAggregate(
+    reportId: string,
+    entityId: number,
+    transactionTypeIdentifier: string
   ): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/sa/aggregate_amount`;
-    const data: any = {
-      report_id: reportId,
-      transaction_type: transactionType,
-      contribution_date: contributionDate,
-      entity_id: entityId,
-      contribution_amount: contributionAmount
-    };
-    let httpOptions = new HttpHeaders();
 
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/sa/contribution_aggregate';
+    let httpOptions =  new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    params = params.append('report_id', reportId);
+    params = params.append('entity_id', entityId.toString());
+    params = params.append('transaction_type_identifier', transactionTypeIdentifier);
+
     return this._http
-      .post(url, data, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            console.log('res: ', res);
-            return res;
+        .get(
+          `${environment.apiUrl}${url}`,
+          {
+            headers: httpOptions,
+            params
           }
-          return false;
-        })
-      );
+        );
   }
 }

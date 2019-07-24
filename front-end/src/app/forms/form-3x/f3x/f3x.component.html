@@ -28,7 +28,7 @@
       'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps" *ngIf="step !== 'financial_summary'">
+    <div class="form__steps">
       <app-steps
         [steps]="[
           { text: 'Report', step: 'step_1' },
@@ -73,6 +73,7 @@
           [formOptionsVisible]="formOptionsVisible"
           [selectedOptions]="selectedOptions"
           [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
           (status)="onNotify($event)"
         >
         </f3x-individual-receipt>
