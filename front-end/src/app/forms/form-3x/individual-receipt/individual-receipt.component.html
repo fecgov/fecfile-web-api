@@ -92,15 +92,6 @@
                       "
                       (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     />
-
-                    <!-- <app-typeahead
-                      *ngIf="col?.name === 'first_name' || col?.name === 'last_name'"
-                      [fieldName]="col?.name"
-                      [columnProperties]="col"
-                      (selectedItem)="receiveTypeaheadData($event)"
-                    >
-                    </app-typeahead> -->
-
                     <input
                       *ngIf="col?.name === 'last_name'"
                       class="form-control"
@@ -237,7 +228,7 @@
                     "
                   >
                     <ng-option *ngFor="let item of states" [value]="item.code">
-                      {{ item.name }}
+                      {{ item.code }} - {{ item.name }}
                     </ng-option>
                   </ng-select>
                 </ng-container>
