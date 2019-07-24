@@ -180,17 +180,9 @@ def build_flyway(String version) {
 def deployToK8s(String version, String environment, String deployment, String repo) {
   sh """ 
     kubectl \
-      --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile \
+      --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile4 \
       --namespace=${environment} \
       set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
-    """
-  if (environment == "dev" ){
-    sh """ 
-      kubectl \
-        --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile4 \
-        --namespace=${environment} \
-        set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
-    """
-  }
+  """
 
 }

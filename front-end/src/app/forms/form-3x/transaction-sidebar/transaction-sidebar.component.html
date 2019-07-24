@@ -45,6 +45,7 @@
         <button
           type="button"
           class="btn btn-secondary-gray"
+          (click)="viewSummary()"
           [routerLink]="['/forms/form/', '3X']"
           [queryParams]="{ step: 'financial_summary' }"
         >

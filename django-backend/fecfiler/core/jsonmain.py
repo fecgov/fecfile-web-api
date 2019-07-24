@@ -474,6 +474,8 @@ def task_sched_a(request):
                                     response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                                     response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
                                     response_dict_out['categoryCode'] = '15G'
+                                    response_dict_out['electionCode'] = entity_child_obj['election_code']
+                                    response_dict_out['electionOtherDescription'] = entity_child_obj['election_other_description']
                                     response_dict_out['beneficiaryCommitteeFecId'] = entity_child_obj['beneficiary_cmte_id']
                                     response_dict_out['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
                                     response_dict_out['beneficiaryCandidateFecId'] = candidate_info.get('candidateFecId')
@@ -512,6 +514,9 @@ def task_sched_a(request):
                                     response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                                     response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
+                                    response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
+                                    response_dict_out['electionCode'] = entity_child_obj['election_code']
+                                    response_dict_out['electionOtherDescription'] = entity_child_obj['election_other_description']
                                     response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
                                     response_dict_out['categoryCode'] = '15G'
                                     response_dict_out['beneficiaryCommitteeFecId'] = entity_child_obj['beneficiary_cmte_id']
@@ -634,6 +639,23 @@ def task_sched_a(request):
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
                             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
                             response_dict_receipt['categoryCode'] = '15G'
+
+                            response_dict_receipt['electionCode'] =  entity_obj_b['election_code']
+                            response_dict_receipt['electionOtherDescription'] =  entity_obj_b['election_other_description']
+                            response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
+                            response_dict_receipt['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
+                            response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
+                            response_dict_receipt['benificiaryCandidateLastName'] = ''
+                            response_dict_receipt['benificiaryCandidateFirstName'] = ''
+                        
+
+                            response_dict_receipt['benificiaryCandidateMiddleName'] = ''
+                            response_dict_receipt['benificiaryCandidatePrefix'] = ''
+                            response_dict_receipt['benificiaryCandidateSuffix'] = ''
+                            response_dict_receipt['benificiaryCandidateOffice'] = entity_obj_b['beneficiary_cand_office']
+                            response_dict_receipt['benificiaryCandidateState'] = entity_obj_b['beneficiary_cand_state']
+                            response_dict_receipt['benificiaryCandidateDistrict'] = entity_obj_b['beneficiary_cand_district']
+
                             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
                                 # continue # Needs a fail condition implemented
@@ -661,6 +683,23 @@ def task_sched_a(request):
                             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
                             response_dict_receipt['expenditurePurposeDescription'] = entity_obj_b['expenditure_purpose']
+
+                            response_dict_receipt['electionCode'] =  entity_obj_b['election_code']
+                            response_dict_receipt['electionOtherDescription'] =  entity_obj_b['election_other_description']
+                            response_dict_receipt['beneficiaryCommitteeFecId'] = entity_obj_b['beneficiary_cmte_id']
+                            response_dict_receipt['beneficiaryCommitteeName'] = comm_info_obj.get('committeeName')
+                            response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
+                            response_dict_receipt['benificiaryCandidateLastName'] = list_entity_b['last_name']
+                            response_dict_receipt['benificiaryCandidateFirstName'] = list_entity_b['first_name']
+                        
+
+                            response_dict_receipt['benificiaryCandidateMiddleName'] = list_entity_b['middle_name']
+                            response_dict_receipt['benificiaryCandidatePrefix'] = list_entity_b['prefix']
+                            response_dict_receipt['benificiaryCandidateSuffix'] = list_entity_b['suffix']
+                            response_dict_receipt['benificiaryCandidateOffice'] = entity_obj_b['beneficiary_cand_office']
+                            response_dict_receipt['benificiaryCandidateState'] = entity_obj_b['beneficiary_cand_state']
+                            response_dict_receipt['benificiaryCandidateDistrict'] = entity_obj_b['beneficiary_cand_district']
+
                             response_dict_receipt['categoryCode'] = '15G'
                             response_dict_receipt['memoCode'] = entity_obj_b['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj_b['memo_text']
@@ -773,7 +812,7 @@ def create_json_builders(request):
                             'emailAddress2': request.data.get('emailAddress2'),
                             'wait': request.data.get('wait')
                             }
-                file_obj = {'json_file': ('data.json', open(tmp_path, 'rb'), 'application/json')}
+                file_obj = {'fecDataFile': ('data.json', open(tmp_path, 'rb'), 'application/json')}
                 print("data_obj = ", data_obj)
                 print("file_obj = ", file_obj)
 

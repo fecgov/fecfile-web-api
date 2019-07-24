@@ -45,6 +45,7 @@ export class F3xComponent implements OnInit {
   public transactionCategories: any = [];
   public transactionCategory: string = '';
   public transactionTypeText = '';
+  public transactionType = '';
 
   private _step: string = '';
   private _formType: string = '';
@@ -245,6 +246,7 @@ export class F3xComponent implements OnInit {
           // Pass Transaction Type to individual-receipt
           if (this.currentStep === 'step_3') {
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
+            this.transactionType = e.transactionType ? e.transactionType : '';
           }
 
           this.canContinue();

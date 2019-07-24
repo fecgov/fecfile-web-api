@@ -145,7 +145,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
-    localStorage.setItem('Transaction_Table_Screen', 'Yes');
+    localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
     this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       if (res) {
@@ -186,6 +186,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     localStorage.removeItem('Transaction_Table_Screen');
+    localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
   }

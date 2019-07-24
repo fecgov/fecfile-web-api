@@ -29,10 +29,12 @@ urlpatterns = [
     url(r'^api/v1/', include(accounts_router.urls)),
     url(r'^api/v1/', include('fecfiler.forms.urls')),
     url(r'^api/v1/', include('fecfiler.core.urls')),
-    
+
     #url(r'^api/v1/', include('fecfiler.form3x.urls')),
     url(r'^api/v1/', include('fecfiler.sched_A.urls')),
     url(r'^api/v1/', include('fecfiler.sched_B.urls')),
+    url(r'^api/v1/', include('fecfiler.sched_C.urls')),
+    url(r'^api/v1/', include('fecfiler.sched_D.urls')),
     #url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
     #url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
     url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
@@ -44,5 +46,5 @@ urlpatterns = [
     #url('^.*$', IndexView.as_view(), name='index'),
 ]
 
-#if settings.DEBUG:
+# if settings.DEBUG:
 #  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
