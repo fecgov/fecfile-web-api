@@ -322,10 +322,12 @@ export class IndividualReceiptComponent implements OnInit {
     if (checked) {
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+      console.log('memo checked');
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
+      console.log('memo unchecked');
     }
   }
 
@@ -343,6 +345,7 @@ export class IndividualReceiptComponent implements OnInit {
           if (field === 'memo_code') {
             if (this.memoCode) {
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+              console.log('memo code val ' + receiptObj[field]);
             }
           }
           if (field === 'last_name' || field === 'first_name') {
