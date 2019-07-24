@@ -28,9 +28,10 @@ from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+
 """
 some questions to discuss:
-1. remove line_number, trsaction_type from madatroy fields.
+1. remove line_number, trsaction_type from mandatory fields.
 2. expenditure purpose = ? 
 3. one sched_a each request ?
 4. one sched_a one entity each request ?
@@ -758,8 +759,8 @@ def delete_schedA(data):
         transaction_id = check_transaction_id(data.get('transaction_id'))
         datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
         delete_sql_schedA(transaction_id, report_id, cmte_id)
-        delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
-        delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
+        # delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
+        # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
         update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
         ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
     except:
