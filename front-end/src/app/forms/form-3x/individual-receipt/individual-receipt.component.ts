@@ -42,6 +42,8 @@ export class IndividualReceiptComponent implements OnInit {
   @Input() transactionType = '';
 
   public checkBoxVal: boolean = false;
+  public cvgStartDate: string = null;
+  public cvgEndDate: string = null;
   public frmIndividualReceipt: FormGroup;
   public formFields: any = [];
   public formVisible: boolean = false;
@@ -52,7 +54,7 @@ export class IndividualReceiptComponent implements OnInit {
   public states: any = [];
 
   private _formType: string = '';
-  private _reportType: any = {};
+  private _reportType: any = null;
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
@@ -137,6 +139,19 @@ export class IndividualReceiptComponent implements OnInit {
     this._validateContributionDate();
 
     this._getTransactionType();
+
+    if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+      if (typeof this._reportType === 'object') {
+        if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
+          if (typeof this._reportType.cvgStartDate === 'string' && typeof this._reportType.cvgEndDate === 'string') {
+            this.cvgStartDate = this._reportType.cvgStartDate;
+            this.cvgEndDate = this._reportType.cvgEndDate;
+          }
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {
