@@ -4,13 +4,12 @@ import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
-import { form3xReportTypeDetails} from '../../../shared/interfaces/FormsService//FormsService';
+import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService//FormsService';
 import { DatePipe } from '@angular/common';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-
 export class ReportTypeService {
   constructor(private _http: HttpClient, private _cookieService: CookieService) {
     this._datePipe = new DatePipe('en-US');
@@ -54,9 +53,7 @@ export class ReportTypeService {
 
     let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (form3xReportType === null)
-    {
-      console.log("get backup object");
+    if (form3xReportType === null) {
       let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
@@ -71,7 +68,7 @@ export class ReportTypeService {
     if (form3xReportType.hasOwnProperty('cvgStartDate')) {
       formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
     } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('cvg_start_dt', form3xReportType.cvgstartdate)
+      formData.append('cvg_start_dt', form3xReportType.cvgstartdate);
     }
 
     if (form3xReportType.hasOwnProperty('cvgEndDate')) {
@@ -119,8 +116,8 @@ export class ReportTypeService {
     if (form3xReportType.election_date !== null) {
       if (typeof form3xReportType.election_date === 'string') {
         if (form3xReportType.election_date.length >= 1) {
-          formData.append('date_of_election', this._datePipe.transform(form3xReportType.election_date,'MM/dd/yyyy'));
-        }        
+          formData.append('date_of_election', this._datePipe.transform(form3xReportType.election_date, 'MM/dd/yyyy'));
+        }
       }
     }
 
@@ -177,10 +174,11 @@ export class ReportTypeService {
       .pipe(
         map(res => {
           if (res) {
-            console.log("Form 3X save res = ", res);
             if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
-              const reportObj: form3xReportTypeDetails = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
-               if (res['reportid']) {
+              const reportObj: form3xReportTypeDetails = JSON.parse(
+                window.localStorage.getItem(`form_${formType}_report_type`)
+              );
+              if (res['reportid']) {
                 reportObj.reportId = res['reportid'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
               }
@@ -199,23 +197,22 @@ export class ReportTypeService {
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
-    console.log("signandSaveSubmitReport called");
-    console.log("signandSaveSubmitReport formType = ", formType);
-    console.log("signandSaveSubmitReport access_type = ", access_type);
+    console.log('signandSaveSubmitReport called');
+    console.log('signandSaveSubmitReport formType = ', formType);
+    console.log('signandSaveSubmitReport access_type = ', access_type);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (form3xReportType === null)
-    {
-      console.log("get backup object");
+    if (form3xReportType === null) {
+      console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log("backup object form3xReportType = ", form3xReportType);
+      console.log('backup object form3xReportType = ', form3xReportType);
     }
 
     localStorage.setItem('F3X_submit_backup', JSON.stringify(form3xReportType));
-    console.log("signandSaveSubmitReport access_type you reached here = ", access_type);
+    console.log('signandSaveSubmitReport access_type you reached here = ', access_type);
     formData.append('form_type', `F${formType}`);
 
     if (form3xReportType.hasOwnProperty('reportid')) {
@@ -231,35 +228,32 @@ export class ReportTypeService {
     }
 
     if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgStartDate,'MM/dd/yyyy'));
+      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
     } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgstartdate,'MM/dd/yyyy'));
+      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
     }
 
     if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgEndDate,'MM/dd/yyyy'));
+      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
     } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
-      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgenddate,'MM/dd/yyyy'));
+      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
     }
-    
+
     if (form3xReportType.hasOwnProperty('dueDate')) {
       if (form3xReportType.dueDate !== null) {
-        formData.append('due_dt', this._datePipe.transform(form3xReportType.dueDate,'MM/dd/yyyy'));
+        formData.append('due_dt', this._datePipe.transform(form3xReportType.dueDate, 'MM/dd/yyyy'));
       } else {
         formData.append('due_dt', null);
       }
-
     } else if (form3xReportType.hasOwnProperty('duedate')) {
       if (form3xReportType.duedate !== null) {
-        formData.append('due_dt', this._datePipe.transform(form3xReportType.duedate,'MM/dd/yyyy'));
+        formData.append('due_dt', this._datePipe.transform(form3xReportType.duedate, 'MM/dd/yyyy'));
       } else {
         formData.append('due_dt', null);
       }
-
     }
 
-
-    console.log("signandSaveSubmitReport access_type you reached here1 = ", access_type);
+    console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
 
     if (form3xReportType.hasOwnProperty('amend_Indicator')) {
       if (typeof form3xReportType.amend_Indicator === 'string') {
@@ -284,7 +278,7 @@ export class ReportTypeService {
     } else {
       formData.append('coh_bop', '0');
     }
-    
+
     if (form3xReportType.hasOwnProperty('electionCode')) {
       if (typeof form3xReportType.electionCode === 'string') {
         if (form3xReportType.electionCode.length >= 1) {
@@ -303,7 +297,7 @@ export class ReportTypeService {
       if (typeof form3xReportType.election_date === 'string') {
         if (form3xReportType.election_date.length >= 1) {
           formData.append('date_of_election', form3xReportType.election_date);
-        }        
+        }
       }
     }
 
@@ -315,7 +309,7 @@ export class ReportTypeService {
       }
     }
 
-    console.log(" access_type =", access_type);
+    console.log(' access_type =', access_type);
 
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
@@ -345,15 +339,14 @@ export class ReportTypeService {
           formData.append('additional_email_1', form3xReportType.additionalEmail1);
         }
       }
-    } else  if (form3xReportType.hasOwnProperty('additionalemail1')) {
+    } else if (form3xReportType.hasOwnProperty('additionalemail1')) {
       if (typeof form3xReportType.additionalemail1 === 'string') {
         if (form3xReportType.additionalemail1.length >= 1) {
           formData.append('additional_email_1', form3xReportType.additionalemail1);
         }
+      }
     }
-  }
-    
-    
+
     if (form3xReportType.hasOwnProperty('additionalEmail2')) {
       if (typeof form3xReportType.additionalEmail2 === 'string') {
         if (form3xReportType.additionalEmail2.length >= 1) {
@@ -367,21 +360,23 @@ export class ReportTypeService {
         }
       }
     }
-    
-    console.log("signandSaveSubmitReport formData = ", formData);
 
-    if (access_type==='Saved'){
-      console.log("signandSaveSubmitReport HTTP called with access_type = ", access_type);
-        return this._http
+    console.log('signandSaveSubmitReport formData = ', formData);
+
+    if (access_type === 'Saved') {
+      console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
+      return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
         })
         .pipe(
           map(res => {
             if (res) {
-              console.log("Form 3X save res = ", res);
+              console.log('Form 3X save res = ', res);
               if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
-                const reportObj: form3xReportTypeDetails = JSON.parse(window.localStorage.getItem(`form_${formType}_report_type`));
+                const reportObj: form3xReportTypeDetails = JSON.parse(
+                  window.localStorage.getItem(`form_${formType}_report_type`)
+                );
                 if (res['reportid']) {
                   reportObj.reportId = res['reportid'];
                   window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
@@ -392,27 +387,25 @@ export class ReportTypeService {
             return false;
           })
         );
-      } else if (access_type==='Submitted'){
-        console.log("signandSaveSubmitReport HTTP called with access_type = ", access_type);
-        console.log("submit Report form 3X submitted...")
-        return this._http
-        .put(
-          `${environment.apiUrl}${url}`,
-          formData,
-          {
-            headers: httpOptions
-          }
-        )
-        .pipe(map(res => {
+    } else if (access_type === 'Submitted') {
+      console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
+      console.log('submit Report form 3X submitted...');
+      return this._http
+        .put(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
             if (res) {
-              console.log("submit Report form 3X submitted res = ", res)
+              console.log('submit Report form 3X submitted res = ', res);
               /*localStorage.removeItem(`form_${formType}_saved_backup`);
               localStorage.removeItem(`form_${formType}_report_type_backup`);*/
               return true;
             }
             return false;
-        }));
-      }
+          })
+        );
+    }
   }
 
   public submitForm(formType: string, callFrom: string): Observable<any> {
@@ -420,30 +413,29 @@ export class ReportTypeService {
     let httpOptions = new HttpHeaders();
     let url: string = '/core/create_json_builders';
     //let url: string = '/core/create_json_builders_test';
-    
+
     let params = new HttpParams();
     let formData: FormData = new FormData();
-    console.log("submitForm called");
-    console.log("submitForm formType = ", formType);
-    console.log("submitForm callFrom = ", callFrom);
+    console.log('submitForm called');
+    console.log('submitForm formType = ', formType);
+    console.log('submitForm callFrom = ', callFrom);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    
-    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    console.log(" submitForm form3xReportType = ", form3xReportType)
 
-    if (form3xReportType === null)
-    {
-      console.log("get backup object");
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    console.log(' submitForm form3xReportType = ', form3xReportType);
+
+    if (form3xReportType === null) {
+      console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       if (form3xReportType === null) {
         form3xReportType = JSON.parse(localStorage.getItem('F3X_submit_backup'));
       }
     }
 
-    console.log(" submitForm form3xReportType = ", form3xReportType)
+    console.log(' submitForm form3xReportType = ', form3xReportType);
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    
+
     formData.append('call_from', callFrom);
     formData.append('committeeId', committeeDetails.committeeid);
     formData.append('password', 'test');
@@ -475,7 +467,7 @@ export class ReportTypeService {
     } else if (form3xReportType.hasOwnProperty('reportid')) {
       formData.append('reportSequence', form3xReportType.reportid);
       formData.append('report_id', form3xReportType.reportid);
-    }  
+    }
 
     if (form3xReportType.hasOwnProperty('email1')) {
       if (form3xReportType.email1 !== null) {
@@ -489,21 +481,21 @@ export class ReportTypeService {
 
     if (form3xReportType.hasOwnProperty('reportType')) {
       formData.append('reportType', form3xReportType.reportType);
-    }else if (form3xReportType.hasOwnProperty('reporttype')) {
+    } else if (form3xReportType.hasOwnProperty('reporttype')) {
       formData.append('reportType', form3xReportType.reporttype);
     }
 
     if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgStartDate,'MM/dd/yyyy'));
+      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
     } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgstartdate,'MM/dd/yyyy'));
-    } 
+      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
+    }
 
     if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgEndDate,'MM/dd/yyyy'));
+      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
     } else if (form3xReportType.hasOwnProperty('cvgendeate')) {
-      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgenddate,'MM/dd/yyyy'));
-    } 
+      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
+    }
 
     formData.append('originalFECId', '');
     formData.append('backDoorCode', '');
@@ -514,49 +506,44 @@ export class ReportTypeService {
           formData.append('emailAddress2', form3xReportType.email2);
         }
       }
- 
     }
-    formData.append('wait', 'false' );
- 
-    return this._http
-        .post(`${environment.apiUrl}${url}`, formData, {
-          headers: httpOptions
-        })
-   }
-  
-   public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
+    formData.append('wait', 'false');
+
+    return this._http.post(`${environment.apiUrl}${url}`, formData, {
+      headers: httpOptions
+    });
+  }
+
+  public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/create_json_builders';
     //let url: string = '/core/create_json_builders_test';
     let formData: FormData = new FormData();
 
-    console.log("printForm formType = ", formType);
+    console.log('printForm formType = ', formType);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (form3xReportType === null)
-    {
-      console.log("get backup object");
+    if (form3xReportType === null) {
+      console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log("backup object form3xReportType = ", form3xReportType);
+      console.log('backup object form3xReportType = ', form3xReportType);
     }
-    
+
     if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
-    } else if (form3xReportType.hasOwnProperty('reportid')) {   
+    } else if (form3xReportType.hasOwnProperty('reportid')) {
       formData.append('report_id', form3xReportType.reportid);
     }
 
     formData.append('form_type', `F${formType}`);
     formData.append('call_from', callFrom);
-          
-    return this._http
-    .post(`${environment.apiUrl}${url}`, formData, {
+
+    return this._http.post(`${environment.apiUrl}${url}`, formData, {
       headers: httpOptions
     });
-
-   }
+  }
 }

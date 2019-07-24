@@ -131,10 +131,6 @@ export class F3xComponent implements OnInit {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
     }
-
-    if (this.currentStep) {
-      console.log('this.currentStep: ', this.currentStep);
-    }
   }
 
   /**
