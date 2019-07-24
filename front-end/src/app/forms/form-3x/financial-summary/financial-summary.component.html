@@ -2,7 +2,7 @@
      <header class="header-content">
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--6">
-            <h1>&nbsp;&nbsp;&nbsp;Financial Summary</h1>
+            <h1>&nbsp;&nbsp;Financial Summary</h1>
           </div>
          <div class="grid-row__col grid-row__col--12 text-right">
             <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
@@ -24,6 +24,7 @@
         </div>
         <hr />
       </header>
+      
   <section>
     <div class="financial-summary-content">
       <div class="row">
@@ -230,19 +231,17 @@
     </div>
   </section>
   <footer>
-    <footer>
         <div class="grid-row">
             <div class="grid-row__col grid-row__col--4">
             <div class="forms__btn-container">
-                <button class="btn btn-previous btn-left" type="button" (click)="all_Transactions()">
+                <button id="all_transactions" class="btn btn-previous btn-left" type="button" (click)="all_Transactions()">
                     All Transactions
                  </button>
-                 <button class="btn btn-previous btn-left" type="button" (click)="expanded_Summary()">
+                 <button id="extended_summary" class="btn btn-previous btn-left" type="button" (click)="expanded_Summary()">
                     Extended Summary
                   </button>
             </div>
             </div>
         </div>
-      </footer> 
-  </footer>
+  </footer> 
 </div>

@@ -119,6 +119,11 @@
     }
   }
   footer {
+    margin-right: 0;
+    margin-left: 10px;
+    margin-top: 1px;
+    margin-bottom: 20px;
+
     .forms__btn-container {
       margin: 10 auto;
       padding: 0;
@@ -148,34 +153,39 @@
 .summary_text_level_1{
   background-color: #979A9A  !important;
   padding-left: 50px;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
 }
 .summary_text_level_2{
   background-color: #D0D3D4    !important;
   padding-left: 50px;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
 }
 .summary_text_level_3{
-  background-color: #ffffff  !important;
+  background-color: #E5E7E9  !important;
   padding-left: 100px;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
 }
 .summary_text_level_4{
-  background-color: #ffffff  !important;
+  background-color: #E5E7E9  !important;
   padding-left: 150px;
   font-style: italic !important;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
 }
 .summary_table_text{
   background-color: #ffffff !important;
+  //background-color: #E5E7E9 !important;
+    
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   //padding-left: 5px;
   //width: 1200px;
   //border:none;
@@ -200,52 +210,52 @@
 .summary_text_amt_level_1{
   background-color: #979A9A  !important;
   text-align: right;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  //padding-right: 10px !important;
+  padding-right: 2px !important;
 }
 .summary_text_amt_level_2{
   background-color: #D0D3D4    !important;
   text-align: right;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px;
   vertical-align: middle !important;
-  //padding-right: 10px !important;
+  padding-right: 2px !important;
 }
 .summary_text_amt_level_3{
-  background-color: #ffffff  !important;
+  background-color: #E5E7E9  !important;
   text-align: right;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  //padding-right: 10px !important;
+  padding-right: 2px !important;
 }
 .summary_text_amt_level_4{
-  background-color: #ffffff  !important;
+  background-color: #E5E7E9  !important;
   text-align: right;
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
-  //padding-right: 10px !important;
+  padding-right: 2px !important;
 }
 
 .th{  
-  height: 30px !important;
+  height: 35px !important;
   vertical-align: middle !important;
   padding-top: 10px !important;
   padding-right: 10px !important;
 }
 
 .td{
-  height: 30px !important;
+  height: 35px !important;
   padding-top: 10px !important;
   vertical-align: middle !important;
   padding-right: 10px ;
 }
 
 .tr{
-  height: 30px !important;
+  height: 35px !important;
   vertical-align: middle !important;
   padding-top: 10px !important;
 }
@@ -263,4 +273,19 @@ table
 table td, table th
 {
   padding: 0; /* 'cellpadding' equivalent */
+}
+
+.btn-previous-spacing 
+{
+margin-right: 10px;
+margin-bottom: 5px !important;
+}
+.btn-space {
+  margin-right: 5px !important;
+}
+.all_transactions{
+  margin-right:10px !important;
+}
+.extended_summary{
+  margin-right:10px !important;
 }
