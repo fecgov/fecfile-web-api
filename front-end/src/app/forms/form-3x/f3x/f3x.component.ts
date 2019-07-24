@@ -102,8 +102,8 @@ export class F3xComponent implements OnInit {
                 `form_${this._formType}_report_type_backup`,
                 localStorage.getItem(`form_${this._formType}_report_type`)
               );
-              console.log(`form_${this._formType}_report_type_backup` + 'copied ');
-              console.log(new Date().toISOString());
+              // console.log(`form_${this._formType}_report_type_backup` + 'copied ');
+              // console.log(new Date().toISOString());
             }
 
             setTimeout(() => {
@@ -111,8 +111,8 @@ export class F3xComponent implements OnInit {
               localStorage.removeItem(`form_${this._formType}_transaction_type`);
               localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
               localStorage.removeItem(`form_${this._formType}_saved`);
-              console.log(`form_${this._formType}_report_type_backup` + 'removed ');
-              console.log(new Date().toISOString());
+              // console.log(`form_${this._formType}_report_type_backup` + 'removed ');
+              // console.log(new Date().toISOString());
             }, 200);
           }
         } else {
@@ -130,6 +130,10 @@ export class F3xComponent implements OnInit {
     if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
       this.currentStep = this._activatedRoute.snapshot.queryParams.step;
       this.step = this._activatedRoute.snapshot.queryParams.step;
+    }
+
+    if (this.currentStep) {
+      console.log('this.currentStep: ', this.currentStep);
     }
   }
 
