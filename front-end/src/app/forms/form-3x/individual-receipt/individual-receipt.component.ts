@@ -180,6 +180,10 @@ export class IndividualReceiptComponent implements OnInit {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+
+    // get form data API is passing X for memo code value.
+    // Set it to null here until it is checked by user where it will be set to X.
+    this.frmIndividualReceipt.controls['memo_code'].setValue(null);
   }
 
   /**
@@ -404,7 +408,7 @@ export class IndividualReceiptComponent implements OnInit {
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
-          this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+          this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntityId = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
