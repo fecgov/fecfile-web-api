@@ -71,6 +71,8 @@
                       </div>
                     </ng-container>
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
+                    <!-- Now coming from the backend -->
+                    <!-- (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null" -->
                     <input
                       *ngIf="col?.name !== 'first_name' && col?.name !== 'last_name'"
                       class="form-control"
