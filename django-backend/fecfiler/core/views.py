@@ -1781,12 +1781,14 @@ def get_list_report_data(report_id, cmte_id):
 def delete_trashed_transactions(request):
     try:
         #import ipdb;ipdb.set_trace()
+        message_dict = {}
         committeeid = request.user.username
         for _action in request.data.get('actions', []):
             #report_id = _action.get('report_id', '')
             trans_id = _action.get('transaction_id', '')
             
             message='Transaction deleted successfully'
+            message_dict[trans_id] = message
             sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
             print(sched_a_obj)
             if sched_a_obj:
@@ -1795,8 +1797,10 @@ def delete_trashed_transactions(request):
                 #print(report_info)
                 if report_info and report_info['status'] == 'Submitted':
                    message = 'The transaction report is submitted.'
+                   message_dict[trans_id] = message
                 elif report_info and report_info['status'] == None:
                     message = 'The transaction report is None.'
+                    message_dict[trans_id] = message
                 else:
                     try:
 
@@ -1806,8 +1810,10 @@ def delete_trashed_transactions(request):
                     except Exception as e:
                         print(e)
                         message = 'Error in deleting the transaction'
+                        message_dict[trans_id] = message
+                        
 
-        json_result = {'message':message}
+        json_result = {'message':message_dict}
         return Response(json_result, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response('The delete_trashed_transactions API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
