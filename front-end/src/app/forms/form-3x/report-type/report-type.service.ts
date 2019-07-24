@@ -433,7 +433,7 @@ export class ReportTypeService {
       }
     }
 
-    console.log(' submitForm form3xReportType = ', form3xReportType);
+    // console.log(' submitForm form3xReportType = ', form3xReportType);
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
 
     formData.append('call_from', callFrom);
@@ -459,59 +459,61 @@ export class ReportTypeService {
       }
     }*/
 
+    console.log('form3xReportType: ', form3xReportType);
     formData.append('newAmendIndicator', 'N');
+    if (form3xReportType !== null) {
+      if (form3xReportType.hasOwnProperty('reportId')) {
+        formData.append('reportSequence', form3xReportType.reportId);
+        formData.append('report_id', form3xReportType.reportId);
+      } else if (form3xReportType.hasOwnProperty('reportid')) {
+        formData.append('reportSequence', form3xReportType.reportid);
+        formData.append('report_id', form3xReportType.reportid);
+      }
 
-    if (form3xReportType.hasOwnProperty('reportId')) {
-      formData.append('reportSequence', form3xReportType.reportId);
-      formData.append('report_id', form3xReportType.reportId);
-    } else if (form3xReportType.hasOwnProperty('reportid')) {
-      formData.append('reportSequence', form3xReportType.reportid);
-      formData.append('report_id', form3xReportType.reportid);
-    }
-
-    if (form3xReportType.hasOwnProperty('email1')) {
-      if (form3xReportType.email1 !== null) {
-        if (typeof form3xReportType.email1 === 'string') {
-          if (form3xReportType.email1.length >= 1) {
-            formData.append('emailAddress1', form3xReportType.email1);
+      if (form3xReportType.hasOwnProperty('email1')) {
+        if (form3xReportType.email1 !== null) {
+          if (typeof form3xReportType.email1 === 'string') {
+            if (form3xReportType.email1.length >= 1) {
+              formData.append('emailAddress1', form3xReportType.email1);
+            }
           }
         }
       }
-    }
 
-    if (form3xReportType.hasOwnProperty('reportType')) {
-      formData.append('reportType', form3xReportType.reportType);
-    } else if (form3xReportType.hasOwnProperty('reporttype')) {
-      formData.append('reportType', form3xReportType.reporttype);
-    }
+      if (form3xReportType.hasOwnProperty('reportType')) {
+        formData.append('reportType', form3xReportType.reportType);
+      } else if (form3xReportType.hasOwnProperty('reporttype')) {
+        formData.append('reportType', form3xReportType.reporttype);
+      }
 
-    if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
-    } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
-    }
+      if (form3xReportType.hasOwnProperty('cvgStartDate')) {
+        formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
+      } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
+        formData.append('coverageStartDate', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
+      }
 
-    if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
-    } else if (form3xReportType.hasOwnProperty('cvgendeate')) {
-      formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
-    }
+      if (form3xReportType.hasOwnProperty('cvgEndDate')) {
+        formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
+      } else if (form3xReportType.hasOwnProperty('cvgendeate')) {
+        formData.append('coverageEndDate', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
+      }
 
-    formData.append('originalFECId', '');
-    formData.append('backDoorCode', '');
+      formData.append('originalFECId', '');
+      formData.append('backDoorCode', '');
 
-    if (form3xReportType.email2 !== null) {
-      if (typeof form3xReportType.email2 === 'string') {
-        if (form3xReportType.email2.length >= 1) {
-          formData.append('emailAddress2', form3xReportType.email2);
+      if (form3xReportType.email2 !== null) {
+        if (typeof form3xReportType.email2 === 'string') {
+          if (form3xReportType.email2.length >= 1) {
+            formData.append('emailAddress2', form3xReportType.email2);
+          }
         }
       }
-    }
-    formData.append('wait', 'false');
+      formData.append('wait', 'false');
 
-    return this._http.post(`${environment.apiUrl}${url}`, formData, {
-      headers: httpOptions
-    });
+      return this._http.post(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions
+      });
+    }
   }
 
   public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
