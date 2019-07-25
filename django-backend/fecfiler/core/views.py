@@ -3258,7 +3258,7 @@ def prepare_json_builders_data(request):
         
         schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         schedule_a_b_line_sum_dict.update(sched_b_line_sum)
-        status_value = status.HTTP_200_OK
+        #status_value = status.HTTP_200_OK
         
         col_a = [('6b', ''), ('6c', '19'), ('6d', '6b + 6c'), ('7', '31'), ('8', '6d - 7'), ('9', '0'), 
         ('10', '0'), ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
@@ -3278,7 +3278,7 @@ def prepare_json_builders_data(request):
         for line_number in col_a_dict_original:
             final_col_a_dict[line_number] = get_line_sum_value(line_number, col_a_dict_original[line_number], schedule_a_b_line_sum_dict, cmte_id,report_id)
             sched_a_line_sum[line_number] = final_col_a_dict[line_number]
-        print("-------------------------")
+        # print("-------------------------")
         print(final_col_a_dict, "col_a_dict")
 
         col_b = [('6a',''),('6c', '19'), ('6d', '6a + 6c'), ('7', '30'), ('8', '6d - 7'), 
@@ -3298,8 +3298,8 @@ def prepare_json_builders_data(request):
         for line_number in col_b_dict_original:
             final_col_b_dict[line_number] = get_line_sum_value(line_number, col_b_dict_original[line_number], schedule_a_b_line_sum_dict, cmte_id,report_id)
             sched_b_line_sum[line_number] = final_col_b_dict[line_number]
-        print("-------------------------")
-        print("-------------------------")
+        # print("-------------------------")
+        # print("-------------------------")
         print(final_col_b_dict, "col_b_dict")
         final_line_number_sum_dict = {}
         for line_number in final_col_a_dict:
@@ -3342,7 +3342,7 @@ def prepare_json_builders_data(request):
                 update_str += "%s=%s," %(update_col_dict[i], str(sum_value))
 
         update_str = update_str[:-1]
-        print("-------------------------")
+        # print("-------------------------")
         print(update_str , "update_str")
 
         #return Response({'Response':'Success'}, status=status_value)
@@ -3353,6 +3353,6 @@ def prepare_json_builders_data(request):
             update_query = """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
             cursor.execute(update_query)
             print("Updated on Database ---- yoyooooo")
-        return Response({'Response':'Success'}, status=status_value)
+        return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
