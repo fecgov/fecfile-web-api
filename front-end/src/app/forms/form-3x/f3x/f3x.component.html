@@ -1,6 +1,7 @@
 <div class="forms__wizard" *ngIf="!loadingData">
-  <div class="form__sidebar" *ngIf="step !== 'step_5' && step !== 'step_6'">
-    <ng-container *ngIf="step === 'step_1'">
+  <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
+  <div class="form__sidebar" >
+    <div [hidden]="step !== 'step_1'">
       <report-type-sidebar
         title="Report Coverage Dates"
         (status)="onNotify($event)"
@@ -9,22 +10,22 @@
         [regularReports]="regularReports"
       >
       </report-type-sidebar>
-    </ng-container>
-    <ng-container *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary'">
-      <transaction-sidebar
+    </div>
+    <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary'">
+    <transaction-sidebar
         [step]="step"
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"
         (status)="onNotify($event)"
       >
       </transaction-sidebar>
-    </ng-container>
+    </div>
   </div>
   <div
     class="form__container"
     [ngClass]="{
       'show-alerts': showValidateBar === true,
-      'hide-alerts': step === 'step_5' || step === 'step_6'
+      'hide-alerts': step === 'step_6'
     }"
   >
     <div class="form__steps">
@@ -83,11 +84,11 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_5'">
-        <app-sign></app-sign>
+        <f3x-sign></f3x-sign>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_6'">
-        <app-submit></app-submit>
+        <f3x-submit></f3x-submit>
       </div>
     </div>
   </div>
