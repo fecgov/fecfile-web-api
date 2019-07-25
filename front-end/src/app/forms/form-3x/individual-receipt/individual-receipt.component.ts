@@ -59,7 +59,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _formSubmitted: boolean = false;
-  private readonly _contributionAggregateValue: number = 0.0;
+  private _contributionAggregateValue = 0.0;
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntityId: number;
 
@@ -83,6 +83,7 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._contributionAggregateValue = 0.0;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
@@ -275,29 +276,14 @@ export class IndividualReceiptComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public contributionAmountChange(e): void {
-    const contributionAmount: string = e.target.value;
+    let contributionAmount: string = e.target.value;
+    contributionAmount = contributionAmount ? contributionAmount : '0';
     const contributionAggregate: string = String(this._contributionAggregateValue);
 
     const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
     const value: string = this._decimalPipe.transform(total, '.2-2');
 
     this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
-
-    /**
-     * TODO: To be implemented in the future.
-     */
-
-    // this._receiptService
-    //   .aggregateAmount(
-    //     res.report_id,
-    //     res.transaction_type,
-    //     res.contribution_date,
-    //     res.entity_id,
-    //     res.contribution_amount
-    //   )
-    //   .subscribe(resp => {
-    //     console.log('resp: ', resp);
-    //   });
   }
 
   /**
@@ -333,6 +319,31 @@ export class IndividualReceiptComponent implements OnInit {
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
       console.log('memo unchecked');
     }
+  }
+
+  /**
+   * State select options are formatted " AK - Alaska ".  Once selected
+   * the input field should display on the state code and the API must receive
+   * only the state code.  When an optin is selected, the $ngOptionLabel
+   * is received here having the state code - name format.  Parse it
+   * for the state code.  This should be modified if possible.  Look into
+   * options for ng-select and ng-option.
+   * 
+   * @param stateOption the state selected in the dropdown.
+   */
+  public handleStateChange(stateOption: any) {
+
+    let stateCode = null;
+    if (stateOption.$ngOptionLabel) {
+      stateCode = stateOption.$ngOptionLabel;
+      if (stateCode) {
+        stateCode = stateCode.trim();
+        if (stateCode.length > 1) {
+          stateCode = stateCode.substring(0, 2);
+        }
+      }
+    }
+    this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
   }
 
   /**
@@ -399,15 +410,16 @@ export class IndividualReceiptComponent implements OnInit {
             }
           }
 
+          this._contributionAggregateValue = 0.0;
           const contributionAggregateValue: string = this._decimalPipe.transform(
             this._contributionAggregateValue,
             '.2-2'
           );
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
 
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntityId = null;
 
@@ -549,21 +561,28 @@ export class IndividualReceiptComponent implements OnInit {
     this._receiptService
       .getContributionAggregate(reportId, contact.entity_id, transactionTypeIdentifier)
       .subscribe(res => {
-        // Add the UI val and the server val.
-        // TODO uncomment when revisit.  Need to do the same when UI value changes.  See contributionAmountChange()
-        // const uiContribAggregateVal = this.frmIndividualReceipt.get('contribution_aggregate').value;
-        // let contributionAggregate = 0;
-        // if (this._utilService.isNumber(uiContribAggregateVal)) {
-        //   contributionAggregate = uiContribAggregateVal + res.contribution_aggregate;
-        // } else {
-        //   contributionAggregate = res.contribution_aggregate;
-        // }
-        // FNE-1217 Add this to UI field Sprint 18.
-        // this.frmIndividualReceipt.patchValue(
-        //   { contribution_aggregate: res.contribution_aggregate },
-        //   // { contribution_aggregate: contributionAggregate },
-        //   { onlySelf: true }
-        // );
+        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+        // Entity selected from the typeahead list.
+
+        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
+
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
+
+        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+          ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
+
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValue = parseFloat(contributionAggregate);
       });
   }
 
