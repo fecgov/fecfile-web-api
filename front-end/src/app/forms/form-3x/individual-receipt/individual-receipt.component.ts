@@ -180,6 +180,10 @@ export class IndividualReceiptComponent implements OnInit {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+
+    // get form data API is passing X for memo code value.
+    // Set it to null here until it is checked by user where it will be set to X.
+    this.frmIndividualReceipt.controls['memo_code'].setValue(null);
   }
 
   /**
@@ -322,10 +326,12 @@ export class IndividualReceiptComponent implements OnInit {
     if (checked) {
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+      console.log('memo checked');
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
+      console.log('memo unchecked');
     }
   }
 
@@ -343,6 +349,7 @@ export class IndividualReceiptComponent implements OnInit {
           if (field === 'memo_code') {
             if (this.memoCode) {
               receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+              console.log('memo code val ' + receiptObj[field]);
             }
           }
           if (field === 'last_name' || field === 'first_name') {
@@ -401,7 +408,7 @@ export class IndividualReceiptComponent implements OnInit {
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
-          this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+          this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntityId = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
@@ -551,12 +558,12 @@ export class IndividualReceiptComponent implements OnInit {
         // } else {
         //   contributionAggregate = res.contribution_aggregate;
         // }
-
-        this.frmIndividualReceipt.patchValue(
-          { contribution_aggregate: res.contribution_aggregate },
-          // { contribution_aggregate: contributionAggregate },
-          { onlySelf: true }
-        );
+        // FNE-1217 Add this to UI field Sprint 18.
+        // this.frmIndividualReceipt.patchValue(
+        //   { contribution_aggregate: res.contribution_aggregate },
+        //   // { contribution_aggregate: contributionAggregate },
+        //   { onlySelf: true }
+        // );
       });
   }
 

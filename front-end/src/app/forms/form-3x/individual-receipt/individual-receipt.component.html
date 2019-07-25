@@ -84,6 +84,7 @@
                       [attr.value]="col?.value"
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
+                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
