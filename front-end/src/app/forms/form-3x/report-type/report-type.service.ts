@@ -508,7 +508,7 @@ export class ReportTypeService {
           }
         }
       }
-      formData.append('wait', 'false');
+      formData.append('wait', 'True');
 
       return this._http.post(`${environment.apiUrl}${url}`, formData, {
         headers: httpOptions
