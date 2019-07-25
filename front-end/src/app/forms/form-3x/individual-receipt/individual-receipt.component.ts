@@ -60,6 +60,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _transactionType: string = null;
   private _formSubmitted: boolean = false;
   private _contributionAggregateValue = 0.0;
+  private _contributionAmount = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntityId: number;
 
@@ -84,6 +85,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnInit(): void {
     this._contributionAggregateValue = 0.0;
+    this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
@@ -278,12 +280,18 @@ export class IndividualReceiptComponent implements OnInit {
   public contributionAmountChange(e): void {
     let contributionAmount: string = e.target.value;
     contributionAmount = contributionAmount ? contributionAmount : '0';
+    this._contributionAmount = contributionAmount;
+
     const contributionAggregate: string = String(this._contributionAggregateValue);
 
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
+    const contributionAmountNum = parseFloat(contributionAmount);
+    const aggregateTotal: number = contributionAmountNum + parseFloat(contributionAggregate);
+    const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
 
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+    this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+    // this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(aggregateValue);
   }
 
   /**
@@ -328,11 +336,13 @@ export class IndividualReceiptComponent implements OnInit {
    * is received here having the state code - name format.  Parse it
    * for the state code.  This should be modified if possible.  Look into
    * options for ng-select and ng-option.
-   * 
+   *
+   * NOTE: If the format of the option changes in the html template, the parsing
+   * logic will most likely need to change here.
+   *
    * @param stateOption the state selected in the dropdown.
    */
   public handleStateChange(stateOption: any) {
-
     let stateCode = null;
     if (stateOption.$ngOptionLabel) {
       stateCode = stateOption.$ngOptionLabel;
@@ -356,28 +366,27 @@ export class IndividualReceiptComponent implements OnInit {
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
-        } else {
-          if (field === 'memo_code') {
-            if (this.memoCode) {
-              receiptObj[field] = this.frmIndividualReceipt.get(field).value;
-              console.log('memo code val ' + receiptObj[field]);
-            }
-          }
-          if (field === 'last_name' || field === 'first_name') {
-            // TODO Possible detfect with typeahead setting field as the entity object
-            // rather than the string defined by the inputFormatter();
-            // If an object is received, find the value on the object by fields type
-            // otherwise use the string value.  This is not desired and this patch
-            // should be removed if the issue is resolved.
-            const typeAheadField = this.frmIndividualReceipt.get(field).value;
-            if (typeof typeAheadField !== 'string') {
-              receiptObj[field] = typeAheadField[field];
-            } else {
-              receiptObj[field] = typeAheadField;
-            }
-          } else {
+        } else if (field === 'memo_code') {
+          if (this.memoCode) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+            console.log('memo code val ' + receiptObj[field]);
           }
+        } else if (field === 'last_name' || field === 'first_name') {
+          // TODO Possible detfect with typeahead setting field as the entity object
+          // rather than the string defined by the inputFormatter();
+          // If an object is received, find the value on the object by fields type
+          // otherwise use the string value.  This is not desired and this patch
+          // should be removed if the issue is resolved.
+          const typeAheadField = this.frmIndividualReceipt.get(field).value;
+          if (typeof typeAheadField !== 'string') {
+            receiptObj[field] = typeAheadField[field];
+          } else {
+            receiptObj[field] = typeAheadField;
+          }
+        } else if (field === 'contribution_amount') {
+          receiptObj[field] = this._contributionAmount;
+        } else {
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
       }
 
@@ -410,6 +419,7 @@ export class IndividualReceiptComponent implements OnInit {
             }
           }
 
+          this._contributionAmount = '';
           this._contributionAggregateValue = 0.0;
           const contributionAggregateValue: string = this._decimalPipe.transform(
             this._contributionAggregateValue,

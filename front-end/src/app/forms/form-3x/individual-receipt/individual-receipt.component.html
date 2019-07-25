@@ -72,7 +72,8 @@
                     </ng-container>
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
-                      *ngIf="col?.name !== 'first_name' && col?.name !== 'last_name'"
+                      *ngIf="col?.name !== 'first_name' 
+                          && col?.name !== 'last_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -80,7 +81,7 @@
                       [attr.name]="col?.name"                      
                       [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
                       [attr.value]="col?.value"
-                      [maxlength]="col?.validation?.max"
+                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 1: col?.validation?.max"
                       [formControlName]="col?.name"
                       (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
@@ -90,7 +91,7 @@
                           : ''
                       "
                       (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                    />
+                    />                    
                     <input
                       *ngIf="col?.name === 'last_name'"
                       class="form-control"
