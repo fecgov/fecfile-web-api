@@ -558,12 +558,12 @@ export class IndividualReceiptComponent implements OnInit {
         // } else {
         //   contributionAggregate = res.contribution_aggregate;
         // }
-
-        this.frmIndividualReceipt.patchValue(
-          { contribution_aggregate: res.contribution_aggregate },
-          // { contribution_aggregate: contributionAggregate },
-          { onlySelf: true }
-        );
+        // FNE-1217 Add this to UI field Sprint 18.
+        // this.frmIndividualReceipt.patchValue(
+        //   { contribution_aggregate: res.contribution_aggregate },
+        //   // { contribution_aggregate: contributionAggregate },
+        //   { onlySelf: true }
+        // );
       });
   }
 
