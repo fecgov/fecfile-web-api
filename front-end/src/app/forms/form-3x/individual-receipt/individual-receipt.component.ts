@@ -179,7 +179,6 @@ export class IndividualReceiptComponent implements OnInit {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-          // contribution_amount' ? col?.validation?.max
           if (e.name === 'contribution_amount') {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
