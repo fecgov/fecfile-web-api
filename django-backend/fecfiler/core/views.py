@@ -2492,7 +2492,7 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
                 result = cursor.fetchone()
                 coh_cop = result[0]
 
-        return int(coh_cop)
+        return coh_cop
     except Exception as e:
         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
 
@@ -2995,13 +2995,13 @@ def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, rep
     val = 0
     if line_number == '6b':
         val = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
-        print('rep: '+str(val))
+        # print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+        # print('rep: '+str(val))
         return val
-    if line_number == '6a':
-        print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+    if line_number == '6(a)':
         val = prev_cash_on_hand_cop(report_id, cmte_id, True)
-        print('year: '+ str(val))
+        # print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+        # print('year: '+ str(val))
         return val
     if formula == "":
         val += sched_a_line_sum_dict.get(line_number, 0) if sched_a_line_sum_dict.get(line_number, 0) else 0
@@ -3031,7 +3031,7 @@ def prepare_json_builders_data(request):
         report_id = request.data.get('report_id')
         sched_a_line_sum = {}
         sched_b_line_sum = {}
-        schedule_a_b_line_sum_dict = {}
+        #schedule_a_b_line_sum_dict = {}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
@@ -3044,13 +3044,14 @@ def prepare_json_builders_data(request):
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
             sched_b_line_sum_result = cursor.fetchall()
             sched_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result}
-        sched_a_line_sum.update(sched_b_line_sum)
-        print(sched_a_line_sum, "sched_a_line_sum")
-        print(sched_b_line_sum, "sched_b_line_sum")
         
-        schedule_a_b_line_sum_dict.update(sched_a_line_sum)
-        schedule_a_b_line_sum_dict.update(sched_b_line_sum)
-        #status_value = status.HTTP_200_OK
+        #sched_a_line_sum.update(sched_b_line_sum)
+        #print(sched_a_line_sum, "sched_a_line_sum")
+        #print(sched_b_line_sum, "sched_b_line_sum")
+        
+        ##schedule_a_b_line_sum_dict.update(sched_a_line_sum)
+        ##schedule_a_b_line_sum_dict.update(sched_b_line_sum)
+       
         
         col_a = [('9', '0'), 
         ('10', '0'), ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
@@ -3061,39 +3062,66 @@ def prepare_json_builders_data(request):
         ('30ai', '0'), ('30aii', '0'), ('30b', ''), ('30c', '30ai + 30aii + 30b'), ('31', '21c + 22 - 27 + 28d + 29'), 
         ('32', '31 - 21aii + 30aii'), ('33', '11d'), ('34', '28d'), 
         ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37'), ('6b', ''), ('6c', '19'), ('6d', '6b + 6c'), ('7', '31'), ('8', '6d - 7')]
-
         
         col_a_dict_original = OrderedDict()
         for i in col_a:
             col_a_dict_original[i[0]] = i[1]
         final_col_a_dict = {}
         for line_number in col_a_dict_original:
-            final_col_a_dict[line_number] = get_line_sum_value(line_number, col_a_dict_original[line_number], schedule_a_b_line_sum_dict, cmte_id,report_id)
+            final_col_a_dict[line_number] = get_line_sum_value(line_number, col_a_dict_original[line_number], sched_a_line_sum, cmte_id, report_id)
             sched_a_line_sum[line_number] = final_col_a_dict[line_number]
+
+
         # print("-------------------------")
+        
         print(final_col_a_dict, "col_a_dict")
 
         col_b = [ 
-        ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
-        ('11d', '11aiii + 11b + 11c'), ('12', ''), ('13', ''), ('14', ''), ('15', ''), ('16', ''), ('17', ''), 
-        ('18a', '0'), ('18b', '0'), ('18c', '18a+18b'), ('19', '11d+12+13+14+15+16+17+18c'), ('20', '19 - 18c'), 
-        ('21ai', '0'), ('21aii', '0'), ('21b', ''), ('21c', '21ai + 21aii + 21b'), ('22', ''), ('23', ''), ('24', ''),
-        ('25', '0'), ('26', ''), ('27', ''), ('28a', ''), ('28b', ''), ('28c', ''), ('28d', '28a + 28b + 28c'), ('29', ''), 
-        ('30ai', '0'), ('30aii', '0'), ('30b', ''), ('30c', '30ai + 30aii + 30b'), ('31', '21c + 22 - 27 + 28d + 29'), 
-        ('32', '31 - 21aii + 30aii'), ('33', '11d'), ('34', '28d'), 
-        ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37'), ('6a',''),('6c', '19'), ('6d', '6a + 6c'),
-        ('7', '30'), ('8', '6d - 7')]
+         ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
+         ('11d', '11aiii + 11b + 11c'), ('12', ''), ('13', ''), ('14', ''), ('15', ''), ('16', ''), ('17', ''), 
+         ('18a', '0'), ('18b', '0'), ('18c', '18a+18b'), ('19', '11d+12+13+14+15+16+17+18c'), ('20', '19 - 18c'), 
+         ('21ai', '0'), ('21aii', '0'), ('21b', ''), ('21c', '21ai + 21aii + 21b'), ('22', ''), ('23', ''), ('24', ''),
+         ('25', '0'), ('26', ''), ('27', ''), ('28a', ''), ('28b', ''), ('28c', ''), ('28d', '28a + 28b + 28c'), ('29', ''), 
+         ('30ai', '0'), ('30aii', '0'), ('30b', ''), ('30c', '30ai + 30aii + 30b'), ('31', '21c + 22 - 27 + 28d + 29'), 
+         ('32', '31 - 21aii + 30aii'), ('33', '11d'), ('34', '28d'), 
+         ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37'), ('6a',''),('6c', '19'), ('6d', '6a + 6c'),
+         ('7', '31'), ('8', '6d - 7')]
+
 
         col_b_dict_original = OrderedDict()
         for i in col_b:
             col_b_dict_original[i[0]] = i[1]
         final_col_b_dict = {}
         for line_number in col_b_dict_original:
-            final_col_b_dict[line_number] = get_line_sum_value(line_number, col_b_dict_original[line_number], schedule_a_b_line_sum_dict, cmte_id,report_id)
+            final_col_b_dict[line_number] = get_line_sum_value(line_number, col_b_dict_original[line_number], sched_b_line_sum,
+             cmte_id,report_id)
             sched_b_line_sum[line_number] = final_col_b_dict[line_number]
-        # print("-------------------------")
-        # print("-------------------------")
         print(final_col_b_dict, "col_b_dict")
+        for line_number in final_col_a_dict:
+            col_a_line_formula = col_a_dict_original.get(line_number)
+            if '+' not in col_a_line_formula and '-' not in col_a_line_formula and col_a_line_formula != "":
+                sch_line_a_sum = sched_a_line_sum.get(col_a_line_formula, 0)                
+                final_col_a_dict[line_number] = sch_line_a_sum
+        for line_number in final_col_b_dict:
+            col_b_line_formula = col_b_dict_original.get(line_number)
+            if '+' not in col_b_line_formula and '-' not in col_b_line_formula and col_b_line_formula != "":
+                sch_line_b_sum = sched_b_line_sum.get(col_a_line_formula, 0)                
+                final_col_b_dict[line_number] = sch_line_b_sum
+        
+        for i in final_col_a_dict:
+            b_val = final_col_b_dict.get(i)
+            if b_val == 0 or b_val is None:
+                final_col_b_dict[i] = final_col_a_dict[i]
+        for i in final_col_b_dict:
+            b_val = final_col_a_dict.get(i)
+            if b_val == 0 or b_val is None:
+                final_col_a_dict[i] = final_col_b_dict[i]
+        print("---------------------------------")
+        print("Final AAAA", final_col_a_dict)
+        print("---------------------------------")
+        print("Final B", final_col_b_dict)
+
+        """
         final_line_number_sum_dict = {}
         for line_number in final_col_a_dict:
             b_line_number_sum = final_col_b_dict.get(line_number)
@@ -3109,11 +3137,12 @@ def prepare_json_builders_data(request):
                 sch_line_b_sum = sched_b_line_sum.get(col_a_line_formula)
                 if sch_line_b_sum and sch_line_b_sum !=0:
                      final_line_number_sum_dict[line_number] = sch_line_b_sum
+        """
 
-        print("FINALL Updated SUms",  final_line_number_sum_dict)
+    
+        #print("FINALL Updated SUms",  final_line_number_sum_dict)
 
-        update_col_dict = {'6a':'coh_begin_calendar_yr','6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per',
-        '7': 'ttl_disb_sum_page_per', 
+        update_col_a_dict = {'6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per','7': 'ttl_disb_sum_page_per', 
         '8': 'coh_cop', '9': 'debts_owed_to_cmte', '10': 'debts_owed_by_cmte', '11ai': 'indv_item_contb_per', 
         '11aii': 'indv_unitem_contb_per', '11aiii': 'ttl_indv_contb', '11b': 'pol_pty_cmte_contb_per_i', 
         '11c': 'other_pol_cmte_contb_per_i', '11d': 'ttl_contb_col_ttl_per', '12': 'tranf_from_affiliated_pty_per', 
@@ -3128,16 +3157,36 @@ def prepare_json_builders_data(request):
         '30aii': 'shared_fed_actvy_nonfed_per', '30b': 'non_alloc_fed_elect_actvy_per', '30c': 'ttl_fed_elect_actvy_per', 
         '31': 'ttl_disb_per', '32': 'ttl_fed_disb_per', '33': 'ttl_contb_per', '34': 'ttl_contb_ref_per_ii', '35': 'net_contb_per', 
         '36': 'ttl_fed_op_exp_per', '37': 'offsets_to_op_exp_per_ii', '38': 'net_op_exp_per'}
+
+        update_col_b_dict = {'6a': 'coh_begin_calendar_yr', '6c': 'ttl_receipts_sum_page_ytd', '6d': 'subttl_sum_ytd', '7': 'ttl_disb_sum_page_ytd',
+         '8': 'coh_coy', '11ai': 'indv_item_contb_ytd', '11aii': 'indv_unitem_contb_ytd', '11aiii': 'ttl_indv_contb_ytd', 
+         '11b': 'pol_pty_cmte_contb_ytd_i', '11c': 'other_pol_cmte_contb_ytd_i', '11d': 'ttl_contb_col_ttl_ytd', 
+         '12': 'tranf_from_affiliated_pty_ytd', '13': 'all_loans_received_ytd', '14': 'loan_repymts_received_ytd', 
+         '15': 'offsets_to_op_exp_ytd_i', '16': 'fed_cand_cmte_contb_ytd', '17': 'other_fed_receipts_ytd', 
+         '18a': 'tranf_from_nonfed_acct_ytd', '18b': 'tranf_from_nonfed_levin_ytd', '18c': 'ttl_nonfed_tranf_ytd', 
+         '19': 'ttl_receipts_ytd', '20': 'ttl_fed_receipts_ytd', '21ai': 'shared_fed_op_exp_ytd', '21aii': 'shared_nonfed_op_exp_ytd', 
+         '21b': 'other_fed_op_exp_ytd', '21c': 'ttl_op_exp_ytd', '22': 'tranf_to_affilitated_cmte_ytd', '23': 'fed_cand_cmte_contb_ref_ytd', 
+         '24_independentExpenditures': 'indt_exp_ytd', '25': 'coord_exp_by_pty_cmte_ytd', '26': 'loan_repymts_made_ytd', '27': 'loans_made_ytd', 
+         '28a': 'indv_contb_ref_ytd', '28b': 'pol_pty_cmte_contb_ytd_ii', '28c': 'other_pol_cmte_contb_ytd_ii', '28d': 'ttl_contb_ref_ytd_i', 
+         '29': 'other_disb_ytd', '30ai': 'shared_fed_actvy_fed_shr_ytd', '30aii': 'shared_fed_actvy_nonfed_ytd', 
+         '30b': 'non_alloc_fed_elect_actvy_ytd', '30c': 'ttl_fed_elect_actvy_ytd', '31': 'ttl_disb_ytd', 
+         '32': 'ttl_fed_disb_ytd', '33': 'ttl_contb_ytd', '34': 'ttl_contb_ref_ytd_ii', '35': 'net_contb_ytd',
+         '36': 'ttl_fed_op_exp_ytd', '37': 'offsets_to_op_exp_ytd_ii', '38': 'net_op_exp_ytd'}
+
+
         update_str = ""
-        for i in update_col_dict:
-            sum_value = final_line_number_sum_dict.get(i, None)
+        for i in update_col_a_dict:
+            sum_value = final_col_a_dict.get(i, None)
             if sum_value:
-                update_str += "%s=%s," %(update_col_dict[i], str(sum_value))
+                update_str += "%s=%s," %(update_col_a_dict[i], str(sum_value))
+        for i in update_col_b_dict:
+            sum_value = final_col_b_dict.get(i, None)
+            if sum_value:
+                update_str += "%s=%s," %(update_col_b_dict[i], str(sum_value))
 
         update_str = update_str[:-1]
         # print("-------------------------")
         print(update_str , "update_str")
-
         #return Response({'Response':'Success'}, status=status_value)
         
         with connection.cursor() as cursor:
