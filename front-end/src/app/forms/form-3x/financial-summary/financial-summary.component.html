@@ -1,47 +1,30 @@
 <div class="financial-summary-container">
-  <header class="header-content">
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--6">
-        <h1>Financial Summary</h1>
-      </div>
-     <div class="grid-row__col grid-row__col--6 text-right">
-       <!-- <div *ngIf ="viewMode === 'tab1'">
-        <button
-          type="button"
-          class="btn btn-secondary-gray"
-          (click)="viewTransactions()"
-        >
-         Browse Receipts
-        </button>
-      </div>
-       <div *ngIf ="viewMode === 'tab2'">
-        <button
-          type="button"
-          class="btn btn-secondary-gray"
-          (click)="viewTransactions()"
-        >
-         Browse Disbursements
-        </button>
-      </div> -->
-        <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-            id="actionsMenu"
-            ngbDropdownToggle
-          >
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="actionsMenu">
-            <button class="dropdown-item"><i class="view-icon"></i> View</button>
-            <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
-           </div>
+     <header class="header-content">
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--6">
+            <h1>&nbsp;&nbsp;Financial Summary</h1>
+          </div>
+         <div class="grid-row__col grid-row__col--12 text-right">
+            <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
+              <button
+                type="button"
+                class="btn btn-link btn-options"
+                id="actionsMenu"
+                ngbDropdownToggle
+              >
+                <span class="ellipsis-icon" aria-hidden="true"></span>
+                <span class="sr-only">Click for more options</span>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="actionsMenu">
+                <button class="dropdown-item"><i class="view-icon"></i> View</button>
+                <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
+               </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <hr />
-  </header>
+        <hr />
+      </header>
+      
   <section>
     <div class="financial-summary-content">
       <div class="row">
@@ -106,109 +89,38 @@
         <div id="tab1" *ngSwitchDefault>
           <table class="summary_table_text">
             <thead>
-              <tr>
-                  <th class="summary_text_amt">&nbsp;</th>
-                  <th class="summary_text_amt"><h3>Total This Period
-                     
-                  </h3></th>
-                  <th class="summary_text_amt"><h3>Calendar Year-to-Date
-                    
-                  </h3></th>
+              <tr  >
+                  <th width=50% class="summary_text_amt">&nbsp;</th>
+                  <th width=25% class="summary_text_amt"><h3>Total This Period</h3></th>
+                  <th width=25% class="summary_text_amt"><h3>Calendar Year-to-Date</h3></th>
               </tr>
             </thead>
             <tbody *ngIf="tab1Data" class="summary_text">
-                <tr *ngFor="let row of tab1Data.period_receipts">
-                <td>
-                  <div *ngIf=" row.level === 1 " id="level_1" class="summary_text_level_1" >
-                      {{ row.description }}
-                      <button type="button" class="btn-info " ngbTooltip="Represents the total receipts. 
-                      Calculated by adding total contributions, transfers, loans received, loan repayments 
-                      received, offsets to operating expenditures, refunds, other federal receipts, and
-                       transfers from non-federal and Levin accounts.">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                  </div>
-                  <div *ngIf=" row.level === 2 " id="level_2" class="summary_text_level_2" >
-                      {{ row.description }}
-                  </div>
-                  <div *ngIf=" row.level === 3 " id="level_3" class="summary_text_level_3" >
-                      {{ row.description }}
-                  </div>
-                  <div *ngIf=" row.level === 4 " id="level_4" class="summary_text_level_4" >
-                      {{ row.description }}
-                  </div>
-                </td>
-                <td>
-                  <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
-                      <a href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>
-                  </div>
-                  <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
-                      <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
+                <tr *ngFor="let row of tab1Data.period_receipts"  >
+                  <td>
+                    <div *ngIf=" row.level === 1 " id="level_1" class="summary_text_level_1" >
+                        {{ row.description }}
+                        <button type="button" class="btn-info " ngbTooltip="Represents the total receipts. 
+                        Calculated by adding total contributions, transfers, loans received, loan repayments 
+                        received, offsets to operating expenditures, refunds, other federal receipts, and
+                        transfers from non-federal and Levin accounts.">
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
                     </div>
-                  <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
-                      <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
+                    <div *ngIf=" row.level === 2 " id="level_2" class="summary_text_level_2" >
+                        {{ row.description }}
                     </div>
-                  <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
-                      <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
-                    </div>                  
-                </td>  
-                <td>
-                    <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    <div *ngIf=" row.level === 3 " id="level_3" class="summary_text_level_3" >
+                        {{ row.description }}
                     </div>
-                    <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    <div *ngIf=" row.level === 4 " id="level_4" class="summary_text_level_4" >
+                        {{ row.description }}
                     </div>
-                    <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                    </div>
-                    <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                    </div>                          
-                </td>  
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div id="tab2" *ngSwitchCase="'tab2'">
-          <table class="summary_table_text">
-            <thead>
-              <tr>
-                  <th class="summary_text_amt">&nbsp;</th>
-                  <th class="summary_text_amt"><h3>Total This Period</h3></th>
-                  <th class="summary_text_amt"><h3>Calendar Year-to-Date</h3></th>
-              </tr>
-            </thead>
-            <tbody *ngIf="tab1Data" class="summary_text">
-                <tr *ngFor="let row of tab2Data.period_disbursements">
-                <td>
-                  <div *ngIf=" row.level === 1 " id="level_1" class="summary_text_level_1" >
-                      {{ row.description }}
-                      <button type="button" class="btn-info " ngbTooltip="Represents the total disbursements. 
-                      Calculated by adding total operating expenditures, transfers, contributions to federal 
-                      candidates/committees, independent expenditures, coordinated party expenditures, loan repayments 
-                      made, loans made, refunds, other disbursements, and federal election activity.">
-                        <i class="info-icon" aria-hidden="true"></i>
-
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                  </div>
-                  <div *ngIf=" row.level === 2 " id="level_2" class="summary_text_level_2" >
-                      {{ row.description }}
-                  </div>
-                  <div *ngIf=" row.level === 3 " id="level_3" class="summary_text_level_3" >
-                      {{ row.description }}
-                  </div>
-                  <div *ngIf=" row.level === 4 " id="level_4" class="summary_text_level_4" >
-                      {{ row.description }}
-                  </div>
-                </td>
-                <td>
+                  </td>
+                  <td>
                     <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
                         <a href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>
                     </div>
@@ -223,20 +135,87 @@
                       </div>                  
                   </td>  
                   <td>
-                    <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>                          
+                  </td>  
+               </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="tab2" *ngSwitchCase="'tab2'">
+          <table class="summary_table_text" cellspacing="0" cellpadding="0">
+            <thead>
+              <tr  >
+                <th width=50% class="summary_text_amt">&nbsp;</th>
+                <th width=25% class="summary_text_amt"><h3>Total This Period</h3></th>
+                <th width=25% class="summary_text_amt"><h3>Calendar Year-to-Date</h3></th>
+             </tr>
+            </thead>
+            <tbody *ngIf="tab1Data" class="summary_text">
+                <tr *ngFor="let row of tab2Data.period_disbursements"  >
+                  <td>
+                    <div *ngIf=" row.level === 1 " id="level_1" class="summary_text_level_1" >
+                        {{ row.description }}
+                        <button type="button" class="btn-info " ngbTooltip="Represents the total disbursements. 
+                        Calculated by adding total operating expenditures, transfers, contributions to federal 
+                        candidates/committees, independent expenditures, coordinated party expenditures, loan repayments 
+                        made, loans made, refunds, other disbursements, and federal election activity.">
+                          <i class="info-icon" aria-hidden="true"></i>
+
+                          <span class="sr-only">
+                            Click for more information
+                          </span>
+                        </button>
                     </div>
-                    <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    <div *ngIf=" row.level === 2 " id="level_2" class="summary_text_level_2" >
+                        {{ row.description }}
                     </div>
-                    <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    <div *ngIf=" row.level === 3 " id="level_3" class="summary_text_level_3" >
+                        {{ row.description }}
                     </div>
-                    <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
-                        {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                    </div>                          
-                </td>  
-              </tr>
+                    <div *ngIf=" row.level === 4 " id="level_4" class="summary_text_level_4" >
+                        {{ row.description }}
+                    </div>
+                  </td>
+                  <td>
+                      <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
+                          <a href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>
+                      </div>
+                      <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
+                          <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
+                        </div>
+                      <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
+                          <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
+                        </div>
+                      <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
+                          <a  href="javascript:void(0);" (click)="viewTransactions()">{{ row.amt | currency:'USD':'symbol-narrow':'1.2-2'}}</a>                  
+                        </div>                  
+                  </td>  
+                  <td>
+                      <div *ngIf=" row.level === 1 "  class="summary_text_amt_level_1" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 2 "  class="summary_text_amt_level_2" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 3 "  class="summary_text_amt_level_3" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>
+                      <div *ngIf=" row.level === 4 "  class="summary_text_amt_level_4" >
+                          {{ row.amt_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                      </div>                          
+                  </td>  
+               </tr>
             </tbody>
           </table>
         </div>
@@ -252,16 +231,17 @@
     </div>
   </section>
   <footer>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <a
-          class="btn btn-secondary-gray"
-          [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'step_2' }"
-        >
-          Return to form
-        </a>
-      </div>
-    </div>
-  </footer>
+        <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+                   <button id="extended_summary" class="btn btn-previous btn-right" type="button" (click)="expanded_Summary()">
+                    Extended Summary
+                  </button>
+                  <button id="all_transactions" class="btn btn-previous btn-right" type="button" (click)="all_Transactions()">
+                      All Transactions
+                   </button>
+            </div>
+            </div>
+        </div>
+  </footer> 
 </div>

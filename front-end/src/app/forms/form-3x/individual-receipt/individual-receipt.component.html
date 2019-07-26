@@ -1,3 +1,7 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt">
     <header>
@@ -66,15 +70,18 @@
                         </span>
                       </div>
                     </ng-container>
+                    <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
+                      *ngIf="col?.name !== 'first_name' 
+                          && col?.name !== 'last_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
                       [attr.type]="col?.type"
-                      [attr.name]="col?.name"
+                      [attr.name]="col?.name"                      
                       [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
                       [attr.value]="col?.value"
-                      [maxlength]="col?.validation?.max"
+                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
                       [formControlName]="col?.name"
                       (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
@@ -83,7 +90,52 @@
                           ? 'input-field-error'
                           : ''
                       "
+                      (keyup)="col?.name === 'contribution_amount' ? contributionAmountKeyup($event) : null"
                       (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    />                    
+                    <input
+                      *ngIf="col?.name === 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-last-name"
+                      [ngbTypeahead]="searchLastName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterLastName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                    <input
+                      *ngIf="col?.name === 'first_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-first-name"
+                      [ngbTypeahead]="searchFirstName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterFirstName"
+                      (selectItem)="handleSelectedItem($event)"
                     />
                   </div>
                   <div
@@ -126,8 +178,12 @@
                         class="text-error text-left"
                         *ngIf="frmIndividualReceipt.get(col?.name).errors?.contributionDateInvalid"
                       >
-                        Entered date is outside of the report coverage period. Please enter transactions for this
-                        coverage period only.
+                        The date entered falls outside of the report coverage period. Transactions for this report
+                        should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
+                        need to add a transaction with a date that falls outside of the coverage period for this report,
+                        you will need to check the memo code box.
+                        <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                        coverage period only. -->
                       </div>
                     </ng-container>
                   </div>
@@ -163,6 +219,7 @@
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
+                    (change)="handleStateChange($event)"
                     class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="
@@ -172,8 +229,8 @@
                         : ''
                     "
                   >
-                    <ng-option *ngFor="let item of states" [value]="item.code">
-                      {{ item.name }}
+                    <ng-option *ngFor="let item of states" [ngValue]="item">
+                      {{ item.code }} - {{ item.name }}
                     </ng-option>
                   </ng-select>
                 </ng-container>
