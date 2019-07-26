@@ -3,7 +3,7 @@ backcall==0.1.0
 bcrypt==3.1.4
 boto==2.49.0
 boto3==1.9.40
-botocore==1.12.40
+botocore==1.12.196
 certifi==2018.8.24
 cffi==1.11.5
 chardet==3.0.4
@@ -30,15 +30,9 @@ djangorestframework-jwt==1.11.0
 djangorestframework-sso==0.0.10
 docutils==0.14
 drf-nested-routers==0.11.1
-#drf-swagger==0.1.3
 gunicorn==19.9.0
 humanize==0.5.1
-idna==2.7
-ipdb==0.11
-ipython==6.5.0
-ipython-genutils==0.2.0
 itypes==1.1.0
-jedi==0.12.1
 Jinja2==2.10.1
 jmespath==0.9.3
 MarkupSafe==1.0
@@ -49,7 +43,7 @@ pdfrw==0.4
 pendulum==2.0.4
 pexpect==4.6.0
 pickleshare==0.7.4
-prompt-toolkit==1.0.15
+prompt-toolkit==2.0.9
 psycopg2==2.7.5
 psycopg2-binary==2.7.5
 ptyprocess==0.6.0
@@ -63,7 +57,7 @@ pytz==2018.5
 pytzdata==2018.7
 PyYAML==4.2b1
 regex==2018.11.22
-requests==2.21.0
+requests==2.22.0
 requests-toolbelt==0.8.0
 retrying==1.3.3
 s3transfer==0.1.13
@@ -75,5 +69,5 @@ static3==0.6.1
 traitlets==4.3.2
 tzlocal==1.5.1
 uritemplate==3.0.0
-urllib3==1.24.2
+urllib3==1.25.3
 wcwidth==0.1.7
