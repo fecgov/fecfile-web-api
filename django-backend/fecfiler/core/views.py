@@ -2946,18 +2946,16 @@ def get_loan_debt_summary(request):
                     SELECT sum(payment_amount) AS _sum 
                     FROM   public.sched_d 
                     WHERE  cmte_id = %(cmte_id)s 
-                    AND    report_id = %(report_id)s)) t;
+                    AND    report_id = %(report_id)s
+                    AND    line_number= %(line_num)s)) t;
         """
-
-        #             AND    line_number= %(line_num)s) t;
-        # """
         with connection.cursor() as cursor:
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '9'})
             to_committee_sum = list(cursor.fetchone())[0]
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '10'})
             by_committee_sum = list(cursor.fetchone())[0]
             json_result = {"to_committee_sum": to_committee_sum, "by_committee_sum": by_committee_sum}
-            return Response(json_result, status.HTTP_200_OK)
+        return Response(json_result, status.HTTP_200_OK)
 
     except Exception as e:
         return Response("The get_loan_debt_summary api is throwing an error: " + str(e), 
