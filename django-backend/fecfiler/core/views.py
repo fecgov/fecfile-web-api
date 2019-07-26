@@ -23,6 +23,10 @@ from django.conf import settings
 import re
 import csv
 from django.core.paginator import Paginator
+from datetime import date, timedelta, time
+from dateutil.relativedelta import relativedelta
+from collections import OrderedDict
+
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
 # Create your views here.
@@ -2909,220 +2913,6 @@ def create_contacts_view(request):
 END - Contacts API - CORE APP
 ******************************************************************************************************************************
 """
-# dict_names = {
-#     "ColA":["6b_cashOnHandBeginning",
-#     "6c_totalReceipts",
-#     "6d_subtotal",
-#     "7_totalDisbursements",
-#     "8_cashOnHandAtClose",
-#     "9_debtsTo",
-#     "10_debtsBy",
-#     "11ai_Itemized",
-#     "11aii_Unitemized",
-#     "11aiii_Total",
-#     "11b_politicalPartyCommittees",
-#     "11c_otherPoliticalCommitteesPACs",
-#     "11d_totalContributions",
-#     "12_transfersFromAffiliatedOtherPartyCommittees",
-#     "13_allLoansReceived",
-#     "14_loanRepaymentsReceived",
-#     "15_offsetsToOperatingExpendituresRefunds",
-#     "16_refundsOfFederalContributions",
-#     "17_otherFederalReceiptsDividends",
-#     "18a_transfersFromNonFederalAccount_h3",
-#     "18b_transfersFromNonFederalLevin_h5",
-#     "18c_totalNonFederalTransfers",
-#     "19_totalReceipts",
-#     "20_totalFederalReceipts",
-#     "21ai_federalShare",
-#     "21aii_nonFederalShare",
-#     "21b_otherFederalOperatingExpenditures",
-#     "21c_totalOperatingExpenditures",
-#     "22_transfersToAffiliatedOtherPartyCommittees",
-#     "23_contributionsToFederalCandidatesCommittees",
-#     "24_independentExpenditures",
-#     "25_coordinatedExpenditureMadeByPartyCommittees",
-#     "26_loanRepayments",
-#     "27_loansMade",
-#     "28a_individualsPersons",
-#     "28b_politicalPartyCommittees",
-#     "28c_otherPoliticalCommittees",
-#     "28d_totalContributionsRefunds",
-#     "29_otherDisbursements",
-#     "30ai_sharedFederalActivity_h6_fedShare",
-#     "30aii_sharedFederalActivity_h6_nonFed",
-#     "30b_nonAllocable_100_federalElectionActivity",
-#     "30c_totalFederalElectionActivity",
-#     "31_totalDisbursements",
-#     "32_totalFederalDisbursements",
-#     "33_totalContributions",
-#     "34_totalContributionRefunds",
-#     "35_netContributions",
-#     "36_totalFederalOperatingExpenditures",
-#     "37_offsetsToOperatingExpenditures",
-#     "38_netOperatingExpenditures",],
-#     "ColB":[  "6a_cashOnHandJan_1",
-#     "6c_totalReceipts",
-#     "6d_subtotal",
-#     "7_totalDisbursements",
-#     "8_cashOnHandAtClose",
-#     "11ai_itemized",
-#     "11aii_unitemized",
-#     "11aiii_total",
-#     "11b_politicalPartyCommittees",
-#     "11c_otherPoliticalCommitteesPACs",
-#     "11d_totalContributions",
-#     "12_transfersFromAffiliatedOtherPartyCommittees",
-#     "13_allLoansReceived",
-#     "14_loanRepaymentsReceived",
-#     "15_offsetsToOperatingExpendituresRefunds",
-#     "16_refundsOfFederalContributions",
-#     "17_otherFederalReceiptsDividends",
-#     "18a_transfersFromNonFederalAccount_h3",
-#     "18b_transfersFromNonFederalLevin_h5",
-#     "18c_totalNonFederalTransfers",
-#     "19_totalReceipts",
-#     "20_totalFederalReceipts",
-#     "21ai_federalShare",
-#     "21aii_nonFederalShare",
-#     "21b_otherFederalOperatingExpenditures",
-#     "21c_totalOperatingExpenditures",
-#     "22_transfersToAffiliatedOtherPartyCommittees",
-#     "23_contributionsToFederalCandidatesCommittees",
-#     "24_independentExpenditures",
-#     "25_coordinatedExpendituresMadeByPartyCommittees",
-#     "26_loanRepayments",
-#     "27_loansMade",
-#     "28a_individualPersons",
-#     "28b_politicalPartyCommittees",
-#     "28c_otherPoliticalCommittees",
-#     "28d_totalContributionRefunds",
-#     "29_otherDisbursements",
-#     "30ai_sharedFederalActivity_h6_federalShare",
-#     "30aii_sharedFederalActivity_h6_nonFederal",
-#     "30b_nonAllocable_100_federalElectionActivity",
-#     "30c_totalFederalElectionActivity",
-#     "31_totalDisbursements",
-#     "32_totalFederalDisbursements",
-#     "33_totalContributions",
-#     "34_totalContributionRefunds",
-#     "35_netContributions",
-#     "36_totalFederalOperatingExpenditures",
-#     "37_offsetsToOperatingExpenditures",
-#     "38_netOperatingExpenditures"]
-# }
-
-
-# col_a = {
-# "6b":"",
-# "6c":"19",
-# "6d":"6b + 6c",             
-# "7":"31",
-# "8":"6d - 7",
-# "9":"0",
-# "10":"0",
-# "11ai":"",
-# "11aii":"",
-# "11aiii":"11ai + 11aii",
-# "11b":"",   
-# "11c":"",   
-# "11d":"11aiii + 11b + 11c",
-# "12":"",    
-# "13":"",
-# "14":"",
-# "15":"",
-# "16":"",    
-# "17":"",
-# "18a":"0",
-# "18b":"0",
-# "18c":"18a+18b",
-# "19":"11d+12+13+14+15+16+17+18c",
-# "20":"19 - 18c",
-# "21ai":"0",
-# "21aii":"0",
-# "21b":"",
-# "21c":"21ai + 21aii + 21b",
-# "22":"",    
-# "23":"",    
-# "24":"",
-# "25":"0",
-# "26":"",    
-# "27":"",    
-# "28a":"",   
-# "28b":"",   
-# "28c":"",   
-# "28d":"28a + 28b + 28c",
-# "29":"",
-# "30ai":"0",
-# "30aii":"0",
-# "30b":"",   
-# "30c":"30ai + 30aii + 30b",
-# "31":"21c + 22 - 27 + 28d + 29",
-# "32":"31 - 21aii + 30aii",
-# "33":"11d",
-# "34":"28d",
-# "35":"11d - 28d",
-# "36":"21ai + 21b",
-# "37":"15",
-# "38":"36 - 37",
-# }
-    
-# col_b = {
-# "6c":"19",
-# "6d":"6a + 6c",
-# "7":"30",
-# "8":"6d - 7",
-# "11ai":"",  
-# "11aii":"", 
-# "11aiii":"11ai + 11aii",
-# "11b":"",   
-# "11c":"",   
-# "11d":" 11aiii + 11b + 11c",
-# "12":"",    
-# "13":"",    
-# "14":"",    
-# "15":"",    
-# "16":"",    
-# "17":"",    
-# "18a":"",   
-# "18b":"",   
-# "18c":"18a + 18b",
-# "19":"11d + 12 + 13 + 14 + 15 + 16 + 17 + 18c",
-# "20":"19 - 18c",
-# "21ai":"",  
-# "21aii":"", 
-# "21b":"",   
-# "21c":"21ai + 21aii + 21b",
-# "22":"",    
-# "23":"",    
-# "24":"",    
-# "25":"",    
-# "26":"",    
-# "27":"",    
-# "28a":"",   
-# "28b":"",   
-# "28c":"",   
-# "28d":"28a + 28b + 28c",
-# "29":"",    
-# "30ai":"0",
-# "30aii":"0",
-# "30b":"",
-# "30c":"30ai+30aii+30b",
-# "31":"21c + 22 - 27 + 28d + 29",
-# "32":"31 - 21aii + 30aii",
-# "33":"11d",
-# "34":"28d",
-# "35":"11d - 28d",
-# "36":"21ai + 21b",
-# "37":"15",
-# "38":"36 - 37"
-# }
-
-# column_names_dict = {'colA': {'coh_bop': '6b', 'ttl_receipts_sum_page_per': '6c', 'subttl_sum_page_per': '6d', 'ttl_disb_sum_page_per': '7', 'coh_cop': '8', 'debts_owed_to_cmte': '9', 'debts_owed_by_cmte': '10', 'indv_item_contb_per': '11ai', 'indv_unitem_contb_per': '11aii', 'ttl_indv_contb': '11aiii', 'pol_pty_cmte_contb_per_i': '11b', 'other_pol_cmte_contb_per_i': '11c', 'ttl_contb_col_ttl_per': '11d', 'tranf_from_affiliated_pty_per': '12', 'all_loans_received_per': '13', 'loan_repymts_received_per': '14', 'offsets_to_op_exp_per_i': '15', 'fed_cand_contb_ref_per': '16', 'other_fed_receipts_per': '17', 'tranf_from_nonfed_acct_per': '18a', 'tranf_from_nonfed_levin_per': '18b', 'ttl_nonfed_tranf_per': '18c', 'ttl_receipts_per': '19', 'ttl_fed_receipts_per': '20', 'shared_fed_op_exp_per': '21ai', 'shared_nonfed_op_exp_per': '21aii', 'other_fed_op_exp_per': '21b', 'ttl_op_exp_per': '21c', 'tranf_to_affliliated_cmte_per': '22', 'fed_cand_cmte_contb_per': '23', 'indt_exp_per': '24', 'coord_exp_by_pty_cmte_per': '25', 'loan_repymts_made_per': '26', 'loans_made_per': '27', 'indv_contb_ref_per': '28a', 'pol_pty_cmte_contb_per_ii': '28b', 'other_pol_cmte_contb_per_ii': '28c', 'ttl_contb_ref_per_i': '28d', 'other_disb_per': '29', 'shared_fed_actvy_fed_shr_per': '30ai', 'shared_fed_actvy_nonfed_per': '30aii', 'non_alloc_fed_elect_actvy_per': '30b', 'ttl_fed_elect_actvy_per': '30c', 'ttl_disb_per': '31', 'ttl_fed_disb_per': '32', 'ttl_contb_per': '33', 'ttl_contb_ref_per_ii': '34', 'net_contb_per': '35', 'ttl_fed_op_exp_per': '36', 'offsets_to_op_exp_per_ii': '37', 'net_op_exp_per': '38'}, 
-# 'colB': {'coh_begin_calendar_yr': '6a', 'ttl_receipts_sum_page_ytd': '6c', 'subttl_sum_ytd': '6d', 'ttl_disb_sum_page_ytd': '7', 'coh_coy': '8', 'indv_item_contb_ytd': '11ai', 'indv_unitem_contb_ytd': '11aii', 'ttl_indv_contb_ytd': '11aiii', 'pol_pty_cmte_contb_ytd_i': '11b', 'other_pol_cmte_contb_ytd_i': '11c', 'ttl_contb_col_ttl_ytd': '11d', 'tranf_from_affiliated_pty_ytd': '12', 'all_loans_received_ytd': '13', 'loan_repymts_received_ytd': '14', 'offsets_to_op_exp_ytd_i': '15', 'fed_cand_cmte_contb_ytd': '16', 'other_fed_receipts_ytd': '17', 'tranf_from_nonfed_acct_ytd': '18a', 'tranf_from_nonfed_levin_ytd': '18b', 'ttl_nonfed_tranf_ytd': '18c', 'ttl_receipts_ytd': '19', 'ttl_fed_receipts_ytd': '20', 'shared_fed_op_exp_ytd': '21ai', 'shared_nonfed_op_exp_ytd': '21aii', 'other_fed_op_exp_ytd': '21b', 'ttl_op_exp_ytd': '21c', 'tranf_to_affilitated_cmte_ytd': '22', 'fed_cand_cmte_contb_ref_ytd': '23', 'indt_exp_ytd': '24_independentExpenditures', 'coord_exp_by_pty_cmte_ytd': '25', 'loan_repymts_made_ytd': '26', 'loans_made_ytd': '27', 'indv_contb_ref_ytd': '28a', 'pol_pty_cmte_contb_ytd_ii': '28b', 'other_pol_cmte_contb_ytd_ii': '28c', 'ttl_contb_ref_ytd_i': '28d', 'other_disb_ytd': '29', 'shared_fed_actvy_fed_shr_ytd': '30ai', 'shared_fed_actvy_nonfed_ytd': '30aii', 'non_alloc_fed_elect_actvy_ytd': '30b', 'ttl_fed_elect_actvy_ytd': '30c', 'ttl_disb_ytd': '31', 'ttl_fed_disb_ytd': '32', 'ttl_contb_ytd': '33', 'ttl_contb_ref_ytd_ii': '34', 'net_contb_ytd': '35', 'ttl_fed_op_exp_ytd': '36', 'offsets_to_op_exp_ytd_ii': '37', 'net_op_exp_ytd': '38'}}
-
-# col_name_value_dict = {'colA': {'6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per', '7': 'ttl_disb_sum_page_per', '8': 'coh_cop', '9': 'debts_owed_to_cmte', '10': 'debts_owed_by_cmte', '11ai': 'indv_item_contb_per', '11aii': 'indv_unitem_contb_per', '11aiii': 'ttl_indv_contb', '11b': 'pol_pty_cmte_contb_per_i', '11c': 'other_pol_cmte_contb_per_i', '11d': 'ttl_contb_col_ttl_per', '12': 'tranf_from_affiliated_pty_per', '13': 'all_loans_received_per', '14': 'loan_repymts_received_per', '15': 'offsets_to_op_exp_per_i', '16': 'fed_cand_contb_ref_per', '17': 'other_fed_receipts_per', '18a': 'tranf_from_nonfed_acct_per', '18b': 'tranf_from_nonfed_levin_per', '18c': 'ttl_nonfed_tranf_per', '19': 'ttl_receipts_per', '20': 'ttl_fed_receipts_per', '21ai': 'shared_fed_op_exp_per', '21aii': 'shared_nonfed_op_exp_per', '21b': 'other_fed_op_exp_per', '21c': 'ttl_op_exp_per', '22': 'tranf_to_affliliated_cmte_per', '23': 'fed_cand_cmte_contb_per', '24': 'indt_exp_per', '25': 'coord_exp_by_pty_cmte_per', '26': 'loan_repymts_made_per', '27': 'loans_made_per', '28a': 'indv_contb_ref_per', '28b': 'pol_pty_cmte_contb_per_ii', '28c': 'other_pol_cmte_contb_per_ii', '28d': 'ttl_contb_ref_per_i', '29': 'other_disb_per', '30ai': 'shared_fed_actvy_fed_shr_per', '30aii': 'shared_fed_actvy_nonfed_per', '30b': 'non_alloc_fed_elect_actvy_per', '30c': 'ttl_fed_elect_actvy_per', '31': 'ttl_disb_per', '32': 'ttl_fed_disb_per', '33': 'ttl_contb_per', '34': 'ttl_contb_ref_per_ii', '35': 'net_contb_per', '36': 'ttl_fed_op_exp_per', '37': 'offsets_to_op_exp_per_ii', '38': 'net_op_exp_per'}, 
-# 'colB': {'6a': 'coh_begin_calendar_yr', '6c': 'ttl_receipts_sum_page_ytd', '6d': 'subttl_sum_ytd', '7': 'ttl_disb_sum_page_ytd', '8': 'coh_coy', '11ai': 'indv_item_contb_ytd', '11aii': 'indv_unitem_contb_ytd', '11aiii': 'ttl_indv_contb_ytd', '11b': 'pol_pty_cmte_contb_ytd_i', '11c': 'other_pol_cmte_contb_ytd_i', '11d': 'ttl_contb_col_ttl_ytd', '12': 'tranf_from_affiliated_pty_ytd', '13': 'all_loans_received_ytd', '14': 'loan_repymts_received_ytd', '15': 'offsets_to_op_exp_ytd_i', '16': 'fed_cand_cmte_contb_ytd', '17': 'other_fed_receipts_ytd', '18a': 'tranf_from_nonfed_acct_ytd', '18b': 'tranf_from_nonfed_levin_ytd', '18c': 'ttl_nonfed_tranf_ytd', '19': 'ttl_receipts_ytd', '20': 'ttl_fed_receipts_ytd', '21ai': 'shared_fed_op_exp_ytd', '21aii': 'shared_nonfed_op_exp_ytd', '21b': 'other_fed_op_exp_ytd', '21c': 'ttl_op_exp_ytd', '22': 'tranf_to_affilitated_cmte_ytd', '23': 'fed_cand_cmte_contb_ref_ytd', '24_independentExpenditures': 'indt_exp_ytd', '25': 'coord_exp_by_pty_cmte_ytd', '26': 'loan_repymts_made_ytd', '27': 'loans_made_ytd', '28a': 'indv_contb_ref_ytd', '28b': 'pol_pty_cmte_contb_ytd_ii', '28c': 'other_pol_cmte_contb_ytd_ii', '28d': 'ttl_contb_ref_ytd_i', '29': 'other_disb_ytd', '30ai': 'shared_fed_actvy_fed_shr_ytd', '30aii': 'shared_fed_actvy_nonfed_ytd', '30b': 'non_alloc_fed_elect_actvy_ytd', '30c': 'ttl_fed_elect_actvy_ytd', '31': 'ttl_disb_ytd', '32': 'ttl_fed_disb_ytd', '33': 'ttl_contb_ytd', '34': 'ttl_contb_ref_ytd_ii', '35': 'net_contb_ytd', '36': 'ttl_fed_op_exp_ytd', '37': 'offsets_to_op_exp_ytd_ii', '38': 'net_op_exp_ytd'}}
 
 def get_f3x_report_data(cmte_id, report_id):
     try:
@@ -3139,77 +2929,79 @@ def get_f3x_report_data(cmte_id, report_id):
         return forms_obj
     except Exception:
         raise
-from datetime import date, timedelta, datetime, time
-from dateutil.relativedelta import relativedelta
 
-def cash_on_hand_begining_amount(cmte_id, report_id):
-    try:
-        # today = date.today()
+# def cash_on_hand_begining_amount(cmte_id, report_id):
+#     try:
+#         # today = date.today()
         
-        #d = today - relativedelta(months=1)
+#         #d = today - relativedelta(months=1)
 
-        from_date, to_date = get_cvg_dates(report_id, cmte_id)
-        #print(from_date_time,to_date_time,'datetime')
-        d = from_date - relativedelta(months=1)
+#         from_date, to_date = get_cvg_dates(report_id, cmte_id)
+#         #print(from_date_time,to_date_time,'datetime')
+#         d = from_date - relativedelta(months=1)
        
-        from_date_time = date(d.year, d.month, 1)
-        to_date_time = date(from_date.year, from_date.month, 1) - relativedelta(days=1)
-        # from_date_time = datetime.combine(fromdate, time(0,0,0))
-        # to_date_time = datetime.combine(todate, time(23,59,59))
-        print(from_date_time,to_date_time,'datetime')
+#         from_date_time = date(d.year, d.month, 1)
+#         to_date_time = date(from_date.year, from_date.month, 1) - relativedelta(days=1)
+#         # from_date_time = datetime.combine(fromdate, time(0,0,0))
+#         # to_date_time = datetime.combine(todate, time(23,59,59))
+#         print(from_date_time,to_date_time,'datetime')
 
-        ######THIS IS FOR CURRENT YEAR TILL DATE######
-        """"
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
-            if (cursor.rowcount == 0):
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
-        return coh_cop if coh_cop else 0
-        """
+#         ######THIS IS FOR CURRENT YEAR TILL DATE######
+#         """"
+#         with connection.cursor() as cursor:
+#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
+#             if (cursor.rowcount == 0):
+#                 coh_cop = 0
+#             else:
+#                 result = cursor.fetchone()
+#                 coh_cop = result[0]
+#         return coh_cop if coh_cop else 0
+#         """
 
-        ######THIS IS FOR CURRENT YEAR BEGINIG DATE#######
+#         ######THIS IS FOR CURRENT YEAR BEGINIG DATE#######
 
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time])
-            if (cursor.rowcount == 0):
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
-        return coh_cop if coh_cop else 0
-    except Exception as e:
-        raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
+#         with connection.cursor() as cursor:
+#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time])
+#             if (cursor.rowcount == 0):
+#                 coh_cop = 0
+#             else:
+#                 result = cursor.fetchone()
+#                 coh_cop = result[0]
+#         return coh_cop if coh_cop else 0
+#     except Exception as e:
+#         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
 
 
-def cash_on_hand_current_year(cmte_id, report_id):
-    try:
-        d = date.today()
-        from_date_time = datetime.combine(date(d.year, 1,1), time(0,0,0))
-        to_date_time = datetime.combine(d, time(23,59,59))
+# def cash_on_hand_current_year(cmte_id, report_id):
+#     try:
+#         d = date.today()
+#         from_date_time = datetime.combine(date(d.year, 1,1), time(0,0,0))
+#         to_date_time = datetime.combine(d, time(23,59,59))
 
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
-            if (cursor.rowcount == 0):
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
-        return coh_cop if coh_cop else 0
-    except Exception as e:
-        raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
+#         with connection.cursor() as cursor:
+#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
+#             if (cursor.rowcount == 0):
+#                 coh_cop = 0
+#             else:
+#                 result = cursor.fetchone()
+#                 coh_cop = result[0]
+#         return coh_cop if coh_cop else 0
+#     except Exception as e:
+#         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
 
 
 #def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
 def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, report_id):
     val = 0
     if line_number == '6b':
-        val = cash_on_hand_begining_amount(cmte_id,report_id)
+        val = prev_cash_on_hand_cop(report_id, cmte_id, False)
+        print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+        print('rep: '+str(val))
         return val
     if line_number == '6a':
-        val = cash_on_hand_current_year(cmte_id,report_id)
+        print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+        val = prev_cash_on_hand_cop(report_id, cmte_id, True)
+        print('year: '+ str(val))
         return val
     if formula == "":
         val += sched_a_line_sum_dict.get(line_number, 0) if sched_a_line_sum_dict.get(line_number, 0) else 0
@@ -3260,7 +3052,7 @@ def prepare_json_builders_data(request):
         schedule_a_b_line_sum_dict.update(sched_b_line_sum)
         #status_value = status.HTTP_200_OK
         
-        col_a = [('6b', ''), ('6c', '19'), ('6d', '6b + 6c'), ('7', '31'), ('8', '6d - 7'), ('9', '0'), 
+        col_a = [('9', '0'), 
         ('10', '0'), ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
         ('11d', '11aiii + 11b + 11c'), ('12', ''), ('13', ''), ('14', ''), ('15', ''), ('16', ''), ('17', ''), 
         ('18a', '0'), ('18b', '0'), ('18c', '18a+18b'), ('19', '11d+12+13+14+15+16+17+18c'), ('20', '19 - 18c'), 
@@ -3268,9 +3060,9 @@ def prepare_json_builders_data(request):
         ('25', '0'), ('26', ''), ('27', ''), ('28a', ''), ('28b', ''), ('28c', ''), ('28d', '28a + 28b + 28c'), ('29', ''), 
         ('30ai', '0'), ('30aii', '0'), ('30b', ''), ('30c', '30ai + 30aii + 30b'), ('31', '21c + 22 - 27 + 28d + 29'), 
         ('32', '31 - 21aii + 30aii'), ('33', '11d'), ('34', '28d'), 
-        ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37')]
+        ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37'), ('6b', ''), ('6c', '19'), ('6d', '6b + 6c'), ('7', '31'), ('8', '6d - 7')]
 
-        from collections import OrderedDict
+        
         col_a_dict_original = OrderedDict()
         for i in col_a:
             col_a_dict_original[i[0]] = i[1]
@@ -3281,7 +3073,7 @@ def prepare_json_builders_data(request):
         # print("-------------------------")
         print(final_col_a_dict, "col_a_dict")
 
-        col_b = [('6a',''),('6c', '19'), ('6d', '6a + 6c'), ('7', '30'), ('8', '6d - 7'), 
+        col_b = [ 
         ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''), 
         ('11d', '11aiii + 11b + 11c'), ('12', ''), ('13', ''), ('14', ''), ('15', ''), ('16', ''), ('17', ''), 
         ('18a', '0'), ('18b', '0'), ('18c', '18a+18b'), ('19', '11d+12+13+14+15+16+17+18c'), ('20', '19 - 18c'), 
@@ -3289,7 +3081,8 @@ def prepare_json_builders_data(request):
         ('25', '0'), ('26', ''), ('27', ''), ('28a', ''), ('28b', ''), ('28c', ''), ('28d', '28a + 28b + 28c'), ('29', ''), 
         ('30ai', '0'), ('30aii', '0'), ('30b', ''), ('30c', '30ai + 30aii + 30b'), ('31', '21c + 22 - 27 + 28d + 29'), 
         ('32', '31 - 21aii + 30aii'), ('33', '11d'), ('34', '28d'), 
-        ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37')]
+        ('35', '11d - 28d'), ('36', '21ai + 21b'), ('37', '15'), ('38', '36 - 37'), ('6a',''),('6c', '19'), ('6d', '6a + 6c'),
+        ('7', '30'), ('8', '6d - 7')]
 
         col_b_dict_original = OrderedDict()
         for i in col_b:
@@ -3352,7 +3145,7 @@ def prepare_json_builders_data(request):
             #cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
             update_query = """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
             cursor.execute(update_query)
-            print("Updated on Database ---- yoyooooo")
+            #print("Updated on Database ---- yoyooooo")
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
