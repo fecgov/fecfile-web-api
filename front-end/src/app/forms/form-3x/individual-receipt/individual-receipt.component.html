@@ -80,8 +80,8 @@
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"                      
                       [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                      [attr.value]="col?.value"
-                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 1: col?.validation?.max"
+                      [attr.value]="col?.value | zipCode"
+                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
                       [formControlName]="col?.name"
                       (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
@@ -90,6 +90,7 @@
                           ? 'input-field-error'
                           : ''
                       "
+                      (keyup)="col?.name === 'contribution_amount' ? contributionAmountKeyup($event) : null"
                       (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     />                    
                     <input

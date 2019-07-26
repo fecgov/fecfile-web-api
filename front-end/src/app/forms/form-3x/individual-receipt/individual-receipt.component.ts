@@ -63,6 +63,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _contributionAmount = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntityId: number;
+  private _contributionAmountMax: number;
 
   constructor(
     private _http: HttpClient,
@@ -178,6 +179,12 @@ export class IndividualReceiptComponent implements OnInit {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          // contribution_amount' ? col?.validation?.max
+          if (e.name === 'contribution_amount') {
+            if (e.validation) {
+              this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
+            }
+          }
         });
       }
     });
@@ -277,9 +284,15 @@ export class IndividualReceiptComponent implements OnInit {
    *
    * @param      {Object}  e       The event object.
    */
-  public contributionAmountChange(e): void {
+  public contributionAmountChange(e: any): void {
     let contributionAmount: string = e.target.value;
+    // default to 0 when no value
     contributionAmount = contributionAmount ? contributionAmount : '0';
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+    // determine if negative, truncate if > max
+    contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
+
     this._contributionAmount = contributionAmount;
 
     const contributionAggregate: string = String(this._contributionAggregateValue);
@@ -291,7 +304,53 @@ export class IndividualReceiptComponent implements OnInit {
 
     this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
-    // this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(aggregateValue);
+  }
+
+  /**
+   * Prevent user from keying in more than the max allowed by the API.
+   * HTML max must allow for commas, decimals and negative sign and therefore
+   * this is needed to enforce digit limitation.  This method will remove
+   * non-numerics permitted by the floatingPoint() validator,
+   * commas, decimals and negative sign, before checking the number of digits.
+   *
+   * Note: If this method is not desired, it may be replaced with a validation
+   * on submit.  It is here to catch user error before submitting the form.
+   */
+  public contributionAmountKeyup(e: any) {
+    let val = this._utilService.deepClone(e.target.value);
+    val = val.replace(/,/g, ``);
+    val = val.replace(/\./g, ``);
+    val = val.replace(/-/g, ``);
+
+    if (val) {
+      if (val.length > this._contributionAmountMax) {
+        e.target.value = e.target.value.substring(0, e.target.value.length - 1);
+      }
+    }
+  }
+
+  /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
+    }
   }
 
   /**
