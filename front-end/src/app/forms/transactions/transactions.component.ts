@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
 import { Subscription } from 'rxjs/Subscription';
@@ -99,7 +99,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService,
+    private _router: Router
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
@@ -176,6 +177,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
+  }
+
+  public goToPreviousStep(): void {
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'step_3' }
+    });
   }
 
   /**
