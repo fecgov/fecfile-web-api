@@ -26,6 +26,8 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -62,7 +64,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _contributionAggregateValue = 0.0;
   private _contributionAmount = '';
   private readonly _memoCodeValue: string = 'X';
-  private _selectedEntityId: number;
+  private _selectedEntity: any;
   private _contributionAmountMax: number;
 
   constructor(
@@ -78,13 +80,15 @@ export class IndividualReceiptComponent implements OnInit {
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
     private _reportTypeService: ReportTypeService,
-    private _typeaheadService: TypeaheadService
+    private _typeaheadService: TypeaheadService,
+    private _dialogService: DialogService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
+    this._selectedEntity = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -367,6 +371,49 @@ export class IndividualReceiptComponent implements OnInit {
     }
   }
 
+  public handleFormFieldKeyup($event: any, col: any) {
+    if (!col) {
+      return;
+    }
+    if (!col.name) {
+      return;
+    }
+    if (
+      col.name === 'middle_name' ||
+      col.name === 'prefix' ||
+      col.name === 'suffix' ||
+      col.name === 'street_1' ||
+      col.name === 'street_2' ||
+      col.name === 'city' ||
+      col.name === 'state' ||
+      col.name === 'zip_code' ||
+      col.name === 'employer' ||
+      col.name === 'occupation'
+    ) {
+      if (this._selectedEntity) {
+        this.frmIndividualReceipt.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
+        this.showWarn(col.text);
+      }
+    } else if (col.name === 'contribution_amount') {
+      this.contributionAmountKeyup($event);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Show a warning indicating fields may not be changed for entities loaded from the database.
+   *
+   * @param fieldLabel Field Label to show in the message
+   */
+  private showWarn(fieldLabel: string) {
+    const message =
+      `Changes to ${fieldLabel} can't be edited when a Contributor is` +
+      ` selected from the dropdwon.  Go to the Contacts page to edit a Contributor.`;
+
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {});
+  }
+
   /**
    * Updates vaprivate _memoCode variable.
    *
@@ -400,18 +447,23 @@ export class IndividualReceiptComponent implements OnInit {
    *
    * @param stateOption the state selected in the dropdown.
    */
-  public handleStateChange(stateOption: any) {
-    let stateCode = null;
-    if (stateOption.$ngOptionLabel) {
-      stateCode = stateOption.$ngOptionLabel;
-      if (stateCode) {
-        stateCode = stateCode.trim();
-        if (stateCode.length > 1) {
-          stateCode = stateCode.substring(0, 2);
+  public handleStateChange(stateOption: any, col: any) {
+    if (this._selectedEntity) {
+      this.showWarn(col.text);
+      this.frmIndividualReceipt.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+    } else {
+      let stateCode = null;
+      if (stateOption.$ngOptionLabel) {
+        stateCode = stateOption.$ngOptionLabel;
+        if (stateCode) {
+          stateCode = stateCode.trim();
+          if (stateCode.length > 1) {
+            stateCode = stateCode.substring(0, 2);
+          }
         }
       }
+      this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
     }
-    this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
   }
 
   /**
@@ -430,16 +482,27 @@ export class IndividualReceiptComponent implements OnInit {
             console.log('memo code val ' + receiptObj[field]);
           }
         } else if (field === 'last_name' || field === 'first_name') {
-          // TODO Possible detfect with typeahead setting field as the entity object
-          // rather than the string defined by the inputFormatter();
-          // If an object is received, find the value on the object by fields type
-          // otherwise use the string value.  This is not desired and this patch
-          // should be removed if the issue is resolved.
-          const typeAheadField = this.frmIndividualReceipt.get(field).value;
-          if (typeof typeAheadField !== 'string') {
-            receiptObj[field] = typeAheadField[field];
+          if (this._selectedEntity) {
+            // If the typeahead was used to load the entity into the form,
+            // we don't allow users to make changes to the entity. Non-Typeahead
+            // field (address, middle name, etc) are reset onKeyup.  Typeahead
+            // fields must be reset here.  This is a known UI design issue with the
+            // typeahead and not being able to disable fields because of add functionality.
+            // We are tolerating this limitation where the user may change the last or
+            // first name, it will reflect the change in the UI but won't be save to API.
+            receiptObj[field] = this._selectedEntity[field];
           } else {
-            receiptObj[field] = typeAheadField;
+            // TODO Possible defect with typeahead setting field as the entity object
+            // rather than the string defined by the inputFormatter();
+            // If an object is received, find the value on the object by fields type
+            // otherwise use the string value.  This is not desired and this patch
+            // should be removed if the issue is resolved.
+            const typeAheadField = this.frmIndividualReceipt.get(field).value;
+            if (typeof typeAheadField !== 'string') {
+              receiptObj[field] = typeAheadField[field];
+            } else {
+              receiptObj[field] = typeAheadField;
+            }
           }
         } else if (field === 'contribution_amount') {
           receiptObj[field] = this._contributionAmount;
@@ -454,8 +517,8 @@ export class IndividualReceiptComponent implements OnInit {
 
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.
-      if (this._selectedEntityId) {
-        receiptObj.entity_id = this._selectedEntityId;
+      if (this._selectedEntity) {
+        receiptObj.entity_id = this._selectedEntity.entity_id;
       }
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
@@ -489,7 +552,7 @@ export class IndividualReceiptComponent implements OnInit {
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-          this._selectedEntityId = null;
+          this._selectedEntity = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -597,8 +660,7 @@ export class IndividualReceiptComponent implements OnInit {
    */
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
-
-    this._selectedEntityId = contact.entity_id;
+    this._selectedEntity = this._utilService.deepClone(contact);
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
