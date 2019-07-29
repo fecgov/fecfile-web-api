@@ -28,7 +28,6 @@ from fecfiler.core.views import get_list_entity
 # from .jsonbuilder import *
 
 
-up_datetime=datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
 conn = boto.connect_s3()
@@ -113,6 +112,50 @@ def get_entity_sched_b_data(report_id, cmte_id, transaction_id):
     except Exception:
         raise
 
+def get_transaction_entity_sched_a_data(report_id, cmte_id, transaction_id_list):
+    try:
+        # GET all rows from schedA table
+        forms_obj = []
+        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, transaction_type_identifier, donor_cmte_id, donor_cmte_name
+                        FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') """.format("', '".join(transaction_id_list))
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            print(cursor.query)
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i] and i != 'aggregate_amt':
+                                d[i] = ''
+        if forms_obj is None:
+            pass
+        return forms_obj
+    except Exception:
+        raise
+
+def get_transaction_entity_sched_b_data(report_id, cmte_id, transaction_id_list):
+    try:
+        # GET all rows from schedB table
+        forms_obj = []
+        query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, expenditure_date, expenditure_amount, (CASE WHEN aggregate_amt IS NULL THEN 0.0 ELSE aggregate_amt END) AS aggregate_amt, expenditure_purpose, memo_code, memo_text, election_code, election_other_description, create_date, category_code, transaction_type_identifier, beneficiary_cmte_id, beneficiary_cand_id, beneficiary_cand_office, beneficiary_cand_state, beneficiary_cand_district
+                        FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') """.format("', '".join(transaction_id_list))
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [report_id, cmte_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj = data_row[0]
+                if forms_obj is not None:
+                    for d in forms_obj:
+                        for i in d:
+                            if not d[i] and i != 'aggregate_amt':
+                                d[i] = ''
+        if forms_obj is None:
+            pass
+        return forms_obj
+    except Exception:
+        raise
 
 def get_summary_dict(form3x_header_data):
     form3x_data_string ='{'
@@ -224,7 +267,6 @@ def get_summary_dict(form3x_header_data):
     form3x_data_string = form3x_data_string + '}'
     return form3x_data_string
 
-
 def get_committee_master_values(cmte_id):
     try:
         query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code,
@@ -260,7 +302,6 @@ def get_committee_master_values(cmte_id):
     except Exception:
         raise
 
-
 def get_f3x_report_data(cmte_id, report_id):
     try:
         query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
@@ -288,7 +329,7 @@ def get_list_report(report_id, cmte_id):
                 data_row = list(row)
                 forms_obj=data_row[0]
         if forms_obj is None:
-            raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(report_id))   
+            raise NoOPError('The Report ID: {} does not exist or is deleted'.format(report_id))   
         return forms_obj
     except Exception:
         raise
@@ -328,10 +369,15 @@ def get_candidate_master_data():
 def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
+        transaction_flag = False
+        transaction_id_list = []
         report_id = request.data.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
+        if 'transaction_id' in request.data and request.data.get('transaction_id'):
+            transaction_flag = True
+            transaction_id_list = request.data.get('transaction_id')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -352,16 +398,17 @@ def task_sched_a(request):
             response_dict_receipt = {}
             for f3_i in f_3x_list:
                 #print (f3_i['report_id'])
-
-                entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
-                entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
+                if not transaction_flag:
+                    entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], None)
+                    entity_id_sched_b_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], None)
+                else:
+                    entity_id_list = get_transaction_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], transaction_id_list)
+                    entity_id_sched_b_list = get_transaction_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], transaction_id_list)
                 
-
                 #print('parent sched A trans:',len(entity_id_list))
                 
                 #entity_id_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'])
                 
-
                 if entity_id_list:
                     
                     print ("we got the data")
@@ -436,11 +483,12 @@ def task_sched_a(request):
                             response_dict_receipt['donorFecCommitteeName'] = entity_obj['donor_cmte_name'] 
                             response_dict_receipt['memoCode'] = entity_obj['memo_code']
                             response_dict_receipt['memoDescription'] = entity_obj['memo_text']
-
-
                         
                         # entity_id_child_list = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
-                        entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                        if not transaction_flag:
+                            entity_id_child_list = get_entity_sched_b_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                        else:
+                            entity_id_child_list = []
 
                         if entity_id_child_list:
 
@@ -535,7 +583,10 @@ def task_sched_a(request):
                                 response_dict_receipt['child'].append(response_dict_out)
                             # print(entity_obj['transaction_id'])
                         
-                        entity_id_child_list_a = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                        if not transaction_flag:
+                            entity_id_child_list_a = get_entity_sched_a_data(f3_i['report_id'], f3_i['cmte_id'], entity_obj['transaction_id'])
+                        else:
+                            entity_id_child_list_a = []
 
                         if entity_id_child_list_a: 
                             if not 'child' in response_dict_receipt:
@@ -647,8 +698,6 @@ def task_sched_a(request):
                             response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
                             response_dict_receipt['benificiaryCandidateLastName'] = ''
                             response_dict_receipt['benificiaryCandidateFirstName'] = ''
-                        
-
                             response_dict_receipt['benificiaryCandidateMiddleName'] = ''
                             response_dict_receipt['benificiaryCandidatePrefix'] = ''
                             response_dict_receipt['benificiaryCandidateSuffix'] = ''
@@ -691,8 +740,6 @@ def task_sched_a(request):
                             response_dict_receipt['beneficiaryCandidateFecId'] = entity_obj_b['beneficiary_cand_id']
                             response_dict_receipt['benificiaryCandidateLastName'] = list_entity_b['last_name']
                             response_dict_receipt['benificiaryCandidateFirstName'] = list_entity_b['first_name']
-                        
-
                             response_dict_receipt['benificiaryCandidateMiddleName'] = list_entity_b['middle_name']
                             response_dict_receipt['benificiaryCandidatePrefix'] = list_entity_b['prefix']
                             response_dict_receipt['benificiaryCandidateSuffix'] = list_entity_b['suffix']
@@ -738,25 +785,24 @@ def task_sched_a(request):
             data_obj['data'] = comm_info_obj
             data_obj['data']['formType'] = "F3X"
             summary_d = {i:(k if k else 0) for i, k in f_3x_list[0].items()}
-            f=get_summary_dict(summary_d)
-            data_obj['data']['summary'] = json.loads(f)
+            if not transaction_flag:
+                f=get_summary_dict(summary_d)
+                data_obj['data']['summary'] = json.loads(f)
             #data_obj['data']['summary'] = json.loads(json.dumps(get_summary_dict(f_3x_list[0])))
             data_obj['data']['schedules'] = {'SA': [], 'SB':[]}
             data_obj['data']['schedules']['SA'] = response_inkind_receipt_list
             data_obj['data']['schedules']['SB'] = reponse_sched_b_data
            
-           
-            
     except Exception as e:
-        print (str(e))
+        raise 
+        # print (str(e))
         return False
     return data_obj
 
 
 @api_view(["POST"])
 def create_json_builders(request):
-    #import ipdb;ipdb.set_trace()
-    # Check for Inkind
+
     try:
         print(" request = ", request)
         report_id = request.data.get('report_id')
@@ -769,17 +815,12 @@ def create_json_builders(request):
         print("committeeid", committeeid)
 
         data_obj = task_sched_a(request)
-        # Check for partnership
-        # sche_b_data = task_sched_b(request)
-        # if data_obj and sche_b_data:
 
         if data_obj:
-            # data_obj['data']['schedules']['SB'] = sche_b_data
-            # Check for returned bounced
             
             client = boto3.client('s3')
             transfer = S3Transfer(client)
-
+            up_datetime=datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
             tmp_filename = committeeid +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
             tmp_path='/tmp/'+tmp_filename
         
@@ -825,11 +866,10 @@ def create_json_builders(request):
                 dictprint = resp.json()
                 #merged_dict = {**create_json_data, **dictprint}
                 return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
-        
 
             #return Response({'status':'Success', 'filepath': tmp_path, 'filename': tmp_filename}, status=status.HTTP_200_OK)
         else:
-            return Response('error for json builder', status=status.HTTP_404_BAD_REQUEST)
+            return Response('error for json builder', status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
         return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
