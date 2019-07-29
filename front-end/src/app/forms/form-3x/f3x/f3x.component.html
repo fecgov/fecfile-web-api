@@ -1,6 +1,6 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
-  <div class="form__sidebar" >
+  <div class="form__sidebar">
     <div [hidden]="step !== 'step_1'">
       <report-type-sidebar
         title="Report Coverage Dates"
@@ -12,7 +12,7 @@
       </report-type-sidebar>
     </div>
     <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary'">
-    <transaction-sidebar
+      <transaction-sidebar
         [step]="step"
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"
@@ -89,6 +89,10 @@
 
       <div class="form__step" [hidden]="step !== 'step_6'">
         <f3x-submit></f3x-submit>
+      </div>
+
+      <div class="form_step" [hidden]="step !== 'transactions'">
+        <app-transactions></app-transactions>
       </div>
     </div>
   </div>
