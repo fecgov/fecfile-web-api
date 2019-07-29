@@ -609,12 +609,12 @@ def get_committee_details(request):
             query_string = """SELECT cmte_id AS "committeeid", cmte_name AS "committeename", street_1 AS "street1", street_2 AS "street2", city, state, zip_code AS "zipcode", 
                                 cmte_email_1 AS "email_on_file", cmte_email_2 AS "email_on_file_1", phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, 
                                 treasurer_last_name AS "treasurerlastname", treasurer_first_name AS "treasurerfirstname", treasurer_middle_name AS "treasurermiddlename", 
-                                treasurer_prefix AS "treasurerprefix", treasurer_suffix AS "treasurersuffix", create_date AS "created_at"
-                                FROM public.committee_master WHERE cmte_id = %s AND cmte_type_category = %s ORDER BY create_date"""
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, cmte_type_category])
+                                treasurer_prefix AS "treasurerprefix", treasurer_suffix AS "treasurersuffix", create_date AS "created_at", cmte_type_category
+                                FROM public.committee_master WHERE cmte_id = %s ORDER BY create_date"""
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
             modified_output = cursor.fetchone()[0]
         if modified_output is None:
-            raise NoOPError('The Committee ID: {} and cmte_type_category: {} does not match records in Committee table'.format(cmte_id, cmte_type_category))
+            raise NoOPError('The Committee ID: {} does not match records in Committee table'.format(cmte_id))
 
         #     for row in cursor.fetchone():
         #         # print(row)
