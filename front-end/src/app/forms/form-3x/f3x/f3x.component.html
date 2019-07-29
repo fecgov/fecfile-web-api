@@ -11,7 +11,7 @@
       >
       </report-type-sidebar>
     </div>
-    <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary'">
+    <div *ngIf="step === 'step_2' || step === 'step_3' || step === 'financial_summary' || step === 'transactions'">
       <transaction-sidebar
         [step]="step"
         title="Transaction Categories"
