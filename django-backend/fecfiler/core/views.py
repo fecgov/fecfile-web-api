@@ -2912,6 +2912,55 @@ def create_contacts_view(request):
         return Response("The contact_views API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+def get_loan_debt_summary(request):
+    """
+    get loan and debt aggreagation data 'to the committee' and 'by the committee'（FNE-1291）
+    Business Logic:
+    Loans/Debts owed to committees : (SC + SC1 with line number 9 ) + (SD with line number 9 )
+    Loans/Debts owed by committees : (SC + SC1 with line number 10 ) + (SD with line number 10 )
+
+    api query parameters: cmet_id + report_id
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = check_report_id(request.data.get('report_id'))
+        _sql = """
+        SELECT Sum(t._sum) 
+        FROM  ( 
+            ( 
+                    SELECT Sum(loan_payment_to_date) AS _sum 
+                    FROM   public.sched_c 
+                    WHERE  cmte_id = %(cmte_id)s 
+                    AND    report_id = %(report_id)s 
+                    AND    line_number= %(line_num)s) 
+        UNION 
+            ( 
+                    SELECT sum(loan_amount) AS _sum 
+                    FROM   public.sched_c1 
+                    WHERE  cmte_id = %(cmte_id)s 
+                    AND    report_id = %(report_id)s 
+                    AND    line_number= %(line_num)s) 
+        UNION 
+            ( 
+                    SELECT sum(payment_amount) AS _sum 
+                    FROM   public.sched_d 
+                    WHERE  cmte_id = %(cmte_id)s 
+                    AND    report_id = %(report_id)s
+                    AND    line_number= %(line_num)s)) t;
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '9'})
+            to_committee_sum = list(cursor.fetchone())[0]
+            cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '10'})
+            by_committee_sum = list(cursor.fetchone())[0]
+            json_result = {"to_committee_sum": to_committee_sum, "by_committee_sum": by_committee_sum}
+        return Response(json_result, status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response("The get_loan_debt_summary api is throwing an error: " + str(e), 
+                        status=status.HTTP_400_BAD_REQUEST)
+
 """
 *****************************************************************************************************************************
 END - Contacts API - CORE APP
