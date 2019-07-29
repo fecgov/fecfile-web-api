@@ -152,6 +152,34 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
     }
+
+    if (this.frmIndividualReceipt) {
+      if (Array.isArray(this.frmIndividualReceipt.controls)) {
+        if (this.frmIndividualReceipt.controls['contribution_date']) {
+          if (this.cvgStartDate === null && this.cvgEndDate === null && this._reportType === null) {
+            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+              this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+              if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
+                if (
+                  typeof this._reportType.cvgStartDate === 'string' &&
+                  typeof this._reportType.cvgEndDate === 'string'
+                ) {
+                  this.cvgStartDate = this._reportType.cvgStartDate;
+                  this.cvgEndDate = this._reportType.cvgEndDate;
+
+                  this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+                    contributionDate(this.cvgStartDate, this.cvgEndDate),
+                    Validators.required
+                  ]);
+
+                  this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {
