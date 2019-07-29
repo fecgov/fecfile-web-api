@@ -89,4 +89,5 @@ urlpatterns = [
         views.get_loan_debt_summary,
         name="get_loan_debt_summary",
     ),
+    url(r'^core/prepare_json_builders_data$', views.prepare_json_builders_data, name='prepare_json_builders_data'),
 ]
