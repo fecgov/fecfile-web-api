@@ -28,7 +28,7 @@
       'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps">
+    <div class="form__steps" >
       <app-steps
         [steps]="[
           { text: 'Report', step: 'step_1' },
@@ -88,7 +88,7 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_6'">
-        <f3x-submit></f3x-submit>
+        <app-submit></app-submit>
       </div>
     </div>
   </div>

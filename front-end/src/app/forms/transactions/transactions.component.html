@@ -34,6 +34,23 @@
           </button>
         </div>
       </div>
+      <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
+        <button
+          type="button"
+          class="btn btn-link btn-options"
+          id="actionsMenu"
+          ngbDropdownToggle
+        >
+          <span class="ellipsis-icon" aria-hidden="true"></span>
+          <span class="sr-only">Click for more options</span>
+        </button>
+        <div ngbDropdownMenu aria-labelledby="actionsMenu">
+          <button class="dropdown-item"><i class="view-icon"></i> View</button>
+          <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
+          <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>            
+        </div>
+      </div>
+      
       <hr />
     </header>
     <div>

@@ -6,6 +6,7 @@ import { TransactionFilterModel } from './model/transaction-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { TransactionModel } from './model/transaction.model';
 import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
+import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -105,7 +106,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService,
+    private _reportTypeService: ReportTypeService
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService.getApplyFiltersMessage()
       .subscribe(
@@ -765,5 +767,23 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
   }*/
+  public printPreview(): void {
+    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
+    this._reportTypeService
+    .printPreviewPdf('3X', "PrintPreviewPDF")
+    .subscribe(res => {
+      if(res) {
+            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
+           
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
+            }
+          }
+        },
+        (error) => {
+          console.log('error: ', error);
+        });/*  */
 
+  }
 }
