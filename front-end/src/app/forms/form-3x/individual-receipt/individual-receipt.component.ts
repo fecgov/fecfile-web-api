@@ -363,12 +363,19 @@ export class IndividualReceiptComponent implements OnInit {
     if (checked) {
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-      console.log('memo checked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-      console.log('memo unchecked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     }
   }
 
