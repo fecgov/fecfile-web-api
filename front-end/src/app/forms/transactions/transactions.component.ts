@@ -133,7 +133,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
+    this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
+
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
     this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
@@ -180,7 +181,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   public goToPreviousStep(): void {
-    this._router.navigate([`/forms/form/${this._formType}`], {
+    this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: { step: 'step_3' }
     });
   }
