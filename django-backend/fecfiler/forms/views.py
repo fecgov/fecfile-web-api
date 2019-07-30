@@ -31,6 +31,7 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
+from fecfiler.core.views import NoOPError
 #import datetime as dt
 
 # API view functionality for GET DELETE and PUT
@@ -599,36 +600,44 @@ def get_committee_details(request):
         cmte_id = request.user.username
         with connection.cursor() as cursor:
             # GET all rows from committee table
-            query_string = """SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix, create_date
-                                                    FROM public.committee_master WHERE cmte_id = %s ORDER BY create_date"""
+            query_string = """SELECT cmte_id AS "committeeid", cmte_name AS "committeename", street_1 AS "street1", street_2 AS "street2", city, state, zip_code AS "zipcode", 
+                                cmte_email_1 AS "email_on_file", cmte_email_2 AS "email_on_file_1", phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, 
+                                treasurer_last_name AS "treasurerlastname", treasurer_first_name AS "treasurerfirstname", treasurer_middle_name AS "treasurermiddlename", 
+                                treasurer_prefix AS "treasurerprefix", treasurer_suffix AS "treasurersuffix", create_date AS "created_at", cmte_type_category
+                                FROM public.committee_master WHERE cmte_id = %s ORDER BY create_date"""
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
-            for row in cursor.fetchall():
-                forms_obj=row[0][0]
-                # print(forms_obj)
-        if forms_obj is None:
-            raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
-        else:
-            modified_output = {"committeeid": forms_obj.get('cmte_id'),
-                                "committeename": forms_obj.get('cmte_name'),
-                                "street1": forms_obj.get('street_1'),
-                                "street2": forms_obj.get('street_2'),
-                                "city": forms_obj.get('city'),
-                                "state": forms_obj.get('state'),
-                                "zipcode": forms_obj.get('zip_code'),
-                                "treasurerprefix": forms_obj.get('treasurer_prefix'),
-                                "treasurerfirstname": forms_obj.get('treasurer_first_name'),
-                                "treasurermiddlename": forms_obj.get('treasurer_middle_name'),
-                                "treasurerlastname": forms_obj.get('treasurer_last_name'),
-                                "treasurersuffix": forms_obj.get('treasurer_suffix'),
-                                "email_on_file": forms_obj.get('cmte_email_1'),
-                                "email_on_file_1": forms_obj.get('cmte_email_2'),
-                                "phone_number": forms_obj.get('phone_number'),
-                                "cmte_type": forms_obj.get('cmte_type'),
-                                "cmte_dsgn": forms_obj.get('cmte_dsgn'),
-                                "cmte_filing_freq": forms_obj.get('cmte_filing_freq'),
-                                "cmte_filed_type": forms_obj.get('cmte_filed_type'),
-                                "created_at": forms_obj.get('create_date')}
-        return JsonResponse(modified_output, status=status.HTTP_200_OK)
+            modified_output = cursor.fetchone()[0]
+        if modified_output is None:
+            raise NoOPError('The Committee ID: {} does not match records in Committee table'.format(cmte_id))
+
+        #     for row in cursor.fetchone():
+        #         # print(row)
+        #         forms_obj=row[0]
+        #         # print(forms_obj)
+        # if forms_obj is None:
+        #     raise NoOPError('The Committee: {} does not have any reports listed'.format(cmte_id))
+        # else:
+        #     modified_output = {"committeeid": forms_obj.get('cmte_id'),
+        #                         "committeename": forms_obj.get('cmte_name'),
+        #                         "street1": forms_obj.get('street_1'),
+        #                         "street2": forms_obj.get('street_2'),
+        #                         "city": forms_obj.get('city'),
+        #                         "state": forms_obj.get('state'),
+        #                         "zipcode": forms_obj.get('zip_code'),
+        #                         "treasurerprefix": forms_obj.get('treasurer_prefix'),
+        #                         "treasurerfirstname": forms_obj.get('treasurer_first_name'),
+        #                         "treasurermiddlename": forms_obj.get('treasurer_middle_name'),
+        #                         "treasurerlastname": forms_obj.get('treasurer_last_name'),
+        #                         "treasurersuffix": forms_obj.get('treasurer_suffix'),
+        #                         "email_on_file": forms_obj.get('cmte_email_1'),
+        #                         "email_on_file_1": forms_obj.get('cmte_email_2'),
+        #                         "phone_number": forms_obj.get('phone_number'),
+        #                         "cmte_type": forms_obj.get('cmte_type'),
+        #                         "cmte_dsgn": forms_obj.get('cmte_dsgn'),
+        #                         "cmte_filing_freq": forms_obj.get('cmte_filing_freq'),
+        #                         "cmte_filed_type": forms_obj.get('cmte_filed_type'),
+        #                         "created_at": forms_obj.get('create_date')}
+        return Response(modified_output[0], status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_committee_details API is throwing  an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
