@@ -47,10 +47,10 @@
         <div ngbDropdownMenu aria-labelledby="actionsMenu">
           <button class="dropdown-item"><i class="view-icon"></i> View</button>
           <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
-          <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>            
+          <button *ngIf="isTransactionViewActive()" class="dropdown-item" (click)="doImport()" ><i class="far fa-file-import" ></i> Import</button>            
         </div>
       </div>
-      
+
       <hr />
     </header>
     <div>
@@ -67,11 +67,6 @@
                 class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showRecycleBin()">
                 <i class="trash-icon"></i>
                 Recycle Bin
-              </button>
-              <button [@fadeInOut] *ngIf="isTransactionViewActive()"
-                class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="doImport()">
-                <i class="file-import-icon"></i>
-                Import
               </button>
               <button [@fadeInOut] *ngIf="isTransactionViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn" type="button" (click)="showFilters()">
