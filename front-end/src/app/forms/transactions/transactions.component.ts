@@ -774,10 +774,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     .subscribe(res => {
       if(res) {
             console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-           
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
+            if (res.hasOwnProperty('results')) {
+              if (res['results.pdf_url'] !== null) {
+                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                window.open(res.results.pdf_url, '_blank');
+              }
             }
           }
         },
