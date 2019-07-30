@@ -42,7 +42,6 @@ list_mandatory_fields_schedB = [
     "report_id",
     "expenditure_date",
     "expenditure_amount",
-    "semi_annual_refund_bundled_amount",
     "cmte_id",
     "line_number",
     "transaction_type",
