@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
@@ -42,6 +42,8 @@ export enum FilterTypes {
   ]
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
+  @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
+
   public formType = '';
   public reportId = '0';
   public view: ActiveView = ActiveView.transactions;
@@ -644,6 +646,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showFilters() {
     this.isShowFilters = true;
+    this.sidebarSwitch.emit(this.isShowFilters);
   }
 
   /**
@@ -651,6 +654,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showCategories() {
     this.isShowFilters = false;
+    this.sidebarSwitch.emit(false);
   }
 
   /**

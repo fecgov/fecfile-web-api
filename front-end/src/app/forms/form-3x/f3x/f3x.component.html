@@ -17,8 +17,11 @@
         title="Transaction Categories"
         [transactionCategories]="transactionCategories"
         (status)="onNotify($event)"
+        [hidden]="isShowFilters"
       >
       </transaction-sidebar>
+
+      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="'F3X'"> </app-transactions-filter>
     </div>
   </div>
   <div
@@ -28,7 +31,7 @@
       'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps" >
+    <div class="form__steps">
       <app-steps
         [steps]="[
           { text: 'Report', step: 'step_1' },
@@ -92,7 +95,8 @@
       </div>
 
       <div class="form_step" [hidden]="step !== 'transactions'">
-        <app-transactions></app-transactions>
+        <!-- <app-transactions></app-transactions> -->
+        <app-transactions (sidebarSwitch)="switchSidebar($event)"> </app-transactions>
       </div>
     </div>
   </div>

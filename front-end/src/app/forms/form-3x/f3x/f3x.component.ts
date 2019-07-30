@@ -46,6 +46,7 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
+  public isShowFilters = false;
 
   private _step: string = '';
   private _formType: string = '';
@@ -213,6 +214,15 @@ export class F3xComponent implements OnInit {
         }
       }
     }
+  }
+
+  /**
+   * Get's message from child components to change the sidebar
+   * in the view.
+   */
+  public switchSidebar(e: boolean): void {
+    this.isShowFilters = e;
+    console.log('showfilters is ' + this.isShowFilters);
   }
 
   /**
