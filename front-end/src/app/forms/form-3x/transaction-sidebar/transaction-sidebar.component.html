@@ -1,35 +1,59 @@
 <div class="form-sidebar">
   <header>
     <h3 class="text-center">Transaction Categories</h3>
-    <hr />
+    <ng-container *ngIf="step === 'step_2' || step === 'step_3'">
+      <hr />
 
-    <div class="search">
-      <span class="fa fa-search"></span>
-      <input type="text" placeholder="Search by Type" />
-    </div>
+      <div class="search">
+        <span class="fa fa-search"></span>
+        <input type="text" placeholder="Search by Type" />
+      </div>
+    </ng-container>
   </header>
   <section>
-    <ul class="form-sidebar__links">
-      <li
-        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
-        *ngFor="let categoryType of transactionCategories"
-      >
-        <div class="float-left">
-          <button type="button" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
-            <i class="plus-icon" aria-hidden="true"></i>
+    <ng-container *ngIf="step === 'step_2' || step === 'step_3'">
+      <ul class="form-sidebar__links">
+        <li
+          [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+          *ngFor="let categoryType of transactionCategories"
+        >
+          <div class="float-left">
+            <button type="button" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
+              <i class="plus-icon" aria-hidden="true"></i>
+              {{ categoryType?.text }}
+            </button>
+          </div>
+          <ng-container *ngIf="categoryType?.value === 'receipts'">
+            <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+          </ng-container>
+          <ng-container *ngIf="categoryType?.value !== 'receipts'">
+            <span class="float-right amount">
+              $0.00
+            </span>
+          </ng-container>
+        </li>
+      </ul>
+    </ng-container>
+    <ng-container *ngIf="step !== 'step_2' && step !== 'step_3'">
+      <ul class="form-sidebar__links">
+        <li
+          [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+          *ngFor="let categoryType of transactionCategories"
+        >
+          <div class="float-left">
             {{ categoryType?.text }}
-          </button>
-        </div>
-        <ng-container *ngIf="categoryType?.value === 'receipts'">
-          <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
-        </ng-container>
-        <ng-container *ngIf="categoryType?.value !== 'receipts'">
-          <span class="float-right amount">
-            $0.00
-          </span>
-        </ng-container>
-      </li>
-    </ul>
+          </div>
+          <ng-container *ngIf="categoryType?.value === 'receipts'">
+            <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
+          </ng-container>
+          <ng-container *ngIf="categoryType?.value !== 'receipts'">
+            <span class="float-right amount">
+              $0.00
+            </span>
+          </ng-container>
+        </li>
+      </ul>
+    </ng-container>
   </section>
   <footer>
     <div class="form-sidebar__item" *ngIf="cashOnHand?.showCashOnHand">

@@ -84,16 +84,16 @@ export class F3xComponent implements OnInit {
     this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
-
-        console.log('this.transactionCategories: ', this.transactionCategories);
       }
     });
 
     this._router.events.subscribe(val => {
       if (val) {
         if (val instanceof NavigationEnd) {
-          if (val.url.indexOf(`/forms/form/${this._formType}`) === -1) {
-            console.log(new Date().toISOString());
+          if (
+            val.url.indexOf(`/forms/form/${this._formType}`) === -1 &&
+            val.url.indexOf(`/forms/transactions/${this._formType}`) === -1
+          ) {
             if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
               localStorage.setItem(
                 `form_${this._formType}_saved_backup`,
@@ -107,14 +107,10 @@ export class F3xComponent implements OnInit {
               // console.log(new Date().toISOString());
             }
 
-            setTimeout(() => {
-              localStorage.removeItem(`form_${this._formType}_report_type`);
-              localStorage.removeItem(`form_${this._formType}_transaction_type`);
-              localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
-              localStorage.removeItem(`form_${this._formType}_saved`);
-              // console.log(`form_${this._formType}_report_type_backup` + 'removed ');
-              // console.log(new Date().toISOString());
-            }, 200);
+            window.localStorage.removeItem(`form_${this._formType}_report_type`);
+            window.localStorage.removeItem(`form_${this._formType}_transaction_type`);
+            window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
+            window.localStorage.removeItem(`form_${this._formType}_saved`);
           }
         } else {
           if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
