@@ -140,8 +140,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
-
-        console.log('this.transactionCategories: ', this.transactionCategories);
       }
     });
 
@@ -168,6 +166,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     if (filters.show === true) {
       this.showFilters();
     }
+  }
+
+  public ngDoCheck(): void {
+    this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
   }
 
   /**

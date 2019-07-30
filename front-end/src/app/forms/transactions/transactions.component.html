@@ -319,14 +319,14 @@
       <app-transactions-table
         *ngIf="isTransactionViewActive()"
         formType="{{ formType }}"
-        reportId="{{ reportId }}"
+        [reportId]="reportId"
         tableType="{{ transactionsView }}"
       >
       </app-transactions-table>
       <app-transactions-table
         *ngIf="isRecycleBinViewActive()"
         formType="{{ formType }}"
-        reportId="{{ reportId }}"
+        [reportId]="reportId"
         tableType="{{ recycleBinView }}"
       >
       </app-transactions-table>
@@ -334,7 +334,7 @@
         *ngIf="isEditViewActive()"
         [transactionToEdit]="transactionToEdit"
         formType="{{ formType }}"
-        reportId="{{ reportId }}"
+        [reportId]="reportId"
       >
       </app-transactions-edit>
     </div>
