@@ -1,7 +1,5 @@
 <div class="transaction-type-container">
-  <form
-    [formGroup]="frmOption"
-  >
+  <form [formGroup]="frmOption">
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -10,23 +8,17 @@
           </ng-container>
         </div>
         <!--<div class="float-right" ngbDropdown>-->
-        <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
-          <button
-            type="button"
-            class="btn btn-link btn-options"
-            id="actionsMenu"
-            ngbDropdownToggle
-          >
+        <div class="float-right" ngbDropdown role="group" aria-label="Action dropdown">
+          <button type="button" class="btn btn-link btn-options" id="actionsMenu" ngbDropdownToggle>
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="actionsMenu">
             <button class="dropdown-item"><i class="view-icon"></i> View</button>
-            <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
-            <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>            
+            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>
           </div>
         </div>
-        
       </div>
       <ng-container *ngIf="transactionCategorySelected">
         <hr />
@@ -51,34 +43,16 @@
           </ng-container>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <ngb-accordion 
-                class="secondary-options"
-                (pannelChange)="beforeChange($event)"
-                >
-                <ngb-panel
-                  class="secondary-options__item"
-                  *ngFor="let option of secondaryOptions; index as i"
-                >
-                  <ng-template
-                    ngbPanelHeader
-                    let-opened="opened"
-                  >
+              <ngb-accordion class="secondary-options" (pannelChange)="beforeChange($event)">
+                <ngb-panel class="secondary-options__item" *ngFor="let option of secondaryOptions; index as i">
+                  <ng-template ngbPanelHeader let-opened="opened">
                     <div class="option-header">
                       <div class="option-header-text">
-                        <button
-                          class="btn btn-link"
-                          (click)="pannelChange(opened)"
-                          ngbPanelToggle
-                        >
-                          {{option?.text}}
+                        <button class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
+                          {{ option?.text }}
                         </button>
                         <ng-container *ngIf="option?.infoIcon">
-                          <button
-                            type="button"
-                            class="btn-info"
-                            ngbTooltip=" {{option?.info}}"
-
-                          >
+                          <button type="button" class="btn-info" ngbTooltip=" {{ option?.info }}">
                             <i class="info-icon" aria-hidden="true"></i>
                             <span class="sr-only">
                               Click for more information
@@ -87,16 +61,8 @@
                         </ng-container>
                       </div>
                       <div class="option-header-icon">
-                        <button
-                          type="button"
-                          class="btn btn-link"
-                          (click)="pannelChange(opened)"
-                          ngbPanelToggle
-                        >
-                          <i
-                            [ngClass]="{'down-arrow-icon': opened,'up-arrow-icon': !opened}"
-                            aria-hidden="true"
-                          >
+                        <button type="button" class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
+                          <i [ngClass]="{ 'down-arrow-icon': opened, 'up-arrow-icon': !opened }" aria-hidden="true">
                           </i>
                         </button>
                       </div>
@@ -104,29 +70,18 @@
                   </ng-template>
                   <ng-template ngbPanelContent>
                     <ul class="child-options">
-                      <li
-                        class="child-options__item"
-                        *ngFor="let childOption of option.options"
-                      >
+                      <li class="child-options__item" *ngFor="let childOption of option.options">
                         <input
                           [type]="childOption.type"
                           [name]="secondaryOption"
                           [value]="childOption.value"
                           (change)="updateTypeSelected($event, childOption)"
                         />
-                        <label
-                          for="{{childOption.name}}"
-                          class="child-options-label"
-                        >
-                          {{childOption.text}}
+                        <label for="{{ childOption.name }}" class="child-options-label">
+                          {{ childOption.text }}
                         </label>
                         <ng-container *ngIf="childOption?.infoIcon">
-                          <button
-                            type="button"
-                            class="btn-info"
-                            ngbTooltip=" {{childOption?.info}}"
-
-                          >
+                          <button type="button" class="btn-info" ngbTooltip=" {{ childOption?.info }}">
                             <i class="info-icon" aria-hidden="true"></i>
                             <span class="sr-only">
                               Click for more information
@@ -141,22 +96,16 @@
             </div>
           </div>
         </ng-container>
-      </div> <!-- ./content -->
+      </div>
+      <!-- ./content -->
     </section>
     <footer>
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--11 forms__btn-container">
-          <button
-            class="btn btn-previous btn-left"
-            type="button"
-            (click)="previousStep()"
-          >
+          <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
             Previous
           </button>
-          <button
-            class="btn btn-primary btn-right"
-            (click)="doValidateOption()"
-          >
+          <button class="btn btn-primary btn-right" (click)="doValidateOption()">
             Next
           </button>
         </div>

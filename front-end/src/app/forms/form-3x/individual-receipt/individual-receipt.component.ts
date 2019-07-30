@@ -60,6 +60,7 @@ export class IndividualReceiptComponent implements OnInit {
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
+  private _transactionTypePrevious: string = null;
   private _formSubmitted: boolean = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAmount = '';
@@ -105,36 +106,7 @@ export class IndividualReceiptComponent implements OnInit {
 
     this.frmIndividualReceipt = this._fb.group({});
 
-    this._receiptService.getDynamicFormFields(this._formType, 'Individual Receipt').subscribe(res => {
-      if (res) {
-        if (res.hasOwnProperty('data')) {
-          if (typeof res.data === 'object') {
-            if (res.data.hasOwnProperty('formFields')) {
-              if (Array.isArray(res.data.formFields)) {
-                this.formFields = res.data.formFields;
-
-                this._setForm(this.formFields);
-              }
-            }
-            if (res.data.hasOwnProperty('hiddenFields')) {
-              if (Array.isArray(res.data.hiddenFields)) {
-                this.hiddenFields = res.data.hiddenFields;
-              }
-            }
-            if (res.data.hasOwnProperty('states')) {
-              if (Array.isArray(res.data.states)) {
-                this.states = res.data.states;
-              }
-            }
-            if (res.data.hasOwnProperty('titles')) {
-              if (Array.isArray(res.data.titles)) {
-                this.titles = res.data.titles;
-              }
-            }
-          } // typeof res.data
-        } // res.hasOwnProperty('data')
-      } // res
-    });
+    // this.getFormFields();
   }
 
   ngDoCheck(): void {
@@ -144,9 +116,9 @@ export class IndividualReceiptComponent implements OnInit {
       }
     }
 
-    this._validateContributionDate();
-
     this._getTransactionType();
+
+    this._validateContributionDate();
 
     if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
@@ -367,6 +339,14 @@ export class IndividualReceiptComponent implements OnInit {
         if (transactionType.hasOwnProperty('mainTransactionTypeValue')) {
           this._transactionType = transactionType.mainTransactionTypeValue;
         }
+      }
+    }
+
+    if (this.transactionType) {
+      if (this.transactionType !== this._transactionTypePrevious) {
+        this._transactionTypePrevious = this.transactionType;
+        // reload dynamic form fields
+        this.getFormFields();
       }
     }
   }
@@ -814,4 +794,38 @@ export class IndividualReceiptComponent implements OnInit {
   //   }
   //   return null;
   // }
+
+  private getFormFields(): void {
+    console.log('get transaction type form fields ' + this.transactionType);
+    this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+      if (res) {
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
+
+                this._setForm(this.formFields);
+              }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
+              }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
+              }
+            }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
+    });
+  }
 }
