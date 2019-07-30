@@ -169,7 +169,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public ngDoCheck(): void {
-    const step = this._activatedRoute.snapshot.queryParams.step;
+    const step: string = this._activatedRoute.snapshot.queryParams.step;
+
     if (this.reportId !== undefined && !this.pageReceived) {
       this.getPage(this.config.currentPage);
 
