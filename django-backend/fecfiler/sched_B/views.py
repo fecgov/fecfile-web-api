@@ -38,6 +38,7 @@ SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINK
 """
 **************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
 """
+
 list_mandatory_fields_schedB = [
     "report_id",
     "expenditure_date",
@@ -48,6 +49,7 @@ list_mandatory_fields_schedB = [
 ]
 # list_mandatory_fields_aggregate = ['transaction_type']
 # list_child_schedA = ['16']
+
 
 
 def get_next_transaction_id(trans_char):
@@ -670,6 +672,7 @@ def schedB_sql_dict(data):
             "employer": data.get("employer"),
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
+
         }
         return datum
     except:

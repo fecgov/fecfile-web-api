@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { TransactionModel } from '../model/transaction.model';
@@ -53,6 +54,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
+  public pageReceived: boolean = false;
 
   // ngx-pagination config
   public maxItemsPerPage = 10;
@@ -114,7 +116,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -163,6 +166,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       }
     }
     this.getPage(this.config.currentPage);
+  }
+
+  public ngDoCheck(): void {
+    const step: string = this._activatedRoute.snapshot.queryParams.step;
+
+    if (this.reportId !== undefined && !this.pageReceived) {
+      this.getPage(this.config.currentPage);
+
+      if (!this.pageReceived) {
+        this.pageReceived = true;
+      }
+    }
+
+    if (step !== 'transactions') {
+      this.pageReceived = false;
+    }
   }
 
   /**

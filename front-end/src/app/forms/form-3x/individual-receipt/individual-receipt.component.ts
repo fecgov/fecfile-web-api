@@ -156,6 +156,34 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
     }
+
+    if (this.frmIndividualReceipt) {
+      if (Array.isArray(this.frmIndividualReceipt.controls)) {
+        if (this.frmIndividualReceipt.controls['contribution_date']) {
+          if (this.cvgStartDate === null && this.cvgEndDate === null && this._reportType === null) {
+            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+              this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+              if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
+                if (
+                  typeof this._reportType.cvgStartDate === 'string' &&
+                  typeof this._reportType.cvgEndDate === 'string'
+                ) {
+                  this.cvgStartDate = this._reportType.cvgStartDate;
+                  this.cvgEndDate = this._reportType.cvgEndDate;
+
+                  this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+                    contributionDate(this.cvgStartDate, this.cvgEndDate),
+                    Validators.required
+                  ]);
+
+                  this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -206,10 +234,19 @@ export class IndividualReceiptComponent implements OnInit {
     const formValidators = [];
 
     /**
-     * Adds alphanumeric validation for the zip code field.
+     * For adding field specific validation that's custom.
+     * This block adds zip code, and contribution date validation.
      */
     if (fieldName === 'zip_code') {
       formValidators.push(alphaNumeric());
+    } else if (fieldName === 'contribution_date') {
+      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+      if (this._reportType !== null) {
+        const cvgStartDate: string = this._reportType.cvgStartDate;
+        const cvgEndDate: string = this._reportType.cvgEndDate;
+
+        formValidators.push(contributionDate(cvgStartDate, cvgEndDate));
+      }
     }
 
     if (validators) {
@@ -378,12 +415,19 @@ export class IndividualReceiptComponent implements OnInit {
     if (checked) {
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-      console.log('memo checked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-      console.log('memo unchecked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     }
   }
 
@@ -527,11 +571,14 @@ export class IndividualReceiptComponent implements OnInit {
       // reportId = '431';
       // reportId = '1206963';
     }
-    console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
     localStorage.setItem(`form_${this._formType}_view_transaction_screen`, 'Yes');
     localStorage.setItem('Transaction_Table_Screen', 'Yes');
 
-    this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
+    // this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
+
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'transactions', reportId: reportId }
+    });
   }
 
   public printPreview(): void {
@@ -540,10 +587,11 @@ export class IndividualReceiptComponent implements OnInit {
       res => {
         if (res) {
           console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
-
-          if (res['results.pdf_url'] !== null) {
-            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-            window.open(res.results.pdf_url, '_blank');
+          if (res.hasOwnProperty('results')) {
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
+            }
           }
         }
       },

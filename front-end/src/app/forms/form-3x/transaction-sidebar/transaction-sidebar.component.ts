@@ -112,9 +112,15 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public viewSummary(): void {
+    console.log(" Form3x viewSummary clicked ...!")    
     localStorage.setItem('Summary_Screen', 'Yes');
     localStorage.setItem(`form_${this._formType}_summary_screen`, 'Yes');
     this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'financial_summary' } });
+  }
+
+  public signandSubmit(): void {
+    console.log(" Form3x signandSubmit clicked ...!")
+    this._router.navigate([`/signandSubmit/${this._formType}`]);
   }
 
   /**
