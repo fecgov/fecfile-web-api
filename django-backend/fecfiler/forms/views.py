@@ -598,12 +598,6 @@ def get_f99_reasons(request):
 def get_committee_details(request):
     try:
         cmte_id = request.user.username
-        # Adding a new parameter for cmte_type_category field
-        if 'cmte_type_category' in request.query_params and request.query_params.get('cmte_type_category'):
-            cmte_type_category = request.query_params.get('cmte_type_category')
-        else:
-            raise Exception("Field 'cmte_type_category' is mandatory")
-
         with connection.cursor() as cursor:
             # GET all rows from committee table
             query_string = """SELECT cmte_id AS "committeeid", cmte_name AS "committeename", street_1 AS "street1", street_2 AS "street2", city, state, zip_code AS "zipcode", 
