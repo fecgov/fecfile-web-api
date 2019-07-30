@@ -25,7 +25,7 @@ SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINK
 """
 **************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
 """
-list_mandatory_fields_schedB = ['report_id', 'expenditure_date', 'expenditure_amount', 'semi_annual_refund_bundled_amount', 'cmte_id', 'line_number', 'transaction_type', ]
+list_mandatory_fields_schedB = ['report_id', 'expenditure_date', 'expenditure_amount', 'cmte_id', 'line_number', 'transaction_type', ]
 #list_mandatory_fields_aggregate = ['transaction_type']
 #list_child_schedA = ['16']
 
@@ -335,7 +335,7 @@ def schedB_sql_dict(data):
             'back_ref_sched_name': data.get('back_ref_sched_name'),
             'expenditure_date': date_format(data.get('expenditure_date')),
             'expenditure_amount': check_decimal(data.get('expenditure_amount')),
-            'semi_annual_refund_bundled_amount': check_decimal(data.get('semi_annual_refund_bundled_amount')),
+            'semi_annual_refund_bundled_amount': check_decimal(data.get('semi_annual_refund_bundled_amount', 0.0)),
             'expenditure_purpose': data.get('expenditure_purpose'),
             'category_code': data.get('category_code'),
             'memo_code': data.get('memo_code'),

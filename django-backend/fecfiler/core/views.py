@@ -90,7 +90,12 @@ def get_transaction_categories(request):
         with connection.cursor() as cursor:
             forms_obj= {}
             form_type = request.query_params.get('form_type')
-            cursor.execute("select transaction_category_json from transaction_category_json_view where form_type = %s", [form_type])
+
+            if 'cmte_type_category' in request.query_params and request.query_params.get('cmte_type_category'):
+                cmte_type_category = request.query_params.get('cmte_type_category')
+            else:
+                cmte_type_category = 'PAC'
+            cursor.execute("select transaction_category_json from transaction_category_json_view where form_type = %s AND cmte_type_category = %s", [form_type, cmte_type_category])
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
