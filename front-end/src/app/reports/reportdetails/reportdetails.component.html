@@ -96,7 +96,7 @@
                         </button>                     
                     </div>
 
-                    <div [@fadeInOut] *ngIf="isReportViewActive()" class="btn-group" 
+                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Saved'" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown"> 
 
                         <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
@@ -104,7 +104,7 @@
                         </button>
 
 
-                        <div id="forms__trx-dropdown-action1" *ngIf="report.form_type !== 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action1"  class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -121,8 +121,15 @@
                                 <i class="fas fa-trash"></i>Trash
                             </button>
                         </div>
+                    </div>
 
-                        <div id="forms__trx-dropdown-action2" *ngIf="report.form_type !== 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
+                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Filed'" class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown"> 
+
+                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action2"  class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -136,8 +143,15 @@
                                 <i class=" fa fa-file-pdf-o"></i>Download PDF
                             </button>
                         </div>
+                    </div>
 
-                        <div id="forms__trx-dropdown-action3" *ngIf="report.form_type === 'F99' && report.status === 'Filed'" class="dropdown-menu" ngbDropdownMenu>
+                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Filed'" class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown"> 
+
+                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action3"  class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -148,8 +162,15 @@
                                 <i class=" fa fa-file-pdf-o"></i>Download PDF
                             </button>
                         </div>
+                    </div>
 
-                        <div id="forms__trx-dropdown-action4" *ngIf="report.form_type === 'F99' && report.status === 'Saved'" class="dropdown-menu" ngbDropdownMenu>
+                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Saved'"  class="btn-group" 
+                            ngbDropdown role="group" aria-label="Action dropdown"> 
+
+                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action4"  class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
