@@ -249,13 +249,13 @@ def date_format(cvg_date):
         raise
 
 def check_null_value(check_value):
-    try:
-        if check_value in ["none", "null", " ", ""]:
-            return None
-        else:
-            return check_value
-    except:
-        raise
+    if check_value in ["none", "null", " ", ""]:
+        #return None
+        return False
+    # else:
+    return True
+
+
 
 def check_email(email):
     try:
@@ -618,18 +618,18 @@ def reports(request):
 
     if request.method == 'POST':
         try:
-            if 'amend_ind' in request.data:
-                amend_ind = check_null_value(request.data.get('amend_ind'))
+            if 'amend_ind' in request.data and check_null_value(request.data.get('amend_ind')):
+                amend_ind = request.data.get('amend_ind')
             else:
                 amend_ind = "N"
 
-            if 'election_code' in request.data:
-                election_code = check_null_value(request.data.get('election_code'))
+            if 'election_code' in request.data and check_null_value(request.data.get('election_code')):
+                election_code = request.data.get('election_code')
             else:
                 election_code = None
 
-            if 'status' in request.data:
-                f_status = check_null_value(request.data.get('status'))
+            if 'status' in request.data and check_null_value(request.data.get('status')):
+                f_status = request.data.get('status')
             else:
                 f_status = "Saved"
 
@@ -655,12 +655,12 @@ def reports(request):
             
             datum = {
                 'cmte_id': request.user.username,
-                'form_type': check_null_value(request.data.get('form_type')),
+                'form_type': request.data.get('form_type', None),
                 'amend_ind': amend_ind,
-                'report_type': check_null_value(request.data.get('report_type')),
+                'report_type': request.data.get('report_type', None),
                 'election_code': election_code,
                 'date_of_election': date_format(request.data.get('date_of_election')),
-                'state_of_election': check_null_value(request.data.get('state_of_election')),
+                'state_of_election': request.data.get('state_of_election', None),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'due_dt': date_format(request.data.get('due_dt')),
@@ -711,17 +711,17 @@ def reports(request):
         # print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
-                amend_ind = check_null_value(request.data.get('amend_ind'))
+                amend_ind = request.data.get('amend_ind')
             else:
                 amend_ind = "N"
 
             if 'election_code' in request.data:
-                election_code = check_null_value(request.data.get('election_code'))
+                election_code = request.data.get('election_code')
             else:
                 election_code = ""
 
             if 'status' in request.data:
-                f_status = check_null_value(request.data.get('status'))
+                f_status = request.data.get('status')
             else:
                 f_status = "Saved"
 
