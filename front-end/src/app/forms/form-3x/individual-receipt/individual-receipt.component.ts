@@ -59,9 +59,11 @@ export class IndividualReceiptComponent implements OnInit {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _formSubmitted: boolean = false;
-  private readonly _contributionAggregateValue: number = 0.0;
+  private _contributionAggregateValue = 0.0;
+  private _contributionAmount = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntityId: number;
+  private _contributionAmountMax: number;
 
   constructor(
     private _http: HttpClient,
@@ -83,6 +85,8 @@ export class IndividualReceiptComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._contributionAggregateValue = 0.0;
+    this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
@@ -152,6 +156,34 @@ export class IndividualReceiptComponent implements OnInit {
         }
       }
     }
+
+    if (this.frmIndividualReceipt) {
+      if (Array.isArray(this.frmIndividualReceipt.controls)) {
+        if (this.frmIndividualReceipt.controls['contribution_date']) {
+          if (this.cvgStartDate === null && this.cvgEndDate === null && this._reportType === null) {
+            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+              this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+              if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
+                if (
+                  typeof this._reportType.cvgStartDate === 'string' &&
+                  typeof this._reportType.cvgEndDate === 'string'
+                ) {
+                  this.cvgStartDate = this._reportType.cvgStartDate;
+                  this.cvgEndDate = this._reportType.cvgEndDate;
+
+                  this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+                    contributionDate(this.cvgStartDate, this.cvgEndDate),
+                    Validators.required
+                  ]);
+
+                  this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -175,6 +207,11 @@ export class IndividualReceiptComponent implements OnInit {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          if (e.name === 'contribution_amount') {
+            if (e.validation) {
+              this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
+            }
+          }
         });
       }
     });
@@ -197,10 +234,19 @@ export class IndividualReceiptComponent implements OnInit {
     const formValidators = [];
 
     /**
-     * Adds alphanumeric validation for the zip code field.
+     * For adding field specific validation that's custom.
+     * This block adds zip code, and contribution date validation.
      */
     if (fieldName === 'zip_code') {
       formValidators.push(alphaNumeric());
+    } else if (fieldName === 'contribution_date') {
+      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+      if (this._reportType !== null) {
+        const cvgStartDate: string = this._reportType.cvgStartDate;
+        const cvgEndDate: string = this._reportType.cvgEndDate;
+
+        formValidators.push(contributionDate(cvgStartDate, cvgEndDate));
+      }
     }
 
     if (validators) {
@@ -274,30 +320,73 @@ export class IndividualReceiptComponent implements OnInit {
    *
    * @param      {Object}  e       The event object.
    */
-  public contributionAmountChange(e): void {
-    const contributionAmount: string = e.target.value;
+  public contributionAmountChange(e: any): void {
+    let contributionAmount: string = e.target.value;
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+    // determine if negative, truncate if > max
+    contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
+
+    this._contributionAmount = contributionAmount;
+
     const contributionAggregate: string = String(this._contributionAggregateValue);
 
-    const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    const value: string = this._decimalPipe.transform(total, '.2-2');
+    const contributionAmountNum = parseFloat(contributionAmount);
+    const aggregateTotal: number = contributionAmountNum + parseFloat(contributionAggregate);
+    const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
 
-    this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(value);
+    this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+  }
 
-    /**
-     * TODO: To be implemented in the future.
-     */
+  /**
+   * Prevent user from keying in more than the max allowed by the API.
+   * HTML max must allow for commas, decimals and negative sign and therefore
+   * this is needed to enforce digit limitation.  This method will remove
+   * non-numerics permitted by the floatingPoint() validator,
+   * commas, decimals and negative sign, before checking the number of digits.
+   *
+   * Note: If this method is not desired, it may be replaced with a validation
+   * on submit.  It is here to catch user error before submitting the form.
+   */
+  public contributionAmountKeyup(e: any) {
+    let val = this._utilService.deepClone(e.target.value);
+    val = val.replace(/,/g, ``);
+    val = val.replace(/\./g, ``);
+    val = val.replace(/-/g, ``);
 
-    // this._receiptService
-    //   .aggregateAmount(
-    //     res.report_id,
-    //     res.transaction_type,
-    //     res.contribution_date,
-    //     res.entity_id,
-    //     res.contribution_amount
-    //   )
-    //   .subscribe(resp => {
-    //     console.log('resp: ', resp);
-    //   });
+    if (val) {
+      if (val.length > this._contributionAmountMax) {
+        e.target.value = e.target.value.substring(0, e.target.value.length - 1);
+      }
+    }
+  }
+
+  /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
+    }
   }
 
   /**
@@ -326,13 +415,47 @@ export class IndividualReceiptComponent implements OnInit {
     if (checked) {
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-      console.log('memo checked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
       this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-      console.log('memo unchecked');
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+
+      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
     }
+  }
+
+  /**
+   * State select options are formatted " AK - Alaska ".  Once selected
+   * the input field should display on the state code and the API must receive
+   * only the state code.  When an optin is selected, the $ngOptionLabel
+   * is received here having the state code - name format.  Parse it
+   * for the state code.  This should be modified if possible.  Look into
+   * options for ng-select and ng-option.
+   *
+   * NOTE: If the format of the option changes in the html template, the parsing
+   * logic will most likely need to change here.
+   *
+   * @param stateOption the state selected in the dropdown.
+   */
+  public handleStateChange(stateOption: any) {
+    let stateCode = null;
+    if (stateOption.$ngOptionLabel) {
+      stateCode = stateOption.$ngOptionLabel;
+      if (stateCode) {
+        stateCode = stateCode.trim();
+        if (stateCode.length > 1) {
+          stateCode = stateCode.substring(0, 2);
+        }
+      }
+    }
+    this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
   }
 
   /**
@@ -345,28 +468,27 @@ export class IndividualReceiptComponent implements OnInit {
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
-        } else {
-          if (field === 'memo_code') {
-            if (this.memoCode) {
-              receiptObj[field] = this.frmIndividualReceipt.get(field).value;
-              console.log('memo code val ' + receiptObj[field]);
-            }
-          }
-          if (field === 'last_name' || field === 'first_name') {
-            // TODO Possible detfect with typeahead setting field as the entity object
-            // rather than the string defined by the inputFormatter();
-            // If an object is received, find the value on the object by fields type
-            // otherwise use the string value.  This is not desired and this patch
-            // should be removed if the issue is resolved.
-            const typeAheadField = this.frmIndividualReceipt.get(field).value;
-            if (typeof typeAheadField !== 'string') {
-              receiptObj[field] = typeAheadField[field];
-            } else {
-              receiptObj[field] = typeAheadField;
-            }
-          } else {
+        } else if (field === 'memo_code') {
+          if (this.memoCode) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+            console.log('memo code val ' + receiptObj[field]);
           }
+        } else if (field === 'last_name' || field === 'first_name') {
+          // TODO Possible detfect with typeahead setting field as the entity object
+          // rather than the string defined by the inputFormatter();
+          // If an object is received, find the value on the object by fields type
+          // otherwise use the string value.  This is not desired and this patch
+          // should be removed if the issue is resolved.
+          const typeAheadField = this.frmIndividualReceipt.get(field).value;
+          if (typeof typeAheadField !== 'string') {
+            receiptObj[field] = typeAheadField[field];
+          } else {
+            receiptObj[field] = typeAheadField;
+          }
+        } else if (field === 'contribution_amount') {
+          receiptObj[field] = this._contributionAmount;
+        } else {
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
       }
 
@@ -399,15 +521,17 @@ export class IndividualReceiptComponent implements OnInit {
             }
           }
 
+          this._contributionAmount = '';
+          this._contributionAggregateValue = 0.0;
           const contributionAggregateValue: string = this._decimalPipe.transform(
             this._contributionAggregateValue,
             '.2-2'
           );
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
 
           this._formSubmitted = true;
           this.memoCode = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntityId = null;
 
@@ -447,11 +571,14 @@ export class IndividualReceiptComponent implements OnInit {
       // reportId = '431';
       // reportId = '1206963';
     }
-    console.log(`View Transactions for form ${this._formType} where reportId = ${reportId}`);
     localStorage.setItem(`form_${this._formType}_view_transaction_screen`, 'Yes');
     localStorage.setItem('Transaction_Table_Screen', 'Yes');
 
-    this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
+    // this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
+
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'transactions', reportId: reportId }
+    });
   }
 
   public printPreview(): void {
@@ -460,10 +587,11 @@ export class IndividualReceiptComponent implements OnInit {
       res => {
         if (res) {
           console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
-
-          if (res['results.pdf_url'] !== null) {
-            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-            window.open(res.results.pdf_url, '_blank');
+          if (res.hasOwnProperty('results')) {
+            if (res['results.pdf_url'] !== null) {
+              console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
+              window.open(res.results.pdf_url, '_blank');
+            }
           }
         }
       },
@@ -549,21 +677,28 @@ export class IndividualReceiptComponent implements OnInit {
     this._receiptService
       .getContributionAggregate(reportId, contact.entity_id, transactionTypeIdentifier)
       .subscribe(res => {
-        // Add the UI val and the server val.
-        // TODO uncomment when revisit.  Need to do the same when UI value changes.  See contributionAmountChange()
-        // const uiContribAggregateVal = this.frmIndividualReceipt.get('contribution_aggregate').value;
-        // let contributionAggregate = 0;
-        // if (this._utilService.isNumber(uiContribAggregateVal)) {
-        //   contributionAggregate = uiContribAggregateVal + res.contribution_aggregate;
-        // } else {
-        //   contributionAggregate = res.contribution_aggregate;
-        // }
-        // FNE-1217 Add this to UI field Sprint 18.
-        // this.frmIndividualReceipt.patchValue(
-        //   { contribution_aggregate: res.contribution_aggregate },
-        //   // { contribution_aggregate: contributionAggregate },
-        //   { onlySelf: true }
-        // );
+        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+        // Entity selected from the typeahead list.
+
+        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
+
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
+
+        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+          ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
+
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValue = parseFloat(contributionAggregate);
       });
   }
 
