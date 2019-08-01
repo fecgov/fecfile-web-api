@@ -2929,25 +2929,25 @@ def get_loan_debt_summary(request):
         SELECT Sum(t._sum) 
         FROM  ( 
             ( 
-                    SELECT Sum(loan_payment_to_date) AS _sum 
+                    SELECT SUM(loan_balance) AS _sum 
                     FROM   public.sched_c 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(loan_amount) AS _sum 
+                    SELECT SUM(loan_amount) AS _sum 
                     FROM   public.sched_c1 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(payment_amount) AS _sum 
+                    SELECT SUM(payment_amount) AS _sum 
                     FROM   public.sched_d 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s
-                    AND    line_number= %(line_num)s)) t;
+                    AND    line_num= %(line_num)s)) t;
         """
         with connection.cursor() as cursor:
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '9'})
