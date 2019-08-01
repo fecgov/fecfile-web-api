@@ -6,7 +6,8 @@ import {
   OnInit,
   Output,
   ViewEncapsulation,
-  ViewChild
+  ViewChild,
+  OnDestroy
 } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -23,11 +24,13 @@ import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numer
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { TransactionModel } from '../../transactions/model/transaction.model';
+import { F3xMessageService } from '../service/f3x-message.service';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -36,12 +39,18 @@ import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/con
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None
 })
-export class IndividualReceiptComponent implements OnInit {
+export class IndividualReceiptComponent implements OnInit, OnDestroy {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
+  // @Input() editOrView: any = null;
+
+  /**
+   * Subscription for pre-populating the form for view or edit.
+   */
+  private _populateFormSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
   public cvgStartDate: string = null;
@@ -67,6 +76,7 @@ export class IndividualReceiptComponent implements OnInit {
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
   private _contributionAmountMax: number;
+  private _editOrViewLoaded: boolean;
 
   constructor(
     private _http: HttpClient,
@@ -82,14 +92,20 @@ export class IndividualReceiptComponent implements OnInit {
     private _decimalPipe: DecimalPipe,
     private _reportTypeService: ReportTypeService,
     private _typeaheadService: TypeaheadService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _f3xMessageService: F3xMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+
+    this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
+      this.populateFormForEditOrView(message);
+    });
   }
 
   ngOnInit(): void {
     this._selectedEntity = null;
+    this._editOrViewLoaded = false;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -164,6 +180,7 @@ export class IndividualReceiptComponent implements OnInit {
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
+    this._populateFormSubscription.unsubscribe();
     localStorage.removeItem('form_3X_saved');
   }
 
@@ -875,5 +892,55 @@ export class IndividualReceiptComponent implements OnInit {
         } // res.hasOwnProperty('data')
       } // res
     });
+  }
+
+  private populateFormForEditOrView(editOrView: any) {
+    // If the parent passed a transaction for edit or view
+    // make sure it hasn't already been loaded.
+    // if (this.editOrView !== null && !this._editOrViewLoaded) {
+    //   if (this.editOrView.transactionModel) {
+    //     const formData: TransactionModel = this.editOrView.transactionModel;
+
+    if (editOrView !== null) {
+      if (editOrView.transactionModel) {
+        const formData: TransactionModel = editOrView.transactionModel;
+
+        this.frmIndividualReceipt.addControl('transaction_id', new FormControl('', Validators.required));
+        this.frmIndividualReceipt.patchValue({ transaction_id: formData.transactionId }, { onlySelf: true });
+
+        const nameArray = formData.name.split(',');
+        const firstName = nameArray[1] ? nameArray[1] : null;
+        const lastName = nameArray[0] ? nameArray[0] : null;
+        const middleName = nameArray[2] ? nameArray[2] : null;
+        const prefix = nameArray[3] ? nameArray[3] : null;
+        const suffix = nameArray[4] ? nameArray[4] : null;
+
+        this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
+
+        this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ city: formData.city }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ state: formData.state }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ zip_code: formData.zip }, { onlySelf: true });
+
+        this.frmIndividualReceipt.patchValue({ employer: formData.contributorEmployer }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
+
+        this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
+
+        if (formData.memoCode) {
+          this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
+        }
+
+        this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
+      }
+    }
   }
 }

@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { TransactionModel } from './model/transaction.model';
 import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { FormBuilder } from '@angular/forms';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -43,6 +44,7 @@ export enum FilterTypes {
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
   @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
+  @Output() showTransaction: EventEmitter<any> = new EventEmitter<any>();
 
   public formType = '';
   public reportId = '0';
@@ -104,7 +106,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private _transactionsMessageService: TransactionsMessageService,
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
-    private _router: Router
+    private _router: Router,
+    private _fb: FormBuilder
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
@@ -185,6 +188,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
+    this.showTransactionsSubscription.unsubscribe();
   }
 
   public goToPreviousStep(): void {
@@ -623,7 +627,25 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show edit for a single transaction.
    */
   public showEdit() {
-    this.view = ActiveView.edit;
+    // this.view = ActiveView.edit;
+    // this.showTransaction.emit({
+    //   showTransactionType: 'edit',
+    //   direction: 'next',
+    //   step: 'transactions',
+    // });
+
+    const emptyValidForm = this._fb.group({});
+
+    this.showTransaction.emit({
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      editOrView: {action: 'edit', transactionModel: this.transactionToEdit}
+
+      // transactionTypeText: this.transactionToEdit.type,
+      // transactionType: this.transactionToEdit.type
+    });
   }
 
   /**
