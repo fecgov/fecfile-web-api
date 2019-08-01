@@ -581,7 +581,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   private getStates() {
     // TODO using this service to get states until available in another API.
-    this._transactionsService.getStates(this.formType, 'Individual Receipt').subscribe(res => {
+    // Passing INDV_REC as type but any should do as states are not specific to
+    // transaction type.
+    this._transactionsService.getStates(this.formType, 'INDV_REC').subscribe(res => {
       let statesExist = false;
       if (res.data) {
         if (res.data.states) {
