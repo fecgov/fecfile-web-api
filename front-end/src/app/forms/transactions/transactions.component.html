@@ -8,29 +8,54 @@
   <div class="transactions__container">
     <header>
       <div class="header-content">
-        <div class="float-left">
-          <h1 *ngIf="!isEditViewActive(); else editHeading">
-            Transactions / Form {{ formType }}
-            <span [@fadeInOut] *ngIf="isRecycleBinViewActive()">
-              / Recycling Bin
-              <span class="trash-icon"></span>
-            </span>
-          </h1>
-          <ng-template #editHeading>
-            <h1 [@fadeInOut] *ngIf="isEditViewActive()">Form {{ formType }} / {{ transactionToEdit.type }} / Edit</h1>
-          </ng-template>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="float-left">
+              <h1 *ngIf="!isEditViewActive(); else editHeading">
+                Transactions / Form {{ formType }}
+                <span [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                  / Recycling Bin
+                  <span class="trash-icon"></span>
+                </span>
+              </h1>
+              <ng-template #editHeading>
+                <h1 [@fadeInOut] *ngIf="isEditViewActive()">Form {{ formType }} / {{ transactionToEdit.type }} / Edit</h1>
+              </ng-template>
+            </div>
+            <div class="float-right">
+              <button
+                [@fadeInOut]
+                *ngIf="isShowFilters"
+                class="btn btn-primary btn-right"
+                type="submit"
+                (click)="showCategories()"
+              >
+                Return to Transaction Categories
+              </button>
+            </div>
+         </div>
+       </div>
+        <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+          <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
+            <button
+              type="button"
+              class="btn btn-link btn-options"
+              id="actionsMenu"
+              ngbDropdownToggle
+            >
+              <span class="ellipsis-icon" aria-hidden="true"></span>
+              <span class="sr-only">Click for more options</span>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="actionsMenu">
+              <button class="dropdown-item"><i class="view-icon"></i> View</button>
+              <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
+              <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>            
+            </div>
+            </div>
+          </div>
         </div>
-        <div class="float-right">
-          <button
-            [@fadeInOut]
-            *ngIf="isShowFilters"
-            class="btn btn-primary btn-right"
-            type="submit"
-            (click)="showCategories()"
-          >
-            Return to Transaction Categories
-          </button>
-        </div>
+      
       </div>
       <hr />
     </header>
@@ -58,16 +83,6 @@
               >
                 <i class="trash-icon"></i>
                 Recycle Bin
-              </button>
-              <button
-                [@fadeInOut]
-                *ngIf="isTransactionViewActive()"
-                class="btn btn-primary btn-left transactions__trx-btn"
-                type="button"
-                (click)="doImport()"
-              >
-                <i class="file-import-icon"></i>
-                Import
               </button>
               <button
                 [@fadeInOut]

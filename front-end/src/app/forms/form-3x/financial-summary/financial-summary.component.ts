@@ -77,25 +77,12 @@ export class FinancialSummaryComponent implements OnInit {
   }
   
   public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-            if (res.hasOwnProperty('results')) {
-              if (res['results.pdf_url'] !== null) {
-                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-                window.open(res.results.pdf_url, '_blank');
-              }
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
+    
+    console.log("FinancialSummaryComponent printPreview this._formType = ", this._formType);
+    this._reportTypeService.printPreview(this._formType);
 
   }
+
 
   public viewTransactions(): void {
     this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
