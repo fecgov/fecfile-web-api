@@ -49,7 +49,7 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public isShowFilters = false;
   public formType: string = '';
-  public editOrView: any = null;
+  public scheduleAction: string;
 
   private _step: string = '';
 
@@ -259,15 +259,15 @@ export class F3xComponent implements OnInit {
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
             if (this.previousStep === 'transactions') {
-              // this.editOrView = e.editOrView;
               // message the child component rather than sending data as input because
               // ngOnChanges fires when the form fields are changed, thereby reseting the
               // fields to the previous value.  Result is fields can't be changed.
               this._f3xMessageService.sendPopulateFormMessage(e.editOrView);
+              this.scheduleAction = e.editOrView.action;
+            } else {
+              this.scheduleAction = 'add';
             }
           }
-
-
           this.canContinue();
         } else if (typeof e.form === 'string') {
           if (e.form === this.formType) {

@@ -45,7 +45,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
-  // @Input() editOrView: any = null;
+  @Input() scheduleAction: string = null;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -76,7 +76,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
   private _contributionAmountMax: number;
-  private _editOrViewLoaded: boolean;
 
   constructor(
     private _http: HttpClient,
@@ -105,7 +104,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._selectedEntity = null;
-    this._editOrViewLoaded = false;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -121,8 +119,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
 
     this.frmIndividualReceipt = this._fb.group({});
-
-    // this.getFormFields();
   }
 
   ngDoCheck(): void {
@@ -323,6 +319,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
 
     this._contributionAmount = contributionAmount;
+    // this._contributionAmount = this.formatAmountForAPI(e.target.value)
 
     const contributionAggregate: string = String(this._contributionAggregateValue);
 
@@ -356,6 +353,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         e.target.value = e.target.value.substring(0, e.target.value.length - 1);
       }
     }
+  }
+
+  private formatAmountForAPI(contributionAmount): string {
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+    // determine if negative, truncate if > max
+    contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
+    return contributionAmount;
   }
 
   /**
@@ -895,12 +902,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   private populateFormForEditOrView(editOrView: any) {
-    // If the parent passed a transaction for edit or view
-    // make sure it hasn't already been loaded.
-    // if (this.editOrView !== null && !this._editOrViewLoaded) {
-    //   if (this.editOrView.transactionModel) {
-    //     const formData: TransactionModel = this.editOrView.transactionModel;
-
+    // The action here is the same as the this.scheduleAction
+    // using the field from the message in case there is a race condition with Input().
     if (editOrView !== null) {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
@@ -914,6 +917,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         const middleName = nameArray[2] ? nameArray[2] : null;
         const prefix = nameArray[3] ? nameArray[3] : null;
         const suffix = nameArray[4] ? nameArray[4] : null;
+
+        // The amount needs to be formatted for API.  If user changes amount value,
+        // it will be formatted in contributionAmountChange().  If user does not change,
+        // it must be formatted so it is done here.
+        // this._contributionAmount = this.formatAmountForAPI(formData.amount);
+        const amountString = formData.amount ? formData.amount.toString() : '';
+        this._contributionAmount = amountString;
 
         this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
         this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
@@ -931,8 +941,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
 
         this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
-        // this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
-        // this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
 
         if (formData.memoCode) {
           this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
