@@ -20,11 +20,7 @@
         [hidden]="isShowFilters"
       >
       </transaction-sidebar>
-      <app-transactions-filter 
-        [hidden]="!isShowFilters" 
-        title="Filters" 
-        [formType]="formType"
-      >
+      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
       </app-transactions-filter>
     </div>
   </div>
@@ -84,7 +80,6 @@
           [scheduleAction]="scheduleAction"
           (status)="onNotify($event)"
         >
-        <!-- [editOrView]="editOrView" -->
         </f3x-individual-receipt>
       </div>
 
@@ -101,10 +96,7 @@
       </div>
 
       <div class="form_step" [hidden]="step !== 'transactions'">
-        <app-transactions 
-          (sidebarSwitch)="switchSidebar($event)"
-          (showTransaction)="onNotify($event)" 
-        >
+        <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
       </div>
     </div>
