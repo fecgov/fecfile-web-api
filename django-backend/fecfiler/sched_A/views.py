@@ -290,61 +290,63 @@ def get_list_all_schedA(report_id, cmte_id):
     """
     load sched_a items from DB
     """
+    return get_list_schedA(report_id, cmte_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET all rows from schedA table
+    #         query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+    #                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
-    try:
-        with connection.cursor() as cursor:
-            # GET all rows from schedA table
-            query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+    #         cursor.execute("""SELECT json_agg(t) FROM (""" +
+    #                        query_string + """) t""", [report_id, cmte_id])
+    #         # charlieSun: josn_agg function is returning one record with a list of row_dics
+    #         # something like ([{c1:v1},{c1:v2},{c1:v3}])
+    #         schedA_list = cursor.fetchone()[0]
+    #         # for row in cursor.fetchall():
+    #         # forms_obj.append(data_row)
+    #         # data_row = list(row)
+    #         # schedA_list = data_row[0]
 
-            cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [report_id, cmte_id])
-            # charlieSun: josn_agg function is returning one record with a list of row_dics
-            # something like ([{c1:v1},{c1:v2},{c1:v3}])
-            schedA_list = cursor.fetchone()[0]
-            # for row in cursor.fetchall():
-            # forms_obj.append(data_row)
-            # data_row = list(row)
-            # schedA_list = data_row[0]
+    #         if schedA_list is None:
+    #             raise NoOPError(
+    #                 'The Report id:{} does not have any schedA transactions'.format(report_id))
+    #         merged_list = []
+    #         for dictA in schedA_list:
+    #             entity_id = dictA.get('entity_id')
+    #             data = {
+    #                 'entity_id': entity_id,
+    #                 'cmte_id': cmte_id
+    #             }
+    #             entity_list = get_entities(data)
+    #             dictEntity = entity_list[0]
+    #             merged_dict = {**dictA, **dictEntity}
+    #             merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
-            if schedA_list is None:
-                raise NoOPError(
-                    'The Report id:{} does not have any schedA transactions'.format(report_id))
-            merged_list = []
-            for dictA in schedA_list:
-                entity_id = dictA.get('entity_id')
-                data = {
-                    'entity_id': entity_id,
-                    'cmte_id': cmte_id
-                }
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                merged_dict = {**dictA, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
-
-
-# TODO: get_list_schedA and get_list_all_schedA can be unified
-def get_list_schedA(report_id, cmte_id, transaction_id):
+def get_list_schedA(report_id, cmte_id, transaction_id = None):
 
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+            if transaction_id:
+                query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                           """) t""", [report_id, cmte_id, transaction_id])
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                            """) t""", [report_id, cmte_id, transaction_id])
+            else:
+                query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
-            for row in cursor.fetchall():
-                # forms_obj.append(data_row)
-                data_row = list(row)
-                schedA_list = data_row[0]
-            if schedA_list is None:
+                cursor.execute("""SELECT json_agg(t) FROM (""" +
+                           query_string + """) t""", [report_id, cmte_id])           
+ 
+            schedA_list = cursor.fetchone()[0]
+            if not schedA_list:
                 raise NoOPError(
-                    'The transaction id: {} does not exist or is deleted'.format(transaction_id))
+                    'No transaction found for cmte_id {} and report_id {}'.format(cmte_id, report_id))
             merged_list = []
             for dictA in schedA_list:
                 entity_id = dictA.get('entity_id')
