@@ -1,4 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  ElementRef,
+  ViewChildren,
+  QueryList,
+  OnDestroy
+} from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { TransactionsMessageService } from '../service/transactions-message.service';
@@ -10,7 +21,7 @@ import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
 import { FilterTypes, ActiveView } from '../transactions.component';
-
+import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 
 /**
  * A component for filtering transactions located in the sidebar.
@@ -22,57 +33,66 @@ import { FilterTypes, ActiveView } from '../transactions.component';
   providers: [NgbTooltipConfig, OrderByPipe],
   animations: [
     trigger('openClose', [
-      state('open', style({
-        'max-height': '500px', // Set high to handle multiple scenarios.
-        backgroundColor: 'white',
-      })),
-      state('closed', style({
-        'max-height': '0',
-        overflow: 'hidden',
-        display: 'none',
-        backgroundColor: '#AEB0B5'
-      })),
-      transition('open => closed', [
-        animate('.25s ease')
-      ]),
-      transition('closed => open', [
-        animate('.5s ease')
-      ]),
+      state(
+        'open',
+        style({
+          'max-height': '500px', // Set high to handle multiple scenarios.
+          backgroundColor: 'white'
+        })
+      ),
+      state(
+        'closed',
+        style({
+          'max-height': '0',
+          overflow: 'hidden',
+          display: 'none',
+          backgroundColor: '#AEB0B5'
+        })
+      ),
+      transition('open => closed', [animate('.25s ease')]),
+      transition('closed => open', [animate('.5s ease')])
     ]),
     trigger('openCloseScroll', [
-      state('open', style({
-        'max-height': '500px', // Set high to handle multiple scenarios.
-        backgroundColor: 'white',
-        'overflow-y': 'scroll'
-      })),
-      state('closed', style({
-        'max-height': '0',
-        overflow: 'hidden',
-        display: 'none',
-        backgroundColor: '#AEB0B5'
-      })),
-      state('openNoAnimate', style({
-        'max-height': '500px',
-        backgroundColor: 'white',
-        'overflow-y': 'scroll'
-      })),
-      state('closedNoAnimate', style({
-        'max-height': '0',
-        overflow: 'hidden',
-        display: 'none',
-        backgroundColor: '#AEB0B5'
-      })),
-      transition('open => closed', [
-        animate('.25s ease')
-      ]),
-      transition('closed => open', [
-        animate('.5s ease')
-      ]),
-    ]),
+      state(
+        'open',
+        style({
+          'max-height': '500px', // Set high to handle multiple scenarios.
+          backgroundColor: 'white',
+          'overflow-y': 'scroll'
+        })
+      ),
+      state(
+        'closed',
+        style({
+          'max-height': '0',
+          overflow: 'hidden',
+          display: 'none',
+          backgroundColor: '#AEB0B5'
+        })
+      ),
+      state(
+        'openNoAnimate',
+        style({
+          'max-height': '500px',
+          backgroundColor: 'white',
+          'overflow-y': 'scroll'
+        })
+      ),
+      state(
+        'closedNoAnimate',
+        style({
+          'max-height': '0',
+          overflow: 'hidden',
+          display: 'none',
+          backgroundColor: '#AEB0B5'
+        })
+      ),
+      transition('open => closed', [animate('.25s ease')]),
+      transition('closed => open', [animate('.5s ease')])
+    ])
   ]
 })
 export class TransactionsFilterComponent implements OnInit, OnDestroy {
-
   @Input()
   public formType: string;
 
@@ -126,45 +146,42 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
   constructor(
     private _transactionsService: TransactionsService,
-    private _transactionsMessageService: TransactionsMessageService
+    private _transactionsMessageService: TransactionsMessageService,
+    private _transactionTypeService: TransactionTypeService
   ) {
-    this.removeFilterSubscription = this._transactionsMessageService.getRemoveFilterMessage()
-      .subscribe(
-        (message: any) => {
-          if (message) {
-            if (message.removeAll) {
-              this.clearFilters();
-            } else {
-              this.removeFilter(message);
-            }
+    this.removeFilterSubscription = this._transactionsMessageService
+      .getRemoveFilterMessage()
+      .subscribe((message: any) => {
+        if (message) {
+          if (message.removeAll) {
+            this.clearFilters();
+          } else {
+            this.removeFilter(message);
           }
         }
-      );
+      });
 
-      this.switchFilterViewSubscription = this._transactionsMessageService.getSwitchFilterViewMessage()
-      .subscribe(
-        (message: ActiveView) => {
-          switch (message) {
-            case ActiveView.transactions:
-              this.view = message;
-              break;
-            case ActiveView.recycleBin:
-              this.view = message;
-              break;
-            default:
-              this.view = ActiveView.transactions;
-              console.log('unexpected ActiveView received: ' + message);
-          }
+    this.switchFilterViewSubscription = this._transactionsMessageService
+      .getSwitchFilterViewMessage()
+      .subscribe((message: ActiveView) => {
+        switch (message) {
+          case ActiveView.transactions:
+            this.view = message;
+            break;
+          case ActiveView.recycleBin:
+            this.view = message;
+            break;
+          default:
+            this.view = ActiveView.transactions;
+            console.log('unexpected ActiveView received: ' + message);
         }
-      );
+      });
   }
-
 
   /**
    * Initialize the component.
    */
   public ngOnInit(): void {
-
     this.msEdge = this.isEdge();
 
     this.filterDateFrom = null;
@@ -195,7 +212,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * A method to run when component is destroyed.
    */
@@ -204,7 +220,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.switchFilterViewSubscription.unsubscribe();
   }
 
-
   /**
    * Toggle visibility of the Type filter
    */
@@ -212,14 +227,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideTypeFilter = !this.isHideTypeFilter;
   }
 
-
   /**
    * Toggle visibility of the Date filter
    */
   public toggleDateFilterItem() {
     this.isHideDateFilter = !this.isHideDateFilter;
   }
-
 
   /**
    * Toggle visibility of the Deleted Date filter
@@ -235,14 +248,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideAmountFilter = !this.isHideAmountFilter;
   }
 
-
   /**
    * Toggle visibility of the Aggregate Amount filter
    */
   public toggleAggregateAmountFilterItem() {
     this.isHideAggregateAmountFilter = !this.isHideAggregateAmountFilter;
   }
-
 
   /**
    * Toggle visibility of the State filter
@@ -251,14 +262,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideStateFilter = !this.isHideStateFilter;
   }
 
-
   /**
    * Toggle visibility of the Memo filter
    */
   public toggleMemoFilterItem() {
     this.isHideMemoFilter = !this.isHideMemoFilter;
   }
-
 
   /**
    * Toggle the direction of the filter collapsed or expanded
@@ -273,7 +282,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public toggleItemizationFilterItem() {
     this.isHideItemizationFilter = !this.isHideItemizationFilter;
   }
-
 
   /**
    * Determine the state for scrolling.  The category tye wasn't displaying
@@ -300,29 +308,29 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * value from the category search input.
    */
   public scrollToType(): void {
-
     this.clearHighlightedTypes();
 
-    if (this.filterCategoriesText === undefined ||
+    if (
+      this.filterCategoriesText === undefined ||
       this.filterCategoriesText === null ||
-      this.filterCategoriesText === '') {
-        return;
+      this.filterCategoriesText === ''
+    ) {
+      return;
     }
 
-    const typeMatches: Array<TransactionsFilterTypeComponent> =
-      this.categoryElements.filter(el => {
-        return el.categoryType.text.toString().toLowerCase()
-          .includes(this.filterCategoriesText.toLowerCase());
-      });
+    const typeMatches: Array<TransactionsFilterTypeComponent> = this.categoryElements.filter(el => {
+      return el.categoryType.text
+        .toString()
+        .toLowerCase()
+        .includes(this.filterCategoriesText.toLowerCase());
+    });
 
     if (typeMatches.length > 0) {
       const scrollEl = typeMatches[0];
       if (this.msEdge) {
         scrollEl.elRef.nativeElement.scrollIntoView();
       } else {
-        scrollEl.elRef.nativeElement.scrollIntoView(
-          { behavior: 'smooth', block: 'center', inline: 'start' }
-        );
+        scrollEl.elRef.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
       }
     }
 
@@ -331,7 +339,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       type.categoryType.highlight = 'selected_row';
     }
   }
-
 
   /**
    * Determine if the browser is MS Edge.
@@ -349,13 +356,11 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     return false;
   }
 
-
   /**
    * Send filter values to the table transactions component.
    * Set the filters.show to true indicating the filters have been altered.
    */
   public applyFilters(isClearKeyword: boolean) {
-
     if (!this.validateFilters()) {
       return;
     }
@@ -433,35 +438,32 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
     }
-    console.log('itemizations = ', this.itemizations)
+    console.log('itemizations = ', this.itemizations);
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
         console.log('I.itemized', I.itemized);
         filterItemizations.push(I.itemized);
-        console.log ('itemization tag found...');
+        console.log('itemization tag found...');
         modified = true;
       }
     }
     filters.filterItemizations = filterItemizations;
     console.log('filters.filterItemizations =', filters.filterItemizations);
-    
-    filters.show = modified;
-    this._transactionsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
-  }
 
+    filters.show = modified;
+    this._transactionsMessageService.sendApplyFiltersMessage({ filters: filters, isClearKeyword: isClearKeyword });
+  }
 
   /**
    * Clear all filter values.
    */
   private clearFilters() {
-
     this.initValidationErrors();
 
     // clear the scroll to input
     this.filterCategoriesText = '';
     this.clearHighlightedTypes();
-
 
     for (const s of this.states) {
       s.selected = false;
@@ -490,15 +492,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterMemoCode = false;
   }
 
-
   /**
    * Clear all filter values and apply them by running the search.
    */
   public clearAndApplyFilters() {
-        this.clearFilters();
-        this.applyFilters(true);
+    this.clearFilters();
+    this.applyFilters(true);
   }
-
 
   /**
    * Check if the view to show is Transactions.
@@ -507,14 +507,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     return this.view === ActiveView.transactions ? true : false;
   }
 
-
   /**
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
     return this.view === ActiveView.recycleBin ? true : false;
   }
-
 
   /**
    * Clear any hightlighted types as result of the scroll to input.
@@ -525,134 +523,124 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Get the Category Types from the server for populating
    * filter options on Type.
    */
   private getCategoryTypes() {
-    this._transactionsService
-    .getTransactionCategories(this.formType)
-      .subscribe(res => {
+    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+      let categoriesExist = false;
+      const categoriesGroupArray = [];
+      if (res.data) {
+        if (res.data.transactionCategories) {
+          categoriesExist = true;
 
-        let categoriesExist = false;
-        const categoriesGroupArray = [];
-        if (res.data) {
-          if (res.data.transactionCategories) {
-            categoriesExist = true;
+          // 1st node is the group of types (not checkable).
+          // 2nd node is ignored.
+          // 3rd node is the type checkable.
+          for (const node1 of res.data.transactionCategories) {
+            const categoryGroup: any = {};
+            categoryGroup.text = node1.text;
+            categoryGroup.options = [];
 
-            // 1st node is the group of types (not checkable).
-            // 2nd node is ignored.
-            // 3rd node is the type checkable.
-            for (const node1 of res.data.transactionCategories) {
-              const categoryGroup: any = {};
-              categoryGroup.text = node1.text;
-              categoryGroup.options = [];
-
-              for (const node2 of node1.options) {
-                for (const option of node2.options) {
-                  if (this.cachedFilters) {
-                    if (this.cachedFilters.filterCategories) {
-                      // check for categories selected in the filter cache
-                      // TODO scroll to first check item
-                      if (this.cachedFilters.filterCategories.includes(option.text)) {
-                        option.selected = true;
-                        this.isHideTypeFilter = false;
-                      } else {
-                        option.selected = false;
-                      }
+            for (const node2 of node1.options) {
+              for (const option of node2.options) {
+                if (this.cachedFilters) {
+                  if (this.cachedFilters.filterCategories) {
+                    // check for categories selected in the filter cache
+                    // TODO scroll to first check item
+                    if (this.cachedFilters.filterCategories.includes(option.text)) {
+                      option.selected = true;
+                      this.isHideTypeFilter = false;
+                    } else {
+                      option.selected = false;
                     }
                   }
-                  categoryGroup.options.push(option);
                 }
+                categoryGroup.options.push(option);
               }
-              if (categoryGroup.options.length > 0) {
-                categoriesGroupArray.push(categoryGroup);
-              }
+            }
+            if (categoryGroup.options.length > 0) {
+              categoriesGroupArray.push(categoryGroup);
             }
           }
         }
-        if (categoriesExist) {
-          this.transactionCategories = categoriesGroupArray;
-          // this.transactionCategories = this._orderByPipe.transform(
-          //   res.data.transactionCategories, {property: 'text', direction: 1});
-        } else {
-          this.transactionCategories = [];
-        }
+      }
+      if (categoriesExist) {
+        this.transactionCategories = categoriesGroupArray;
+        // this.transactionCategories = this._orderByPipe.transform(
+        //   res.data.transactionCategories, {property: 'text', direction: 1});
+      } else {
+        this.transactionCategories = [];
+      }
     });
   }
-
 
   /**
    * Get US State Codes and Values.
    */
   private getStates() {
     // TODO using this service to get states until available in another API.
-    this._transactionsService
-      .getStates(this.formType, 'Individual Receipt')
-        .subscribe(res => {
-
-          let statesExist = false;
-          if (res.data) {
-            if (res.data.states) {
-              statesExist = true;
-              for (const s of res.data.states) {
-                // check for states selected in the filter cache
-                // TODO scroll to first check item
-                if (this.cachedFilters) {
-                  if (this.cachedFilters.filterStates) {
-                    if (this.cachedFilters.filterStates.includes(s.code)) {
-                      s.selected = true;
-                      this.isHideStateFilter = false;
-                    } else {
-                      s.selected = false;
-                    }
-                  }
+    // Passing INDV_REC as type but any should do as states are not specific to
+    // transaction type.
+    this._transactionsService.getStates(this.formType, 'INDV_REC').subscribe(res => {
+      let statesExist = false;
+      if (res.data) {
+        if (res.data.states) {
+          statesExist = true;
+          for (const s of res.data.states) {
+            // check for states selected in the filter cache
+            // TODO scroll to first check item
+            if (this.cachedFilters) {
+              if (this.cachedFilters.filterStates) {
+                if (this.cachedFilters.filterStates.includes(s.code)) {
+                  s.selected = true;
+                  this.isHideStateFilter = false;
+                } else {
+                  s.selected = false;
                 }
               }
             }
           }
-          if (statesExist) {
-            this.states = res.data.states;
-          } else {
-            this.states = [];
-          }
-        });
+        }
+      }
+      if (statesExist) {
+        this.states = res.data.states;
+      } else {
+        this.states = [];
+      }
+    });
   }
 
   private getItemizations() {
     // TODO using this service to get Itemizations until available in another API.
-    this._transactionsService
-      .getItemizations()
-        .subscribe(res => {
-
-          let itemizationExist = false;
-          if (res.data) {
-              console.log("res.data", res.data);
-              itemizationExist = true;
-              for (const s of res.data) {
-                // check for Itemizations selected in the filter cache
-                // TODO scroll to first check item
-                if (this.cachedFilters) {
-                  if (this.cachedFilters.filterItemizations) {
-                    if (this.cachedFilters.filterItemizations.includes(s.itemized)) {
-                      s.selected = true;
-                      this.isHideItemizationFilter = false;
-                    } else {
-                      s.selected = false;
-                    }
-                  }
-                }
+    this._transactionsService.getItemizations().subscribe(res => {
+      let itemizationExist = false;
+      if (res.data) {
+        console.log('res.data', res.data);
+        itemizationExist = true;
+        for (const s of res.data) {
+          // check for Itemizations selected in the filter cache
+          // TODO scroll to first check item
+          if (this.cachedFilters) {
+            if (this.cachedFilters.filterItemizations) {
+              if (this.cachedFilters.filterItemizations.includes(s.itemized)) {
+                s.selected = true;
+                this.isHideItemizationFilter = false;
+              } else {
+                s.selected = false;
               }
-
+            }
           }
-          if (itemizationExist) {
-            this.itemizations = res.data;
-            console.log("this.itemizations", this.itemizations);
-          } else {
-            this.itemizations = [];
-          }
-        });
+        }
+      }
+      if (itemizationExist) {
+        this.itemizations = res.data;
+        console.log('this.itemizations', this.itemizations);
+      } else {
+        this.itemizations = [];
+      }
+    });
   }
 
   /**
@@ -678,11 +666,11 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
-        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
+        this.isHideDateFilter = this.filterDateFrom && this.filterDateFrom ? false : true;
 
         this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
         this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
-        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateFrom) ? false : true;
+        this.isHideDeletedDateFilter = this.filterDeletedDateFrom && this.filterDeletedDateFrom ? false : true;
 
         this.filterMemoCode = this.cachedFilters.filterMemoCode;
         this.isHideMemoFilter = !this.filterMemoCode;
@@ -690,14 +678,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
         // TODO itenized was left out and needs to be added.
         this.itemizations = this.cachedFilters.filterItemizations;
-
       }
     } else {
       // Just in case cache has an unexpected issue, use default.
       this.cachedFilters = new TransactionFilterModel();
     }
   }
-
 
   /**
    * Initialize validation errors to their defaults.
@@ -709,7 +695,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
   }
 
-
   /**
    * Validate the filter settings.  Set the the validation error model
    * to true with a message if invalid.
@@ -717,7 +702,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * @returns true if valid.
    */
   private validateFilters(): boolean {
-
     this.initValidationErrors();
     if (this.filterDateFrom !== null && this.filterDateTo === null) {
       this.dateFilterValidation.isError = true;
@@ -756,7 +740,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.isHideDeletedDateFilter = false;
       return false;
     }
-
 
     if (this.filterAmountMin !== null && this.filterAmountMax === null) {
       this.amountFilterValidation.isError = true;
@@ -799,10 +782,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     return true;
   }
 
-
   /**
    * Process the message received to remove the filter.
-   * 
+   *
    * @param message contains details on the filter to remove
    */
   private removeFilter(message: any) {
@@ -857,5 +839,4 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
     }
   }
-
 }

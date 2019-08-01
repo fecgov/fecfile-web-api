@@ -165,7 +165,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
-    this.getPage(this.config.currentPage);
+    // No longer get onInit now that this is a child component of F3X.
+    // this.getPage(this.config.currentPage);
   }
 
   public ngDoCheck(): void {

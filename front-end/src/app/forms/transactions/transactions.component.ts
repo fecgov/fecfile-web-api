@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TransactionsMessageService } from './service/transactions-message.service';
 import { TransactionFilterModel } from './model/transaction-filter.model';
@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { TransactionModel } from './model/transaction.model';
 import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { FormBuilder } from '@angular/forms';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -42,6 +43,9 @@ export enum FilterTypes {
   ]
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
+  @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
+  @Output() showTransaction: EventEmitter<any> = new EventEmitter<any>();
+
   public formType = '';
   public reportId = '0';
   public view: ActiveView = ActiveView.transactions;
@@ -102,7 +106,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private _transactionsMessageService: TransactionsMessageService,
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
-    private _router: Router
+    private _router: Router,
+    private _fb: FormBuilder
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
@@ -183,6 +188,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
+    this.showTransactionsSubscription.unsubscribe();
   }
 
   public goToPreviousStep(): void {
@@ -621,7 +627,25 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show edit for a single transaction.
    */
   public showEdit() {
-    this.view = ActiveView.edit;
+    // this.view = ActiveView.edit;
+    // this.showTransaction.emit({
+    //   showTransactionType: 'edit',
+    //   direction: 'next',
+    //   step: 'transactions',
+    // });
+
+    const emptyValidForm = this._fb.group({});
+
+    this.showTransaction.emit({
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      editOrView: {action: 'edit', transactionModel: this.transactionToEdit}
+
+      // transactionTypeText: this.transactionToEdit.type,
+      // transactionType: this.transactionToEdit.type
+    });
   }
 
   /**
@@ -644,6 +668,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showFilters() {
     this.isShowFilters = true;
+    this.sidebarSwitch.emit(this.isShowFilters);
   }
 
   /**
@@ -651,6 +676,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public showCategories() {
     this.isShowFilters = false;
+    this.sidebarSwitch.emit(false);
   }
 
   /**
@@ -727,22 +753,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
   }*/
   public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
-    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
-      res => {
-        if (res) {
-          console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
-          if (res.hasOwnProperty('results')) {
-            if (res['results.pdf_url'] !== null) {
-              console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-              window.open(res.results.pdf_url, '_blank');
-            }
-          }
-        }
-      },
-      error => {
-        console.log('error: ', error);
-      }
-    ); /*  */
+    
+    this._reportTypeService.printPreview(this._formType);
   }
 }

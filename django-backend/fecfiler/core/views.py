@@ -250,7 +250,7 @@ def date_format(cvg_date):
 
 def check_null_value(check_value):
     try:
-        if check_value in ["none", "null", " ", ""]:
+        if check_value in ["None", "none", "null", " ", ""]:
             return None
         else:
             return check_value
@@ -1481,7 +1481,10 @@ def get_all_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         # import ipdb;ipdb.set_trace()
@@ -1643,7 +1646,10 @@ def get_all_trashed_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         params = request.data.get('filters', {})
