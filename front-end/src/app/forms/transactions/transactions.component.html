@@ -1,10 +1,4 @@
 <div class="transactions__main-container">
-  <!-- div class="form__sidebar">
-    <div class="transactions__sidebar_filters">
-      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
-      </app-transactioYesns-filter>
-    </div>
-  </div-->
   <div class="transactions__container">
     <header>
       <div class="header-content">
@@ -19,7 +13,9 @@
                 </span>
               </h1>
               <ng-template #editHeading>
-                <h1 [@fadeInOut] *ngIf="isEditViewActive()">Form {{ formType }} / {{ transactionToEdit.type }} / Edit</h1>
+                <h1 [@fadeInOut] *ngIf="isEditViewActive()">
+                  Form {{ formType }} / {{ transactionToEdit.type }} / Edit
+                </h1>
               </ng-template>
             </div>
             <div class="float-right">
@@ -33,29 +29,23 @@
                 Return to Transaction Categories
               </button>
             </div>
-         </div>
-       </div>
+          </div>
+        </div>
         <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-          <div class="float-right"   ngbDropdown role="group" aria-label="Action dropdown">
-            <button
-              type="button"
-              class="btn btn-link btn-options"
-              id="actionsMenu"
-              ngbDropdownToggle
-            >
-              <span class="ellipsis-icon" aria-hidden="true"></span>
-              <span class="sr-only">Click for more options</span>
-            </button>
-            <div ngbDropdownMenu aria-labelledby="actionsMenu">
-              <button class="dropdown-item"><i class="view-icon"></i> View</button>
-              <button class="dropdown-item" (click)="printPreview()" ><i class="print-icon"></i> Print</button>
-              <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>            
-            </div>
+          <div class="grid-row__col grid-row__col--12">
+            <div class="float-right" ngbDropdown role="group" aria-label="Action dropdown">
+              <button type="button" class="btn btn-link btn-options" id="actionsMenu" ngbDropdownToggle>
+                <span class="ellipsis-icon" aria-hidden="true"></span>
+                <span class="sr-only">Click for more options</span>
+              </button>
+              <div ngbDropdownMenu aria-labelledby="actionsMenu">
+                <button class="dropdown-item"><i class="view-icon"></i> View</button>
+                <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+                <button class="dropdown-item"><i class="far fa-file-import"></i> Import</button>
+              </div>
             </div>
           </div>
         </div>
-      
       </div>
       <hr />
     </header>
@@ -180,153 +170,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- <br>
-              <hr>
-              <br> -->
-
-              <!-- <div style="display: inline-block">
-                <div id="button-container" class="transactions__tag_wrapper">
-                  <div *ngIf="searchTextArray.length > 0" class="transactions__tag_group">
-                    <span *ngFor="let searchTextItem of searchTextArray; let i = index">
-                      <button 
-                        class="btn transactions__tag_btn transactions__btn-search-filter"
-                        (click)="removeSearchText(i)">
-                        <i class="fas fa-window-close"></i>
-                        {{ searchTextItem }}
-                      </button>
-                      <span class="transactions__btn-search-filter-join" 
-                        *ngIf="i < (searchTextArray.length -1 )">
-                          or
-                      </span>
-                    </span>
-                  </div>
-                  <div *ngIf="filters.filterCategories && filters.filterCategories.length > 0" 
-                      class="transactions__tag_group">
-                    <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
-                      <button
-                        class="btn transactions__tag_btn transactions__btn-search-filter"
-                        (click)="removeCategoryFilter(i, categoryZ)">
-                        <i class="fas fa-window-close"></i>
-                        Type: {{ categoryZ }}
-                      </button>
-                      <span class="transactions__btn-search-filter-join" 
-                        *ngIf="i < (filters.filterCategories.length -1 )">
-                          or
-                      </span>
-                    </span>
-                  </div> 
-                  <div *ngIf="filters.filterDateFrom  && filters.filterDateTo"
-                      class="transactions__tag_group">
-                    <button
-                      class="btn transactions__tag_btn transactions__btn-search-filter"
-                      (click)="removeDateFilter()">
-                      <i class="fas fa-window-close"></i>
-                      Date: {{ filters.filterDateFrom | date: 'MM/dd/yyyy'}} - 
-                              {{ filters.filterDateTo | date: 'MM/dd/yyyy'}}
-                    </button>
-                  </div>
-                  <div *ngIf="filters.filterStates && filters.filterStates.length > 0" 
-                      class="transactions__tag_group">
-                    <span *ngFor="let state of filters.filterStates; let i = index">
-                      <button
-                        class="btn transactions__tag_btn transactions__btn-search-filter"
-                        (click)="removeStateFilter(i, state)">
-                        <i class="fas fa-window-close"></i>
-                        {{ state }}
-                      </button>
-                      <span class="transactions__btn-search-filter-join" 
-                        *ngIf="i < (filters.filterStates.length -1 )">
-                          or
-                      </span>
-                    </span>                   
-                  </div>
-                  <div *ngIf="filters.filterAmountMin > 0 && filters.filterAmountMax > 0"
-                      class="transactions__tag_group">
-                    <button
-                      class="btn transactions__tag_btn transactions__btn-search-filter"
-                      (click)="removeAmountFilter()">
-                      <i class="fas fa-window-close"></i>
-                      Amount: {{ filters.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
-                              {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
-                    </button>
-                  </div>                    
-                </div> -->
-
-              <!-- <div id="" class="transactions__tag_wrapper">
-                  <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
-                    <button
-                      class="btn transactions__tag_btn transactions__btn-search-filter"
-                      (click)="removeCategoryFilter(i, categoryZ)">
-                      <i class="fas fa-window-close"></i>
-                      Type: {{ categoryZ }}
-                    </button>
-                    <span class="transactions__btn-search-filter-join" 
-                      *ngIf="i < (filters.filterCategories.length -1 )">
-                        or
-                    </span>
-                  </span>
-                </div>
-              </div> -->
-
-              <!-- <div *ngFor="let searchTextItem of searchTextArray; let i = index">
-                <div class="tag__category">
-                  <button
-                    class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                    (click)="removeSearchText(i)">
-                    <i class="fas fa-window-close"></i>
-                    {{ searchTextItem }}
-                  </button>
-                  <span class="transactions__btn-search-filter-join" 
-                    *ngIf="i < (searchTextArray.length -1 )">
-                      or
-                  </span>
-                </div>
-              </div> -->
-
-              <!-- <div *ngFor="let categoryZ of filters.filterCategories; let i = index">
-                <button
-                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeCategoryFilter(i, categoryZ)">
-                  <i class="fas fa-window-close"></i>
-                  Type: {{ categoryZ }}
-                </button>
-                <span class="transactions__btn-search-filter-join" 
-                  *ngIf="i < (filters.filterCategories.length -1 )">
-                    or
-                </span>
-              </div> -->
-
-              <!-- <div *ngIf="filters.filterDateFrom  && filters.filterDateTo">
-                <button
-                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeDateFilter()">
-                  <i class="fas fa-window-close"></i>
-                  Date: {{ filters.filterDateFrom | date: 'MM/dd/yyyy'}} - 
-                          {{ filters.filterDateTo | date: 'MM/dd/yyyy'}}
-                </button>
-              </div>  -->
-              <!-- <div *ngFor="let state of filters.filterStates; let i = index">
-                <button
-                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeStateFilter(i, state)">
-                  <i class="fas fa-window-close"></i>
-                  {{ state }}
-                </button>
-                <span class="transactions__btn-search-filter-join" 
-                  *ngIf="i < (filters.filterStates.length -1 )">
-                    or
-                </span>
-              </div>  -->
-              <!-- <div *ngIf="filters.filterAmountMin > 0 && filters.filterAmountMax > 0">
-                <button
-                  class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
-                  (click)="removeAmountFilter()">
-                  <i class="fas fa-window-close"></i>
-                  Amount: {{ filters.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
-                          {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
-                </button>
-              </div>  -->
             </div>
           </div>
         </div>
@@ -354,10 +197,4 @@
       </app-transactions-edit>
     </div>
   </div>
-
-  <!-- <div>
-    <button class="btn btn-previous btn-left" type="button" (click)="goToPreviousStep()">
-      Previous
-    </button>
-  </div> -->
 </div>
