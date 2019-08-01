@@ -46,6 +46,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public reportId: string;
 
   @Input()
+  public routeData: any;
+
+  @Input()
   public tableType: string;
 
   public transactionsModel: Array<TransactionModel>;
@@ -165,8 +168,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
-    // No longer get onInit now that this is a child component of F3X.
-    // this.getPage(this.config.currentPage);
+    // When coming from transaction route the reportId is not received
+    // from the input perhaps due to the ngDoCheck in transactions-component.
+    // TODO look at replacing ngDoCheck and reportId as Input()
+    // with a message subscription service.
+    if (this.routeData) {
+      if (this.routeData.accessedByRoute) {
+        if (this.routeData.reportId) {
+          console.log('reportId for transaction accessed directly by route is ' + this.routeData.reportId);
+          this.reportId = this.routeData.reportId;
+          this.getPage(this.config.currentPage);
+        }
+      }
+    }
   }
 
   public ngDoCheck(): void {
@@ -179,8 +193,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.pageReceived = true;
       }
     }
-
-    if (step !== 'transactions') {
+    // Prevent looping
+    if (step !== 'transactions' && !this.routeData.reportId) {
       this.pageReceived = false;
     }
   }

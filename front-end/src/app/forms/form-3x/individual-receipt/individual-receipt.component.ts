@@ -635,13 +635,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     if (!reportId) {
       reportId = '0';
-      // reportId = '431';
-      // reportId = '1206963';
     }
     localStorage.setItem(`form_${this._formType}_view_transaction_screen`, 'Yes');
     localStorage.setItem('Transaction_Table_Screen', 'Yes');
-
-    // this._router.navigate([`/forms/transactions/${this._formType}/${reportId}`]);
 
     this._router.navigate([`/forms/form/${this._formType}`], {
       queryParams: { step: 'transactions', reportId: reportId }
