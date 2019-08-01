@@ -177,6 +177,7 @@
       <app-transactions-table
         *ngIf="isTransactionViewActive()"
         formType="{{ formType }}"
+        [routeData]="routeData"
         [reportId]="reportId"
         tableType="{{ transactionsView }}"
       >
@@ -184,6 +185,7 @@
       <app-transactions-table
         *ngIf="isRecycleBinViewActive()"
         formType="{{ formType }}"
+        [routeData]="routeData"
         [reportId]="reportId"
         tableType="{{ recycleBinView }}"
       >

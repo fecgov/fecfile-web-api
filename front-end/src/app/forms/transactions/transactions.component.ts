@@ -48,6 +48,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   public formType = '';
   public reportId = '0';
+  public routeData: any;
   public view: ActiveView = ActiveView.transactions;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
@@ -141,6 +142,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
+    const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
+
+    this.routeData = {accessedByRoute: true, formType: this.formType, reportId: reportIdRoute};
+
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
     this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
