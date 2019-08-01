@@ -34,7 +34,6 @@ import { F99Component } from './forms/form-99/f99/f99.component';
 import { ReasonComponent } from './forms/form-99/reason/reason.component';
 import { TypeComponent } from './forms/form-99/type/type.component';
 import { FormsComponent } from './forms/forms.component';
-import { TransactionCategoriesComponent } from './forms/transactions/categories/transaction-categories.component';
 import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
 import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
 import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
@@ -71,7 +70,7 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
-import { ContactsComponent} from './contacts/contacts.component';
+import { ContactsComponent } from './contacts/contacts.component';
 import { ContactsTableComponent } from './contacts/contacts-table/contacts-table.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 
@@ -98,7 +97,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionsTableComponent,
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
-    TransactionCategoriesComponent,
     TransactionsEditComponent,
     TrashConfirmComponent,
     F99Component,
@@ -135,7 +133,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SafeHTMLPipe,
     ReportsFilterTypeComponent,
     ContactsComponent,
-    ContactsTableComponent,
+    ContactsTableComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
