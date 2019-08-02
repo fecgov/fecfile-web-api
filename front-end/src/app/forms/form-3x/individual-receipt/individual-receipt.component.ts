@@ -576,8 +576,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveSchedule(this._formType,
-          this.scheduleAction).subscribe(res => {
+      this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
         if (res) {
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
@@ -651,7 +650,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    
     this._reportTypeService.printPreview(this._formType);
   }
 
@@ -915,11 +913,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         const amountString = formData.amount ? formData.amount.toString() : '';
         this._contributionAmount = amountString;
 
-        this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
 
         this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
         this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
