@@ -32,6 +32,11 @@ import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/con
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
 
+export enum ScheduleActions {
+  add = 'add',
+  edit = 'edit'
+}
+
 @Component({
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
@@ -45,7 +50,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
-  @Input() scheduleAction: string = null;
+  @Input() scheduleAction: ScheduleActions = null;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -571,7 +576,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveSchedule(this._formType).subscribe(res => {
+      this._receiptService.saveSchedule(this._formType,
+          this.scheduleAction).subscribe(res => {
         if (res) {
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
@@ -889,8 +895,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
 
-        this.frmIndividualReceipt.addControl('transaction_id', new FormControl('', Validators.required));
-        this.frmIndividualReceipt.patchValue({ transaction_id: formData.transactionId }, { onlySelf: true });
+        this.hiddenFields.forEach(el => {
+          if (el.name === 'transaction_id') {
+            el.value = formData.transactionId;
+          }
+        });
 
         const nameArray = formData.name.split(',');
         const firstName = nameArray[1] ? nameArray[1] : null;
