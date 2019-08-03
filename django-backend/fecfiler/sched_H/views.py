@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id']
-
+MANDATORY_FIELDS_SCHED_H5 = ['cmte_id', 'report_id', 'transaction_id']
 
 
 def check_transaction_id(transaction_id):
