@@ -34,7 +34,7 @@ class SchedF(models.Model):
     payee_cand_id  = models.CharField(primary_key=True, max_length=9)
     payee_cand_last_name = models.CharField(primary_key=True, max_length=30) 
     payee_cand_fist_name = models.CharField(primary_key=True, max_length=20)
-    payee_cand_middle_name  = models.CharField(primary_key=True, max_length=20)(20),
+    payee_cand_middle_name  = models.CharField(primary_key=True, max_length=20),
     payee_cand_prefix = models.CharField(primary_key=True, max_length=10)
     payee_cand_suffix = models.CharField(primary_key=True, max_length=10) 
     payee_cand_office = models.CharField(primary_key=True, max_length=1) 

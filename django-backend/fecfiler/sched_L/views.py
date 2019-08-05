@@ -55,9 +55,9 @@ def check_mandatory_fields_SL(data):
         raise
 
 
-def schedH3_sql_dict(data):
+def schedL_sql_dict(data):
     """
-    filter out valid fileds for sched_H3
+    filter out valid fileds for sched_L
 
     """
     valid_fields = [
@@ -80,30 +80,30 @@ def schedH3_sql_dict(data):
         raise Exception('invalid request data.')
 
 
-def put_schedH3(data):
+def put_schedL(data):
     """
     update sched_H3 item
     here we are assuming entity_id are always referencing something already in our DB
     """
     try:
-        check_mandatory_fields_SH3(data)
+        check_mandatory_fields_SL(data)
         #check_transaction_id(data.get('transaction_id'))
         try:
-            put_sql_schedH3(data)
+            put_sql_schedL(data)
         except Exception as e:
             raise Exception(
-                'The put_sql_schedH3 function is throwing an error: ' + str(e))
+                'The put_sql_schedL function is throwing an error: ' + str(e))
         return data
     except:
         raise
 
 
-def put_sql_schedH3(data):
+def put_sql_schedL(data):
     """
-    update a schedule_H3 item                    
+    update a schedule_L item                    
             
     """
-    _sql = """UPDATE public.sched_h3
+    _sql = """UPDATE public.sched_l
               SET transaction_type_identifier= %s, 
                   back_ref_transaction_id= %s,
                   back_ref_sched_name= %s,
@@ -141,14 +141,14 @@ def put_sql_schedH3(data):
     do_transaction(_sql, _v)
 
 
-def validate_sh3_data(data):
+def validate_sl_data(data):
     """
-    validate sH3 json data
+    validate sL json data
     """
-    check_mandatory_fields_SH3(data)
+    check_mandatory_fields_SL(data)
 
 
-def post_schedH3(data):
+def post_schedL(data):
     """
     function for handling POST request for sH3, need to:
     1. generatye new transaction_id
@@ -156,24 +156,24 @@ def post_schedH3(data):
     3. save data to db
     """
     try:
-        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
-        data['transaction_id'] = get_next_transaction_id('SH3')
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_L)
+        data['transaction_id'] = get_next_transaction_id('SL')
         print(data)
-        validate_sh3_data(data)
+        validate_sl_data(data)
         try:
-            post_sql_schedH3(data)
+            post_sql_schedL(data)
         except Exception as e:
             raise Exception(
-                'The post_sql_schedH3 function is throwing an error: ' + str(e))
+                'The post_sql_schedL function is throwing an error: ' + str(e))
         return data
     except:
         raise
 
 
-def post_sql_schedH3(data):
+def post_sql_schedL(data):
     try:
         _sql = """
-        INSERT INTO public.sched_h3 (
+        INSERT INTO public.sched_l (
             cmte_id,
             report_id,
             transaction_type_identifier,
@@ -217,28 +217,28 @@ def post_sql_schedH3(data):
         raise
 
 
-def get_schedH3(data):
+def get_schedL(data):
     """
-    load sched_H3 data based on cmte_id, report_id and transaction_id
+    load sched_L data based on cmte_id, report_id and transaction_id
     """
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
-            forms_obj = get_list_schedH3(report_id, cmte_id, transaction_id)
+            forms_obj = get_list_schedL(report_id, cmte_id, transaction_id)
         else:
-            forms_obj = get_list_all_schedH3(report_id, cmte_id)
+            forms_obj = get_list_all_schedL(report_id, cmte_id)
         return forms_obj
     except:
         raise
 
 
-def get_list_all_schedH3(report_id, cmte_id):
+def get_list_all_schedL(report_id, cmte_id):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from schedA table
+            # GET single row from schedL table
             _sql = """SELECT json_agg(t) FROM ( SELECT
             cmte_id,
             report_id,
@@ -257,18 +257,18 @@ def get_list_all_schedH3(report_id, cmte_id):
             delete_ind,
             create_date ,
             last_update_date
-            FROM public.sched_h3
+            FROM public.sched_l
             WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedH3_list = cursor.fetchone()[0]
-            if schedH3_list is None:
-                raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
+            schedl_list = cursor.fetchone()[0]
+            if schedl_list is None:
+                raise NoOPError('No sched_L transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictH3 in schedH3_list:
-                merged_list.append(dictH3)
+            for dictL in schedL_list:
+                merged_list.append(dictL)
         return merged_list
     except Exception:
         raise
@@ -338,7 +338,7 @@ def delete_schedH3(data):
 
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
-def schedH3(request):
+def schedL(request):
     
     if request.method == 'POST':
         try:
