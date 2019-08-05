@@ -984,10 +984,38 @@ def parent_SA_to_child_SB_dict(data):
     except:
         raise
 
+@lru_cache(maxsize=32)
+def populate_transaction_types():
+    """
+    load all transaction_type data for shced_a
+    return a dic in the following format:
+    {"trans_identifier: (line_number, trans_type)"}
+    """
+    _sql = """
+    SELECT tran_identifier as tran_id, line_num as line_num, tran_code as tran_code
+    FROM ref_transaction_types 
+    WHERE sched_type = 'sched_a'
+    """
+    tran_dic = {}
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedA table
+            cursor.execute(_sql)
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'no transactio_types found for sched_a')
+            for row in cursor.fetchall():
+                tran_dic[row['tran_id']] = (row['line_num'], row['tran_code'])
+        return tran_dic
+    except Exception:
+        raise
+
+
 def get_line_number_trans_type(transaction_type_identifier):
     try:
-        if transaction_type_identifier in TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP.keys():
-            list_value = TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP.get(transaction_type_identifier)
+        trans_dic = populate_transaction_types()
+        if transaction_type_identifier in trans_dic:
+            list_value = trans_dic.get(transaction_type_identifier)
             line_number = list_value[0]
             transaction_type = list_value[1]
             return line_number, transaction_type
