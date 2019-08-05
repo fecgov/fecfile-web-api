@@ -1,11 +1,74 @@
 <div class="report-table-container">
+    <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+            <div class="transactions__btn-container">
+                <div class="transactions__tag-outer-wrapper">
+                    <div id="button-container" class="transactions__tag_wrapper">
+                        <div *ngIf="filters" class="transactions__tag_group">
+                            <div *ngIf="filters.filterForms[0]">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    <span *ngFor="let formTag of filters.filterForms; let formIndex=index; let isLast=last">
+                                        {{formTag}}
+                                        <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterForms', formIndex)"></i>
+                                        {{isLast ? '' : ' or '}}
+                                    </span>
+                                </button>
+                            </div>
+                            <div *ngIf="filters.filterReports[0]">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    <span *ngFor="let reportTag of filters.filterReports; let reportTypeIndex=index; let isLast=last">
+                                        {{displayReportTypes(reportTag)}}
+                                        <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterReports', reportTypeIndex)"></i>
+                                        {{isLast ? '' : ' or '}}
+                                    </span>
+                                </button>
+                            </div>
+                            <div *ngIf="filters.filterAmendmentIndicators[0]">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    <span
+                                        *ngFor="let amendmentIndicatorTag of filters.filterAmendmentIndicators; let amendmentIndicatorIndex=index; let isLast=last">
+                                        {{displayAmendmentIndicator(amendmentIndicatorTag)}}
+                                        <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterAmendmentIndicators', amendmentIndicatorIndex)"></i>
+                                        {{isLast ? '' : ' or '}}
+                                    </span>
+                                </button>
+                            </div>
+                            <div *ngIf="filters.filterStatuss[0]">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    <span *ngFor="let status of filters.filterStatuss; let statusIndex=index; let isLast=last">
+                                        {{displayStatusName(status)}}
+                                        <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterStatuss', statusIndex)"></i>
+                                        {{isLast ? '' : ' or '}}
+                                    </span>
+                                </button>
+                            </div>
+                            <div *ngIf="filters.filterCvgDateFrom && filters.filterCvgDateTo">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    {{filters.filterCvgDateFrom | date: 'MM/dd/yyyy'}} -
+                                    {{filters.filterCvgDateTo | date: 'MM/dd/yyyy'}}
+                                    <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterCvgDate')"></i>
+                                </button>
+                            </div>
+                            <div *ngIf="filters.filterFiledDateFrom && filters.filterFiledDateTo">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    {{filters.filterFiledDateFrom | date: 'MM/dd/yyyy'}} -
+                                    {{filters.filterFiledDateTo | date: 'MM/dd/yyyy'}}
+                                    <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterFiledDate')"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="grid-row float-right">
         <div class="float-right forms__trx-item-range">
             {{determineItemRange()}} of {{config.totalItems}}
         </div>
-    </div>            
+    </div>
     <!--<table class="table table-striped table-hover table__sortable forms__trx-table">-->
-    <table class="table table-striped table-hover table__sortable transactions__table">     
+    <table class="table table-striped table-hover table__sortable transactions__table">
         <thead>
             <tr>
                 <!--<th class="forms__trx-table-checkbox">
@@ -13,45 +76,31 @@
                         [(ngModel)]="allTransactionsSelected"
                         type="checkbox" (change)="changeAllTransactionsSelected()">
                 </th> -->
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('form_type')"
-                    [class]="getSortClass('form_type')" 
+                <th [@fadeInOut] *ngIf="isColumnVisible('form_type')" [class]="getSortClass('form_type')"
                     (click)="changeSortDirection('form_type')">Form
                 </th>
-                <th
-                    [@fadeInOut] *ngIf="isColumnVisible('status')"
-                    [class]="getSortClass('status')" 
+                <th [@fadeInOut] *ngIf="isColumnVisible('status')" [class]="getSortClass('status')"
                     (click)="changeSortDirection('status')">Status
                 </th>
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('fec_id')"
-                    [class]="getSortClass('fec_id')" 
+                <th [@fadeInOut] *ngIf="isColumnVisible('fec_id')" [class]="getSortClass('fec_id')"
                     (click)="changeSortDirection('fec_id')">FEC ID
                 </th>
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('amend_ind')"
-                    [class]="getSortClass('amend_ind')" 
+                <th [@fadeInOut] *ngIf="isColumnVisible('amend_ind')" [class]="getSortClass('amend_ind')"
                     (click)="changeSortDirection('amend_ind')">Amendment <br /> Indicator
-                </th>   
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')"    
-                    [class]="getSortClass('cvg_start_date')" 
+                </th>
+                <th [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')" [class]="getSortClass('cvg_start_date')"
                     (click)="changeSortDirection('cvg_start_date')">Coverage Date Cycle
-                </th>                              
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('report_type_desc')"
-                    [class]="getSortClass('report_type_desc')" 
+                </th>
+                <th [@fadeInOut] *ngIf="isColumnVisible('report_type_desc')" [class]="getSortClass('report_type_desc')"
                     (click)="changeSortDirection('report_type_desc')">Report
                 </th>
-                <th 
-                    [@fadeInOut] *ngIf="isColumnVisible('filed_date')"
-                    [class]="getSortClass('filed_date')" 
+                <th [@fadeInOut] *ngIf="isColumnVisible('filed_date')" [class]="getSortClass('filed_date')"
                     (click)="changeSortDirection('filed_date')">Filed/Saved Date Time
-                </th>                        
+                </th>
                 <th>
-               &nbsp;
-            </th>                                                                       
-               <!-- <th class="bulk_action">
+                    &nbsp;
+                </th>
+                <!-- <th class="bulk_action">
                     <div *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn">
@@ -84,27 +133,31 @@
                 <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
                 <td *ngIf="isColumnVisible('amend_ind')"></td>
-                <td *ngIf="isColumnVisible('cvg_start_date')">{{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}</td>
+                <td *ngIf="isColumnVisible('cvg_start_date')">
+                    {{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
-                <td *ngIf="isColumnVisible('filed_date')">{{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss')}}</td>
+                <td *ngIf="isColumnVisible('filed_date')">
+                    {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss')}}
+                </td>
 
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
-                        <button class="btn btn-sm btn-primary" 
-                            (click)="restoreTransaction(report)">
+                        <button class="btn btn-sm btn-primary" (click)="restoreTransaction(report)">
                             <i class="fas fa-trash-restore"></i>
-                        </button>                     
+                        </button>
                     </div>
 
-                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Saved'" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown"> 
+                    <div [@fadeInOut]
+                        *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Saved'"
+                        class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
-                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
 
 
-                        <div id="forms__trx-dropdown-action1"  class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action1" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -123,13 +176,14 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Filed'" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown"> 
+                    <div [@fadeInOut]
+                        *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Filed'"
+                        class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
-                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action2"  class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -145,13 +199,14 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Filed'" class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown"> 
+                    <div [@fadeInOut]
+                        *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Filed'"
+                        class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
-                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action3"  class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action3" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -164,13 +219,14 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut] *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Saved'"  class="btn-group" 
-                            ngbDropdown role="group" aria-label="Action dropdown"> 
+                    <div [@fadeInOut]
+                        *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Saved'"
+                        class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
-                        <button class= "btn btn-sm btn-primary"  ngbDropdownToggle>
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div id="forms__trx-dropdown-action4"  class="dropdown-menu" ngbDropdownMenu>
+                        <div id="forms__trx-dropdown-action4" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i>View
                             </button>
@@ -193,22 +249,20 @@
             </tr>
         </tbody>
     </table>
-    <div *ngIf="showPagination()" 
-        class="d-flex justify-content-center Report-table-pagination-container">
-        <pagination-controls [id]="config.id"
-            (pageChange)="getPage($event)">
-        </pagination-controls>	
+    <div *ngIf="showPagination()" class="d-flex justify-content-center Report-table-pagination-container">
+        <pagination-controls [id]="config.id" (pageChange)="getPage($event)">
+        </pagination-controls>
     </div>
-    
-    <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+
+    <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"
+        aria-labelledby="dialog-sizes-name1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title pull-left">Column Options</h4>
-                    <button aria-label="Close" class="close btn btn-link" type="button" 
-                            (click)="cancelColumnOptions()">
+                    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
                         <span aria-hidden="true">×</span>
-                    </button>                
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="container">
@@ -217,12 +271,12 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('form_type').checked"
-                                        (change)="toggleVisibility('form_type', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('form_type').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('form_type').disabled}">
+                                            (change)="toggleVisibility('form_type', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('form_type').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('form_type').disabled}">
                                             Form
-                                        </span>                                         
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -230,12 +284,12 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('status').checked"
-                                            (change)="toggleVisibility('status', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('status').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('status').disabled}">
+                                            (change)="toggleVisibility('status', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('status').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('status').disabled}">
                                             Status
-                                        </span>                                          
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -243,25 +297,25 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('fec_id').checked"
-                                            (change)="toggleVisibility('fec_id', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('fec_id').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('fec_id').disabled}">
+                                            (change)="toggleVisibility('fec_id', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('fec_id').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('fec_id').disabled}">
                                             FEC ID
-                                        </span>                                         
+                                        </span>
                                     </label>
                                 </div>
-                            </div>                                   
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md">
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('amend_ind').checked"
-                                        (change)="toggleVisibility('amend_ind', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('amend_ind').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('amend_ind').disabled}">
+                                            (change)="toggleVisibility('amend_ind', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('amend_ind').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('amend_ind').disabled}">
                                             Amendment Indicator
                                         </span>
                                     </label>
@@ -271,12 +325,12 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('cvg_start_date').checked"
-                                            (change)="toggleVisibility('cvg_start_date', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('cvg_start_date').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('cvg_start_date').disabled}">
+                                            (change)="toggleVisibility('cvg_start_date', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('cvg_start_date').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('cvg_start_date').disabled}">
                                             Coverage Date Cycle
-                                        </span>   
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -284,12 +338,12 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('report_type_desc').checked"
-                                            (change)="toggleVisibility('report_type_desc', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('report_type_desc').disabled">
-                                        <span [ngClass]=
-                                            "{'disabled-column-option':getSortableColumn('report_type_desc').disabled}">
+                                            (change)="toggleVisibility('report_type_desc', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('report_type_desc').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('report_type_desc').disabled}">
                                             Report
-                                        </span>          
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -299,27 +353,29 @@
                                 <div class="checkbox">
                                     <label>
                                         <input [(ngModel)]="getSortableColumn('last_update_date').checked"
-                                            (change)="toggleVisibility('last_update_date', $event)"
-                                            type="checkbox" [disabled]="getSortableColumn('last_update_date').disabled">
-                                        <span [ngClass]="{'disabled-column-option':getSortableColumn('last_update_date').disabled}">
+                                            (change)="toggleVisibility('last_update_date', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('last_update_date').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('last_update_date').disabled}">
                                             Filed Date
-                                        </span>                                        
+                                        </span>
                                     </label>
                                 </div>
                             </div>
-                        </div>  
-                     </div>
-                </div> 
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-footer">
                     <button type="button" id="btn-cancel" class="btn btn-modal-footer btn-right"
                         (click)="cancelColumnOptions()">
                         Cancel
                     </button>
-                    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveColumnOptions()">
+                    <button type="button" class="btn btn-secondary btn-modal-footer btn-right"
+                        (click)="saveColumnOptions()">
                         Save
                     </button>
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
 </div>

@@ -18,6 +18,7 @@ import {
 } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { F3xMessageService } from '../service/f3x-message.service';
+import { ScheduleActions } from '../individual-receipt/individual-receipt.component';
 
 @Component({
   selector: 'app-f3x',
@@ -49,7 +50,7 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public isShowFilters = false;
   public formType: string = '';
-  public scheduleAction: string;
+  public scheduleAction: ScheduleActions;
 
   private _step: string = '';
 
@@ -265,7 +266,7 @@ export class F3xComponent implements OnInit {
               this._f3xMessageService.sendPopulateFormMessage(e.editOrView);
               this.scheduleAction = e.editOrView.action;
             } else {
-              this.scheduleAction = 'add';
+              this.scheduleAction = ScheduleActions.add;
             }
           }
           this.canContinue();

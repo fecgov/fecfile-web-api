@@ -8,6 +8,7 @@ import { TransactionModel } from './model/transaction.model';
 import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { FormBuilder } from '@angular/forms';
+import { ScheduleActions } from '../form-3x/individual-receipt/individual-receipt.component';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -144,7 +145,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
 
-    this.routeData = {accessedByRoute: true, formType: this.formType, reportId: reportIdRoute};
+    this.routeData = { accessedByRoute: true, formType: this.formType, reportId: reportIdRoute };
 
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
@@ -646,7 +647,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       direction: 'next',
       step: 'step_3',
       previousStep: 'transactions',
-      editOrView: {action: 'edit', transactionModel: this.transactionToEdit}
+      editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
 
       // transactionTypeText: this.transactionToEdit.type,
       // transactionType: this.transactionToEdit.type
@@ -758,7 +759,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
   }*/
   public printPreview(): void {
-    
     this._reportTypeService.printPreview(this._formType);
   }
 }
