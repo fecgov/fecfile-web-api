@@ -14,8 +14,13 @@ import { GetReportsResponse } from '../../reports/service/report.service';
 import { reportModel } from '../model/report.model';
 import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
-import { form99, form3XReport, form99PrintPreviewResponse, form3xReportTypeDetails} from '../../shared/interfaces/FormsService/FormsService';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import {
+  form99,
+  form3XReport,
+  form99PrintPreviewResponse,
+  form3xReportTypeDetails
+} from '../../shared/interfaces/FormsService/FormsService';
 
 @Component({
   selector: 'app-reportdetails',
@@ -23,20 +28,13 @@ import { form99, form3XReport, form99PrintPreviewResponse, form3xReportTypeDetai
   styleUrls: ['./reportdetails.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
-		trigger('fadeInOut', [
-			transition(':enter', [
-				style({opacity:0}),
-				animate(500, style({opacity:1})) 
-      ]),
-				transition(':leave', [
-				animate(10, style({opacity:0})) 
-			])
-		])
-	]
+    trigger('fadeInOut', [
+      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
+      transition(':leave', [animate(10, style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class ReportdetailsComponent implements OnInit, OnDestroy {
-
-
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
@@ -44,7 +42,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public trashModal: TrashConfirmComponent;*/
 
   @Input()
-  public view: string; 
+  public view: string;
 
   @Input()
   public formType: string;
@@ -58,8 +56,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   // @ViewChild('modalBody')
   // public modalBody;
 
- 
-  
   private filters: ReportFilterModel;
 
   public reportsModel: Array<reportModel>;
@@ -69,6 +65,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
+  public statusDescriptions = [];
+  public getAmendmentIndicatorsDescriptions = [];
+  public getReportTypesDescriptions = [];
   //public existingReportId: string;
 
   // ngx-pagination config
@@ -77,43 +76,34 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
- 
 
   // private keywords = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
-
   // Local Storage Keys
-  private readonly reportSortableColumnsLSK =
-    'reports.rpt.sortableColumn';
-  private readonly recycleSortableColumnsLSK =
-    'reports.recycle.sortableColumn';
-  private readonly reportCurrentSortedColLSK =
-    'reports.rpt.currentSortedColumn';
-  private readonly recycleCurrentSortedColLSK =
-    'reports.recycle.currentSortedColumn';
-  private readonly reportPageLSK =
-    'reports.rpt.page';
-  private readonly recyclePageLSK =
-    'reports.recycle.page';
-  private readonly filtersLSK =
-    'reports.filters';
+  private readonly reportSortableColumnsLSK = 'reports.rpt.sortableColumn';
+  private readonly recycleSortableColumnsLSK = 'reports.recycle.sortableColumn';
+  private readonly reportCurrentSortedColLSK = 'reports.rpt.currentSortedColumn';
+  private readonly recycleCurrentSortedColLSK = 'reports.recycle.currentSortedColumn';
+  private readonly reportPageLSK = 'reports.rpt.page';
+  private readonly recyclePageLSK = 'reports.recycle.page';
+  private readonly filtersLSK = 'reports.filters';
 
   /**.
-	 * Array of columns to be made sortable.
-	 */
+   * Array of columns to be made sortable.
+   */
   private sortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * A clone of the sortableColumns for reverting user
+   * A clone of the sortableColumns for reverting user
    * column options on a Cancel.
-	 */
+   */
   private cloneSortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * Identifies the column currently sorted by name.
-	 */
+   * Identifies the column currently sorted by name.
+   */
   private currentSortedColumnName: string;
 
   /**
@@ -121,7 +111,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * options.
    */
   private showPinColumnsSubscription: Subscription;
-
 
   /**
    * Subscription for running the keyword and filter search
@@ -142,33 +131,27 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute,
     private _router: Router
   ) {
-    this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage()
-      .subscribe(
-        message => {
-          this.showPinColumns();
-        }
-      );
+    this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
+      this.showPinColumns();
+    });
 
-    this.keywordFilterSearchSubscription = this._reportsMessageService.getDoKeywordFilterSearchMessage()
-      .subscribe(
-        (filters: ReportFilterModel) => {
-          if (filters) {
-            this.filters = filters;
-            if (filters.formType) {
-              this.formType = filters.formType;
-            }
+    this.keywordFilterSearchSubscription = this._reportsMessageService
+      .getDoKeywordFilterSearchMessage()
+      .subscribe((filters: ReportFilterModel) => {
+        if (filters) {
+          this.filters = filters;
+          if (filters.formType) {
+            this.formType = filters.formType;
           }
-          this.getPage(this.config.currentPage);
         }
-      );
+        this.getPage(this.config.currentPage);
+      });
   }
-
 
   /**
    * Initialize the component.
    */
   public ngOnInit(): void {
-
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
       itemsPerPage: 30,
@@ -185,14 +168,13 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.view !== localStorage.getItem("Reports.view")){
-      localStorage.setItem("Reports.view",this.view);
-      this.config.currentPage=1;
+    if (this.view !== localStorage.getItem('Reports.view')) {
+      localStorage.setItem('Reports.view', this.view);
+      this.config.currentPage = 1;
     }
 
     this.getPage(this.config.currentPage);
   }
-
 
   /**
    * A method to run when component is destroyed.
@@ -203,20 +185,19 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription.unsubscribe();
   }
 
-
   /**
-	 * The Reports for a given page.
-	 *
-	 * @param page the page containing the reports to get
-	 */
+   * The Reports for a given page.
+   *
+   * @param page the page containing the reports to get
+   */
   public getPage(page: number): void {
-
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
 
     switch (this.tableType) {
       case this.reportsView:
         this.getReportsPage(page);
+        this.getFilterNames();
         break;
       case this.recycleBinView:
         this.getReportsPage(page);
@@ -226,12 +207,11 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
-	 * The Reports for a given page.
-	 *
-	 * @param page the page containing the reports to get
-	 */
+   * The Reports for a given page.
+   *
+   * @param page the page containing the reports to get
+   */
   /*public getReportsPage(page: number): void {
 
     // this.config.currentPage = page;
@@ -274,55 +254,150 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
 */
 
-
-/**
-	 * The Reports for a given page.
-	 * 
-	 * @param page the page containing the reports to get
-	 */
-	public getReportsPage(page: number) : void {
-
+  /**
+   * The Reports for a given page.
+   *
+   * @param page the page containing the reports to get
+   */
+  public getReportsPage(page: number): void {
     this.config.currentPage = page;
 
-    const sortedCol: SortableColumnModel =
-    this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    const sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
 
-    console.log("view",this.view);
-    console.log("existingReportId",this.existingReportId);
-  
-    this._ReportsService.getReports (this.view, page, this.config.itemsPerPage,
-      this.currentSortedColumnName, sortedCol.descending,  this.filters, this.existingReportId)
-      
+    console.log('view', this.view);
+    console.log('existingReportId', this.existingReportId);
+
+    this._ReportsService
+      .getReports(
+        this.view,
+        page,
+        this.config.itemsPerPage,
+        this.currentSortedColumnName,
+        sortedCol.descending,
+        this.filters,
+        this.existingReportId
+      )
+
       .subscribe((res: GetReportsResponse) => {
-   
         this.reportsModel = [];
         this._ReportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._ReportsService.mapFromServerFields(res.reports);
-        console.log(" getReportsPage reportsModelL", reportsModelL);
+        console.log(' getReportsPage reportsModelL', reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
         this.reportsModel = this._ReportsService.sortReports(
-          reportsModelL, this.currentSortedColumnName, sortedCol.descending);
-        
-        console.log(" getReportsPage this.reportsModel= ", this.reportsModel);
+          reportsModelL,
+          this.currentSortedColumnName,
+          sortedCol.descending
+        );
+
+        console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
         this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
-        this.numberOfPages = (res.totalreportsCount > this.maxItemsPerPage)? Math.round(this.config.totalItems/this.maxItemsPerPage) : 1;
-        
-        console.log("this.numberOfPages = ", this.numberOfPages);
+        this.numberOfPages =
+          res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+
+        console.log('this.numberOfPages = ', this.numberOfPages);
         this.allReportsSelected = false;
       });
+  }
 
-      
-  }  
+  public getFilterNames() {
+    this._ReportsService
+      .getStatuss()
+      .subscribe((res) => {
+        this.statusDescriptions = res.data;
+      }
+      );
+    this._ReportsService
+      .getAmendmentIndicators()
+      .subscribe((res) => {
+        this.getAmendmentIndicatorsDescriptions = res.data;
+      }
+      );
+    this._ReportsService
+      .getReportTypes()
+      .subscribe((res) => {
+        this.getReportTypesDescriptions = res;
+      }
+      );
+  }
 
-  
+  public displayStatusName(status: any) {
+    if (this.statusDescriptions.length) {
+      for (const statusName of this.statusDescriptions) {
+        if (statusName.status_cd === status) {
+          return statusName.status_desc;
+        }
+      }
+    }
+  }
+
+  public displayAmendmentIndicator(amendmentIndicator: any) {
+    if (this.getAmendmentIndicatorsDescriptions.length) {
+      for (const amendmentIndicatorName of this.getAmendmentIndicatorsDescriptions) {
+        if (amendmentIndicatorName.amend_ind === amendmentIndicator) {
+          return amendmentIndicatorName.amendment_desc;
+        }
+      }
+    }
+  }
+
+  public displayReportTypes(reportType: any) {
+    if (this.getReportTypesDescriptions) {
+      for (const reportTypeName of this.getReportTypesDescriptions) {
+        if (reportTypeName.rpt_type === reportType) {
+          return reportTypeName.rpt_type_desc;
+        }
+      }
+    }
+  }
+
+  public removeTag(tagType: string, tagIndex: number) {
+    switch (tagType) {
+      case 'filterForms':
+        this.filters.filterForms.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterReports':
+        this.filters.filterReports.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterAmendmentIndicators':
+        this.filters.filterAmendmentIndicators.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterStatuss':
+        this.filters.filterStatuss.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterStatuss':
+        this.filters.filterStatuss.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterCvgDate':
+        this.filters.filterCvgDateFrom = null;
+        this.filters.filterCvgDateTo = null;
+        this.getReportsPage(1);
+        break;
+        case 'filterFiledDate':
+        this.filters.filterFiledDateFrom = null;
+        this.filters.filterFiledDateTo = null;
+        this.getReportsPage(1);
+        break;
+      default:
+        console.log('unexpected type received for remove tag');
+    }
+  }
 
   /**
-	 * The Reports for the recycling bin.
-	 *
-	 * @param page the page containing the reports to get
-	 */
- /* public getRecyclingPage(page: number): void {
+   * The Reports for the recycling bin.
+   *
+   * @param page the page containing the reports to get
+   */
+  /* public getRecyclingPage(page: number): void {
 
     this.calculateNumberOfPages();
 
@@ -356,23 +431,21 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }*/
 
-
   /**
-	 * Wrapper method for the table service to set the class for sort column styling.
-	 *
-	 * @param colName the column to apply the class
-	 * @returns string of classes for CSS styling sorted/unsorted classes
-	 */
+   * Wrapper method for the table service to set the class for sort column styling.
+   *
+   * @param colName the column to apply the class
+   * @returns string of classes for CSS styling sorted/unsorted classes
+   */
   public getSortClass(colName: string): string {
     return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
   }
 
-
   /**
-	 * Change the sort direction of the table column.
-	 *
-	 * @param colName the column name of the column to sort
-	 */
+   * Change the sort direction of the table column.
+   *
+   * @param colName the column name of the column to sort
+   */
   public changeSortDirection(colName: string): void {
     this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
 
@@ -380,7 +453,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     // call server for page data in new direction
     this.getPage(this.config.currentPage);
   }
-
 
   /**
    * Get the SortableColumnModel by name.
@@ -397,7 +469,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     return new SortableColumnModel('', false, false, false, false);
   }
 
-
   /**
    * Determine if the column is to be visible in the table.
    *
@@ -413,7 +484,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Set the visibility of a column in the table.
    *
@@ -426,7 +496,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       sortableCol.visible = visible;
     }
   }
-
 
   /**
    * Set the checked property of a column in the table.
@@ -443,7 +512,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    *
    * @param colName Determine if the checkbox column option should be disabled.
@@ -451,14 +519,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public disableOption(colName: string): boolean {
     const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      if (!sortableCol.checked && this.columnOptionCount >
-        (this.maxColumnOption - 1)) {
+      if (!sortableCol.checked && this.columnOptionCount > this.maxColumnOption - 1) {
         return true;
       }
     }
     return false;
   }
-
 
   /**
    * Toggle the visibility of a column in the table.
@@ -467,7 +533,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param e the click event
    */
   public toggleVisibility(colName: string, e: any) {
-
     if (!this.sortableColumns) {
       return;
     }
@@ -493,12 +558,11 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.applyDisabledColumnOptions();
   }
 
-
   /**
    * Disable the unchecked column options if the max is met.
    */
   private applyDisabledColumnOptions() {
-    if (this.columnOptionCount > (this.maxColumnOption - 1)) {
+    if (this.columnOptionCount > this.maxColumnOption - 1) {
       for (const col of this.sortableColumns) {
         col.disabled = !col.checked;
       }
@@ -509,19 +573,16 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Save the columns to show selected by the user.
    */
   public saveColumnOptions() {
-
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, col.checked);
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
     this.columnOptionsModal.hide();
   }
-
 
   /**
    * Cancel the request to save columns options.
@@ -531,23 +592,21 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
   }
 
-
   /**
    * Toggle checking all types.
    *
    * @param e the click event
    */
   public toggleAllTypes(e: any) {
-    const checked = (e.target.checked) ? true : false;
+    const checked = e.target.checked ? true : false;
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, checked);
     }
   }
 
-
   /**
-	 * Determine if pagination should be shown.
-	 */
+   * Determine if pagination should be shown.
+   */
   public showPagination(): boolean {
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
@@ -556,14 +615,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     return false;
   }
 
-
   /**
    * View all reports selected by the user.
    */
   public viewAllSelected(): void {
     alert('View all reports is not yet supported');
   }
-
 
   /**
    * Print all reports selected by the user.
@@ -572,7 +629,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Print all reports is not yet supported');
   }
 
-
   /**
    * Export all reports selected by the user.
    */
@@ -580,14 +636,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Export all reports is not yet supported');
   }
 
-
   /**
    * Link all reports selected by the user.
    */
   public linkAllSelected(): void {
     alert('Link multiple report requirements have not been finalized');
   }
-
 
   /**
    * Trash all reports selected by the user.
@@ -629,7 +683,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }*/
 
-
   /**
    * Clone the report selected by the user.
    *
@@ -638,7 +691,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public cloneReport(): void {
     alert('Clone report is not yet supported');
   }
-
 
   /**
    * Link the report selected by the user.
@@ -649,7 +701,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Link requirements have not been finalized');
   }
 
-
   /**
    * View the report selected by the user.
    *
@@ -659,49 +710,43 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('View report is not yet supported');
   }
 
-
   /**
    * Edit the report selected by the user.
    *
    * @param report the Report to edit
    */
-  public editReport(report:reportModel): void {
-
-    if (report.form_type==='F99'){
-      this._ReportsService.getReportInfo(report.form_type, report.report_id)
-      .subscribe((res: form99) => {
-        console.log("getReportInfo res =", res)
+  public editReport(report: reportModel): void {
+    if (report.form_type === 'F99') {
+      this._ReportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
         //return false;
       });
       console.log(new Date().toISOString());
-      setTimeout(() => 
-      {
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1'} });  
+      setTimeout(() => {
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
         console.log(new Date().toISOString());
-      },
-      1500);
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._ReportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
-    }
-    else if (report.form_type==='F3X'){
-      this._ReportsService.getReportInfo(report.form_type, report.report_id)
-      .subscribe((res: form3xReportTypeDetails) => {
-        console.log("getReportInfo res =", res)
-        localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-        localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
-
-        //return false;
-      });
+          //return false;
+        });
       console.log(new Date().toISOString());
-      setTimeout(() => 
-      {
-        this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4'} });
+      setTimeout(() => {
+        this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+        // this._router.navigate([`/forms/form/${report.form_type}`], {
+        //   queryParams: { step: 'transactions', reportId: report.report_id }
+        // });
         console.log(new Date().toISOString());
-      },
-      1500);
+      }, 1500);
     }
   }
-
 
   /**
    * Trash the report selected by the user.
@@ -755,7 +800,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }*/
 
-
   /**
    * Delete selected reports from the the recyle bin.
    *
@@ -803,25 +847,20 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }*/
 
-
-
   /**
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-
     let start = 0;
     let end = 0;
     // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
-      this.config.currentPage : 1;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
 
     if (!this.reportsModel) {
       return '0';
     }
 
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.reportsModel.length > 0) {
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && this.reportsModel.length > 0) {
       // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
@@ -830,7 +869,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
-        start = (end - this.config.itemsPerPage) + 1;
+        start = end - this.config.itemsPerPage + 1;
       }
       // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
       // if (end > this.contactsModel.length) {
@@ -839,8 +878,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
 
     this.firstItemOnPage = start;
-    if (end > this.config.totalItems ){
-      end = this.config.totalItems
+    if (end > this.config.totalItems) {
+      end = this.config.totalItems;
     }
     this.lastItemOnPage = end;
     return start + ' - ' + end;
@@ -854,12 +893,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.columnOptionsModal.show();
   }
 
-
   /**
    * Check/Uncheck all reports in the table.
    */
   public changeAllReportsSelected() {
-
     // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
     // reports for the current page.
@@ -877,10 +914,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     //   }
     // }
 
-
     //Commented by Mahendra@04/16/2019
     // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
+    for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
       this.reportsModel[i].selected = this.allReportsSelected;
       if (this.allReportsSelected) {
         this.bulkActionCounter++;
@@ -889,7 +925,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.bulkActionDisabled = !this.allReportsSelected;
   }
 
-
   /**
    * Check if the view to show is Reports.
    */
@@ -897,14 +932,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     return this.tableType === this.reportsView ? true : false;
   }
 
-
   /**
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
     return this.tableType === this.recycleBinView ? true : false;
   }
-
 
   /**
    * Check for multiple rows checked in the table
@@ -914,7 +947,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param the event payload from the click
    */
   public checkForMultiChecked(e: any): void {
-
     if (e.target.checked) {
       this.bulkActionCounter++;
     } else {
@@ -927,9 +959,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     // Report View shows bulk action when more than 1 checked
     // Recycle Bin shows delete action when 1 or more checked.
     const count = this.isReportViewActive() ? 1 : 0;
-    this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
+    this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
   }
-
 
   /**
    * Get cached values from session.
@@ -953,7 +984,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Columns selected in the PIN dialog from the reports view
    * need to be applied to the Recycling Bin table.
@@ -964,12 +994,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     if (localStorage.getItem(key) != null) {
       const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
       for (const col of trxCols) {
-        this._tableService.getColumnByName(col.colName,
-          this.sortableColumns).visible = col.visible;
+        this._tableService.getColumnByName(col.colName, this.sortableColumns).visible = col.visible;
       }
     }
   }
-
 
   /**
    * Apply the filters from the cache.
@@ -983,7 +1011,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.filters = null;
     }
   }
-
 
   /**
    * Get the column and their settings from the cache and apply it to the component.
@@ -1000,34 +1027,33 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Get the current sorted column from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentSortedColCache(key: string) {
-    const currentSortedColumnJson: string | null =
-      localStorage.getItem(key);
+    const currentSortedColumnJson: string | null = localStorage.getItem(key);
     let currentSortedColumnL: SortableColumnModel = null;
     if (currentSortedColumnJson) {
       currentSortedColumnL = JSON.parse(currentSortedColumnJson);
 
       // sort by the column direction previously set
-      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName,
-        this.sortableColumns, currentSortedColumnL.descending);
+      this.currentSortedColumnName = this._tableService.setSortDirection(
+        currentSortedColumnL.colName,
+        this.sortableColumns,
+        currentSortedColumnL.descending
+      );
     } else {
       this.setSortDefault();
     }
   }
-
 
   /**
    * Get the current page from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentPageCache(key: string) {
-    const currentPageCache: string =
-      localStorage.getItem(key);
+    const currentPageCache: string = localStorage.getItem(key);
     if (this._utilService.isNumber(currentPageCache)) {
       this.config.currentPage = this._utilService.toInteger(currentPageCache);
     } else {
@@ -1035,28 +1061,26 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Retrieve the cahce values from local storage and set the
    * component's class variables.
    */
   private setCachedValues() {
-
     switch (this.tableType) {
       case this.reportsView:
-
-        this.setCacheValuesforView(this.reportSortableColumnsLSK,
-          this.reportCurrentSortedColLSK, this.reportPageLSK);
+        this.setCacheValuesforView(this.reportSortableColumnsLSK, this.reportCurrentSortedColLSK, this.reportPageLSK);
         break;
       case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
-          this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+        this.setCacheValuesforView(
+          this.recycleSortableColumnsLSK,
+          this.recycleCurrentSortedColLSK,
+          this.recyclePageLSK
+        );
         break;
       default:
         break;
     }
   }
-
 
   /**
    * Set the currently sorted column and current page in the cache.
@@ -1065,21 +1089,14 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param sortedColKey currently sorted column key for the cache
    * @param pageKey current page key from the cache
    */
-  private setCacheValuesforView(columnsKey: string, sortedColKey: string,
-    pageKey: string) {
-   
-  
+  private setCacheValuesforView(columnsKey: string, sortedColKey: string, pageKey: string) {
     // shared between trx and recycle tables
-    localStorage.setItem(columnsKey,
-      JSON.stringify(this.sortableColumns));
-
+    localStorage.setItem(columnsKey, JSON.stringify(this.sortableColumns));
 
     // shared between trx and recycle tables
-    localStorage.setItem(this.filtersLSK,
-      JSON.stringify(this.filters));
+    localStorage.setItem(this.filtersLSK, JSON.stringify(this.filters));
 
-    const currentSortedCol = this._tableService.getColumnByName(
-      this.currentSortedColumnName, this.sortableColumns);
+    const currentSortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
     localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
 
     if (currentSortedCol) {
@@ -1088,16 +1105,25 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     localStorage.setItem(pageKey, this.config.currentPage.toString());
   }
 
-
   /**
    * Set the Table Columns model.
    */
- /**
+  /**
    * Set the Table Columns model.
    */
-  private setSortableColumns() : void {
+  private setSortableColumns(): void {
     // sort column names must match the domain model names
-    let defaultSortColumns = ['form_type', 'status', 'fec_id', 'amend_ind', 'cvg_start_date', 'cvg_end_date', 'report_type_desc','filed_date', 'last_update_date'];
+    let defaultSortColumns = [
+      'form_type',
+      'status',
+      'fec_id',
+      'amend_ind',
+      'cvg_start_date',
+      'cvg_end_date',
+      'report_type_desc',
+      'filed_date',
+      'last_update_date'
+    ];
 
     /*let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
       'contributorEmployer', 'contributorOccupation', 'memoCode', 'memoText',];*/
@@ -1105,44 +1131,36 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.sortableColumns = [];
     for (let field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
-    }  
+    }
     /*for (let field of otherSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }*/
-
-
   }
-
 
   /**
    * Set the UI to show the default column sorted in the default direction.
    */
   private setSortDefault(): void {
     //this.currentSortedColumnName = this._tableService.setSortDirection('form_type',
-      //this.sortableColumns, false);
-    this.currentSortedColumnName = this._tableService.setSortDirection('last_update_date',
-      this.sortableColumns, true);
+    //this.sortableColumns, false);
+    this.currentSortedColumnName = this._tableService.setSortDirection('last_update_date', this.sortableColumns, true);
   }
 
-
-  private calculateNumberOfPages() : void {
-
+  private calculateNumberOfPages(): void {
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
       if (this.reportsModel && this.reportsModel.length > 0) {
-        this.numberOfPages =  this.reportsModel.length / this.config.itemsPerPage;
+        this.numberOfPages = this.reportsModel.length / this.config.itemsPerPage;
         this.numberOfPages = Math.ceil(this.numberOfPages);
       }
     }
   }
 
-  public getErrors(){
-   alert('Get Errors functionality is not yet implemented.');
+  public getErrors() {
+    alert('Get Errors functionality is not yet implemented.');
   }
 
-  public isStatusFailed(status:string):boolean{
-    if (status==='Failed')
-      return true;
-    else 
-      return false;  
+  public isStatusFailed(status: string): boolean {
+    if (status === 'Failed') return true;
+    else return false;
   }
 }

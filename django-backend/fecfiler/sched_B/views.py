@@ -627,7 +627,7 @@ def delete_schedB(data):
         transaction_id = data.get("transaction_id")
         check_transaction_id(transaction_id)
         delete_sql_schedB(transaction_id, report_id, cmte_id)
-        delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
+        # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
 

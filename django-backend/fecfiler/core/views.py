@@ -257,6 +257,7 @@ def check_null_value(check_value):
 
 
 
+
 def check_email(email):
     try:
         pattern = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
@@ -1481,7 +1482,10 @@ def get_all_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         # import ipdb;ipdb.set_trace()
@@ -1643,7 +1647,10 @@ def get_all_trashed_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         params = request.data.get('filters', {})
@@ -2712,25 +2719,25 @@ def get_loan_debt_summary(request):
         SELECT Sum(t._sum) 
         FROM  ( 
             ( 
-                    SELECT Sum(loan_payment_to_date) AS _sum 
+                    SELECT SUM(loan_balance) AS _sum 
                     FROM   public.sched_c 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(loan_amount) AS _sum 
+                    SELECT SUM(loan_amount) AS _sum 
                     FROM   public.sched_c1 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(payment_amount) AS _sum 
+                    SELECT SUM(payment_amount) AS _sum 
                     FROM   public.sched_d 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s
-                    AND    line_number= %(line_num)s)) t;
+                    AND    line_num= %(line_num)s)) t;
         """
         with connection.cursor() as cursor:
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '9'})

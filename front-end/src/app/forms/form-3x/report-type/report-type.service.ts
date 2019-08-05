@@ -552,9 +552,45 @@ export class ReportTypeService {
   public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    let prior_url: string = '/core/prepare_json_builders_data';  //JSON builder data preparation URL
     let url: string = '/core/create_json_builders'; //Actual JSON file genaration URL
     //let url: string = '/core/create_json_builders_test';
+    let formData: FormData = new FormData();
+
+    console.log("printForm formType = ", formType);
+    console.log("printForm callFrom = ", callFrom);
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (form3xReportType === null)
+    {
+      console.log("get backup object");
+      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+      console.log("backup object form3xReportType = ", form3xReportType);
+    }
+    
+    if (form3xReportType.hasOwnProperty('reportId')) {
+      formData.append('report_id', form3xReportType.reportId);
+    } else if (form3xReportType.hasOwnProperty('reportid')) {   
+      formData.append('report_id', form3xReportType.reportid);
+    }
+
+    formData.append('form_type', `F${formType}`);
+    formData.append('call_from', callFrom);
+
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions
+      });
+   }
+
+   public prepare_json_builders_data(formType: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url: string = '/core/prepare_json_builders_data';  //JSON builder data preparation URL
+
     let formData: FormData = new FormData();
 
     console.log("printForm formType = ", formType);
@@ -577,24 +613,43 @@ export class ReportTypeService {
     }
 
     return this._http
-      .post(`${environment.apiUrl}${prior_url}`, formData, {
+      .post(`${environment.apiUrl}${url}`, formData, {
         headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            console.log("Form 3X JSON Builder Data Prep res = ", res);
-               if (res['Response']==='Success') {
-                formData.append('form_type', `F${formType}`);
-                formData.append('call_from', callFrom);
-                      
-                return this._http
-                .post(`${environment.apiUrl}${url}`, formData, {
-                  headers: httpOptions
-                });
-               } else { return res}
-          } else {return res}
-        })
-      );
+      });
    }
+
+   public printPreview(formType: string): void {
+    
+    this.signandSaveSubmitReport(formType,'Saved');
+    console.log("printPreview Data saved successfully...!");
+
+    this.prepare_json_builders_data(formType)
+      .subscribe( res => {
+        if (res) {
+             console.log("Form 3X prepare_json_builders_data res = ", res);
+             if (res['Response']==='Success') {
+                    console.log(" Form 3X prepare_json_builders_data successfully processed...!");
+                    this.printPreviewPdf(formType, "PrintPreviewPDF")
+                      .subscribe(res => {
+                      if(res) {
+                        console.log("Form 3X  printPriview res ...",res);
+                        if (res.hasOwnProperty('results')) {
+                          if (res['results.pdf_url'] !== null) {
+                            console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                            window.open(res.results.pdf_url, '_blank');
+                          }
+                        }
+                      }
+                  },
+                  (error) => {
+                    console.log('error: ', error);
+                  });/*  */
+                  }       
+        }
+      },
+        (error) => {
+          console.log('error: ', error);
+        });/*  */
+
+  }
 }

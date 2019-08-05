@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
+import { ScheduleActions } from './individual-receipt.component';
 
 @Injectable({
   providedIn: 'root'
@@ -40,9 +41,10 @@ export class IndividualReceiptService {
   /**
    * Saves a schedule.
    *
-   * @param      {string}  formType  The form type
+   * @param      {string}           formType  The form type
+   * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSchedule(formType: string): Observable<any> {
+  public saveSchedule(formType: string, scheduleAction: ScheduleActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -74,6 +76,8 @@ export class IndividualReceiptService {
       formData.append('report_id', reportType.reportid);
     }
 
+    console.log();
+
     for (const [key, value] of Object.entries(receipt)) {
       if (value !== null) {
         if (typeof value === 'string') {
@@ -82,18 +86,35 @@ export class IndividualReceiptService {
       }
     }
 
-    return this._http
-      .post(`${environment.apiUrl}${url}`, formData, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
+    if (scheduleAction === ScheduleActions.add) {
+      return this._http
+        .post(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
         })
-      );
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    } else if (scheduleAction === ScheduleActions.edit) {
+      return this._http
+        .put(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    } else {
+      console.log('unexpected ScheduleActions received - ' + scheduleAction);
+    }
   }
 
   /**
@@ -276,15 +297,14 @@ export class IndividualReceiptService {
    * @param      {string}  entityId                   The entity identifier
    * @param      {string}  transactionTypeIdentifier  The transaction type
    */
-    public getContributionAggregate(
+  public getContributionAggregate(
     reportId: string,
     entityId: number,
     transactionTypeIdentifier: string
   ): Observable<any> {
-
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sa/contribution_aggregate';
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -294,13 +314,9 @@ export class IndividualReceiptService {
     params = params.append('entity_id', entityId.toString());
     params = params.append('transaction_type_identifier', transactionTypeIdentifier);
 
-    return this._http
-        .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions,
-            params
-          }
-        );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
   }
 }

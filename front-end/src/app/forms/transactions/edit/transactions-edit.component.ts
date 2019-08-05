@@ -340,21 +340,5 @@ export class TransactionsEditComponent implements OnInit, DoCheck {
    */
   public viewTransactions(): void {
     this._transactionsMessageService.sendShowTransactionsMessage('');
-
-    // let reportId = '0';
-    // const form3XReportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
-
-    // if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-    //   if (form3XReportType.hasOwnProperty('reportId')) {
-    //     reportId = form3XReportType.reportId;
-    //   }
-    // }
-
-    // if (!reportId) {
-    //   reportId = '0';
-    // }
-    // console.log(`View Transactions for form ${this.formType} where reportId = ${reportId}`);
-
-    // this._router.navigate([`/forms/transactions/${this.formType}/${reportId}`]);
   }
 }
