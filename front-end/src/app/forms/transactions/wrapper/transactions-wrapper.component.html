@@ -1,0 +1,19 @@
+<div class="forms__wizard">
+  <!-- <div class="transactions__main-container"></div> -->
+  <div class="form__sidebar">
+    <transaction-sidebar
+      [hidden]="isShowFilters"
+      [step]="step"
+      title="Transaction Categories"
+      [transactionCategories]="transactionCategories"
+      (status)="onNotify($event)"
+    >
+    </transaction-sidebar>
+    <div class="transactions__sidebar_filters">
+      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
+      </app-transactions-filter>
+    </div>
+  </div>
+  <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)"> </app-transactions>
+  <!-- </div> -->
+</div>

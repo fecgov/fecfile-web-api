@@ -72,6 +72,7 @@ import { UsersComponent } from './users/users.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { ContactsTableComponent } from './contacts/contacts-table/contacts-table.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
+import { TransactionsWrapperComponent } from './forms/transactions/wrapper/transactions-wrapper.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -93,6 +94,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ContributorsComponent,
     ToolsComponent,
     TransactionsComponent,
+    TransactionsWrapperComponent,
     TransactionsTableComponent,
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
