@@ -20,7 +20,7 @@ export class ContactsMessageService {
   private showContactsSubject = new Subject<any>();
   private removeFilterSubject = new Subject<any>();
   private switchFilterViewSubject = new Subject<any>();
-
+  private populateFormSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -194,4 +194,10 @@ export class ContactsMessageService {
     return this.switchFilterViewSubject.asObservable();
   }
 
+  /**
+   * A method for subscribers of the Populate Form message.
+   */
+  public getPopulateFormMessage(): Observable<any> {
+    return this.populateFormSubject.asObservable();
+  }
 }

@@ -72,7 +72,9 @@ import { UsersComponent } from './users/users.component';
 import { TransactionsEditComponent } from './forms/transactions/edit/transactions-edit.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { ContactsTableComponent } from './contacts/contacts-table/contacts-table.component';
+import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
+
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -133,7 +135,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SafeHTMLPipe,
     ReportsFilterTypeComponent,
     ContactsComponent,
-    ContactsTableComponent
+    ContactsTableComponent,
+    AddNewContactComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
