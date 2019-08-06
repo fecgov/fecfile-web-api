@@ -65,6 +65,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
+  public statusDescriptions = [];
+  public getAmendmentIndicatorsDescriptions = [];
+  public getReportTypesDescriptions = [];
   //public existingReportId: string;
 
   // ngx-pagination config
@@ -194,6 +197,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     switch (this.tableType) {
       case this.reportsView:
         this.getReportsPage(page);
+        this.getFilterNames();
         break;
       case this.recycleBinView:
         this.getReportsPage(page);
@@ -298,6 +302,94 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         console.log('this.numberOfPages = ', this.numberOfPages);
         this.allReportsSelected = false;
       });
+  }
+
+  public getFilterNames() {
+    this._ReportsService
+      .getStatuss()
+      .subscribe((res) => {
+        this.statusDescriptions = res.data;
+      }
+      );
+    this._ReportsService
+      .getAmendmentIndicators()
+      .subscribe((res) => {
+        this.getAmendmentIndicatorsDescriptions = res.data;
+      }
+      );
+    this._ReportsService
+      .getReportTypes()
+      .subscribe((res) => {
+        this.getReportTypesDescriptions = res;
+      }
+      );
+  }
+
+  public displayStatusName(status: any) {
+    if (this.statusDescriptions.length) {
+      for (const statusName of this.statusDescriptions) {
+        if (statusName.status_cd === status) {
+          return statusName.status_desc;
+        }
+      }
+    }
+  }
+
+  public displayAmendmentIndicator(amendmentIndicator: any) {
+    if (this.getAmendmentIndicatorsDescriptions.length) {
+      for (const amendmentIndicatorName of this.getAmendmentIndicatorsDescriptions) {
+        if (amendmentIndicatorName.amend_ind === amendmentIndicator) {
+          return amendmentIndicatorName.amendment_desc;
+        }
+      }
+    }
+  }
+
+  public displayReportTypes(reportType: any) {
+    if (this.getReportTypesDescriptions) {
+      for (const reportTypeName of this.getReportTypesDescriptions) {
+        if (reportTypeName.rpt_type === reportType) {
+          return reportTypeName.rpt_type_desc;
+        }
+      }
+    }
+  }
+
+  public removeTag(tagType: string, tagIndex: number) {
+    switch (tagType) {
+      case 'filterForms':
+        this.filters.filterForms.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterReports':
+        this.filters.filterReports.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterAmendmentIndicators':
+        this.filters.filterAmendmentIndicators.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterStatuss':
+        this.filters.filterStatuss.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterStatuss':
+        this.filters.filterStatuss.splice(tagIndex, 1);
+        this.getReportsPage(1);
+        break;
+        case 'filterCvgDate':
+        this.filters.filterCvgDateFrom = null;
+        this.filters.filterCvgDateTo = null;
+        this.getReportsPage(1);
+        break;
+        case 'filterFiledDate':
+        this.filters.filterFiledDateFrom = null;
+        this.filters.filterFiledDateTo = null;
+        this.getReportsPage(1);
+        break;
+      default:
+        console.log('unexpected type received for remove tag');
+    }
   }
 
   /**
