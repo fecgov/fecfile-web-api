@@ -18,7 +18,7 @@ import {
 } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { F3xMessageService } from '../service/f3x-message.service';
-import { ScheduleActions } from '../individual-receipt/individual-receipt.component';
+import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
 
 @Component({
   selector: 'app-f3x',
@@ -70,6 +70,7 @@ export class F3xComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.scheduleAction = ScheduleActions.add;
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;

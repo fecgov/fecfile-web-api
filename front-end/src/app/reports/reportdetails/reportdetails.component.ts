@@ -647,10 +647,13 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         });
       console.log(new Date().toISOString());
       setTimeout(() => {
-        this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-        // this._router.navigate([`/forms/form/${report.form_type}`], {
-        //   queryParams: { step: 'transactions', reportId: report.report_id }
-        // });
+        // this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+        this._router.navigate([`/forms/form/${formType}`], {
+          queryParams: { step: 'transactions', reportId: report.report_id }
+        });
         console.log(new Date().toISOString());
       }, 1500);
     }

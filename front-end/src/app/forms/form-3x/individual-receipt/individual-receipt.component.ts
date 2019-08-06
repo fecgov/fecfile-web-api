@@ -31,11 +31,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
-
-export enum ScheduleActions {
-  add = 'add',
-  edit = 'edit'
-}
+import { ScheduleActions } from './schedule-actions.enum';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -126,6 +122,37 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt = this._fb.group({});
   }
 
+  /**
+   * A temporary fix to a case naming issue.  The report_type object
+   * in storage differes from the values set in report-type componentt and
+   * the reportdetail component. This method will set the camelCased fields
+   * missing from the reportdetail component.
+   */
+  private handleCaseNaming() {
+    if (!this._reportType.hasOwnProperty('reportid')) {
+      return;
+    }
+
+    const camelCaseReportType: any = {};
+    if (this._reportType.hasOwnProperty('cmteid')) {
+      camelCaseReportType.cmteId = this._reportType.cmteid;
+    }
+    if (this._reportType.hasOwnProperty('reportid')) {
+      camelCaseReportType.reportId = this._reportType.reportid;
+    }
+    if (this._reportType.hasOwnProperty('formtype')) {
+      camelCaseReportType.formType = this._reportType.formtype;
+    }
+    if (this._reportType.hasOwnProperty('cvgstartdate')) {
+      camelCaseReportType.cvgStartDate = this._reportType.cvgstartdate;
+    }
+    if (this._reportType.hasOwnProperty('cvgenddate')) {
+      camelCaseReportType.cvgEndDate = this._reportType.cvgenddate;
+    }
+    this._reportType = camelCaseReportType;
+    localStorage.setItem(`form_3X_report_type`, JSON.stringify(this._reportType));
+  }
+
   ngDoCheck(): void {
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
@@ -133,12 +160,19 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       }
     }
 
+    // // just for test
+    // if (!this.transactionType) {
+    //   this.transactionType = 'INDV_REC';
+    // }
+
     this._getTransactionType();
 
     this._validateContributionDate();
 
     if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+      // this.handleCaseNaming();
 
       if (typeof this._reportType === 'object') {
         if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
@@ -892,6 +926,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (editOrView !== null) {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
+
+        // Until get_all_transactions has the new code use this
+        if (formData.type === 'Individual Receipt') {
+          this.transactionType = 'INDV_REC';
+        }
 
         this.hiddenFields.forEach(el => {
           if (el.name === 'transaction_id') {

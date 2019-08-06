@@ -8,7 +8,8 @@ import { TransactionModel } from './model/transaction.model';
 import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { FormBuilder } from '@angular/forms';
-import { ScheduleActions } from '../form-3x/individual-receipt/individual-receipt.component';
+import { F3xMessageService } from '../form-3x/service/f3x-message.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -59,6 +60,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public searchTextArray = [];
   public tagArray: any = [];
   public transactionCategories: any = [];
+  public showEditTransaction = false;
 
   public currentStep: string = 'step_1';
   public step: string = '';
@@ -109,7 +111,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
     private _router: Router,
-    private _fb: FormBuilder
+    private _fb: FormBuilder,
+    private _f3xMessageService: F3xMessageService
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
@@ -141,6 +144,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+    this.showEditTransaction = false;
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
@@ -633,25 +637,32 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show edit for a single transaction.
    */
   public showEdit() {
-    // this.view = ActiveView.edit;
-    // this.showTransaction.emit({
-    //   showTransactionType: 'edit',
-    //   direction: 'next',
-    //   step: 'transactions',
-    // });
+    let accessedByRoute = false;
+    if (this.routeData) {
+      if (this.routeData.accessedByRoute && this.routeData.reportId) {
+        accessedByRoute = true;
+      }
+    }
 
-    const emptyValidForm = this._fb.group({});
+    if (accessedByRoute) {
+      // this._router.navigate([`/forms/form/${this.formType}`], {
+      //   queryParams: { step: 'step_3' }
+      // });
 
-    this.showTransaction.emit({
-      form: emptyValidForm,
-      direction: 'next',
-      step: 'step_3',
-      previousStep: 'transactions',
-      editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
-
-      // transactionTypeText: this.transactionToEdit.type,
-      // transactionType: this.transactionToEdit.type
-    });
+      this._router.navigate([`/forms/form/edit/${this.formType}/${this.routeData.reportId}`]);
+      const editOrView = { action: ScheduleActions.edit, transactionModel: this.transactionToEdit };
+      this._f3xMessageService.sendPopulateFormMessage(editOrView);
+      // this.showEditTransaction = true;
+    } else {
+      const emptyValidForm = this._fb.group({});
+      this.showTransaction.emit({
+        form: emptyValidForm,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'transactions',
+        editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
+      });
+    }
   }
 
   /**
@@ -714,50 +725,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this._transactionsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
   }
 
-  /*  public onNotify(e): void {
-    if (typeof e === 'object') {
-      if (e.hasOwnProperty('form')) {
-        if (typeof e.form === 'object') {
-          this.frm = e.form;
-
-          this.direction = e.direction;
-
-          this.previousStep = e.previousStep;
-
-          this._step = e.step;
-
-          this.currentStep = e.step;
-
-   
-          //this.canContinue();
-        } else if (typeof e.form === 'string') {
-          if (e.form === this._formType) {
-            if (e.hasOwnProperty('reportTypeRadio')) {
-              if (typeof e.reportTypeRadio === 'string') {
-                //this._setCoverageDates(e.reportTypeRadio);
-              }
-            } else if (e.hasOwnProperty('toDate') && e.hasOwnProperty('fromDate')) {
-              this.selectedReportInfo = e;
-            } else if (e.hasOwnProperty('transactionCategory')) {
-              if (typeof e.transactionCategory === 'string') {
-                this.transactionCategory = e.transactionCategory;
-              }
-            }
-          }
-        }
-      } else if (e.hasOwnProperty('direction')) {
-        if (typeof e.direction === 'string') {
-          if (e.direction === 'previous') {
-            this.direction = e.direction;
-
-            this.previousStep = e.previousStep;
-
-            this._step = e.step;
-          }
-        }
-      }
-    }
-  }*/
   public printPreview(): void {
     this._reportTypeService.printPreview(this._formType);
   }
