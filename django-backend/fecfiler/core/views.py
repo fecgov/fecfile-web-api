@@ -2836,6 +2836,45 @@ def get_f3x_report_data(cmte_id, report_id):
 #         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
 
 
+
+# def get_line_sum_value_b(line_number, formula, sched_b_line_sum_dict, cmte_id, report_id):
+#     val = 0
+#     if line_number == '6b':
+#         val = prev_cash_on_hand_cop(report_id, cmte_id, False)
+#         # print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+#         # print('rep: '+str(val))
+#         return val
+#     if line_number == '6a':
+#         val = prev_cash_on_hand_cop(report_id, cmte_id, True)
+#         # print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
+#         # print('year: '+ str(val))
+#         return val
+#     if formula == "":
+#         val += sched_b_line_sum_dict.get(line_number, 0) if sched_b_line_sum_dict.get(line_number, 0) else 0
+#         return val
+#     if formula == "0":
+#         return val
+#     formula_split = formula.replace(' ', '').split('+')
+#     if len(formula_split) == 1:
+#         if '-' in formula_split[0]:
+#             cl_n = formula_split[0].replace(' ', '')
+#             val += get_line_sum_value_b(cl_n.split('-')[0], "", sched_a_line_sum_dict, cmte_id,
+#                                           report_id) - get_line_sum_value_b(cl_n.split('-')[1], "", sched_a_line_sum_dict, cmte_id,
+#                                           report_id)
+#         else:
+#             line_number = formula_split[0]
+#             val += sched_b_line_sum_dict.get(line_number, 0) if sched_a_line_sum_dict.get(line_number, 0) else 0
+#     else:
+#         for cl_n in formula_split:
+#             if '-' in cl_n:
+#                 val += get_line_sum_value_b(cl_n.split('-')[0], "", sched_a_line_sum_dict, cmte_id,
+#                                           report_id) - get_line_sum_value_b(cl_n.split('-')[1], "", sched_a_line_sum_dict, cmte_id,
+#                                           report_id)
+#             else:
+#                 val += get_line_sum_value_b(cl_n, "", sched_a_line_sum_dict, cmte_id, report_id)
+#     return val
+
+
 #def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
 def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, report_id):
     val = 0
@@ -2885,6 +2924,15 @@ def prepare_json_builders_data(request):
         report_id = request.data.get('report_id')
         sched_a_line_sum = {}
         sched_b_line_sum = {}
+
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+
+        #cdate = date.today()
+        from_date = date(cvg_start_date.year, 1,1)
+        print(from_date,'gggggggggggggggggggggggggg')
+        to_date = date(cvg_end_date.year, 12, 31)
+        print(to_date,'tooooooooooooooooooooooooooooooooooooo')
+
         #schedule_a_b_line_sum_dict = {}
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -2908,6 +2956,32 @@ def prepare_json_builders_data(request):
         schedule_a_b_line_sum_dict = {}
         schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         schedule_a_b_line_sum_dict.update(sched_b_line_sum)
+
+        col_a_line_sum = {}
+        col_b_line_sum = {}
+
+
+        with connection.cursor() as cursor:
+            cursor.execute(""" 
+                SELECT line_number, sum(contribution_amount) from public.sched_a 
+                where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+                 
+            col_a_line_sum_result = cursor.fetchall()
+            col_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result}
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT line_number, sum(expenditure_amount) from public.sched_b 
+                where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+            col_b_line_sum_result = cursor.fetchall()
+            col_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result}
+
+
+        col_line_sum_dict = {}
+        col_line_sum_dict.update(col_a_line_sum)
+        col_line_sum_dict.update(col_b_line_sum)
+
+        print(col_a_line_sum, "col_a_line_sum")
+        print(col_b_line_sum, "col_b_line_sum")
         
 
 
@@ -2959,9 +3033,9 @@ def prepare_json_builders_data(request):
         final_col_b_dict = {}
         for line_number in col_b_dict_original:
             final_col_b_dict[line_number] = get_line_sum_value(line_number, col_b_dict_original[line_number],
-                                                               schedule_a_b_line_sum_dict,
+                                                               col_line_sum_dict,
                                                                cmte_id, report_id)
-            schedule_a_b_line_sum_dict[line_number] = final_col_b_dict[line_number]
+            col_line_sum_dict[line_number] = final_col_b_dict[line_number]
         print(final_col_b_dict, "col_b_dict")
 
         for i in final_col_a_dict:

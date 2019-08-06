@@ -34,10 +34,10 @@ MANDATORY_FIELDS_SCHED_H6 = ['cmte_id', 'report_id', 'transaction_id']
 
 
 def check_transaction_id(transaction_id):
-    if not (transaction_id[0:2] == "SH3"):
+    if not (transaction_id[0:2] == "SH"):
         raise Exception(
             'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SH3 characters'.format(transaction_id))
+            'Transaction IDs start with SH6 characters'.format(transaction_id))
     return transaction_id
 
 
@@ -454,12 +454,6 @@ def schedH3(request):
 ************************************************* CRUD API FOR SCHEDULE_H4 ********************************************************************************
 
 """
-def check_transaction_id(transaction_id):
-    if not (transaction_id[0:2] == "SH4"):
-        raise Exception(
-            'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SH4 characters'.format(transaction_id))
-    return transaction_id
 
 
 def check_mandatory_fields_SH4(data):
@@ -906,13 +900,6 @@ def schedH4(request):
 ************************************************** CRUD API FOR SCHEDULE_H5 ***********************************************************************************
 
 """
-def check_transaction_id(transaction_id):
-    if not (transaction_id[0:2] == "SH5"):
-        raise Exception(
-            'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SH5 characters'.format(transaction_id))
-    return transaction_id
-
 
 def check_mandatory_fields_SH5(data):
     """
@@ -1319,13 +1306,6 @@ def schedH5(request):
 
 **********************************************************CRUD API FOR SCHEDULE_H6*********************************************************************************
 """
-def check_transaction_id(transaction_id):
-    if not (transaction_id[0:2] == "SH6"):
-        raise Exception(
-            'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SH6 characters'.format(transaction_id))
-    return transaction_id
-
 
 def check_mandatory_fields_SH6(data):
     """
@@ -1366,6 +1346,9 @@ def schedH6_sql_dict(data):
             'activity_event_type',
             'memo_code',
             'memo_text',
+            'delete_ind',
+            'create_date',
+            'last_update_date',
     ]
     try:
         return {k: v for k, v in data.items() if k in valid_fields}
@@ -1420,7 +1403,7 @@ def put_sql_schedH6(data):
               AND delete_ind is distinct from 'Y';
         """
     _v = (  
-            data.get('line_number', ''),
+            data.get('line_number'),
             data.get('transaction_type_identifier', ''),
             data.get('transaction_type', ''),
             data.get('back_ref_transaction_id', ''),
@@ -1452,38 +1435,16 @@ def validate_sh6_data(data):
     check_mandatory_fields_SH6(data)
 
 
-def post_schedH6(data):
-    """
-    function for handling POST request for sH6, need to:
-    1. generatye new transaction_id
-    2. validate data
-    3. save data to db
-    """
-    try:
-        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6)
-        data['transaction_id'] = get_next_transaction_id('SH6')
-        print(data)
-        validate_sh6_data(data)
-        try:
-            post_sql_schedH6(data)
-        except Exception as e:
-            raise Exception(
-                'The post_sql_schedH6 function is throwing an error: ' + str(e))
-        return data
-    except:
-        raise
-
-
 def post_sql_schedH6(data):
     try:
         _sql = """
-        INSERT INTO public.sched_h6 (
+        INSERT INTO public.sched_h6 ( 
             cmte_id,
             report_id,
             line_number,
             transaction_type_identifier,
             transaction_type,
-            transaction_id ,
+            transaction_id,
             back_ref_transaction_id,
             back_ref_sched_name,
             entity_id,
@@ -1499,14 +1460,14 @@ def post_sql_schedH6(data):
             memo_code,
             memo_text,
             create_date,
-            last_update_date 
-            )
+            last_update_date
+         )
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('line_number', ''),
+            data.get('line_number',''),
             data.get('transaction_type_identifier', ''),
             data.get('transaction_type', ''),
             data.get('transaction_id'),
@@ -1524,7 +1485,8 @@ def post_sql_schedH6(data):
             data.get('activity_event_type', ''),
             data.get('memo_code', ''),
             data.get('memo_text', ''),
-            datetime.datetime.now(),   
+            datetime.datetime.now(),
+            datetime.datetime.now()
          )
         with connection.cursor() as cursor:
             # Insert data into schedH6 table
@@ -1533,18 +1495,44 @@ def post_sql_schedH6(data):
         raise
 
 
+def post_schedH6(data):
+    """
+    function for handling POST request for sH6, need to:
+    1. generatye new transaction_id
+    2. validate data
+    3. save data to db
+    """
+    try:
+        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6)
+        data['transaction_id'] = get_next_transaction_id('SH6')
+        print(data,'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
+        validate_sh6_data(data)
+        try:
+            post_sql_schedH6(data)
+        except Exception as e:
+            raise Exception(
+                'The post_sql_schedH6 function is throwing an error: ' + str(e))
+        return data
+    except:
+        raise
+
 def get_schedH6(data):
     """
     load sched_H6 data based on cmte_id, report_id and transaction_id
     """
     try:
+        print('jkjkjkkj')
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
+        
         if 'transaction_id' in data:
+            print('get_schedH6jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjs')
             transaction_id = check_transaction_id(data.get('transaction_id'))
+            print('get_schedH6')
             forms_obj = get_list_schedH6(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedH6(report_id, cmte_id)
+        print(forms_obj,'jkjkjkkj')
         return forms_obj
     except:
         raise
@@ -1674,6 +1662,7 @@ def schedH6(request):
             if not('report_id' in request.data):
                 raise Exception('Missing Input: Report_id is mandatory')
             # handling null,none value of report_id
+
             if not (check_null_value(request.data.get('report_id'))):
                 report_id = "0"
             else:
@@ -1682,6 +1671,7 @@ def schedH6(request):
             datum = schedH6_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            print('datttat')
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -1692,7 +1682,11 @@ def schedH6(request):
                 data = post_schedH6(datum)
             # Associating child transactions to parent and storing them to DB
 
+            print('print',data)
+
+
             output = get_schedH6(data)
+            print('print')
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedH6 API - POST is throwing an exception: "

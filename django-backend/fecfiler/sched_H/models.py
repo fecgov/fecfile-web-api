@@ -99,25 +99,6 @@ class SchedH5(models.Model):
         db_table = 'sched_h5'
 
 
-  """
-character varying(8),
-  transaction_type_identifier character varying(40),
-  transaction_type character varying(12),
-  transaction_id character varying(20) NOT NULL DEFAULT get_next_transaction_id('H6'::bpchar),
-  back_ref_transaction_id character varying(20),
-  back_ref_sched_name character varying(8),
-  entity_id character varying(20),
-  account_event_identifier character varying(90),
-  expenditure_date date,
-  total_fed_levin_amount numeric(12,2),
-  federal_share numeric(12,2),
-  levin_share numeric(12,2),
-  activity_event_total_ytd numeric(12,2),
-  expenditure_purpose character varying(100),
-  category_code character varying(3),
-  activity_event_type character varying(20),
-"""
-
 
 class SchedH6(models.Model):
     cmte_id = models.CharField(max_length=9)

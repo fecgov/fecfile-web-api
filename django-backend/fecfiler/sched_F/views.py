@@ -291,9 +291,9 @@ def post_sql_schedF(data):
             data.get('subordinate_cmte_state', ''),
             data.get('subordinate_cmte_zip', ''),
             data.get('payee_entity_id', ''),
-            data.get('expenditure_date', ''),
-            data.get('expenditure_amount ', ''),
-            data.get('aggregate_general_elec_exp', ''),
+            data.get('expenditure_date', None),
+            data.get('expenditure_amount ', None),
+            data.get('aggregate_general_elec_exp', None),
             data.get('purpose', ''),
             data.get('category_code', ''),
             data.get('payee_cmte_id', ''),
@@ -308,7 +308,8 @@ def post_sql_schedF(data):
             data.get('payee_cand_district', ''),
             data.get('memo_code', ''),
             data.get('memo_text', ''),
-            datetime.datetime.now(),     
+            datetime.datetime.now(),
+            datetime.datetime.now()    
          )
         with connection.cursor() as cursor:
             # Insert data into schedD table
