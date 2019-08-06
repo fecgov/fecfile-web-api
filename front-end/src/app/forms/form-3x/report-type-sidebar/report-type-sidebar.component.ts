@@ -89,7 +89,6 @@ export class ReportTypeSidebarComponent implements OnInit {
               if (Array.isArray(this.selectedReport.election_state)) {
                 if (this.selectedReport.election_state.length === 1) {
                   const electionState: any = this.selectedReport.election_state[0];
-
                   if (!this.selectedElectionState && !this.selectedElecetionDate) {
                     if (this._newReportSelected) {
                       if (this.fromDate && this.toDate) {
@@ -120,6 +119,12 @@ export class ReportTypeSidebarComponent implements OnInit {
 
                   if (this.selectedReport.hasOwnProperty('election_state')) {
                     this.electionStates = this.selectedReport.election_state;
+                    if (this._newReportSelected) {
+                      if (this.fromDate && this.toDate) {
+                        this.toDate = '';
+                        this.fromDate = '';
+                      }
+                    }
                   }
                 }
               } // Array.isArray(this.selectedReport.election_state)
