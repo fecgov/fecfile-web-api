@@ -80,6 +80,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmount = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
+  private _selectedChangeWarn: any;
   private _contributionAmountMax: number;
 
   constructor(
@@ -109,6 +110,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._selectedEntity = null;
+    this._selectedChangeWarn = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -437,8 +439,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       col.name === 'occupation'
     ) {
       if (this._selectedEntity) {
-        this.frmIndividualReceipt.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
-        this.showWarn(col.text);
+        this.showWarn(col.text, col.name);
       }
     } else if (col.name === 'contribution_amount') {
       this.contributionAmountKeyup($event);
@@ -452,12 +453,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    *
    * @param fieldLabel Field Label to show in the message
    */
-  private showWarn(fieldLabel: string) {
-    const message =
-      `Changes to ${fieldLabel} can't be edited when a Contributor is` +
-      ` selected from the dropdwon.  Go to the Contacts page to edit a Contributor.`;
-
+  private showWarn(fieldLabel: string, name: string) {
+    // only show on first key
+    if (this._selectedChangeWarn[name] === name) {
+      return;
+    }
+    const message = `Please note that if you update contact information it will be updated in the Contacts file`;
     this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {});
+    this._selectedChangeWarn[name] = name;
   }
 
   /**
@@ -502,21 +505,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   public handleStateChange(stateOption: any, col: any) {
     if (this._selectedEntity) {
-      this.showWarn(col.text);
-      this.frmIndividualReceipt.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-    } else {
-      let stateCode = null;
-      if (stateOption.$ngOptionLabel) {
-        stateCode = stateOption.$ngOptionLabel;
-        if (stateCode) {
-          stateCode = stateCode.trim();
-          if (stateCode.length > 1) {
-            stateCode = stateCode.substring(0, 2);
-          }
+      this.showWarn(col.text, 'state');
+    }
+
+    let stateCode = null;
+    if (stateOption.$ngOptionLabel) {
+      stateCode = stateOption.$ngOptionLabel;
+      if (stateCode) {
+        stateCode = stateCode.trim();
+        if (stateCode.length > 1) {
+          stateCode = stateCode.substring(0, 2);
         }
       }
-      this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
     }
+    this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
   }
 
   /**
@@ -606,6 +608,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntity = null;
+          this._selectedChangeWarn = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -698,6 +701,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
+    this._selectedChangeWarn = {};
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
