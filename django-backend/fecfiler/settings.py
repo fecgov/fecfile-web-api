@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     'fecfiler.sched_E',
     'fecfiler.sched_F',
     'fecfiler.sched_H',
-    'fecfiler.sched_L',
+    #'fecfiler.sched_L',
     'storages',
 ]
 

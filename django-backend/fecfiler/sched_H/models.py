@@ -69,7 +69,7 @@ class SchedH4(models.Model):
 
 
 
-class SchedH4(models.Model):
+class SchedH5(models.Model):
     cmte_id = models.CharField(max_length=9)
     report_id = models.BigIntegerField()
     transaction_type_identifier = models.CharField(
@@ -97,6 +97,63 @@ class SchedH4(models.Model):
     class Meta:
         managed = False
         db_table = 'sched_h5'
+
+
+  """
+character varying(8),
+  transaction_type_identifier character varying(40),
+  transaction_type character varying(12),
+  transaction_id character varying(20) NOT NULL DEFAULT get_next_transaction_id('H6'::bpchar),
+  back_ref_transaction_id character varying(20),
+  back_ref_sched_name character varying(8),
+  entity_id character varying(20),
+  account_event_identifier character varying(90),
+  expenditure_date date,
+  total_fed_levin_amount numeric(12,2),
+  federal_share numeric(12,2),
+  levin_share numeric(12,2),
+  activity_event_total_ytd numeric(12,2),
+  expenditure_purpose character varying(100),
+  category_code character varying(3),
+  activity_event_type character varying(20),
+"""
+
+
+class SchedH6(models.Model):
+    cmte_id = models.CharField(max_length=9)
+    report_id = models.BigIntegerField()
+    line_number = models.CharField(
+        max_length=8, blank=True, null=True)
+    transaction_type_identifier = models.CharField(
+        max_length=12, blank=True, null=True)
+    transaction_type=models.CharField(primary_key=True, max_length=12)
+    transaction_id = models.CharField(primary_key=True, max_length=20)
+    back_ref_transaction_id = models.CharField(primary_key=True, max_length=20)
+    back_ref_sched_name = models.CharField(primary_key=True, max_length=8)
+    entity_id = models.CharField(primary_key=True, max_length=20)
+    account_event_identifier = models.CharField(primary_key=True, max_length=90)
+    expenditure_date= models.DateField(blank=True, null=True)
+    total_fed_levin_amount = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True)
+    federal_share = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True)
+    levin_share = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True)
+    activity_event_total_ytd = models.DecimalField(
+        max_digits=12, decimal_places=2, blank=True, null=True)
+    expenditure_purpose = models.CharField(primary_key=True, max_length=100)
+    category_code =  models.CharField(primary_key=True, max_length=3)
+    activity_event_type =  models.CharField(primary_key=True, max_length=20)
+    memo_code = models.CharField(max_length=1, blank=True, null=True)
+    memo_text = models.CharField(max_length=90, blank=True, null=True)
+    delete_ind = models.CharField(max_length=1, blank=True, null=True)
+    create_date = models.DateTimeField(blank=True, null=True)
+    last_update_date = models.DateTimeField(blank=True, null=True)
+
+
+    class Meta:
+        managed = False
+        db_table = 'sched_h6'
 
 
 

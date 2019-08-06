@@ -2908,6 +2908,7 @@ def prepare_json_builders_data(request):
         schedule_a_b_line_sum_dict = {}
         schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         schedule_a_b_line_sum_dict.update(sched_b_line_sum)
+        
 
 
         col_a = [('9', '0'),
