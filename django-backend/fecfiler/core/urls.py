@@ -90,4 +90,8 @@ urlpatterns = [
         name="get_loan_debt_summary",
     ),
     url(r'^core/prepare_json_builders_data$', views.prepare_json_builders_data, name='prepare_json_builders_data'),
+    url(r'^core/get_contacts_dynamic_forms_fields$', 
+        views.get_contacts_dynamic_forms_fields, 
+        name="get_contacts_dynamic_forms_fields"
+    ),
 ]

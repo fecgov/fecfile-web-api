@@ -3074,3 +3074,25 @@ def prepare_json_builders_data(request):
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+            """
+********************************************************************************************************************************
+GET CONTACT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 18 - FNE 503 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_contacts_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/contacts_fields.json", encoding='utf-8', errors='ignore') as contacts_json_file:
+            data_obj = json.load(contacts_json_file)
+                
+        if not bool(data_obj):
+            return Response("Contacts dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_contacts_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    
