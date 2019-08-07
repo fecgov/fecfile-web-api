@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
@@ -82,6 +82,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _contactsMessageService: ContactsMessageService,
+    private _router: Router,
   ) {
     this.applyFiltersSubscription = this._contactsMessageService.getApplyFiltersMessage()
       .subscribe(
@@ -611,7 +612,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
    * Show the table of form contacts.
    */
   public AddContacts() {
-    alert('Add contacts is not yet supported');
+    this._router.navigate([`/addContact`]);
   }
 
   

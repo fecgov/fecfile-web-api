@@ -122,13 +122,13 @@ export const AppRoutes: Routes = [
         component: IndividualReceiptComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard]
-    },
-    // {
-    //     path: 'forms/transactions/:form_id/:report_id',
-    //     component: TransactionsWrapperComponent,
-    //     pathMatch: 'full',
-    //     canActivate: [CanActivateGuard]
-    // }
+      }
+      // {
+      //     path: 'forms/transactions/:form_id/:report_id',
+      //     component: TransactionsWrapperComponent,
+      //     pathMatch: 'full',
+      //     canActivate: [CanActivateGuard]
+      // }
     ]
   },
   { path: '**', redirectTo: '' }

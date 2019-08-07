@@ -1,0 +1,294 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
+<div class="add_new_contact-container">
+  <form [formGroup]="frmContact">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h1>
+            Add New Contact
+          </h1>
+          <br />
+          <br />
+        </div>
+       </div>
+
+      <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+                <div class="float-left">
+                    <label for="type">
+                      &nbsp;&nbsp;Type*
+                      <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">
+                          Click for more information
+                        </span>
+                      </button>
+                    </label>
+         &nbsp;&nbsp;&nbsp;
+                    <select id="type" name="type" class="form-control" (change)="selectTypeChange($event)">
+                      <option
+                        *ngFor="let entityType of entityTypes"
+                        [selected]="selectedentityType === entityType.code"
+                        [value]="entityType.code"
+                      >
+                        {{ entityType.name }}
+                      </option>
+                    </select>
+                 </div>
+          </div>
+      </div>  
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12">
+          <div class="forms__btn-container">
+          <br />
+          <br />
+          </div>
+        </div>
+      </div>
+    </header>
+    <section>
+       <ng-container *ngFor="let hiddenField of hiddenFields">
+        <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
+      </ng-container>
+      <ng-container *ngFor="let row of formFields; let i = index">
+      <div class="row" *ngIf="row.cols">
+          <ng-container *ngIf="row.cols | isArray">
+            <div [class]="row.colClassName" *ngFor="let col of row.cols">
+              <div class="form-group">
+                <label [for]="col?.name">
+                  {{ col?.text }}
+                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                    (Optional)
+                  </ng-container>
+                </label>
+                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
+                  <div [ngClass]="{ 'input-group': col?.inputGroup }">
+                    <ng-container *ngIf="col?.inputGroup">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                        </span>
+                      </div>
+                    </ng-container>
+                    <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
+                    <input
+                      *ngIf="col?.name !== 'first_name' 
+                          && col?.name !== 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"                      
+                      [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
+                      [formControlName]="col?.name"
+                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
+                      [ngClass]="
+                        frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      (keyup)="handleFormFieldKeyup($event, col)"
+                    />
+                    <input
+                      *ngIf="col?.name === 'last_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-last-name"
+                      [ngbTypeahead]="searchLastName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterLastName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                    <input
+                      *ngIf="col?.name === 'first_name'"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                      id="typeahead-template-first-name"
+                      [ngbTypeahead]="searchFirstName"
+                      [resultTemplate]="rt"
+                      [inputFormatter]="formatterFirstName"
+                      (selectItem)="handleSelectedItem($event)"
+                    />
+                  </div>
+                  <div
+                    class="error-text"
+                    *ngIf="
+                      (frmContact.touched || frmContact.dirty) &&
+                      frmContact.get(col?.name).invalid
+                    "
+                  >
+                    <ng-container *ngIf="frmContact.get(col?.name).errors?.maxlength">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="
+                          frmContact.get(col?.name).errors.maxlength?.requiredLength <
+                          frmContact.get(col?.name).errors.maxlength?.actualLength
+                        "
+                      >
+                        Only {{ frmContact.get(col?.name).errors.maxlength?.requiredLength }} characters
+                        allowed.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="frmContact.get(col?.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmContact.get(col?.name).errors?.nonAlphaNumeric"
+                      >
+                        Alphanumeric characters only.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="frmContact.get(col?.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmContact.get(col?.name).errors?.nonFloatingPoint"
+                      >
+                        Only numerical values are allowed.
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="frmContact.get(col?.name).errors">
+                      <div
+                        class="text-error text-left"
+                        *ngIf="frmContact.get(col?.name).errors?.contributionDateInvalid"
+                      >
+                        The date entered falls outside of the report coverage period. Transactions for this report
+                        should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
+                        need to add a transaction with a date that falls outside of the coverage period for this report,
+                        you will need to check the memo code box.
+                        <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                        coverage period only. -->
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="col?.type === 'checkbox'">
+                  <input
+                    class="form-control"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [attr.type]="col?.type"
+                    [attr.name]="col?.name"
+                    [attr.value]="col?.value"
+                    [checked]="col?.name === 'memo_code' ? memoCode : null"
+                    [formControlName]="col?.name"
+                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    "
+                  />
+                </ng-container>
+                <ng-container *ngIf="col?.type === 'textarea'">
+                  <textarea
+                    [style.height]="col?.height"
+                    [style.width]="col?.width"
+                    [style.overflow]="col.scroll ? col.scroll : null"
+                    [attr.name]="col?.name"
+                    [attr.maxlength]="col?.validation?.max"
+                    [formControlName]="col?.name"
+                  ></textarea>
+                </ng-container>
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
+                  <ng-select
+                    (change)="handleStateChange($event, col)"
+                    class="state-select"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'state-select-error'
+                        : ''
+                    "
+                  >
+                    <ng-option *ngFor="let item of states" [ngValue]="item">
+                      {{ item.code }} - {{ item.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>
+              </div>
+            </div>
+            <!-- ./col -->
+          </ng-container>
+        </div>
+        <!-- ./row -->
+        <ng-container *ngIf="row.seperator">
+          <div class="row">
+            <div class="col-md-12">
+              <hr />
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>  
+    </section>
+    <footer>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <button class="btn btn-previous btn-left" type="button" (click)="saveAndAddMore()">
+                Save &amp; Addmore
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <br />
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
+                Cancel
+              </button>
+              <button class="btn btn-secondary btn-right" (click)="saveAndExit()">
+                Save &amp; Exit
+              </button>
+            </div>
+          </div>          
+        </div>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+              <br />
+            </div>
+          </div>
+        </div>
+      </footer>
+    </footer>
+  </form>
+</div>
