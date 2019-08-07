@@ -51,6 +51,7 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 MANDATORY_FIELDS_SCHED_A = ['report_id', 'transaction_type_identifier', 'contribution_date', 
                             'contribution_amount', 'entity_type']
 
+# TODO: do we need cmte_id in the mandatory list?
 MANDATORY_CHILD_FIELDS_SCHED_A = ['cmte_id', 'report_id', 'child_transaction_type_identifier', 'child_contribution_date', 
                             'child_contribution_amount', 'child_entity_type']
 
