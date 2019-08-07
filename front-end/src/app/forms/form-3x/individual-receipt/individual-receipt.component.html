@@ -90,9 +90,8 @@
                           ? 'input-field-error'
                           : ''
                       "
-                      (keyup)="col?.name === 'contribution_amount' ? contributionAmountKeyup($event) : null"
-                      (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                    />                    
+                      (keyup)="handleFormFieldKeyup($event, col)"
+                    />
                     <input
                       *ngIf="col?.name === 'last_name'"
                       class="form-control"
@@ -219,7 +218,7 @@
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
-                    (change)="handleStateChange($event)"
+                    (change)="handleStateChange($event, col)"
                     class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="

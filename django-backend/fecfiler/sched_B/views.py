@@ -39,6 +39,8 @@ SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINK
 **************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
 """
 
+# semi_annual_refund_bundled_amount remmoed from ths list but is still needed
+# you need to pass in a valid decimal value: this is valid until db change happens
 list_mandatory_fields_schedB = [
     "report_id",
     "expenditure_date",
@@ -49,7 +51,6 @@ list_mandatory_fields_schedB = [
 ]
 # list_mandatory_fields_aggregate = ['transaction_type']
 # list_child_schedA = ['16']
-
 
 
 def get_next_transaction_id(trans_char):
@@ -109,6 +110,8 @@ def check_decimal(value):
     """
 
     try:
+        # if not value:
+        #     return None
         check_value = Decimal(value)
         return value
     except Exception as e:
@@ -468,6 +471,7 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get("entity_id")
+        print(entity_id)
         datum["entity_id"] = entity_id
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
@@ -506,7 +510,8 @@ def post_schedB(datum):
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    cmte_id), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
@@ -534,7 +539,8 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
+            child_forms_obj = get_list_child_schedB(
+                report_id, cmte_id, transaction_id)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -600,7 +606,8 @@ def put_schedB(datum):
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
@@ -620,7 +627,7 @@ def delete_schedB(data):
         transaction_id = data.get("transaction_id")
         check_transaction_id(transaction_id)
         delete_sql_schedB(transaction_id, report_id, cmte_id)
-        delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
+        # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
 
@@ -637,9 +644,9 @@ def schedB_sql_dict(data):
             "transaction_type_identifier": data.get("transaction_type_identifier"),
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "expenditure_date": date_format(data.get("expenditure_date")),
-            "expenditure_amount": check_decimal(data.get("expenditure_amount")),
+            "expenditure_amount": check_decimal(data.get("expenditure_amount", None)),
             "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount")
+                data.get("semi_annual_refund_bundled_amount", None)
             ),
             "expenditure_purpose": data.get("expenditure_purpose"),
             "category_code": data.get("category_code"),
@@ -701,6 +708,7 @@ def schedB(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum = schedB_sql_dict(request.data)
+            print(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             if "entity_id" in request.data and check_null_value(

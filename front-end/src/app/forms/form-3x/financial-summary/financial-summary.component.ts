@@ -13,7 +13,6 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
   providers: [NgbTooltipConfig]
 })
 export class FinancialSummaryComponent implements OnInit {
-
   public categoryId: string = '';
   public column: string = '';
   public direction: number = null;
@@ -22,19 +21,19 @@ export class FinancialSummaryComponent implements OnInit {
   public tab2Data: any = {};
   public tab3Data: any = {};
   public viewMode: string = '';
-  public reportId: string='';
+  public reportId: string = '';
   public step: string = '';
 
   private _form3XReportType: any = {};
 
-  private _formType: string='';
+  private _formType: string = '';
   constructor(
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
     private _financialSummaryService: FinancialSummaryService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router,
+    private _router: Router
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -44,25 +43,22 @@ export class FinancialSummaryComponent implements OnInit {
     this.viewMode = 'tab1';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.step = this._activatedRoute.snapshot.queryParams.step;
-    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({'saved':true}));
-    console.log("this.step = ", this.step);
+    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
+    console.log('this.step = ', this.step);
 
-    this._financialSummaryService
-    .getSummaryDetails('3X')
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing FinancialSummaryComponent res ...",res);            
-            this.tab1Data=res["Total Raised"];
-            this.tab2Data=res["Total Spent"];
-            this.tab3Data=res["Cash summary"];
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });
-
-
-      
+    this._financialSummaryService.getSummaryDetails('3X').subscribe(
+      res => {
+        if (res) {
+          console.log('Accessing FinancialSummaryComponent res ...', res);
+          this.tab1Data = res['Total Raised'];
+          this.tab2Data = res['Total Spent'];
+          this.tab3Data = res['Cash summary'];
+        }
+      },
+      error => {
+        console.log('error: ', error);
+      }
+    );
   }
 
   /**
@@ -75,32 +71,16 @@ export class FinancialSummaryComponent implements OnInit {
     this.column = property;
     this.direction = this.isDesc ? 1 : -1;
   }
-  
-  public printPreview(): void {
-    this._reportTypeService.signandSaveSubmitReport('3X','Saved');
-    this._reportTypeService
-    .printPreviewPdf('3X', "PrintPreviewPDF")
-    .subscribe(res => {
-      if(res) {
-            console.log("Accessing FinancialSummaryComponent printPriview res ...",res);
-            if (res.hasOwnProperty('results')) {
-              if (res['results.pdf_url'] !== null) {
-                console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-                window.open(res.results.pdf_url, '_blank');
-              }
-            }
-          }
-        },
-        (error) => {
-          console.log('error: ', error);
-        });/*  */
 
+  public printPreview(): void {
+    console.log('FinancialSummaryComponent printPreview this._formType = ', this._formType);
+    this._reportTypeService.printPreview(this._formType);
   }
 
   public viewTransactions(): void {
     this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
-    if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined' ){
+    if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined') {
       this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }
 
@@ -110,17 +90,19 @@ export class FinancialSummaryComponent implements OnInit {
       } else if (this._form3XReportType.hasOwnProperty('reportid')) {
         this.reportId = this._form3XReportType.reportid;
       }
-    }      
-    console.log(" FinancialSummaryComponent this.reportId = ", this.reportId );
-    this._router.navigate([`/forms/transactions/${this._formType}/${this.reportId}`]);
+    }
+    console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'transactions', reportId: this.reportId }
+    });
   }
-  
+
   public all_Transactions(): void {
-    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: {  step: 'step_2' } });
+    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'step_2' } });
   }
 
   public expanded_Summary(): void {
-    alert("This functionality not yet implemented...!");
+    alert('This functionality not yet implemented...!');
   }
 
   /**
@@ -131,4 +113,3 @@ export class FinancialSummaryComponent implements OnInit {
     localStorage.removeItem(`form_${this._formType}_summary_screen`);
   }
 }
-

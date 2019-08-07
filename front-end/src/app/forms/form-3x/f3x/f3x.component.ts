@@ -17,6 +17,8 @@ import {
   selectedReportType
 } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { F3xMessageService } from '../service/f3x-message.service';
+import { ScheduleActions } from '../individual-receipt/individual-receipt.component';
 
 @Component({
   selector: 'app-f3x',
@@ -46,9 +48,11 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
+  public isShowFilters = false;
+  public formType: string = '';
+  public scheduleAction: ScheduleActions;
 
   private _step: string = '';
-  private _formType: string = '';
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -58,18 +62,19 @@ export class F3xComponent implements OnInit {
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _f3xMessageService: F3xMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
   }
 
   ngOnInit(): void {
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
 
-    this._reportTypeService.getReportTypes(this._formType).subscribe(res => {
+    this._reportTypeService.getReportTypes(this.formType).subscribe(res => {
       if (typeof res === 'object') {
         if (Array.isArray(res.report_type)) {
           this.reportTypes = res.report_type;
@@ -81,7 +86,7 @@ export class F3xComponent implements OnInit {
       }
     });
 
-    this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
       }
@@ -91,26 +96,26 @@ export class F3xComponent implements OnInit {
       if (val) {
         if (val instanceof NavigationEnd) {
           if (
-            val.url.indexOf(`/forms/form/${this._formType}`) === -1 &&
-            val.url.indexOf(`/forms/transactions/${this._formType}`) === -1
+            val.url.indexOf(`/forms/form/${this.formType}`) === -1 &&
+            val.url.indexOf(`/forms/transactions/${this.formType}`) === -1
           ) {
-            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
+            if (localStorage.getItem(`form_${this.formType}_report_type`) !== null) {
               localStorage.setItem(
-                `form_${this._formType}_saved_backup`,
-                localStorage.getItem(`form_${this._formType}_saved`)
+                `form_${this.formType}_saved_backup`,
+                localStorage.getItem(`form_${this.formType}_saved`)
               );
               localStorage.setItem(
-                `form_${this._formType}_report_type_backup`,
-                localStorage.getItem(`form_${this._formType}_report_type`)
+                `form_${this.formType}_report_type_backup`,
+                localStorage.getItem(`form_${this.formType}_report_type`)
               );
               // console.log(`form_${this._formType}_report_type_backup` + 'copied ');
               // console.log(new Date().toISOString());
             }
 
-            window.localStorage.removeItem(`form_${this._formType}_report_type`);
-            window.localStorage.removeItem(`form_${this._formType}_transaction_type`);
-            window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
-            window.localStorage.removeItem(`form_${this._formType}_saved`);
+            window.localStorage.removeItem(`form_${this.formType}_report_type`);
+            window.localStorage.removeItem(`form_${this.formType}_transaction_type`);
+            window.localStorage.removeItem(`form_${this.formType}_temp_transaction_type`);
+            window.localStorage.removeItem(`form_${this.formType}_saved`);
           }
         } else {
           if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
@@ -135,10 +140,10 @@ export class F3xComponent implements OnInit {
    */
   private _setReports(): void {
     if (
-      typeof JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== 'undefined' ||
-      JSON.parse(localStorage.getItem(`form_${this._formType}_details`)) !== null
+      typeof JSON.parse(localStorage.getItem(`form_${this.formType}_details`)) !== 'undefined' ||
+      JSON.parse(localStorage.getItem(`form_${this.formType}_details`)) !== null
     ) {
-      const form3XDetailsInstance = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+      const form3XDetailsInstance = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
       if (typeof form3XDetailsInstance === 'object' && form3XDetailsInstance !== null) {
         if (form3XDetailsInstance.hasOwnProperty('regularspecialreportind')) {
@@ -216,6 +221,15 @@ export class F3xComponent implements OnInit {
   }
 
   /**
+   * Get's message from child components to change the sidebar
+   * in the view.
+   */
+  public switchSidebar(e: boolean): void {
+    this.isShowFilters = e;
+    console.log('showfilters is ' + this.isShowFilters);
+  }
+
+  /**
    * Get's message from child components.
    *
    * @param      {Object}  e       The event object.
@@ -243,11 +257,21 @@ export class F3xComponent implements OnInit {
           if (this.currentStep === 'step_3') {
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             this.transactionType = e.transactionType ? e.transactionType : '';
+            // Coming from transactions, the event may contain the transaction data
+            // with an action to allow for view or edit.
+            if (this.previousStep === 'transactions') {
+              // message the child component rather than sending data as input because
+              // ngOnChanges fires when the form fields are changed, thereby reseting the
+              // fields to the previous value.  Result is fields can't be changed.
+              this._f3xMessageService.sendPopulateFormMessage(e.editOrView);
+              this.scheduleAction = e.editOrView.action;
+            } else {
+              this.scheduleAction = ScheduleActions.add;
+            }
           }
-
           this.canContinue();
         } else if (typeof e.form === 'string') {
-          if (e.form === this._formType) {
+          if (e.form === this.formType) {
             if (e.hasOwnProperty('reportTypeRadio')) {
               if (typeof e.reportTypeRadio === 'string') {
                 this._setCoverageDates(e.reportTypeRadio);
@@ -261,6 +285,12 @@ export class F3xComponent implements OnInit {
             }
           }
         }
+        // } else if (e.hasOwnProperty('showTransactionType')) {
+        //   this.direction = e.direction;
+        //   this.previousStep = e.previousStep;
+        //   this._step = e.step;
+        //   this.currentStep = e.step;
+        //   this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
       } else if (e.hasOwnProperty('direction')) {
         if (typeof e.direction === 'string') {
           if (e.direction === 'previous') {
@@ -284,16 +314,16 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: this.step } });
+        this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
       }
     }
   }

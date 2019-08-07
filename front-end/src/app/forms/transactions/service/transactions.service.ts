@@ -633,30 +633,6 @@ export class TransactionsService {
     });
   }
 
-  /**
-   * Get transaction category types
-   *
-   * @param formType
-   */
-  public getTransactionCategories(formType: string): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions = new HttpHeaders();
-    let url = '';
-    let params = new HttpParams();
-
-    url = '/core/get_transaction_categories';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    params = params.append('form_type', `F${formType}`);
-
-    return this._http.get(`${environment.apiUrl}${url}`, {
-      params,
-      headers: httpOptions
-    });
-  }
-
   private createMockTrx() {
     const t1: any = {};
     t1.aggregate = 1000;

@@ -249,13 +249,14 @@ def date_format(cvg_date):
         raise
 
 def check_null_value(check_value):
-    try:
-        if check_value in ["none", "null", " ", ""]:
-            return None
-        else:
-            return check_value
-    except:
-        raise
+    if check_value in ["none", "null", " ", ""]:
+        #return None
+        return False
+    # else:
+    return True
+
+
+
 
 def check_email(email):
     try:
@@ -618,18 +619,18 @@ def reports(request):
 
     if request.method == 'POST':
         try:
-            if 'amend_ind' in request.data:
-                amend_ind = check_null_value(request.data.get('amend_ind'))
+            if 'amend_ind' in request.data and check_null_value(request.data.get('amend_ind')):
+                amend_ind = request.data.get('amend_ind')
             else:
                 amend_ind = "N"
 
-            if 'election_code' in request.data:
-                election_code = check_null_value(request.data.get('election_code'))
+            if 'election_code' in request.data and check_null_value(request.data.get('election_code')):
+                election_code = request.data.get('election_code')
             else:
                 election_code = None
 
-            if 'status' in request.data:
-                f_status = check_null_value(request.data.get('status'))
+            if 'status' in request.data and check_null_value(request.data.get('status')):
+                f_status = request.data.get('status')
             else:
                 f_status = "Saved"
 
@@ -655,12 +656,12 @@ def reports(request):
             
             datum = {
                 'cmte_id': request.user.username,
-                'form_type': check_null_value(request.data.get('form_type')),
+                'form_type': request.data.get('form_type', None),
                 'amend_ind': amend_ind,
-                'report_type': check_null_value(request.data.get('report_type')),
+                'report_type': request.data.get('report_type', None),
                 'election_code': election_code,
                 'date_of_election': date_format(request.data.get('date_of_election')),
-                'state_of_election': check_null_value(request.data.get('state_of_election')),
+                'state_of_election': request.data.get('state_of_election', None),
                 'cvg_start_dt': date_format(request.data.get('cvg_start_dt')),
                 'cvg_end_dt': date_format(request.data.get('cvg_end_dt')),
                 'due_dt': date_format(request.data.get('due_dt')),
@@ -711,17 +712,17 @@ def reports(request):
         # print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
-                amend_ind = check_null_value(request.data.get('amend_ind'))
+                amend_ind = request.data.get('amend_ind')
             else:
                 amend_ind = "N"
 
             if 'election_code' in request.data:
-                election_code = check_null_value(request.data.get('election_code'))
+                election_code = request.data.get('election_code')
             else:
                 election_code = ""
 
             if 'status' in request.data:
-                f_status = check_null_value(request.data.get('status'))
+                f_status = request.data.get('status')
             else:
                 f_status = "Saved"
 
@@ -1481,7 +1482,10 @@ def get_all_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         # import ipdb;ipdb.set_trace()
@@ -1643,7 +1647,10 @@ def get_all_trashed_transactions(request):
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
+        if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
+            sortcolumn = 'default'
+        else:
+            sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         params = request.data.get('filters', {})
@@ -2712,25 +2719,25 @@ def get_loan_debt_summary(request):
         SELECT Sum(t._sum) 
         FROM  ( 
             ( 
-                    SELECT Sum(loan_payment_to_date) AS _sum 
+                    SELECT SUM(loan_balance) AS _sum 
                     FROM   public.sched_c 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(loan_amount) AS _sum 
+                    SELECT SUM(loan_amount) AS _sum 
                     FROM   public.sched_c1 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s 
                     AND    line_number= %(line_num)s) 
         UNION 
             ( 
-                    SELECT sum(payment_amount) AS _sum 
+                    SELECT SUM(payment_amount) AS _sum 
                     FROM   public.sched_d 
                     WHERE  cmte_id = %(cmte_id)s 
                     AND    report_id = %(report_id)s
-                    AND    line_number= %(line_num)s)) t;
+                    AND    line_num= %(line_num)s)) t;
         """
         with connection.cursor() as cursor:
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '9'})
@@ -2770,67 +2777,7 @@ def get_f3x_report_data(cmte_id, report_id):
     except Exception:
         raise
 
-# def cash_on_hand_begining_amount(cmte_id, report_id):
-#     try:
-#         # today = date.today()
-        
-#         #d = today - relativedelta(months=1)
 
-#         from_date, to_date = get_cvg_dates(report_id, cmte_id)
-#         #print(from_date_time,to_date_time,'datetime')
-#         d = from_date - relativedelta(months=1)
-       
-#         from_date_time = date(d.year, d.month, 1)
-#         to_date_time = date(from_date.year, from_date.month, 1) - relativedelta(days=1)
-#         # from_date_time = datetime.combine(fromdate, time(0,0,0))
-#         # to_date_time = datetime.combine(todate, time(23,59,59))
-#         print(from_date_time,to_date_time,'datetime')
-
-#         ######THIS IS FOR CURRENT YEAR TILL DATE######
-#         """"
-#         with connection.cursor() as cursor:
-#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
-#             if (cursor.rowcount == 0):
-#                 coh_cop = 0
-#             else:
-#                 result = cursor.fetchone()
-#                 coh_cop = result[0]
-#         return coh_cop if coh_cop else 0
-#         """
-
-#         ######THIS IS FOR CURRENT YEAR BEGINIG DATE#######
-
-#         with connection.cursor() as cursor:
-#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time])
-#             if (cursor.rowcount == 0):
-#                 coh_cop = 0
-#             else:
-#                 result = cursor.fetchone()
-#                 coh_cop = result[0]
-#         return coh_cop if coh_cop else 0
-#     except Exception as e:
-#         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
-
-
-# def cash_on_hand_current_year(cmte_id, report_id):
-#     try:
-#         d = date.today()
-#         from_date_time = datetime.combine(date(d.year, 1,1), time(0,0,0))
-#         to_date_time = datetime.combine(d, time(23,59,59))
-
-#         with connection.cursor() as cursor:
-#             cursor.execute("SELECT coh_cop from public.form_3x where cmte_id = %s AND cvg_start_dt = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, from_date_time, to_date_time])
-#             if (cursor.rowcount == 0):
-#                 coh_cop = 0
-#             else:
-#                 result = cursor.fetchone()
-#                 coh_cop = result[0]
-#         return coh_cop if coh_cop else 0
-#     except Exception as e:
-#         raise Exception('The prev_cash_on_hand_cop function is throwing an error: ' + str(e))
-
-
-#def get_col_a_value(k, actual_vals, cmte_id=None, report_id=None):
 def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, report_id):
     val = 0
     if line_number == '6b':
@@ -2879,17 +2826,28 @@ def prepare_json_builders_data(request):
         report_id = request.data.get('report_id')
         sched_a_line_sum = {}
         sched_b_line_sum = {}
+
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+
+        #cdate = date.today()
+        from_date = date(cvg_start_date.year, 1,1)
+       
+        to_date = date(cvg_end_date.year, 12, 31)
+       
+
         #schedule_a_b_line_sum_dict = {}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
+            print(cursor.query)
             sched_a_line_sum_result = cursor.fetchall()
             sched_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(expenditure_amount) from public.sched_b 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
+            print(cursor.query)
             sched_b_line_sum_result = cursor.fetchall()
             sched_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result}
         
@@ -2902,6 +2860,34 @@ def prepare_json_builders_data(request):
         schedule_a_b_line_sum_dict = {}
         schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         schedule_a_b_line_sum_dict.update(sched_b_line_sum)
+
+        col_a_line_sum = {}
+        col_b_line_sum = {}
+
+
+        with connection.cursor() as cursor:
+            cursor.execute(""" 
+                SELECT line_number, sum(contribution_amount) from public.sched_a 
+                where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+            print(cursor.query)     
+            col_a_line_sum_result = cursor.fetchall()
+            col_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_a_line_sum_result}
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT line_number, sum(expenditure_amount) from public.sched_b 
+                where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+            print(cursor.query)
+            col_b_line_sum_result = cursor.fetchall()
+            col_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_b_line_sum_result}
+
+
+        col_line_sum_dict = {}
+        col_line_sum_dict.update(col_a_line_sum)
+        col_line_sum_dict.update(col_b_line_sum)
+
+        print(col_a_line_sum, "col_a_line_sum")
+        print(col_b_line_sum, "col_b_line_sum")
+        
 
 
         col_a = [('9', '0'),
@@ -2952,9 +2938,9 @@ def prepare_json_builders_data(request):
         final_col_b_dict = {}
         for line_number in col_b_dict_original:
             final_col_b_dict[line_number] = get_line_sum_value(line_number, col_b_dict_original[line_number],
-                                                               schedule_a_b_line_sum_dict,
+                                                               col_line_sum_dict,
                                                                cmte_id, report_id)
-            schedule_a_b_line_sum_dict[line_number] = final_col_b_dict[line_number]
+            col_line_sum_dict[line_number] = final_col_b_dict[line_number]
         print(final_col_b_dict, "col_b_dict")
 
         for i in final_col_a_dict:
@@ -2967,14 +2953,16 @@ def prepare_json_builders_data(request):
             if b_formula:
                 b_formula = b_formula.replace(" ", "")
 
-            if a_formula == b_formula and a_val != b_val:
-                try:
-                    correc_val = a_val if a_val > b_val else b_val
-                except Exception as e:
-                    print("Exception--- same formula and values changes", a_formula, b_formula, e)
-                    correc_val = 0
-                final_col_b_dict[i] = correc_val
-                final_col_a_dict[i] = correc_val
+            # if a_formula == b_formula and a_val != b_val:
+            #     try:
+            #         correc_val = a_val if a_val > b_val else b_val
+            #     except Exception as e:
+            #         print("Exception--- same formula and values changes", a_formula, b_formula, e)
+            #         correc_val = 0
+            #     final_col_b_dict[i] = correc_val
+            #     final_col_a_dict[i] = correc_val
+            final_col_b_dict[i] = b_val
+            final_col_a_dict[i] = a_val
 
         print("---------------------------------")
         print("Final AAAA", final_col_a_dict)
@@ -3067,3 +3055,25 @@ def prepare_json_builders_data(request):
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+"""
+********************************************************************************************************************************
+GET CONTACT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 18 - FNE 503 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_contacts_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/contacts_fields.json", encoding='utf-8', errors='ignore') as contacts_json_file:
+            data_obj = json.load(contacts_json_file)
+                
+        if not bool(data_obj):
+            return Response("Contacts dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_contacts_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    
