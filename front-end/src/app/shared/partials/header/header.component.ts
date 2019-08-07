@@ -27,6 +27,17 @@ export class HeaderComponent implements OnInit {
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
           if(val.url.indexOf('/logout') === 0) {
+
+            let arr: any = [];
+
+            for (let i = 0; i < localStorage.length; i++) {
+                 arr.push(localStorage.key(i));
+            }
+
+            for (let i = 0; i < arr.length; i++) {
+              localStorage.removeItem(arr[i]);
+            }
+
             this._messageService.sendMessage(
               {
                 loggedOut: true,

@@ -15,7 +15,7 @@
     margin-bottom: 15px;
     header {
       .header-content {
-        margin-left: 5;
+        margin-left: 2;
         display: block;
         margin: 0 auto;
         width: 96%;
@@ -62,6 +62,7 @@
     }
     section {
       .row {
+        margin-left: 5;
         margin-bottom: 20px;
         .col {
           &.info-text {

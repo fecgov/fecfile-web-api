@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -60,6 +60,32 @@ export class ReportTypeSidebarComponent implements OnInit {
     this.frmReportSidebar = this._fb.group({});
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
+    // Add '${implements OnChanges}' to the class.
+    if (Array.isArray(this.selectedReport.election_state) && this.selectedReport.election_state.length !== 0 &&
+    this.selectedElectionState && !this.selectedElecetionDate) {
+      if (this._newReportSelected) {
+        if (this.fromDate) {
+          this.fromDate = '';
+        }
+        if (this.toDate) {
+          this.toDate = '';
+        }
+      }
+      this.selectedElectionState = null;
+    } else if (this.selectedReport !== null && this.selectedReport.hasOwnProperty('election_state')) {
+      if (this._newReportSelected) {
+        if (this.fromDate) {
+          this.fromDate = '';
+        }
+        if (this.toDate) {
+          this.toDate = '';
+        }
+      }
+    }
+  }
+
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
       // console.log('this.selectedReport: ', this.selectedReport);
@@ -107,8 +133,6 @@ export class ReportTypeSidebarComponent implements OnInit {
                   }
                 } else {
                   if (this.selectedElectionState && !this.selectedElecetionDate) {
-                    this.selectedElectionState = null;
-
                     if (this._newReportSelected) {
                       if (this.fromDate && this.toDate) {
                         this.toDate = '';
@@ -119,12 +143,6 @@ export class ReportTypeSidebarComponent implements OnInit {
 
                   if (this.selectedReport.hasOwnProperty('election_state')) {
                     this.electionStates = this.selectedReport.election_state;
-                    if (this._newReportSelected) {
-                      if (this.fromDate && this.toDate) {
-                        this.toDate = '';
-                        this.fromDate = '';
-                      }
-                    }
                   }
                 }
               } // Array.isArray(this.selectedReport.election_state)

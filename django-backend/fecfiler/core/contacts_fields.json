@@ -105,7 +105,7 @@
                 ]
             },
             {
-                "colClassName": "col col-md-5",
+                "colClassName": "col col-md-4",
                 "seperator": false,
                 "cols": [
                     {
@@ -211,10 +211,10 @@
                 "seperator": true,
                 "cols": [
                     {
-                        "inputGroup": true,
+                        "inputGroup": false,
                         "inputIcon": "",
                         "text": "Telephone",
-                        "infoIcon": true,
+                        "infoIcon": false,
                         "infoText": "Request language from RAD",
                         "name": "phone_number",
                         "type": "text",
@@ -235,10 +235,10 @@
                 "seperator": true,
                 "cols": [
                     {
-                        "inputGroup": true,
+                        "inputGroup": false,
                         "inputIcon": "",
                         "text": "Employer",
-                        "infoIcon": true,
+                        "infoIcon": false,
                         "infoText": "Request language from RAD",
                         "name": "employer",
                         "type": "text",
@@ -256,7 +256,7 @@
                         "inputGroup": false,
                         "inputIcon": "",
                         "text": "Occupation",
-                        "infoIcon": true,
+                        "infoIcon": false,
                         "infoText": "Request language from RAD",
                         "name": "occupation",
                         "type": "text",
@@ -402,7 +402,7 @@
                ]
             },
             {
-                "colClassName": "col col-md-5",
+                "colClassName": "col col-md-4",
                 "seperator": false,
                 "cols": [
                     {
@@ -514,7 +514,7 @@
                         "text": "Office Sought",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "office Sought",
+                        "name": "office_Sought",
                         "type": "select",
                         "value": null,
                         "scroll": false,
@@ -532,7 +532,7 @@
                         "text": "Office State",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "suffix",
+                        "name": "state",
                         "type": "select",
                         "value": null,
                         "scroll": false,
@@ -572,7 +572,7 @@
                         "inputGroup": false,
                         "inputIcon": "",
                         "text": "Employer",
-                        "infoIcon": true,
+                        "infoIcon": false,
                         "infoText": "Request language from RAD",
                         "name": "employer",
                         "type": "text",
@@ -590,7 +590,7 @@
                         "inputGroup": false,
                         "inputIcon": "",
                         "text": "Occupation",
-                        "infoIcon": true,
+                        "infoIcon": false,
                         "infoText": "Request language from RAD",
                         "name": "occupation",
                         "type": "text",
@@ -653,7 +653,7 @@
                 ]
             },
                      {
-                "colClassName": "col col-md-5",
+                "colClassName": "col col-md-4",
                 "seperator": false,
                 "cols": [
                     {
@@ -782,7 +782,7 @@
                 ]
             },
                      {
-                "colClassName": "col col-md-5",
+                "colClassName": "col col-md-4",
                 "seperator": false,
                 "cols": [
                     {
