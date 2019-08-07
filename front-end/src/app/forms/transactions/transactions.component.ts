@@ -144,7 +144,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
-
+    this._step = this._activatedRoute.snapshot.paramMap.get('step');
+    
+    console.log("TransactionsComponent this._step", this._step);
     this.routeData = { accessedByRoute: true, formType: this.formType, reportId: reportIdRoute };
 
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);

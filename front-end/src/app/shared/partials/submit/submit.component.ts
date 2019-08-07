@@ -39,6 +39,11 @@ export class SubmitComponent implements OnInit {
               if(res) {
                     console.log("Accessing SubmitComponent F3x submit res ...",res);
                     if (res['status'] === 'Accepted') {
+                      localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
+                      localStorage.removeItem(`form_${this.form_type}_report_type`);
+                      localStorage.removeItem('F3X_submit_backup');
+                      localStorage.removeItem(`form_${this.form_type}_saved`);
+          
                       this.FEC_Id = res['submissionId'];
                     }
                   }
@@ -47,32 +52,9 @@ export class SubmitComponent implements OnInit {
                   console.log('error: ', error);
                 });/*  */
 
-            localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
-            localStorage.removeItem(`form_${this.form_type}_report_type`);
-            localStorage.removeItem('F3X_submit_backup');
-          }
+              }
 
-          localStorage.removeItem(`form_${this.form_type}_saved`);
-        } else if (this.form_type ==='3X'){
-          console.log(" SubmitComponent F3X res", res); 
-          console.log("Accessing SubmitComponent F3x submit Data Receiver API ");
-          this._reportTypeService.submitForm('3X', "Submit")
-          .subscribe(res => {
-            if(res) {
-                  console.log("Accessing SubmitComponent F3x submit res ...",res);
-                  if (res['status'] === 'Accepted') {
-                    this.FEC_Id = res['submissionId'];
-                  }
-                }
-              },
-              (error) => {
-                console.log('error: ', error);
-              });/*  */
-
-          localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
-          localStorage.removeItem(`form_${this.form_type}_report_type`);
-          localStorage.removeItem('F3X_submit_backup');
-        }
+        } 
 
       });
 
@@ -82,7 +64,7 @@ export class SubmitComponent implements OnInit {
         if(val) {
           if(val instanceof NavigationEnd) {
             console.log("val.url = ", val.url);
-            if((val.url.indexOf('/forms/form/99') === -1) || (val.url.indexOf('/forms/form/3X') === -1) || (val.url.indexOf('/forms/form/3X') === -1)) {
+            if((val.url.indexOf('/forms/form/99') === -1) || (val.url.indexOf('/forms/form/3X') === -1)) {
               this._messageService
                 .sendMessage({
                   'validateMessage': {

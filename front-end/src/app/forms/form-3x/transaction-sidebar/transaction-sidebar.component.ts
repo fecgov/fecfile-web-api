@@ -20,7 +20,7 @@ export class TransactionSidebarComponent implements OnInit {
   @Input() transactionCategories: any = [];
   @Input() step: string = '';
 
-  public itemSelected: string = null;
+  public itemSelected: string = '';
   public receiptsTotal: number = 0.0;
 
   private _formType: string = '';
@@ -40,6 +40,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+  
   }
 
   ngDoCheck(): void {
@@ -75,6 +76,11 @@ export class TransactionSidebarComponent implements OnInit {
           this.receiptsTotal = totals.receipts;
         }
       }
+    }
+
+    if (this.itemSelected === '')
+    {
+      this.itemSelected = 'receipts';
     }
   }
 

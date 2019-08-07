@@ -175,19 +175,7 @@
                         Only numerical values are allowed.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmContact.get(col?.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmContact.get(col?.name).errors?.contributionDateInvalid"
-                      >
-                        The date entered falls outside of the report coverage period. Transactions for this report
-                        should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
-                        need to add a transaction with a date that falls outside of the coverage period for this report,
-                        you will need to check the memo code box.
-                        <!-- Entered date is outside of the report coverage period. Please enter transactions for this
-                        coverage period only. -->
-                      </div>
-                    </ng-container>
+     
                   </div>
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'checkbox'">
@@ -251,13 +239,14 @@
         </ng-container>
       </ng-container>  
     </section>
+
     <footer>
       <footer>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
               <button class="btn btn-previous btn-left" type="button" (click)="saveAndAddMore()">
-                Save &amp; Addmore
+                Save &amp; AddMore
               </button>
             </div>
           </div>
@@ -290,5 +279,7 @@
         </div>
       </footer>
     </footer>
+
+
   </form>
 </div>

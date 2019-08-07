@@ -77,7 +77,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public officeSought: any = [];
   public officeState: any = [];
-  
+ 
   private _formType: string = '';
   private _reportType: any = null;
   private _types: any = [];
@@ -91,7 +91,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private _selectedEntity: any;
   private _contributionAmountMax: number;
   private _entityType: string = 'IND';
-
+  private _loading: boolean =  true;
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
@@ -814,103 +814,107 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   // }
 
   private getFormFields(): void {
+ 
     console.log('get transaction type form fields ' + this.transactionType);
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
-        console.log("getFormFields res =", res );
-        if (res.hasOwnProperty('data')) {
-          if (typeof res.data === 'object') {
-            /*if (res.data.hasOwnProperty('formFields')) {
-              if (Array.isArray(res.data.formFields)) {
-                this.formFields = res.data.formFields;
+             console.log("getFormFields res =", res );
+            if (res.hasOwnProperty('data')) {
+              if (typeof res.data === 'object') {
+                /*if (res.data.hasOwnProperty('formFields')) {
+                  if (Array.isArray(res.data.formFields)) {
+                    this.formFields = res.data.formFields;
 
-                this._setForm(this.formFields);
-              }
-            }*/
-            if (res.data.hasOwnProperty('individualFormFields')) {
-              if (Array.isArray(res.data.individualFormFields)) {
-                this.individualFormFields = res.data.individualFormFields;
-               }
-               console.log("this.individualFormFields =", this.individualFormFields );
-            }
-   
-            if (res.data.hasOwnProperty('committeeFormFields')) {
-              if (Array.isArray(res.data.committeeFormFields)) {
-                this.committeeFormFields = res.data.committeeFormFields;
-             }
-            }   
-               console.log("this.committeeFormFields =", this.committeeFormFields );
+                    this._setForm(this.formFields);
+                  }
+                }*/
+                if (res.data.hasOwnProperty('individualFormFields')) {
+                  if (Array.isArray(res.data.individualFormFields)) {
+                    this.individualFormFields = res.data.individualFormFields;
+                  }
+                  console.log("this.individualFormFields =", this.individualFormFields );
+                }
+      
+                if (res.data.hasOwnProperty('committeeFormFields')) {
+                  if (Array.isArray(res.data.committeeFormFields)) {
+                    this.committeeFormFields = res.data.committeeFormFields;
+                }
+                }   
+                  console.log("this.committeeFormFields =", this.committeeFormFields );
 
-            if (res.data.hasOwnProperty('organizationFormFields')) {
-              if (Array.isArray(res.data.organizationFormFields)) {
-                this.organizationFormFields = res.data.organizationFormFields;
-              }
-            }   
-              console.log("this.organizationFormFields =", this.organizationFormFields );
+                if (res.data.hasOwnProperty('organizationFormFields')) {
+                  if (Array.isArray(res.data.organizationFormFields)) {
+                    this.organizationFormFields = res.data.organizationFormFields;
+                  }
+                }   
+                  console.log("this.organizationFormFields =", this.organizationFormFields );
 
-            if (res.data.hasOwnProperty('candidateFormFields')) {
-              if (Array.isArray(res.data.candidateFormFields)) {
-                this.candidateFormFields = res.data.candidateFormFields;
-              }
-            }  
+                if (res.data.hasOwnProperty('candidateFormFields')) {
+                  if (Array.isArray(res.data.candidateFormFields)) {
+                    this.candidateFormFields = res.data.candidateFormFields;
+                  }
+                }  
 
-              console.log("this.organizationFormFields =", this.organizationFormFields );
+                  console.log("this.organizationFormFields =", this.organizationFormFields );
 
-            if (res.data.hasOwnProperty('hiddenFields')) {
-              if (Array.isArray(res.data.hiddenFields)) {
-                this.hiddenFields = res.data.hiddenFields;
-              }
-            }
-              console.log("this.organizationFormFields =", this.organizationFormFields );
+                if (res.data.hasOwnProperty('hiddenFields')) {
+                  if (Array.isArray(res.data.hiddenFields)) {
+                    this.hiddenFields = res.data.hiddenFields;
+                  }
+                }
+                  console.log("this.organizationFormFields =", this.organizationFormFields );
 
-            if (res.data.hasOwnProperty('states')) {
-              if (Array.isArray(res.data.states)) {
-                this.states = res.data.states;
-              }
-            }
+                if (res.data.hasOwnProperty('states')) {
+                  if (Array.isArray(res.data.states)) {
+                    this.states = res.data.states;
+                  }
+                }
 
-              console.log("this.organizationFormFields =", this.organizationFormFields );
-            
-              if (res.data.hasOwnProperty('prefixes')) {
-              if (Array.isArray(res.data.prefixes)) {
-                this.prefixes = res.data.prefixes;
-              }
-            } 
-                console.log("this.prefixes =", this.prefixes );
+                  console.log("this.organizationFormFields =", this.organizationFormFields );
+                
+                  if (res.data.hasOwnProperty('prefixes')) {
+                  if (Array.isArray(res.data.prefixes)) {
+                    this.prefixes = res.data.prefixes;
+                  }
+                } 
+                    console.log("this.prefixes =", this.prefixes );
 
-            if (res.data.hasOwnProperty('suffixes')) {
-              if (Array.isArray(res.data.suffixes)) {
-                this.suffixes = res.data.suffixes;
-              }
-            }   
-              console.log("this.suffixes =", this.suffixes );
-            if (res.data.hasOwnProperty('entityTypes')) {
-              if (Array.isArray(res.data.entityTypes)) {
-                this.entityTypes = res.data.entityTypes;
-              }
-            }   
-              console.log("this.entityTypes =", this.entityTypes );
-            
-              if (res.data.hasOwnProperty('officeSought')) {
-              if (Array.isArray(res.data.officeSought)) {
-                this.officeSought = res.data.officeSought;
-              }
-            }   
-            console.log("this.officeSought =", this.officeSought );
+                if (res.data.hasOwnProperty('suffixes')) {
+                  if (Array.isArray(res.data.suffixes)) {
+                    this.suffixes = res.data.suffixes;
+                  }
+                }   
+                  console.log("this.suffixes =", this.suffixes );
+                if (res.data.hasOwnProperty('entityTypes')) {
+                  if (Array.isArray(res.data.entityTypes)) {
+                    this.entityTypes = res.data.entityTypes;
+                  }
+                }   
+                  console.log("this.entityTypes =", this.entityTypes );
+                
+                  if (res.data.hasOwnProperty('officeSought')) {
+                  if (Array.isArray(res.data.officeSought)) {
+                    this.officeSought = res.data.officeSought;
+                  }
+                }   
+                console.log("this.officeSought =", this.officeSought );
 
-            if (res.data.hasOwnProperty('officeState')) {
-              if (Array.isArray(res.data.officeState)) {
-                this.officeState = res.data.officeState;
-              }
-            }   
+                if (res.data.hasOwnProperty('officeState')) {
+                  if (Array.isArray(res.data.officeState)) {
+                    this.officeState = res.data.officeState;
+                  }
+                }   
 
-            console.log("this.officeState =", this.officeState );
-            if (res.data.hasOwnProperty('titles')) {
-              if (Array.isArray(res.data.titles)) {
-                this.titles = res.data.titles;
-              }
-            }
-            console.log("this.titles =", this.titles );
+                console.log("this.officeState =", this.officeState );
+                if (res.data.hasOwnProperty('titles')) {
+                  if (Array.isArray(res.data.titles)) {
+                    this.titles = res.data.titles;
+                  }
+                }
+                console.log("this.titles =", this.titles );
+                this._loading = false;
+                console.log(new Date().toISOString());
+      
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
@@ -960,22 +964,28 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
      this.loadDynamiceFormFields();
   }
   public loadDynamiceFormFields(): void {
-    if  (this._entityType=== 'IND'){
+    if  (this._entityType === 'IND'){
       this.formFields  =  this.individualFormFields;
       this._setForm(this.formFields);
-      } else if  (this._entityType=== 'ORG'){
+      } else if  (this._entityType === 'ORG'){
         this.formFields  =  this.organizationFormFields;
         this._setForm(this.formFields);
-      } else if  (this._entityType=== 'COM'){
+      } else if  (this._entityType === 'COM'){
         this.formFields  =  this.committeeFormFields;
         this._setForm(this.formFields);
-      } else if  (this._entityType=== 'CAN'){
+      } else if  (this._entityType === 'CAN'){
         this.formFields  =  this.candidateFormFields;
         this._setForm(this.formFields);
       } 
   }
 
+  public cancelStep(): void {
+    this.frmContact.reset();
+  }
   public saveAndExit(): void {
+    //this._router.navigate([`/contacts`]);
+  }
+  public saveAndAddMore(): void {
     this._router.navigate([`/contacts`]);
   }
 }
