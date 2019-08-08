@@ -210,7 +210,8 @@ def post_sql_schedH3(data):
             data.get('transferred_amount', None),
             data.get('memo_code', ''),
             data.get('memo_text', ''),
-            datetime.datetime.now(),    
+            datetime.datetime.now(), 
+            datetime.datetime.now(),   
          )
         with connection.cursor() as cursor:
             # Insert data into schedH3 table
@@ -645,7 +646,8 @@ def post_sql_schedH4(data):
             data.get('activity_event_type ', ''),
             data.get('memo_code ', ''),
             data.get('memo_text ', ''),
-            datetime.datetime.now(),   
+            datetime.datetime.now(),
+            datetime.datetime.now(),  
          )
         with connection.cursor() as cursor:
             # Insert data into schedH4 table
@@ -1065,6 +1067,7 @@ def post_sql_schedH5(data):
             data.get('generic_campaign_amount', None),
             data.get('memo_code', ''),
             data.get('memo_text', ''),
+            datetime.datetime.now(),
             datetime.datetime.now(),   
          )
         with connection.cursor() as cursor:
@@ -1505,7 +1508,7 @@ def post_schedH6(data):
     try:
         # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6)
         data['transaction_id'] = get_next_transaction_id('SH6')
-        print(data,'jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
+        
         validate_sh6_data(data)
         try:
             post_sql_schedH6(data)
@@ -1521,18 +1524,15 @@ def get_schedH6(data):
     load sched_H6 data based on cmte_id, report_id and transaction_id
     """
     try:
-        print('jkjkjkkj')
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
         
         if 'transaction_id' in data:
-            print('get_schedH6jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjs')
             transaction_id = check_transaction_id(data.get('transaction_id'))
             print('get_schedH6')
             forms_obj = get_list_schedH6(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedH6(report_id, cmte_id)
-        print(forms_obj,'jkjkjkkj')
         return forms_obj
     except:
         raise
@@ -1671,7 +1671,6 @@ def schedH6(request):
             datum = schedH6_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
-            print('datttat')
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -1681,12 +1680,8 @@ def schedH6(request):
                 print(datum)
                 data = post_schedH6(datum)
             # Associating child transactions to parent and storing them to DB
-
-            print('print',data)
-
-
             output = get_schedH6(data)
-            print('print')
+          
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedH6 API - POST is throwing an exception: "
