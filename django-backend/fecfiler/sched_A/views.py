@@ -181,24 +181,9 @@ def check_transaction_id(transaction_id):
 
 def validate_sa_data(data):
     """
-    validate: 1. mandatory sa fields; 2. valid line number and transaction types
+    validate: mandatory sa fields
     """
     check_mandatory_fields_SA(data, MANDATORY_FIELDS_SCHED_A)
-    # validate_transaction_type(data)
-
-
-def validate_transaction_type(data):
-    """
-    check line number and transaction types are both valid and compatible
-    """
-    if not data.get('transaction_type') in VALID_TRANSACTION_TYPES:
-        raise Exception('Invalid transaction type detected.')
-    elif not data.get('line_number') in TRANSACTION_TYPES_LINE_NUM_MAP.get(
-            data.get('transaction_type')):
-        raise Exception('Line number does not match transaction type.')
-    else:
-        pass
-
 
 def check_mandatory_fields_SA(data, list_mandatory_fields):
     """
@@ -930,54 +915,10 @@ def parent_SA_to_child_SB_dict(data):
     except:
         raise
 
-# @lru_cache(maxsize=32)
-# def populate_transaction_types():
-#     """
-#     load all transaction_type data for shced_a
-#     return a dic in the following format:
-#     {"trans_identifier: (line_number, trans_type)"}
-#     """
-#     _sql = """
-#     SELECT tran_identifier as tran_id, line_num as line_num, tran_code as tran_code
-#     FROM ref_transaction_types 
-#     WHERE sched_type = 'sched_a'
-#     OR sched_type = 'sched_b'
-#     """
-#     tran_dic = {}
-#     try:
-#         with connection.cursor() as cursor:
-#             # Insert data into schedA table
-#             cursor.execute(_sql)
-#             if (cursor.rowcount == 0):
-#                 raise Exception(
-#                     'no transaction_types found for sched_a')
-#             for row in cursor.fetchall():
-#                 # print('*****row:{}'.format(row))
-#                 # tran_dic[row['tran_id']] = (row['line_num'], row['tran_code'])
-#                 tran_dic[row[0]] = (row[1], row[2])
-#         # print(tran_dic)
-#         return tran_dic
-#     except Exception:
-#         raise
-
-
-# def get_line_number_trans_type(transaction_type_identifier):
-    # try:
-    #     trans_dic = populate_transaction_types()
-    #     # print('------')
-    #     # print(transaction_type_identifier)
-    #     if transaction_type_identifier in trans_dic:
-    #         list_value = trans_dic.get(transaction_type_identifier)
-    #         # print(list_value)
-    #         line_number = list_value[0]
-    #         transaction_type = list_value[1]
-    #         return line_number, transaction_type
-    #     else:
-    #         raise Exception('The transaction type identifier is not in the specified list')
-    # except:
-        # raise
-
 def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
+    """
+    load child sched_b transaction_id
+    """
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT transaction_id FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
@@ -990,6 +931,9 @@ def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
         raise
 
 def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
+    """
+    load child sched_a transaction_id
+    """
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT transaction_id FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
