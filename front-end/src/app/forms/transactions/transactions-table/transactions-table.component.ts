@@ -551,23 +551,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public printAllSelected(): void {
     //alert('Print all transactions is not yet supported');
-
-    this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
-    this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
-      res => {
-        if (res) {
-          console.log('Accessing FinancialSummaryComponent printPriview res ...', res);
-
-          if (res['results.pdf_url'] !== null) {
-            console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-            window.open(res.results.pdf_url, '_blank');
-          }
-        }
-      },
-      error => {
-        console.log('error: ', error);
+    let trxIds = '';
+    const selectedTransactions: Array<TransactionModel> = [];
+    for (const trx of this.transactionsModel) {
+      if (trx.selected) {
+        selectedTransactions.push(trx);
+        trxIds += trx.transactionId + ', ';
       }
-    ); /*  */
+    }
+
+    trxIds = trxIds.substr(0, trxIds.length - 2);
+    this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
+    this._reportTypeService.printPreview(this.formType, trxIds);
   }
 
   /**

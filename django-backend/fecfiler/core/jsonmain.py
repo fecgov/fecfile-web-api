@@ -808,11 +808,15 @@ def create_json_builders(request):
         report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         form_type = request.data.get('form_type')
+        if 'transaction_id' in request.data:
+            transaction_id = request.data.get('transaction_id')
+            print("transaction_id=", transaction_id)
+
         committeeid = request.user.username
 
-        print("report_id", report_id)
-        print("call_from", call_from)
-        print("committeeid", committeeid)
+        print("report_id=", report_id)
+        print("call_from=", call_from)
+        print("committeeid=", committeeid)
 
         data_obj = task_sched_a(request)
 
