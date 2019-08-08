@@ -3076,49 +3076,49 @@ def get_contacts_dynamic_forms_fields(request):
     except Exception as e:
         return Response("The get_contacts_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-"""
+# """
 
 
-****************************************************************************************************************************************************************
-TRANSACTION CATOGIRES SCREEN SEARCH BY TYPE FIELD API- CORE APP - SPRINT 18 - FNE 1276 - BY YESWANTH KUMAR TELLA
-*****************************************************************************************************************************************************************
-"""
-@api_view(['GET', 'POST'])
-def get_filler_transaction_type(request):
-    try:
-        # print("request.data: ", request.data)
-        #cmte_id = request.user.username
-        param_string = ""
+# ****************************************************************************************************************************************************************
+# TRANSACTION CATOGIRES SCREEN SEARCH BY TYPE FIELD API- CORE APP - SPRINT 18 - FNE 1276 - BY YESWANTH KUMAR TELLA
+# *****************************************************************************************************************************************************************
+# """
+# @api_view(['GET', 'POST'])
+# def get_filler_transaction_type(request):
+#     try:
+#         # print("request.data: ", request.data)
+#         #cmte_id = request.user.username
+#         param_string = ""
         
-        search_string = request.data.get('search')
-        # import ipdb;ipdb.set_trace()
-        report_id = request.data.get('reportid')
-        search_keys = ['form_type','sched_type', 'line_num', 'tran_code', 
-            'tran_identifier', 'tran_desc']
-        if search_string:
-            for key in search_keys:
-                if not param_string:
-                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
-                else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
-            param_string = param_string + " )"
-        query_string = """SELECT * FROM public.ref_transaction_types where cmte_id = %s """ + param_string + """ AND delete_ind is distinct from 'Y'"""
-                           # + """ ORDER BY """ + order_string
-        # print(query_string)
-        forms_obj = None
-        with connection.cursor() as cursor:
-            cursor.execute(query_string)
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-                if forms_obj is None:
-                    forms_obj =[]
-                    status_value = status.HTTP_200_OK
+#         search_string = request.data.get('search')
+#         # import ipdb;ipdb.set_trace()
+#         report_id = request.data.get('reportid')
+#         search_keys = ['form_type','sched_type', 'line_num', 'tran_code', 
+#             'tran_identifier', 'tran_desc']
+#         if search_string:
+#             for key in search_keys:
+#                 if not param_string:
+#                     param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+#                 else:
+#                     param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+#             param_string = param_string + " )"
+#         query_string = """SELECT * FROM public.ref_transaction_types where cmte_id = %s """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+#                            # + """ ORDER BY """ + order_string
+#         # print(query_string)
+#         forms_obj = None
+#         with connection.cursor() as cursor:
+#             cursor.execute(query_string)
+#             for row in cursor.fetchall():
+#                 data_row = list(row)
+#                 forms_obj=data_row[0]
+#                 if forms_obj is None:
+#                     forms_obj =[]
+#                     status_value = status.HTTP_200_OK
         
         
-        #import ipdb; ipdb.set_trace()
-        json_result = {'transaction_type': list(forms_obj)}
-        # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
-        return Response(json_result, status=status_value)
-    except Exception as e:
-        return Response("The get_filer_transaction_type API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST) 
+#         #import ipdb; ipdb.set_trace()
+#         json_result = {'transaction_type': list(forms_obj)}
+#         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
+#         return Response(json_result, status=status_value)
+#     except Exception as e:
+#         return Response("The get_filer_transaction_type API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST) 
