@@ -58,73 +58,73 @@ class SchedL(models.Model):
     account_name = models.CharField(primary_key=True, max_length=20)
     cvg_from_date = models.DateField(blank=True, null=True)
     cvg_end_date = models.DateField(blank=True, null=True)
-    item_receipts  models.DecimalField(
+    item_receipts = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    unitem_receipts  models.DecimalField(
+    unitem_receipts =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    ttl_receipts  models.DecimalField(
+    ttl_receipts =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    other_receipts  models.DecimalField(
+    other_receipts =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_receipts  models.DecimalField(
+    total_receipts = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    voter_reg_disb_amount  models.DecimalField(
+    voter_reg_disb_amount = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    voter_id_disb_amount  models.DecimalField(
+    voter_id_disb_amount  =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    gotv_disb_amount  models.DecimalField(
+    gotv_disb_amount = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    generic_campaign_disb_amount  models.DecimalField(
+    generic_campaign_disb_amount = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_disb_sub  models.DecimalField(
+    total_disb_sub =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    other_disb  models.DecimalField(
+    other_disb =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_disb  models.DecimalField(
+    total_disb =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    coh_bop  models.DecimalField(
+    coh_bop  = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    receipts  models.DecimalField(
+    receipts = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    subtotal  models.DecimalField(
+    subtotal = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    disbursements  models.DecimalField(
+    disbursements = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    coh_cop  models.DecimalField(
+    coh_cop =models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    item_receipts_ytd  models.DecimalField(
+    item_receipts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    unitem_receipts_ytd  models.DecimalField(
+    unitem_receipts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_reciepts_ytd  models.DecimalField(
+    total_reciepts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    other_receipts_ytd  models.DecimalField(
+    other_receipts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_receipts_ytd  models.DecimalField(
+    total_receipts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    voter_reg_disb_amount_ytd  models.DecimalField(
+    voter_reg_disb_amount_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    voter_id_disb_amount_ytd  models.DecimalField(
+    voter_id_disb_amount_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    gotv_disb_amount_ytd  models.DecimalField(
+    gotv_disb_amount_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    generic_campaign_disb_amount_ytd  models.DecimalField(
+    generic_campaign_disb_amount_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_disb_sub_ytd  models.DecimalField(
+    total_disb_sub_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    other_disb_ytd  models.DecimalField(
+    other_disb_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    total_disb_ytd  models.DecimalField(
+    total_disb_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    coh_coy  models.DecimalField(
+    coh_coy = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    receipts_ytd  models.DecimalField(
+    receipts_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    sub_total_ytd   models.DecimalField(
+    sub_total_ytd  = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    disbursements_ytd  models.DecimalField(
+    disbursements_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
-    coh_cop_ytd  models.DecimalField(
+    coh_cop_ytd = models.DecimalField(
         max_digits=12, decimal_places=2, blank=True, null=True)
     delete_ind = models.CharField(max_length=1, blank=True, null=True)
     create_date = models.DateTimeField(blank=True, null=True)
