@@ -50,7 +50,7 @@ def check_mandatory_fields_SL(data):
                 errors.append(field)
         if errors:
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedH3 table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data to schedL table: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -63,16 +63,44 @@ def schedL_sql_dict(data):
     valid_fields = [
 
             'transaction_type_identifier',
-            'back_ref_transaction_id',
-            'back_ref_sched_name',
+            'record_id',
             'account_name',
-            'activity_event_type',
-            'activity_event_name',
-            'receipt_date',
-            'total_amount_transferred',
-            'transferred_amount',
-            'memo_code',
-            'memo_text',         
+            'cvg_from_date',
+            'cvg_end_date',
+            'item_receipts',
+            'unitem_receipts',
+            'ttl_receipts',
+            'other_receipts',
+            'total_receipts',
+            'voter_reg_disb_amount',
+            'voter_id_disb_amount',
+            'gotv_disb_amount',
+            'generic_campaign_disb_amount',
+            'total_disb_sub',
+            'other_disb',
+            'total_disb',
+            'coh_bop',
+            'receipts',
+            'subtotal',
+            'disbursements',
+            'coh_cop',
+            'item_receipts_ytd',
+            'unitem_receipts_ytd',
+            'total_reciepts_ytd',
+            'other_receipts_ytd',
+            'total_receipts_ytd',
+            'voter_reg_disb_amount_ytd',
+            'voter_id_disb_amount_ytd',
+            'gotv_disb_amount_ytd',
+            'generic_campaign_disb_amount_ytd',
+            'total_disb_sub_ytd',
+            'other_disb_ytd',
+            'total_disb_ytd',
+            'coh_coy',
+            'receipts_ytd',
+            'sub_total_ytd',
+            'disbursements_ytd',
+            'coh_cop_ytd',        
     ]
     try:
         return {k: v for k, v in data.items() if k in valid_fields}
@@ -82,7 +110,7 @@ def schedL_sql_dict(data):
 
 def put_schedL(data):
     """
-    update sched_H3 item
+    update sched_L item
     here we are assuming entity_id are always referencing something already in our DB
     """
     try:
@@ -105,17 +133,45 @@ def put_sql_schedL(data):
     """
     _sql = """UPDATE public.sched_l
               SET transaction_type_identifier= %s, 
-                  back_ref_transaction_id= %s,
-                  back_ref_sched_name= %s,
-                  account_name= %s,
-                  activity_event_type= %s,
-                  activity_event_name= %s,
-                  receipt_date= %s,
-                  total_amount_transferred= %s,
-                  transferred_amount= %s,
-                  memo_code= %s,
-                  memo_text= %s,
-                  create_date= %s,
+                  record_id =%s,
+                  account_name =%s,
+                  cvg_from_date =%s,
+                  cvg_end_date =%s,
+                  item_receipts =%s,
+                  unitem_receipts =%s,
+                  ttl_receipts =%s,
+                  other_receipts =%s,
+                  total_receipts =%s,
+                  voter_reg_disb_amount =%s,
+                  voter_id_disb_amount =%s,
+                  gotv_disb_amount =%s,
+                  generic_campaign_disb_amount =%s,
+                  total_disb_sub =%s,
+                  other_disb =%s,
+                  total_disb =%s,
+                  coh_bop =%s,
+                  receipts =%s,
+                  subtotal =%s,
+                  disbursements =%s,
+                  coh_cop =%s,
+                  item_receipts_ytd =%s,
+                  unitem_receipts_ytd =%s,
+                  total_reciepts_ytd =%s,
+                  other_receipts_ytd =%s,
+                  total_receipts_ytd =%s,
+                  voter_reg_disb_amount_ytd =%s,
+                  voter_id_disb_amount_ytd =%s,
+                  gotv_disb_amount_ytd =%s,
+                  generic_campaign_disb_amount_ytd =%s,
+                  total_disb_sub_ytd =%s,
+                  other_disb_ytd =%s,
+                  total_disb_ytd =%s,
+                  coh_coy =%s,
+                  receipts_ytd =%s,
+                  sub_total_ytd =%s,
+                  disbursements_ytd =%s,
+                  coh_cop_ytd =%s,
+                  create_date =%s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -123,16 +179,45 @@ def put_sql_schedL(data):
     _v = (  
            
             data.get('transaction_type_identifier', ''),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
+            data.get('record_id', ''),
             data.get('account_name', ''),
-            data.get('activity_event_type', ''),
-            data.get('activity_event_name', ''),
-            data.get('receipt_date', None),
-            data.get('total_amount_transferred', None),
-            data.get('transferred_amount', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('cvg_from_date', None),
+            data.get('cvg_end_date', None),
+            data.get('item_receipts', None),
+            data.get('unitem_receipts', None),
+            data.get('ttl_receipts', None),
+            data.get('other_receipts', None),
+            data.get('total_receipts', None),
+            data.get('voter_reg_disb_amount', None),
+            data.get('voter_id_disb_amount', None),
+            data.get('gotv_disb_amount', None),
+            data.get('generic_campaign_disb_amount', None),
+            data.get('total_disb_sub', None),
+            data.get('other_disb', None),
+            data.get('total_disb', None),
+            data.get('coh_bop', None),
+            data.get('receipts', None),
+            data.get('subtotal', None),
+            data.get('disbursements', None),
+            data.get('coh_cop', None),
+            data.get('item_receipts_ytd', None),
+            data.get('unitem_receipts_ytd', None),
+            data.get('total_reciepts_ytd', None),
+            data.get('other_receipts_ytd', None),
+            data.get('total_receipts_ytd', None),
+            data.get('voter_reg_disb_amount_ytd', None),
+            data.get('voter_id_disb_amount_ytd', None),
+            data.get('gotv_disb_amount_ytd', None),
+            data.get('generic_campaign_disb_amount_ytd', None),
+            data.get('total_disb_sub_ytd', None),
+            data.get('other_disb_ytd', None),
+            data.get('total_disb_ytd', None),
+            data.get('coh_coy', None),
+            data.get('receipts_ytd', None),
+            data.get('sub_total_ytd', None),
+            data.get('disbursements_ytd', None),
+            data.get('coh_cop_ytd', None),
+            datetime.datetime.now(),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -150,13 +235,13 @@ def validate_sl_data(data):
 
 def post_schedL(data):
     """
-    function for handling POST request for sH3, need to:
+    function for handling POST request for sL, need to:
     1. generatye new transaction_id
     2. validate data
     3. save data to db
     """
     try:
-        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_L)
+        # check_mandatory_fields_SL(datum, MANDATORY_FIELDS_SCHED_L)
         data['transaction_id'] = get_next_transaction_id('SL')
         print(data)
         validate_sl_data(data)
@@ -178,40 +263,97 @@ def post_sql_schedL(data):
             report_id,
             transaction_type_identifier,
             transaction_id,
-            back_ref_transaction_id,
-            back_ref_sched_name,
+            record_id,
             account_name,
-            activity_event_type,
-            activity_event_name,
-            receipt_date,
-            total_amount_transferred,
-            transferred_amount,
-            memo_code,
-            memo_text,
+            cvg_from_date,
+            cvg_end_date,
+            item_receipts,
+            unitem_receipts,
+            ttl_receipts,
+            other_receipts,
+            total_receipts,
+            voter_reg_disb_amount,
+            voter_id_disb_amount,
+            gotv_disb_amount,
+            generic_campaign_disb_amount,
+            total_disb_sub,
+            other_disb,
+            total_disb,
+            coh_bop,
+            receipts,
+            subtotal,
+            disbursements,
+            coh_cop,
+            item_receipts_ytd,
+            unitem_receipts_ytd,
+            total_reciepts_ytd,
+            other_receipts_ytd,
+            total_receipts_ytd,
+            voter_reg_disb_amount_ytd,
+            voter_id_disb_amount_ytd,
+            gotv_disb_amount_ytd,
+            generic_campaign_disb_amount_ytd,
+            total_disb_sub_ytd,
+            other_disb_ytd,
+            total_disb_ytd,
+            coh_coy,
+            receipts_ytd,
+            sub_total_ytd,
+            disbursements_ytd,
+            coh_cop_ytd,
             create_date ,
-            last_update_date
+            last_update_date 
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
             data.get('transaction_type_identifier', ''),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
+            data.get('record_id', ''),
             data.get('account_name', ''),
-            data.get('activity_event_type', ''),
-            data.get('activity_event_name', ''),
-            data.get('receipt_date', None),
-            data.get('total_amount_transferred', None),
-            data.get('transferred_amount', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('cvg_from_date', None),
+            data.get('cvg_end_date', None),
+            data.get('item_receipts', None),
+            data.get('unitem_receipts', None),
+            data.get('ttl_receipts', None),
+            data.get('other_receipts', None),
+            data.get('total_receipts', None),
+            data.get('voter_reg_disb_amount', None),
+            data.get('voter_id_disb_amount', None),
+            data.get('gotv_disb_amount', None),
+            data.get('generic_campaign_disb_amount', None),
+            data.get('total_disb_sub', None),
+            data.get('other_disb', None),
+            data.get('total_disb', None),
+            data.get('coh_bop', None),
+            data.get('receipts', None),
+            data.get('subtotal', None),
+            data.get('disbursements', None),
+            data.get('coh_cop', None),
+            data.get('item_receipts_ytd', None),
+            data.get('unitem_receipts_ytd', None),
+            data.get('total_reciepts_ytd', None),
+            data.get('other_receipts_ytd', None),
+            data.get('total_receipts_ytd', None),
+            data.get('voter_reg_disb_amount_ytd', None),
+            data.get('voter_id_disb_amount_ytd', None),
+            data.get('gotv_disb_amount_ytd', None),
+            data.get('generic_campaign_disb_amount_ytd', None),
+            data.get('total_disb_sub_ytd', None),
+            data.get('other_disb_ytd', None),
+            data.get('total_disb_ytd', None),
+            data.get('coh_coy', None),
+            data.get('receipts_ytd', None),
+            data.get('sub_total_ytd', None),
+            data.get('disbursements_ytd', None),
+            data.get('coh_cop_ytd', None),
+            datetime.datetime.now(),
             datetime.datetime.now(),    
          )
         with connection.cursor() as cursor:
-            # Insert data into schedH3 table
+            # Insert data into schedL table
             cursor.execute(_sql, _v)
     except Exception:
         raise
@@ -244,16 +386,44 @@ def get_list_all_schedL(report_id, cmte_id):
             report_id,
             transaction_type_identifier,
             transaction_id,
-            back_ref_transaction_id,
-            back_ref_sched_name,
+            record_id,
             account_name,
-            activity_event_type,
-            activity_event_name,
-            receipt_date,
-            total_amount_transferred,
-            transferred_amount,
-            memo_code,
-            memo_text,
+            cvg_from_date,
+            cvg_end_date,
+            item_receipts,
+            unitem_receipts,
+            ttl_receipts,
+            other_receipts,
+            total_receipts,
+            voter_reg_disb_amount,
+            voter_id_disb_amount,
+            gotv_disb_amount,
+            generic_campaign_disb_amount,
+            total_disb_sub,
+            other_disb,
+            total_disb,
+            coh_bop,
+            receipts,
+            subtotal,
+            disbursements,
+            coh_cop,
+            item_receipts_ytd,
+            unitem_receipts_ytd,
+            total_reciepts_ytd,
+            other_receipts_ytd,
+            total_receipts_ytd,
+            voter_reg_disb_amount_ytd,
+            voter_id_disb_amount_ytd,
+            gotv_disb_amount_ytd,
+            generic_campaign_disb_amount_ytd,
+            total_disb_sub_ytd,
+            other_disb_ytd,
+            total_disb_ytd,
+            coh_coy,
+            receipts_ytd,
+            sub_total_ytd,
+            disbursements_ytd,
+            coh_cop_ytd,
             delete_ind,
             create_date ,
             last_update_date
@@ -274,50 +444,78 @@ def get_list_all_schedL(report_id, cmte_id):
         raise
 
 
-def get_list_schedH3(report_id, cmte_id, transaction_id):
+def get_list_schedL(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
-            # GET single row from schedH3 table
+            # GET single row from schedL table
             _sql = """SELECT json_agg(t) FROM ( SELECT
             cmte_id,
             report_id,
             transaction_type_identifier,
             transaction_id,
-            back_ref_transaction_id,
-            back_ref_sched_name,
+            record_id,
             account_name,
-            activity_event_type,
-            activity_event_name,
-            receipt_date,
-            total_amount_transferred,
-            transferred_amount,
-            memo_code,
-            memo_text,
+            cvg_from_date,
+            cvg_end_date,
+            item_receipts,
+            unitem_receipts,
+            ttl_receipts,
+            other_receipts,
+            total_receipts,
+            voter_reg_disb_amount,
+            voter_id_disb_amount,
+            gotv_disb_amount,
+            generic_campaign_disb_amount,
+            total_disb_sub,
+            other_disb,
+            total_disb,
+            coh_bop,
+            receipts,
+            subtotal,
+            disbursements,
+            coh_cop,
+            item_receipts_ytd,
+            unitem_receipts_ytd,
+            total_reciepts_ytd,
+            other_receipts_ytd,
+            total_receipts_ytd,
+            voter_reg_disb_amount_ytd,
+            voter_id_disb_amount_ytd,
+            gotv_disb_amount_ytd,
+            generic_campaign_disb_amount_ytd,
+            total_disb_sub_ytd,
+            other_disb_ytd,
+            total_disb_ytd,
+            coh_coy,
+            receipts_ytd,
+            sub_total_ytd,
+            disbursements_ytd,
+            coh_cop_ytd,
             delete_ind,
             create_date ,
             last_update_date
-            FROM public.sched_h3
+            FROM public.sched_l
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
-            schedH3_list = cursor.fetchone()[0]
-            if schedH3_list is None:
-                raise NoOPError('No sched_H3 transaction found for transaction_id {}'.format(
+            schedL_list = cursor.fetchone()[0]
+            if schedL_list is None:
+                raise NoOPError('No sched_L transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictH3 in schedH3_list:
-                merged_list.append(dictH3)
+            for dictL in schedL_list:
+                merged_list.append(dictL)
         return merged_list
     except Exception:
         raise
 
 
-def delete_sql_schedH3(cmte_id, report_id, transaction_id):
+def delete_sql_schedL(cmte_id, report_id, transaction_id):
     """
     do delete sql transaction
     """
-    _sql = """UPDATE public.sched_h3
+    _sql = """UPDATE public.sched_l
             SET delete_ind = 'Y' 
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
         """
@@ -325,13 +523,13 @@ def delete_sql_schedH3(cmte_id, report_id, transaction_id):
     do_transaction(_sql, _v)
 
 
-def delete_schedH3(data):
+def delete_schedL(data):
     """
-    function for handling delete request for sh3
+    function for handling delete request for sl
     """
     try:
         
-        delete_sql_schedH3(data.get('cmte_id'), data.get(
+        delete_sql_schedL(data.get('cmte_id'), data.get(
             'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
@@ -351,23 +549,23 @@ def schedL(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
-            datum = schedH3_sql_dict(request.data)
+            datum = schedL_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
                     request.data.get('transaction_id'))
-                data = put_schedH3(datum)
+                data = put_schedL(datum)
             else:
                 print(datum)
-                data = post_schedH3(datum)
+                data = post_schedL(datum)
             # Associating child transactions to parent and storing them to DB
 
-            output = get_schedH3(data)
+            output = get_schedL(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response("The schedH3 API - POST is throwing an exception: "
+            return Response("The schedL API - POST is throwing an exception: "
                             + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'GET':
@@ -383,7 +581,7 @@ def schedL(request):
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
                     request.data.get('transaction_id'))
-            datum = get_schedH3(data)
+            datum = get_schedL(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
@@ -391,7 +589,7 @@ def schedL(request):
             return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
         except Exception as e:
             logger.debug(e)
-            return Response("The schedH3 API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The schedL API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         try:
@@ -408,14 +606,14 @@ def schedL(request):
                     request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
-            delete_schedH3(data)
+            delete_schedL(data)
             return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')), status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response("The schedH3 API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The schedL API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
         try:
-            datum = schedH3_sql_dict(request.data)
+            datum = schedL_sql_dict(request.data)
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
             else:
@@ -438,12 +636,12 @@ def schedL(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedH3(datum)
+            data = put_schedL(datum)
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
-            return Response("The schedH3 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The schedL API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     else:
         raise NotImplementedError
