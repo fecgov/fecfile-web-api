@@ -26,7 +26,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-from fecfiler.sched_A.views import (
+from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
 )
 # Create your views here.
@@ -472,7 +472,6 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get("entity_id")
-        print(entity_id)
         datum["entity_id"] = entity_id
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
@@ -713,7 +712,6 @@ def schedB(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum = schedB_sql_dict(request.data)
-            print(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             if "entity_id" in request.data and check_null_value(

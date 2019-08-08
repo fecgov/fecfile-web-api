@@ -19,12 +19,14 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
+
+from fecfiler.core.transaction_util import get_line_number_trans_type
+
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB)
 
-# TODO: adding earmarked transactions: one sched_a and one generated sched_b transactions
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -51,8 +53,7 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 MANDATORY_FIELDS_SCHED_A = ['report_id', 'transaction_type_identifier', 'contribution_date', 
                             'contribution_amount', 'entity_type']
 
-# TODO: do we need cmte_id in the mandatory list?
-MANDATORY_CHILD_FIELDS_SCHED_A = ['cmte_id', 'report_id', 'child_transaction_type_identifier', 'child_contribution_date', 
+MANDATORY_CHILD_FIELDS_SCHED_A = ['report_id', 'child_transaction_type_identifier', 'child_contribution_date', 
                             'child_contribution_amount', 'child_entity_type']
 
 # madatory fields for aggregate amount api call
@@ -61,88 +62,6 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier']
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
 
-# list of valid line numbers - this list will grow as we add more types
-VALID_TRANSACTION_TYPES = ['15', '18G', '17Z']
-
-# map if transaction_type to line_numbers -
-# this list will grow as we add more types
-TRANSACTION_TYPES_LINE_NUM_MAP = {
-    '15': ['11AI', '11AII'],
-    '18G': ['12'],
-    '17Z': ['16'],
-}
-
-
-# TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP = {
-#     'INDV_REC': ['11A', '15'],
-#     'OTH_REC': ['17', '15O'],
-#     'IND_RECNT': ['17', '15R'],
-#     'PTY_RCNT': ['17', '18R'],
-#     'PAC_RCNT': ['17', '18R'],
-#     'TRI_RCNT': ['17', '11R'],
-#     'IND_NP_RECNT': ['17', '32'],
-#     'TRI_NP_RCNT': ['17', '32T'],
-#     'PTY_NP_RCNT': ['17', '32K'],
-#     'PAC_NP_RCNT': ['17', '32K'],
-#     'IND_HQ_ACCNT': ['17', '31'],
-#     'TRI_HQ_ACCNT': ['17', None],
-#     'PTY_HQ_ACCNT': ['17', '31K'],
-#     'PAC_HQ_ACCNT': ['17', '31K'],
-#     'IND_CO_ACCNT': ['17', '30'],
-#     'TRI_CO_ACCNT': ['17', None],
-#     'PTY_CO_ACCNT': ['17', '30K'],
-#     'PAC_CO_ACCNT': ['17', '30K'],
-#     'IND_CAREY': ['17', '10'],
-#     'OT_COM_CAREY': ['17', '10K'],
-#     'BU_LAB_CAREY': ['17', '10B'],
-#     'PAR_CON': ['11A', '15P'],
-#     'PAR_MEMO': ['11A', '15PM'],
-#     'REATT_FROM': ['11A', None],
-#     'REATT_TO': ['11A', '15M'],
-#     'JF_TRAN': ['12', '14G'],
-#     'IND_JF_MEM': ['12', '14JM'],
-#     'PTY_JF_MEM': ['12', '14KM'],
-#     'PAC_JF_MEM': ['12', '14KM'],
-#     'TRI_JF_MEM': ['12', '14TM'],
-#     'JF_TRAN_R': ['17', '32G'],
-#     'IND_JF_R_MEM': ['17', '32JM'],
-#     'PAC_JF_R_MEM': ['17', '32KM'],
-#     'TRI_JF_R_MEM': ['17', '32TM'],
-#     'JF_TRAN_C': ['17', '30G'],
-#     'IND_JF_C_MEM': ['17', '30JM'],
-#     'PAC_JF_C_MEM': ['17', '30KM'],
-#     'TRI_JF_C_MEM': ['17', '30TM'],
-#     'JF_TRAN_H': ['17', '31G'],
-#     'IND_JF_H_MEM': ['17', '31JM'],
-#     'PAC_JF_H_MEM': ['17', '31KM'],
-#     'TRI_JF_H_MEM': ['17', '31TM'],
-#     'IK_TRAN': ['12', '18Z'],
-#     'IK_TF_OUT': ['21B', '20K'],
-#     'IK_TRAN_FEA': ['12', '18F'],
-#     'IK_OUT_FEA': ['30B', '20K'],
-#     'IK_REC_PTY': ['11B', '15Z'],
-#     'IK_OUT_PTY': ['21B', '20K'],
-#     'IK_REC_PAC': ['11C', '15Z'],
-#     'IK_OUT_PAC': ['21B', '20K'],
-#     'IK_REC': ['11A', '15K'],
-#     'IK_OUT': ['21B', '20K'],
-#     'CON_EM': ['11A', '15I'],
-#     'EM_OUT': ['23', '24T'],
-#     'CON_EM_MEMO': ['11A', '15IM'],
-#     'EM_OUT_MEMO': ['23', '24IM'],
-#     'PAC_EM': ['11C', '18I'],
-#     'PAC_EM_MEMO': ['11C', '18IM'],
-#     'CON_EM_RT': ['11A', '15E'],
-#     'CON_EM_RT_M': ['11A', '15EM'],
-#     'PAC_EM_RT': ['11C', '18E'],
-#     'PAC_EM_RT_M': ['11C', '18EM'],
-#     'EAR_REC_RECT': ['17', '32E'],
-#     'EAR_MEM_RECT': ['17', '32EM'],
-#     'EAR_REC_CONV': ['17', '30E'],
-#     'EAR_MEM_CONV': ['17', '30EM'],
-#     'EAR_REC_HQ': ['17', '31E'],
-#     'EAR_MEM_HQ': ['17', '31EM']
-# }
 
 # list of all transaction type identifiers that should
 # have single column storage in DB
@@ -219,6 +138,7 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_TRAN" : "IK_TRAN_OUT",
                                     "IK_TRAN_FEA" : "IK_TRAN_FEA_OUT"
 }
+
 # list of all transaction type identifiers that have itemization rule applied to it
 # TODO: need to update this list: PAR_CON?, PAR_MEMO?, REATT_TO?
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
@@ -228,7 +148,9 @@ itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = { 
                                             "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
                                             "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
-                                            "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO" 
+                                            "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
+                                            "EAR_REC": "EAR_REC_MEMO",
+                                            "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
 
 def get_next_transaction_id(trans_char):
@@ -1008,52 +930,52 @@ def parent_SA_to_child_SB_dict(data):
     except:
         raise
 
-@lru_cache(maxsize=32)
-def populate_transaction_types():
-    """
-    load all transaction_type data for shced_a
-    return a dic in the following format:
-    {"trans_identifier: (line_number, trans_type)"}
-    """
-    _sql = """
-    SELECT tran_identifier as tran_id, line_num as line_num, tran_code as tran_code
-    FROM ref_transaction_types 
-    WHERE sched_type = 'sched_a'
-    OR sched_type = 'sched_b'
-    """
-    tran_dic = {}
-    try:
-        with connection.cursor() as cursor:
-            # Insert data into schedA table
-            cursor.execute(_sql)
-            if (cursor.rowcount == 0):
-                raise Exception(
-                    'no transaction_types found for sched_a')
-            for row in cursor.fetchall():
-                # print('*****row:{}'.format(row))
-                # tran_dic[row['tran_id']] = (row['line_num'], row['tran_code'])
-                tran_dic[row[0]] = (row[1], row[2])
-        # print(tran_dic)
-        return tran_dic
-    except Exception:
-        raise
+# @lru_cache(maxsize=32)
+# def populate_transaction_types():
+#     """
+#     load all transaction_type data for shced_a
+#     return a dic in the following format:
+#     {"trans_identifier: (line_number, trans_type)"}
+#     """
+#     _sql = """
+#     SELECT tran_identifier as tran_id, line_num as line_num, tran_code as tran_code
+#     FROM ref_transaction_types 
+#     WHERE sched_type = 'sched_a'
+#     OR sched_type = 'sched_b'
+#     """
+#     tran_dic = {}
+#     try:
+#         with connection.cursor() as cursor:
+#             # Insert data into schedA table
+#             cursor.execute(_sql)
+#             if (cursor.rowcount == 0):
+#                 raise Exception(
+#                     'no transaction_types found for sched_a')
+#             for row in cursor.fetchall():
+#                 # print('*****row:{}'.format(row))
+#                 # tran_dic[row['tran_id']] = (row['line_num'], row['tran_code'])
+#                 tran_dic[row[0]] = (row[1], row[2])
+#         # print(tran_dic)
+#         return tran_dic
+#     except Exception:
+#         raise
 
 
-def get_line_number_trans_type(transaction_type_identifier):
-    try:
-        trans_dic = populate_transaction_types()
-        # print('------')
-        # print(transaction_type_identifier)
-        if transaction_type_identifier in trans_dic:
-            list_value = trans_dic.get(transaction_type_identifier)
-            # print(list_value)
-            line_number = list_value[0]
-            transaction_type = list_value[1]
-            return line_number, transaction_type
-        else:
-            raise Exception('The transaction type identifier is not in the specified list')
-    except:
-        raise
+# def get_line_number_trans_type(transaction_type_identifier):
+    # try:
+    #     trans_dic = populate_transaction_types()
+    #     # print('------')
+    #     # print(transaction_type_identifier)
+    #     if transaction_type_identifier in trans_dic:
+    #         list_value = trans_dic.get(transaction_type_identifier)
+    #         # print(list_value)
+    #         line_number = list_value[0]
+    #         transaction_type = list_value[1]
+    #         return line_number, transaction_type
+    #     else:
+    #         raise Exception('The transaction type identifier is not in the specified list')
+    # except:
+        # raise
 
 def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
     try:
