@@ -466,6 +466,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (!col.name) {
       return;
     }
+    if ($event.key) {
+      const key = $event.key.toUpperCase();
+      if (key === 'TAB') {
+        return;
+      }
+    }
     if (
       col.name === 'middle_name' ||
       col.name === 'prefix' ||
@@ -1016,6 +1022,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
 
     if (formData.memoCode) {
+      this.memoCode = true;
       this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
     }
 
