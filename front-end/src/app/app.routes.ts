@@ -108,13 +108,6 @@ export const AppRoutes: Routes = [
           }
         ]
       },
-      {
-        path: 'forms/transactions/:form_id/:report_id',
-        // component: TransactionsComponent,
-        component: TransactionsWrapperComponent,
-        pathMatch: 'full',
-        canActivate: [CanActivateGuard]
-      },
       { path: 'signandSubmit/:form_id', component: SignComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       {
@@ -123,12 +116,6 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard]
       }
-      // {
-      //     path: 'forms/transactions/:form_id/:report_id',
-      //     component: TransactionsWrapperComponent,
-      //     pathMatch: 'full',
-      //     canActivate: [CanActivateGuard]
-      // }
     ]
   },
   { path: '**', redirectTo: '' }
