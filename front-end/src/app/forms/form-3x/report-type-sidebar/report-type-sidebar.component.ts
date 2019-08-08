@@ -61,26 +61,26 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    // Add '${implements OnChanges}' to the class.
-    if (Array.isArray(this.selectedReport.election_state) && this.selectedReport.election_state.length !== 0 &&
-    this.selectedElectionState && !this.selectedElecetionDate) {
-      if (this._newReportSelected) {
-        if (this.fromDate) {
-          this.fromDate = '';
-        }
-        if (this.toDate) {
-          this.toDate = '';
+    if (this.selectedReport.hasOwnProperty('report_type')) {
+      if (typeof this.selectedReport.report_type === 'string') {
+        if (this._previousReportSelected === null) {
+          this._previousReportSelected = this.selectedReport.report_type;
+        } else {
+          this._previousReportSelected = changes.selectedReport.previousValue.report_type;
         }
       }
-      this.selectedElectionState = null;
-    } else if (this.selectedReport !== null && this.selectedReport.hasOwnProperty('election_state')) {
-      if (this._newReportSelected) {
-        if (this.fromDate) {
-          this.fromDate = '';
-        }
-        if (this.toDate) {
-          this.toDate = '';
+
+      if (this._previousReportSelected !== this.selectedReport.report_type) {
+        this._newReportSelected = true;
+        this.selectedElectionState = null;
+        this.selectedElecetionDate = '';
+        if (changes.selectedReport.currentValue.regular_special_report_ind === 'S') {
+          if (this.fromDate) {
+            this.fromDate = '';
+          }
+          if (this.toDate) {
+            this.toDate = '';
+          }
         }
       }
     }
@@ -132,14 +132,6 @@ export class ReportTypeSidebarComponent implements OnInit {
                     };
                   }
                 } else {
-                  if (this.selectedElectionState && !this.selectedElecetionDate) {
-                    if (this._newReportSelected) {
-                      if (this.fromDate && this.toDate) {
-                        this.toDate = '';
-                        this.fromDate = '';
-                      }
-                    }
-                  }
 
                   if (this.selectedReport.hasOwnProperty('election_state')) {
                     this.electionStates = this.selectedReport.election_state;

@@ -549,7 +549,7 @@ export class ReportTypeService {
     });
   }*/
 
-  public printPreviewPdf(formType: string, callFrom: string): Observable<any> {
+  public printPreviewPdf(formType: string, callFrom: string, transactionArray?: Array<string>): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/create_json_builders'; //Actual JSON file genaration URL
@@ -558,6 +558,7 @@ export class ReportTypeService {
 
     console.log("printForm formType = ", formType);
     console.log("printForm callFrom = ", callFrom);
+    console.log("transactionArray=", transactionArray);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -579,6 +580,12 @@ export class ReportTypeService {
     formData.append('form_type', `F${formType}`);
     formData.append('call_from', callFrom);
 
+    if ( typeof transactionArray !== 'undefined' ){
+      if (transactionArray.length > 0){
+        console.log(" printPreviewPdf transactionArray =", transactionArray);
+        formData.append('transaction_id', transactionArray.toString());
+      }
+    }
 
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
@@ -586,7 +593,7 @@ export class ReportTypeService {
       });
    }
 
-   public prepare_json_builders_data(formType: string): Observable<any> {
+   public prepare_json_builders_data(formType: string,  transactionArray?: Array<string>): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/prepare_json_builders_data';  //JSON builder data preparation URL
@@ -594,6 +601,7 @@ export class ReportTypeService {
     let formData: FormData = new FormData();
 
     console.log("printForm formType = ", formType);
+    console.log("transactionArray=", transactionArray);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -612,18 +620,27 @@ export class ReportTypeService {
       formData.append('report_id', form3xReportType.reportid);
     }
 
+    if ( typeof transactionArray !== 'undefined' ){
+      if (transactionArray.length > 0){
+        console.log(" prepare_json_builders_data transactionArray =", transactionArray);
+        formData.append('transaction_id', transactionArray.toString().replace(' ','').replace(',','\',\''));
+      }
+    }
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
         headers: httpOptions
       });
    }
 
-   public printPreview(formType: string): void {
+   public printPreview(formType: string, transactions?: string): void {
     
     this.signandSaveSubmitReport(formType,'Saved');
     console.log("printPreview Data saved successfully...!");
+    console.log("transactions =", transactions);
 
-    this.prepare_json_builders_data(formType)
+    if (typeof transactions === 'undefined') {
+      console.log("No transactions data");
+      this.prepare_json_builders_data(formType)
       .subscribe( res => {
         if (res) {
              console.log("Form 3X prepare_json_builders_data res = ", res);
@@ -650,6 +667,37 @@ export class ReportTypeService {
         (error) => {
           console.log('error: ', error);
         });/*  */
-
+    } else if (transactions !== 'undefined' && (transactions.length>0)) { 
+      console.log("transactions data");
+      var transactionsArray: Array<string> = transactions.split(",");
+      this.prepare_json_builders_data(formType, transactionsArray)
+      .subscribe( res => {
+        if (res) {
+             console.log("Form 3X prepare_json_builders_data res = ", res);
+             if (res['Response']==='Success') {
+                    console.log(" Form 3X prepare_json_builders_data successfully processed...!");
+                    this.printPreviewPdf(formType, "PrintPreviewPDF",transactionsArray)
+                      .subscribe(res => {
+                      if(res) {
+                        console.log("Form 3X  printPriview res ...",res);
+                        if (res.hasOwnProperty('results')) {
+                          if (res['results.pdf_url'] !== null) {
+                            console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                            window.open(res.results.pdf_url, '_blank');
+                          }
+                        }
+                      }
+                  },
+                  (error) => {
+                    console.log('error: ', error);
+                  });/*  */
+                  }       
+        }
+      },
+        (error) => {
+          console.log('error: ', error);
+        });/*  */
+    }
+   
   }
 }
