@@ -78,6 +78,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _selectedEntity: any;
   private _selectedChangeWarn: any;
   private _contributionAmountMax: number;
+  private _transactionToEdit: TransactionModel;
 
   constructor(
     private _http: HttpClient,
@@ -100,13 +101,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._config.triggers = 'click';
 
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
-      this.populateFormForEditOrView(message);
+      this._populateFormForEditOrView(message);
     });
   }
 
   ngOnInit(): void {
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
+    this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -156,16 +158,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   ngDoCheck(): void {
+    // TODO consider changes this to ngOnChanges()
+
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
       }
     }
-
-    // // just for test
-    // if (!this.transactionType) {
-    //   this.transactionType = 'INDV_REC';
-    // }
 
     this._getTransactionType();
 
@@ -247,6 +246,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+
+    // When coming from Reports where this component is not a child
+    // as it is in F3X component, the form data must be set in this way
+    // to avoid race condition
+    if (this._transactionToEdit) {
+      this._setFormDataValues();
+    }
 
     // get form data API is passing X for memo code value.
     // Set it to null here until it is checked by user where it will be set to X.
@@ -600,6 +606,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         }
       }
 
+      // There is a race condition with populating hiddenFields
+      // and receiving transaction data to edit from the message service.
+      // If editing, set transaction ID at this point to avoid race condition issue.
+      if (this._transactionToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          }
+        });
+      }
+
       this.hiddenFields.forEach(el => {
         receiptObj[el.name] = el.value;
       });
@@ -614,6 +631,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
         if (res) {
+          this._transactionToEdit = null;
+
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
               if (res.memo_code === null) {
@@ -929,12 +948,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
   }
 
-  private populateFormForEditOrView(editOrView: any) {
+  private _populateFormForEditOrView(editOrView: any) {
     // The action here is the same as the this.scheduleAction
     // using the field from the message in case there is a race condition with Input().
     if (editOrView !== null) {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
+
+        this._transactionToEdit = formData;
 
         // TODO property names are not the same in TransactionModel
         // as they are when the selectedEntity is populated from
@@ -950,52 +971,55 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this.transactionType = 'INDV_REC';
         }
 
-        this.hiddenFields.forEach(el => {
-          if (el.name === 'transaction_id') {
-            el.value = formData.transactionId;
-          }
-        });
-
-        const nameArray = formData.name.split(',');
-        const firstName = nameArray[1] ? nameArray[1].trim() : null;
-        const lastName = nameArray[0] ? nameArray[0].trim() : null;
-        const middleName = nameArray[2] ? nameArray[2].trim() : null;
-        const prefix = nameArray[3] ? nameArray[3].trim() : null;
-        const suffix = nameArray[4] ? nameArray[4].trim() : null;
-
-        // The amount needs to be formatted for API.  If user changes amount value,
-        // it will be formatted in contributionAmountChange().  If user does not change,
-        // it must be formatted so it is done here.
-        // this._contributionAmount = this.formatAmountForAPI(formData.amount);
-        const amountString = formData.amount ? formData.amount.toString() : '';
-        this._contributionAmount = amountString;
-
-        this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ city: formData.city }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ state: formData.state }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ zip_code: formData.zip }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ employer: formData.contributorEmployer }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
-
-        if (formData.memoCode) {
-          this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
-        }
-
-        this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
+        this._setFormDataValues();
       }
     }
+  }
+
+  /**
+   * When editing a transaction, set the form values.
+   */
+  private _setFormDataValues() {
+    const formData = this._transactionToEdit;
+
+    const nameArray = formData.name.split(',');
+    const firstName = nameArray[1] ? nameArray[1].trim() : null;
+    const lastName = nameArray[0] ? nameArray[0].trim() : null;
+    const middleName = nameArray[2] ? nameArray[2].trim() : null;
+    const prefix = nameArray[3] ? nameArray[3].trim() : null;
+    const suffix = nameArray[4] ? nameArray[4].trim() : null;
+
+    // The amount needs to be formatted for API.  If user changes amount value,
+    // it will be formatted in contributionAmountChange().  If user does not change,
+    // it must be formatted so it is done here.
+    // this._contributionAmount = this.formatAmountForAPI(formData.amount);
+    const amountString = formData.amount ? formData.amount.toString() : '';
+    this._contributionAmount = amountString;
+
+    this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: formData.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: formData.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: formData.zip }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ employer: formData.contributorEmployer }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
+
+    if (formData.memoCode) {
+      this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
+    }
+
+    this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
   }
 }
