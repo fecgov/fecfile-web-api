@@ -148,10 +148,13 @@ def code_quality() {
 def imageBuild(String version, String frontend_env) {
   if(frontend_env == "awsdev"){
     sh("sed -i 's/local/${frontend_env}/g' front-end/Dockerfile")
+    sh("sed -i 's/VERDEPLOYED/${version}/g' front-end/Dockerfile
   }
   if (frontend_env == "awsqa") {
     sh("sed -i 's/local/${frontend_env}/g' front-end/Dockerfile")
     sh("sed -i 's/awsdev/${frontend_env}/g' front-end/Dockerfile")
+    sh("sed -i 's/VERDEPLOYED/${version}/g' front-end/Dockerfile
+
   }
   if (frontend_env == "awsuat") {
     sh("sed -i 's/local/${frontend_env}/g' front-end/Dockerfile")
