@@ -5,7 +5,9 @@ import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
-import { ScheduleActions } from './individual-receipt.component';
+import { ScheduleActions } from './schedule-actions.enum';
+
+
 
 @Injectable({
   providedIn: 'root'

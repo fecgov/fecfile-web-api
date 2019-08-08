@@ -31,11 +31,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
-
-export enum ScheduleActions {
-  add = 'add',
-  edit = 'edit'
-}
+import { ScheduleActions } from './schedule-actions.enum';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -82,6 +78,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _selectedEntity: any;
   private _selectedChangeWarn: any;
   private _contributionAmountMax: number;
+  private _transactionToEdit: TransactionModel;
 
   constructor(
     private _http: HttpClient,
@@ -104,13 +101,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._config.triggers = 'click';
 
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
-      this.populateFormForEditOrView(message);
+      this._populateFormForEditOrView(message);
     });
   }
 
   ngOnInit(): void {
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
+    this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -128,7 +126,40 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt = this._fb.group({});
   }
 
+  /**
+   * A temporary fix to a case naming issue.  The report_type object
+   * in storage differes from the values set in report-type componentt and
+   * the reportdetail component. This method will set the camelCased fields
+   * missing from the reportdetail component.
+   */
+  private handleCaseNaming() {
+    if (!this._reportType.hasOwnProperty('reportid')) {
+      return;
+    }
+
+    const camelCaseReportType: any = {};
+    if (this._reportType.hasOwnProperty('cmteid')) {
+      camelCaseReportType.cmteId = this._reportType.cmteid;
+    }
+    if (this._reportType.hasOwnProperty('reportid')) {
+      camelCaseReportType.reportId = this._reportType.reportid;
+    }
+    if (this._reportType.hasOwnProperty('formtype')) {
+      camelCaseReportType.formType = this._reportType.formtype;
+    }
+    if (this._reportType.hasOwnProperty('cvgstartdate')) {
+      camelCaseReportType.cvgStartDate = this._reportType.cvgstartdate;
+    }
+    if (this._reportType.hasOwnProperty('cvgenddate')) {
+      camelCaseReportType.cvgEndDate = this._reportType.cvgenddate;
+    }
+    this._reportType = camelCaseReportType;
+    localStorage.setItem(`form_3X_report_type`, JSON.stringify(this._reportType));
+  }
+
   ngDoCheck(): void {
+    // TODO consider changes this to ngOnChanges()
+
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
@@ -141,6 +172,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+      // this.handleCaseNaming();
 
       if (typeof this._reportType === 'object') {
         if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
@@ -213,6 +246,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+
+    // When coming from Reports where this component is not a child
+    // as it is in F3X component, the form data must be set in this way
+    // to avoid race condition
+    if (this._transactionToEdit) {
+      this._setFormDataValues();
+    }
 
     // get form data API is passing X for memo code value.
     // Set it to null here until it is checked by user where it will be set to X.
@@ -426,6 +466,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (!col.name) {
       return;
     }
+    if ($event.key) {
+      const key = $event.key.toUpperCase();
+      if (key === 'TAB') {
+        return;
+      }
+    }
     if (
       col.name === 'middle_name' ||
       col.name === 'prefix' ||
@@ -537,33 +583,44 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             console.log('memo code val ' + receiptObj[field]);
           }
         } else if (field === 'last_name' || field === 'first_name') {
-          if (this._selectedEntity) {
-            // If the typeahead was used to load the entity into the form,
-            // we don't allow users to make changes to the entity. Non-Typeahead
-            // field (address, middle name, etc) are reset onKeyup.  Typeahead
-            // fields must be reset here.  This is a known UI design issue with the
-            // typeahead and not being able to disable fields because of add functionality.
-            // We are tolerating this limitation where the user may change the last or
-            // first name, it will reflect the change in the UI but won't be save to API.
-            receiptObj[field] = this._selectedEntity[field];
+          // if (this._selectedEntity) {
+          // If the typeahead was used to load the entity into the form,
+          // we don't allow users to make changes to the entity. Non-Typeahead
+          // field (address, middle name, etc) are reset onKeyup.  Typeahead
+          // fields must be reset here.  This is a known UI design issue with the
+          // typeahead and not being able to disable fields because of add functionality.
+          // We are tolerating this limitation where the user may change the last or
+          // first name, it will reflect the change in the UI but won't be save to API.
+          // receiptObj[field] = this._selectedEntity[field];
+          // } else {
+          // TODO Possible defect with typeahead setting field as the entity object
+          // rather than the string defined by the inputFormatter();
+          // If an object is received, find the value on the object by fields type
+          // otherwise use the string value.  This is not desired and this patch
+          // should be removed if the issue is resolved.
+          const typeAheadField = this.frmIndividualReceipt.get(field).value;
+          if (typeof typeAheadField !== 'string') {
+            receiptObj[field] = typeAheadField[field];
           } else {
-            // TODO Possible defect with typeahead setting field as the entity object
-            // rather than the string defined by the inputFormatter();
-            // If an object is received, find the value on the object by fields type
-            // otherwise use the string value.  This is not desired and this patch
-            // should be removed if the issue is resolved.
-            const typeAheadField = this.frmIndividualReceipt.get(field).value;
-            if (typeof typeAheadField !== 'string') {
-              receiptObj[field] = typeAheadField[field];
-            } else {
-              receiptObj[field] = typeAheadField;
-            }
+            receiptObj[field] = typeAheadField;
           }
+          // }
         } else if (field === 'contribution_amount') {
           receiptObj[field] = this._contributionAmount;
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
+      }
+
+      // There is a race condition with populating hiddenFields
+      // and receiving transaction data to edit from the message service.
+      // If editing, set transaction ID at this point to avoid race condition issue.
+      if (this._transactionToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          }
+        });
       }
 
       this.hiddenFields.forEach(el => {
@@ -580,6 +637,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
         if (res) {
+          this._transactionToEdit = null;
+
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
               if (res.memo_code === null) {
@@ -690,7 +749,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadItem(result: any) {
-    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+    const lastName = result.last_name ? result.last_name.trim() : '';
+    const firstName = result.first_name ? result.first_name.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+
+    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
   }
 
   /**
@@ -890,59 +954,79 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
   }
 
-  private populateFormForEditOrView(editOrView: any) {
+  private _populateFormForEditOrView(editOrView: any) {
     // The action here is the same as the this.scheduleAction
     // using the field from the message in case there is a race condition with Input().
     if (editOrView !== null) {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
 
-        this.hiddenFields.forEach(el => {
-          if (el.name === 'transaction_id') {
-            el.value = formData.transactionId;
-          }
-        });
+        this._transactionToEdit = formData;
 
-        const nameArray = formData.name.split(',');
-        const firstName = nameArray[1] ? nameArray[1] : null;
-        const lastName = nameArray[0] ? nameArray[0] : null;
-        const middleName = nameArray[2] ? nameArray[2] : null;
-        const prefix = nameArray[3] ? nameArray[3] : null;
-        const suffix = nameArray[4] ? nameArray[4] : null;
+        // TODO property names are not the same in TransactionModel
+        // as they are when the selectedEntity is populated from
+        // the auto-lookup / core/autolookup_search_contacts API.
+        // Mapping may need to be added here.  See transactions service
+        // mapToServerFields(model: TransactionModel) as it may
+        // be used or cloned to a mapping method in the contact.service.
+        this._selectedEntity = formData;
+        this._selectedChangeWarn = {};
 
-        // The amount needs to be formatted for API.  If user changes amount value,
-        // it will be formatted in contributionAmountChange().  If user does not change,
-        // it must be formatted so it is done here.
-        // this._contributionAmount = this.formatAmountForAPI(formData.amount);
-        const amountString = formData.amount ? formData.amount.toString() : '';
-        this._contributionAmount = amountString;
-
-        this.frmIndividualReceipt.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ city: formData.city }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ state: formData.state }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ zip_code: formData.zip }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ employer: formData.contributorEmployer }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
-
-        this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
-
-        if (formData.memoCode) {
-          this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
+        // Until get_all_transactions has the new code use this
+        if (formData.type === 'Individual Receipt') {
+          this.transactionType = 'INDV_REC';
         }
 
-        this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
+        this._setFormDataValues();
       }
     }
+  }
+
+  /**
+   * When editing a transaction, set the form values.
+   */
+  private _setFormDataValues() {
+    const formData = this._transactionToEdit;
+
+    const nameArray = formData.name.split(',');
+    const firstName = nameArray[1] ? nameArray[1].trim() : null;
+    const lastName = nameArray[0] ? nameArray[0].trim() : null;
+    const middleName = nameArray[2] ? nameArray[2].trim() : null;
+    const prefix = nameArray[3] ? nameArray[3].trim() : null;
+    const suffix = nameArray[4] ? nameArray[4].trim() : null;
+
+    // The amount needs to be formatted for API.  If user changes amount value,
+    // it will be formatted in contributionAmountChange().  If user does not change,
+    // it must be formatted so it is done here.
+    // this._contributionAmount = this.formatAmountForAPI(formData.amount);
+    const amountString = formData.amount ? formData.amount.toString() : '';
+    this._contributionAmount = amountString;
+
+    this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ street_1: formData.street }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ street_2: formData.street2 }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ city: formData.city }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ state: formData.state }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ zip_code: formData.zip }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ employer: formData.contributorEmployer }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ occupation: formData.contributorOccupation }, { onlySelf: true });
+
+    this.frmIndividualReceipt.patchValue({ contribution_date: formData.date }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
+
+    if (formData.memoCode) {
+      this.memoCode = true;
+      this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
+    }
+
+    this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
   }
 }

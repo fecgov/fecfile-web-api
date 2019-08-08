@@ -305,24 +305,15 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   }
 
   public getFilterNames() {
-    this._ReportsService
-      .getStatuss()
-      .subscribe((res) => {
-        this.statusDescriptions = res.data;
-      }
-      );
-    this._ReportsService
-      .getAmendmentIndicators()
-      .subscribe((res) => {
-        this.getAmendmentIndicatorsDescriptions = res.data;
-      }
-      );
-    this._ReportsService
-      .getReportTypes()
-      .subscribe((res) => {
-        this.getReportTypesDescriptions = res;
-      }
-      );
+    this._ReportsService.getStatuss().subscribe(res => {
+      this.statusDescriptions = res.data;
+    });
+    this._ReportsService.getAmendmentIndicators().subscribe(res => {
+      this.getAmendmentIndicatorsDescriptions = res.data;
+    });
+    this._ReportsService.getReportTypes().subscribe(res => {
+      this.getReportTypesDescriptions = res;
+    });
   }
 
   public displayStatusName(status: any) {
@@ -361,28 +352,28 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.filters.filterForms.splice(tagIndex, 1);
         this.getReportsPage(1);
         break;
-        case 'filterReports':
+      case 'filterReports':
         this.filters.filterReports.splice(tagIndex, 1);
         this.getReportsPage(1);
         break;
-        case 'filterAmendmentIndicators':
+      case 'filterAmendmentIndicators':
         this.filters.filterAmendmentIndicators.splice(tagIndex, 1);
         this.getReportsPage(1);
         break;
-        case 'filterStatuss':
+      case 'filterStatuss':
         this.filters.filterStatuss.splice(tagIndex, 1);
         this.getReportsPage(1);
         break;
-        case 'filterStatuss':
+      case 'filterStatuss':
         this.filters.filterStatuss.splice(tagIndex, 1);
         this.getReportsPage(1);
         break;
-        case 'filterCvgDate':
+      case 'filterCvgDate':
         this.filters.filterCvgDateFrom = null;
         this.filters.filterCvgDateTo = null;
         this.getReportsPage(1);
         break;
-        case 'filterFiledDate':
+      case 'filterFiledDate':
         this.filters.filterFiledDateFrom = null;
         this.filters.filterFiledDateTo = null;
         this.getReportsPage(1);
@@ -739,12 +730,13 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         });
       console.log(new Date().toISOString());
       setTimeout(() => {
-        //this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-        
-        this._router.navigate([`/forms/form/3X`], {
+        // this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+        this._router.navigate([`/forms/form/${formType}`], {
           queryParams: { step: 'transactions', reportId: report.report_id }
         });
-
         console.log(new Date().toISOString());
       }, 1500);
     }
