@@ -26,7 +26,9 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+)
 # Create your views here.
 logger = logging.getLogger(__name__)
 
@@ -45,9 +47,8 @@ list_mandatory_fields_schedB = [
     "report_id",
     "expenditure_date",
     "expenditure_amount",
-    "cmte_id",
-    "line_number",
-    "transaction_type",
+    "transaction_type_identifier",
+    "entity_type"
 ]
 # list_mandatory_fields_aggregate = ['transaction_type']
 # list_child_schedA = ['16']
@@ -471,7 +472,6 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get("entity_id")
-        print(entity_id)
         datum["entity_id"] = entity_id
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
@@ -681,6 +681,10 @@ def schedB_sql_dict(data):
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
 
         }
+        if 'entity_id' in data and check_null_value(data.get('entity_id')):
+            datum['entity_id'] = data.get('entity_id')
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
         return datum
     except:
         raise
@@ -708,7 +712,6 @@ def schedB(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum = schedB_sql_dict(request.data)
-            print(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             if "entity_id" in request.data and check_null_value(

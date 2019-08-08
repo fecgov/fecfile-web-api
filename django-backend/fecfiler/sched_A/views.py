@@ -5,6 +5,7 @@ import os
 from decimal import Decimal
 
 import requests
+from functools import lru_cache
 from django.conf import settings
 from django.db import connection
 from django.http import JsonResponse
@@ -18,12 +19,14 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
+
+from fecfiler.core.transaction_util import get_line_number_trans_type
+
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB)
 
-# TODO: adding earmarked transactions: one sched_a and one generated sched_b transactions
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -50,7 +53,7 @@ SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
 MANDATORY_FIELDS_SCHED_A = ['report_id', 'transaction_type_identifier', 'contribution_date', 
                             'contribution_amount', 'entity_type']
 
-MANDATORY_CHILD_FIELDS_SCHED_A = ['cmte_id', 'report_id', 'child_transaction_type_identifier', 'child_contribution_date', 
+MANDATORY_CHILD_FIELDS_SCHED_A = ['report_id', 'child_transaction_type_identifier', 'child_contribution_date', 
                             'child_contribution_amount', 'child_entity_type']
 
 # madatory fields for aggregate amount api call
@@ -59,90 +62,10 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier']
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
 
-# list of valid line numbers - this list will grow as we add more types
-VALID_TRANSACTION_TYPES = ['15', '18G', '17Z']
-
-# map if transaction_type to line_numbers -
-# this list will grow as we add more types
-TRANSACTION_TYPES_LINE_NUM_MAP = {
-    '15': ['11AI', '11AII'],
-    '18G': ['12'],
-    '17Z': ['16'],
-}
-
-TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP = {
-    'INDV_REC': ['11A', '15'],
-    'OTH_REC': ['17', '15O'],
-    'IND_RECNT': ['17', '15R'],
-    'PTY_RCNT': ['17', '18R'],
-    'PAC_RCNT': ['17', '18R'],
-    'TRI_RCNT': ['17', '11R'],
-    'IND_NP_RECNT': ['17', '32'],
-    'TRI_NP_RCNT': ['17', '32T'],
-    'PTY_NP_RCNT': ['17', '32K'],
-    'PAC_NP_RCNT': ['17', '32K'],
-    'IND_HQ_ACCNT': ['17', '31'],
-    'TRI_HQ_ACCNT': ['17', None],
-    'PTY_HQ_ACCNT': ['17', '31K'],
-    'PAC_HQ_ACCNT': ['17', '31K'],
-    'IND_CO_ACCNT': ['17', '30'],
-    'TRI_CO_ACCNT': ['17', None],
-    'PTY_CO_ACCNT': ['17', '30K'],
-    'PAC_CO_ACCNT': ['17', '30K'],
-    'IND_CAREY': ['17', '10'],
-    'OT_COM_CAREY': ['17', '10K'],
-    'BU_LAB_CAREY': ['17', '10B'],
-    'PAR_CON': ['11A', '15P'],
-    'PAR_MEMO': ['11A', '15PM'],
-    'REATT_FROM': ['11A', None],
-    'REATT_TO': ['11A', '15M'],
-    'JF_TRAN': ['12', '14G'],
-    'IND_JF_MEM': ['12', '14JM'],
-    'PTY_JF_MEM': ['12', '14KM'],
-    'PAC_JF_MEM': ['12', '14KM'],
-    'TRI_JF_MEM': ['12', '14TM'],
-    'JF_TRAN_R': ['17', '32G'],
-    'IND_JF_R_MEM': ['17', '32JM'],
-    'PAC_JF_R_MEM': ['17', '32KM'],
-    'TRI_JF_R_MEM': ['17', '32TM'],
-    'JF_TRAN_C': ['17', '30G'],
-    'IND_JF_C_MEM': ['17', '30JM'],
-    'PAC_JF_C_MEM': ['17', '30KM'],
-    'TRI_JF_C_MEM': ['17', '30TM'],
-    'JF_TRAN_H': ['17', '31G'],
-    'IND_JF_H_MEM': ['17', '31JM'],
-    'PAC_JF_H_MEM': ['17', '31KM'],
-    'TRI_JF_H_MEM': ['17', '31TM'],
-    'IK_TRAN': ['12', '18Z'],
-    'IK_TF_OUT': ['21B', '20K'],
-    'IK_TRAN_FEA': ['12', '18F'],
-    'IK_OUT_FEA': ['30B', '20K'],
-    'IK_REC_PTY': ['11B', '15Z'],
-    'IK_OUT_PTY': ['21B', '20K'],
-    'IK_REC_PAC': ['11C', '15Z'],
-    'IK_OUT_PAC': ['21B', '20K'],
-    'IK_REC': ['11A', '15K'],
-    'IK_OUT': ['21B', '20K'],
-    'CON_EM': ['11A', '15I'],
-    'EM_OUT': ['23', '24T'],
-    'CON_EM_MEMO': ['11A', '15IM'],
-    'EM_OUT_MEMO': ['23', '24IM'],
-    'PAC_EM': ['11C', '18I'],
-    'PAC_EM_MEMO': ['11C', '18IM'],
-    'CON_EM_RT': ['11A', '15E'],
-    'CON_EM_RT_M': ['11A', '15EM'],
-    'PAC_EM_RT': ['11C', '18E'],
-    'PAC_EM_RT_M': ['11C', '18EM'],
-    'EAR_REC_RECT': ['17', '32E'],
-    'EAR_MEM_RECT': ['17', '32EM'],
-    'EAR_REC_CONV': ['17', '30E'],
-    'EAR_MEM_CONV': ['17', '30EM'],
-    'EAR_REC_HQ': ['17', '31E'],
-    'EAR_MEM_HQ': ['17', '31EM']
-}
 
 # list of all transaction type identifiers that should
 # have single column storage in DB
+# TODO: no sure this list is used in this module
 SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
                                   'OTH_REC',
                                   'IND_RECNT',
@@ -187,24 +110,47 @@ SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
                                   'TRI_JF_H_MEM']
 
 #list of all transaction type identifiers that should auto generate sched_b item in DB
-AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {"IK_TRAN": "IK_TF_OUT", 
-                                                    "IK_TRAN_FEA": "IK_OUT_FEA",
-                                                    "IK_REC_PTY": "IK_OUT_PTY",
-                                                    "IK_REC_PAC": "IK_OUT_PAC", 
-                                                    "IK_REC": "IK_OUT",
-                                                    "CON_EM": "EM_OUT",
-                                                    "CON_EM_MEMO": "EM_OUT_MEMO",
-                                                    "PAC_EM": "EM_OUT",
-                                                    "PAC_EM_MEMO": "EM_OUT_MEMO"
-                                                    }
+AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
+# "IK_TRAN": "IK_TRAN_OUT", 
+#                                                     "IK_TRAN_FEA": "IK_TRAN_FEA_OUT",
+#                                                     # "IK_REC_PTY": "IK_OUT_PTY",
+#                                                     # "IK_REC_PAC": "IK_OUT_PAC", 
+#                                                     "IK_REC": "IK_OUT",
+#                                                     "IK_BC_REC": "IK_BC_OUT",
+#                                                     # "CON_EM": "EM_OUT",
+#                                                     # "CON_EM_MEMO": "EM_OUT_MEMO",
+#                                                     "CON_EAR_DEP": "CON_EAR_DEP_MEMO",
+#                                                     "CON_EAR_UNDEP": "CON_EAR_DEP_MEMO",
+#                                                     "PAC_EM": "EM_OUT",
+#                                                     "PAC_EM_MEMO": "EM_OUT_MEMO"
+#                                                     }
+                                    "IK_REC" : "IK_OUT",
+                                    "IK_BC_REC" : "IK_BC_OUT",
+                                    "REATT_FROM" : "REATT_MEMO",
+                                    "CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
+                                    "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                    "PARTY_IK_REC" : "PARTY_IK_OUT",
+                                    "PARTY_IK_BC_REC" : "PARTY_IK_BC_OUT",
+                                    "PAC_IK_REC" : "PAC_IK_OUT",
+                                    "PAC_IK_BC_REC" : "PAC_IK_BC_OUT",
+                                    "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                    "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
+                                    "IK_TRAN" : "IK_TRAN_OUT",
+                                    "IK_TRAN_FEA" : "IK_TRAN_FEA_OUT"
+}
 
-#list of all transaction type identifiers that have itemization rule applied to it
+# list of all transaction type identifiers that have itemization rule applied to it
+# TODO: need to update this list: PAR_CON?, PAR_MEMO?, REATT_TO?
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
 
-#DICTIONARY OF ALL TRANSACTIONS TYPE IDENTIFIERS THAT ARE IMPLEMENTED AS 2 TRANSACTIONS IN 1 SCREEN FOR SCHED_A TO SCHED_A TABLE
-TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = { "EAR_REC_RECT": "EAR_MEM_RECT",
-                                            "EAR_REC_CONV": "EAR_MEM_CONV",
-                                            "EAR_REC_HQ": "EAR_MEM_HQ" 
+# DICTIONARY OF ALL TRANSACTIONS TYPE IDENTIFIERS THAT ARE IMPLEMENTED AS 2 TRANSACTIONS IN 1 SCREEN FOR SCHED_A TO SCHED_A TABLE
+# TODO: need to decide if we need add "EAR_REC:EAR_REC_MEMO, PAC_EAR_REC:PAC_EAR_MEMO" to this list
+TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = { 
+                                            "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
+                                            "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
+                                            "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
+                                            "EAR_REC": "EAR_REC_MEMO",
+                                            "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
 
 def get_next_transaction_id(trans_char):
@@ -235,24 +181,9 @@ def check_transaction_id(transaction_id):
 
 def validate_sa_data(data):
     """
-    validate: 1. mandatory sa fields; 2. valid line number and transaction types
+    validate: mandatory sa fields
     """
     check_mandatory_fields_SA(data, MANDATORY_FIELDS_SCHED_A)
-    # validate_transaction_type(data)
-
-
-def validate_transaction_type(data):
-    """
-    check line number and transaction types are both valid and compatible
-    """
-    if not data.get('transaction_type') in VALID_TRANSACTION_TYPES:
-        raise Exception('Invalid transaction type detected.')
-    elif not data.get('line_number') in TRANSACTION_TYPES_LINE_NUM_MAP.get(
-            data.get('transaction_type')):
-        raise Exception('Line number does not match transaction type.')
-    else:
-        pass
-
 
 def check_mandatory_fields_SA(data, list_mandatory_fields):
     """
@@ -984,19 +915,10 @@ def parent_SA_to_child_SB_dict(data):
     except:
         raise
 
-def get_line_number_trans_type(transaction_type_identifier):
-    try:
-        if transaction_type_identifier in TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP.keys():
-            list_value = TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP.get(transaction_type_identifier)
-            line_number = list_value[0]
-            transaction_type = list_value[1]
-            return line_number, transaction_type
-        else:
-            raise Exception('The transaction type identifier is not in the specified list. Input received: {}. Valid Inputs: {}'.format(transaction_type_identifier, ','.join(TRANSACTION_TYPE_IDENTIFIER_LINE_NUM_TRANS_CODE_MAP.keys())))
-    except:
-        raise
-
 def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
+    """
+    load child sched_b transaction_id
+    """
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT transaction_id FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
@@ -1009,6 +931,9 @@ def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
         raise
 
 def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
+    """
+    load child sched_a transaction_id
+    """
     try:
         with connection.cursor() as cursor:
             query_string = """SELECT transaction_id FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
