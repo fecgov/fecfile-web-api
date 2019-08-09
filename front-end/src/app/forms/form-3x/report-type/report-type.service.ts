@@ -583,7 +583,7 @@ export class ReportTypeService {
     if ( typeof transactionArray !== 'undefined' ){
       if (transactionArray.length > 0){
         console.log(" printPreviewPdf transactionArray =", transactionArray);
-        formData.append('transaction_id', transactionArray.toString());
+        formData.append('transaction_id', transactionArray.toString().replace(' ','').replace(',','\',\''));
       }
     }
 
