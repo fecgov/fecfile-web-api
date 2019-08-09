@@ -28,7 +28,6 @@ import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.co
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ContactsComponent } from './contacts/contacts.component';
-import { TransactionsWrapperComponent } from './forms/transactions/wrapper/transactions-wrapper.component';
 
 export const AppRoutes: Routes = [
   {
