@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService//FormsService';
 import { DatePipe } from '@angular/common';
+import { IsStringPipe } from 'ngx-pipes';
 
 @Injectable({
   providedIn: 'root'
@@ -549,7 +550,7 @@ export class ReportTypeService {
     });
   }*/
 
-  public printPreviewPdf(formType: string, callFrom: string, transactionArray?: Array<string>): Observable<any> {
+  public printPreviewPdf(formType: string, callFrom: string, transactions?: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/create_json_builders'; //Actual JSON file genaration URL
@@ -558,7 +559,7 @@ export class ReportTypeService {
 
     console.log("printForm formType = ", formType);
     console.log("printForm callFrom = ", callFrom);
-    console.log("transactionArray=", transactionArray);
+    console.log("transactions ==", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -580,10 +581,10 @@ export class ReportTypeService {
     formData.append('form_type', `F${formType}`);
     formData.append('call_from', callFrom);
 
-    if ( typeof transactionArray !== 'undefined' ){
-      if (transactionArray.length > 0){
-        console.log(" printPreviewPdf transactionArray =", transactionArray);
-        formData.append('transaction_id', transactionArray.toString().replace(' ','').replace(',','\',\''));
+    if ( typeof transactions !== 'undefined' ){
+      if (transactions.length > 0){
+        console.log(" printPreviewPdf transactions =", transactions);
+        formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
       }
     }
 
@@ -593,7 +594,7 @@ export class ReportTypeService {
       });
    }
 
-   public prepare_json_builders_data(formType: string,  transactionArray?: Array<string>): Observable<any> {
+   public prepare_json_builders_data(formType: string,  transactions?:string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/prepare_json_builders_data';  //JSON builder data preparation URL
@@ -601,7 +602,7 @@ export class ReportTypeService {
     let formData: FormData = new FormData();
 
     console.log("printForm formType = ", formType);
-    console.log("transactionArray=", transactionArray);
+    console.log("transactions=", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -620,10 +621,10 @@ export class ReportTypeService {
       formData.append('report_id', form3xReportType.reportid);
     }
 
-    if ( typeof transactionArray !== 'undefined' ){
-      if (transactionArray.length > 0){
-        console.log(" prepare_json_builders_data transactionArray =", transactionArray);
-        formData.append('transaction_id', transactionArray.toString().replace(' ','').replace(',','\',\''));
+    if ( typeof transactions !== 'undefined' ){
+      if (transactions.length > 0){
+        console.log(" prepare_json_builders_data transactions =", transactions);
+        formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
       }
     }
     return this._http
@@ -669,14 +670,14 @@ export class ReportTypeService {
         });/*  */
     } else if (transactions !== 'undefined' && (transactions.length>0)) { 
       console.log("transactions data");
-      var transactionsArray: Array<string> = transactions.split(",");
-      this.prepare_json_builders_data(formType, transactionsArray)
+      //var transactionsArray: Array<string> = transactions.split(",");
+      this.prepare_json_builders_data(formType, transactions)
       .subscribe( res => {
         if (res) {
              console.log("Form 3X prepare_json_builders_data res = ", res);
              if (res['Response']==='Success') {
                     console.log(" Form 3X prepare_json_builders_data successfully processed...!");
-                    this.printPreviewPdf(formType, "PrintPreviewPDF",transactionsArray)
+                    this.printPreviewPdf(formType, "PrintPreviewPDF",transactions)
                       .subscribe(res => {
                       if(res) {
                         console.log("Form 3X  printPriview res ...",res);
