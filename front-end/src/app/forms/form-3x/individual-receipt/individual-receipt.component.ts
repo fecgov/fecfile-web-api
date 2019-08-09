@@ -504,8 +504,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (this._selectedChangeWarn[name] === name) {
       return;
     }
-    const message = `Please note that if you update contact information it will be updated in the Contacts file`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {});
+    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
     this._selectedChangeWarn[name] = name;
   }
 
