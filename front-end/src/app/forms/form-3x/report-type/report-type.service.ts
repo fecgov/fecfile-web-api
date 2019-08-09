@@ -6,7 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService//FormsService';
 import { DatePipe } from '@angular/common';
-import { IsStringPipe } from 'ngx-pipes';
+
 
 @Injectable({
   providedIn: 'root'
