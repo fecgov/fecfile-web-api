@@ -370,14 +370,14 @@ def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
         transaction_flag = False
-        transaction_id_list = []
         report_id = request.data.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
         if 'transaction_id' in request.data and request.data.get('transaction_id'):
             transaction_flag = True
-            transaction_id_list = request.data.get('transaction_id')
+            transaction_id_string = request.data.get('transaction_id')
+            transaction_id_list = transaction_id_string.split(',')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
