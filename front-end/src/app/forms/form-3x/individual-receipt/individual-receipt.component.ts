@@ -126,37 +126,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt = this._fb.group({});
   }
 
-  /**
-   * A temporary fix to a case naming issue.  The report_type object
-   * in storage differes from the values set in report-type componentt and
-   * the reportdetail component. This method will set the camelCased fields
-   * missing from the reportdetail component.
-   */
-  private handleCaseNaming() {
-    if (!this._reportType.hasOwnProperty('reportid')) {
-      return;
-    }
-
-    const camelCaseReportType: any = {};
-    if (this._reportType.hasOwnProperty('cmteid')) {
-      camelCaseReportType.cmteId = this._reportType.cmteid;
-    }
-    if (this._reportType.hasOwnProperty('reportid')) {
-      camelCaseReportType.reportId = this._reportType.reportid;
-    }
-    if (this._reportType.hasOwnProperty('formtype')) {
-      camelCaseReportType.formType = this._reportType.formtype;
-    }
-    if (this._reportType.hasOwnProperty('cvgstartdate')) {
-      camelCaseReportType.cvgStartDate = this._reportType.cvgstartdate;
-    }
-    if (this._reportType.hasOwnProperty('cvgenddate')) {
-      camelCaseReportType.cvgEndDate = this._reportType.cvgenddate;
-    }
-    this._reportType = camelCaseReportType;
-    localStorage.setItem(`form_3X_report_type`, JSON.stringify(this._reportType));
-  }
-
   ngDoCheck(): void {
     // TODO consider changes this to ngOnChanges()
 
@@ -172,8 +141,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-      // this.handleCaseNaming();
 
       if (typeof this._reportType === 'object') {
         if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
@@ -275,7 +242,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
      */
     if (fieldName === 'zip_code') {
       formValidators.push(alphaNumeric());
-    } else if (fieldName === 'contribution_date') {
+    } else if (fieldName === 'contribution_date' || fieldName === 'child*contribution_date') {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
       if (this._reportType !== null) {
         const cvgStartDate: string = this._reportType.cvgStartDate;
