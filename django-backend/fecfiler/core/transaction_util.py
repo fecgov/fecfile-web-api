@@ -141,11 +141,12 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
                     [report_id, cmte_id],
                 )
             transaction_list = cursor.fetchone()[0]
-            if not back_ref_transaction_id and not transaction_list:
-                raise NoOPError(
-                    'No transactions found for current report.')  # cmte_id {} and report_id {}'.format(cmte_id, report_id))
             if not transaction_list:
-                return []
+                if not back_ref_transaction_id:  # raise exception for non_child transaction
+                    raise NoOPError(
+                        'No transactions found for current report.')
+                else:  # retrun empy list for child transactions.
+                    return []
             merged_list = []
             for item in transaction_list:
                 entity_id = item.get('entity_id')
