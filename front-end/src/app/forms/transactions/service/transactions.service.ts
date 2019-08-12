@@ -234,6 +234,7 @@ export class TransactionsService {
     for (const row of serverData) {
       const model = new TransactionModel({});
       model.type = row.transaction_type_desc;
+      model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionId = row.transaction_id;
       model.name = row.name;
       model.street = row.street_1;
@@ -277,6 +278,9 @@ export class TransactionsService {
     switch (appFieldName) {
       case 'type':
         name = 'transaction_type_desc';
+        break;
+      case 'transactionTypeIdentifier':
+        name = 'transaction_type_identifier';
         break;
       case 'transactionId':
         name = 'transaction_id';
@@ -337,6 +341,7 @@ export class TransactionsService {
     }
 
     serverObject.transaction_type_desc = model.type;
+    serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
     serverObject.transaction_id = model.transactionId;
     serverObject.name = model.name;
     serverObject.street_1 = model.street;
