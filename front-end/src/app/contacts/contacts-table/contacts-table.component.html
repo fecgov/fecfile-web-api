@@ -16,7 +16,15 @@
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">ID
+        <!--<th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">ID
+        </th>-->
+        <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">Street
+        </th>
+        <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+        </th>
+        <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">State
+        </th>
+        <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">zip
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('employer')" [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
         </th>
@@ -64,7 +72,11 @@
         </td>
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{cnt.type}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
+       <!-- <td [@fadeInOut] *ngIf="isColumnVisible('id')">{{cnt.id}}</td>-->
+        <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{cnt.zip | zipCode}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
         <td>
@@ -102,7 +114,11 @@
         <td></td>
         <td *ngIf="isColumnVisible('name')"></td>
         <td *ngIf="isColumnVisible('type')"></td>
-        <td *ngIf="isColumnVisible('id')"></td>
+       <!-- <td *ngIf="isColumnVisible('id')"></td>-->
+        <td *ngIf="isColumnVisible('street')"></td>
+        <td *ngIf="isColumnVisible('city')"></td>
+        <td *ngIf="isColumnVisible('state')"></td>
+        <td *ngIf="isColumnVisible('zip')"></td>
         <td *ngIf="isColumnVisible('employer')"></td>
         <td *ngIf="isColumnVisible('occupation')"></td>
         <td></td>
@@ -149,19 +165,56 @@
                     </label>
                   </div>
                 </div>
+                <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('street').checked" (change)="toggleVisibility('street', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('street').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('street').disabled}">
+                        Street
+                      </span>
+                    </label>
+                  </div>
+                </div>  
+            </div>
+
+            <div class="row">
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('state').checked" (change)="toggleVisibility('state', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('state').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('state').disabled}">
+                      State
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
+                        City
+                      </span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('zip').checked" (change)="toggleVisibility('zip', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('zip').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('zip').disabled}">
+                        Zip
+                      </span>
+                    </label>
+                  </div>
+                </div>  
             </div>
             <div class="row">
-                <div class="col-md">
-                    <div class="checkbox">
-                      <label>
-                        <input [(ngModel)]="getSortableColumn('id').checked" (change)="toggleVisibility('id', $event)"
-                          type="checkbox" [disabled]="getSortableColumn('id').disabled">
-                        <span [ngClass]="{'disabled-column-option':getSortableColumn('id').disabled}">
-                          Id
-                        </span>
-                      </label>
-                    </div>
-                  </div>              
+                            
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -174,8 +227,7 @@
                   </label>
                 </div>                
               </div>
-            </div>
-            <div class="row">  
+
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -188,7 +240,12 @@
                   </label>
                 </div>
               </div>
+              <div class="col-md">
+                <div class="checkbox">
+                    </div>
+              </div>
             </div>
+   
           </div>
         </div>
         <div class="modal-footer">
