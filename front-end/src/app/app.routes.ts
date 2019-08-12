@@ -28,6 +28,7 @@ import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.co
 import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ContactsComponent } from './contacts/contacts.component';
+import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 
 export const AppRoutes: Routes = [
   {
@@ -114,7 +115,8 @@ export const AppRoutes: Routes = [
         component: IndividualReceiptComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard]
-      }
+      },
+      { path: 'addContact', component: AddNewContactComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
     ]
   },
   { path: '**', redirectTo: '' }
