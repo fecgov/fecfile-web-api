@@ -2617,87 +2617,90 @@ Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 """
 
 @api_view(['GET', 'POST'])
-def create_contacts_view(request):
+def contacts(request):
     try:
-        # print("request.data: ", request.data)
-        cmte_id = request.user.username
-        param_string = ""
-        page_num = int(request.data.get('page', 1))
-        descending = request.data.get('descending', 'false')
-        sortcolumn = request.data.get('sortColumnName')
-        itemsperpage = request.data.get('itemsPerPage', 5)
-        search_string = request.data.get('search')
-        #import ipdb;ipdb.set_trace()
-        params = request.data.get('filters', {})
-        keywords = params.get('keywords')
-        if str(descending).lower() == 'true':
-            descending = 'DESC'
-        else:
-            descending = 'ASC'
+        
+        if request.method == 'POST':
+            # print("request.data: ", request.data)
+            cmte_id = request.user.username
+            param_string = ""
+            page_num = int(request.data.get('page', 1))
+            descending = request.data.get('descending', 'false')
+            sortcolumn = request.data.get('sortColumnName')
+            itemsperpage = request.data.get('itemsPerPage', 5)
+            search_string = request.data.get('search')
+            #import ipdb;ipdb.set_trace()
+            params = request.data.get('filters', {})
+            keywords = params.get('keywords')
+            if str(descending).lower() == 'true':
+                descending = 'DESC'
+            else:
+                descending = 'ASC'
 
-        keys = ['id', 'type', 'name', 'occupation', 'employer' ]
-        search_keys = ['id', 'type', 'name', 'occupation', 'employer']
-        if search_string:
-            for key in search_keys:
-                if not param_string:
-                    param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
-                else:
-                    param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
-            param_string = param_string + " )"
-        keywords_string = ''
-        if keywords:
-            for key in keys:
-                for word in keywords:
-                    if '"' in word:
-                        continue
-                    elif "'" in word:
-                        if not keywords_string:
-                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
-                        else:
-                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer' ]
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer']
+            if search_string:
+                for key in search_keys:
+                    if not param_string:
+                        param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
                     else:
-                        if not keywords_string:
-                            keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                        param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                param_string = param_string + " )"
+            keywords_string = ''
+            if keywords:
+                for key in keys:
+                    for word in keywords:
+                        if '"' in word:
+                            continue
+                        elif "'" in word:
+                            if not keywords_string:
+                                keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                            else:
+                                keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
                         else:
-                            keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
-            keywords_string = keywords_string + " )"
-        param_string = param_string + keywords_string
-        
-        
-        trans_query_string = """SELECT id, type, name, occupation, employer from all_contacts_view
-                                    where cmte_id='""" + cmte_id + """' """ + param_string 
-        # print("trans_query_string: ",trans_query_string)
-        # import ipdb;ipdb.set_trace()
-        if sortcolumn and sortcolumn != 'default':
-            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
-        elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC"""
-        with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj=data_row[0]
-                forms_obj = data_row[0]
-                if forms_obj is None:
-                    forms_obj =[]
-                    status_value = status.HTTP_200_OK
-                else:
-                    for d in forms_obj:
-                        for i in d:
-                            if not d[i]:
-                                d[i] = ''
-                      
-                    status_value = status.HTTP_200_OK
-        
-        #import ipdb; ipdb.set_trace()
-        total_count = len(forms_obj)
-        paginator = Paginator(forms_obj, itemsperpage)
-        if paginator.num_pages < page_num:
-            page_num = paginator.num_pages
-        forms_obj = paginator.page(page_num)
-        json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
-                    'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+                            if not keywords_string:
+                                keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                            else:
+                                keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                keywords_string = keywords_string + " )"
+            param_string = param_string + keywords_string
+            
+            
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view
+                                        where cmte_id='""" + cmte_id + """' """ + param_string 
+            # print("trans_query_string: ",trans_query_string)
+            # import ipdb;ipdb.set_trace()
+            if sortcolumn and sortcolumn != 'default':
+                trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+            elif sortcolumn == 'default':
+                trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj=data_row[0]
+                    forms_obj = data_row[0]
+                    if forms_obj is None:
+                        forms_obj =[]
+                        status_value = status.HTTP_200_OK
+                    else:
+                        for d in forms_obj:
+                            for i in d:
+                                if not d[i]:
+                                    d[i] = ''
+                        
+                        status_value = status.HTTP_200_OK
+            
+            #import ipdb; ipdb.set_trace()
+            total_count = len(forms_obj)
+            paginator = Paginator(forms_obj, itemsperpage)
+            if paginator.num_pages < page_num:
+                page_num = paginator.num_pages
+            forms_obj = paginator.page(page_num)
+            json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
+                        'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         return Response(json_result, status=status_value)
+    
     except Exception as e:
         return Response("The contact_views API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -2745,7 +2748,7 @@ def get_loan_debt_summary(request):
             cursor.execute(_sql, {'cmte_id':cmte_id, 'report_id': report_id, 'line_num': '10'})
             by_committee_sum = list(cursor.fetchone())[0]
             json_result = {"to_committee_sum": to_committee_sum, "by_committee_sum": by_committee_sum}
-        return Response(json_result, status.HTTP_200_OK)
+            return Response(json_result, status.HTTP_200_OK)
 
     except Exception as e:
         return Response("The get_loan_debt_summary api is throwing an error: " + str(e), 

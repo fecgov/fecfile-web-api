@@ -167,6 +167,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
+
+    
     this.getPage(this.config.currentPage);
   }
 
@@ -1043,15 +1045,45 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     
-    const defaultSortColumns = ['name', 'type', 'id', 'employer', 'occupation'];
-    
+    const defaultSortColumns = ['name', 'type', 'street', 'city', 'state'];
+    const otherSortColumns = [
+      'zip', 'employer', 'occupation'
+    ];
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
     }
-    
+
+    for (const field of otherSortColumns) {
+      this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
+    }
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
+
+
+  /*private setSortableColumns(): void {
+    const defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+    const otherSortColumns = [
+      'transactionId',
+      'street',
+      'city',
+      'state',
+      'zip',
+      'purposeDescription',
+      'contributorEmployer',
+      'contributorOccupation',
+      'memoText'
+    ];
+
+    this.sortableColumns = [];
+    for (const field of defaultSortColumns) {
+      this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
+    }
+    for (const field of otherSortColumns) {
+      this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
+    }
+    this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
+  }*/
 
 
   /**

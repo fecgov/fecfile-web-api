@@ -90,7 +90,7 @@ export class ContactsService {
       filters: ContactFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/core/create_contacts_view';
+    const url = '/core/contacts';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -251,6 +251,11 @@ export class ContactsService {
       model.type = row.type;
       model.id = row.id;
       model.name = row.name;
+      model.street1 = row.street1;
+      model.street2 = row.street_2;
+      model.city = row.city;
+      model.state = row.state;
+      model.zip = row.zip;
       model.employer = row.employer;
       model.occupation = row.occupation;
       
@@ -288,6 +293,21 @@ export class ContactsService {
       case 'id':
         name = 'id';
         break;
+      case 'street1':
+        name = 'street1';
+        break; 
+      case 'street2':
+        name = 'street2';
+        break;         
+      case 'city':
+        name = 'city';
+        break;         
+      case 'state':
+        name = 'state';
+        break;                                
+      case 'zip':
+        name = 'zip';
+        break;                        
       case 'employer':
         name = 'employer';
         break;
@@ -315,6 +335,11 @@ export class ContactsService {
     serverObject.name =  model.name;
     serverObject.type = model.type;
     serverObject.id = model.id;
+    serverObject.street1 = model.street1;
+    serverObject.street2 = model.street2;
+    serverObject.city = model.city;
+    serverObject.state = model.state;
+    serverObject.zip = model.zip;
     serverObject.employer = model.employer;
     serverObject.occupation = model.occupation;
     
