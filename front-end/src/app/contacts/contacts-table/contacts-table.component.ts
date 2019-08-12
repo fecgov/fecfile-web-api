@@ -1045,9 +1045,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     
-    const defaultSortColumns = ['name', 'type', 'street', 'city', 'state'];
+    const defaultSortColumns = ['name', 'type', 'employer', 'occupation',];
     const otherSortColumns = [
-      'zip', 'employer', 'occupation'
+      'id','street', 'city', 'state', 'zip', 
     ];
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
