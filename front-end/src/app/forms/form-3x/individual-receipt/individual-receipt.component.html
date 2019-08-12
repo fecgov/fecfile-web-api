@@ -79,11 +79,14 @@
                       </div>
                     </ng-container>
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
+                    <!-- && col?.name !== 'child*entity_name'
+                    && col?.name !== 'child*donor_cmte_id'" -->
                     <input
                       *ngIf="col?.name !== 'first_name' 
                           && col?.name !== 'last_name'
-                          && col?.name !== 'child*entity_name'
-                          && col?.name !== 'child*donor_cmte_id'"
+                          && !isFieldName(col?.name, 'entity_name')
+                          && !isFieldName(col?.name, 'donor_cmte_id')
+                          "
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -147,7 +150,7 @@
                       (selectItem)="handleSelectedItem($event)"
                     />
                     <input
-                      *ngIf="col?.name === 'child*entity_name'"
+                      *ngIf="isFieldName(col?.name, 'entity_name')"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -166,10 +169,10 @@
                       [ngbTypeahead]="searchOrg"
                       [resultTemplate]="rtOrg"
                       [inputFormatter]="formatterOrgName"
-                      (selectItem)="handleSelectedEntityChildForm($event, col?.name)"
+                      (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
                     />
                     <input
-                      *ngIf="col?.name === 'child*donor_cmte_id'"
+                      *ngIf="isFieldName(col?.name, 'donor_cmte_id')"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -188,7 +191,7 @@
                       [ngbTypeahead]="searchCommitteeId"
                       [resultTemplate]="rtCommitteeId"
                       [inputFormatter]="formatterCommitteeId"
-                      (selectItem)="handleSelectedEntityChildForm($event, col?.name)"
+                      (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
                     />                  
                   </div>
                   <div

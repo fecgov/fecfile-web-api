@@ -32,6 +32,7 @@ import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/con
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from './schedule-actions.enum';
+import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 
 @Component({
   selector: 'f3x-individual-receipt',
@@ -72,7 +73,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  // private _transactionTypeIdentifier: string = null;
   private _formSubmitted: boolean = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -80,7 +80,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
+  private _selectedEntityChild: any;
   private _selectedChangeWarn: any;
+  private _selectedChangeWarnChild: any;
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
@@ -113,6 +115,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
+    this._selectedEntityChild = null;
+    this._selectedChangeWarnChild = null;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
@@ -207,7 +211,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     const formGroup: any = [];
 
     fields.forEach(el => {
-      if (el.hasOwnProperty('cols')) {
+      if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
           if (this.isFieldName(e.name, 'contribution_amount')) {
@@ -350,7 +354,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       // Do same as above for child amount
       if (this.frmIndividualReceipt.controls['child*contribution_amount']) {
-        this.frmIndividualReceipt.controls['child*contribution_amount'].setValidators([floatingPoint(), Validators.required]);
+        this.frmIndividualReceipt.controls['child*contribution_amount'].setValidators([
+          floatingPoint(),
+          Validators.required
+        ]);
 
         this.frmIndividualReceipt.controls['child*contribution_amount'].updateValueAndValidity();
       }
@@ -518,6 +525,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (this._selectedEntity) {
         this.showWarn(col.text, col.name);
       }
+    } else if (
+      col.name === this._childFieldNamePrefix + 'street_1' ||
+      col.name === this._childFieldNamePrefix + 'street_2' ||
+      col.name === this._childFieldNamePrefix + 'city' ||
+      col.name === this._childFieldNamePrefix + 'state' ||
+      col.name === this._childFieldNamePrefix + 'zip_code' ||
+      col.name === this._childFieldNamePrefix + 'employer' ||
+      col.name === this._childFieldNamePrefix + 'occupation'
+    ) {
+      if (this._selectedEntityChild) {
+        this.showWarn(col.text, col.name);
+      }
     } else if (this.isFieldName(col.name, 'contribution_amount')) {
       this.contributionAmountKeyup($event);
     } else {
@@ -531,13 +550,27 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param fieldLabel Field Label to show in the message
    */
   private showWarn(fieldLabel: string, name: string) {
+    const isChildForm = name.startsWith(this._childFieldNamePrefix) ? true : false;
+
     // only show on first key
-    if (this._selectedChangeWarn[name] === name) {
-      return;
+    if (isChildForm) {
+      if (this._selectedChangeWarnChild[name] === name) {
+        return;
+      }
+    } else {
+      if (this._selectedChangeWarn[name] === name) {
+        return;
+      }
     }
+
     const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
     this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
-    this._selectedChangeWarn[name] = name;
+
+    if (isChildForm) {
+      this._selectedChangeWarnChild[name] = name;
+    } else {
+      this._selectedChangeWarn[name] = name;
+    }
   }
 
   /**
@@ -567,7 +600,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
         this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
       }
-
     } else {
       if (checked) {
         this.memoCode = checked;
@@ -603,14 +635,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param stateOption the state selected in the dropdown.
    */
   public handleStateChange(stateOption: any, col: any) {
-
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
     if (isChildForm) {
-      // TODO handle warning for child form
-      // if (this._selectedEntity) {
-      //   this.showWarn(col.text, 'state');
-      // }
+      if (this._selectedEntityChild) {
+        this.showWarn(col.text, this._childFieldNamePrefix + 'state');
+      }
     } else {
       if (this._selectedEntity) {
         this.showWarn(col.text, 'state');
@@ -707,6 +737,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         receiptObj.entity_id = this._selectedEntity.entity_id;
       }
 
+      // TODO do we need to save child entity?
+      if (this._selectedEntityChild) {
+        receiptObj['child*entity_id'] = this._selectedEntityChild.entity_id;
+      }
+
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
       this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
@@ -736,16 +771,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             this._contributionAggregateValue,
             '.2-2'
           );
-          this.frmIndividualReceipt.controls['contribution_aggregate']
-            .setValue(contributionAggregateValue);
+          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
 
           if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
             const contributionAggregateValueChild: string = this._decimalPipe.transform(
               this._contributionAggregateValueChild,
               '.2-2'
             );
-            this.frmIndividualReceipt.controls['child*contribution_aggregate']
-              .setValue(contributionAggregateValueChild);
+            this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
+              contributionAggregateValueChild
+            );
           }
 
           this._formSubmitted = true;
@@ -755,6 +790,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntity = null;
           this._selectedChangeWarn = null;
+          this._selectedEntityChild = null;
+          this._selectedChangeWarnChild = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -889,32 +926,30 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     console.log('transaction type from input is ' + this.transactionType);
 
     const reportId = this.getReportIdFromStorage();
-    this._receiptService
-      .getContributionAggregate(reportId, contact.entity_id, this.transactionType)
-      .subscribe(res => {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
+    this._receiptService.getContributionAggregate(reportId, contact.entity_id, this.transactionType).subscribe(res => {
+      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+      // Entity selected from the typeahead list.
 
-        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
+      let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+      contributionAmount = contributionAmount ? contributionAmount : 0;
 
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+      // TODO make this a class variable for contributionAmountChange() to add to.
+      let contributionAggregate: string = String(res.contribution_aggregate);
+      contributionAggregate = contributionAggregate ? contributionAggregate : '0';
 
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
+      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+      const value: string = this._decimalPipe.transform(total, '.2-2');
 
-        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+      console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
           ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
+      console.log(`value = ${value}`);
 
-        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
 
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValue = parseFloat(contributionAggregate);
-      });
+      // Store the entity aggregate to be added to the contribution amount
+      // if it changes in the UI.  See contributionAmountChange();
+      this._contributionAggregateValue = parseFloat(contributionAggregate);
+    });
   }
 
   /**
@@ -922,14 +957,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
-  public handleSelectedEntityChildForm($event: NgbTypeaheadSelectItemEvent, fieldName: string) {
+  public handleSelectedEntity_NEW($event: NgbTypeaheadSelectItemEvent, fieldName: string) {
     const entity = $event.item;
 
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
 
-    // TODO these will be needed for warning save changes
-    // this._selectedEntity = this._utilService.deepClone(entity);
-    // this._selectedChangeWarn = {};
+    if (isChildForm) {
+      this._selectedEntityChild = this._utilService.deepClone(entity);
+      this._selectedChangeWarnChild = {};
+    } else {
+      this._selectedEntity = this._utilService.deepClone(entity);
+      this._selectedChangeWarn = {};
+    }
 
     if (isChildForm) {
       if (fieldName === this._childFieldNamePrefix + 'entity_name') {
@@ -946,6 +985,36 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       this.frmIndividualReceipt.patchValue({ 'child*occupation': entity.occupation }, { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ 'child*employer': entity.employer }, { onlySelf: true });
     } else {
+      if (fieldName === 'first_name' || fieldName === 'last_name') {
+        // populate individual name fields
+        this.frmIndividualReceipt.patchValue({ last_name: entity.last_name }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ first_name: entity.first_name }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ middle_name: entity.middle_name }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ prefix: entity.prefix }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ suffix: entity.suffix }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ street_1: entity.street_1 }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ street_2: entity.street_2 }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ city: entity.city }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ state: entity.state }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ zip_code: entity.zip_code }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ occupation: entity.occupation }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
+      } else if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id') {
+        // populate org/committee fields
+        if (fieldName === 'entity_name') {
+          this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+        }
+        if (fieldName === 'donor_cmte_id') {
+          this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
+        }
+        this.frmIndividualReceipt.patchValue({ street_1: entity.street_1 }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ street_2: entity.street_2 }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ city: entity.city }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ state: entity.state }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ zip_code: entity.zip_code }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ occupation: entity.occupation }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
+      }
     }
 
     // default to indiv-receipt for sprint 17 - use input field in sprint 18.
@@ -953,38 +1022,36 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     console.log('transaction type from input is ' + this.transactionType);
 
     const reportId = this.getReportIdFromStorage();
-    this._receiptService
-      .getContributionAggregate(reportId, entity.entity_id, this.transactionType)
-      .subscribe(res => {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
+    this._receiptService.getContributionAggregate(reportId, entity.entity_id, this.transactionType).subscribe(res => {
+      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+      // Entity selected from the typeahead list.
 
-        let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
- 
-        // TODO remove this once orgs and committes have contrib aggregates > 0
-        if (environment.name === 'local') {
-          res.contribution_aggregate = 999.99;
-        }
+      let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
+      contributionAmount = contributionAmount ? contributionAmount : 0;
 
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+      // TODO remove this once orgs and committes have contrib aggregates > 0
+      if (environment.name === 'local') {
+        res.contribution_aggregate = 999.99;
+      }
 
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
+      // TODO make this a class variable for contributionAmountChange() to add to.
+      let contributionAggregate: string = String(res.contribution_aggregate);
+      contributionAggregate = contributionAggregate ? contributionAggregate : '0';
 
-        console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
+      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+      const value: string = this._decimalPipe.transform(total, '.2-2');
+
+      console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
           ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
+      console.log(`value = ${value}`);
 
-        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
 
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
-        // TODO need to handle child form apart from non-child
-      });
+      // Store the entity aggregate to be added to the contribution amount
+      // if it changes in the UI.  See contributionAmountChange();
+      this._contributionAggregateValueChild = parseFloat(contributionAggregate);
+      // TODO need to handle child form apart from non-child
+    });
   }
 
   /**
@@ -1168,113 +1235,38 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //   return null;
   // }
 
-  // private getFormFields(): void {
-  //   console.log('get transaction type form fields ' + this.transactionType);
-  //   this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
-  //     if (res) {
-  //       if (res.hasOwnProperty('data')) {
-  //         if (typeof res.data === 'object') {
-  //           if (res.data.hasOwnProperty('formFields')) {
-  //             if (Array.isArray(res.data.formFields)) {
-  //               this.formFields = res.data.formFields;
-
-  //               this._setForm(this.formFields);
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('hiddenFields')) {
-  //             if (Array.isArray(res.data.hiddenFields)) {
-  //               this.hiddenFields = res.data.hiddenFields;
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('states')) {
-  //             if (Array.isArray(res.data.states)) {
-  //               this.states = res.data.states;
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('titles')) {
-  //             if (Array.isArray(res.data.titles)) {
-  //               this.titles = res.data.titles;
-  //             }
-  //           }
-  //         } // typeof res.data
-  //       } // res.hasOwnProperty('data')
-  //     } // res
-  //   });
-  // }
-
-  // temp code for ear
   private getFormFields(): void {
     console.log('get transaction type form fields ' + this.transactionType);
+    this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+      if (res) {
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-    if (this.transactionType === 'EAR_REC') {
-      this._receiptService.getEarMarkMockData().subscribe(res => {
-        if (res) {
-          if (res.hasOwnProperty('data')) {
-            if (typeof res.data === 'object') {
-              if (res.data.hasOwnProperty('formFields')) {
-                if (Array.isArray(res.data.formFields)) {
-                  this.formFields = res.data.formFields;
-
-                  this._setForm(this.formFields);
-                }
+                this._setForm(this.formFields);
               }
-              if (res.data.hasOwnProperty('hiddenFields')) {
-                if (Array.isArray(res.data.hiddenFields)) {
-                  this.hiddenFields = res.data.hiddenFields;
-
-                  // for (const field of this.hiddenFields) {
-                  //   if (field.name === 'transaction_type_identifier') {
-                  //     this._transactionTypeIdentifier = field.value;
-                  //   }
-                  // }
-                }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
               }
-              if (res.data.hasOwnProperty('states')) {
-                if (Array.isArray(res.data.states)) {
-                  this.states = res.data.states;
-                }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
               }
-              if (res.data.hasOwnProperty('titles')) {
-                if (Array.isArray(res.data.titles)) {
-                  this.titles = res.data.titles;
-                }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
               }
-            } // typeof res.data
-          } // res.hasOwnProperty('data')
-        } // res
-      });
-    } else {
-      this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
-        if (res) {
-          if (res.hasOwnProperty('data')) {
-            if (typeof res.data === 'object') {
-              if (res.data.hasOwnProperty('formFields')) {
-                if (Array.isArray(res.data.formFields)) {
-                  this.formFields = res.data.formFields;
-
-                  this._setForm(this.formFields);
-                }
-              }
-              if (res.data.hasOwnProperty('hiddenFields')) {
-                if (Array.isArray(res.data.hiddenFields)) {
-                  this.hiddenFields = res.data.hiddenFields;
-                }
-              }
-              if (res.data.hasOwnProperty('states')) {
-                if (Array.isArray(res.data.states)) {
-                  this.states = res.data.states;
-                }
-              }
-              if (res.data.hasOwnProperty('titles')) {
-                if (Array.isArray(res.data.titles)) {
-                  this.titles = res.data.titles;
-                }
-              }
-            } // typeof res.data
-          } // res.hasOwnProperty('data')
-        } // res
-      });
-    }
+            }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
+    });
   }
 
   private _populateFormForEditOrView(editOrView: any) {
@@ -1294,6 +1286,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         // be used or cloned to a mapping method in the contact.service.
         this._selectedEntity = formData;
         this._selectedChangeWarn = {};
+
+        // TODO need to handle child data once passed
+        this._selectedEntityChild = editOrView.childTransactionModel ? editOrView.childTransactionModel : null;
+        this._selectedChangeWarnChild = {};
 
         this.transactionType = formData.transactionTypeIdentifier;
 
