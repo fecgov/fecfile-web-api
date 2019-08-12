@@ -44,6 +44,11 @@ list_mandatory_fields_schedB = [
     "entity_type"
 ]
 
+# a list of transactions with negative transaction_amount
+NEGATIVE_TRANSACTIONS = [
+    'OPEXP_VOID',
+]
+
 
 def get_next_transaction_id(trans_char):
     """
@@ -513,10 +518,8 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            print(forms_obj)
             child_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
-            print(child_forms_obj)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -608,12 +611,19 @@ def delete_schedB(data):
         raise
 
 
+def validate_negative_transaction(data):
+    if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
+        if not float(data.get('expenditure_amount')) < 0:
+            raise Exception("current transaction amount need to be negative!")
+
+
 def schedB_sql_dict(data):
     """
     build a formulated data dictionary based on loaded 
     json and validate some field data
     """
     try:
+        validate_negative_transaction(data)
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
