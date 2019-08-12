@@ -141,8 +141,8 @@ export class AppLayoutComponent implements OnInit {
             this.formType = formInfo.formtype;
           }
 
-          if (formInfo.hasOwnProperty('reportTypeDescription')) {
-            this.formDescription = formInfo.reportTypeDescription;
+          if (formInfo.hasOwnProperty('report_type_desciption')) {
+            this.formDescription = formInfo.report_type_desciption;
           } else if (formInfo.hasOwnProperty('reporttypedescription')) {
             this.formDescription = formInfo.reporttypedescription;
           }
