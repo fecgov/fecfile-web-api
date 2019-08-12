@@ -29,17 +29,9 @@ from fecfiler.core.views import (
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
 )
-# Create your views here.
+
 logger = logging.getLogger(__name__)
 
-"""
-********************************************************************************************************************************
-SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINKA 
-********************************************************************************************************************************
-"""
-"""
-**************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
-"""
 
 # semi_annual_refund_bundled_amount remmoed from ths list but is still needed
 # you need to pass in a valid decimal value: this is valid until db change happens
@@ -50,8 +42,6 @@ list_mandatory_fields_schedB = [
     "transaction_type_identifier",
     "entity_type"
 ]
-# list_mandatory_fields_aggregate = ['transaction_type']
-# list_child_schedA = ['16']
 
 
 def get_next_transaction_id(trans_char):
@@ -109,10 +99,7 @@ def check_decimal(value):
     """
     check value is decimal data
     """
-
     try:
-        # if not value:
-        #     return None
         check_value = Decimal(value)
         return value
     except Exception as e:
@@ -121,11 +108,6 @@ def check_decimal(value):
                 value
             )
         )
-
-
-"""
-**************************************************** FUNCTIONS - MANDATORY FIELDS CHECK **********************************************************
-"""
 
 
 def check_mandatory_fields_SB(data, list_mandatory_fields):
@@ -149,11 +131,6 @@ def check_mandatory_fields_SB(data, list_mandatory_fields):
             )
     except:
         raise
-
-
-"""
-**************************************************** FUNCTIONS - SCHED B TRANSACTION - work to be done*************************************************************
-"""
 
 
 def post_sql_schedB(
@@ -368,7 +345,6 @@ def put_sql_schedB(
     """
     try:
         with connection.cursor() as cursor:
-            # Insert data into schedB table
             cursor.execute(
                 """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, expenditure_purpose = %s, category_code = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, beneficiary_cmte_id = %s, beneficiary_cand_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, other_state = %s, other_zip = %s, nc_soft_account = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                 [
@@ -401,7 +377,6 @@ def put_sql_schedB(
                     cmte_id,
                 ],
             )
-            # print(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} does not exist in schedB table".format(
@@ -449,11 +424,6 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
             )
     except Exception:
         raise
-
-
-"""
-**************************************************** API FUNCTIONS - SCHED B TRANSACTION *************************************************************
-"""
 
 
 def post_schedB(datum):
@@ -690,11 +660,6 @@ def schedB_sql_dict(data):
         raise
 
 
-"""
-***************************************************** SCHED B - POST API CALL STARTS HERE **********************************************************
-"""
-
-
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedB(request):
     """
@@ -761,9 +726,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    *********************************************** SCHED B - GET API CALL STARTS HERE **********************************************************
-    """
     # Get records from schedB table
     if request.method == "GET":
 
@@ -798,9 +760,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    ************************************************* SCHED B - PUT API CALL STARTS HERE **********************************************************
-    """
     # Modify a single record from schedB table
     if request.method == "PUT":
 
@@ -846,9 +805,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    ************************************************ SCHED B - DELETE API CALL STARTS HERE **********************************************************
-    """
     # Delete a single record from schedB table
     if request.method == "DELETE":
 
@@ -883,10 +839,3 @@ def schedB(request):
                 "The schedB API - DELETE is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-"""
-******************************************************************************************************************************
-END - SCHEDULE B TRANSACTIONS API - SCHED_B APP
-******************************************************************************************************************************
-"""
