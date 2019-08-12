@@ -346,6 +346,19 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
         this.frmIndividualReceipt.controls['contribution_aggregate'].updateValueAndValidity();
       }
+
+      // Do same as above for child amount
+      if (this.frmIndividualReceipt.controls['child*contribution_amount']) {
+        this.frmIndividualReceipt.controls['child*contribution_amount'].setValidators([floatingPoint(), Validators.required]);
+
+        this.frmIndividualReceipt.controls['child*contribution_amount'].updateValueAndValidity();
+      }
+
+      if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
+        this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValidators([floatingPoint()]);
+
+        this.frmIndividualReceipt.controls['child*contribution_aggregate'].updateValueAndValidity();
+      }
     }
   }
 
