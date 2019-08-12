@@ -72,7 +72,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _transactionTypeIdentifier: string = null;
+  // private _transactionTypeIdentifier: string = null;
   private _formSubmitted: boolean = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -115,6 +115,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
+    this._contributionAggregateValueChild = 0.0;
     this._contributionAmount = '';
     this._contributionAmountChlid = '';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -730,11 +731,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this._contributionAmount = '';
           this._contributionAmountChlid = '';
           this._contributionAggregateValue = 0.0;
+          this._contributionAggregateValueChild = 0.0;
           const contributionAggregateValue: string = this._decimalPipe.transform(
             this._contributionAggregateValue,
             '.2-2'
           );
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+          this.frmIndividualReceipt.controls['contribution_aggregate']
+            .setValue(contributionAggregateValue);
+
+          if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
+            const contributionAggregateValueChild: string = this._decimalPipe.transform(
+              this._contributionAggregateValueChild,
+              '.2-2'
+            );
+            this.frmIndividualReceipt.controls['child*contribution_aggregate']
+              .setValue(contributionAggregateValueChild);
+          }
 
           this._formSubmitted = true;
           this.memoCode = false;
@@ -873,12 +885,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
 
     // default to indiv-receipt for sprint 17 - use input field in sprint 18.
-    this._transactionTypeIdentifier = 'INDV_REC';
+    // this._transactionTypeIdentifier = 'INDV_REC';
     console.log('transaction type from input is ' + this.transactionType);
 
     const reportId = this.getReportIdFromStorage();
     this._receiptService
-      .getContributionAggregate(reportId, contact.entity_id, this._transactionTypeIdentifier)
+      .getContributionAggregate(reportId, contact.entity_id, this.transactionType)
       .subscribe(res => {
         // Add the UI val for Contribution Amount to the Contribution Aggregate for the
         // Entity selected from the typeahead list.
@@ -937,18 +949,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
 
     // default to indiv-receipt for sprint 17 - use input field in sprint 18.
-    this._transactionTypeIdentifier = 'INDV_REC';
+    // this._transactionTypeIdentifier = 'INDV_REC';
     console.log('transaction type from input is ' + this.transactionType);
 
     const reportId = this.getReportIdFromStorage();
     this._receiptService
-      .getContributionAggregate(reportId, entity.entity_id, this._transactionTypeIdentifier)
+      .getContributionAggregate(reportId, entity.entity_id, this.transactionType)
       .subscribe(res => {
         // Add the UI val for Contribution Amount to the Contribution Aggregate for the
         // Entity selected from the typeahead list.
 
         let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
         contributionAmount = contributionAmount ? contributionAmount : 0;
+ 
+        // TODO remove this once orgs and committes have contrib aggregates > 0
+        if (environment.name === 'local') {
+          res.contribution_aggregate = 999.99;
+        }
 
         // TODO make this a class variable for contributionAmountChange() to add to.
         let contributionAggregate: string = String(res.contribution_aggregate);
@@ -965,7 +982,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
         // Store the entity aggregate to be added to the contribution amount
         // if it changes in the UI.  See contributionAmountChange();
-        // this._contributionAggregateValue = parseFloat(contributionAggregate);
+        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
         // TODO need to handle child form apart from non-child
       });
   }
@@ -1205,11 +1222,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 if (Array.isArray(res.data.hiddenFields)) {
                   this.hiddenFields = res.data.hiddenFields;
 
-                  for (const field of this.hiddenFields) {
-                    if (field.name === 'transaction_type_identifier') {
-                      this._transactionTypeIdentifier = field.value;
-                    }
-                  }
+                  // for (const field of this.hiddenFields) {
+                  //   if (field.name === 'transaction_type_identifier') {
+                  //     this._transactionTypeIdentifier = field.value;
+                  //   }
+                  // }
                 }
               }
               if (res.data.hasOwnProperty('states')) {
@@ -1278,10 +1295,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this._selectedEntity = formData;
         this._selectedChangeWarn = {};
 
-        // Until get_all_transactions has the new code use this
-        if (formData.type === 'Individual Receipt') {
-          this.transactionType = 'INDV_REC';
-        }
+        this.transactionType = formData.transactionTypeIdentifier;
 
         this._setFormDataValues();
       }
