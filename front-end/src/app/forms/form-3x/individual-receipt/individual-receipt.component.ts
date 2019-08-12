@@ -61,6 +61,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public formVisible: boolean = false;
   public hiddenFields: any = [];
   public memoCode: boolean = false;
+  public memoCodeChild: boolean = false;
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
@@ -317,6 +318,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
         }
       }
+      if (this.memoCodeChild) {
+        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([Validators.required]);
+
+        this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+      } else {
+        if (this.frmIndividualReceipt.controls['child*contribution_date']) {
+          this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([
+            contributionDate(cvgStartDate, cvgEndDate),
+            Validators.required
+          ]);
+
+          this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+        }
+      }
     }
 
     if (this.frmIndividualReceipt) {
@@ -516,25 +531,47 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    *
    * @param      {Object}  e      The event object.
    */
-  public memoCodeChange(e): void {
+  public memoCodeChange(e, fieldName: string): void {
     const { checked } = e.target;
+    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
 
-    if (checked) {
-      this.memoCode = checked;
-      this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-      this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+    if (isChildForm) {
+      if (checked) {
+        this.memoCodeChild = checked;
+        this.frmIndividualReceipt.controls['child*memo_code'].setValue(this._memoCodeValue);
+        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([Validators.required]);
 
-      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+      } else {
+        this._validateContributionDate();
+        this.memoCodeChild = checked;
+        this.frmIndividualReceipt.controls['child*memo_code'].setValue(null);
+        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([
+          contributionDate(this.cvgStartDate, this.cvgEndDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+      }
+
     } else {
-      this._validateContributionDate();
-      this.memoCode = checked;
-      this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-        contributionDate(this.cvgStartDate, this.cvgEndDate),
-        Validators.required
-      ]);
+      if (checked) {
+        this.memoCode = checked;
+        this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
 
-      this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+      } else {
+        this._validateContributionDate();
+        this.memoCode = checked;
+        this.frmIndividualReceipt.controls['memo_code'].setValue(null);
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+          contributionDate(this.cvgStartDate, this.cvgEndDate),
+          Validators.required
+        ]);
+
+        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+      }
     }
   }
 
@@ -597,6 +634,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           if (this.memoCode) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('memo code val ' + receiptObj[field]);
+          }
+        } else if (field === this._childFieldNamePrefix + 'memo_code') {
+          if (this.memoCodeChild) {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+            console.log('child memo code val ' + receiptObj[field]);
           }
         } else if (field === 'last_name' || field === 'first_name') {
           // if (this._selectedEntity) {
@@ -683,6 +725,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
           this._formSubmitted = true;
           this.memoCode = false;
+          this.memoCodeChild = false;
           this.frmIndividualReceipt.reset();
           this.frmIndividualReceipt.controls['memo_code'].setValue(null);
           this._selectedEntity = null;
@@ -1048,6 +1091,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       return x;
     }
   };
+
+  public checkForMemoCode(fieldName: string) {
+    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    if (isChildForm) {
+      return this.memoCodeChild;
+    } else {
+      return this.memoCode;
+    }
+  }
 
   /**
    * Obtain the Report ID from local storage.

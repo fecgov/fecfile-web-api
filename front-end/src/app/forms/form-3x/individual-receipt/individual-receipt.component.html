@@ -249,9 +249,9 @@
                     [attr.type]="col?.type"
                     [attr.name]="col?.name"
                     [attr.value]="col?.value"
-                    [checked]="col?.name === 'memo_code' ? memoCode : null"
+                    [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                     [formControlName]="col?.name"
-                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
+                    (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
                     [ngClass]="
                       frmIndividualReceipt.get(col?.name)?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
