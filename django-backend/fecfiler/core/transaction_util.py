@@ -1,6 +1,8 @@
 from functools import lru_cache
 from django.db import connection
-from fecfiler.core.views import get_entities
+from fecfiler.core.views import (
+    get_entities,
+    NoOPError)
 
 
 @lru_cache(maxsize=32)
@@ -105,8 +107,21 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
         with connection.cursor() as cursor:
             # GET child rows from schedB table
             if transaction_id:
-                query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                query_string = """
+                SELECT cmte_id, report_id, line_number, transaction_type, 
+                                         transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                                         entity_id, expenditure_date, expenditure_amount, 
+                                         semi_annual_refund_bundled_amount, expenditure_purpose, 
+                                         category_code, memo_code, memo_text, election_code, 
+                                         election_other_description, beneficiary_cmte_id, 
+                                         beneficiary_cand_id, other_name, other_street_1, 
+                                         other_street_2, other_city, other_state, other_zip, 
+                                         nc_soft_account, transaction_type_identifier, create_date
+                FROM public.sched_b WHERE report_id = %s 
+                AND cmte_id = %s 
+                AND transaction_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [report_id, cmte_id, transaction_id],
@@ -125,7 +140,26 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [report_id, cmte_id],
                 )
-        return post_process_it(cursor, cmte_id)
+            transaction_list = cursor.fetchone()[0]
+            if not transaction_list:
+                if not back_ref_transaction_id:  # raise exception for non_child transaction
+                    raise NoOPError(
+                        'No transactions found for current report.')
+                else:  # retrun empy list for child transactions.
+                    return []
+            merged_list = []
+            for item in transaction_list:
+                entity_id = item.get('entity_id')
+                data = {
+                    'entity_id': entity_id,
+                    'cmte_id': cmte_id
+                }
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+            return merged_list
+            # return post_process_it(cursor, cmte_id)
         #     for row in cursor.fetchall():
         #         data_row = list(row)
         #         schedB_list = data_row[0]

@@ -28,6 +28,7 @@ from fecfiler.core.views import (
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
+    get_sched_b_transactions,
 )
 
 logger = logging.getLogger(__name__)
@@ -209,73 +210,75 @@ def get_list_all_schedB(report_id, cmte_id):
     """
     get a list of all transactions with the same cmte_id and report_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET all rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+    return get_sched_b_transactions(report_id, cmte_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET all rows from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            if schedB_list is None:
-                raise NoOPError(
-                    "The Report id:{} does not have any schedB transactions".format(
-                        report_id
-                    )
-                )
-            merged_list = []
-            for dictB in schedB_list:
-                entity_id = dictB.get("entity_id")
-                data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                merged_dict = {**dictB, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id],
+    #         )
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         if schedB_list is None:
+    #             raise NoOPError(
+    #                 "The Report id:{} does not have any schedB transactions".format(
+    #                     report_id
+    #                 )
+    #             )
+    #         merged_list = []
+    #         for dictB in schedB_list:
+    #             entity_id = dictB.get("entity_id")
+    #             data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #             entity_list = get_entities(data)
+    #             dictEntity = entity_list[0]
+    #             merged_dict = {**dictB, **dictEntity}
+    #             merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def get_list_schedB(report_id, cmte_id, transaction_id):
     """
     get sched_b item for this transaction_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET single row from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+    return get_sched_b_transactions(report_id, cmte_id, transaction_id=transaction_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET single row from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id, transaction_id],
-            )
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id, transaction_id],
+    #         )
 
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            if schedB_list is None:
-                raise NoOPError(
-                    "The transaction id: {} does not exist or is deleted".format(
-                        transaction_id
-                    )
-                )
-            merged_list = []
-            for dictB in schedB_list:
-                entity_id = dictB.get("entity_id")
-                data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                merged_dict = {**dictB, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         if schedB_list is None:
+    #             raise NoOPError(
+    #                 "The transaction id: {} does not exist or is deleted".format(
+    #                     transaction_id
+    #                 )
+    #             )
+    #         merged_list = []
+    #         for dictB in schedB_list:
+    #             entity_id = dictB.get("entity_id")
+    #             data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #             entity_list = get_entities(data)
+    #             dictEntity = entity_list[0]
+    #             merged_dict = {**dictB, **dictEntity}
+    #             merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def get_list_child_schedB(report_id, cmte_id, transaction_id):
@@ -283,32 +286,33 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
     get all children sched_b items:
     back_ref_transaction_id == transaction_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET child rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
+    return get_sched_b_transactions(report_id, cmte_id, back_ref_transaction_id=transaction_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET child rows from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id, transaction_id],
-            )
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id, transaction_id],
+    #         )
 
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            merged_list = []
-            if not (schedB_list is None):
-                for dictB in schedB_list:
-                    entity_id = dictB.get("entity_id")
-                    data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                    entity_list = get_entities(data)
-                    dictEntity = entity_list[0]
-                    merged_dict = {**dictB, **dictEntity}
-                    merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         merged_list = []
+    #         if not (schedB_list is None):
+    #             for dictB in schedB_list:
+    #                 entity_id = dictB.get("entity_id")
+    #                 data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #                 entity_list = get_entities(data)
+    #                 dictEntity = entity_list[0]
+    #                 merged_dict = {**dictB, **dictEntity}
+    #                 merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def put_sql_schedB(
@@ -509,8 +513,10 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
+            print(forms_obj)
             child_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
+            print(child_forms_obj)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -671,6 +677,7 @@ def schedB(request):
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
+            # TODO: can report_id be 0? what does it mean?
             if not (check_null_value(request.data.get("report_id"))):
                 report_id = "0"
             else:
