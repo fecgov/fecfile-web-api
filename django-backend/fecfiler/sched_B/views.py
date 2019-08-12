@@ -612,6 +612,9 @@ def delete_schedB(data):
 
 
 def validate_negative_transaction(data):
+    """
+    validate transaction amount if negative transaction encounterred.
+    """
     if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
         if not float(data.get('expenditure_amount')) < 0:
             raise Exception("current transaction amount need to be negative!")
