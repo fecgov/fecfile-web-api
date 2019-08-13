@@ -119,14 +119,25 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
             if transaction_id:
                 query_string = """
                 SELECT cmte_id, report_id, line_number, transaction_type, 
-                                         transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                                         entity_id, expenditure_date, expenditure_amount, 
-                                         semi_annual_refund_bundled_amount, expenditure_purpose, 
-                                         category_code, memo_code, memo_text, election_code, 
-                                         election_other_description, beneficiary_cmte_id, 
-                                         beneficiary_cand_id, other_name, other_street_1, 
-                                         other_street_2, other_city, other_state, other_zip, 
-                                         nc_soft_account, transaction_type_identifier, create_date
+                                        transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                                        entity_id, expenditure_date, expenditure_amount, 
+                                        semi_annual_refund_bundled_amount, expenditure_purpose, 
+                                        category_code, memo_code, memo_text, election_code, 
+                                        election_other_description, beneficiary_cmte_id, 
+                                        beneficiary_cand_id, other_name, other_street_1, 
+                                        other_street_2, other_city, other_state, other_zip, 
+                                        nc_soft_account, transaction_type_identifier, 
+                                        beneficiary_cand_office,
+                                        beneficiary_cand_state,
+                                        beneficiary_cand_district,
+                                        beneficiary_cmte_name,
+                                        beneficiary_cand_last_name,
+                                        beneficiary_cand_first_name,
+                                        beneficiary_cand_middle_name,
+                                        beneficiary_cand_prefix,
+                                        beneficiary_cand_suffix,
+                                        aggregate_amt,
+                                        create_date
                 FROM public.sched_b WHERE report_id = %s 
                 AND cmte_id = %s 
                 AND transaction_id = %s 
@@ -138,11 +149,22 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
                 )
             elif back_ref_transaction_id:
                 query_string = """
-                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                       back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
-                       expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                       beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
-                       other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
+                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
+                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
+                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        other_state, other_zip, nc_soft_account, transaction_type_identifier, 
+                        beneficiary_cand_office,
+                        beneficiary_cand_state,
+                        beneficiary_cand_district,
+                        beneficiary_cmte_name,
+                        beneficiary_cand_last_name,
+                        beneficiary_cand_first_name,
+                        beneficiary_cand_middle_name,
+                        beneficiary_cand_prefix,
+                        beneficiary_cand_suffix,
+                        aggregate_amt,
+                        create_date
                 FROM public.sched_b 
                 WHERE report_id = %s 
                 AND cmte_id = %s 
@@ -155,11 +177,22 @@ def get_sched_b_transactions(report_id, cmte_id, transaction_id=None, back_ref_t
                 )
             else:
                 query_string = """
-                SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
-                       back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
-                       expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                       beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
-                       other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+                SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
+                        back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
+                        expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
+                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        other_state, other_zip, nc_soft_account, transaction_type_identifier, 
+                        beneficiary_cand_office,
+                        beneficiary_cand_state,
+                        beneficiary_cand_district,
+                        beneficiary_cmte_name,
+                        beneficiary_cand_last_name,
+                        beneficiary_cand_first_name,
+                        beneficiary_cand_middle_name,
+                        beneficiary_cand_prefix,
+                        beneficiary_cand_suffix,
+                        aggregate_amt,
+                        create_date
                 FROM public.sched_b 
                 WHERE report_id = %s 
                 AND cmte_id = %s 
