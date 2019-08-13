@@ -100,6 +100,10 @@ urlpatterns = [
         jsonmain.create_json_builders,
         name="create_json_builders",
     ),
+    url(
+        r"^core/sample_sql_generate$",
+        jsonmain.sample_sql_generate,
+        name="sample_sql_generate",
     url(r"^core/print_preview_pdf$", 
         views.print_preview_pdf, 
         name="print_preview_pdf"),
