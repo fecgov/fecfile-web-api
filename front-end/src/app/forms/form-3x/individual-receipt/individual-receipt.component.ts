@@ -887,7 +887,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadOrgItem(result: any) {
-    return result.entity_name ? result.entity_name.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.entity_name ? result.entity_name.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
   }
 
   /**
@@ -896,7 +900,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCommitteeId(result: any) {
-    return result.cmte_id ? result.cmte_id.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.cmte_id ? result.cmte_id.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
   }
 
   /**
@@ -1030,9 +1038,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       contributionAmount = contributionAmount ? contributionAmount : 0;
 
       // TODO remove this once orgs and committes have contrib aggregates > 0
-      if (environment.name === 'local') {
-        res.contribution_aggregate = 999.99;
-      }
+      // if (environment.name === 'local') {
+      //   res.contribution_aggregate = 999.99;
+      // }
 
       // TODO make this a class variable for contributionAmountChange() to add to.
       let contributionAggregate: string = String(res.contribution_aggregate);
