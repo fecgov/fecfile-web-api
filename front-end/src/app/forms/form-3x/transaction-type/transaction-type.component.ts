@@ -203,7 +203,7 @@ export class TransactionTypeComponent implements OnInit {
 
   public printPreview(): void {
     
-    this._reportTypeService.printPreview(this._formType);
+    this._reportTypeService.printPreview('transaction_category_screen', this._formType);
     this.status.emit({
       form: {},
       direction: '',

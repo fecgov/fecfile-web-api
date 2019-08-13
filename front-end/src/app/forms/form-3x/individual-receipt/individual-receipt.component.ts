@@ -712,7 +712,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    this._reportTypeService.printPreview(this._formType);
+    this._reportTypeService.printPreview('individual_receipt',this._formType);
   }
 
   /**

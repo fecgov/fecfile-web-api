@@ -551,6 +551,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public printAllSelected(): void {
     //alert('Print all transactions is not yet supported');
+    console.log("TransactionsTableComponent printAllSelected...!");
+
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
@@ -561,8 +563,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
 
     trxIds = trxIds.substr(0, trxIds.length - 2);
-    this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
-    this._reportTypeService.printPreview(this.formType, trxIds);
+    //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
+    this._reportTypeService.printPreview('transaction_table_screen', this.formType, trxIds);
   }
 
   /**
