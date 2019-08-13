@@ -7,8 +7,6 @@ import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 import { ScheduleActions } from './schedule-actions.enum';
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -321,4 +319,5 @@ export class IndividualReceiptService {
       params
     });
   }
+
 }

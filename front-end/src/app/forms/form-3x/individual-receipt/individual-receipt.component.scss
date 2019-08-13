@@ -71,6 +71,9 @@
             font-family: sans-serif;
             font-weight: bold;
           }
+          &.childForm {
+            padding-top: 30px;
+          }
           label {
             display: block;
             padding-bottom: 0.75em;
@@ -80,6 +83,14 @@
               overflow: scroll;
               width: 400px;
             }
+          }
+          .forms__big_checkbox {
+            -webkit-transform: scale(1.9);
+            -ms-transform: scale(1.9); /* IE */
+            -moz-transform: scale(1.9); /* FF */
+            -webkit-transform: scale(1.9); /* Safari and Chrome */
+            -o-transform: scale(1.9); /* Opera */
+            margin: 10px;
           }
           label {
             font-family: 'sans-serif';
