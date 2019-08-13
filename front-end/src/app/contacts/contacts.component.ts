@@ -1,10 +1,11 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
+import { ComponentFactoryResolver } from '@angular/core/src/render3';
 
 export enum ActiveView {
   contacts = 'contacts',
@@ -45,6 +46,8 @@ export enum FilterTypes {
   ]
 })
 export class ContactsComponent implements OnInit, OnDestroy {
+  @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
+  @Output() showContact: EventEmitter<any> = new EventEmitter<any>();
 
   public formType = '';
   public reportId = '0';
@@ -57,7 +60,6 @@ export class ContactsComponent implements OnInit, OnDestroy {
   public searchTextArray = [];
   public tagArray: any = [];
   public showSideBar: boolean = false;
-
   /**
    * Subscription for applying filters to the contacts obtained from
    * the server.
@@ -72,7 +74,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   /**
    * Subscription for showing all Contacts.
    */
-  private showContactsSubscription: Subscription;
+  private showContactSubscription: Subscription;
 
   public transactionToEdit: ContactModel;
 
@@ -106,7 +108,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
         }
       );
 
-      this.showContactsSubscription = this._contactsMessageService.getShowContactsMessage()
+      this.showContactSubscription = this._contactsMessageService.getShowContactsMessage()
       .subscribe(
         message => {
           this.showContacts();
@@ -148,6 +150,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.applyFiltersSubscription.unsubscribe();
     this.editContactSubscription.unsubscribe();
+    this.showContactSubscription.unsubscribe();
   }
 
 
@@ -351,7 +354,9 @@ export class ContactsComponent implements OnInit, OnDestroy {
       this.searchText = '';
     }
     this.doSearch();
-    this.showFilters();
+    //this.showFilters();
+    this.isShowFilters = true;
+    this.showSideBar=true;
   }
 
 
@@ -647,7 +652,16 @@ export class ContactsComponent implements OnInit, OnDestroy {
    */
   public showFilters() {
     this.isShowFilters = true;
-  }
+    this.sidebarSwitch.emit(this.isShowFilters);
+
+    if (this.showSideBar){
+      this.showSideBar=false;
+    } else
+    {
+      this.showSideBar=true;
+    }
+    
+   }
 
 
   /**
@@ -655,6 +669,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
    */
   public showCategories() {
     this.isShowFilters = false;
+    this.showSideBar=false;
   }
 
 
