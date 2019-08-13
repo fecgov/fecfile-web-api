@@ -557,9 +557,9 @@ export class ReportTypeService {
     //let url: string = '/core/create_json_builders_test';
     let formData: FormData = new FormData();
 
-    console.log("printForm formType = ", formType);
-    console.log("printForm callFrom = ", callFrom);
-    console.log("transactions ==", transactions);
+    console.log("printPreviewPdf formType = ", formType);
+    console.log("printPreviewPdf callFrom = ", callFrom);
+    console.log("printPreviewPdf transactions ==", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -567,14 +567,15 @@ export class ReportTypeService {
 
     if (form3xReportType === null)
     {
-      console.log("get backup object");
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log("backup object form3xReportType = ", form3xReportType);
+      console.log(" printPreviewPdf backup object form3xReportType = ", form3xReportType);
     }
     
     if (form3xReportType.hasOwnProperty('reportId')) {
+      console.log(" printPreviewPdf reportId found");
       formData.append('report_id', form3xReportType.reportId);
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
+      console.log(" printPreviewPdf reportid found");
       formData.append('report_id', form3xReportType.reportid);
     }
 
@@ -584,7 +585,8 @@ export class ReportTypeService {
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
         console.log(" printPreviewPdf transactions =", transactions);
-        formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
+        //formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
+        formData.append('transaction_id',  transactions.replace(' ',''));
       }
     }
 
@@ -601,8 +603,8 @@ export class ReportTypeService {
 
     let formData: FormData = new FormData();
 
-    console.log("printForm formType = ", formType);
-    console.log("transactions=", transactions);
+    console.log("prepare_json_builders_data formType = ", formType);
+    console.log("prepare_json_builders_data transactions=", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -610,21 +612,24 @@ export class ReportTypeService {
 
     if (form3xReportType === null)
     {
-      console.log("get backup object");
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log("backup object form3xReportType = ", form3xReportType);
+      console.log("prepare_json_builders_data backup object form3xReportType = ", form3xReportType);
     }
-    
+  
+  
     if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
+      console.log(" prepare_json_builders_data reportId found");
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
       formData.append('report_id', form3xReportType.reportid);
+      console.log(" printPreprepare_json_builders_dataviewPdf reportid found");
     }
 
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
-        console.log(" prepare_json_builders_data transactions =", transactions);
-        formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
+        console.log("prepare_json_builders_data transactions =", transactions);
+        //formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
+        formData.append('transaction_id',  transactions.replace(' ',''));
       }
     }
     return this._http
@@ -633,14 +638,17 @@ export class ReportTypeService {
       });
    }
 
-   public printPreview(formType: string, transactions?: string): void {
+   public printPreview(accessFrom: string, formType: string, transactions?: string): void {
     
-    this.signandSaveSubmitReport(formType,'Saved');
-    console.log("printPreview Data saved successfully...!");
-    console.log("transactions =", transactions);
+    if (accessFrom !=='transaction_table_screen') {
+      this.signandSaveSubmitReport(formType,'Saved');
+      console.log("printPreview Data saved successfully...!");
+      console.log("printPreview transactions =", transactions);
+    }
 
     if (typeof transactions === 'undefined') {
       console.log("No transactions data");
+      console.log("formType", formType);
       this.prepare_json_builders_data(formType)
       .subscribe( res => {
         if (res) {
@@ -670,6 +678,7 @@ export class ReportTypeService {
         });/*  */
     } else if (transactions !== 'undefined' && (transactions.length>0)) { 
       console.log("transactions data");
+      console.log("formType", formType);
       //var transactionsArray: Array<string> = transactions.split(",");
       this.prepare_json_builders_data(formType, transactions)
       .subscribe( res => {
