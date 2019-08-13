@@ -43,12 +43,17 @@
               name="electionDate"
               class="form-control"
               (change)="selectElectionDateChange($event)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === 0)"
+              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
             >
-            <option value="0" [selected]='specialReports === true && (selectedElectionState === null || selectedElectionState === 0)'>---</option>
-            <option *ngFor="let dateSelected of electionDates" [attr.data-startdate]="dateSelected.cvg_start_date"
-              [attr.data-enddate]="dateSelected.cvg_end_date" [attr.data-duedate]="dateSelected.due_date"
-              [selected]="selectedElectionDate === dateSelected.election_date" [value]="dateSelected.election_date">
+              <option value="0" [selected]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')">---</option>
+              <option
+                *ngFor="let dateSelected of electionDates"
+                [attr.data-startdate]="dateSelected.cvg_start_date"
+                [attr.data-enddate]="dateSelected.cvg_end_date"
+                [attr.data-duedate]="dateSelected.due_date"
+                [selected]="selectedElectionDate === dateSelected.election_date"
+                [value]="dateSelected.election_date"
+              >
                 {{ dateSelected.election_date | date: 'MM/dd/yyyy' }}
               </option>
             </select>
@@ -76,7 +81,7 @@
               class="form-control"
               [value]="fromDate"
               (change)="fromDateChange($event.target.value)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === 0)"
+              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
             />
           </div>
         </div>
@@ -102,7 +107,7 @@
               class="form-control"
               [value]="toDate"
               (change)="toDateChange($event.target.value)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === 0)"
+              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
             />
           </div>
         </div>

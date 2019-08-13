@@ -13,7 +13,6 @@ import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { ActiveView } from '../reportheader/reportheader.component';
 
-
 export interface GetReportsResponse {
   reports: reportModel[];
   totalreportsCount: number;
@@ -22,7 +21,6 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 export class ReportsService {
-
   // only for mock data
   // only for mock data
   // only for mock data
@@ -40,28 +38,22 @@ export class ReportsService {
   // only for mock data - end
   // only for mock data - end
 
-
   // May only be needed for mocking server
   private _orderByPipe: OrderByPipe;
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
 
-  constructor(
-    private _http: HttpClient,
-    private _cookieService: CookieService,
-  ) {
-    
+  constructor(private _http: HttpClient, private _cookieService: CookieService) {
     this._orderByPipe = new OrderByPipe();
     this._filterPipe = new FilterPipe();
     this._zipCodePipe = new ZipCodePipe();
     this._datePipe = new DatePipe('en-US');
   }
 
-
   public getFormTypes(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -70,18 +62,14 @@ export class ReportsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-       );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
   }
 
   public getReportTypes(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -90,17 +78,13 @@ export class ReportsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-       );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
   }
   public getStatuss(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -109,17 +93,13 @@ export class ReportsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-       );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
   }
   public getAmendmentIndicators(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -128,43 +108,40 @@ export class ReportsService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-       );
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
   }
 
-  public getReports(view: string, page: number, itemsPerPage: number,
-    sortColumnName: string, descending: boolean, filter: ReportFilterModel, reportId: number): Observable<any> {
-  const token: string = JSON.parse(this._cookieService.get('user'));
-  let httpOptions =  new HttpHeaders();
-  let params = new HttpParams();
-  
-  const url ='/f99/get_form99list';   
+  public getReports(
+    view: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filter: ReportFilterModel,
+    reportId: number
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
 
-  httpOptions = httpOptions.append('Content-Type', 'application/json');
-  httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-  
-  params = params.append('view', view);
-  params = params.append('reportId', reportId.toString());
+    const url = '/f99/get_form99list';
 
-  console.log("${environment.apiUrl}${url}", `${environment.apiUrl}${url}`);
-  
-  return this._http
-  .get(
-      `${environment.apiUrl}${url}`,
-      {
-        headers: httpOptions,
-        params 
-      }
-    );
-  
-  
-    }
-  
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('view', view);
+    params = params.append('reportId', reportId.toString());
+
+    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
   /**
    * Map server fields from the response to the model.
    */
@@ -174,7 +151,7 @@ export class ReportsService {
     }
 
     const modelArray: any = [];
-   
+
     for (const row of serverData) {
       const model = new reportModel({});
       model.form_type = row.form_type;
@@ -200,20 +177,16 @@ export class ReportsService {
    * @param descending
    */
   public sortReports(array: any, sortColumnName: string, descending: boolean) {
-
     const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
     return array;
-      
   }
 
-
-
-    /**
+  /**
    * Some data from the server is formatted for display in the UI.  Users will search
    * on the reformatted data.  For the search filter to work against the formatted data,
    * the server array must also contain the formatted data.  They will be added her.
-   * 
+   *
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
@@ -223,13 +196,11 @@ export class ReportsService {
     }
   }
 
-
   /**
    * This method handles filtering the transactions array and will be replaced
    * by a backend API.
    */
-  public mockApplyFilters(response: any, filters: ReportFilterModel){
-
+  public mockApplyFilters(response: any, filters: ReportFilterModel) {
     if (!response) {
       return;
     }
@@ -241,7 +212,7 @@ export class ReportsService {
     let isFilter = false;
 
     if (filters.filterForms) {
-       if (filters.filterForms.length > 0) {
+      if (filters.filterForms.length > 0) {
         isFilter = true;
         const fields = ['form_type'];
         let filteredformArray = [];
@@ -249,13 +220,12 @@ export class ReportsService {
           const filtered = this._filterPipe.transform(response.reports, fields, form);
           filteredformArray = filteredformArray.concat(filtered);
         }
-        response.reports= filteredformArray;
+        response.reports = filteredformArray;
       }
-      
     }
 
     if (filters.filterReports) {
-       if (filters.filterReports.length > 0) {
+      if (filters.filterReports.length > 0) {
         isFilter = true;
         const fields = ['report_type'];
         let filteredreportArray = [];
@@ -263,11 +233,10 @@ export class ReportsService {
           const filtered = this._filterPipe.transform(response.reports, fields, report);
           filteredreportArray = filteredreportArray.concat(filtered);
         }
-        response.reports= filteredreportArray;
-       }
-      
-    } 
-    
+        response.reports = filteredreportArray;
+      }
+    }
+
     if (filters.filterStatuss) {
       if (filters.filterStatuss.length > 0) {
         isFilter = true;
@@ -277,10 +246,9 @@ export class ReportsService {
           const filtered = this._filterPipe.transform(response.reports, fields, status);
           filteredStatusArray = filteredStatusArray.concat(filtered);
         }
-        response.reports= filteredStatusArray;
+        response.reports = filteredStatusArray;
       }
-      
-    }  
+    }
 
     if (filters.filterAmendmentIndicators) {
       if (filters.filterAmendmentIndicators.length > 0) {
@@ -291,11 +259,9 @@ export class ReportsService {
           const filtered = this._filterPipe.transform(response.reports, fields, AmendmentIndicator);
           filteredAmendmentArray = filteredAmendmentArray.concat(filtered);
         }
-        response.reports= filteredAmendmentArray;
+        response.reports = filteredAmendmentArray;
       }
-      
-    }  
-
+    }
 
     if (filters.filterCvgDateFrom && filters.filterCvgDateTo) {
       const cvgFromDate = new Date(filters.filterCvgDateFrom);
@@ -304,119 +270,130 @@ export class ReportsService {
       for (const rep of response.reports) {
         if (rep.cvg_start_date) {
           const repDate = new Date(rep.cvg_start_date);
-          if (repDate >= cvgFromDate &&
-            repDate <= cvgToDate) {
+          if (repDate >= cvgFromDate && repDate <= cvgToDate) {
             isFilter = true;
-          }
-          else { 
+          } else {
             isFilter = false;
           }
         }
 
-        if (isFilter){
+        if (isFilter) {
           if (rep.cvg_end_date) {
             const repDate = new Date(rep.cvg_end_date);
-            if (repDate >= cvgFromDate &&
-              repDate <= cvgToDate) {
+            if (repDate >= cvgFromDate && repDate <= cvgToDate) {
               isFilter = true;
-            }
-            else { 
+            } else {
               isFilter = false;
             }
           }
         }
 
-        if (isFilter){
-          filteredCvgDateArray.push(rep);    
+        if (isFilter) {
+          filteredCvgDateArray.push(rep);
         }
-
       }
       response.reports = filteredCvgDateArray;
     }
 
-    if (filters.filterFiledDateFrom && filters.filterFiledDateTo ) {
+    if (filters.filterFiledDateFrom && filters.filterFiledDateTo) {
       const filedFromDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateFrom));
-      const filedToDate =  this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
+      const filedToDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
-
-        if (rep.status==='Filed') {
+        if (rep.status === 'Filed') {
           if (rep.filed_date) {
-            let d= new Date(rep.filed_date);
-            d.setUTCHours(0,0,0,0);
-            const repDate =  this.getDateMMDDYYYYformat(d);
+            let d = new Date(rep.filed_date);
+            d.setUTCHours(0, 0, 0, 0);
+            const repDate = this.getDateMMDDYYYYformat(d);
 
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
-            }
-            else { 
+            } else {
               isFilter = false;
             }
-         }
-        }
-        else if (rep.status==='Saved') {
+          }
+        } else if (rep.status === 'Saved') {
           if (rep.last_update_date) {
             //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
-            let d= new Date(rep.last_update_date);
-            d.setUTCHours(0,0,0,0);
-            const repDate =  this.getDateMMDDYYYYformat(d);
+            let d = new Date(rep.last_update_date);
+            d.setUTCHours(0, 0, 0, 0);
+            const repDate = this.getDateMMDDYYYYformat(d);
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
-            }
-            else { 
+            } else {
               isFilter = false;
             }
-         }
+          }
         }
 
-        if (isFilter){
-          filteredFiledDateArray.push(rep);    
+        if (isFilter) {
+          filteredFiledDateArray.push(rep);
         }
       }
-      
+
       response.reports = filteredFiledDateArray;
     }
+  }
+  private getDateMMDDYYYYformat(dateValue: Date): string {
+    var year = dateValue.getUTCFullYear() + '';
+    var month = dateValue.getUTCMonth() + 1 + '';
+    var day = dateValue.getUTCDate() + '';
+    return month + day + year;
+  }
 
-    
-  }
-  private getDateMMDDYYYYformat(dateValue:Date):string{
-    var year = dateValue.getUTCFullYear()+"";
-    var month = (dateValue.getUTCMonth()+1)+"";
-    var day = dateValue.getUTCDate()+"";
-    return month + day  +year;
-  }
-  
   public getReportInfo(form_type: string, report_id: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
-    
-    
-    console.log("form_type =",form_type);
-    console.log("report_id =",report_id);
 
-    if (form_type==='F99'){
+    console.log('form_type =', form_type);
+    console.log('report_id =', report_id);
+
+    if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
-    } else if (form_type==='F3X'){
+    } else if (form_type === 'F3X') {
       url = '/core/get_report_info';
     }
-    
+
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     //params = params.append('committeeid', committee_id);
     params = params.append('reportid', report_id);
-    console.log ("params =", params);
-    console.log("${environment.apiUrl}${url} =",`${environment.apiUrl}${url}`);
+    console.log('params =', params);
+    console.log('${environment.apiUrl}${url} =', `${environment.apiUrl}${url}`);
 
-    return this._http
-     .get(
-        `${environment.apiUrl}${url}`,
-        {
+    if (form_type === 'F99') {
+      return this._http.get(`${environment.apiUrl}${url}`, {
+        headers: httpOptions,
+        params
+      });
+    } else {
+      return this._http
+        .get(`${environment.apiUrl}${url}`, {
           headers: httpOptions,
           params
-        }
-      )
+        })
+        .map((res: any[]) => {
+          // report_type in local storage is set in the report-type component.
+          // The field names and format must be in sync when report_type object is set in local
+          // storage by the report-detail. Any transformations should be done here.
+          if (res) {
+            if (Array.isArray(res)) {
+              const resp = res[0];
+              if (resp.hasOwnProperty('cvgstartdate')) {
+                resp.cvgStartDate = this._datePipe.transform(resp.cvgstartdate, 'MM/dd/yyyy');
+                delete resp.cvgstartdate;
+              }
+              if (resp.hasOwnProperty('cvgenddate')) {
+                resp.cvgEndDate = this._datePipe.transform(resp.cvgenddate, 'MM/dd/yyyy');
+                delete resp.cvgenddate;
+              }
+            }
+          }
+          return res;
+        });
+    }
   }
 }

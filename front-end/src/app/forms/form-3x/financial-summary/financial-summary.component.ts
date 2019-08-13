@@ -74,7 +74,7 @@ export class FinancialSummaryComponent implements OnInit {
 
   public printPreview(): void {
     console.log('FinancialSummaryComponent printPreview this._formType = ', this._formType);
-    this._reportTypeService.printPreview(this._formType);
+    this._reportTypeService.printPreview('financial_screen', this._formType);
   }
 
   public viewTransactions(): void {

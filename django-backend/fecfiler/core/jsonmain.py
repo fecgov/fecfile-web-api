@@ -370,14 +370,14 @@ def task_sched_a(request):
      #creating a JSON file so that it is handy for all the public API's   
     try:
         transaction_flag = False
-        transaction_id_list = []
         report_id = request.data.get('report_id')
         #import ipdb;ipdb.set_trace()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
         #comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username)
         if 'transaction_id' in request.data and request.data.get('transaction_id'):
             transaction_flag = True
-            transaction_id_list = request.data.get('transaction_id')
+            transaction_id_string = request.data.get('transaction_id')
+            transaction_id_list = transaction_id_string.split(',')
         comm_info = True
         if comm_info:
             committeeid = request.user.username
@@ -432,11 +432,11 @@ def task_sched_a(request):
                             response_dict_receipt['contributorMiddleName'] = ''
                             response_dict_receipt['contributorPrefix'] = ''
                             response_dict_receipt['contributorSuffix'] = ''
-                            response_dict_receipt['contributorStreet1 '] = ''
+                            response_dict_receipt['contributorStreet1'] = ''
                             response_dict_receipt['contributorStreet2'] = ''
                             response_dict_receipt['contributorCity'] = ''
                             response_dict_receipt['contributorState'] = ''
-                            response_dict_receipt['contributorZip'] = ''
+                            response_dict_receipt['contributorZipCode'] = ''
                             response_dict_receipt['electionCode'] =  entity_obj['election_code']
                             response_dict_receipt['election0therDescriptionle'] = entity_obj['election_other_description']
                             response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
@@ -466,11 +466,11 @@ def task_sched_a(request):
                             response_dict_receipt['contributorMiddleName'] = list_entity['middle_name']
                             response_dict_receipt['contributorPrefix'] = list_entity['prefix']
                             response_dict_receipt['contributorSuffix'] = list_entity['suffix']
-                            response_dict_receipt['contributorStreet1 '] = list_entity['street_1']
+                            response_dict_receipt['contributorStreet1'] = list_entity['street_1']
                             response_dict_receipt['contributorStreet2'] = list_entity['street_2']
                             response_dict_receipt['contributorCity'] = list_entity['city']
                             response_dict_receipt['contributorState'] = list_entity['state']
-                            response_dict_receipt['contributorZip'] = list_entity['zip_code']
+                            response_dict_receipt['contributorZipCode'] = list_entity['zip_code']
                             response_dict_receipt['electionCode'] =  entity_obj['election_code']
                             response_dict_receipt['election0therDescriptionle'] = entity_obj['election_other_description']
                             response_dict_receipt['contributionDate'] = datetime.strptime(entity_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
@@ -516,7 +516,7 @@ def task_sched_a(request):
                                     response_dict_out['payeeStreet2'] = ''
                                     response_dict_out['payeeCity'] = ''
                                     response_dict_out['payeeState'] = ''
-                                    response_dict_out['payeezip'] = ''
+                                    response_dict_out['payeeZipCode'] = ''
                                     response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                                     response_dict_out['expenditurePurposeDescription'] = entity_child_obj['expenditure_purpose']
@@ -558,7 +558,7 @@ def task_sched_a(request):
                                     response_dict_out['payeeStreet2'] = list_child_entity['street_2']
                                     response_dict_out['payeeCity'] = list_child_entity['city']
                                     response_dict_out['payeeState'] = list_child_entity['state']
-                                    response_dict_out['payeezip'] = list_child_entity['zip_code']
+                                    response_dict_out['payeeZipCode'] = list_child_entity['zip_code']
                                     response_dict_out['expenditureDate'] = datetime.strptime(entity_child_obj['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['expenditureAmount'] = round(entity_child_obj['expenditure_amount'],2)
                                     response_dict_out['contributionAggregate'] = round(entity_child_obj['aggregate_amt'],2)
@@ -609,11 +609,11 @@ def task_sched_a(request):
                                     response_dict_out['contributorMiddleName'] = ''
                                     response_dict_out['contributorPrefix'] = ''
                                     response_dict_out['contributorSuffix'] = ''
-                                    response_dict_out['contributorStreet1 '] = ''
+                                    response_dict_out['contributorStreet1'] = ''
                                     response_dict_out['contributorStreet2'] = ''
                                     response_dict_out['contributorCity'] = ''
                                     response_dict_out['contributorState'] = ''
-                                    response_dict_out['contributorZip'] = ''
+                                    response_dict_out['contributorZipCode'] = ''
                                     response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
                                     response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
@@ -640,11 +640,11 @@ def task_sched_a(request):
                                     response_dict_out['contributorMiddleName'] = list_child_entity['middle_name']
                                     response_dict_out['contributorPrefix'] = list_child_entity['prefix']
                                     response_dict_out['contributorSuffix'] = list_child_entity['suffix']
-                                    response_dict_out['contributorStreet1 '] = list_child_entity['street_1']
+                                    response_dict_out['contributorStreet1'] = list_child_entity['street_1']
                                     response_dict_out['contributorStreet2'] = list_child_entity['street_2']
                                     response_dict_out['contributorCity'] = list_child_entity['city']
                                     response_dict_out['contributorState'] = list_child_entity['state']
-                                    response_dict_out['contributorZip'] = list_child_entity['zip_code']
+                                    response_dict_out['contributorZipCode'] = list_child_entity['zip_code']
                                     response_dict_out['contributionDate'] =  datetime.strptime(entity_child_obj['contribution_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                                     response_dict_out['contributionAmount'] = round(entity_child_obj['contribution_amount'],2)
                                     response_dict_out['contributionAggregate'] = entity_child_obj['aggregate_amt']
@@ -684,7 +684,7 @@ def task_sched_a(request):
                             response_dict_receipt['payeeStreet2'] = ''
                             response_dict_receipt['payeeCity'] = ''
                             response_dict_receipt['payeeState'] = ''
-                            response_dict_receipt['payeezip'] = ''
+                            response_dict_receipt['payeeZipCode'] = ''
                             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
@@ -727,7 +727,7 @@ def task_sched_a(request):
                             response_dict_receipt['payeeStreet2'] = list_entity_b['street_2']
                             response_dict_receipt['payeeCity'] = list_entity_b['city']
                             response_dict_receipt['payeeState'] = list_entity_b['state']
-                            response_dict_receipt['payeezip'] = list_entity_b['zip_code']
+                            response_dict_receipt['payeeZipCode'] = list_entity_b['zip_code']
                             response_dict_receipt['expenditureDate'] = datetime.strptime(entity_obj_b['expenditure_date'].split('T')[0], '%Y-%m-%d').strftime('%m/%d/%Y')
                             response_dict_receipt['expenditureAmount'] = round(entity_obj_b['expenditure_amount'],2)
                             response_dict_receipt['contributionAggregate'] = round(entity_obj_b['aggregate_amt'],2)
@@ -808,11 +808,15 @@ def create_json_builders(request):
         report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         form_type = request.data.get('form_type')
+        if 'transaction_id' in request.data:
+            transaction_id = request.data.get('transaction_id')
+            print("transaction_id=", transaction_id)
+
         committeeid = request.user.username
 
-        print("report_id", report_id)
-        print("call_from", call_from)
-        print("committeeid", committeeid)
+        print("report_id=", report_id)
+        print("call_from=", call_from)
+        print("committeeid=", committeeid)
 
         data_obj = task_sched_a(request)
 

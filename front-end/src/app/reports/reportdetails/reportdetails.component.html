@@ -138,7 +138,7 @@
                 </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">
-                    {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss')}}
+                    {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
                 </td>
 
                 <td>

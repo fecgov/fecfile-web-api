@@ -26,18 +26,13 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    get_sched_b_transactions,
+)
 
-# Create your views here.
 logger = logging.getLogger(__name__)
 
-"""
-********************************************************************************************************************************
-SCHEDULE B TRANSACTION API - SCHED_B APP - SPRINT 10 - FNE 708 - BY PRAVEEN JINKA 
-********************************************************************************************************************************
-"""
-"""
-**************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
-"""
 
 # semi_annual_refund_bundled_amount remmoed from ths list but is still needed
 # you need to pass in a valid decimal value: this is valid until db change happens
@@ -45,12 +40,14 @@ list_mandatory_fields_schedB = [
     "report_id",
     "expenditure_date",
     "expenditure_amount",
-    "cmte_id",
-    "line_number",
-    "transaction_type",
+    "transaction_type_identifier",
+    "entity_type"
 ]
-# list_mandatory_fields_aggregate = ['transaction_type']
-# list_child_schedA = ['16']
+
+# a list of transactions with negative transaction_amount
+NEGATIVE_TRANSACTIONS = [
+    'OPEXP_VOID',
+]
 
 
 def get_next_transaction_id(trans_char):
@@ -108,10 +105,7 @@ def check_decimal(value):
     """
     check value is decimal data
     """
-
     try:
-        # if not value:
-        #     return None
         check_value = Decimal(value)
         return value
     except Exception as e:
@@ -120,11 +114,6 @@ def check_decimal(value):
                 value
             )
         )
-
-
-"""
-**************************************************** FUNCTIONS - MANDATORY FIELDS CHECK **********************************************************
-"""
 
 
 def check_mandatory_fields_SB(data, list_mandatory_fields):
@@ -148,11 +137,6 @@ def check_mandatory_fields_SB(data, list_mandatory_fields):
             )
     except:
         raise
-
-
-"""
-**************************************************** FUNCTIONS - SCHED B TRANSACTION - work to be done*************************************************************
-"""
 
 
 def post_sql_schedB(
@@ -231,73 +215,75 @@ def get_list_all_schedB(report_id, cmte_id):
     """
     get a list of all transactions with the same cmte_id and report_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET all rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+    return get_sched_b_transactions(report_id, cmte_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET all rows from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            if schedB_list is None:
-                raise NoOPError(
-                    "The Report id:{} does not have any schedB transactions".format(
-                        report_id
-                    )
-                )
-            merged_list = []
-            for dictB in schedB_list:
-                entity_id = dictB.get("entity_id")
-                data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                merged_dict = {**dictB, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id],
+    #         )
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         if schedB_list is None:
+    #             raise NoOPError(
+    #                 "The Report id:{} does not have any schedB transactions".format(
+    #                     report_id
+    #                 )
+    #             )
+    #         merged_list = []
+    #         for dictB in schedB_list:
+    #             entity_id = dictB.get("entity_id")
+    #             data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #             entity_list = get_entities(data)
+    #             dictEntity = entity_list[0]
+    #             merged_dict = {**dictB, **dictEntity}
+    #             merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def get_list_schedB(report_id, cmte_id, transaction_id):
     """
     get sched_b item for this transaction_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET single row from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+    return get_sched_b_transactions(report_id, cmte_id, transaction_id=transaction_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET single row from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id, transaction_id],
-            )
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id, transaction_id],
+    #         )
 
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            if schedB_list is None:
-                raise NoOPError(
-                    "The transaction id: {} does not exist or is deleted".format(
-                        transaction_id
-                    )
-                )
-            merged_list = []
-            for dictB in schedB_list:
-                entity_id = dictB.get("entity_id")
-                data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                merged_dict = {**dictB, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         if schedB_list is None:
+    #             raise NoOPError(
+    #                 "The transaction id: {} does not exist or is deleted".format(
+    #                     transaction_id
+    #                 )
+    #             )
+    #         merged_list = []
+    #         for dictB in schedB_list:
+    #             entity_id = dictB.get("entity_id")
+    #             data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #             entity_list = get_entities(data)
+    #             dictEntity = entity_list[0]
+    #             merged_dict = {**dictB, **dictEntity}
+    #             merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def get_list_child_schedB(report_id, cmte_id, transaction_id):
@@ -305,32 +291,33 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
     get all children sched_b items:
     back_ref_transaction_id == transaction_id
     """
-    try:
-        with connection.cursor() as cursor:
-            # GET child rows from schedB table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
-                            FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
+    return get_sched_b_transactions(report_id, cmte_id, back_ref_transaction_id=transaction_id)
+    # try:
+    #     with connection.cursor() as cursor:
+    #         # GET child rows from schedB table
+    #         query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, other_state, other_zip, nc_soft_account, transaction_type_identifier, create_date
+    #                         FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                [report_id, cmte_id, transaction_id],
-            )
+    #         cursor.execute(
+    #             """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+    #             [report_id, cmte_id, transaction_id],
+    #         )
 
-            for row in cursor.fetchall():
-                data_row = list(row)
-                schedB_list = data_row[0]
-            merged_list = []
-            if not (schedB_list is None):
-                for dictB in schedB_list:
-                    entity_id = dictB.get("entity_id")
-                    data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                    entity_list = get_entities(data)
-                    dictEntity = entity_list[0]
-                    merged_dict = {**dictB, **dictEntity}
-                    merged_list.append(merged_dict)
-        return merged_list
-    except Exception:
-        raise
+    #         for row in cursor.fetchall():
+    #             data_row = list(row)
+    #             schedB_list = data_row[0]
+    #         merged_list = []
+    #         if not (schedB_list is None):
+    #             for dictB in schedB_list:
+    #                 entity_id = dictB.get("entity_id")
+    #                 data = {"entity_id": entity_id, "cmte_id": cmte_id}
+    #                 entity_list = get_entities(data)
+    #                 dictEntity = entity_list[0]
+    #                 merged_dict = {**dictB, **dictEntity}
+    #                 merged_list.append(merged_dict)
+    #     return merged_list
+    # except Exception:
+    #     raise
 
 
 def put_sql_schedB(
@@ -367,7 +354,6 @@ def put_sql_schedB(
     """
     try:
         with connection.cursor() as cursor:
-            # Insert data into schedB table
             cursor.execute(
                 """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, expenditure_purpose = %s, category_code = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, beneficiary_cmte_id = %s, beneficiary_cand_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, other_state = %s, other_zip = %s, nc_soft_account = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                 [
@@ -400,7 +386,6 @@ def put_sql_schedB(
                     cmte_id,
                 ],
             )
-            # print(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} does not exist in schedB table".format(
@@ -450,11 +435,6 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
         raise
 
 
-"""
-**************************************************** API FUNCTIONS - SCHED B TRANSACTION *************************************************************
-"""
-
-
 def post_schedB(datum):
     """
     create and save current sched_b item
@@ -471,7 +451,6 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         entity_id = entity_data.get("entity_id")
-        print(entity_id)
         datum["entity_id"] = entity_id
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
@@ -632,12 +611,22 @@ def delete_schedB(data):
         raise
 
 
+def validate_negative_transaction(data):
+    """
+    validate transaction amount if negative transaction encounterred.
+    """
+    if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
+        if not float(data.get('expenditure_amount')) < 0:
+            raise Exception("current transaction amount need to be negative!")
+
+
 def schedB_sql_dict(data):
     """
     build a formulated data dictionary based on loaded 
     json and validate some field data
     """
     try:
+        validate_negative_transaction(data)
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
@@ -681,14 +670,13 @@ def schedB_sql_dict(data):
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
 
         }
+        if 'entity_id' in data and check_null_value(data.get('entity_id')):
+            datum['entity_id'] = data.get('entity_id')
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
         return datum
     except:
         raise
-
-
-"""
-***************************************************** SCHED B - POST API CALL STARTS HERE **********************************************************
-"""
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
@@ -702,13 +690,13 @@ def schedB(request):
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
+            # TODO: can report_id be 0? what does it mean?
             if not (check_null_value(request.data.get("report_id"))):
                 report_id = "0"
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum = schedB_sql_dict(request.data)
-            print(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             if "entity_id" in request.data and check_null_value(
@@ -758,9 +746,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    *********************************************** SCHED B - GET API CALL STARTS HERE **********************************************************
-    """
     # Get records from schedB table
     if request.method == "GET":
 
@@ -795,9 +780,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    ************************************************* SCHED B - PUT API CALL STARTS HERE **********************************************************
-    """
     # Modify a single record from schedB table
     if request.method == "PUT":
 
@@ -843,9 +825,6 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    """
-    ************************************************ SCHED B - DELETE API CALL STARTS HERE **********************************************************
-    """
     # Delete a single record from schedB table
     if request.method == "DELETE":
 
@@ -880,10 +859,3 @@ def schedB(request):
                 "The schedB API - DELETE is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-"""
-******************************************************************************************************************************
-END - SCHEDULE B TRANSACTIONS API - SCHED_B APP
-******************************************************************************************************************************
-"""

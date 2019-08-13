@@ -768,20 +768,7 @@ export class SignComponent implements OnInit {
             }
           );
         } else if (this.formType === '3X') {
-          this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
-          this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
-            res => {
-              if (res) {
-                if (res['results.pdf_url'] !== null) {
-                  console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-                  window.open(res.results.pdf_url, '_blank');
-                }
-              }
-            },
-            error => {
-              console.log('error: ', error);
-            }
-          ); /*  */
+          this._reportTypeService.printPreview('sign_and_submit', this.formType);
         }
       }
     } else {
@@ -797,20 +784,7 @@ export class SignComponent implements OnInit {
           }
         );
       } else if (this.formType === '3X') {
-        this._reportTypeService.signandSaveSubmitReport('3X', 'Saved');
-        this._reportTypeService.printPreviewPdf('3X', 'PrintPreviewPDF').subscribe(
-          res => {
-            if (res) {
-              if (res['results.pdf_url'] !== null) {
-                console.log("res['results.pdf_url'] = ", res['results.pdf_url']);
-                window.open(res.results.pdf_url, '_blank');
-              }
-            }
-          },
-          error => {
-            console.log('error: ', error);
-          }
-        ); /*  */
+        this._reportTypeService.printPreview('sign_and_submit', this.formType);
       }
     }
   }

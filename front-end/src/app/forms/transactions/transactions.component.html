@@ -1,4 +1,21 @@
 <div class="transactions__main-container">
+
+  <!-- <div *ngIf="routeData.accessedByRoute" class="form__sidebar">
+    <transaction-sidebar
+      [hidden]="isShowFilters"
+      [step]="step"
+      title="Transaction Categories new"
+      [transactionCategories]="transactionCategories"
+      (status)="onNotify($event)">
+    </transaction-sidebar>
+    <div class="transactions__sidebar_filters">
+      <app-transactions-filter [hidden]="!isShowFilters" 
+        title="Filters"
+        [formType]="formType">
+      </app-transactions-filter>
+    </div>
+  </div> -->
+
   <div class="transactions__container">
     <header>
       <div class="header-content">
@@ -190,13 +207,15 @@
         tableType="{{ recycleBinView }}"
       >
       </app-transactions-table>
-      <app-transactions-edit
-        *ngIf="isEditViewActive()"
-        [transactionToEdit]="transactionToEdit"
-        formType="{{ formType }}"
-        [reportId]="reportId"
+
+
+      <!-- <f3x-individual-receipt *ngIf="showEditTransaction"
+        [transactionTypeText]="'Test Child Component'"
+        [transactionType]="'INDV_REC'"
+        [scheduleAction]="'edit'"
       >
-      </app-transactions-edit>
+      </f3x-individual-receipt> -->
+
     </div>
   </div>
 </div>
