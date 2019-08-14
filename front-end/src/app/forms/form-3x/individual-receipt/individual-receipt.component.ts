@@ -66,6 +66,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
+  public entityTypes: any = [];
+  public selectedEntityType: any;
 
   private _formType: string = '';
   private _reportType: any = null;
@@ -86,6 +88,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
+  private _readOnlyMemoCode: boolean;
 
   constructor(
     private _http: HttpClient,
@@ -117,6 +120,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarnChild = null;
+    this.selectedEntityType = {
+      name: 'Individual',
+      code: 'IND',
+      group: 'ind-group',
+      selected: true
+    };
+    this._readOnlyMemoCode = false;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
@@ -209,6 +219,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   private _setForm(fields: any): void {
     const formGroup: any = [];
+    let memoCodeValue = null;
+    this._readOnlyMemoCode = false;
 
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
@@ -219,9 +231,26 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
+          // if (this.isFieldName(e.name, 'memo_code')) {
+          //   memoCodeValue = e.value;
+          //   if (memoCodeValue === this._memoCodeValue) {
+          //     this._readOnlyMemoCode = true;
+          //     const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
+          //     if (isChildForm) {
+          //       this.memoCodeChild = true;
+          //     } else {
+          //       this.memoCode = true;
+          //     }
+          //   }
+          // }
         });
       }
     });
+
+    // If the org type was provided by API, set the validations based on the default ORG type.
+    // if (this.selectedEntityType) {
+    //   this.handleEntityTypeChange(this.selectedEntityType, null);
+    // }
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
 
@@ -233,7 +262,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
 
     // get form data API is passing X for memo code value.
-    // Set it to null here until it is checked by user where it will be set to X.
+    // Set it to value from dynamic forms as some should be checked and disabled by default.
+    // this.frmIndividualReceipt.controls['memo_code'].setValue(memoCodeValue);
     this.frmIndividualReceipt.controls['memo_code'].setValue(null);
   }
 
@@ -506,11 +536,27 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
     if ($event.key) {
       const key = $event.key.toUpperCase();
-      if (key === 'TAB') {
+      if (
+        key === 'TAB' ||
+        key === 'ENTER' ||
+        key === 'SHIFT' ||
+        key === 'ALT' ||
+        key === 'CONTROL' ||
+        key === 'ARROWRIGHT' ||
+        key === 'CAPSLOCK' ||
+        key === 'PAGEUP' ||
+        key === 'PAGEDOWN' ||
+        key === 'ESCAPE' ||
+        key === 'ARROWUP' ||
+        key === 'ARROWLEFT' ||
+        key === 'ARROWDOWN'
+      ) {
         return;
       }
     }
     if (
+      col.name === 'last_name' ||
+      col.name === 'first_name' ||
       col.name === 'middle_name' ||
       col.name === 'prefix' ||
       col.name === 'suffix' ||
@@ -701,7 +747,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           // otherwise use the string value.  This is not desired and this patch
           // should be removed if the issue is resolved.
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
-          if (typeof typeAheadField !== 'string') {
+          if (typeAheadField && typeof typeAheadField !== 'string') {
             receiptObj[field] = typeAheadField[field];
           } else {
             receiptObj[field] = typeAheadField;
@@ -771,16 +817,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             this._contributionAggregateValue,
             '.2-2'
           );
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+
+          if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
+            this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+          }
 
           if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
             const contributionAggregateValueChild: string = this._decimalPipe.transform(
               this._contributionAggregateValueChild,
               '.2-2'
             );
-            this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
-              contributionAggregateValueChild
-            );
+            if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
+              this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
+                contributionAggregateValueChild);
+            }
           }
 
           this._formSubmitted = true;
@@ -810,6 +860,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Goes to the previous step.
    */
   public previousStep(): void {
+    this._clearFormValues();
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -836,7 +887,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    this._reportTypeService.printPreview('individual_receipt',this._formType);
+    this._reportTypeService.printPreview('individual_receipt', this._formType);
   }
 
   /**
@@ -1034,30 +1085,52 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       // Add the UI val for Contribution Amount to the Contribution Aggregate for the
       // Entity selected from the typeahead list.
 
-      let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
-      contributionAmount = contributionAmount ? contributionAmount : 0;
+      // TODO make this 1 method code for child/non-child with variable for the distinction
+      if (isChildForm) {
+        let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
 
-      // TODO remove this once orgs and committes have contrib aggregates > 0
-      // if (environment.name === 'local') {
-      //   res.contribution_aggregate = 999.99;
-      // }
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
 
-      // TODO make this a class variable for contributionAmountChange() to add to.
-      let contributionAggregate: string = String(res.contribution_aggregate);
-      contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
 
-      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-      const value: string = this._decimalPipe.transform(total, '.2-2');
+        console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
+            ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
 
-      console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
-          ${contributionAggregate} = ${total}`);
-      console.log(`value = ${value}`);
+        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
 
-      this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
+      } else {
+        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+        // Entity selected from the typeahead list.
 
-      // Store the entity aggregate to be added to the contribution amount
-      // if it changes in the UI.  See contributionAmountChange();
-      this._contributionAggregateValueChild = parseFloat(contributionAggregate);
+        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
+
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
+
+        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+            ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
+
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValue = parseFloat(contributionAggregate);
+      }
+
       // TODO need to handle child form apart from non-child
     });
   }
@@ -1271,10 +1344,141 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 this.titles = res.data.titles;
               }
             }
+            if (res.data.hasOwnProperty('entityTypes')) {
+              if (Array.isArray(res.data.entityTypes)) {
+                this.entityTypes = res.data.entityTypes;
+                if (this.entityTypes) {
+                  for (const field of this.entityTypes) {
+                    if (field.selected) {
+                      this.selectedEntityType = field;
+                      this.frmIndividualReceipt.patchValue(
+                        { entity_type: this.selectedEntityType.entityTypeDescription },
+                        { onlySelf: true }
+                      );
+                    }
+                  }
+                }
+              }
+            }
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
     });
+  }
+
+  // temp code for stubbing out OPEXP forms
+  private getFormFields__(): void {
+    console.log('get transaction type form fields ' + this.transactionType);
+    if (this.transactionType === 'OPEXP') {
+      this._receiptService.getOpexpMockData().subscribe((res: any) => {
+        if (res) {
+          if (res.hasOwnProperty('data')) {
+            if (typeof res.data === 'object') {
+              if (res.data.hasOwnProperty('formFields')) {
+                if (Array.isArray(res.data.formFields)) {
+                  this.formFields = res.data.formFields;
+
+                  this._setForm(this.formFields);
+                }
+              }
+              if (res.data.hasOwnProperty('hiddenFields')) {
+                if (Array.isArray(res.data.hiddenFields)) {
+                  this.hiddenFields = res.data.hiddenFields;
+                }
+              }
+              if (res.data.hasOwnProperty('states')) {
+                if (Array.isArray(res.data.states)) {
+                  this.states = res.data.states;
+                }
+              }
+              if (res.data.hasOwnProperty('titles')) {
+                if (Array.isArray(res.data.titles)) {
+                  this.titles = res.data.titles;
+                }
+              }
+              if (res.data.hasOwnProperty('orgTypes')) {
+                if (Array.isArray(res.data.orgTypes)) {
+                  this.entityTypes = res.data.orgTypes;
+                  if (this.entityTypes) {
+                    for (const field of this.entityTypes) {
+                      if (field.selected) {
+                        this.selectedEntityType = field;
+                        this.frmIndividualReceipt.patchValue(
+                          { entity_type: this.selectedEntityType.entityTypeDescription },
+                          { onlySelf: true }
+                        );
+                      }
+                    }
+                  }
+                }
+              }
+            } // typeof res.data
+          } // res.hasOwnProperty('data')
+        } // res
+      });
+    } else {
+      this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+        if (res) {
+          if (res.hasOwnProperty('data')) {
+            if (typeof res.data === 'object') {
+              if (res.data.hasOwnProperty('formFields')) {
+                if (Array.isArray(res.data.formFields)) {
+                  this.formFields = res.data.formFields;
+
+                  this._setForm(this.formFields);
+                }
+              }
+              if (res.data.hasOwnProperty('hiddenFields')) {
+                if (Array.isArray(res.data.hiddenFields)) {
+                  this.hiddenFields = res.data.hiddenFields;
+                }
+              }
+              if (res.data.hasOwnProperty('states')) {
+                if (Array.isArray(res.data.states)) {
+                  this.states = res.data.states;
+                }
+              }
+              if (res.data.hasOwnProperty('titles')) {
+                if (Array.isArray(res.data.titles)) {
+                  this.titles = res.data.titles;
+                }
+              }
+            } // typeof res.data
+          } // res.hasOwnProperty('data')
+        } // res
+      });
+    }
+  }
+
+  public handleEntityTypeChange(entityTypeCode: any, col: any, entityType: any) {
+    for (const entityTypeObj of this.entityTypes) {
+      if (entityTypeObj.entityType === entityTypeCode) {
+        entityTypeObj.selected = true;
+        this.selectedEntityType = entityTypeObj;
+        this.frmIndividualReceipt.patchValue({ entity_type: entityTypeCode }, { onlySelf: true });
+      } else {
+        entityTypeObj.selected = false;
+      }
+    }
+
+    // set validations based on the selected org type
+    if (this.selectedEntityType.group === 'org-group') {
+      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
+      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
+      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+
+      this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+    } else {
+      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+
+      this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
+      this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+    }
   }
 
   private _populateFormForEditOrView(editOrView: any) {
@@ -1348,12 +1552,47 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
 
-    if (formData.memoCode) {
+    if (formData.memoCode === this._memoCodeValue) {
       this.memoCode = true;
       this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
     }
 
+    if (formData['child*memoCode'] === this._memoCodeValue) {
+      this.memoCode = true;
+      this.frmIndividualReceipt.patchValue({ 'child*memo_code': this._memoCodeValue }, { onlySelf: true });
+    }
+
     this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
+  }
+
+  /**
+   * Determine if the field should be shown when the org type is toggled.
+   */
+  public isToggleShow(col: any) {
+    if (!this.selectedEntityType) {
+      return true;
+    }
+    if (!col.toggle) {
+      return true;
+    }
+    if (this.selectedEntityType.group === col.entityGroup || !col.entityGroup) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public isMemoCodeReadOnly(fieldName: string) {
+    if (this.isFieldName(fieldName, 'memo_code')) {
+      if (this._readOnlyMemoCode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private _clearFormValues(): void {
+    this.frmIndividualReceipt.reset();
   }
 }
