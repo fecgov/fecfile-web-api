@@ -120,7 +120,6 @@ def get_data_details(report_id, cmte_id):
     except Exception:
         raise
 
-
 def get_f3x_summary_details(report_id, cmte_id):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -217,7 +216,7 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
 			query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(DB_table)
 		query_values_list = [report_id, cmte_id]
 		result = json_query(query, query_values_list, DB_table, True)
-		print(result)
+		# print(result)
 		return result
 	except Exception as e:
 		raise Exception('The get_transaction_type_identifier function is raising the following error: ' + str(e))
@@ -228,18 +227,18 @@ def get_schedules_for_form_type(form_type):
 		query_values_list = [form_type]
 		error_string = "forms_and_schedules"
 		result = json_query(query, query_values_list, error_string, False)
-		print(result)
+		# print(result)
 		return result
 	except Exception as e:
 		raise Exception('The get_schedules_for_form_type function is raising the following error: ' + str(e))
 
-def get_child_identifer(identifier):
+def get_child_identifer(identifier, form_type):
 	try:
-		query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s ORDER BY p.line_num,p.ref_tran_id"""
-		query_values_list = [identifier]
+		query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+		query_values_list = [identifier, form_type]
 		error_string = "ref_transaction_types"
 		result = json_query(query, query_values_list, error_string, True)
-		print(result)
+		# print(result)
 		return result
 	except Exception as e:
 		raise Exception('The get_child_identifer function is raising the following error:' + str(e))
@@ -269,14 +268,14 @@ def create_json_builders(request):
             transaction_flag = True
             transaction_id_string = request.data.get('transaction_id')
             transaction_id_list = transaction_id_string.split(',')
-
         # Populating output json with header and data values
         output['header'] = get_header_details()
         output['data'] = get_data_details(report_id, cmte_id)
         # Figuring out the form type
-        form_type = FORMTYPE_FORM_DICT.get(output.get('data').get('formType'))
+        form_type = output.get('data').get('formType')
+        full_form_type = FORMTYPE_FORM_DICT.get(form_type)
         # Figuring out what schedules are to be checked for the form type
-        schedule_name_list = get_schedules_for_form_type(form_type)
+        schedule_name_list = get_schedules_for_form_type(full_form_type)
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [{'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}]        
@@ -293,7 +292,7 @@ def create_json_builders(request):
             	list_identifier = get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id_list)
             	for identifier in list_identifier:
             		identifier = identifier.get('transaction_type_identifier')
-            		child_identifier_list = get_child_identifer(identifier)
+            		child_identifier_list = get_child_identifer(identifier, form_type)
             		# SQL QUERY to get all transactions of the specific identifier
             		if identifier:
 	                    parent_transactions = get_transactions(identifier, report_id, cmte_id, None, transaction_id_list)
@@ -303,7 +302,7 @@ def create_json_builders(request):
 	                            	child_identifier = child_identifier.get('tran_identifier')
 	                            	if child_identifier:
 		                            	child_transactions = get_transactions(child_identifier, report_id, cmte_id, transaction.get('transactionId'), transaction_id_list)
-		                            	print(child_transactions)
+		                            	# print(child_transactions)
 		                            	if child_transactions:
 		                                    if 'child' in transaction:
 		                                        transaction['child'].extend(child_transactions)
@@ -357,7 +356,7 @@ def create_json_builders(request):
             dictprint = resp.json()
             return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response("The create_json_builders is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("The create_json_builders is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
 def sample_sql_generate(request):
@@ -387,9 +386,9 @@ WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_
 			INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-		# file = open("/tmp/indv_rec_sql.sql", 'w')
-		# file.write(INDV_REC_STRING)
-		# file.close()
+		file = open("/tmp/indv_rec_sql.sql", 'w')
+		file.write(INDV_REC_STRING)
+		file.close()
 
 		list_SA_similar_PAR_CON_transactionTypeCode = ["PARTN_REC", "TRIB_REC", "TRIB_NP_RECNT_ACC", "TRIB_NP_HQ_ACC", "TRIB_NP_CONVEN_ACC", 
 														"BUS_LAB_NON_CONT_ACC", "JF_TRAN_TRIB_MEMO", "JF_TRAN_NP_RECNT_TRIB_MEMO", "JF_TRAN_NP_CONVEN_TRIB_MEMO", 
@@ -413,9 +412,9 @@ WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_
 			PAR_CON_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-		# file = open("/tmp/par_con_sql.sql", 'w')
-		# file.write(PAR_CON_STRING)
-		# file.close()
+		file = open("/tmp/par_con_sql.sql", 'w')
+		file.write(PAR_CON_STRING)
+		file.close()
 
 		list_SA_similar_COND_EARM_PAC_transactionTypeIdentifier = ["EAR_MEMO", "PAC_CON_EAR_UNDEP", "PAC_CON_EAR_DEP", "PAC_EAR_REC", "PAC_EAR_MEMO", "PARTY_IK_REC", "PAC_IK_REC", "PARTY_REC", 
 														            "PAC_REC", "PAC_NON_FED_REC", "PAC_NON_FED_RET", "PAC_RET", "PARTY_RET", "TRAN", "PARTY_RECNT_REC", "PAC_RECNT_REC", 
@@ -444,9 +443,9 @@ WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_
 			COND_EARM_PAC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-		# file = open("/tmp/con_earm_sql.sql", 'w')
-		# file.write(COND_EARM_PAC_STRING)
-		# file.close()
+		file = open("/tmp/con_earm_sql.sql", 'w')
+		file.write(COND_EARM_PAC_STRING)
+		file.close()
 
 		list_SA_similar_OFFSET = ["OFFSET_TO_OPEX"]		
 		list_SA_similar_REF_FED_CAN = ["REF_TO_FED_CAN"]
@@ -536,9 +535,9 @@ WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_
 			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-		# file = open("/tmp/sa_oth_sql.sql", 'w')
-		# file.write(SA_OTHER_STRING)
-		# file.close()
+		file = open("/tmp/sa_oth_sql.sql", 'w')
+		file.write(SA_OTHER_STRING)
+		file.close()
 
 		list_SB_similar_IK_OUT = ["IK_OUT"]
 		list_SB_similar_IK_TF_OUT = ["IK_TRAN_OUT", "IK_TRAN_FEA_OUT"]
@@ -636,7 +635,10 @@ WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_
 			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-		# file = open("/tmp/sb_sa_child_sql.sql", 'w')
+		file = open("/tmp/sb_sa_child_sql.sql", 'w')
+		file.write(SB_SA_CHILD_STRING)
+		file.close()
+
 		file = open("/tmp/SA_sql.sql", 'w')
 		file.write(INDV_REC_STRING)
 		file.write(SB_SA_CHILD_STRING)
