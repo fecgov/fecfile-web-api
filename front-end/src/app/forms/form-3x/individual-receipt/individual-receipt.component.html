@@ -249,6 +249,7 @@
                     </div>
                   </ng-container>
                   <ng-container *ngIf="col?.type === 'checkbox'">
+                      <!-- [attr.disabled]="isMemoCodeReadOnly(col?.name)" -->
                     <input
                       class="form-control forms__big_checkbox"
                       [style.width]="col?.width"
@@ -256,7 +257,6 @@
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"
                       [attr.value]="col?.value"
-                      [attr.disabled]="isMemoCodeReadOnly(col?.name)"
                       [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                       [formControlName]="col?.name"
                       (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
@@ -297,8 +297,8 @@
                   </ng-container>
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
-                      (change)="handleOrgTypeChange($event, col)"
-                      class="org-type-select"
+                      (change)="handleEntityTypeChange($event, col)"
+                      class="entity-type-select"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -307,8 +307,8 @@
                           : ''
                       "
                     >
-                      <ng-option *ngFor="let item of orgTypes" value="{{item.code}}">
-                        {{item.name}}
+                      <ng-option *ngFor="let entityType of entityTypes" value="{{entityType.entityType}}">
+                        {{entityType.entityTypeDescription}}
                       </ng-option>
                     </ng-select>
                   </ng-container>                
