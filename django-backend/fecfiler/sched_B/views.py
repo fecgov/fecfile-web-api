@@ -47,6 +47,10 @@ list_mandatory_fields_schedB = [
 # a list of transactions with negative transaction_amount
 NEGATIVE_TRANSACTIONS = [
     'OPEXP_VOID',
+    'CONT_TO_OTH_CMTE_VOID',
+    'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID',
+
+
 ]
 
 
