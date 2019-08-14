@@ -66,8 +66,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
-  public orgTypes: any = [];
-  public selectedOrgType: any;
+  public entityTypes: any = [];
+  public selectedEntityType: any;
 
   private _formType: string = '';
   private _reportType: any = null;
@@ -120,7 +120,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarnChild = null;
-    this.selectedOrgType = {
+    this.selectedEntityType = {
       name: 'Individual',
       code: 'IND',
       group: 'ind-group',
@@ -220,6 +220,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _setForm(fields: any): void {
     const formGroup: any = [];
     let memoCodeValue = null;
+    this._readOnlyMemoCode = false;
 
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
@@ -230,24 +231,25 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
-          if (this.isFieldName(e.name, 'memo_code')) {
-            memoCodeValue = e.value;
-            this._readOnlyMemoCode = true;
-
-            const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
-            if (isChildForm) {
-              this.memoCodeChild = true;
-            } else {
-              this.memoCode = true;
-            }
-          }
+          // if (this.isFieldName(e.name, 'memo_code')) {
+          //   memoCodeValue = e.value;
+          //   if (memoCodeValue === this._memoCodeValue) {
+          //     this._readOnlyMemoCode = true;
+          //     const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
+          //     if (isChildForm) {
+          //       this.memoCodeChild = true;
+          //     } else {
+          //       this.memoCode = true;
+          //     }
+          //   }
+          // }
         });
       }
     });
 
     // If the org type was provided by API, set the validations based on the default ORG type.
-    // if (this.selectedOrgType) {
-    //   this.handleOrgTypeChange(this.selectedOrgType, null);
+    // if (this.selectedEntityType) {
+    //   this.handleEntityTypeChange(this.selectedEntityType, null);
     // }
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
@@ -261,7 +263,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     // get form data API is passing X for memo code value.
     // Set it to value from dynamic forms as some should be checked and disabled by default.
-    this.frmIndividualReceipt.controls['memo_code'].setValue(memoCodeValue);
+    // this.frmIndividualReceipt.controls['memo_code'].setValue(memoCodeValue);
+    this.frmIndividualReceipt.controls['memo_code'].setValue(null);
   }
 
   /**
@@ -533,19 +536,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
     if ($event.key) {
       const key = $event.key.toUpperCase();
-      if (key === 'TAB' ||
-          key === 'ENTER' ||
-          key === 'SHIFT' ||
-          key === 'ALT' ||
-          key === 'CONTROL' ||
-          key === 'ARROWRIGHT' ||
-          key === 'CAPSLOCK' ||
-          key === 'PAGEUP' ||
-          key === 'PAGEDOWN' ||
-          key === 'ESCAPE' ||
-          key === 'ARROWUP' ||
-          key === 'ARROWLEFT' ||
-          key === 'ARROWDOWN') {
+      if (
+        key === 'TAB' ||
+        key === 'ENTER' ||
+        key === 'SHIFT' ||
+        key === 'ALT' ||
+        key === 'CONTROL' ||
+        key === 'ARROWRIGHT' ||
+        key === 'CAPSLOCK' ||
+        key === 'PAGEUP' ||
+        key === 'PAGEDOWN' ||
+        key === 'ESCAPE' ||
+        key === 'ARROWUP' ||
+        key === 'ARROWLEFT' ||
+        key === 'ARROWDOWN'
+      ) {
         return;
       }
     }
@@ -812,16 +817,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             this._contributionAggregateValue,
             '.2-2'
           );
-          this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+
+          if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
+            this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+          }
 
           if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
             const contributionAggregateValueChild: string = this._decimalPipe.transform(
               this._contributionAggregateValueChild,
               '.2-2'
             );
-            this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
-              contributionAggregateValueChild
-            );
+            if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
+              this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
+                contributionAggregateValueChild);
+            }
           }
 
           this._formSubmitted = true;
@@ -851,6 +860,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Goes to the previous step.
    */
   public previousStep(): void {
+    this._clearFormValues();
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -1334,15 +1344,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 this.titles = res.data.titles;
               }
             }
-            if (res.data.hasOwnProperty('orgTypes')) {
-              if (Array.isArray(res.data.orgTypes)) {
-                this.orgTypes = res.data.orgTypes;
-                if (this.hiddenFields) {
-                  for (const field of this.orgTypes) {
+            if (res.data.hasOwnProperty('entityTypes')) {
+              if (Array.isArray(res.data.entityTypes)) {
+                this.entityTypes = res.data.entityTypes;
+                if (this.entityTypes) {
+                  for (const field of this.entityTypes) {
                     if (field.selected) {
-                      this.selectedOrgType = field;
+                      this.selectedEntityType = field;
                       this.frmIndividualReceipt.patchValue(
-                        { org_type: this.selectedOrgType.name },
+                        { entity_type: this.selectedEntityType.entityTypeDescription },
                         { onlySelf: true }
                       );
                     }
@@ -1388,13 +1398,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
               }
               if (res.data.hasOwnProperty('orgTypes')) {
                 if (Array.isArray(res.data.orgTypes)) {
-                  this.orgTypes = res.data.orgTypes;
-                  if (this.hiddenFields) {
-                    for (const field of this.orgTypes) {
+                  this.entityTypes = res.data.orgTypes;
+                  if (this.entityTypes) {
+                    for (const field of this.entityTypes) {
                       if (field.selected) {
-                        this.selectedOrgType = field;
+                        this.selectedEntityType = field;
                         this.frmIndividualReceipt.patchValue(
-                          { org_type: this.selectedOrgType.name },
+                          { entity_type: this.selectedEntityType.entityTypeDescription },
                           { onlySelf: true }
                         );
                       }
@@ -1440,19 +1450,19 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
   }
 
-  public handleOrgTypeChange(orgCode: any, col: any) {
-    for (const orgType of this.orgTypes) {
-      if (orgType.code === orgCode) {
-        orgType.selected = true;
-        this.selectedOrgType = orgType;
-        this.frmIndividualReceipt.patchValue({ org_type: orgCode }, { onlySelf: true });
+  public handleEntityTypeChange(entityTypeCode: any, col: any, entityType: any) {
+    for (const entityTypeObj of this.entityTypes) {
+      if (entityTypeObj.entityType === entityTypeCode) {
+        entityTypeObj.selected = true;
+        this.selectedEntityType = entityTypeObj;
+        this.frmIndividualReceipt.patchValue({ entity_type: entityTypeCode }, { onlySelf: true });
       } else {
-        orgType.selected = false;
+        entityTypeObj.selected = false;
       }
     }
 
     // set validations based on the selected org type
-    if (this.selectedOrgType.group === 'org-group') {
+    if (this.selectedEntityType.group === 'org-group') {
       this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
       this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
       this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
@@ -1542,9 +1552,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ contribution_amount: formData.amount }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: formData.aggregate }, { onlySelf: true });
 
-    if (formData.memoCode) {
+    if (formData.memoCode === this._memoCodeValue) {
       this.memoCode = true;
       this.frmIndividualReceipt.patchValue({ memo_code: this._memoCodeValue }, { onlySelf: true });
+    }
+
+    if (formData['child*memoCode'] === this._memoCodeValue) {
+      this.memoCode = true;
+      this.frmIndividualReceipt.patchValue({ 'child*memo_code': this._memoCodeValue }, { onlySelf: true });
     }
 
     this.frmIndividualReceipt.patchValue({ purpose_description: formData.purposeDescription }, { onlySelf: true });
@@ -1555,13 +1570,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Determine if the field should be shown when the org type is toggled.
    */
   public isToggleShow(col: any) {
-    if (!this.selectedOrgType) {
+    if (!this.selectedEntityType) {
       return true;
     }
     if (!col.toggle) {
       return true;
     }
-    if (this.selectedOrgType.group === col.entityGroup || !col.entityGroup) {
+    if (this.selectedEntityType.group === col.entityGroup || !col.entityGroup) {
       return true;
     } else {
       return false;
@@ -1575,5 +1590,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       }
     }
     return false;
+  }
+
+  private _clearFormValues(): void {
+    this.frmIndividualReceipt.reset();
   }
 }
