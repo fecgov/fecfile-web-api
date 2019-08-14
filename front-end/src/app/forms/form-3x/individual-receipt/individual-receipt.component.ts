@@ -1507,20 +1507,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ memo_text: formData.memoText }, { onlySelf: true });
   }
 
-  public isToggleShowLabel(col: any) {
-    if (!this.selectedOrgType) {
-      return true;
-    }
-    if (!col.toggle) {
-      return true;
-    }
-    if (this.selectedOrgType.group === col.orgGroup) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
+  /**
+   * Determine if the field should be shown when the org type is toggled.
+   */
   public isToggleShow(col: any) {
     if (!this.selectedOrgType) {
       return true;
@@ -1528,7 +1517,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (!col.toggle) {
       return true;
     }
-    if (this.selectedOrgType.group === col.orgGroup) {
+    if (this.selectedOrgType.group === col.orgGroup || !col.orgGroup) {
       return true;
     } else {
       return false;

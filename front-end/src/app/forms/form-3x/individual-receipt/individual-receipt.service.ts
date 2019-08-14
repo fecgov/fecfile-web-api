@@ -340,8 +340,9 @@ export class IndividualReceiptService {
                        "infoText":null,
                        "name":"org_type",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"select",
-                       "value": null,
+                       "value":null,
                        "scroll":false,
                        "height":"30px",
                        "width":"98px",
@@ -358,25 +359,25 @@ export class IndividualReceiptService {
                  "seperator":false,
                  "cols":[  
                     {  
-                      "inputGroup":false,
-                      "inputIcon":"",
-                      "text":"Organization Name",
-                      "infoIcon":false,
-                      "infoText":null,
-                      "name":"entity_name",
-                      "toggle":true,
-                      "orgGroup":"org-group",
-                      "type":"text",
-                      "value":null,
-                      "scroll":false,
-                      "height":"30px",
-                      "width":"197px",
-                      "validation":{  
-                        "required":true,
-                        "max":200,
-                        "alphaNumeric":true
-                      }
-                  },
+                       "inputGroup":false,
+                       "inputIcon":"",
+                       "text":"Organization Name",
+                       "infoIcon":false,
+                       "infoText":null,
+                       "name":"entity_name",
+                       "toggle":true,
+                       "orgGroup":"org-group",
+                       "type":"text",
+                       "value":null,
+                       "scroll":false,
+                       "height":"30px",
+                       "width":"197px",
+                       "validation":{  
+                          "required":true,
+                          "max":200,
+                          "alphaNumeric":true
+                       }
+                    },
                     {  
                        "inputGroup":false,
                        "inputIcon":"",
@@ -440,52 +441,52 @@ export class IndividualReceiptService {
                  ]
               },
               {  
-                "childForm":false,
-                "childFormTitle":null,
-                "colClassName":"col col-md-4",
-                "seperator":true,
-                "cols":[  
-                   {  
-                      "inputGroup":false,
-                      "inputIcon":"",
-                      "text":"Prefix",
-                      "infoIcon":false,
-                      "infoText":null,
-                      "name":"prefix",
-                      "orgGroup":"ind-group",
-                      "toggle":true,
-                      "type":"text",
-                      "value":null,
-                      "scroll":false,
-                      "height":"30px",
-                      "width":"98.35px",
-                      "validation":{  
-                         "required":false,
-                         "max":10,
-                         "alphaNumeric":true
-                      }
-                   },
-                   {  
-                      "inputGroup":false,
-                      "inputIcon":"",
-                      "text":"Suffix",
-                      "infoIcon":false,
-                      "infoText":null,
-                      "name":"suffix",
-                      "orgGroup":"ind-group",
-                      "toggle":true,
-                      "type":"text",
-                      "value":null,
-                      "scroll":false,
-                      "height":"30px",
-                      "width":"98.35px",
-                      "validation":{  
-                         "required":false,
-                         "max":10,
-                         "alphaNumeric":true
-                      }
-                   }
-                ]
+                 "childForm":false,
+                 "childFormTitle":null,
+                 "colClassName":"col col-md-4",
+                 "seperator":true,
+                 "cols":[  
+                    {  
+                       "inputGroup":false,
+                       "inputIcon":"",
+                       "text":"Prefix",
+                       "infoIcon":false,
+                       "infoText":null,
+                       "name":"prefix",
+                       "orgGroup":"ind-group",
+                       "toggle":true,
+                       "type":"text",
+                       "value":null,
+                       "scroll":false,
+                       "height":"30px",
+                       "width":"98.35px",
+                       "validation":{  
+                          "required":false,
+                          "max":10,
+                          "alphaNumeric":true
+                       }
+                    },
+                    {  
+                       "inputGroup":false,
+                       "inputIcon":"",
+                       "text":"Suffix",
+                       "infoIcon":false,
+                       "infoText":null,
+                       "name":"suffix",
+                       "orgGroup":"ind-group",
+                       "toggle":true,
+                       "type":"text",
+                       "value":null,
+                       "scroll":false,
+                       "height":"30px",
+                       "width":"98.35px",
+                       "validation":{  
+                          "required":false,
+                          "max":10,
+                          "alphaNumeric":true
+                       }
+                    }
+                 ]
               },
               {  
                  "childForm":false,
@@ -499,8 +500,9 @@ export class IndividualReceiptService {
                        "text":"Street 1",
                        "infoIcon":false,
                        "infoText":null,
-                       "name":"street_1",                       
+                       "name":"street_1",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":false,
@@ -520,6 +522,7 @@ export class IndividualReceiptService {
                        "infoText":null,
                        "name":"street_2",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":false,
@@ -547,6 +550,7 @@ export class IndividualReceiptService {
                        "infoText":null,
                        "name":"city",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":false,
@@ -566,6 +570,7 @@ export class IndividualReceiptService {
                        "infoText":null,
                        "name":"state",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"select",
                        "value":null,
                        "scroll":false,
@@ -585,6 +590,7 @@ export class IndividualReceiptService {
                        "infoText":null,
                        "name":"zip_code",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":false,
@@ -612,6 +618,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"contribution_date",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"date",
                        "value":null,
                        "scroll":false,
@@ -639,6 +646,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"contribution_amount",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":false,
@@ -658,6 +666,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"contribution_aggregate",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":"0.00",
                        "scroll":false,
@@ -677,6 +686,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"memo_code",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"checkbox",
                        "value":"X",
                        "scroll":false,
@@ -704,6 +714,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"purpose_description",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":true,
@@ -723,6 +734,7 @@ export class IndividualReceiptService {
                        "infoText":"Request language from RAD",
                        "name":"memo_text",
                        "toggle":false,
+               "orgGroup":null,
                        "type":"text",
                        "value":null,
                        "scroll":true,
@@ -774,10 +786,10 @@ export class IndividualReceiptService {
                  "value":"15"
               },
               {  
-                "type":"hidden",
-                "name":"default_org_type",
-                "value":"Individual"
-              }              
+                 "type":"hidden",
+                 "name":"default_org_type",
+                 "value":"Individual"
+              }
            ],
            "orgTypes":[  
               {  
@@ -787,11 +799,11 @@ export class IndividualReceiptService {
                  "selected":true
               },
               {  
-                "name":"Candidate",
-                "code":"CAN",
-                "group":"ind-group",
-                "selected":false
-              },              
+                 "name":"Candidate",
+                 "code":"CAN",
+                 "group":"ind-group",
+                 "selected":false
+              },
               {  
                  "name":"Organization",
                  "code":"ORG",
