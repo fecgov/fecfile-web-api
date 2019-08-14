@@ -128,6 +128,7 @@
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName"
                         (selectItem)="handleSelectedItem($event)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
                         *ngIf="col?.name === 'first_name'"
@@ -150,6 +151,7 @@
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName"
                         (selectItem)="handleSelectedItem($event)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
                         *ngIf="isFieldName(col?.name, 'entity_name')"
@@ -254,6 +256,7 @@
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"
                       [attr.value]="col?.value"
+                      [attr.disabled]="isMemoCodeReadOnly(col?.name)"
                       [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                       [formControlName]="col?.name"
                       (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
@@ -292,7 +295,7 @@
                       </ng-option>
                     </ng-select>
                   </ng-container>
-                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'org_type')">  
+                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
                       (change)="handleOrgTypeChange($event, col)"
                       class="org-type-select"

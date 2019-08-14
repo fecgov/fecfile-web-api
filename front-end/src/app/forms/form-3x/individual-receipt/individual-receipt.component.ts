@@ -88,6 +88,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
+  private _readOnlyMemoCode: boolean;
 
   constructor(
     private _http: HttpClient,
@@ -125,6 +126,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       group: 'ind-group',
       selected: true
     };
+    this._readOnlyMemoCode = false;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
@@ -217,6 +219,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   private _setForm(fields: any): void {
     const formGroup: any = [];
+    let memoCodeValue = null;
 
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
@@ -225,6 +228,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           if (this.isFieldName(e.name, 'contribution_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
+            }
+          }
+          if (this.isFieldName(e.name, 'memo_code')) {
+            memoCodeValue = e.value;
+            this._readOnlyMemoCode = true;
+
+            const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
+            if (isChildForm) {
+              this.memoCodeChild = true;
+            } else {
+              this.memoCode = true;
             }
           }
         });
@@ -246,8 +260,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
 
     // get form data API is passing X for memo code value.
-    // Set it to null here until it is checked by user where it will be set to X.
-    this.frmIndividualReceipt.controls['memo_code'].setValue(null);
+    // Set it to value from dynamic forms as some should be checked and disabled by default.
+    this.frmIndividualReceipt.controls['memo_code'].setValue(memoCodeValue);
   }
 
   /**
@@ -519,11 +533,25 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
     if ($event.key) {
       const key = $event.key.toUpperCase();
-      if (key === 'TAB') {
+      if (key === 'TAB' ||
+          key === 'ENTER' ||
+          key === 'SHIFT' ||
+          key === 'ALT' ||
+          key === 'CONTROL' ||
+          key === 'ARROWRIGHT' ||
+          key === 'CAPSLOCK' ||
+          key === 'PAGEUP' ||
+          key === 'PAGEDOWN' ||
+          key === 'ESCAPE' ||
+          key === 'ARROWUP' ||
+          key === 'ARROWLEFT' ||
+          key === 'ARROWDOWN') {
         return;
       }
     }
     if (
+      col.name === 'last_name' ||
+      col.name === 'first_name' ||
       col.name === 'middle_name' ||
       col.name === 'prefix' ||
       col.name === 'suffix' ||
@@ -1278,42 +1306,58 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //   return null;
   // }
 
-  // private getFormFields(): void {
-  //   console.log('get transaction type form fields ' + this.transactionType);
-  //   this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
-  //     if (res) {
-  //       if (res.hasOwnProperty('data')) {
-  //         if (typeof res.data === 'object') {
-  //           if (res.data.hasOwnProperty('formFields')) {
-  //             if (Array.isArray(res.data.formFields)) {
-  //               this.formFields = res.data.formFields;
+  private getFormFields(): void {
+    console.log('get transaction type form fields ' + this.transactionType);
+    this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+      if (res) {
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-  //               this._setForm(this.formFields);
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('hiddenFields')) {
-  //             if (Array.isArray(res.data.hiddenFields)) {
-  //               this.hiddenFields = res.data.hiddenFields;
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('states')) {
-  //             if (Array.isArray(res.data.states)) {
-  //               this.states = res.data.states;
-  //             }
-  //           }
-  //           if (res.data.hasOwnProperty('titles')) {
-  //             if (Array.isArray(res.data.titles)) {
-  //               this.titles = res.data.titles;
-  //             }
-  //           }
-  //         } // typeof res.data
-  //       } // res.hasOwnProperty('data')
-  //     } // res
-  //   });
-  // }
+                this._setForm(this.formFields);
+              }
+            }
+            if (res.data.hasOwnProperty('hiddenFields')) {
+              if (Array.isArray(res.data.hiddenFields)) {
+                this.hiddenFields = res.data.hiddenFields;
+              }
+            }
+            if (res.data.hasOwnProperty('states')) {
+              if (Array.isArray(res.data.states)) {
+                this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('titles')) {
+              if (Array.isArray(res.data.titles)) {
+                this.titles = res.data.titles;
+              }
+            }
+            if (res.data.hasOwnProperty('orgTypes')) {
+              if (Array.isArray(res.data.orgTypes)) {
+                this.orgTypes = res.data.orgTypes;
+                if (this.hiddenFields) {
+                  for (const field of this.orgTypes) {
+                    if (field.selected) {
+                      this.selectedOrgType = field;
+                      this.frmIndividualReceipt.patchValue(
+                        { org_type: this.selectedOrgType.name },
+                        { onlySelf: true }
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          } // typeof res.data
+        } // res.hasOwnProperty('data')
+      } // res
+    });
+  }
 
   // temp code for stubbing out OPEXP forms
-  private getFormFields(): void {
+  private getFormFields__(): void {
     console.log('get transaction type form fields ' + this.transactionType);
     if (this.transactionType === 'OPEXP') {
       this._receiptService.getOpexpMockData().subscribe((res: any) => {
@@ -1517,10 +1561,19 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (!col.toggle) {
       return true;
     }
-    if (this.selectedOrgType.group === col.orgGroup || !col.orgGroup) {
+    if (this.selectedOrgType.group === col.entityGroup || !col.entityGroup) {
       return true;
     } else {
       return false;
     }
+  }
+
+  public isMemoCodeReadOnly(fieldName: string) {
+    if (this.isFieldName(fieldName, 'memo_code')) {
+      if (this._readOnlyMemoCode) {
+        return true;
+      }
+    }
+    return false;
   }
 }
