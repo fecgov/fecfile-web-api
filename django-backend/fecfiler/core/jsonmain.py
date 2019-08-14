@@ -63,6 +63,9 @@ SCHEDULES_DBTABLES_DICT = {
     'SB': 'public.sched_b'
 }
 
+# Dictionary that excludes line numbers from final json
+EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
+
 def get_header_details():
     return {
         "version": "8.3",
@@ -266,7 +269,7 @@ def create_json_builders(request):
         # Checking for transaction ids in the request
         if 'transaction_id' in request.data and request.data.get('transaction_id'):
             transaction_flag = True
-            transaction_id_string = request.data.get('transaction_id')
+            transaction_id_string = request.data.get('transaction_id').replace(" ", "")
             transaction_id_list = transaction_id_string.split(',')
         # Populating output json with header and data values
         output['header'] = get_header_details()
@@ -297,7 +300,7 @@ def create_json_builders(request):
             		if identifier:
 	                    parent_transactions = get_transactions(identifier, report_id, cmte_id, None, transaction_id_list)
 	                    for transaction in parent_transactions:
-	                        if child_identifier_list:
+	                    	if child_identifier_list:
 	                            for child_identifier in child_identifier_list:
 	                            	child_identifier = child_identifier.get('tran_identifier')
 	                            	if child_identifier:
@@ -308,7 +311,8 @@ def create_json_builders(request):
 		                                        transaction['child'].extend(child_transactions)
 		                                    else:
 		                                        transaction['child'] = child_transactions
-	                        output['data']['schedules'][schedule].append(transaction)
+	                    	if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
+	                    		output['data']['schedules'][schedule].append(transaction)	                    	
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         tmp_filename = cmte_id +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path='/tmp/'+tmp_filename
@@ -361,12 +365,12 @@ def create_json_builders(request):
 @api_view(["GET"])
 def sample_sql_generate(request):
 	try:
-		list_SA_similar_INDV_REC_transactionTypeCode = ["INDV_REC", "PARTN_MEMO", "IK_REC", "REATT_FROM", "REATT_MEMO", "RET_REC", "EAR_REC",
-												"CON_EAR_UNDEP", "CON_EAR_DEP", "IND_RECNT_REC", "IND_NP_RECNT_ACC", "IND_NP_HQ_ACC", "IND_NP_CONVEN_ACC",
-												"IND_REC_NON_CONT_ACC", "JF_TRAN_IND_MEMO", "JF_TRAN_NP_RECNT_IND_MEMO", "JF_TRAN_NP_CONVEN_IND_MEMO", 
-												"JF_TRAN_NP_HQ_IND_MEMO"]
+		List_SA_similar_INDV_REC = ["INDV_REC", "PARTN_MEMO", "IK_REC", "REATT_FROM", "REATT_MEMO", "RET_REC", "EAR_REC",
+                            "CON_EAR_UNDEP", "CON_EAR_DEP", "IND_RECNT_REC", "IND_NP_RECNT_ACC", "IND_NP_HQ_ACC", "IND_NP_CONVEN_ACC",
+                            "IND_REC_NON_CONT_ACC", "JF_TRAN_IND_MEMO", "JF_TRAN_NP_RECNT_IND_MEMO", "JF_TRAN_NP_CONVEN_IND_MEMO", 
+                            "JF_TRAN_NP_HQ_IND_MEMO", "EAR_REC_RECNT_ACC", "EAR_REC_CONVEN_ACC", "EAR_REC_HQ_ACC"]
 		INDV_REC_STRING = ""
-		for tran in list_SA_similar_INDV_REC_transactionTypeCode:
+		for tran in List_SA_similar_INDV_REC:
 
 			query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier", 
 t1.transaction_id AS "transactionId",
@@ -390,11 +394,11 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 		file.write(INDV_REC_STRING)
 		file.close()
 
-		list_SA_similar_PAR_CON_transactionTypeCode = ["PARTN_REC", "TRIB_REC", "TRIB_NP_RECNT_ACC", "TRIB_NP_HQ_ACC", "TRIB_NP_CONVEN_ACC", 
-														"BUS_LAB_NON_CONT_ACC", "JF_TRAN_TRIB_MEMO", "JF_TRAN_NP_RECNT_TRIB_MEMO", "JF_TRAN_NP_CONVEN_TRIB_MEMO", 
-														"JF_TRAN_NP_HQ_TRIB_MEMO"]
+		list_SA_similar_PAR_CON = ["PARTN_REC", "TRIB_REC", "TRIB_NP_RECNT_ACC", "TRIB_NP_HQ_ACC", "TRIB_NP_CONVEN_ACC", 
+                            "BUS_LAB_NON_CONT_ACC", "JF_TRAN_TRIB_MEMO", "JF_TRAN_NP_RECNT_TRIB_MEMO", "JF_TRAN_NP_CONVEN_TRIB_MEMO", 
+                            "JF_TRAN_NP_HQ_TRIB_MEMO"]
 		PAR_CON_STRING = ""
-		for tran in list_SA_similar_PAR_CON_transactionTypeCode:
+		for tran in list_SA_similar_PAR_CON:
 
 			query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier", 
 t1.transaction_id AS "transactionId",
@@ -416,15 +420,15 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 		file.write(PAR_CON_STRING)
 		file.close()
 
-		list_SA_similar_COND_EARM_PAC_transactionTypeIdentifier = ["EAR_MEMO", "PAC_CON_EAR_UNDEP", "PAC_CON_EAR_DEP", "PAC_EAR_REC", "PAC_EAR_MEMO", "PARTY_IK_REC", "PAC_IK_REC", "PARTY_REC", 
-														            "PAC_REC", "PAC_NON_FED_REC", "PAC_NON_FED_RET", "PAC_RET", "PARTY_RET", "TRAN", "PARTY_RECNT_REC", "PAC_RECNT_REC", 
-														            "TRIB_RECNT_REC", "PARTY_NP_RECNT_ACC", "PAC_NP_RECNT_ACC", 
-														            "PARTY_NP_HQ_ACC", "PAC_NP_HQ_ACC", "PARTY_NP_CONVEN_ACC", "PAC_NP_CONVEN_ACC", "OTH_CMTE_NON_CONT_ACC", "IK_TRAN","IK_TRAN_FEA", 
-														            "JF_TRAN", "JF_TRAN_PARTY_MEMO", "JF_TRAN_PAC_MEMO", 
-														            "JF_TRAN_NP_RECNT_ACC", "JF_TRAN_NP_RECNT_PAC_MEMO", "JF_TRAN_NP_CONVEN_ACC", "JF_TRAN_NP_CONVEN_PAC_MEMO", "JF_TRAN_NP_HQ_ACC", 
-														            "JF_TRAN_NP_HQ_PAC_MEMO", "EAR_REC_RECNT_ACC_MEMO", "EAR_REC_CONVEN_ACC_MEMO", "EAR_REC_HQ_ACC_MEMO"]
+		list_SA_similar_COND_EARM_PAC = ["EAR_MEMO", "PAC_CON_EAR_UNDEP", "PAC_CON_EAR_DEP", "PAC_EAR_REC", "PAC_EAR_MEMO", "PARTY_IK_REC", "PAC_IK_REC", "PARTY_REC", 
+                                "PAC_REC", "PAC_NON_FED_REC", "PAC_NON_FED_RET", "PAC_RET", "PARTY_RET", "TRAN", "PARTY_RECNT_REC", "PAC_RECNT_REC", 
+                                "TRIB_RECNT_REC", "PARTY_NP_RECNT_ACC", "PAC_NP_RECNT_ACC", 
+                                "PARTY_NP_HQ_ACC", "PAC_NP_HQ_ACC", "PARTY_NP_CONVEN_ACC", "PAC_NP_CONVEN_ACC", "OTH_CMTE_NON_CONT_ACC", "IK_TRAN","IK_TRAN_FEA", 
+                                "JF_TRAN", "JF_TRAN_PARTY_MEMO", "JF_TRAN_PAC_MEMO", 
+                                "JF_TRAN_NP_RECNT_ACC", "JF_TRAN_NP_RECNT_PAC_MEMO", "JF_TRAN_NP_CONVEN_ACC", "JF_TRAN_NP_CONVEN_PAC_MEMO", "JF_TRAN_NP_HQ_ACC", 
+                                "JF_TRAN_NP_HQ_PAC_MEMO", "EAR_REC_RECNT_ACC_MEMO", "EAR_REC_CONVEN_ACC_MEMO", "EAR_REC_HQ_ACC_MEMO"]
 		COND_EARM_PAC_STRING = ""
-		for tran in list_SA_similar_COND_EARM_PAC_transactionTypeIdentifier:
+		for tran in list_SA_similar_COND_EARM_PAC:
 
 			query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier", 
 t1.transaction_id AS "transactionId",
