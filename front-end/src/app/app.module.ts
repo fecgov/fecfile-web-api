@@ -71,6 +71,7 @@ import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { ContactsTableComponent } from './contacts/contacts-table/contacts-table.component';
+import { ContactsFilterComponent } from './contacts/filter/contacts-filter.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 
@@ -133,7 +134,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportsFilterTypeComponent,
     ContactsComponent,
     ContactsTableComponent,
-    AddNewContactComponent
+    AddNewContactComponent,
+    ContactsFilterComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
