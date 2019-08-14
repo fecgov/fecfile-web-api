@@ -53,6 +53,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Subscription for pre-populating the form for view or edit.
    */
   private _populateFormSubscription: Subscription;
+  private _clearFormSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
   public cvgStartDate: string = null;
@@ -112,6 +113,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
       this._populateFormForEditOrView(message);
+    });
+
+    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+      this._clearFormValues();
     });
   }
 
@@ -205,6 +210,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._messageService.clearMessage();
     this._populateFormSubscription.unsubscribe();
+    this._clearFormSubscription.unsubscribe();
     localStorage.removeItem('form_3X_saved');
   }
 
@@ -872,6 +878,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
+    this._clearFormValues();
     let reportId = this.getReportIdFromStorage();
     console.log('reportId', reportId);
 
