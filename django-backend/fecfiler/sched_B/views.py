@@ -49,8 +49,7 @@ NEGATIVE_TRANSACTIONS = [
     'OPEXP_VOID',
     'CONT_TO_OTH_CMTE_VOID',
     'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID',
-
-
+    'FEA_100PCT_PAY_VOID',
 ]
 
 
@@ -94,10 +93,11 @@ def check_type_list(data):
     """
     try:
         if not type(data) is list:
-            raise Exception(
-                "The child transactions have to be sent in as an array or list. Input received: {}".format(
-                    data
-                )
+            raise Exception("""
+                The child transactions have to be sent in as an array or list. 
+                Input received: {}""".format(
+                data
+            )
             )
         else:
             return data
@@ -113,10 +113,11 @@ def check_decimal(value):
         check_value = Decimal(value)
         return value
     except Exception as e:
-        raise Exception(
-            "Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}".format(
-                value
-            )
+        raise Exception("""
+            Invalid Input: Expecting a decimal value like 18.11, 24.07. 
+            Input received: {}""".format(
+            value
+        )
         )
 
 
@@ -135,7 +136,8 @@ def check_mandatory_fields_SB(data, list_mandatory_fields):
                 string = string + x + ", "
             string = string[0:-2]
             raise Exception(
-                "The following mandatory fields are required in order to save data to schedB table: {}".format(
+                """The following mandatory fields are required in order to 
+                save data to schedB table: {}""".format(
                     string
                 )
             )
@@ -438,10 +440,16 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
         with connection.cursor() as cursor:
 
             # UPDATE delete_ind flag on a single row from Sched_B table
-            cursor.execute(
-                """UPDATE public.sched_b SET delete_ind = 'Y' WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [transaction_id, report_id, cmte_id],
-            )
+            cursor.execute("""
+                UPDATE public.sched_b 
+                SET delete_ind = 'Y' 
+                WHERE transaction_id = %s 
+                AND report_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """,
+                           [transaction_id, report_id, cmte_id],
+                           )
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} is either already deleted or does not exist in schedB table".format(
