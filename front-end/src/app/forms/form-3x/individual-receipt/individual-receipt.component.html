@@ -51,9 +51,15 @@
         </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-            <div [class]="row.colClassName" *ngFor="let col of row.cols">
-              <div class="form-group">
-                <label [for]="col?.name">
+
+            <ng-container *ngFor="let col of row.cols">
+              <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
+
+
+            <!-- <div [class]="row.colClassName" *ngFor="let col of row.cols"> -->
+              <div class="form-group" *ngIf="isToggleShow(col)"> 
+
+                <label [for]="col?.name" *ngIf="isToggleShowLabel(col)">
                   {{ col?.text }}
                   <button
                     type="button"
@@ -86,6 +92,7 @@
                           && col?.name !== 'last_name'
                           && !isFieldName(col?.name, 'entity_name')
                           && !isFieldName(col?.name, 'donor_cmte_id')
+                          && isToggleShow(col)
                           "
                       class="form-control"
                       [style.width]="col?.width"
@@ -106,7 +113,7 @@
                       (keyup)="handleFormFieldKeyup($event, col)"
                     />
                     <input
-                      *ngIf="col?.name === 'last_name'"
+                      *ngIf="col?.name === 'last_name' && isToggleShow(col)"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -128,7 +135,7 @@
                       (selectItem)="handleSelectedItem($event)"
                     />
                     <input
-                      *ngIf="col?.name === 'first_name'"
+                      *ngIf="col?.name === 'first_name' && isToggleShow(col)"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -150,7 +157,9 @@
                       (selectItem)="handleSelectedItem($event)"
                     />
                     <input
-                      *ngIf="isFieldName(col?.name, 'entity_name')"
+                      *ngIf="isFieldName(col?.name, 'entity_name') &&
+                             isToggleShow(col)
+                            "
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -272,8 +281,7 @@
                     [attr.maxlength]="col?.validation?.max"
                     [formControlName]="col?.name"
                   ></textarea>
-                </ng-container>
-                <!-- <ng-container *ngIf="col?.type === 'select' && (col?.name === 'state' || col?.name === 'child*state')"> -->
+                </ng-container>                
                 <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'state')">  
                   <ng-select
                     (change)="handleStateChange($event, col)"
@@ -291,8 +299,28 @@
                     </ng-option>
                   </ng-select>
                 </ng-container>
+                <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'org_type')">  
+                  <ng-select
+                    (change)="handleOrgTypeChange($event, col)"
+                    class="org-type-select"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmIndividualReceipt.get(col?.name)?.invalid &&
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                        ? 'org-type-select-error'
+                        : ''
+                    "
+                  >
+                    <ng-option *ngFor="let item of orgTypes" value="{{item.code}}">
+                      {{item.name}}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>                
               </div>
-            </div>
+
+              </div>
+            </ng-container>
+
             <!-- ./col -->
           </ng-container>
         </div>
