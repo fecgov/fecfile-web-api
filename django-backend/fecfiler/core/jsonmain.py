@@ -63,6 +63,9 @@ SCHEDULES_DBTABLES_DICT = {
     'SB': 'public.sched_b'
 }
 
+# Dictionary that excludes line numbers from final json
+EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
+
 def get_header_details():
     return {
         "version": "8.3",
@@ -266,7 +269,7 @@ def create_json_builders(request):
         # Checking for transaction ids in the request
         if 'transaction_id' in request.data and request.data.get('transaction_id'):
             transaction_flag = True
-            transaction_id_string = request.data.get('transaction_id')
+            transaction_id_string = request.data.get('transaction_id').replace(" ", "")
             transaction_id_list = transaction_id_string.split(',')
         # Populating output json with header and data values
         output['header'] = get_header_details()
@@ -297,7 +300,7 @@ def create_json_builders(request):
             		if identifier:
 	                    parent_transactions = get_transactions(identifier, report_id, cmte_id, None, transaction_id_list)
 	                    for transaction in parent_transactions:
-	                        if child_identifier_list:
+	                    	if child_identifier_list:
 	                            for child_identifier in child_identifier_list:
 	                            	child_identifier = child_identifier.get('tran_identifier')
 	                            	if child_identifier:
@@ -308,7 +311,8 @@ def create_json_builders(request):
 		                                        transaction['child'].extend(child_transactions)
 		                                    else:
 		                                        transaction['child'] = child_transactions
-	                        output['data']['schedules'][schedule].append(transaction)
+	                    	if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
+	                    		output['data']['schedules'][schedule].append(transaction)	                    	
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         tmp_filename = cmte_id +'_'+ str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path='/tmp/'+tmp_filename
