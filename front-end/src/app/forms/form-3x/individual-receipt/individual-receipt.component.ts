@@ -24,8 +24,8 @@ import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numer
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
 import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-import { Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Observable, Subscription, interval, timer } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
@@ -83,6 +83,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
+  private _isSelectedEntityAggregate: boolean;
   private _selectedEntityChild: any;
   private _selectedChangeWarn: any;
   private _selectedChangeWarnChild: any;
@@ -126,6 +127,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarnChild = null;
+    this._isSelectedEntityAggregate = false;
     this._readOnlyMemoCode = false;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
@@ -149,6 +151,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   ngDoCheck(): void {
     // TODO consider changes this to ngOnChanges()
+
+    // this._populatePurposeForEarmark();
+
+    this._listenForDateChange();
 
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
@@ -721,6 +727,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       for (const field in this.frmIndividualReceipt.controls) {
         if (field === 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+        } else if (field === this._childFieldNamePrefix + 'contribution_date') {
+          receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === 'memo_code') {
           if (this.memoCode) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
@@ -731,7 +739,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
-        } else if (field === 'last_name' || field === 'first_name') {
+        } else if (field === 'last_name' ||
+                   field === 'first_name' ||
+                   this.isFieldName(field, 'cmte_id') ||
+                   this.isFieldName(field, 'cmte_name') ||
+                   this.isFieldName(field, 'entity_name')
+                   ) {
           // if (this._selectedEntity) {
           // If the typeahead was used to load the entity into the form,
           // we don't allow users to make changes to the entity. Non-Typeahead
@@ -962,14 +975,32 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Format an entity to display in the Committee Name type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCommitteeName(result: any) {
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.cmte_id ? result.cmte_name.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
+  }
+
+  /**
    * Populate the fields in the form with the values from the selected contact.
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
+
+    // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
+    // TODO need a way to determine if key was tab.
+
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
     this._selectedChangeWarn = {};
+    this._isSelectedEntityAggregate = false;
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -983,35 +1014,39 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    // default to indiv-receipt for sprint 17 - use input field in sprint 18.
-    // this._transactionTypeIdentifier = 'INDV_REC';
-    console.log('transaction type from input is ' + this.transactionType);
+    // If Earmark, auto populate purpose
+    // console.log('transaction type from input is ' + this.transactionType);
+    // if (this.transactionType === 'EAR_REC') {
+    //   if (this.frmIndividualReceipt.contains('child*purpose_description')) {
+    //     this._populateChildPurpose();
+    //   }
+    // }
 
-    const reportId = this.getReportIdFromStorage();
-    this._receiptService.getContributionAggregate(reportId, contact.entity_id, this.transactionType).subscribe(res => {
-      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-      // Entity selected from the typeahead list.
+    // const reportId = this.getReportIdFromStorage();
+    // this._receiptService.getContributionAggregate(reportId, contact.entity_id, this.transactionType).subscribe(res => {
+    //   // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+    //   // Entity selected from the typeahead list.
 
-      let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-      contributionAmount = contributionAmount ? contributionAmount : 0;
+    //   let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+    //   contributionAmount = contributionAmount ? contributionAmount : 0;
 
-      // TODO make this a class variable for contributionAmountChange() to add to.
-      let contributionAggregate: string = String(res.contribution_aggregate);
-      contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+    //   // TODO make this a class variable for contributionAmountChange() to add to.
+    //   let contributionAggregate: string = String(res.contribution_aggregate);
+    //   contributionAggregate = contributionAggregate ? contributionAggregate : '0';
 
-      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-      const value: string = this._decimalPipe.transform(total, '.2-2');
+    //   const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+    //   const value: string = this._decimalPipe.transform(total, '.2-2');
 
-      console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-          ${contributionAggregate} = ${total}`);
-      console.log(`value = ${value}`);
+    //   console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+    //       ${contributionAggregate} = ${total}`);
+    //   console.log(`value = ${value}`);
 
-      this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+    //   this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
 
-      // Store the entity aggregate to be added to the contribution amount
-      // if it changes in the UI.  See contributionAmountChange();
-      this._contributionAggregateValue = parseFloat(contributionAggregate);
-    });
+    //   // Store the entity aggregate to be added to the contribution amount
+    //   // if it changes in the UI.  See contributionAmountChange();
+    //   this._contributionAggregateValue = parseFloat(contributionAggregate);
+    // });
   }
 
   /**
@@ -1039,6 +1074,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (fieldName === this._childFieldNamePrefix + 'donor_cmte_id') {
         this.frmIndividualReceipt.patchValue({ 'child*entity_name': entity.cmte_name }, { onlySelf: true });
       }
+
+      if (fieldName === this._childFieldNamePrefix + 'donor_cmte_name') {
+        this.frmIndividualReceipt.patchValue({ 'child*donor_cmte_id': entity.cmte_id }, { onlySelf: true });
+      }
+      if (fieldName === this._childFieldNamePrefix + 'donor_cmte_id') {
+        this.frmIndividualReceipt.patchValue({ 'child*donor_cmte_name': entity.cmte_name }, { onlySelf: true });
+      }
+
       this.frmIndividualReceipt.patchValue({ 'child*street_1': entity.street_1 }, { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ 'child*street_2': entity.street_2 }, { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ 'child*city': entity.city }, { onlySelf: true });
@@ -1189,6 +1232,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   /**
    * Search for entities when organization/entity_name input value changes.
    */
+  searchCommitteeName = (text$: Observable<string>) =>
+  text$.pipe(
+    debounceTime(500),
+    distinctUntilChanged(),
+    switchMap(searchText => {
+
+      if (searchText) {
+        return this._typeaheadService.getContacts(searchText, 'cmte_name');
+      } else {
+        return Observable.of([]);
+      }
+    })
+  );
+
+  /**
+   * Search for entities when organization/entity_name input value changes.
+   */
   searchCommitteeId = (text$: Observable<string>) =>
     text$.pipe(
       debounceTime(500),
@@ -1272,6 +1332,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       return x;
     }
   };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the committee name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCommitteeName = (x: { cmte_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cmte_name;
+    } else {
+      return x;
+    }
+  };  
 
   public checkForMemoCode(fieldName: string) {
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
@@ -1618,4 +1693,159 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  private _populatePurposeForEarmark() {
+    if (this.transactionType === 'EAR_REC') {
+      if (this.frmIndividualReceipt.contains('child*purpose_description') &&
+        !this._selectedEntity) {
+
+          const source = timer(5000);
+          //output: 0
+          source.subscribe(val => {
+            this.frmIndividualReceipt.get('prefix').valueChanges.subscribe(val => {
+              this._populateChildPurpose();
+            });
+            this.frmIndividualReceipt.get('last_name').valueChanges.subscribe(val => {
+              this._populateChildPurpose();
+            });
+            this.frmIndividualReceipt.get('middle_name').valueChanges.subscribe(val => {
+              this._populateChildPurpose();
+            });
+            this.frmIndividualReceipt.get('first_name').valueChanges.subscribe(val => {
+              this._populateChildPurpose();
+            });
+            this.frmIndividualReceipt.get('suffix').valueChanges.subscribe(val => {
+              this._populateChildPurpose();
+            });
+          });
+      }
+    }
+  }
+
+  private _listenForDateChange() {
+    if (this.frmIndividualReceipt.contains('contribution_date')) {
+
+      this.frmIndividualReceipt.get('contribution_date').valueChanges
+        .pipe(pairwise())
+        .subscribe(([prev, next]: [any, any]) => {
+          if (prev !== next) {
+            // The valueChanges() is firing ~100 times even though
+            // the previous/next values are equal.  This may be due to
+            // the calling this method from ngDoCheck() as it is where the formGroup
+            // is set.  To avoid this problem, another check break the loop needs
+            // to be added.
+            if (this._selectedEntity) {
+              if (this._selectedEntity.entity_id && !this._isSelectedEntityAggregate) {
+                this._getContributionAggregate();
+                this._isSelectedEntityAggregate = true;
+              }
+            }
+          }
+        });
+
+      // .pipe(pairwise())
+      // .subscribe(([prev, next]: [any, any]) => ... );
+
+      // this.frmIndividualReceipt.get('contribution_date').valueChanges.subscribe(val => {
+      //   if (this._selectedEntity) {
+      //     if (this._selectedEntity.entity_id) {
+      //       this._getContributionAggregate();
+      //     }
+      //   }
+      // });
+    }
+  }
+
+  private _populateChildPurpose() {
+
+    // type ahead fields need to be checked for objects
+    const lastNameObject = this.frmIndividualReceipt.get('last_name').value;
+    let lastName = null;
+
+    if (typeof lastNameObject !== 'string') {
+      // it's an object as a result of the ngb-typeahead
+      lastName = lastNameObject.last_name;
+    } else {
+      lastName = lastNameObject;
+      lastName = lastName && typeof lastName === 'string' ? lastName.trim() : '';
+    }
+
+
+    const firstNameObject = this.frmIndividualReceipt.get('first_name').value;;
+    let firstName = null;
+
+    if (typeof firstNameObject !== 'string') {
+      // it's an object as a result of the ngb-typeahead
+      firstName = firstNameObject.first_name;
+    } else {
+      firstName = firstNameObject;
+      firstName = firstName && typeof firstName === 'string' ? firstName.trim() : '';
+    }
+
+
+    let prefix = this.frmIndividualReceipt.get('prefix').value;
+    prefix = prefix && typeof prefix === 'string' ? prefix.trim() : '';
+
+    let middleName = this.frmIndividualReceipt.get('middle_name').value;
+    middleName = middleName && typeof middleName === 'string' ? middleName.trim() : '';
+
+    let suffix = this.frmIndividualReceipt.get('suffix').value;
+    suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
+
+    // const purpose = `Earmarked for ${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`;
+    let purpose = 'Earmarked for';
+    const nameArray = [];
+    if (prefix) {
+      nameArray.push(prefix);
+    }
+    if (firstName) {
+      nameArray.push(firstName);
+    }
+    if (middleName) {
+      nameArray.push(middleName);
+    }
+    if (lastName) {
+      nameArray.push(lastName);
+    }
+    if (suffix) {
+      nameArray.push(suffix);
+    }
+    for (const field of nameArray) {
+      purpose += ' ' + field;
+    }
+
+    console.log('purpose is: ' + purpose);
+    this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose },
+    { onlySelf: true });
+  }
+
+  private _getContributionAggregate() {
+    const reportId = this.getReportIdFromStorage();
+    this._receiptService.getContributionAggregate(reportId, this._selectedEntity.entity_id, 
+        this.transactionType).subscribe(res => {
+      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+      // Entity selected from the typeahead list.
+
+      let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+      contributionAmount = contributionAmount ? contributionAmount : 0;
+
+      // TODO make this a class variable for contributionAmountChange() to add to.
+      let contributionAggregate: string = String(res.contribution_aggregate);
+      contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+      const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+      const value: string = this._decimalPipe.transform(total, '.2-2');
+
+      console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+          ${contributionAggregate} = ${total}`);
+      console.log(`value = ${value}`);
+
+      this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+
+      // Store the entity aggregate to be added to the contribution amount
+      // if it changes in the UI.  See contributionAmountChange();
+      this._contributionAggregateValue = parseFloat(contributionAggregate);
+    });
+  }
+
 }
