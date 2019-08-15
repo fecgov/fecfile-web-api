@@ -138,5 +138,9 @@ urlpatterns = [
         views.get_contacts_dynamic_forms_fields, 
         name="get_contacts_dynamic_forms_fields"
     ),
+    url(r'^core/get_entityTypes$', 
+        views.get_entityTypes, 
+        name="get_entityTypes"
+    ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 ]
