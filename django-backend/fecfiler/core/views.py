@@ -3125,3 +3125,34 @@ def get_contacts_dynamic_forms_fields(request):
 #         return Response(json_result, status=status_value)
 #     except Exception as e:
 #         return Response("The get_filer_transaction_type API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST) 
+
+@api_view(['GET'])
+def get_entityTypes(request):
+    try:
+        cmte_id = request.user.username
+      
+        data = """{
+                    "data":  [
+                        {
+                            "type_code": "CAN",
+                            "type_desc": "Candidate"
+                        },
+                        {
+                            "type_code": "COM",
+                            "type_desc": "Committee"
+                        },
+                      
+                        {
+                            "type_code": "IND",
+                            "type_desc": "Individual"
+                        },
+                        {
+                            "type_code": "ORG",
+                            "type_desc": "Organization"
+                        }]
+                  }
+                """
+        forms_obj = json.loads(data)
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_entityTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
