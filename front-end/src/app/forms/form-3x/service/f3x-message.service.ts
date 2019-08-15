@@ -13,6 +13,7 @@ import { Subject } from 'rxjs/Subject';
 export class F3xMessageService {
 
   private populateFormSubject = new Subject<any>();
+  private clearFormSubject = new Subject<any>();
 
 
   /**
@@ -39,6 +40,32 @@ export class F3xMessageService {
    */
   public getPopulateFormMessage(): Observable<any> {
     return this.populateFormSubject.asObservable();
+  }
+
+  /**
+   * Used by the Transaction Type component to inform the Save Form (Individual Receipt)
+   * component to clear any form fields previously set.
+   *
+   * @param message
+   */
+  public sendInitFormMessage(message: any) {
+    this.clearFormSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Init Form Form message.
+   */
+  public clearInitFormMessage() {
+    this.clearFormSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Init Form message.
+   */
+  public getInitFormMessage(): Observable<any> {
+    return this.clearFormSubject.asObservable();
   }
 
 }

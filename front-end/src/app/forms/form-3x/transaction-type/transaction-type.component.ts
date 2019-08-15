@@ -9,6 +9,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { TransactionTypeService } from './transaction-type.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { F3xMessageService } from '../service/f3x-message.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -47,7 +48,8 @@ export class TransactionTypeComponent implements OnInit {
     private _formService: FormsService,
     private _messageService: MessageService,
     private _transactionTypeService: TransactionTypeService,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService,
+    private _f3xMessageService: F3xMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -98,6 +100,9 @@ export class TransactionTypeComponent implements OnInit {
 
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
+
+      // Send message to form (indv-receipt) to clear form field vals if they are still populated.
+      this._f3xMessageService.sendInitFormMessage('');
 
       this.status.emit({
         form: this.frmOption,

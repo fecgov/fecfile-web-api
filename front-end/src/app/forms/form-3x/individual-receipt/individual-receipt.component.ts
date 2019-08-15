@@ -44,7 +44,7 @@ import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 export class IndividualReceiptComponent implements OnInit, OnDestroy {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
-  @Input() formOptionsVisible: boolean = false;
+  @Input() formOptionsVisible = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
   @Input() scheduleAction: ScheduleActions = null;
@@ -53,6 +53,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Subscription for pre-populating the form for view or edit.
    */
   private _populateFormSubscription: Subscription;
+  private _clearFormSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
   public cvgStartDate: string = null;
@@ -69,13 +70,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public selectedEntityType: any;
 
-  private _formType: string = '';
+  private _formType = '';
   private _reportType: any = null;
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _formSubmitted: boolean = false;
+  private _formSubmitted = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
   private _contributionAmount = '';
@@ -89,6 +90,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
   private _readOnlyMemoCode: boolean;
+  private _entityTypeDefault: any;
 
   constructor(
     private _http: HttpClient,
@@ -113,6 +115,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
       this._populateFormForEditOrView(message);
     });
+
+    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+      this._clearFormValues();
+    });
   }
 
   ngOnInit(): void {
@@ -120,12 +126,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarnChild = null;
-    this.selectedEntityType = {
-      name: 'Individual',
-      code: 'IND',
-      group: 'ind-group',
-      selected: true
-    };
     this._readOnlyMemoCode = false;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
@@ -205,6 +205,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._messageService.clearMessage();
     this._populateFormSubscription.unsubscribe();
+    this._clearFormSubscription.unsubscribe();
     localStorage.removeItem('form_3X_saved');
   }
 
@@ -829,7 +830,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             );
             if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
               this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
-                contributionAggregateValueChild);
+                contributionAggregateValueChild
+              );
             }
           }
 
@@ -872,6 +874,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
+    this._clearFormValues();
     let reportId = this.getReportIdFromStorage();
     console.log('reportId', reportId);
 
@@ -1349,15 +1352,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 this.entityTypes = res.data.entityTypes;
                 if (this.entityTypes) {
                   for (const field of this.entityTypes) {
+                    // If API sets selected to true it can be used to set the default.
+                    // If none are set, use the first.
                     if (field.selected) {
                       this.selectedEntityType = field;
-                      this.frmIndividualReceipt.patchValue(
-                        { entity_type: this.selectedEntityType.entityTypeDescription },
-                        { onlySelf: true }
-                      );
+                    }
+                  }
+                  if (!this.selectedEntityType) {
+                    if (this.entityTypes.length > 0) {
+                      this.selectedEntityType = this.entityTypes[0];
                     }
                   }
                 }
+                this._entityTypeDefault = this.selectedEntityType;
+                this.frmIndividualReceipt.patchValue(
+                  { entity_type: this.selectedEntityType.entityTypeDescription },
+                  { onlySelf: true }
+                );
               }
             }
           } // typeof res.data
@@ -1593,6 +1604,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   private _clearFormValues(): void {
+    this._selectedEntity = null;
+    this._selectedEntityChild = null;
+    this._selectedChangeWarn = {};
+    this._selectedChangeWarnChild = {};
     this.frmIndividualReceipt.reset();
+
+    if (this.frmIndividualReceipt.contains('entity_type')) {
+      this.selectedEntityType = this._entityTypeDefault;
+      this.frmIndividualReceipt.patchValue(
+        { entity_type: this.selectedEntityType.entityTypeDescription },
+        { onlySelf: true }
+      );
+    }
   }
 }
