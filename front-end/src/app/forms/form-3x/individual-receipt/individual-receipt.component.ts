@@ -84,6 +84,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
   private _isSelectedEntityAggregate: boolean;
+  private _isSelectedEntityAggregateChild: boolean;
   private _selectedEntityChild: any;
   private _selectedChangeWarn: any;
   private _selectedChangeWarnChild: any;
@@ -1062,9 +1063,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
       this._selectedChangeWarnChild = {};
+      this._isSelectedEntityAggregateChild = false;
     } else {
       this._selectedEntity = this._utilService.deepClone(entity);
       this._selectedChangeWarn = {};
+      this._isSelectedEntityAggregate = false;
     }
 
     if (isChildForm) {
@@ -1121,64 +1124,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
       }
     }
-
-    // default to indiv-receipt for sprint 17 - use input field in sprint 18.
-    // this._transactionTypeIdentifier = 'INDV_REC';
-    console.log('transaction type from input is ' + this.transactionType);
-
-    const reportId = this.getReportIdFromStorage();
-    this._receiptService.getContributionAggregate(reportId, entity.entity_id, this.transactionType).subscribe(res => {
-      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-      // Entity selected from the typeahead list.
-
-      // TODO make this 1 method code for child/non-child with variable for the distinction
-      if (isChildForm) {
-        let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
-
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
-            ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
-
-        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
-      } else {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
-
-        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
-
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-            ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
-
-        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValue = parseFloat(contributionAggregate);
-      }
-
-      // TODO need to handle child form apart from non-child
-    });
   }
 
   /**
@@ -1723,8 +1668,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   private _listenForDateChange() {
-    if (this.frmIndividualReceipt.contains('contribution_date')) {
 
+    if (this.frmIndividualReceipt.contains('contribution_date')) {
       this.frmIndividualReceipt.get('contribution_date').valueChanges
         .pipe(pairwise())
         .subscribe(([prev, next]: [any, any]) => {
@@ -1736,23 +1681,36 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             // to be added.
             if (this._selectedEntity) {
               if (this._selectedEntity.entity_id && !this._isSelectedEntityAggregate) {
-                this._getContributionAggregate();
+                const contribDate =
+                  this._utilService.formatDate(this.frmIndividualReceipt.get('contribution_date').value);
+                this._getContributionAggregate(contribDate);
                 this._isSelectedEntityAggregate = true;
               }
             }
           }
         });
+    }
 
-      // .pipe(pairwise())
-      // .subscribe(([prev, next]: [any, any]) => ... );
-
-      // this.frmIndividualReceipt.get('contribution_date').valueChanges.subscribe(val => {
-      //   if (this._selectedEntity) {
-      //     if (this._selectedEntity.entity_id) {
-      //       this._getContributionAggregate();
-      //     }
-      //   }
-      // });
+    if (this.frmIndividualReceipt.contains('child*contribution_date')) {
+      this.frmIndividualReceipt.get('child*contribution_date').valueChanges
+        .pipe(pairwise())
+        .subscribe(([prev, next]: [any, any]) => {
+          if (prev !== next) {
+            // The valueChanges() is firing ~100 times even though
+            // the previous/next values are equal.  This may be due to
+            // the calling this method from ngDoCheck() as it is where the formGroup
+            // is set.  To avoid this problem, another check break the loop needs
+            // to be added.
+            if (this._selectedEntityChild) {
+              if (this._selectedEntityChild.entity_id && !this._isSelectedEntityAggregateChild) {
+                const contribDate =
+                  this._utilService.formatDate(this.frmIndividualReceipt.get('child*contribution_date').value);
+                this._getContributionAggregate_NEW(contribDate, 'child*contribution_date');
+                this._isSelectedEntityAggregateChild = true;
+              }
+            }
+          }
+        });
     }
   }
 
@@ -1819,10 +1777,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     { onlySelf: true });
   }
 
-  private _getContributionAggregate() {
+  private _getContributionAggregate(contributionDate: string) {
     const reportId = this.getReportIdFromStorage();
-    this._receiptService.getContributionAggregate(reportId, this._selectedEntity.entity_id, 
-        this.transactionType).subscribe(res => {
+    this._receiptService.getContributionAggregate(reportId, this._selectedEntity.entity_id,
+        this.transactionType, contributionDate).subscribe(res => {
       // Add the UI val for Contribution Amount to the Contribution Aggregate for the
       // Entity selected from the typeahead list.
 
@@ -1848,4 +1806,70 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
   }
 
+  private _getContributionAggregate_NEW(contributionDate: string, fieldName: string) {
+    console.log('transaction type from input is ' + this.transactionType);
+    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+
+    let entityId = null;
+    if (isChildForm) {
+      entityId = this._selectedEntityChild.entity_id;
+    } else {
+      entityId = this._selectedEntity.entity_id;
+    }
+
+    const reportId = this.getReportIdFromStorage();
+    this._receiptService.getContributionAggregate(reportId, entityId,
+      this.transactionType, contributionDate).subscribe(res => {
+      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+      // Entity selected from the typeahead list.
+
+      // TODO make this 1 method code for child/non-child with variable for the distinction
+      if (isChildForm) {
+        let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
+
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
+
+        console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
+            ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
+
+        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
+
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
+      } else {
+        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
+        // Entity selected from the typeahead list.
+
+        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+        contributionAmount = contributionAmount ? contributionAmount : 0;
+
+        // TODO make this a class variable for contributionAmountChange() to add to.
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+
+        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
+        const value: string = this._decimalPipe.transform(total, '.2-2');
+
+        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
+            ${contributionAggregate} = ${total}`);
+        console.log(`value = ${value}`);
+
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
+
+        // Store the entity aggregate to be added to the contribution amount
+        // if it changes in the UI.  See contributionAmountChange();
+        this._contributionAggregateValue = parseFloat(contributionAggregate);
+      }
+
+      // TODO need to handle child form apart from non-child
+    });
+  }
 }
