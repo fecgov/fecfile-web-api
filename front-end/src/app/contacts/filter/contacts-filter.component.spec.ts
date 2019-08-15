@@ -1,21 +1,21 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ContactsFilterSidbarComponent } from './contacts-filter-sidebar.component';
+import { ContactsFilterComponent } from './contacts-filter.component';
 
 
 
 describe('ContactsFilterSidbarComponent', () => {
-  let component: ContactsFilterSidbarComponent;
-  let fixture: ComponentFixture<ContactsFilterSidbarComponent>;
+  let component: ContactsFilterComponent;
+  let fixture: ComponentFixture<ContactsFilterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ContactsFilterSidbarComponent ]
+      declarations: [ ContactsFilterComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ContactsFilterSidbarComponent);
+    fixture = TestBed.createComponent(ContactsFilterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -385,6 +385,8 @@ export class ContactsService {
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: ContactFilterModel) {
+    console.log("mockApplyFilters response =", response);
+    console.log("mockApplyFilters filters =", filters);
 
     if (!response.contacts) {
       return;
@@ -396,7 +398,7 @@ export class ContactsService {
 
     let isFilter = false;
 
-    if (filters.keywords) {
+    /*if (filters.keywords) {
       if (response.contacts.length > 0 && filters.keywords.length > 0) {
         isFilter = true;
 
@@ -414,8 +416,37 @@ export class ContactsService {
           response.contacts = filtered;
         }
       }
+    }   */
+
+    if (filters.filterStates) {
+      console.log("filters.filterStates", filters.filterStates);
+      if (filters.filterStates.length > 0) {
+        isFilter = true;
+        const fields = ['state'];
+        let filteredStateArray = [];
+        for (const state of filters.filterStates) {
+          const filtered = this._filterPipe.transform(response.contacts, fields, state);
+          filteredStateArray = filteredStateArray.concat(filtered);
+        }
+        response.contacts = filteredStateArray;
+      }
     }
-   
+
+    if (filters.filterTypes) {
+      console.log("filters.filterTypes", filters.filterTypes);
+      if (filters.filterTypes.length > 0) {
+        isFilter = true;
+        const fields = ['type'];
+        let filteredTypeArray = [];
+        for (const type of filters.filterTypes) {
+          const filtered = this._filterPipe.transform(response.contacts, fields, type);
+          filteredTypeArray = filteredTypeArray.concat(filtered);
+        }
+        response.contacts = filteredTypeArray;
+      }
+    }
+
+    console.log("response.contacts", response.contacts);
   }
 
 
@@ -482,6 +513,32 @@ export class ContactsService {
        );
   }
 
+  public getStates(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/state';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
+  
+  public getTypes(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/get_entityTypes';
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
 
   private createMockTrx() {
     const t1: any = {};
@@ -508,24 +565,7 @@ export class ContactsService {
     return t1;
   }
 
-  public getItemizations(): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url = '/core/get_ItemizationIndicators';
-    let httpOptions =  new HttpHeaders();
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    return this._http
-        .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-        );
-   }
-
-   /**
+     /**
     * Trash or restore tranactions to/from the Recycling Bin.
     * 
     * @param action the action to be applied to the contacts (e.g. trash, restore)
@@ -648,135 +688,6 @@ export class ContactsService {
     }
   }
 
-  /**
-   * Saves a schedule a using POST.  The POST API supports saving an existing
-   * transaction.  Therefore, transaction_id is required in this API call.
-   *
-   * TODO consider modifying saveScheduleA() to support both POST and PUT.
-   *
-   * @param      {string}  formType  The form type
-   */
-  public putScheduleA(formType: string): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sa/schedA';
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-
-    if (reportType === null || typeof reportType === 'undefined') {
-      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-    }
-
-    const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-    const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
-
-    let httpOptions = new HttpHeaders();
-    const formData: FormData = new FormData();
-
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    // Needed for update but not for add
-    formData.append('transaction_id', receipt.transactionId);
-
-    formData.append('cmte_id', committeeDetails.committeeid);
-    // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
-      formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
-      formData.append('report_id', reportType.reportid);
-    }
-
-    // formData.append('report_id', reportType.reportId);
-    formData.append('transaction_type', '15');
-    formData.append('line_number', '11AI');
-    formData.append('first_name', receipt.ContributorFirstName);
-    formData.append('last_name', receipt.ContributorLastName);
-    formData.append('state', receipt.ContributorState);
-    formData.append('city', receipt.ContributorCity);
-    formData.append('zip_code', receipt.ContributorZip);
-    formData.append('occupation', receipt.ContributorOccupation);
-    formData.append('employer', receipt.ContributorEmployer);
-    formData.append('contribution_amount', receipt.ContributionAmount);
-    formData.append('contribution_date', receipt.ContributionDate);
-    // formData.append('contribution_aggregate', receipt.ContributionAggregate);
-    formData.append('entity_type', receipt.EntityType);
-    if (receipt.ContributorMiddleName !== null) {
-      if (typeof receipt.ContributorMiddleName === 'string') {
-        formData.append('middle_name', receipt.ContributorMiddleName);
-      }
-    }
-    if (receipt.ContributorPrefix !== null) {
-      if (typeof receipt.ContributorPrefix === 'string') {
-        formData.append('prefix', receipt.ContributorPrefix);
-      }
-    }
-    if (receipt.ContributorSuffix !== null) {
-      if (typeof receipt.ContributorSuffix === 'string') {
-        formData.append('suffix', receipt.ContributorSuffix);
-      }
-    }
-    formData.append('street_1', receipt.ContributorStreet1);
-    if (receipt.ContributorStreet2 !== null) {
-      if (typeof receipt.ContributorStreet2 === 'string') {
-        formData.append('street_2', receipt.ContributorStreet2);
-      }
-    }
-    if (receipt.MemoText !== null) {
-      if (typeof receipt.MemoText === 'string') {
-        formData.append('memo_text', receipt.MemoText);
-      }
-    }
-    if (receipt.MemoCode !== null) {
-      if (typeof receipt.MemoCode === 'string') {
-        formData.append('memo_code', receipt.MemoCode);
-      }
-    }
-    if (receipt.ContributionPurposeDescription !== null) {
-      if (typeof receipt.ContributionPurposeDescription === 'string') {
-        formData.append('purpose_description', receipt.ContributionPurposeDescription);
-      }
-    }
-    // if (receipt.ContributionAggregate !== null) {
-    //   if (typeof receipt.ContributionAggregate === 'string') {
-    //     formData.append('contribution_aggregate', receipt.ContributionAggregate);
-    //   }
-    // }
-
-    return this._http
-      .put(`${environment.apiUrl}${url}`, formData, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
-        })
-      );
-  }
-
-  /**
-   * Gets the schedule after submitted.
-   *
-   * @param      {string}  formType  The form type
-   * @param      {any}     receipt   The receipt
-   */
-  public getSchedule(formType: string, receipt: any): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
-    const data: any = JSON.stringify(receipt);
-    let httpOptions = new HttpHeaders();
-
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    return this._http.get(url, {
-      headers: httpOptions,
-      params: {
-        report_id: receipt.report_id
-      }
-    });
-  }
- 
   public getContactsDynamicFormFields(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;

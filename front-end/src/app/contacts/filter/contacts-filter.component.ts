@@ -83,27 +83,10 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   @ViewChildren('categoryElements')
   private categoryElements: QueryList<ContactsFilterTypeComponent>;
 
-  public isHideTypeFilter: boolean;
-  public isHideDateFilter: boolean;
-  public isHideDeletedDateFilter: boolean;
-  public isHideAmountFilter: boolean;
-  public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
-  public isHideMemoFilter: boolean;
-  public isHideItemizationFilter: boolean;
-  public transactionCategories: any = [];
+  public isHideTypeFilter: boolean;
   public states: any = [];
-  public itemizations: any = [];
-  public filterCategoriesText = '';
-  public filterAmountMin: number;
-  public filterAmountMax: number;
-  public filterAggregateAmountMin: number;
-  public filterAggregateAmountMax: number;
-  public filterDateFrom: Date = null;
-  public filterDateTo: Date = null;
-  public filterDeletedDateFrom: Date = null;
-  public filterDeletedDateTo: Date = null;
-  public filterMemoCode = false;
+  public types: any = [];
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
@@ -167,31 +150,17 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
 
     this.msEdge = this.isEdge();
-
-    this.filterDateFrom = null;
-    this.filterDateTo = null;
-    this.filterDeletedDateFrom = null;
-    this.filterDeletedDateTo = null;
-    this.filterAmountMin = null;
-    this.filterAmountMax = null;
-    this.filterAggregateAmountMin = null;
-    this.filterAggregateAmountMax = null;
-
     this.isHideTypeFilter = true;
-    this.isHideDateFilter = true;
-    this.isHideDeletedDateFilter = true;
-    this.isHideAmountFilter = true;
-    this.isHideAggregateAmountFilter = true;
     this.isHideStateFilter = true;
-    this.isHideMemoFilter = true;
-    this.isHideItemizationFilter = true;
-
+   
     this.initValidationErrors();
 
-    if (this.formType) {
-      this.applyFiltersCache();
-      this.getCategoryTypes();
-    }
+    this.applyFiltersCache();
+    this.getStates();
+    this.getTypes();
+    console.log(" this.states", this.states);
+    console.log(" this.types", this.types);
+
   }
 
 
@@ -212,35 +181,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Toggle visibility of the Date filter
-   */
-  public toggleDateFilterItem() {
-    this.isHideDateFilter = !this.isHideDateFilter;
-  }
-
-
-  /**
-   * Toggle visibility of the Deleted Date filter
-   */
-  public toggleDeletedDateFilterItem() {
-    this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
-  }
-
-  /**
-   * Toggle visibility of the Amount filter
-   */
-  public toggleAmountFilterItem() {
-    this.isHideAmountFilter = !this.isHideAmountFilter;
-  }
-
-
-  /**
-   * Toggle visibility of the Aggregate Amount filter
-   */
-  public toggleAggregateAmountFilterItem() {
-    this.isHideAggregateAmountFilter = !this.isHideAggregateAmountFilter;
-  }
+  
 
 
   /**
@@ -249,15 +190,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   public toggleStateFilterItem() {
     this.isHideStateFilter = !this.isHideStateFilter;
   }
-
-
-  /**
-   * Toggle visibility of the Memo filter
-   */
-  public toggleMemoFilterItem() {
-    this.isHideMemoFilter = !this.isHideMemoFilter;
-  }
-
 
   /**
    * Toggle the direction of the filter collapsed or expanded
@@ -269,30 +201,27 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     return isHidden ? 'up-arrow-icon' : 'down-arrow-icon';
   }
 
-  public toggleItemizationFilterItem() {
-    this.isHideItemizationFilter = !this.isHideItemizationFilter;
-  }
-
-
+  
   /**
    * Determine the state for scrolling.  The category tye wasn't displaying
    * properly in edge with animation.  If edge, don't apply the state with animation.
    */
   public determineScrollState() {
     if (this.msEdge) {
+      return !this.isHideStateFilter ? 'openNoAnimate' : 'closedNoAnimate';
+    } else {
+      return !this.isHideStateFilter ? 'open' : 'closed';
+    }
+  }
+
+  public determineScrollType() {
+    if (this.msEdge) {
       return !this.isHideTypeFilter ? 'openNoAnimate' : 'closedNoAnimate';
     } else {
       return !this.isHideTypeFilter ? 'open' : 'closed';
     }
   }
-
-  public determineScrollItemization() {
-    if (this.msEdge) {
-      return !this.isHideItemizationFilter ? 'openNoAnimate' : 'closedNoAnimate';
-    } else {
-      return !this.isHideItemizationFilter ? 'open' : 'closed';
-    }
-  }
+ 
 
   /**
    * Scroll to the Category Type in the list that contains the
@@ -302,13 +231,8 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
 
     this.clearHighlightedTypes();
 
-    if (this.filterCategoriesText === undefined ||
-      this.filterCategoriesText === null ||
-      this.filterCategoriesText === '') {
-        return;
-    }
-
-    const typeMatches: Array<ContactsFilterTypeComponent> =
+    
+    /*const typeMatches: Array<ContactsFilterTypeComponent> =
       this.categoryElements.filter(el => {
         return el.categoryType.text.toString().toLowerCase()
           .includes(this.filterCategoriesText.toLowerCase());
@@ -328,7 +252,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     // TODO check if sequence is guaranteed to be preserved.
     for (const type of typeMatches) {
       type.categoryType.highlight = 'selected_row';
-    }
+    }*/
   }
 
 
@@ -359,92 +283,32 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       return;
     }
 
+    console.log("applyFilters");
+
     const filters = new ContactFilterModel();
     let modified = false;
-    filters.formType = this.formType;
+    //filters.formType = this.formType;
 
     // states
     const filterStates = [];
     for (const s of this.states) {
       if (s.selected) {
-        filterStates.push(s.code);
+        filterStates.push(s.state_code);
         modified = true;
       }
     }
-    filters.filterStates = filterStates;
+    filters.filterStates= filterStates;
 
-    // type/category
-    const filterCategories = [];
-    // if (this.filterCategoriesText.length > 0) {
-    //   modified = true;
-    //   filterCategories.push(this.filterCategoriesText);
-    // }
-    for (const category of this.transactionCategories) {
-      if (category.options) {
-        for (const option of category.options) {
-          if (option.selected) {
-            modified = true;
-            // TODO use code with backend
-            filterCategories.push(option.text);
-          }
-        }
-      }
-    }
-    filters.filterCategories = filterCategories;
-
-    filters.filterAmountMin = this.filterAmountMin;
-    filters.filterAmountMax = this.filterAmountMax;
-    filters.filterAggregateAmountMin = this.filterAggregateAmountMin;
-    filters.filterAggregateAmountMax = this.filterAggregateAmountMax;
-
-    if (this.filterAmountMin !== null) {
-      modified = true;
-    }
-    if (this.filterAmountMax !== null) {
-      modified = true;
-    }
-    if (this.filterAggregateAmountMin !== null) {
-      modified = true;
-    }
-    if (this.filterAggregateAmountMax !== null) {
-      modified = true;
-    }
-
-    filters.filterDateFrom = this.filterDateFrom;
-    filters.filterDateTo = this.filterDateTo;
-    if (this.filterDateFrom !== null) {
-      modified = true;
-    }
-    if (this.filterDateTo !== null) {
-      modified = true;
-    }
-
-    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
-    filters.filterDeletedDateTo = this.filterDeletedDateTo;
-    if (this.filterDeletedDateFrom !== null) {
-      modified = true;
-    }
-    if (this.filterDeletedDateTo !== null) {
-      modified = true;
-    }
-
-    if (this.filterMemoCode) {
-      filters.filterMemoCode = this.filterMemoCode;
-      modified = true;
-    }
-    console.log('itemizations = ', this.itemizations)
-    const filterItemizations = [];
-    for (const I of this.itemizations) {
-      if (I.selected) {
-        console.log('I.itemized', I.itemized);
-        filterItemizations.push(I.itemized);
-        console.log ('itemization tag found...');
+    const filterTypes = [];
+    for (const s of this.types) {
+      if (s.selected) {
+        filterTypes.push(s.type_code);
         modified = true;
       }
     }
-    filters.filterItemizations = filterItemizations;
-    console.log('filters.filterItemizations =', filters.filterItemizations);
-    
+    filters.filterTypes = filterTypes;
+
+    console.log("filters = ", filters);
     filters.show = modified;
     this._contactsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
   }
@@ -458,35 +322,18 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     this.initValidationErrors();
 
     // clear the scroll to input
-    this.filterCategoriesText = '';
+   // this.filterCategoriesText = '';
     this.clearHighlightedTypes();
 
 
     for (const s of this.states) {
       s.selected = false;
     }
-    for (const category of this.transactionCategories) {
-      if (category.options) {
-        for (const option of category.options) {
-          option.selected = false;
-        }
-      }
-    }
 
-    for (const s of this.itemizations) {
+    for (const s of this.types) {
       s.selected = false;
     }
 
-    this.filterAmountMin = null;
-    this.filterAmountMax = null;
-    this.filterAggregateAmountMin = null;
-    this.filterAggregateAmountMax = null;
-
-    this.filterDateFrom = null;
-    this.filterDateTo = null;
-    this.filterDeletedDateFrom = null;
-    this.filterDeletedDateTo = null;
-    this.filterMemoCode = false;
   }
 
 
@@ -525,59 +372,64 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Get the Category Types from the server for populating
-   * filter options on Type.
-   */
-  private getCategoryTypes() {
-    this._contactsService
-    .getContactCategories(this.formType)
-      .subscribe(res => {
-
-        let categoriesExist = false;
-        const categoriesGroupArray = [];
-        if (res.data) {
-          if (res.data.transactionCategories) {
-            categoriesExist = true;
-
-            // 1st node is the group of types (not checkable).
-            // 2nd node is ignored.
-            // 3rd node is the type checkable.
-            for (const node1 of res.data.transactionCategories) {
-              const categoryGroup: any = {};
-              categoryGroup.text = node1.text;
-              categoryGroup.options = [];
-
-              for (const node2 of node1.options) {
-                for (const option of node2.options) {
-                  if (this.cachedFilters) {
-                    if (this.cachedFilters.filterCategories) {
-                      // check for categories selected in the filter cache
-                      // TODO scroll to first check item
-                      if (this.cachedFilters.filterCategories.includes(option.text)) {
-                        option.selected = true;
-                        this.isHideTypeFilter = false;
-                      } else {
-                        option.selected = false;
-                      }
-                    }
-                  }
-                  categoryGroup.options.push(option);
+  private getStates() {
+    // TODO using this service to get states until available in another API.
+    // Passing INDV_REC as type but any should do as states are not specific to
+    // transaction type.
+    this._contactsService.getStates().subscribe(res => {
+      let statesExist = false;
+      if (res) {
+          statesExist = true;
+          for (const s of res) {
+            // check for states selected in the filter cache
+            // TODO scroll to first check item
+            if (this.cachedFilters) {
+              if (this.cachedFilters.filterStates) {
+                if (this.cachedFilters.filterStates.includes(s.state_code)) {
+                  s.selected = true;
+                  this.isHideStateFilter = false;
+                } else {
+                  s.selected = false;
                 }
               }
-              if (categoryGroup.options.length > 0) {
-                categoriesGroupArray.push(categoryGroup);
+          }
+        }
+      }
+      if (statesExist) {
+        this.states = res;
+      } else {
+        this.states = [];
+      }
+    });
+    
+  }
+
+  private getTypes() {
+    // TODO using this service to get Itemizations until available in another API.
+    this._contactsService.getTypes().subscribe(res => {
+      let typeExist = false;
+      if (res.data) {
+        typeExist = true;
+        for (const s of res.data) {
+          // check for Itemizations selected in the filter cache
+          // TODO scroll to first check item
+          if (this.cachedFilters) {
+            if (this.cachedFilters.filterTypes) {
+              if (this.cachedFilters.filterTypes.includes(s.type_code)) {
+                s.selected = true;
+                this.isHideTypeFilter = false;
+              } else {
+                s.selected = false;
               }
             }
           }
         }
-        if (categoriesExist) {
-          this.transactionCategories = categoriesGroupArray;
-          // this.transactionCategories = this._orderByPipe.transform(
-          //   res.data.transactionCategories, {property: 'text', direction: 1});
-        } else {
-          this.transactionCategories = [];
-        }
+      }
+      if (typeExist) {
+        this.types = res.data;
+      } else {
+        this.types = [];
+      }
     });
   }
 
@@ -590,33 +442,11 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     if (filtersJson != null) {
       this.cachedFilters = JSON.parse(filtersJson);
       if (this.cachedFilters) {
-        this.filterCategoriesText = this.cachedFilters.filterCategoriesText;
-        if (this.filterCategoriesText) {
-          this.isHideTypeFilter = !(this.filterCategoriesText.length > 0);
-        }
-
-        this.filterAmountMin = this.cachedFilters.filterAmountMin;
-        this.filterAmountMax = this.cachedFilters.filterAmountMax;
-        this.isHideAmountFilter = !(this.filterAmountMin > 0 && this.filterAmountMax > 0);
-
-        this.filterAggregateAmountMin = this.cachedFilters.filterAggregateAmountMin;
-        this.filterAggregateAmountMax = this.cachedFilters.filterAggregateAmountMax;
-        this.isHideAggregateAmountFilter = !(this.filterAggregateAmountMin > 0 && this.filterAggregateAmountMax > 0);
-
-        this.filterDateFrom = this.cachedFilters.filterDateFrom;
-        this.filterDateTo = this.cachedFilters.filterDateTo;
-        this.isHideDateFilter = (this.filterDateFrom && this.filterDateFrom) ? false : true;
-
-        this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
-        this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
-        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateFrom) ? false : true;
-
-        this.filterMemoCode = this.cachedFilters.filterMemoCode;
-        this.isHideMemoFilter = !this.filterMemoCode;
         // Note state and type apply filters are handled after server call to get values.
 
         // TODO itenized was left out and needs to be added.
-        this.itemizations = this.cachedFilters.filterItemizations;
+        this.types = this.cachedFilters.filterTypes;
+        this.states = this.cachedFilters.filterStates;
 
       }
     } else {
@@ -646,83 +476,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
   private validateFilters(): boolean {
 
     this.initValidationErrors();
-    if (this.filterDateFrom !== null && this.filterDateTo === null) {
-      this.dateFilterValidation.isError = true;
-      this.dateFilterValidation.message = 'To Date is required';
-      this.isHideDateFilter = false;
-      return false;
-    }
-    if (this.filterDateTo !== null && this.filterDateFrom === null) {
-      this.dateFilterValidation.isError = true;
-      this.dateFilterValidation.message = 'From Date is required';
-      this.isHideDateFilter = false;
-      return false;
-    }
-    if (this.filterDateFrom > this.filterDateTo) {
-      this.dateFilterValidation.isError = true;
-      this.dateFilterValidation.message = 'From Date must preceed To Date';
-      this.isHideDateFilter = false;
-      return false;
-    }
-
-    if (this.filterDeletedDateFrom !== null && this.filterDeletedDateTo === null) {
-      this.deletedDateFilterValidation.isError = true;
-      this.deletedDateFilterValidation.message = 'To Date is required';
-      this.isHideDeletedDateFilter = false;
-      return false;
-    }
-    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
-      this.deletedDateFilterValidation.isError = true;
-      this.deletedDateFilterValidation.message = 'From Date is required';
-      this.isHideDeletedDateFilter = false;
-      return false;
-    }
-    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
-      this.deletedDateFilterValidation.isError = true;
-      this.deletedDateFilterValidation.message = 'From Date must preceed To Date';
-      this.isHideDeletedDateFilter = false;
-      return false;
-    }
-
-
-    if (this.filterAmountMin !== null && this.filterAmountMax === null) {
-      this.amountFilterValidation.isError = true;
-      this.amountFilterValidation.message = 'Maximum Amount is required';
-      this.isHideAmountFilter = false;
-      return false;
-    }
-    if (this.filterAmountMax !== null && this.filterAmountMin === null) {
-      this.amountFilterValidation.isError = true;
-      this.amountFilterValidation.message = 'Minimum Amount is required';
-      this.isHideAmountFilter = false;
-      return false;
-    }
-    if (this.filterAmountMin > this.filterAmountMax) {
-      this.amountFilterValidation.isError = true;
-      this.amountFilterValidation.message = 'Maximum is less than Minimum';
-      this.isHideAmountFilter = false;
-      return false;
-    }
-
-    if (this.filterAggregateAmountMin !== null && this.filterAggregateAmountMax === null) {
-      this.aggregateAmountFilterValidation.isError = true;
-      this.aggregateAmountFilterValidation.message = 'Maximum Aggregate Amount is required';
-      this.isHideAggregateAmountFilter = false;
-      return false;
-    }
-    if (this.filterAggregateAmountMax !== null && this.filterAggregateAmountMin === null) {
-      this.aggregateAmountFilterValidation.isError = true;
-      this.aggregateAmountFilterValidation.message = 'Minimum Aggregate Amount is required';
-      this.isHideAggregateAmountFilter = false;
-      return false;
-    }
-    if (this.filterAggregateAmountMin > this.filterAggregateAmountMax) {
-      this.aggregateAmountFilterValidation.isError = true;
-      this.aggregateAmountFilterValidation.message = 'Maximum is less than Minimum';
-      this.isHideAggregateAmountFilter = false;
-      return false;
-    }
-
+ 
     return true;
   }
 
@@ -743,41 +497,13 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
               }
             }
             break;
-          case FilterTypes.category:
-            for (const categoryGroup of this.transactionCategories) {
-              for (const categoryType of categoryGroup.options) {
-                if (categoryType.text === message.value) {
-                  categoryType.selected = false;
-                }
+            case FilterTypes.type:
+            for (const st of this.types) {
+              if (st.code === message.value) {
+                st.selected = false;
               }
             }
-            break;
-          case FilterTypes.date:
-            this.filterDateFrom = null;
-            this.filterDateTo = null;
-            break;
-          case FilterTypes.deletedDate:
-            this.filterDeletedDateFrom = null;
-            this.filterDeletedDateTo = null;
-            break;
-          case FilterTypes.amount:
-            this.filterAmountMin = null;
-            this.filterAmountMax = null;
-            break;
-          case FilterTypes.aggregateAmount:
-            this.filterAggregateAmountMin = null;
-            this.filterAggregateAmountMax = null;
-            break;
-          case FilterTypes.memoCode:
-            this.filterMemoCode = false;
-            break;
-          case FilterTypes.itemizations:
-            for (const itemization of this.itemizations) {
-              if (itemization.itemized === message.value) {
-                itemization.selected = false;
-              }
-            }
-            break;
+            break;  
           default:
             console.log('unexpected key for remove filter = ' + message.key);
         }
