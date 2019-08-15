@@ -156,7 +156,7 @@ def get_f3x_summary_details(report_id, cmte_id):
 				       COALESCE(net_op_exp_per, 0.0) AS "38_netOperatingExpenditures"
 		            	FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
 
-        colB_query = """SELECT COALESCE(coh_begin_calendar_yr, 0.0) AS "6a_cashOnHandJan_1", COALESCE(calendar_yr, 0) AS "6b_yearOfcashOnHand", 
+        colB_query = """SELECT COALESCE(coh_begin_calendar_yr, 0.0) AS "6a_cashOnHandJan_1",
         			   COALESCE(ttl_receipts_sum_page_ytd, 0.0) AS "6c_totalReceipts",
 				       COALESCE(subttl_sum_ytd, 0.0) AS "6d_subtotal", COALESCE(ttl_disb_sum_page_ytd, 0.0) AS "7_totalDisbursements",
 				       COALESCE(coh_coy, 0.0) AS "8_cashOnHandAtClose", COALESCE(indv_item_contb_ytd, 0.0) AS "11ai_Itemized",
@@ -380,15 +380,16 @@ COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription", COAL
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.last_name, '''') AS "contributorLastName", COALESCE(t2.first_name, '''') AS "contributorFirstName",
 COALESCE(t2.middle_name, '''') AS "contributorMiddleName", COALESCE(t2.preffix, '''') AS "contributorPrefix", COALESCE(t2.suffix, '''') AS "contributorSuffix",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip", COALESCE(t2.employer, '''') AS "contributorEmployer",
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode", COALESCE(t2.employer, '''') AS "contributorEmployer",
 COALESCE(t2.occupation, '''') AS "contributorOccupation"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			INDV_REC_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		file = open("/tmp/indv_rec_sql.sql", 'w')
 		file.write(INDV_REC_STRING)
@@ -407,14 +408,15 @@ to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribut
 COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription", COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip"
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			PAR_CON_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			PAR_CON_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			PAR_CON_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		file = open("/tmp/par_con_sql.sql", 'w')
 		file.write(PAR_CON_STRING)
@@ -438,14 +440,15 @@ COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription", COAL
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip"
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			COND_EARM_PAC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			COND_EARM_PAC_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			COND_EARM_PAC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		file = open("/tmp/con_earm_sql.sql", 'w')
 		file.write(COND_EARM_PAC_STRING)
@@ -468,14 +471,15 @@ COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "mem
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName", COALESCE(t2.last_name, '''') AS "contributorLastName", COALESCE(t2.first_name, '''') AS "contributorFirstName",
 COALESCE(t2.middle_name, '''') AS "contributorMiddleName", COALESCE(t2.preffix, '''') AS "contributorPrefix", COALESCE(t2.suffix, '''') AS "contributorSuffix",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip"
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			SA_OTHER_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 
 		for tran in list_SA_similar_OTH_REC:
@@ -489,15 +493,16 @@ COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "mem
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName", COALESCE(t2.last_name, '''') AS "contributorLastName", COALESCE(t2.first_name, '''') AS "contributorFirstName",
 COALESCE(t2.middle_name, '''') AS "contributorMiddleName", COALESCE(t2.preffix, '''') AS "contributorPrefix", COALESCE(t2.suffix, '''') AS "contributorSuffix",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip", COALESCE(t2.employer, '''') AS "contributorEmployer",
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode", COALESCE(t2.employer, '''') AS "contributorEmployer",
 COALESCE(t2.occupation, '''') AS "contributorOccupation"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			SA_OTHER_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		for tran in list_SA_similar_REF_NFED_CAN:
 
@@ -510,14 +515,15 @@ COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip"
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			SA_OTHER_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		for tran in list_SA_similar_REF_FED_CAN:
 
@@ -530,14 +536,15 @@ COALESCE(t1.election_code, '''') AS "electionCode", COALESCE(t1.election_other_d
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "contributorOrgName",
 COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZip"
+COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode"
 FROM public.sched_a t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+			SA_OTHER_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+# 			SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
 		file = open("/tmp/sa_oth_sql.sql", 'w')
 		file.write(SA_OTHER_STRING)
@@ -560,14 +567,15 @@ COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "mem
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.last_name, '''') AS "payeeLastName", COALESCE(t2.first_name, '''') AS "payeeFirstName",
 COALESCE(t2.middle_name, '''') AS "payeeMiddleName", COALESCE(t2.preffix, '''') AS "payeePrefix", COALESCE(t2.suffix, '''') AS "payeeSuffix",
 COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
-COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZip"
+COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
 FROM public.sched_b t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+			SB_SA_CHILD_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SB')
+# 			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
 		for tran in list_SB_similar_IK_TF_OUT:
 
@@ -579,14 +587,15 @@ COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription", COALE
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
 COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
-COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZip"
+COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
 FROM public.sched_b t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+			SB_SA_CHILD_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SB')
+# 			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
 		for tran in list_SB_similar_EAR_OUT:
 
@@ -609,15 +618,16 @@ COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
 COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
-COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZip"
+COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
 FROM public.sched_b t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+			SB_SA_CHILD_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SB')
+# 			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
 		for tran in list_SB_similar_IK_OUT_PTY:
 
@@ -630,14 +640,15 @@ COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId", COALESCE(t1.
 COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
 COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
-COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZip"
+COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
 FROM public.sched_b t1
 LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
 WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
 (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
-			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+			SB_SA_CHILD_STRING += """UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SB')
+# 			SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
 		file = open("/tmp/sb_sa_child_sql.sql", 'w')
 		file.write(SB_SA_CHILD_STRING)
@@ -649,6 +660,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 		file.write(PAR_CON_STRING)
 		file.write(COND_EARM_PAC_STRING)
 		file.write(SA_OTHER_STRING)
+		file.write(SB_SA_CHILD_STRING)
 		file.close()
 
 		return Response('Success', status=status.HTTP_201_CREATED)

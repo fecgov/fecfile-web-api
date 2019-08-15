@@ -50,7 +50,7 @@ def get_line_number_trans_type(transaction_type_identifier):
             return line_number, transaction_type
         else:
             raise Exception(
-                'The transaction type identifier is not in the specified list')
+                'The transaction type identifier is not in the specified list. Input Received: '+ transaction_type_identifier)
     except:
         raise
 
