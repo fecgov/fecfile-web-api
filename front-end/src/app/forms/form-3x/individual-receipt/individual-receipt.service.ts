@@ -300,7 +300,8 @@ export class IndividualReceiptService {
   public getContributionAggregate(
     reportId: string,
     entityId: number,
-    transactionTypeIdentifier: string
+    transactionTypeIdentifier: string,
+    contributionDate: string
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sa/contribution_aggregate';
@@ -313,6 +314,7 @@ export class IndividualReceiptService {
     params = params.append('report_id', reportId);
     params = params.append('entity_id', entityId.toString());
     params = params.append('transaction_type_identifier', transactionTypeIdentifier);
+    params = params.append('contribution_date', contributionDate);
 
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
