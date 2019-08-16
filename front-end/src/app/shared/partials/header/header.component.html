@@ -5,17 +5,17 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav float-right">
         <li class="nav-item">
-              <a class="nav-link" [routerLink]="['/dashboard']">
+              <a class="nav-link" draggable="false" [routerLink]="['/dashboard']">
                 Dashboard
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" [routerLink]="['/reports']">
+              <a class="nav-link" draggable="false" [routerLink]="['/reports']">
                 Reports
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" [routerLink]="['/contacts']">
+              <a class="nav-link" draggable="false" [routerLink]="['/contacts']">
                 Contacts
               </a>
             </li>
@@ -42,31 +42,31 @@
                   ngbDropdownMenu
                 >
                   
-                    <a class="dropdown-item" [routerLink]="['/tools_import_transactions']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
                       Import Transactions
                     </a>
-                    <a class="dropdown-item" [routerLink]="['/tools_import_names']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
                       Import Names
                     </a>
   
-                    <a class="dropdown-item" [routerLink]="['/tools_export_names']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
                       Export Names
                     </a>
   
-                      <a class="dropdown-item" [routerLink]="['/tools_merge_names']">
+                      <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
                       Merge Names
                     </a>
-                      <a class="dropdown-item" [routerLink]="['/tools_create_backup']">
+                      <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
                       Create Backup
                       </a>
                 </div>
               </div>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="">Help</a>
+              <a class="nav-link" draggable="false" href="">Help</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="">
+              <a class="nav-link" draggable="false" href="">
                 <i class="notifications-icon icon"></i>
                 Notifications
               </a>
@@ -93,16 +93,16 @@
                   aria-labelledby="dropdownProfile"
                   ngbDropdownMenu
                 >
-                    <a class="dropdown-item" [routerLink]="['/account']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
                       Account
                     </a>
-                    <a class="dropdown-item" [routerLink]="['/users']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/users']">
                       Users
                     </a>
-                    <a class="dropdown-item" [routerLink]="['/settings']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/settings']">
                       Settings
                     </a>
-                    <a class="dropdown-item" [routerLink]="['/logout']">
+                    <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
                       Logout
                     </a>
                 </div>

@@ -41,6 +41,7 @@
             >
               <div class="list-item__link">
                 <a
+                   draggable="false"
                   [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                   [queryParams]="{ step: 'step_1' }"
                   (click)="formSelected(committee_form.form_type_mini)"
@@ -57,6 +58,7 @@
                   </ng-container>
                   <ng-container *ngIf="formType !== committee_form.form_type_mini">
                     <a
+                      draggable="false"
                       [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                       [queryParams]="{ step: 'step_1' }"
                       (click)="formSelected(committee_form.form_type_mini)"
@@ -78,7 +80,7 @@
                  </button>
                 <ng-template #myFormsToolTips>
                   {{committee_form.form_info}}
-                  <a href= "{{committee_form.form_pdf_url}}"  target="_blank">Instructions</a>.
+                  <a href= "{{committee_form.form_pdf_url}}"  draggable="false" target="_blank">Instructions</a>.
                   <i class="external-link-icon" aria-hidden="true">
                    <span class="sr-only">Link opens in new window.</span>
                   </i>
@@ -120,6 +122,7 @@
                 </ng-container>
                 <ng-container *ngIf="formType !== committee_form.form_type_mini">
                   <a
+                    draggable="false"
                     [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                     [queryParams]="{ step: 'step_1' }"
                     (click)="formSelected(committee_form.form_type_mini)"
@@ -135,6 +138,7 @@
                   </ng-container>
                   <ng-container *ngIf="formType !== committee_form.form_type_mini">
                     <a
+                      draggable="false"
                       [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                       [queryParams]="{ step: 'step_1' }"
                       (click)="formSelected(committee_form.form_type_mini)"
@@ -156,7 +160,7 @@
                  </button>
                  <ng-template #otherFormsToolTips>
                     {{committee_form.form_info}}
-                    <a href="{{ committee_form.form_pdf_url }}"  target="_blank">Instructions</a>.
+                    <a href="{{ committee_form.form_pdf_url }}"  draggable="false" target="_blank">Instructions</a>.
                     <i class="external-link-icon" aria-hidden="true">
                       <span class="sr-only">Link opens in new window.</span>
                     </i>
