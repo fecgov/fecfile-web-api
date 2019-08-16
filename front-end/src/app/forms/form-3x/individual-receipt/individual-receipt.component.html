@@ -226,24 +226,6 @@
                         (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
                       />                                       
                     </div>
-                    <!-- <input
-                      *ngIf="isFieldName(col?.name, 'contribution_date')"
-                      class="form-control"
-                      [style.width]="col?.width"
-                      [style.height]="col?.height"
-                      [attr.type]="col?.type"
-                      [attr.name]="col?.name"                      
-                      [attr.value]="col?.value"
-                      [maxlength]="col?.validation?.max"
-                      [formControlName]="col?.name"
-                      (change)="doDateChange()"
-                      [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'input-field-error'
-                          : ''
-                      "
-                    />                     -->
                     <div
                       class="error-text"
                       *ngIf="
@@ -295,7 +277,6 @@
                     </div>
                   </ng-container>
                   <ng-container *ngIf="col?.type === 'checkbox'">
-                      <!-- [attr.disabled]="isMemoCodeReadOnly(col?.name)" -->
                     <input
                       class="form-control forms__big_checkbox"
                       [style.width]="col?.width"
@@ -303,6 +284,7 @@
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"
                       [attr.value]="col?.value"
+                      [attr.disabled]="isMemoCodeReadOnly(col?.name)"
                       [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                       [formControlName]="col?.name"
                       (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
