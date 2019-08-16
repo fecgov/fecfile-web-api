@@ -127,7 +127,7 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_REC" : "IK_OUT",
                                     "IK_BC_REC" : "IK_BC_OUT",
                                     "REATT_FROM" : "REATT_MEMO",
-                                    "CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
+                                    #"CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
                                     "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
                                     "PARTY_IK_REC" : "PARTY_IK_OUT",
                                     "PARTY_IK_BC_REC" : "PARTY_IK_BC_OUT",
@@ -151,6 +151,10 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
                                             "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
                                             "EAR_REC": "EAR_MEMO",
                                             "PAC_EAR_REC": "PAC_EAR_MEMO" 
+                                        }
+
+TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
+                                            "CON_EAR_DEP": "CON_EAR_DEP_NONMEMO",
                                         }
 
 def get_next_transaction_id(trans_char):
@@ -570,17 +574,33 @@ def post_schedA(datum):
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), check_decimal(datum.get(
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
-                if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
+                if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
                         child_datum['other_name'] = None
                     child_data = post_schedB(child_datum)
-                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT.keys():
+                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT:
                     check_mandatory_fields_SA(datum, MANDATORY_CHILD_FIELDS_SCHED_A)
                     child_datum = child_SA_to_parent_schedA_dict(datum)
                     child_data = post_schedA(child_datum)
+                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT:
+                    if not 'child_datum' in datum:
+                        raise Exception('child data missing!!!') 
+                    child_datum = datum.get('child_datum')
+                    # update some filds and make sure the parent-child relationashp
+                    child_datum['cmte_id'] = datum.get('cmte_id')
+                    child_datum['report_id'] = datum.get('report_id')
+                    child_datum['transaction_type_identifier'] = TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT.get(
+                        datum.get('transaction_type_identifier'))
+                    child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(
+                        child_datum.get('transaction_type_identifier')
+                    )
+                    child_datum['back_ref_transaction_id'] = transaction_id
+                    child_data = post_schedB(child_datum)
+                else:
+                    pass
             except:
                 remove_schedA(datum)
                 raise
@@ -819,6 +839,11 @@ def schedA_sql_dict(data):
                 child_datum['child_entity_id'] = data.get('child*entity_id')
             child_datum['child_line_number'], child_datum['child_transaction_type'] = get_line_number_trans_type(child_datum.get('child_transaction_type_identifier'))
             datum = {**datum, **child_datum}
+      
+        if data.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT:
+            child_datum = {k.split('*')[1]:v for k,v in data.items() if k.startswith('child')}
+            datum['child_datum'] = child_datum
+
         return datum
     except:
         raise
