@@ -585,7 +585,8 @@ export class ReportTypeService {
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
         console.log(" printPreviewPdf transactions =", transactions);
-        formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
+        //formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
+        formData.append('transaction_id',  transactions.replace(' ',''));
       }
     }
 
@@ -627,7 +628,8 @@ export class ReportTypeService {
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
         console.log("prepare_json_builders_data transactions =", transactions);
-        formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
+        //formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
+        formData.append('transaction_id',  transactions.replace(' ',''));
       }
     }
     return this._http
