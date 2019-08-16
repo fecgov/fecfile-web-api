@@ -7,7 +7,8 @@ import {
   Output,
   ViewEncapsulation,
   ViewChild,
-  OnDestroy
+  OnDestroy,
+  HostListener
 } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -83,7 +84,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
-  private _isSelectedEntityAggregate: boolean;
+  // private _isSelectedEntityAggregate: boolean;
   private _isSelectedEntityAggregateChild: boolean;
   private _selectedEntityChild: any;
   private _selectedChangeWarn: any;
@@ -128,7 +129,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarnChild = null;
-    this._isSelectedEntityAggregate = false;
+    // this._isSelectedEntityAggregate = false;
     this._readOnlyMemoCode = false;
     this._transactionToEdit = null;
     this._contributionAggregateValue = 0.0;
@@ -155,7 +156,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     // this._populatePurposeForEarmark();
 
-    this._listenForDateChange();
+    // this._listenForDateChange();
 
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
@@ -889,7 +890,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   public viewTransactions(): void {
     this._clearFormValues();
-    let reportId = this.getReportIdFromStorage();
+    let reportId = this._getReportIdFromStorage();
     console.log('reportId', reportId);
 
     if (!reportId) {
@@ -1001,7 +1002,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
     this._selectedChangeWarn = {};
-    this._isSelectedEntityAggregate = false;
+    // this._isSelectedEntityAggregate = false;
     this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -1015,39 +1016,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    // If Earmark, auto populate purpose
-    // console.log('transaction type from input is ' + this.transactionType);
-    // if (this.transactionType === 'EAR_REC') {
-    //   if (this.frmIndividualReceipt.contains('child*purpose_description')) {
-    //     this._populateChildPurpose();
-    //   }
-    // }
-
-    // const reportId = this.getReportIdFromStorage();
-    // this._receiptService.getContributionAggregate(reportId, contact.entity_id, this.transactionType).subscribe(res => {
-    //   // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-    //   // Entity selected from the typeahead list.
-
-    //   let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-    //   contributionAmount = contributionAmount ? contributionAmount : 0;
-
-    //   // TODO make this a class variable for contributionAmountChange() to add to.
-    //   let contributionAggregate: string = String(res.contribution_aggregate);
-    //   contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-    //   const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-    //   const value: string = this._decimalPipe.transform(total, '.2-2');
-
-    //   console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-    //       ${contributionAggregate} = ${total}`);
-    //   console.log(`value = ${value}`);
-
-    //   this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
-
-    //   // Store the entity aggregate to be added to the contribution amount
-    //   // if it changes in the UI.  See contributionAmountChange();
-    //   this._contributionAggregateValue = parseFloat(contributionAggregate);
-    // });
+    // If date is selected, get the aggregate.
+    if (this.frmIndividualReceipt.contains('contribution_date')) {
+      const dateValue = this.frmIndividualReceipt.get('contribution_date').value;
+      if (dateValue) {
+        this._getContributionAggregate(dateValue);
+      }
+    }
   }
 
   /**
@@ -1067,7 +1042,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     } else {
       this._selectedEntity = this._utilService.deepClone(entity);
       this._selectedChangeWarn = {};
-      this._isSelectedEntityAggregate = false;
+      // this._isSelectedEntityAggregate = false;
     }
 
     if (isChildForm) {
@@ -1302,10 +1277,28 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
   }
 
+  public doContributionDateChange(fieldName: string) {
+    console.log('date has changed!');
+    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    if (this.frmIndividualReceipt.contains('contribution_date')) {
+      const dateValue = this.frmIndividualReceipt.get('contribution_date').value;
+      if (!dateValue) {
+        return;
+      }
+      if (this._selectedEntity) {
+        if (this._selectedEntity.entity_id) {
+          const contribDate =
+            this._utilService.formatDate(dateValue);
+          this._getContributionAggregate(contribDate);
+        }
+      }
+    }
+  }
+
   /**
    * Obtain the Report ID from local storage.
    */
-  private getReportIdFromStorage() {
+  private _getReportIdFromStorage() {
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
@@ -1628,6 +1621,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedEntityChild = null;
     this._selectedChangeWarn = {};
     this._selectedChangeWarnChild = {};
+    this._contributionAggregateValue = 0.0;
+    this._contributionAggregateValueChild = 0.0;
     this.frmIndividualReceipt.reset();
 
     if (this.frmIndividualReceipt.contains('entity_type')) {
@@ -1644,25 +1639,25 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (this.frmIndividualReceipt.contains('child*purpose_description') &&
         !this._selectedEntity) {
 
-          const source = timer(5000);
-          //output: 0
-          source.subscribe(val => {
-            this.frmIndividualReceipt.get('prefix').valueChanges.subscribe(val => {
-              this._populateChildPurpose();
-            });
-            this.frmIndividualReceipt.get('last_name').valueChanges.subscribe(val => {
-              this._populateChildPurpose();
-            });
-            this.frmIndividualReceipt.get('middle_name').valueChanges.subscribe(val => {
-              this._populateChildPurpose();
-            });
-            this.frmIndividualReceipt.get('first_name').valueChanges.subscribe(val => {
-              this._populateChildPurpose();
-            });
-            this.frmIndividualReceipt.get('suffix').valueChanges.subscribe(val => {
-              this._populateChildPurpose();
-            });
-          });
+          // const source = timer(5000);
+          // //output: 0
+          // source.subscribe(val => {
+          //   this.frmIndividualReceipt.get('prefix').valueChanges.subscribe(val => {
+          //     this._populateChildPurpose();
+          //   });
+          //   this.frmIndividualReceipt.get('last_name').valueChanges.subscribe(val => {
+          //     this._populateChildPurpose();
+          //   });
+          //   this.frmIndividualReceipt.get('middle_name').valueChanges.subscribe(val => {
+          //     this._populateChildPurpose();
+          //   });
+          //   this.frmIndividualReceipt.get('first_name').valueChanges.subscribe(val => {
+          //     this._populateChildPurpose();
+          //   });
+          //   this.frmIndividualReceipt.get('suffix').valueChanges.subscribe(val => {
+          //     this._populateChildPurpose();
+          //   });
+          // });
       }
     }
   }
@@ -1677,14 +1672,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             // The valueChanges() is firing ~100 times even though
             // the previous/next values are equal.  This may be due to
             // the calling this method from ngDoCheck() as it is where the formGroup
-            // is set.  To avoid this problem, another check break the loop needs
-            // to be added.
+            // is set.  To avoid this problem, another check to break the loop
+            // has been added.
             if (this._selectedEntity) {
-              if (this._selectedEntity.entity_id && !this._isSelectedEntityAggregate) {
+              // if (this._selectedEntity.entity_id && !this._isSelectedEntityAggregate) {
+              if (this._selectedEntity.entity_id) {
                 const contribDate =
                   this._utilService.formatDate(this.frmIndividualReceipt.get('contribution_date').value);
                 this._getContributionAggregate(contribDate);
-                this._isSelectedEntityAggregate = true;
+                // this._isSelectedEntityAggregate = true;
               }
             }
           }
@@ -1714,41 +1710,139 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
   }
 
-  private _populateChildPurpose() {
+  /**
+   * Auto populate parent purpose with child names fields or child purpose
+   * with parent name fields
+   */
+  public populatePurpose(fieldName: string) {
 
+    if (this.transactionType !== 'EAR_REC') {
+      return;
+    }
+
+    const isChildFieldChild = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+
+    if (isChildFieldChild) {
+      if (!this.frmIndividualReceipt.contains('purpose_description')) {
+        return;
+      }
+    } else {
+      if (!this.frmIndividualReceipt.contains('child*purpose_description')) {
+        return;
+      }
+    }
+    if (isChildFieldChild) {
+      const childPrefix = this._childFieldNamePrefix;
+      let lastName = '';
+      // type ahead fields need to be checked for objects
+      if (this.frmIndividualReceipt.contains(childPrefix + 'last_name')) {
+        const lastNameObject = this.frmIndividualReceipt.get(childPrefix + 'last_name').value;
+
+        if (lastNameObject && typeof lastNameObject !== 'string') {
+          // it's an object as a result of the ngb-typeahead
+          lastName = lastNameObject[childPrefix + 'last_name'];
+        } else {
+          lastName = lastNameObject;
+          lastName = lastName && typeof lastName === 'string' ? lastName.trim() : '';
+        }
+      }
+
+      let firstName = '';
+      if (this.frmIndividualReceipt.contains(childPrefix + 'first_name')) {
+        const firstNameObject = this.frmIndividualReceipt.get(childPrefix + 'first_name').value;;
+
+        if (firstNameObject && typeof firstNameObject !== 'string') {
+          // it's an object as a result of the ngb-typeahead
+          firstName = firstNameObject[childPrefix + 'first_name'];
+        } else {
+          firstName = firstNameObject;
+          firstName = firstName && typeof firstName === 'string' ? firstName.trim() : '';
+        }
+      }
+
+      let prefix = '';
+      if (this.frmIndividualReceipt.contains(childPrefix + 'prefix')) {
+        prefix = this.frmIndividualReceipt.get(childPrefix + 'prefix').value;
+        prefix = prefix && typeof prefix === 'string' ? prefix.trim() : '';
+      }
+      let middleName = '';
+      if (this.frmIndividualReceipt.contains(childPrefix + 'middle_name')) {
+        middleName = this.frmIndividualReceipt.get(childPrefix + 'middle_name').value;
+        middleName = middleName && typeof middleName === 'string' ? middleName.trim() : '';
+      }
+      let suffix = '';
+      if (this.frmIndividualReceipt.contains(childPrefix + 'suffix')) {
+        suffix = this.frmIndividualReceipt.get(childPrefix + 'suffix').value;
+        suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
+      }
+
+      let purpose = 'Earmarked for';
+      const nameArray = [];
+      if (prefix) {
+        nameArray.push(prefix);
+      }
+      if (firstName) {
+        nameArray.push(firstName);
+      }
+      if (middleName) {
+        nameArray.push(middleName);
+      }
+      if (lastName) {
+        nameArray.push(lastName);
+      }
+      if (suffix) {
+        nameArray.push(suffix);
+      }
+      for (const field of nameArray) {
+        purpose += ' ' + field;
+      }
+
+      console.log('purpose is: ' + purpose);
+      this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose },
+      { onlySelf: true });
+  } else {
+    let lastName = '';
     // type ahead fields need to be checked for objects
-    const lastNameObject = this.frmIndividualReceipt.get('last_name').value;
-    let lastName = null;
+    if (this.frmIndividualReceipt.contains('last_name')) {
+      const lastNameObject = this.frmIndividualReceipt.get('last_name').value;
 
-    if (typeof lastNameObject !== 'string') {
-      // it's an object as a result of the ngb-typeahead
-      lastName = lastNameObject.last_name;
-    } else {
-      lastName = lastNameObject;
-      lastName = lastName && typeof lastName === 'string' ? lastName.trim() : '';
+      if (lastNameObject && typeof lastNameObject !== 'string') {
+        // it's an object as a result of the ngb-typeahead
+        lastName = lastNameObject.last_name;
+      } else {
+        lastName = lastNameObject;
+        lastName = lastName && typeof lastName === 'string' ? lastName.trim() : '';
+      }
     }
 
+    let firstName = '';
+    if (this.frmIndividualReceipt.contains('first_name')) {
+      const firstNameObject = this.frmIndividualReceipt.get('first_name').value;;
 
-    const firstNameObject = this.frmIndividualReceipt.get('first_name').value;;
-    let firstName = null;
-
-    if (typeof firstNameObject !== 'string') {
-      // it's an object as a result of the ngb-typeahead
-      firstName = firstNameObject.first_name;
-    } else {
-      firstName = firstNameObject;
-      firstName = firstName && typeof firstName === 'string' ? firstName.trim() : '';
+      if (firstNameObject && typeof firstNameObject !== 'string') {
+        // it's an object as a result of the ngb-typeahead
+        firstName = firstNameObject.first_name;
+      } else {
+        firstName = firstNameObject;
+        firstName = firstName && typeof firstName === 'string' ? firstName.trim() : '';
+      }
     }
 
-
-    let prefix = this.frmIndividualReceipt.get('prefix').value;
-    prefix = prefix && typeof prefix === 'string' ? prefix.trim() : '';
-
-    let middleName = this.frmIndividualReceipt.get('middle_name').value;
-    middleName = middleName && typeof middleName === 'string' ? middleName.trim() : '';
-
-    let suffix = this.frmIndividualReceipt.get('suffix').value;
-    suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
+    let prefix = '';
+    if (this.frmIndividualReceipt.contains('prefix')) {
+      prefix = this.frmIndividualReceipt.get('prefix').value;
+      prefix = prefix && typeof prefix === 'string' ? prefix.trim() : '';
+    }
+    let middleName = '';
+    if (this.frmIndividualReceipt.contains('middle_name')) {
+      middleName = this.frmIndividualReceipt.get('middle_name').value;
+      middleName = middleName && typeof middleName === 'string' ? middleName.trim() : '';
+    }
+    let suffix = '';
+    if (this.frmIndividualReceipt.contains('suffix')) {
+      suffix = this.frmIndividualReceipt.get('suffix').value;
+      suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
+    }
 
     // const purpose = `Earmarked for ${prefix} ${firstName} ${middleName} ${lastName} ${suffix}`;
     let purpose = 'Earmarked for';
@@ -1777,8 +1871,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     { onlySelf: true });
   }
 
+  }
+
+  private _populateChildPurpose(fieldNam) {
+  }
+
   private _getContributionAggregate(contributionDate: string) {
-    const reportId = this.getReportIdFromStorage();
+    const reportId = this._getReportIdFromStorage();
     this._receiptService.getContributionAggregate(reportId, this._selectedEntity.entity_id,
         this.transactionType, contributionDate).subscribe(res => {
       // Add the UI val for Contribution Amount to the Contribution Aggregate for the
@@ -1786,6 +1885,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
       contributionAmount = contributionAmount ? contributionAmount : 0;
+      // remove commas
+      contributionAmount = contributionAmount.replace(/,/g, ``);
 
       // TODO make this a class variable for contributionAmountChange() to add to.
       let contributionAggregate: string = String(res.contribution_aggregate);
@@ -1817,7 +1918,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       entityId = this._selectedEntity.entity_id;
     }
 
-    const reportId = this.getReportIdFromStorage();
+    const reportId = this._getReportIdFromStorage();
     this._receiptService.getContributionAggregate(reportId, entityId,
       this.transactionType, contributionDate).subscribe(res => {
       // Add the UI val for Contribution Amount to the Contribution Aggregate for the

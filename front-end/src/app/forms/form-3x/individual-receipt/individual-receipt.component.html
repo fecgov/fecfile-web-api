@@ -89,7 +89,7 @@
                             && col?.name !== 'last_name'
                             && !isFieldName(col?.name, 'entity_name')
                             && !isFieldName(col?.name, 'donor_cmte_id')
-                            && !isFieldName(col?.name, 'donor_cmte_name')
+                            && !isFieldName(col?.name, 'donor_cmte_name')                            
                             "
                         class="form-control"
                         [style.width]="col?.width"
@@ -100,7 +100,8 @@
                         [attr.value]="col?.value"
                         [maxlength]="isFieldName(col?.name, 'contribution_amount') ? col?.validation?.max + 5: col?.validation?.max"
                         [formControlName]="col?.name"
-                        (blur)="isFieldName(col?.name, 'contribution_amount') ? contributionAmountChange($event, col?.name) : null"
+                        (blur)="isFieldName(col?.name, 'contribution_amount') ? 
+                          contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -108,6 +109,7 @@
                             : ''
                         "
                         (keyup)="handleFormFieldKeyup($event, col)"
+                        (change)="isFieldName(col?.name, 'contribution_date') ? doContributionDateChange(col?.name) : null"
                       />
                       <input
                         *ngIf="col?.name === 'last_name'"
@@ -131,6 +133,7 @@
                         [inputFormatter]="formatterLastName"
                         (selectItem)="handleSelectedItem($event)"
                         (keyup)="handleFormFieldKeyup($event, col)"
+                        (blur)="populatePurpose(col?.name)"
                       />
                       <input
                         *ngIf="col?.name === 'first_name'"
@@ -154,6 +157,7 @@
                         [inputFormatter]="formatterFirstName"
                         (selectItem)="handleSelectedItem($event)"
                         (keyup)="handleFormFieldKeyup($event, col)"
+                        (blur)="populatePurpose(col?.name)"
                       />
                       <input
                         *ngIf="isFieldName(col?.name, 'entity_name')"
@@ -222,6 +226,24 @@
                         (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
                       />                                       
                     </div>
+                    <!-- <input
+                      *ngIf="isFieldName(col?.name, 'contribution_date')"
+                      class="form-control"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"                      
+                      [attr.value]="col?.value"
+                      [maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                      (change)="doDateChange()"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                    />                     -->
                     <div
                       class="error-text"
                       *ngIf="
