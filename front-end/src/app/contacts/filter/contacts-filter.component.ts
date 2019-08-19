@@ -11,7 +11,7 @@ import { ContactsService } from '../service/contacts.service';
 import { ContactsFilterTypeComponent } from './filter-type/contacts-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
 import { FilterTypes, ActiveView } from '../contacts.component';
-
+import { MessageService } from '../../shared/services/MessageService/message.service';
 
 /**
  * A component for filtering contacts located in the sidebar.
@@ -73,6 +73,7 @@ import { FilterTypes, ActiveView } from '../contacts.component';
   ]
 })
 export class ContactsFilterComponent implements OnInit, OnDestroy {
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   @Input()
   public formType: string;
@@ -110,7 +111,8 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
 
   constructor(
     private _contactsService: ContactsService,
-    private _contactsMessageService: ContactsMessageService
+    private _contactsMessageService: ContactsMessageService,
+    private _messageService: MessageService,
   ) {
     this.removeFilterSubscription = this._contactsMessageService.getRemoveFilterMessage()
       .subscribe(
@@ -334,6 +336,12 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       s.selected = false;
     }
 
+    this._messageService.sendMessage('Filter deleted');
+    
+    this.status.emit({
+      filterstatus:'deleted'
+    });
+
   }
 
 
@@ -488,18 +496,19 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
    */
   private removeFilter(message: any) {
     if (message) {
+      console.log(" contat removeFilter message", message);
       if (message.key) {
         switch (message.key) {
           case FilterTypes.state:
             for (const st of this.states) {
-              if (st.code === message.value) {
+              if (st.state_code === message.value) {
                 st.selected = false;
               }
             }
             break;
             case FilterTypes.type:
             for (const st of this.types) {
-              if (st.code === message.value) {
+              if (st.type_code === message.value) {
                 st.selected = false;
               }
             }
