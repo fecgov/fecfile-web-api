@@ -57,7 +57,7 @@ MANDATORY_CHILD_FIELDS_SCHED_A = ['report_id', 'child_transaction_type_identifie
                             'child_contribution_amount', 'child_entity_type']
 
 # madatory fields for aggregate amount api call
-MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier']
+MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier', 'contribution_date']
 
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
@@ -450,21 +450,35 @@ def find_aggregate_date(form_type, contribution_date):
             'The aggregate_start_date function is throwing an error: ' + str(e))
 
 
-def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id):
+def func_aggregate_amount(contribution_date, transaction_type_identifier, entity_id, cmte_id):
     """
     query aggregate amount based on start/end date, transaction_type, entity_id and cmte_id
     """
     try:
         with connection.cursor() as cursor:
 
-            cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
-                           entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
+AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
+AND contribution_date <= %s::date
+AND memo_code IS NULL 
+AND delete_ind is distinct FROM 'Y' 
+ORDER BY contribution_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
 
-            aggregate_amt = cursor.fetchone()[0]
+            # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
+            # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
+            #                entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            print(cursor.query)
+            result = cursor.fetchone()
+            print(result)
+        if result is None:
+          aggregate_amt = 0
+        elif result[0] is None:
+          aggregate_amt = 0
+        else:
+          aggregate_amt = result[0]
         return aggregate_amt
     except Exception as e:
-        raise Exception(
-            'The aggregate_amount function is throwing an error: ' + str(e))
+        raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 
 def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id):
@@ -1100,19 +1114,20 @@ def contribution_aggregate(request):
             check_mandatory_fields_SA(
                 request.query_params, MANDATORY_FIELDS_AGGREGATE)
             cmte_id = request.user.username
-            if not('report_id' in request.query_params):
-                raise Exception('Missing Input: Report_id is mandatory')
-            # handling null,none value of report_id
-            if check_null_value(request.query_params.get('report_id')):
-                report_id = check_report_id(request.query_params.get('report_id'))
-            else:
-                report_id = "0"
-            # end of handling
-            if report_id == "0":
-                aggregate_date = datetime.datetime.today()
-            else:
-                aggregate_date = report_end_date(report_id, cmte_id)
+            # if not('report_id' in request.query_params):
+            #     raise Exception('Missing Input: Report_id is mandatory')
+            # # handling null,none value of report_id
+            # if check_null_value(request.query_params.get('report_id')):
+            #     report_id = check_report_id(request.query_params.get('report_id'))
+            # else:
+            #     report_id = "0"
+            # # end of handling
+            # if report_id == "0":
+            #     aggregate_date = datetime.datetime.today()
+            # else:
+            #     aggregate_date = report_end_date(report_id, cmte_id)
             transaction_type_identifier = request.query_params.get('transaction_type_identifier')
+            contribution_date = date_format(request.query_params.get('contribution_date'))
             if 'entity_id' in request.query_params and check_null_value(request.query_params.get('entity_id')):
                 entity_id = request.query_params.get('entity_id')
             else:
@@ -1122,11 +1137,9 @@ def contribution_aggregate(request):
                     request.query_params.get('contribution_amount'))
             else:
                 contribution_amount = "0"
-            form_type = find_form_type(report_id, cmte_id)
-            aggregate_start_date, aggregate_end_date = find_aggregate_date(
-                form_type, aggregate_date)
-            aggregate_amt = func_aggregate_amount(
-                aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
+            # form_type = find_form_type(report_id, cmte_id)
+            # aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, aggregate_date)
+            aggregate_amt = func_aggregate_amount(contribution_date, transaction_type_identifier, entity_id, cmte_id)
             total_amt = aggregate_amt + Decimal(contribution_amount)
             return JsonResponse({"contribution_aggregate": total_amt}, status=status.HTTP_201_CREATED)
         except Exception as e:
