@@ -56,6 +56,16 @@ NEGATIVE_TRANSACTIONS = [
     'REF_CONT_NON_FED_VOID',
 ]
 
+# for child transactions, we'll validate parent_id exists in the db
+CHILD_PARENT_SB_SB_TRANSACTIONS = {
+    'OTH_DISB_CC_PAY_MEMO': ('OTH_DISB_CC_PAY', 'sched_b')
+    'OTH_DISB_STAF_REIM_MEMO': ('OTH_DISB_STAF_REIM', 'sched_b')
+    'OTH_DISB_PMT_TO_PROL_MEMO': ('OTH_DISB_PMT_TO_PROL', 'sched_b')
+    'OTH_DISB_NC_ACC_CC_PAY_MEMO': ('OTH_DISB_NC_ACC_CC_PAY', 'sched_b')
+    'OTH_DISB_NC_ACC_STAF_REIM_MEMO': ('OTH_DISB_NC_ACC_STAF_REIM', 'sched_b')
+    'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO': ('OTH_DISB_NC_ACC_PMT_TO_PROL', 'sched_b')
+}
+
 
 def get_next_transaction_id(trans_char):
     """
@@ -687,6 +697,38 @@ def validate_negative_transaction(data):
         if not float(data.get('expenditure_amount')) < 0:
             raise Exception("current transaction amount need to be negative!")
 
+def parent_transaction_exists(tran_id, sched_tp):
+    """
+    check if parent transaction exists
+    """
+    _sql = """
+    SELECT * from public.%s 
+    WHERE transaction_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (sched_tp, tran_id))
+            if cursor.rowcount != 0:
+                return True
+        return False
+    except:
+        raise
+
+
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    if data.get("transaction_type_identifer") in CHILD_PARENT_SB_SB_TRANSACTIONS:
+        if not data.get('back_ref_transaction_id'):
+            raise Exception("Error: parent transaction id missing.")
+        elif not parent_transaction_exists(
+            data.get('back_ref_transaction_id'), 
+            CHILD_PARENT_SB_SB_TRANSACTIONS.get(data.get("transaction_type_identifer"))[1]
+            ):
+            raise Exception('Error: parent transaction not found.')
+        else:
+            pass
 
 def schedB_sql_dict(data):
     """
@@ -695,6 +737,7 @@ def schedB_sql_dict(data):
     """
     try:
         validate_negative_transaction(data)
+        validate_parent_transaction_exist(data)
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
