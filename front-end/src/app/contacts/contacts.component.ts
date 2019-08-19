@@ -5,7 +5,7 @@ import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
-import { ComponentFactoryResolver } from '@angular/core/src/render3';
+import { MessageService } from '../shared/services/MessageService/message.service';
 
 export enum ActiveView {
   contacts = 'contacts',
@@ -81,11 +81,12 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
   private filters: ContactFilterModel = new ContactFilterModel();
   private readonly filtersLSK = 'contacts.filters';
-
+  private keywordGroup: any  = [];
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _contactsMessageService: ContactsMessageService,
     private _router: Router,
+    private _messageService: MessageService,
   ) {
     this.applyFiltersSubscription = this._contactsMessageService.getApplyFiltersMessage()
       .subscribe(
@@ -224,7 +225,37 @@ export class ContactsComponent implements OnInit, OnDestroy {
   } else {
     this.removeTagArrayItem(FilterTypes.type);
   }
-       console.log('tagArray: ' + JSON.stringify(this.tagArray));
+  /*
+  // keywords
+  if (this.filters.keywords.length > 0) {
+    const keywordGroup = [];
+
+    // is tag showing? Then modify it is the curr position
+    // TODO put type strings in constants file as an enumeration
+    // They are also used in the filter component as well.
+
+    let typeTag = false;
+    for (const tag of this.tagArray) {
+      if (tag.type === FilterTypes.keyword) {
+        typeTag = true;
+        for (const cat of filters.filterKeywords) {
+          keywordGroup.push(cat);
+        }
+        tag.group = keywordGroup;
+      }
+    }
+    // If tag is not already showing, add it to the tag array.
+    if (!typeTag) {
+      for (const cat of filters.filterKeywords) {
+        keywordGroup.push(cat);
+      }
+      this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: keywordGroup});
+    }
+  } else {
+    this.removeTagArrayItem(FilterTypes.keyword);
+  } */
+   
+  console.log('tagArray: ' + JSON.stringify(this.tagArray));
 
     this.filters = filters;
   }
@@ -234,6 +265,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
    * Search contacts.
    */
   public search() {
+    console.log( "this.searchTextArray",this.searchTextArray);
 
     // Don't allow more than 12 filters
     if (this.searchTextArray.length > 12) {
@@ -242,10 +274,59 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
     // TODO emit search message to the table contacts component
     if (this.searchText) {
-      this.searchTextArray.push(this.searchText);
-      this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: [this.searchText]});
+      
+     this.searchTextArray.push(this.searchText);
+     // this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: [this.searchText]});
+      //this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: 'Contact_Search'});
+      
+      this._messageService.getMessage().subscribe(res => {
+        console.log(" contact check filter clear message", res);
+        if (res==='Filter deleted'){
+          if (this.keywordGroup.length > 0) {
+            /*while (this.keywordGroup.length > 0) {
+              this.keywordGroup.pop();
+            }*/
+            //this.keywordGroup=[];
+
+          }
+        }
+      });
+
+      this._messageService.getMessage().subscribe(res => {
+        console.log(" contact check filter clear message", res);
+        if (res.hasOwnProperty('filterstatus')){
+          if (res.filterstatus==='deleted'){
+            if (this.keywordGroup.length > 0) {
+              /*while (this.keywordGroup.length > 0) {
+                this.keywordGroup.pop();
+              }*/
+              this.keywordGroup=[];
+
+            }
+          }
+        }
+      });
+
+      console.log("contact check this.keywordGroup =", this.keywordGroup);
+      console.log("contact check this.searchText =", this.searchText);
+      console.log("contact check this.tagArray =", this.tagArray);
+      
+      // const contactFilter =localStorage.getItem(this.filtersLSK);
+      //onsole.log("contactFilter =", contactFilter);
+
+      if (this.keywordGroup.length === 0) {
+          this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: this.keywordGroup});
+          this.keywordGroup.push(this.searchText);
+      } else{
+           this.keywordGroup.push(this.searchText);
+      }
+      
+      
+
       this.searchText = '';
     }
+
+    console.log(" before search this.tagArray =", this.tagArray);
     this.doSearch();
     //this.showFilters();
     this.isShowFilters = true;
@@ -302,7 +383,10 @@ export class ContactsComponent implements OnInit, OnDestroy {
     this.removeFilter(FilterTypes.state, state);
   }
 
-
+  public removeTypeFilter(index: number, type: string) {
+    this.filters.filterTypes.splice(index, 1);
+    this.removeFilter(FilterTypes.type, type);
+  }
   /**
    * Remove the State filter tag and inform the filter component to clear it.
    */
@@ -374,38 +458,20 @@ export class ContactsComponent implements OnInit, OnDestroy {
    */
   public removeTag(type: FilterTypes, index: number, tagText: string) {
     switch (type) {
-      case FilterTypes.category:
-        this.removeCategoryFilter(index, tagText);
+      case FilterTypes.type:
+        this.removeTypeFilter(index, tagText);
         this.removeTagArrayGroupItem(type, index);
         break;
       case FilterTypes.state:
         this.removeStateFilter(index, tagText);
         this.removeTagArrayGroupItem(type, index);
         break;
-      case FilterTypes.date:
-        this.removeDateFilter();
-        this.removeTagArrayItem(type);
-        break;
-      case FilterTypes.amount:
-        this.removeAmountFilter();
-        this.removeTagArrayItem(type);
-        break;
-      case FilterTypes.aggregateAmount:
-        this.removeAggregateAmountFilter();
-        this.removeTagArrayItem(type);
-        break;
       case FilterTypes.keyword:
         this.removeSearchText(tagText);
         this.removeSearchTagArrayItem(tagText);
+        this.keywordGroup.pop(tagText);
         break;
-      case FilterTypes.memoCode:
-        this.removeMemoFilter();
-        this.removeTagArrayItem(type);
-        break;
-      case FilterTypes.itemizations:
-        this.removeItemizationsFilter(index, tagText);
-        this.removeTagArrayGroupItem(type, index);
-        break;
+  
       default:
         console.log('unexpected type received for remove tag');
     }
