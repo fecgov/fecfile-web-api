@@ -38,7 +38,9 @@ export class TypeaheadService {
       fieldName === 'first_name' ||
       fieldName === 'last_name' ||
       fieldName === 'cmte_id' ||
-      fieldName === 'cmte_name'
+      fieldName === 'cmte_name' ||
+      fieldName === 'cand_first_name' ||
+      fieldName === 'cand_last_name'
     ) {
       params = params.append(fieldName, searchString);
     } else {
