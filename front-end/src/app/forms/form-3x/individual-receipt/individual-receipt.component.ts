@@ -84,8 +84,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
-  // private _isSelectedEntityAggregate: boolean;
-  private _isSelectedEntityAggregateChild: boolean;
   private _selectedEntityChild: any;
   private _selectedChangeWarn: any;
   private _selectedChangeWarnChild: any;
@@ -155,10 +153,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   ngDoCheck(): void {
     // TODO consider changes this to ngOnChanges()
-
-    // this._populatePurposeForEarmark();
-
-    // this._listenForDateChange();
 
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
@@ -246,12 +240,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           if (this.isFieldName(e.name, 'memo_code')) {
             memoCodeValue = e.value;
             if (memoCodeValue === this._memoCodeValue) {
-              this._readOnlyMemoCode = true;
+
               const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
               if (isChildForm) {
                 this.memoCodeChild = true;
+                this._readOnlyMemoCodeChild = true;
               } else {
                 this.memoCode = true;
+                this._readOnlyMemoCode = true;
               }
             }
           }
@@ -270,12 +266,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     // get form data API is passing X for memo code value.
     // Set it to value from dynamic forms as some should be checked and disabled by default.
-    if (this.memoCode) {
-      this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-    }
-    if (this.memoCodeChild) {
-      this.frmIndividualReceipt.controls[this._childFieldNamePrefix + 'memo_code'].setValue(this._memoCodeValue);
-    }
+    this._setMemoCodeForForm();
   }
 
   /**
@@ -788,7 +779,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         receiptObj.entity_id = this._selectedEntity.entity_id;
       }
 
-      // TODO do we need to save child entity?
       if (this._selectedEntityChild) {
         receiptObj['child*entity_id'] = this._selectedEntityChild.entity_id;
       }
@@ -843,7 +833,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this.memoCode = false;
           this.memoCodeChild = false;
           this.frmIndividualReceipt.reset();
-          this.frmIndividualReceipt.controls['memo_code'].setValue(null);
+
+          this._setMemoCodeForForm();
+
           this._selectedEntity = null;
           this._selectedChangeWarn = null;
           this._selectedEntityChild = null;
@@ -979,31 +971,96 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Populate the fields in the form with the values from the selected contact.
+   * Format an entity to display in the Candidate type ahead field.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCandidate(result: any) {
+    const street1 = result.cand_street_1 ? result.cand_street_1.trim() : '';
+    const street2 = result.cand_street_2 ? result.cand_street_2.trim() : '';
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+
+    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Populate the fields in the form with the values from the selected Candidate.
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
-  public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
+  public handleSelectedCandidate($event: NgbTypeaheadSelectItemEvent,
+    fieldName: string) {
 
     // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
     // TODO need a way to determine if key was tab.
 
-    const contact = $event.item;
-    this._selectedEntity = this._utilService.deepClone(contact);
-    this._selectedChangeWarn = {};
-    // this._isSelectedEntityAggregate = false;
-    this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
+    const entity = $event.item;
+
+    // const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    // let namePrefix = '';
+
+    // if (isChildForm) {
+    //   this._selectedEntityChild = this._utilService.deepClone(entity);
+    //   this._selectedChangeWarnChild = {};
+    //   namePrefix = this._childFieldNamePrefix;
+    // } else {
+    //   this._selectedEntity = this._utilService.deepClone(entity);
+    //   this._selectedChangeWarn = {};
+    // }
+
+    const fieldNames = [];
+    fieldNames.push('cand_last_name');
+    fieldNames.push('cand_first_name');
+    fieldNames.push('cand_middle_name');
+    fieldNames.push('cand_prefix');
+    fieldNames.push('cand_suffix');
+    fieldNames.push('cand_office');
+    fieldNames.push('cand_office_state');
+    fieldNames.push('cand_office_district');
+    fieldNames.push('cand_election_year');
+    this._patchFormFields(fieldNames, entity, '');
+  }
+
+  /**
+   * Populate the fields in the form with the values from the selected individual.
+   *
+   * @param $event The mouse event having selected the contact from the typeahead options.
+   */
+  public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent,
+      fieldName: string) {
+
+    // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
+    // TODO need a way to determine if key was tab.
+
+    const entity = $event.item;
+
+    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    let namePrefix = '';
+
+    if (isChildForm) {
+      this._selectedEntityChild = this._utilService.deepClone(entity);
+      this._selectedChangeWarnChild = {};
+      namePrefix = this._childFieldNamePrefix;
+    } else {
+      this._selectedEntity = this._utilService.deepClone(entity);
+      this._selectedChangeWarn = {};
+    }
+
+    const fieldNames = [];
+    fieldNames.push('last_name');
+    fieldNames.push('first_name');
+    fieldNames.push('middle_name');
+    fieldNames.push('prefix');
+    fieldNames.push('suffix');
+    fieldNames.push('street_1');
+    fieldNames.push('street_2');
+    fieldNames.push('city');
+    fieldNames.push('state');
+    fieldNames.push('zip_code');
+    fieldNames.push('occupation');
+    fieldNames.push('employer');
+    this._patchFormFields(fieldNames, entity, namePrefix);
 
     // If date is selected, get the aggregate.
     if (this.frmIndividualReceipt.contains('contribution_date')) {
@@ -1014,27 +1071,50 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
   }
 
+  private _patchFormFields(fieldNames: string[], entity: any, namePrefix: string) {
+    if (fieldNames) {
+      for (const fieldName of fieldNames) {
+        const patch = {};
+        patch[namePrefix + fieldName] = entity[fieldName];
+        this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+      }
+    }
+  }
+
   /**
    * Populate the fields in the form with the values from the selected contact.
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
-  // TODO use this when ready to handle both child and non-child - currently on child is calling it.
-  public handleSelectedEntity_NEW($event: NgbTypeaheadSelectItemEvent, fieldName: string) {
+  // TODO use the factory method approach a done with individual to avoid hard coding
+  // child name field prefix and it's let error prone.
+  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, fieldName: string) {
     const entity = $event.item;
 
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
 
+    let namePrefix = '';
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
       this._selectedChangeWarnChild = {};
-      this._isSelectedEntityAggregateChild = false;
+      namePrefix = this._childFieldNamePrefix;
     } else {
       this._selectedEntity = this._utilService.deepClone(entity);
       this._selectedChangeWarn = {};
-      // this._isSelectedEntityAggregate = false;
     }
 
+    // These field names map to the same name in the form
+    const fieldNames = [];
+    fieldNames.push('street_1');
+    fieldNames.push('street_2');
+    fieldNames.push('city');
+    fieldNames.push('state');
+    fieldNames.push('zip_code');
+    fieldNames.push('occupation');
+    fieldNames.push('employer');
+    this._patchFormFields(fieldNames, entity, namePrefix);
+
+    // These fields names do not map to the same name in the form
     if (isChildForm) {
       if (fieldName === this._childFieldNamePrefix + 'entity_name') {
         this.frmIndividualReceipt.patchValue({ 'child*donor_cmte_id': entity.cmte_id }, { onlySelf: true });
@@ -1050,29 +1130,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.frmIndividualReceipt.patchValue({ 'child*donor_cmte_name': entity.cmte_name }, { onlySelf: true });
       }
 
-      this.frmIndividualReceipt.patchValue({ 'child*street_1': entity.street_1 }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*street_2': entity.street_2 }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*city': entity.city }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*state': entity.state }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*zip_code': entity.zip_code }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*occupation': entity.occupation }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*employer': entity.employer }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*street_1': entity.street_1 }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*street_2': entity.street_2 }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*city': entity.city }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*state': entity.state }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*zip_code': entity.zip_code }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*occupation': entity.occupation }, { onlySelf: true });
+      // this.frmIndividualReceipt.patchValue({ 'child*employer': entity.employer }, { onlySelf: true });
     } else {
-      if (fieldName === 'first_name' || fieldName === 'last_name') {
-        // populate individual name fields
-        this.frmIndividualReceipt.patchValue({ last_name: entity.last_name }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ first_name: entity.first_name }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ middle_name: entity.middle_name }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ prefix: entity.prefix }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ suffix: entity.suffix }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ street_1: entity.street_1 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ street_2: entity.street_2 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ city: entity.city }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ state: entity.state }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ zip_code: entity.zip_code }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ occupation: entity.occupation }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
-      } else if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id') {
+
+      if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id') {
         // populate org/committee fields
         if (fieldName === 'entity_name') {
           this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
@@ -1080,13 +1147,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         if (fieldName === 'donor_cmte_id') {
           this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
         }
-        this.frmIndividualReceipt.patchValue({ street_1: entity.street_1 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ street_2: entity.street_2 }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ city: entity.city }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ state: entity.state }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ zip_code: entity.zip_code }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ occupation: entity.occupation }, { onlySelf: true });
-        this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ street_1: entity.street_1 }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ street_2: entity.street_2 }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ city: entity.city }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ state: entity.state }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ zip_code: entity.zip_code }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ occupation: entity.occupation }, { onlySelf: true });
+        // this.frmIndividualReceipt.patchValue({ employer: entity.employer }, { onlySelf: true });
       }
     }
   }
@@ -1117,6 +1184,38 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       switchMap(searchText => {
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'first_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for Candidates when last name input value changes.
+   */
+  searchCandLastName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cand_last_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for Candidate when first name input value changes.
+   */
+  searchCandFirstName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cand_first_name');
         } else {
           return Observable.of([]);
         }
@@ -1208,6 +1307,36 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   formatterFirstName = (x: { first_name: string }) => {
     if (typeof x !== 'string') {
       return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the last name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandLastName = (x: { cand_last_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cand_last_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the first name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandFirstName = (x: { cand_first_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cand_first_name;
     } else {
       return x;
     }
@@ -1324,61 +1453,176 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   private getFormFields(): void {
     console.log('get transaction type form fields ' + this.transactionType);
-    this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
-      if (res) {
-        if (res.hasOwnProperty('data')) {
-          if (typeof res.data === 'object') {
-            if (res.data.hasOwnProperty('formFields')) {
-              if (Array.isArray(res.data.formFields)) {
-                this.formFields = res.data.formFields;
+    if (this.transactionType === 'CON_EAR_DEP') {
+      this._receiptService.getConEarDepMockData().subscribe(res => {
+        if (res) {
+          if (res.hasOwnProperty('data')) {
+            if (typeof res.data === 'object') {
+              if (res.data.hasOwnProperty('formFields')) {
+                if (Array.isArray(res.data.formFields)) {
+                  this.formFields = res.data.formFields;
 
-                this._setForm(this.formFields);
-              }
-            }
-            if (res.data.hasOwnProperty('hiddenFields')) {
-              if (Array.isArray(res.data.hiddenFields)) {
-                this.hiddenFields = res.data.hiddenFields;
-              }
-            }
-            if (res.data.hasOwnProperty('states')) {
-              if (Array.isArray(res.data.states)) {
-                this.states = res.data.states;
-              }
-            }
-            if (res.data.hasOwnProperty('titles')) {
-              if (Array.isArray(res.data.titles)) {
-                this.titles = res.data.titles;
-              }
-            }
-            if (res.data.hasOwnProperty('entityTypes')) {
-              if (Array.isArray(res.data.entityTypes)) {
-                this.entityTypes = res.data.entityTypes;
-                if (this.entityTypes) {
-                  for (const field of this.entityTypes) {
-                    // If API sets selected to true it can be used to set the default.
-                    // If none are set, use the first.
-                    if (field.selected) {
-                      this.selectedEntityType = field;
-                    }
-                  }
-                  if (!this.selectedEntityType) {
-                    if (this.entityTypes.length > 0) {
-                      this.selectedEntityType = this.entityTypes[0];
-                    }
-                  }
+                  this._setForm(this.formFields);
                 }
-                this._entityTypeDefault = this.selectedEntityType;
-                this.frmIndividualReceipt.patchValue(
-                  { entity_type: this.selectedEntityType.entityTypeDescription },
-                  { onlySelf: true }
-                );
               }
-            }
-          } // typeof res.data
-        } // res.hasOwnProperty('data')
-      } // res
-    });
+              if (res.data.hasOwnProperty('hiddenFields')) {
+                if (Array.isArray(res.data.hiddenFields)) {
+                  this.hiddenFields = res.data.hiddenFields;
+                }
+              }
+              if (res.data.hasOwnProperty('states')) {
+                if (Array.isArray(res.data.states)) {
+                  this.states = res.data.states;
+                }
+              }
+              if (res.data.hasOwnProperty('titles')) {
+                if (Array.isArray(res.data.titles)) {
+                  this.titles = res.data.titles;
+                }
+              }
+              if (res.data.hasOwnProperty('entityTypes')) {
+                if (Array.isArray(res.data.entityTypes)) {
+                  this.entityTypes = res.data.entityTypes;
+                  if (this.entityTypes) {
+                    for (const field of this.entityTypes) {
+                      // If API sets selected to true it can be used to set the default.
+                      // If none are set, use the first.
+                      if (field.selected) {
+                        this.selectedEntityType = field;
+                      }
+                    }
+                    if (!this.selectedEntityType) {
+                      if (this.entityTypes.length > 0) {
+                        this.selectedEntityType = this.entityTypes[0];
+                      }
+                    }
+                  }
+                  this._entityTypeDefault = this.selectedEntityType;
+                  this.frmIndividualReceipt.patchValue(
+                    { entity_type: this.selectedEntityType.entityTypeDescription },
+                    { onlySelf: true }
+                  );
+                }
+              }
+            } // typeof res.data
+          } // res.hasOwnProperty('data')
+        } // res
+      });
+    } else {
+      this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+        if (res) {
+          if (res.hasOwnProperty('data')) {
+            if (typeof res.data === 'object') {
+              if (res.data.hasOwnProperty('formFields')) {
+                if (Array.isArray(res.data.formFields)) {
+                  this.formFields = res.data.formFields;
+
+                  this._setForm(this.formFields);
+                }
+              }
+              if (res.data.hasOwnProperty('hiddenFields')) {
+                if (Array.isArray(res.data.hiddenFields)) {
+                  this.hiddenFields = res.data.hiddenFields;
+                }
+              }
+              if (res.data.hasOwnProperty('states')) {
+                if (Array.isArray(res.data.states)) {
+                  this.states = res.data.states;
+                }
+              }
+              if (res.data.hasOwnProperty('titles')) {
+                if (Array.isArray(res.data.titles)) {
+                  this.titles = res.data.titles;
+                }
+              }
+              if (res.data.hasOwnProperty('entityTypes')) {
+                if (Array.isArray(res.data.entityTypes)) {
+                  this.entityTypes = res.data.entityTypes;
+                  if (this.entityTypes) {
+                    for (const field of this.entityTypes) {
+                      // If API sets selected to true it can be used to set the default.
+                      // If none are set, use the first.
+                      if (field.selected) {
+                        this.selectedEntityType = field;
+                      }
+                    }
+                    if (!this.selectedEntityType) {
+                      if (this.entityTypes.length > 0) {
+                        this.selectedEntityType = this.entityTypes[0];
+                      }
+                    }
+                  }
+                  this._entityTypeDefault = this.selectedEntityType;
+                  this.frmIndividualReceipt.patchValue(
+                    { entity_type: this.selectedEntityType.entityTypeDescription },
+                    { onlySelf: true }
+                  );
+                }
+              }
+            } // typeof res.data
+          } // res.hasOwnProperty('data')
+        } // res
+      });
+    }
   }
+
+  // private getFormFields(): void {
+  //   console.log('get transaction type form fields ' + this.transactionType);
+  //   this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+  //     if (res) {
+  //       if (res.hasOwnProperty('data')) {
+  //         if (typeof res.data === 'object') {
+  //           if (res.data.hasOwnProperty('formFields')) {
+  //             if (Array.isArray(res.data.formFields)) {
+  //               this.formFields = res.data.formFields;
+
+  //               this._setForm(this.formFields);
+  //             }
+  //           }
+  //           if (res.data.hasOwnProperty('hiddenFields')) {
+  //             if (Array.isArray(res.data.hiddenFields)) {
+  //               this.hiddenFields = res.data.hiddenFields;
+  //             }
+  //           }
+  //           if (res.data.hasOwnProperty('states')) {
+  //             if (Array.isArray(res.data.states)) {
+  //               this.states = res.data.states;
+  //             }
+  //           }
+  //           if (res.data.hasOwnProperty('titles')) {
+  //             if (Array.isArray(res.data.titles)) {
+  //               this.titles = res.data.titles;
+  //             }
+  //           }
+  //           if (res.data.hasOwnProperty('entityTypes')) {
+  //             if (Array.isArray(res.data.entityTypes)) {
+  //               this.entityTypes = res.data.entityTypes;
+  //               if (this.entityTypes) {
+  //                 for (const field of this.entityTypes) {
+  //                   // If API sets selected to true it can be used to set the default.
+  //                   // If none are set, use the first.
+  //                   if (field.selected) {
+  //                     this.selectedEntityType = field;
+  //                   }
+  //                 }
+  //                 if (!this.selectedEntityType) {
+  //                   if (this.entityTypes.length > 0) {
+  //                     this.selectedEntityType = this.entityTypes[0];
+  //                   }
+  //                 }
+  //               }
+  //               this._entityTypeDefault = this.selectedEntityType;
+  //               this.frmIndividualReceipt.patchValue(
+  //                 { entity_type: this.selectedEntityType.entityTypeDescription },
+  //                 { onlySelf: true }
+  //               );
+  //             }
+  //           }
+  //         } // typeof res.data
+  //       } // res.hasOwnProperty('data')
+  //     } // res
+  //   });
+  // }
 
   public handleEntityTypeChange(entityTypeCode: any, col: any, entityType: any) {
     for (const entityTypeObj of this.entityTypes) {
@@ -1511,8 +1755,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   public isMemoCodeReadOnly(fieldName: string) {
     if (this.isFieldName(fieldName, 'memo_code')) {
-      const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false; 
-      if (isChildField) { 
+      const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+      if (isChildField) {
         return this._readOnlyMemoCodeChild;
       } else {
         return this._readOnlyMemoCode;
@@ -1734,6 +1978,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       // if it changes in the UI.  See contributionAmountChange();
       this._contributionAggregateValue = parseFloat(contributionAggregate);
     });
+  }
+
+  private _setMemoCodeForForm() {
+    if (this._readOnlyMemoCode) {
+      this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+      const memoCntrol = this.frmIndividualReceipt.get('memo_code');
+      memoCntrol.disable();
+      this.memoCode = true;
+    } 
+    if (this._readOnlyMemoCodeChild) {
+      this.frmIndividualReceipt.controls[this._childFieldNamePrefix + 'memo_code']
+        .setValue(this._memoCodeValue);
+      const memoCntrol = this.frmIndividualReceipt.get(this._childFieldNamePrefix + 'memo_code');
+      memoCntrol.disable();
+      this.memoCodeChild = true;
+    } 
   }
 
   // Use this when ready to handle both child and non-child
