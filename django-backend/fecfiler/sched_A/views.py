@@ -154,7 +154,7 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
                                         }
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
-                                            "CON_EAR_DEP": "CON_EAR_DEP_NONMEMO",
+                                            "CON_EAR_DEP": "CON_EAR_OUT_DEP",
                                         }
 
 def get_next_transaction_id(trans_char):
