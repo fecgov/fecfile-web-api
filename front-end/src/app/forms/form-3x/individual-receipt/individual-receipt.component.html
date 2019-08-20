@@ -136,6 +136,7 @@
                         "
                         id="typeahead-template-last-name"
                         [ngbTypeahead]="searchLastName"
+                        [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName"
                         (selectItem)="handleSelectedIndividual($event, col?.name)"
@@ -160,6 +161,7 @@
                         "
                         id="typeahead-template-first-name"
                         [ngbTypeahead]="searchFirstName"
+                        [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName"
                         (selectItem)="handleSelectedIndividual($event, col?.name)"
@@ -184,6 +186,7 @@
                         "
                         id="typeahead-template-cand-last-name"
                         [ngbTypeahead]="searchCandLastName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandLastName"
                         (selectItem)="handleSelectedCandidate($event, col?.name)"
@@ -208,6 +211,7 @@
                         "
                         id="typeahead-template-cand-first-name"
                         [ngbTypeahead]="searchCandFirstName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandFirstName"
                         (selectItem)="handleSelectedCandidate($event, col?.name)"
@@ -232,6 +236,7 @@
                         "
                         id="typeahead-template-org"
                         [ngbTypeahead]="searchOrg"
+                        [focusFirst]=false
                         [resultTemplate]="rtOrg"
                         [inputFormatter]="formatterOrgName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
@@ -256,8 +261,9 @@
                         "
                         id="typeahead-template-committee-id"
                         [ngbTypeahead]="searchCommitteeId"
+                        [focusFirst]=false
                         [resultTemplate]="rtCommitteeId"
-                        [inputFormatter]="formatterCommitteeId"
+                        [inputFormatter]="formatterCommitteeId"                        
                         (selectItem)="handleSelectedOrg($event, col?.name)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />  
@@ -280,6 +286,7 @@
                         "
                         id="typeahead-template-committee-name"
                         [ngbTypeahead]="searchCommitteeName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCommitteeName"
                         [inputFormatter]="formatterCommitteeName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
@@ -386,6 +393,24 @@
                       </ng-option>
                     </ng-select>
                   </ng-container>
+                  <ng-container *ngIf="col?.type === 'select' && 
+                      isFieldName(col?.name, 'election_code')">  
+                    <ng-select
+                      (change)="handleElectionCodeChange($event, col)"
+                      class="election-code-select"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'state-select-error'
+                          : ''
+                      "
+                    >
+                      <ng-option *ngFor="let item of electionTypes" [value]="item">
+                        {{ item.electionTypeDescription }}
+                      </ng-option>
+                    </ng-select>
+                  </ng-container>                  
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
                       (change)="handleEntityTypeChange($event, col)"
