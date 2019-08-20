@@ -1679,6 +1679,7 @@ export class IndividualReceiptService {
   public getContributionAggregate(
     reportId: string,
     entityId: number,
+    cmteId: string,
     transactionTypeIdentifier: string,
     contributionDate: string
   ): Observable<any> {
@@ -1691,7 +1692,12 @@ export class IndividualReceiptService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     params = params.append('report_id', reportId);
-    params = params.append('entity_id', entityId.toString());
+    if (entityId) {
+      params = params.append('entity_id', entityId.toString());
+    }
+    if (cmteId) {
+      params = params.append('cmte_id', cmteId.toString());
+    }
     params = params.append('transaction_type_identifier', transactionTypeIdentifier);
     params = params.append('contribution_date', contributionDate);
 

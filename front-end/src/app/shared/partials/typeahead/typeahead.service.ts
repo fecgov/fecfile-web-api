@@ -11,6 +11,8 @@ import { environment } from '../../../../environments/environment';
 export class TypeaheadService {
   constructor(private _http: HttpClient, private _cookieService: CookieService) {}
 
+  private readonly _childFieldNamePrefix = 'child*';
+
   /**
    * Get contacts starting with the search string by field name.
    * For example, search last_name startng with 'Jon' should return
@@ -19,6 +21,7 @@ export class TypeaheadService {
    * @param searchString the value keyed by the user to search with.
    * @param fieldName the field choosen by the user to search on.
    *  Possible fields are 'entity_name', 'first_name', 'last_name'.
+   *
    */
   public getContacts(searchString: string, fieldName: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
@@ -43,6 +46,11 @@ export class TypeaheadService {
       fieldName === 'cand_last_name'
     ) {
       params = params.append(fieldName, searchString);
+    } else if (
+      fieldName === this._childFieldNamePrefix + 'cand_first_name' ||
+      fieldName === this._childFieldNamePrefix + 'cand_last_name'
+    ) {
+      fieldName = fieldName.substring(6);
     } else {
       if (fieldName) {
         console.log(`invalid field name for ${url} of ${fieldName}`);

@@ -256,6 +256,18 @@ export class F3xComponent implements OnInit {
 
           // Pass Transaction Type to individual-receipt
           if (this.currentStep === 'step_3') {
+            // Force reload form fields even if type did not change.
+            // The original/typical method for informing the child component to get the
+            // dynamic form fields is via change detection of the transactionType
+            // detected by angular's ngDoCheck() implementation.  However, the form
+            // need to be reloaded even when the type does not change as the form is
+            // cleared of the memo default which varies by transaction type.
+            // The solutionhere is to call the message service.  This may be the preferred
+            // mechanism to use going forward.
+            if (this.transactionType && this.transactionType === e.transactionType) {
+              this._f3xMessageService.sendLoadFormFieldsMessage('');
+            }
+
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             this.transactionType = e.transactionType ? e.transactionType : '';
             // Coming from transactions, the event may contain the transaction data
