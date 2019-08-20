@@ -33,7 +33,13 @@ export class TypeaheadService {
       return;
     }
 
-    if (fieldName === 'entity_name' || fieldName === 'first_name' || fieldName === 'last_name') {
+    if (
+      fieldName === 'entity_name' ||
+      fieldName === 'first_name' ||
+      fieldName === 'last_name' ||
+      fieldName === 'cmte_id' ||
+      fieldName === 'cmte_name'
+    ) {
       params = params.append(fieldName, searchString);
     } else {
       if (fieldName) {

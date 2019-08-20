@@ -94,18 +94,26 @@ urlpatterns = [
     ),
     url(r"^core/get_report_info$", 
         views.get_report_info, 
-        name="get_report_info"),
+        name="get_report_info",
+    ),
     url(
         r"^core/create_json_builders$",
         jsonmain.create_json_builders,
         name="create_json_builders",
     ),
+    url(
+        r"^core/sample_sql_generate$",
+        jsonmain.sample_sql_generate,
+        name="sample_sql_generate",
+    ),
     url(r"^core/print_preview_pdf$", 
         views.print_preview_pdf, 
-        name="print_preview_pdf"),
+        name="print_preview_pdf",
+    ),
     url(r"^core/reports$", 
         views.reports, 
-        name="reports"),
+        name="reports",
+    ),
     url(
         r"^core/contacts$",
         views.contacts,
@@ -129,6 +137,10 @@ urlpatterns = [
     url(r'^core/get_contacts_dynamic_forms_fields$', 
         views.get_contacts_dynamic_forms_fields, 
         name="get_contacts_dynamic_forms_fields"
+    ),
+    url(r'^core/get_entityTypes$', 
+        views.get_entityTypes, 
+        name="get_entityTypes"
     ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 ]

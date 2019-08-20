@@ -149,7 +149,7 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
                                             "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
                                             "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
                                             "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
-                                            "EAR_REC": "EAR_REC_MEMO",
+                                            "EAR_REC": "EAR_MEMO",
                                             "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
 
@@ -501,40 +501,40 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         itemized_transaction_list = []
         unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
-        aggregate_start_date, aggregate_end_date = find_aggregate_date(
-            form_type, contribution_date)
+        aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
         aggregate_amount = 0
         for transaction in transactions_list:
             aggregate_amount += transaction[0]
-            if str(report_id) == str(transaction[2]):
-                if contribution_date <= transaction[4]:
-                    if transaction_type_identifier in itemization_transaction_type_identifier_list:
-                        if aggregate_amount <= itemization_value:
-                            put_sql_linenumber_schedA(
-                                cmte_id, report_id, "11AII", transaction[1], entity_id, aggregate_amount)
-                        else:
-                            put_sql_linenumber_schedA(
-                                cmte_id, report_id, "11AI", transaction[1], entity_id, aggregate_amount)
+            # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
+            # if str(report_id) == str(transaction[2]):
+            if contribution_date <= transaction[4]:
+                if transaction_type_identifier in itemization_transaction_type_identifier_list:
+                    if aggregate_amount <= itemization_value:
+                        put_sql_linenumber_schedA(
+                            cmte_id, "11AII", transaction[1], entity_id, aggregate_amount)
                     else:
                         put_sql_linenumber_schedA(
-                                cmte_id, report_id, transaction[3], transaction[1], entity_id, aggregate_amount)
+                            cmte_id, "11AI", transaction[1], entity_id, aggregate_amount)
+                else:
+                    put_sql_linenumber_schedA(
+                            cmte_id, transaction[3], transaction[1], entity_id, aggregate_amount)
     except Exception as e:
         raise Exception(
             'The update_linenumber_aggamt_transactions_SA function is throwing an error: ' + str(e))
 
 
-def put_sql_linenumber_schedA(cmte_id, report_id, line_number, transaction_id, entity_id, aggregate_amount):
+def put_sql_linenumber_schedA(cmte_id, line_number, transaction_id, entity_id, aggregate_amount):
     """
     update line number
     """
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s, aggregate_amt = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
-                           [line_number, aggregate_amount, transaction_id, report_id, cmte_id, entity_id])
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
+                           [line_number, aggregate_amount, transaction_id, cmte_id, entity_id])
             if (cursor.rowcount == 0):
                 raise Exception(
                     'put_sql_linenumber_schedA function: The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
@@ -571,7 +571,7 @@ def post_schedA(datum):
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
-                    child_datum = parent_SA_to_child_SB_dict(datum)
+                    child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
@@ -651,7 +651,7 @@ def put_schedA(datum):
                 'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
-                    child_datum = parent_SA_to_child_SB_dict(datum)
+                    child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
@@ -789,34 +789,34 @@ def schedA_sql_dict(data):
 
             child_datum = {
             'child_transaction_type_identifier': TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT.get(data.get('transaction_type_identifier')),
-            'child_back_ref_sched_name': data.get('child_back_ref_sched_name'),
-            'child_contribution_date': data.get('child_contribution_date'),
-            'child_contribution_amount': data.get('child_contribution_amount'),
-            'child_purpose_description': data.get('child_purpose_description'),
-            'child_memo_code': data.get('child_memo_code'),
-            'child_memo_text': data.get('child_memo_text'),
+            'child_back_ref_sched_name': data.get('child*back_ref_sched_name'),
+            'child_contribution_date': data.get('child*contribution_date'),
+            'child_contribution_amount': data.get('child*contribution_amount'),
+            'child_purpose_description': data.get('child*purpose_description'),
+            'child_memo_code': data.get('child*memo_code'),
+            'child_memo_text': data.get('child*memo_text'),
             'child_election_code': data.get('election_code'),
             'child_election_other_description': data.get('election_other_description'),
-            'child_entity_type': data.get('child_entity_type'),
-            'child_entity_name': data.get('child_entity_name'),
-            'child_first_name': data.get('child_first_name'),
-            'child_last_name': data.get('child_last_name'),
-            'child_middle_name': data.get('child_middle_name'),
-            'child_preffix': data.get('child_prefix'),
-            'child_suffix': data.get('child_suffix'),
-            'child_street_1': data.get('child_street_1'),
-            'child_street_2': data.get('child_street_2'),
-            'child_city': data.get('child_city'),
-            'child_state': data.get('child_state'),
-            'child_zip_code': data.get('child_zip_code'),
-            'child_occupation': data.get('child_occupation'),
-            'child_employer': data.get('child_employer'),
-            'child_ref_cand_cmte_id': data.get('child_ref_cand_cmte_id'),
-            'child_donor_cmte_id': data.get('child_donor_cmte_id'),
-            'child_donor_cmte_name': data.get('child_donor_cmte_name')
+            'child_entity_type': data.get('child*entity_type'),
+            'child_entity_name': data.get('child*entity_name'),
+            'child_first_name': data.get('child*first_name'),
+            'child_last_name': data.get('child*last_name'),
+            'child_middle_name': data.get('child*middle_name'),
+            'child_preffix': data.get('child*prefix'),
+            'child_suffix': data.get('child*suffix'),
+            'child_street_1': data.get('child*street_1'),
+            'child_street_2': data.get('child*street_2'),
+            'child_city': data.get('child*city'),
+            'child_state': data.get('child*state'),
+            'child_zip_code': data.get('child*zip_code'),
+            'child_occupation': data.get('child*occupation'),
+            'child_employer': data.get('child*employer'),
+            'child_ref_cand_cmte_id': data.get('child*ref_cand_cmte_id'),
+            'child_donor_cmte_id': data.get('child*donor_cmte_id'),
+            'child_donor_cmte_name': data.get('child*donor_cmte_name')
             }
-            if 'child_entity_id' in data and check_null_value(data.get('child_entity_id')):
-                child_datum['child_entity_id'] = data.get('child_entity_id')
+            if 'child*entity_id' in data and check_null_value(data.get('child*entity_id')):
+                child_datum['child_entity_id'] = data.get('child*entity_id')
             child_datum['child_line_number'], child_datum['child_transaction_type'] = get_line_number_trans_type(child_datum.get('child_transaction_type_identifier'))
             datum = {**datum, **child_datum}
         return datum
@@ -865,7 +865,7 @@ def child_SA_to_parent_schedA_dict(data):
     except:
         raise
 
-def parent_SA_to_child_SB_dict(data):
+def AUTO_parent_SA_to_child_SB_dict(data):
     try:
         datum = {
             'report_id': data.get('report_id'),

@@ -4,35 +4,50 @@
   </header>
   <section>
     <div class="contacts__filter-sidebar-set">
+      
       <div class="card">
-        <div class="card-header contacts__filter-title" (click)="toggleTypeFilterItem()">
-          Type
-          <i class="float-right" aria-hidden="true" 
-            [ngClass]="toggleFilterDirection(isHideTypeFilter)">
-          </i>          
-        </div>
-        <div class="card-body" 
-          [@openCloseScroll]="determineScrollState()">            
-          <div class="input-group py-1 transacions__filter-scroll-to-input">
-            <input class="form-control" [(ngModel)]="filterCategoriesText" type="text" 
-              placeholder="Search Type" aria-label="Search">
-            <div class="input-group-append" (click)="scrollToType()">
-              <span class="input-group-text">
-                  <!-- <i class="search-icon text-grey" aria-hidden="true"></i> no longer working?-->
-                  <i class="fas fa-search text-grey" aria-hidden="true"></i>
-              </span>
-            </div>              
-          </div>            
-          <div class="contacts__filter-type-list-body">
-              <ul *ngFor="let categoryGroup of transactionCategories" class="contacts__filter-type-list">
-                <li class="contacts__filter-type-group">{{ categoryGroup.text }}</li>
-                <app-contacts-filter-type
-                  [categoryType]="categoryType"
-                  #categoryElements *ngFor="let categoryType of categoryGroup.options">
-                </app-contacts-filter-type>
-            </ul>
+          <div class="card-header transactions__filter-title" (click)="toggleTypeFilterItem()">
+            Type
+            <i class="float-right" aria-hidden="true" 
+              [ngClass]="toggleFilterDirection(isHideTypeFilter)">
+            </i>          
           </div>
-        </div>
+          <div class="card-body" [@openCloseScroll]="determineScrollType(isHideTypeFilter)">
+            <div class="contacts__filter-type-list-body">
+              <ul class="contacts__filter-type-list">
+                <li *ngFor="let type of types">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="{{ type?.type_code }}" 
+                      [(ngModel)]="type.selected">
+                    <label class="form-check-label" for="{{ type?.type_code}}">
+                      {{ type?.type_desc }}</label>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+      </div>
+      <div class="card">
+            <div class="card-header transactions__filter-title" (click)="toggleStateFilterItem()">
+              State
+              <i class="float-right" aria-hidden="true" 
+                [ngClass]="toggleFilterDirection(isHideStateFilter)">
+              </i>          
+            </div>
+            <div class="card-body" [@openCloseScroll]="determineScrollState(isHideStateFilter)">
+              <div class="contacts__filter-type-list-body">
+                <ul class="contacts__filter-type-list">
+                  <li *ngFor="let state of states">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="{{ state?.state_code }}" 
+                        [(ngModel)]="state.selected">
+                      <label class="form-check-label" for="{{ state?.state_code}}">
+                        {{ state?.state_code}} - {{ state?.state_description}} </label>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
       </div>
 
     </div> 

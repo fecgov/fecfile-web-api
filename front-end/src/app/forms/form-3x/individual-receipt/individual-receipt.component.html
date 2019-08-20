@@ -2,6 +2,14 @@
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
 
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt">
     <header>
@@ -43,198 +51,270 @@
         </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-            <div [class]="row.colClassName" *ngFor="let col of row.cols">
-              <div class="form-group">
-                <label [for]="col?.name">
-                  {{ col?.text }}
-                  <button
-                    type="button"
-                    class="btn btn-info"
-                    ngbTooltip="{{ col?.infoText }}"
-                    tooltipClass="form-tooltip"
-                    *ngIf="col?.infoIcon"
-                  >
-                    <i class="info-icon" aria-hidden="true"></i>
-                    <span class="sr-only">Click here for more information</span>
-                  </button>
-                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
-                    (Optional)
-                  </ng-container>
-                </label>
-                <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
-                  <div [ngClass]="{ 'input-group': col?.inputGroup }">
-                    <ng-container *ngIf="col?.inputGroup">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
-                        </span>
-                      </div>
+
+            <ng-container *ngFor="let col of row.cols">
+              <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
+                <div class="form-group"> 
+                  <label [for]="col?.name">
+                    {{ col?.text }}
+                    <button
+                      type="button"
+                      class="btn btn-info"
+                      ngbTooltip="{{ col?.infoText }}"
+                      tooltipClass="form-tooltip"
+                      *ngIf="col?.infoIcon"
+                    >
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </button>
+                    <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                      (Optional)
                     </ng-container>
-                    <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
-                    <input
-                      *ngIf="col?.name !== 'first_name' 
-                          && col?.name !== 'last_name'"
-                      class="form-control"
-                      [style.width]="col?.width"
-                      [style.height]="col?.height"
-                      [attr.type]="col?.type"
-                      [attr.name]="col?.name"                      
-                      [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                      [attr.value]="col?.value"
-                      [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
-                      [formControlName]="col?.name"
-                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
-                      [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'input-field-error'
-                          : ''
-                      "
-                      (keyup)="handleFormFieldKeyup($event, col)"
-                    />
-                    <input
-                      *ngIf="col?.name === 'last_name'"
-                      class="form-control"
-                      [style.width]="col?.width"
-                      [style.height]="col?.height"
-                      [attr.type]="col?.type"
-                      [attr.name]="col?.name"
-                      [attr.value]="col?.value"
-                      [maxlength]="col?.validation?.max"
-                      [formControlName]="col?.name"
-                      [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'input-field-error'
-                          : ''
-                      "
-                      id="typeahead-template-last-name"
-                      [ngbTypeahead]="searchLastName"
-                      [resultTemplate]="rt"
-                      [inputFormatter]="formatterLastName"
-                      (selectItem)="handleSelectedItem($event)"
-                    />
-                    <input
-                      *ngIf="col?.name === 'first_name'"
-                      class="form-control"
-                      [style.width]="col?.width"
-                      [style.height]="col?.height"
-                      [attr.type]="col?.type"
-                      [attr.name]="col?.name"
-                      [attr.value]="col?.value"
-                      [maxlength]="col?.validation?.max"
-                      [formControlName]="col?.name"
-                      [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'input-field-error'
-                          : ''
-                      "
-                      id="typeahead-template-first-name"
-                      [ngbTypeahead]="searchFirstName"
-                      [resultTemplate]="rt"
-                      [inputFormatter]="formatterFirstName"
-                      (selectItem)="handleSelectedItem($event)"
-                    />
-                  </div>
-                  <div
-                    class="error-text"
-                    *ngIf="
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
-                      frmIndividualReceipt.get(col?.name).invalid
-                    "
-                  >
-                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors?.maxlength">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="
-                          frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength <
-                          frmIndividualReceipt.get(col?.name).errors.maxlength?.actualLength
+                  </label>
+                  <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
+                    <div [ngClass]="{ 'input-group': col?.inputGroup }">
+                      <ng-container *ngIf="col?.inputGroup">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">
+                            <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                          </span>
+                        </div>
+                      </ng-container>
+                      <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
+                      <!-- && col?.name !== 'child*entity_name'
+                      && col?.name !== 'child*donor_cmte_id'" -->
+                      <input
+                        *ngIf="col?.name !== 'first_name' 
+                            && col?.name !== 'last_name'
+                            && !isFieldName(col?.name, 'entity_name')
+                            && !isFieldName(col?.name, 'donor_cmte_id')
+                            "
+                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"                      
+                        [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
+                        [attr.value]="col?.value"
+                        [maxlength]="isFieldName(col?.name, 'contribution_amount') ? col?.validation?.max + 5: col?.validation?.max"
+                        [formControlName]="col?.name"
+                        (blur)="isFieldName(col?.name, 'contribution_amount') ? contributionAmountChange($event, col?.name) : null"
+                        [ngClass]="
+                          frmIndividualReceipt.get(col?.name)?.invalid &&
+                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                            ? 'input-field-error'
+                            : ''
                         "
-                      >
-                        Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
-                        allowed.
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonAlphaNumeric"
-                      >
-                        Alphanumeric characters only.
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonFloatingPoint"
-                      >
-                        Only numerical values are allowed.
-                      </div>
-                    </ng-container>
-                    <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
-                      <div
-                        class="text-error text-left"
-                        *ngIf="frmIndividualReceipt.get(col?.name).errors?.contributionDateInvalid"
-                      >
-                        The date entered falls outside of the report coverage period. Transactions for this report
-                        should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
-                        need to add a transaction with a date that falls outside of the coverage period for this report,
-                        you will need to check the memo code box.
-                        <!-- Entered date is outside of the report coverage period. Please enter transactions for this
-                        coverage period only. -->
-                      </div>
-                    </ng-container>
-                  </div>
-                </ng-container>
-                <ng-container *ngIf="col?.type === 'checkbox'">
-                  <input
-                    class="form-control"
-                    [style.width]="col?.width"
-                    [style.height]="col?.height"
-                    [attr.type]="col?.type"
-                    [attr.name]="col?.name"
-                    [attr.value]="col?.value"
-                    [checked]="col?.name === 'memo_code' ? memoCode : null"
-                    [formControlName]="col?.name"
-                    (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
-                    [ngClass]="
-                      frmIndividualReceipt.get(col?.name)?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                        ? 'input-field-error'
-                        : ''
-                    "
-                  />
-                </ng-container>
-                <ng-container *ngIf="col?.type === 'textarea'">
-                  <textarea
-                    [style.height]="col?.height"
-                    [style.width]="col?.width"
-                    [style.overflow]="col.scroll ? col.scroll : null"
-                    [attr.name]="col?.name"
-                    [attr.maxlength]="col?.validation?.max"
-                    [formControlName]="col?.name"
-                  ></textarea>
-                </ng-container>
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
-                  <ng-select
-                    (change)="handleStateChange($event, col)"
-                    class="state-select"
-                    [formControlName]="col?.name"
-                    [ngClass]="
-                      frmIndividualReceipt.get(col?.name)?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    "
-                  >
-                    <ng-option *ngFor="let item of states" [ngValue]="item">
-                      {{ item.code }} - {{ item.name }}
-                    </ng-option>
-                  </ng-select>
-                </ng-container>
+                        (keyup)="handleFormFieldKeyup($event, col)"
+                      />
+                      <input
+                        *ngIf="col?.name === 'last_name'"
+                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"
+                        [attr.value]="col?.value"
+                        [maxlength]="col?.validation?.max"
+                        [formControlName]="col?.name"
+                        [ngClass]="
+                          frmIndividualReceipt.get(col?.name)?.invalid &&
+                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                            ? 'input-field-error'
+                            : ''
+                        "
+                        id="typeahead-template-last-name"
+                        [ngbTypeahead]="searchLastName"
+                        [resultTemplate]="rt"
+                        [inputFormatter]="formatterLastName"
+                        (selectItem)="handleSelectedItem($event)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
+                      />
+                      <input
+                        *ngIf="col?.name === 'first_name'"
+                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"
+                        [attr.value]="col?.value"
+                        [maxlength]="col?.validation?.max"
+                        [formControlName]="col?.name"
+                        [ngClass]="
+                          frmIndividualReceipt.get(col?.name)?.invalid &&
+                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                            ? 'input-field-error'
+                            : ''
+                        "
+                        id="typeahead-template-first-name"
+                        [ngbTypeahead]="searchFirstName"
+                        [resultTemplate]="rt"
+                        [inputFormatter]="formatterFirstName"
+                        (selectItem)="handleSelectedItem($event)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
+                      />
+                      <input
+                        *ngIf="isFieldName(col?.name, 'entity_name')"
+                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"
+                        [attr.value]="col?.value"
+                        [maxlength]="col?.validation?.max"
+                        [formControlName]="col?.name"
+                        [ngClass]="
+                          frmIndividualReceipt.get(col?.name)?.invalid &&
+                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                            ? 'input-field-error'
+                            : ''
+                        "
+                        id="typeahead-template-org"
+                        [ngbTypeahead]="searchOrg"
+                        [resultTemplate]="rtOrg"
+                        [inputFormatter]="formatterOrgName"
+                        (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
+                      />
+                      <input
+                        *ngIf="isFieldName(col?.name, 'donor_cmte_id')"
+                        class="form-control"
+                        [style.width]="col?.width"
+                        [style.height]="col?.height"
+                        [attr.type]="col?.type"
+                        [attr.name]="col?.name"
+                        [attr.value]="col?.value"
+                        [maxlength]="col?.validation?.max"
+                        [formControlName]="col?.name"
+                        [ngClass]="
+                          frmIndividualReceipt.get(col?.name)?.invalid &&
+                          (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                            ? 'input-field-error'
+                            : ''
+                        "
+                        id="typeahead-template-committee-id"
+                        [ngbTypeahead]="searchCommitteeId"
+                        [resultTemplate]="rtCommitteeId"
+                        [inputFormatter]="formatterCommitteeId"
+                        (selectItem)="handleSelectedEntity_NEW($event, col?.name)"
+                      />                  
+                    </div>
+                    <div
+                      class="error-text"
+                      *ngIf="
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                        frmIndividualReceipt.get(col?.name).invalid
+                      "
+                    >
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors?.maxlength">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="
+                            frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength <
+                            frmIndividualReceipt.get(col?.name).errors.maxlength?.actualLength
+                          "
+                        >
+                          Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
+                          allowed.
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonAlphaNumeric"
+                        >
+                          Alphanumeric characters only.
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonFloatingPoint"
+                        >
+                          Only numerical values are allowed.
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="frmIndividualReceipt.get(col?.name).errors?.contributionDateInvalid"
+                        >
+                          The date entered falls outside of the report coverage period. Transactions for this report
+                          should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
+                          need to add a transaction with a date that falls outside of the coverage period for this report,
+                          you will need to check the memo code box.
+                          <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                          coverage period only. -->
+                        </div>
+                      </ng-container>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="col?.type === 'checkbox'">
+                      <!-- [attr.disabled]="isMemoCodeReadOnly(col?.name)" -->
+                    <input
+                      class="form-control forms__big_checkbox"
+                      [style.width]="col?.width"
+                      [style.height]="col?.height"
+                      [attr.type]="col?.type"
+                      [attr.name]="col?.name"
+                      [attr.value]="col?.value"
+                      [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
+                      [formControlName]="col?.name"
+                      (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      "
+                    />
+                  </ng-container>
+                  <ng-container *ngIf="col?.type === 'textarea'">
+                    <textarea
+                      [style.height]="col?.height"
+                      [style.width]="col?.width"
+                      [style.overflow]="col.scroll ? col.scroll : null"
+                      [attr.name]="col?.name"
+                      [attr.maxlength]="col?.validation?.max"
+                      [formControlName]="col?.name"
+                    ></textarea>
+                  </ng-container>                
+                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'state')">  
+                    <ng-select
+                      (change)="handleStateChange($event, col)"
+                      class="state-select"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'state-select-error'
+                          : ''
+                      "
+                    >
+                      <ng-option *ngFor="let item of states" [ngValue]="item">
+                        {{ item.code }} - {{ item.name }}
+                      </ng-option>
+                    </ng-select>
+                  </ng-container>
+                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
+                    <ng-select
+                      (change)="handleEntityTypeChange($event, col)"
+                      class="entity-type-select"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'org-type-select-error'
+                          : ''
+                      "
+                    >
+                      <ng-option *ngFor="let entityType of entityTypes" value="{{entityType.entityType}}">
+                        {{entityType.entityTypeDescription}}
+                      </ng-option>
+                    </ng-select>
+                  </ng-container>                
+                </div>
               </div>
-            </div>
+            </ng-container>
             <!-- ./col -->
           </ng-container>
         </div>
@@ -246,6 +326,20 @@
             </div>
           </div>
         </ng-container>
+
+        <ng-container *ngIf="row.childForm">
+          <div class="row">
+            <div [class]="row.colClassName">
+              {{ row.childFormTitle }}
+            </div>
+          </div>
+          <div class="row">
+              <div class="col-md-12">
+                <hr />
+              </div>
+            </div>
+        </ng-container>
+
       </ng-container>
     </section>
     <footer>

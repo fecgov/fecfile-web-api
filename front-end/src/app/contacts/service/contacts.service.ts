@@ -385,6 +385,8 @@ export class ContactsService {
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: ContactFilterModel) {
+    console.log("mockApplyFilters response =", response);
+    console.log("mockApplyFilters filters =", filters);
 
     if (!response.contacts) {
       return;
@@ -396,7 +398,7 @@ export class ContactsService {
 
     let isFilter = false;
 
-    if (filters.keywords) {
+    /*if (filters.keywords) {
       if (response.contacts.length > 0 && filters.keywords.length > 0) {
         isFilter = true;
 
@@ -414,8 +416,37 @@ export class ContactsService {
           response.contacts = filtered;
         }
       }
+    }   */
+
+    if (filters.filterStates) {
+      console.log("filters.filterStates", filters.filterStates);
+      if (filters.filterStates.length > 0) {
+        isFilter = true;
+        const fields = ['state'];
+        let filteredStateArray = [];
+        for (const state of filters.filterStates) {
+          const filtered = this._filterPipe.transform(response.contacts, fields, state);
+          filteredStateArray = filteredStateArray.concat(filtered);
+        }
+        response.contacts = filteredStateArray;
+      }
     }
-   
+
+    if (filters.filterTypes) {
+      console.log("filters.filterTypes", filters.filterTypes);
+      if (filters.filterTypes.length > 0) {
+        isFilter = true;
+        const fields = ['type'];
+        let filteredTypeArray = [];
+        for (const type of filters.filterTypes) {
+          const filtered = this._filterPipe.transform(response.contacts, fields, type);
+          filteredTypeArray = filteredTypeArray.concat(filtered);
+        }
+        response.contacts = filteredTypeArray;
+      }
+    }
+
+    console.log("response.contacts", response.contacts);
   }
 
 
@@ -482,6 +513,32 @@ export class ContactsService {
        );
   }
 
+  public getStates(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/state';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
+  
+  public getTypes(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/get_entityTypes';
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
 
   private createMockTrx() {
     const t1: any = {};
@@ -508,24 +565,7 @@ export class ContactsService {
     return t1;
   }
 
-  public getItemizations(): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url = '/core/get_ItemizationIndicators';
-    let httpOptions =  new HttpHeaders();
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    return this._http
-        .get(
-          `${environment.apiUrl}${url}`,
-          {
-            headers: httpOptions
-          }
-        );
-   }
-
-   /**
+     /**
     * Trash or restore tranactions to/from the Recycling Bin.
     * 
     * @param action the action to be applied to the contacts (e.g. trash, restore)
@@ -568,6 +608,28 @@ export class ContactsService {
     }));
 
    }
+
+    /**
+   * Gets the schedule after submitted.
+   *
+   * @param      {string}  formType  The form type
+   * @param      {any}     receipt   The receipt
+   */
+  public getSchedule(formType: string, receipt: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
+    const data: any = JSON.stringify(receipt);
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(url, {
+      headers: httpOptions,
+      params: {
+        report_id: receipt.report_id
+      }
+    });
+  }
 
    /**
    * Saves a schedule.
@@ -648,6 +710,21 @@ export class ContactsService {
     }
   }
 
+  public getContactsDynamicFormFields(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+    let formData: FormData = new FormData();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(url, {
+      headers: httpOptions
+    });
+  }
+  
   /**
    * Saves a schedule a using POST.  The POST API supports saving an existing
    * transaction.  Therefore, transaction_id is required in this API call.
@@ -755,40 +832,5 @@ export class ContactsService {
       );
   }
 
-  /**
-   * Gets the schedule after submitted.
-   *
-   * @param      {string}  formType  The form type
-   * @param      {any}     receipt   The receipt
-   */
-  public getSchedule(formType: string, receipt: any): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
-    const data: any = JSON.stringify(receipt);
-    let httpOptions = new HttpHeaders();
-
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    return this._http.get(url, {
-      headers: httpOptions,
-      params: {
-        report_id: receipt.report_id
-      }
-    });
-  }
- 
-  public getContactsDynamicFormFields(): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;
-    let httpOptions = new HttpHeaders();
-    let params = new HttpParams();
-    let formData: FormData = new FormData();
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    return this._http.get(url, {
-      headers: httpOptions
-    });
-  }
 }
+
