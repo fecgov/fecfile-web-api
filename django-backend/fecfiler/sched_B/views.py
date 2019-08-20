@@ -65,6 +65,9 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "OTH_DISB_NC_ACC_CC_PAY_MEMO": ("OTH_DISB_NC_ACC_CC_PAY", "sched_b"),
     "OTH_DISB_NC_ACC_STAF_REIM_MEMO": ("OTH_DISB_NC_ACC_STAF_REIM", "sched_b"),
     "OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO": ("OTH_DISB_NC_ACC_PMT_TO_PROL", "sched_b"),
+    "FEA_PAY_TO_PROL_MEMO": ("FEA_PAY_TO_PROL", "sched_b"),
+    "FEA_CC_PAY_MEMO": ("FEA_CC_PAY", "sched_b"),
+    "FEA_STAF_REIM_MEMO": ("FEA_STAF_REIM", "sched_b"),
 }
 
 
