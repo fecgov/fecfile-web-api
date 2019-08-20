@@ -393,6 +393,24 @@
                       </ng-option>
                     </ng-select>
                   </ng-container>
+                  <ng-container *ngIf="col?.type === 'select' && 
+                      isFieldName(col?.name, 'election_code')">  
+                    <ng-select
+                      (change)="handleElectionCodeChange($event, col)"
+                      class="election-code-select"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'state-select-error'
+                          : ''
+                      "
+                    >
+                      <ng-option *ngFor="let item of electionTypes" [value]="item">
+                        {{ item.electionTypeDescription }}
+                      </ng-option>
+                    </ng-select>
+                  </ng-container>                  
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
                       (change)="handleEntityTypeChange($event, col)"

@@ -69,6 +69,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
+  public electionTypes: any = [];
   public entityTypes: any = [];
   public selectedEntityType: any;
 
@@ -92,6 +93,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _selectedChangeWarnChild: any;
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
+  private _selectedElectionCode: string;
+  private _selectedElectionCodeChild: string;
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
@@ -129,7 +132,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage()
       .subscribe(message => {
-        this.getFormFields();
+        this._getFormFields();
         this._validateContributionDate();
     });
   }
@@ -143,6 +146,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+    this._selectedElectionCode = null;
+    this._selectedElectionCodeChild = null;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this._transactionToEdit = null;
@@ -170,7 +175,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._prepareForm();
   }
 
-  _prepareForm() {
+  private _prepareForm() {
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
@@ -285,6 +290,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     // get form data API is passing X for memo code value.
     // Set it to value from dynamic forms as some should be checked and disabled by default.
     this._setMemoCodeForForm();
+
+    if (this.frmIndividualReceipt.contains('election_code')) {
+      this.frmIndividualReceipt.patchValue({ election_code: null }, { onlySelf: true });
+    }
+    const childElectCodeName = this._childFieldNamePrefix + 'election_code';
+    if (this.frmIndividualReceipt.contains(childElectCodeName)) {
+      const vo = {};
+      vo[childElectCodeName] = null;
+      this.frmIndividualReceipt.patchValue(vo, { onlySelf: true });
+    }
   }
 
   /**
@@ -527,7 +542,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (this.transactionType !== this._transactionTypePrevious) {
         this._transactionTypePrevious = this.transactionType;
         // reload dynamic form fields
-        this.getFormFields();
+        this._getFormFields();
       }
     }
   }
@@ -801,14 +816,24 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         }
       }
     }
-    // if (isChildForm) {
-    //   this.frmIndividualReceipt.patchValue({ 'child*state': stateCode }, { onlySelf: true });
-    // } else {
-    //   this.frmIndividualReceipt.patchValue({ state: stateCode }, { onlySelf: true });
-    // }
     const stateVO = {};
     stateVO[col.name] = stateCode;
     this.frmIndividualReceipt.patchValue(stateVO, { onlySelf: true });
+  }
+
+  /**
+   * Set the Election Code on the form when it changes in the UI.
+   */
+  public handleElectionCodeChange(item: any, col: any) {
+    const electionCodeVO = {};
+    electionCodeVO[col.name] = item.electionTypeDescription;
+    this.frmIndividualReceipt.patchValue(electionCodeVO, { onlySelf: true });
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
+    if (isChildForm) {
+      this._selectedElectionCodeChild = item.electionType;
+    } else {
+      this._selectedElectionCode = item.electionType;
+    }
   }
 
   /**
@@ -865,6 +890,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
+        } else if (field === 'election_code') {
+          receiptObj[field] = this._selectedElectionCode;
+        } else if (field === this._childFieldNamePrefix + 'election_code') {
+          receiptObj[field] = this._selectedElectionCodeChild;
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
@@ -956,6 +985,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
+          this._selectedElectionCode = null;
+          this._selectedElectionCodeChild = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -1589,122 +1620,122 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //   return null;
   // }
 
-  private ___getFormFields(): void {
-    console.log('get transaction type form fields ' + this.transactionType);
-    if (this.transactionType === 'CON_EAR_DEP') {
-      this._receiptService.getConEarDepMockData().subscribe(res => {
-        if (res) {
-          if (res.hasOwnProperty('data')) {
-            if (typeof res.data === 'object') {
-              if (res.data.hasOwnProperty('formFields')) {
-                if (Array.isArray(res.data.formFields)) {
-                  this.formFields = res.data.formFields;
+  // private ___getFormFields(): void {
+  //   console.log('get transaction type form fields ' + this.transactionType);
+  //   if (this.transactionType === 'CON_EAR_DEP') {
+  //     this._receiptService.getConEarDepMockData().subscribe(res => {
+  //       if (res) {
+  //         if (res.hasOwnProperty('data')) {
+  //           if (typeof res.data === 'object') {
+  //             if (res.data.hasOwnProperty('formFields')) {
+  //               if (Array.isArray(res.data.formFields)) {
+  //                 this.formFields = res.data.formFields;
 
-                  this._setForm(this.formFields);
-                }
-              }
-              if (res.data.hasOwnProperty('hiddenFields')) {
-                if (Array.isArray(res.data.hiddenFields)) {
-                  this.hiddenFields = res.data.hiddenFields;
-                }
-              }
-              if (res.data.hasOwnProperty('states')) {
-                if (Array.isArray(res.data.states)) {
-                  this.states = res.data.states;
-                }
-              }
-              if (res.data.hasOwnProperty('titles')) {
-                if (Array.isArray(res.data.titles)) {
-                  this.titles = res.data.titles;
-                }
-              }
-              if (res.data.hasOwnProperty('entityTypes')) {
-                if (Array.isArray(res.data.entityTypes)) {
-                  this.entityTypes = res.data.entityTypes;
-                  if (this.entityTypes) {
-                    for (const field of this.entityTypes) {
-                      // If API sets selected to true it can be used to set the default.
-                      // If none are set, use the first.
-                      if (field.selected) {
-                        this.selectedEntityType = field;
-                      }
-                    }
-                    if (!this.selectedEntityType) {
-                      if (this.entityTypes.length > 0) {
-                        this.selectedEntityType = this.entityTypes[0];
-                      }
-                    }
-                  }
-                  this._entityTypeDefault = this.selectedEntityType;
-                  this.frmIndividualReceipt.patchValue(
-                    { entity_type: this.selectedEntityType.entityTypeDescription },
-                    { onlySelf: true }
-                  );
-                }
-              }
-            } // typeof res.data
-          } // res.hasOwnProperty('data')
-        } // res
-      });
-    } else {
-      this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
-        if (res) {
-          if (res.hasOwnProperty('data')) {
-            if (typeof res.data === 'object') {
-              if (res.data.hasOwnProperty('formFields')) {
-                if (Array.isArray(res.data.formFields)) {
-                  this.formFields = res.data.formFields;
+  //                 this._setForm(this.formFields);
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('hiddenFields')) {
+  //               if (Array.isArray(res.data.hiddenFields)) {
+  //                 this.hiddenFields = res.data.hiddenFields;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('states')) {
+  //               if (Array.isArray(res.data.states)) {
+  //                 this.states = res.data.states;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('titles')) {
+  //               if (Array.isArray(res.data.titles)) {
+  //                 this.titles = res.data.titles;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('entityTypes')) {
+  //               if (Array.isArray(res.data.entityTypes)) {
+  //                 this.entityTypes = res.data.entityTypes;
+  //                 if (this.entityTypes) {
+  //                   for (const field of this.entityTypes) {
+  //                     // If API sets selected to true it can be used to set the default.
+  //                     // If none are set, use the first.
+  //                     if (field.selected) {
+  //                       this.selectedEntityType = field;
+  //                     }
+  //                   }
+  //                   if (!this.selectedEntityType) {
+  //                     if (this.entityTypes.length > 0) {
+  //                       this.selectedEntityType = this.entityTypes[0];
+  //                     }
+  //                   }
+  //                 }
+  //                 this._entityTypeDefault = this.selectedEntityType;
+  //                 this.frmIndividualReceipt.patchValue(
+  //                   { entity_type: this.selectedEntityType.entityTypeDescription },
+  //                   { onlySelf: true }
+  //                 );
+  //               }
+  //             }
+  //           } // typeof res.data
+  //         } // res.hasOwnProperty('data')
+  //       } // res
+  //     });
+  //   } else {
+  //     this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
+  //       if (res) {
+  //         if (res.hasOwnProperty('data')) {
+  //           if (typeof res.data === 'object') {
+  //             if (res.data.hasOwnProperty('formFields')) {
+  //               if (Array.isArray(res.data.formFields)) {
+  //                 this.formFields = res.data.formFields;
 
-                  this._setForm(this.formFields);
-                }
-              }
-              if (res.data.hasOwnProperty('hiddenFields')) {
-                if (Array.isArray(res.data.hiddenFields)) {
-                  this.hiddenFields = res.data.hiddenFields;
-                }
-              }
-              if (res.data.hasOwnProperty('states')) {
-                if (Array.isArray(res.data.states)) {
-                  this.states = res.data.states;
-                }
-              }
-              if (res.data.hasOwnProperty('titles')) {
-                if (Array.isArray(res.data.titles)) {
-                  this.titles = res.data.titles;
-                }
-              }
-              if (res.data.hasOwnProperty('entityTypes')) {
-                if (Array.isArray(res.data.entityTypes)) {
-                  this.entityTypes = res.data.entityTypes;
-                  if (this.entityTypes) {
-                    for (const field of this.entityTypes) {
-                      // If API sets selected to true it can be used to set the default.
-                      // If none are set, use the first.
-                      if (field.selected) {
-                        this.selectedEntityType = field;
-                      }
-                    }
-                    if (!this.selectedEntityType) {
-                      if (this.entityTypes.length > 0) {
-                        this.selectedEntityType = this.entityTypes[0];
-                      }
-                    }
-                  }
-                  this._entityTypeDefault = this.selectedEntityType;
-                  this.frmIndividualReceipt.patchValue(
-                    { entity_type: this.selectedEntityType.entityTypeDescription },
-                    { onlySelf: true }
-                  );
-                }
-              }
-            } // typeof res.data
-          } // res.hasOwnProperty('data')
-        } // res
-      });
-    }
-  }
+  //                 this._setForm(this.formFields);
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('hiddenFields')) {
+  //               if (Array.isArray(res.data.hiddenFields)) {
+  //                 this.hiddenFields = res.data.hiddenFields;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('states')) {
+  //               if (Array.isArray(res.data.states)) {
+  //                 this.states = res.data.states;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('titles')) {
+  //               if (Array.isArray(res.data.titles)) {
+  //                 this.titles = res.data.titles;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('entityTypes')) {
+  //               if (Array.isArray(res.data.entityTypes)) {
+  //                 this.entityTypes = res.data.entityTypes;
+  //                 if (this.entityTypes) {
+  //                   for (const field of this.entityTypes) {
+  //                     // If API sets selected to true it can be used to set the default.
+  //                     // If none are set, use the first.
+  //                     if (field.selected) {
+  //                       this.selectedEntityType = field;
+  //                     }
+  //                   }
+  //                   if (!this.selectedEntityType) {
+  //                     if (this.entityTypes.length > 0) {
+  //                       this.selectedEntityType = this.entityTypes[0];
+  //                     }
+  //                   }
+  //                 }
+  //                 this._entityTypeDefault = this.selectedEntityType;
+  //                 this.frmIndividualReceipt.patchValue(
+  //                   { entity_type: this.selectedEntityType.entityTypeDescription },
+  //                   { onlySelf: true }
+  //                 );
+  //               }
+  //             }
+  //           } // typeof res.data
+  //         } // res.hasOwnProperty('data')
+  //       } // res
+  //     });
+  //   }
+  // }
 
-  private getFormFields(): void {
+  private _getFormFields(): void {
     console.log('get transaction type form fields ' + this.transactionType);
     this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
       if (res) {
@@ -1713,7 +1744,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('formFields')) {
               if (Array.isArray(res.data.formFields)) {
                 this.formFields = res.data.formFields;
-
                 this._setForm(this.formFields);
               }
             }
@@ -1725,6 +1755,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('states')) {
               if (Array.isArray(res.data.states)) {
                 this.states = res.data.states;
+              }
+            }
+            if (res.data.hasOwnProperty('electionTypes')) {
+              if (Array.isArray(res.data.electionTypes)) {
+                this.electionTypes = res.data.electionTypes;
               }
             }
             if (res.data.hasOwnProperty('titles')) {
