@@ -90,11 +90,13 @@
                       <input
                         *ngIf="col?.name !== 'first_name' 
                             && col?.name !== 'last_name'
-                            && col?.name !== 'cand_first_name'
-                            && col?.name !== 'cand_last_name'
+                            && !isFieldName(col?.name, 'cand_first_name')
+                            && !isFieldName(col?.name, 'cand_last_name')
                             && !isFieldName(col?.name, 'entity_name')
                             && !isFieldName(col?.name, 'donor_cmte_id')
-                            && !isFieldName(col?.name, 'donor_cmte_name')                            
+                            && !isFieldName(col?.name, 'donor_cmte_name')
+                            && !isFieldName(col?.name, 'beneficiary_cmte_id')
+                            && !isFieldName(col?.name, 'beneficiary_cmte_name')                                                     
                             "
                         class="form-control"
                         [style.width]="col?.width"
@@ -165,7 +167,7 @@
                         (blur)="populatePurpose(col?.name)"
                       />
                       <input
-                        *ngIf="col?.name === 'cand_last_name'"
+                        *ngIf="isFieldName(col?.name, 'cand_last_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -189,7 +191,7 @@
                         (blur)="populatePurpose(col?.name)"
                       />
                       <input
-                        *ngIf="col?.name === 'cand_first_name'"
+                        *ngIf="isFieldName(col?.name, 'cand_first_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -233,9 +235,11 @@
                         [resultTemplate]="rtOrg"
                         [inputFormatter]="formatterOrgName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
-                        *ngIf="isFieldName(col?.name, 'donor_cmte_id')"
+                        *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
+                               isFieldName(col?.name, 'beneficiary_cmte_id')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -255,9 +259,11 @@
                         [resultTemplate]="rtCommitteeId"
                         [inputFormatter]="formatterCommitteeId"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />  
                       <input
-                        *ngIf="isFieldName(col?.name, 'donor_cmte_name')"
+                        *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
+                               isFieldName(col?.name, 'beneficiary_cmte_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -277,6 +283,7 @@
                         [resultTemplate]="rtCommitteeName"
                         [inputFormatter]="formatterCommitteeName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />                                       
                     </div>
                     <div
@@ -360,7 +367,9 @@
                       [formControlName]="col?.name"
                     ></textarea>
                   </ng-container>                
-                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'state')">  
+                  <ng-container *ngIf="col?.type === 'select' && 
+                      (isFieldName(col?.name, 'state') ||
+                       isFieldName(col?.name, 'cand_office_state'))">  
                     <ng-select
                       (change)="handleStateChange($event, col)"
                       class="state-select"
