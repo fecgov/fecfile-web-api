@@ -81,7 +81,7 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
         with connection.cursor() as cursor:
             sql_query = """SELECT json_agg(t) FROM ({}) t""".format(query)
             cursor.execute(sql_query, query_values_list)
-            # print(cursor.query.decode("utf-8"))
+            print(cursor.query.decode("utf-8"))
             result = cursor.fetchone()[0]
             if result is None:
                 # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer using this condition
@@ -738,7 +738,7 @@ def sample_sql_generate(request):
                 file.write(SB_SA_CHILD_STRING)
                 file.close()
 
-                List_SB_similar_OPEX_REC = ['OPEXP','OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO'] 
+                List_SB_similar_OPEX_REC = ['OPEXP'] 
 
                 OPEX_REC_STRING = ""
                 for tran in List_SB_similar_OPEX_REC:
