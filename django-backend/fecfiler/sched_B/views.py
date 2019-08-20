@@ -58,6 +58,7 @@ NEGATIVE_TRANSACTIONS = [
 ]
 
 # for child transactions, we'll validate parent_id exists in the db
+# TODO: later on chagne it to load this list from DB
 CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "OTH_DISB_CC_PAY_MEMO": ("OTH_DISB_CC_PAY", "sched_b"),
     "OTH_DISB_STAF_REIM_MEMO": ("OTH_DISB_STAF_REIM", "sched_b"),
