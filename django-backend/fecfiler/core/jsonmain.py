@@ -86,7 +86,7 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
             	if empty_list_flag:
             		return []
             	else:
-	                raise NoOPError('No results are found in ' + error_string + ' Table. Input received: {}'.format(','.join(query_values_list)))
+	       raise NoOPError('No results are found in' + error_string + 'Table. Input received:{}'.format(','.join(query_values_list)))
             else:
                 # print(result)
                 return result
@@ -117,8 +117,7 @@ def get_data_details(report_id, cmte_id):
 		             	FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
-
-        return {**json_query(query_1, values_1, string_1, False)[0], **json_query(query_2, values_2, string_2,  False)[0], **json_query(query_3, values_3, string_3, False)[0]}
+        return {**json_query(query_1, values_1, string_1,False)[0],**json_query(query_2,values_2,string_2,False)[0],**json_query(query_3,values_3,string_3,False)[0]}
 
     except Exception:
         raise
@@ -662,6 +661,47 @@ AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'S
 		file.write(SA_OTHER_STRING)
 		file.write(SB_SA_CHILD_STRING)
 		file.close()
+
+	    List_SB_similar_OPEX_REC = ['OPEXP','OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO'] 
+
+        OPEX_REC_STRING = ""
+        for tran in List_SB_similar_OPEX_REC:
+       		query = """SELECT t1.line_number AS "lineNumber", 
+	   	    t1.transaction_type AS "transactionTypeCode",
+	   	    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+	   	    t1.transaction_id AS "transactionId",
+	   	    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+	   	    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+	   	    COALESCE(t2.entity_type, '''') AS "entityType", 
+	   	    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+	   	    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+	   	    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+	   	    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+	   	    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+	   	    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+	   	    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+	   	    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+	   	    COALESCE(t2.city, '''') AS "payeeCity",
+	   	    COALESCE(t2.state, '''') AS "payeeState", 
+	   	    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+	   	    to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", 
+	   	    t1.expenditure_amount AS "expenditureAmount",
+	   	    COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+	   	    COALESCE(t1.memo_code, '''') AS "memoCode", 
+	   	    COALESCE(t1.memo_text, '''') AS "memoDescription"
+FROM public.sched_b t1
+LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+(t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+            OPEX_REC_STRING +="""UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}' 
+AND form_type = '{2}' AND sched_type = '{3}';\n""".format(query, tran, 'F3X', 'SA')
+
+		file = open("/tmp/opex_rec_sql.sql", 'w')
+		file.write(OPEX_REC_STRING)
+		file.close()
+
+		file = open("/tmp/SB_sql.sql", 'w')
+		file.write(OPEX_REC_STRING)
 
 		return Response('Success', status=status.HTTP_201_CREATED)
 	except Exception as e:
