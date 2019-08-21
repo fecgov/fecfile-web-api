@@ -1169,3 +1169,89 @@ def report_end_date(report_id, cmte_id):
 END - AGGREGATE AMOUNT API - SCHED_A APP
 ******************************************************************************************************************************
 """
+"""
+******************************************************************************************************************************
+TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP TO AVOID FUNCTION USAGE RESTRICTIONS) - PRAVEEN
+******************************************************************************************************************************
+"""
+def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
+    """trash or restore sched_a transaction by updating delete_ind"""
+    try:
+        with connection.cursor() as cursor:
+            # UPDATE delete_ind flag to Y in DB
+            _sql = """
+            UPDATE public.sched_a 
+            SET delete_ind = '{}'
+            WHERE report_id = '{}'
+            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
+            cursor.execute(_sql)
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The transaction ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
+    except Exception:
+        raise
+
+@api_view(['PUT'])
+def trash_restore_transactions(request):
+    """api for trash and resore transactions. 
+       we are doing soft-delete only, mark delete_ind to 'Y'
+       
+       request payload in this format:
+{
+    "actions": [
+        {
+            "action": "restore",
+            "reportid": "123",
+            "transactionId": "SA20190610000000087"
+        },
+        {
+            "action": "trash",
+            "reportid": "456",
+            "transactionId": "SA20190610000000087"
+        }
+    ]
+}
+ 
+    """
+    for _action in request.data.get('actions', []):
+        report_id = _action.get('report_id', '')
+        transaction_id = _action.get('transaction_id', '')
+        print(transaction_id[0:2])
+        cmte_id = request.user.username
+
+        action = _action.get('action', '')
+        _delete = 'Y' if action == 'trash' else ''
+        try:
+            #Handling aggregate amount updation for sched A transactions
+            if _delete == 'Y' and transaction_id[0:2] == 'SA':
+                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
+                ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
+            elif transaction_id[0:2] == 'SA':
+                print('IN')
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
+                    ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
+            else:
+            #end of handling
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+        except Exception as e:
+            return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"result":"success"}, status=status.HTTP_200_OK)
+"""
+******************************************************************************************************************************
+END - TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP)
+******************************************************************************************************************************
+"""
