@@ -825,10 +825,35 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * Set the Election Code on the form when it changes in the UI.
    */
   public handleElectionCodeChange(item: any, col: any) {
+
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
+
+    let fieldNamePrefix = '';
+    if (isChildForm) {
+      fieldNamePrefix = this._childFieldNamePrefix;
+    }
+    const description = fieldNamePrefix + 'election_other_description';
+
+    // Description is required when Other is selected
+    if (item.electionType === 'O') {
+
+      if (this.frmIndividualReceipt.contains(description)) {
+        this.frmIndividualReceipt.controls[description]
+          .setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+      }
+    } else {
+      if (this.frmIndividualReceipt.contains(description)) {
+        this.frmIndividualReceipt.controls[description]
+          .setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+      }
+    }
+
     const electionCodeVO = {};
     electionCodeVO[col.name] = item.electionTypeDescription;
     this.frmIndividualReceipt.patchValue(electionCodeVO, { onlySelf: true });
-    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
+    
     if (isChildForm) {
       this._selectedElectionCodeChild = item.electionType;
     } else {
@@ -1760,6 +1785,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('electionTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.electionTypes = res.data.electionTypes;
+
+                // // temp: add Other until API sends it.
+                // const other = {
+                //   'electionType': 'O',
+                //   'electionTypeDescription': 'Other'
+                // };
+                // this.electionTypes.unshift(other);
               }
             }
             if (res.data.hasOwnProperty('titles')) {
