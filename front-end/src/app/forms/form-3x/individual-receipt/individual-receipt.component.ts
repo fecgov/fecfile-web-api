@@ -261,19 +261,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             }
           }
           if (this.isFieldName(e.name, 'memo_code')) {
+            const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
             if (memoCodeValue === this._memoCodeValue) {
-
-              const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
               if (isChildForm) {
                 this.memoCodeChild = true;
                 // this._readOnlyMemoCodeChild = true;
-                this._readOnlyMemoCodeChild = e.isReadonly;
               } else {
                 this.memoCode = true;
                 // this._readOnlyMemoCode = true;
-                this._readOnlyMemoCode = e.isReadonly;
               }
+            }
+            if (isChildForm) {
+              this._readOnlyMemoCodeChild = e.isReadonly;
+            } else {
+              this._readOnlyMemoCode = e.isReadonly;
             }
           }
         });
