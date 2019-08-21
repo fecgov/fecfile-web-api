@@ -146,7 +146,8 @@ def check_transaction_id(transaction_id):
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
             raise Exception(
-                'The Transaction ID: {} is not in the specified format. Transaction IDs start with SA characters'.format(transaction_id))
+                """The Transaction ID: {} is not in the specified format. 
+                Transaction IDs start with SA characters""".format(transaction_id))
         return transaction_id
     except Exception:
         raise
@@ -169,7 +170,8 @@ def check_mandatory_fields_SA(data, list_mandatory_fields):
                 errors.append(field)
         if errors:
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                """The following mandatory fields are required in order to
+                 save data to schedA table: {}""".format(','.join(errors)))
     except:
         raise
 
@@ -183,23 +185,48 @@ def check_decimal(value):
         return value
     except:
         raise Exception(
-            'Invalid Input: Expecting a decimal value like 18.11, 24.07. Input received: {}'.format(value))
+            """Invalid Input: Expecting a decimal value like 18.11, 24.07. 
+            Input received: {}""".format(value))
 
 
-"""
-**************************************************** FUNCTIONS - SCHED A TRANSACTION *************************************************************
-"""
 
 # TODO: update this function to take one argument of data_dic
-
-
-def post_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
+def post_sql_schedA(cmte_id, 
+                    report_id, 
+                    line_number, 
+                    transaction_type, 
+                    transaction_id, 
+                    back_ref_transaction_id, 
+                    back_ref_sched_name, 
+                    entity_id, 
+                    contribution_date, 
+                    contribution_amount, 
+                    purpose_description, 
+                    memo_code, 
+                    memo_text, 
+                    election_code, 
+                    election_other_description, 
+                    donor_cmte_id, 
+                    donor_cmte_name, 
+                    transaction_type_identifier):
     """persist one sched_a item."""
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""INSERT INTO public.sched_a (cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", [cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, datetime.datetime.now(), donor_cmte_id, donor_cmte_name, transaction_type_identifier])
+            cursor.execute("""
+            INSERT INTO public.sched_a 
+            (cmte_id, report_id, line_number, transaction_type, 
+            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+            entity_id, contribution_date, contribution_amount, purpose_description, 
+            memo_code, memo_text, election_code, election_other_description, 
+            create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, [cmte_id, report_id, line_number, transaction_type, 
+            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+            entity_id, contribution_date, contribution_amount, purpose_description, 
+            memo_code, memo_text, election_code, election_other_description, 
+            datetime.datetime.now(), donor_cmte_id, donor_cmte_name, 
+            transaction_type_identifier])
     except Exception:
         raise
 
@@ -209,39 +236,6 @@ def get_list_all_schedA(report_id, cmte_id):
     load sched_a items from DB
     """
     return get_list_schedA(report_id, cmte_id)
-    # try:
-    #     with connection.cursor() as cursor:
-    #         # GET all rows from schedA table
-    #         query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-    #                         FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
-
-    #         cursor.execute("""SELECT json_agg(t) FROM (""" +
-    #                        query_string + """) t""", [report_id, cmte_id])
-    #         # charlieSun: josn_agg function is returning one record with a list of row_dics
-    #         # something like ([{c1:v1},{c1:v2},{c1:v3}])
-    #         schedA_list = cursor.fetchone()[0]
-    #         # for row in cursor.fetchall():
-    #         # forms_obj.append(data_row)
-    #         # data_row = list(row)
-    #         # schedA_list = data_row[0]
-
-    #         if schedA_list is None:
-    #             raise NoOPError(
-    #                 'The Report id:{} does not have any schedA transactions'.format(report_id))
-    #         merged_list = []
-    #         for dictA in schedA_list:
-    #             entity_id = dictA.get('entity_id')
-    #             data = {
-    #                 'entity_id': entity_id,
-    #                 'cmte_id': cmte_id
-    #             }
-    #             entity_list = get_entities(data)
-    #             dictEntity = entity_list[0]
-    #             merged_dict = {**dictA, **dictEntity}
-    #             merged_list.append(merged_dict)
-    #     return merged_list
-    # except Exception:
-    #     raise
 
 def get_list_schedA(report_id, cmte_id, transaction_id = None):
 
@@ -289,7 +283,6 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
-
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
@@ -369,12 +362,9 @@ def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
     """
     try:
         with connection.cursor() as cursor:
-
             # UPDATE back_ref_transaction_id value to null in sched_a table
-            value = None
             cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [
-                           value, transaction_id, report_id, cmte_id])
-
+                           None, transaction_id, report_id, cmte_id])
     except Exception:
         raise
 
