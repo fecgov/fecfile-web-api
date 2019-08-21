@@ -207,7 +207,43 @@
                     [formControlName]="col?.name"
                   ></textarea>
                 </ng-container>
+
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
+                  <ng-select
+                    (change)="handleStateChange($event, col)"
+                    class="state-select"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'state-select-error'
+                        : ''
+                    "
+                  >
+                    <ng-option *ngFor="let item of states" [ngValue]="item">
+                      {{ item.code }} - {{ item.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
+                  <ng-select
+                    (change)="handleStateChange($event, col)"
+                    class="state-select"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'state-select-error'
+                        : ''
+                    "
+                  >
+                    <ng-option *ngFor="let item of officeSought" [ngValue]="item">
+                      {{ item.code }} - {{ item.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>
+
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'Office_State'">
                   <ng-select
                     (change)="handleStateChange($event, col)"
                     class="state-select"
@@ -246,7 +282,7 @@
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
               <button class="btn btn-previous btn-left" type="button" (click)="saveAndAddMore()">
-                Save &amp; AddMore
+                Save &amp; Add More
               </button>
             </div>
           </div>
@@ -264,7 +300,7 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" (click)="saveAndExit()">
+              <button class="btn btn-secondary btn-right" type="button"  (click)="doValidateContact()">
                 Save &amp; Exit
               </button>
             </div>

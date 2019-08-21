@@ -90,11 +90,13 @@
                       <input
                         *ngIf="col?.name !== 'first_name' 
                             && col?.name !== 'last_name'
-                            && col?.name !== 'cand_first_name'
-                            && col?.name !== 'cand_last_name'
+                            && !isFieldName(col?.name, 'cand_first_name')
+                            && !isFieldName(col?.name, 'cand_last_name')
                             && !isFieldName(col?.name, 'entity_name')
                             && !isFieldName(col?.name, 'donor_cmte_id')
-                            && !isFieldName(col?.name, 'donor_cmte_name')                            
+                            && !isFieldName(col?.name, 'donor_cmte_name')
+                            && !isFieldName(col?.name, 'beneficiary_cmte_id')
+                            && !isFieldName(col?.name, 'beneficiary_cmte_name')                                                     
                             "
                         class="form-control"
                         [style.width]="col?.width"
@@ -134,6 +136,7 @@
                         "
                         id="typeahead-template-last-name"
                         [ngbTypeahead]="searchLastName"
+                        [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName"
                         (selectItem)="handleSelectedIndividual($event, col?.name)"
@@ -158,6 +161,7 @@
                         "
                         id="typeahead-template-first-name"
                         [ngbTypeahead]="searchFirstName"
+                        [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName"
                         (selectItem)="handleSelectedIndividual($event, col?.name)"
@@ -165,7 +169,7 @@
                         (blur)="populatePurpose(col?.name)"
                       />
                       <input
-                        *ngIf="col?.name === 'cand_last_name'"
+                        *ngIf="isFieldName(col?.name, 'cand_last_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -182,6 +186,7 @@
                         "
                         id="typeahead-template-cand-last-name"
                         [ngbTypeahead]="searchCandLastName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandLastName"
                         (selectItem)="handleSelectedCandidate($event, col?.name)"
@@ -189,7 +194,7 @@
                         (blur)="populatePurpose(col?.name)"
                       />
                       <input
-                        *ngIf="col?.name === 'cand_first_name'"
+                        *ngIf="isFieldName(col?.name, 'cand_first_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -206,6 +211,7 @@
                         "
                         id="typeahead-template-cand-first-name"
                         [ngbTypeahead]="searchCandFirstName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandFirstName"
                         (selectItem)="handleSelectedCandidate($event, col?.name)"
@@ -230,12 +236,15 @@
                         "
                         id="typeahead-template-org"
                         [ngbTypeahead]="searchOrg"
+                        [focusFirst]=false
                         [resultTemplate]="rtOrg"
                         [inputFormatter]="formatterOrgName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
-                        *ngIf="isFieldName(col?.name, 'donor_cmte_id')"
+                        *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
+                               isFieldName(col?.name, 'beneficiary_cmte_id')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -252,12 +261,15 @@
                         "
                         id="typeahead-template-committee-id"
                         [ngbTypeahead]="searchCommitteeId"
+                        [focusFirst]=false
                         [resultTemplate]="rtCommitteeId"
-                        [inputFormatter]="formatterCommitteeId"
+                        [inputFormatter]="formatterCommitteeId"                        
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />  
                       <input
-                        *ngIf="isFieldName(col?.name, 'donor_cmte_name')"
+                        *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
+                               isFieldName(col?.name, 'beneficiary_cmte_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -274,9 +286,11 @@
                         "
                         id="typeahead-template-committee-name"
                         [ngbTypeahead]="searchCommitteeName"
+                        [focusFirst]=false
                         [resultTemplate]="rtCommitteeName"
                         [inputFormatter]="formatterCommitteeName"
                         (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (keyup)="handleFormFieldKeyup($event, col)"
                       />                                       
                     </div>
                     <div
@@ -360,7 +374,9 @@
                       [formControlName]="col?.name"
                     ></textarea>
                   </ng-container>                
-                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'state')">  
+                  <ng-container *ngIf="col?.type === 'select' && 
+                      (isFieldName(col?.name, 'state') ||
+                       isFieldName(col?.name, 'cand_office_state'))">  
                     <ng-select
                       (change)="handleStateChange($event, col)"
                       class="state-select"
@@ -377,6 +393,24 @@
                       </ng-option>
                     </ng-select>
                   </ng-container>
+                  <ng-container *ngIf="col?.type === 'select' && 
+                      isFieldName(col?.name, 'election_code')">  
+                    <ng-select
+                      (change)="handleElectionCodeChange($event, col)"
+                      class="election-code-select"
+                      [formControlName]="col?.name"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'state-select-error'
+                          : ''
+                      "
+                    >
+                      <ng-option *ngFor="let item of electionTypes" [value]="item">
+                        {{ item.electionTypeDescription }}
+                      </ng-option>
+                    </ng-select>
+                  </ng-container>                  
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
                       (change)="handleEntityTypeChange($event, col)"

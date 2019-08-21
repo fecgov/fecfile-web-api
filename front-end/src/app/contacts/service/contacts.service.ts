@@ -90,7 +90,7 @@ export class ContactsService {
       filters: ContactFilterModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/core/contacts';
+    const url = '/core/contactsTable';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -251,14 +251,18 @@ export class ContactsService {
       model.type = row.type;
       model.id = row.id;
       model.name = row.name;
-      model.street1 = row.street1;
+      model.street = row.street1;
       model.street2 = row.street_2;
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip;
       model.employer = row.employer;
       model.occupation = row.occupation;
-      
+      model.phoneNumber = row.phoneNumber;
+      model.officeSought = row.officeSought;
+      model.officeState = row.officeState;
+      model.district = row.district;
+      model.entity_name = row.entity_name;
       modelArray.push(model);
     }
     return modelArray;
@@ -314,12 +318,25 @@ export class ContactsService {
       case 'occupation':
         name = 'occupation';
         break;
+      case 'phoneNumber':
+        name = 'phoneNumber';
+        break;  
+      case 'officeSought':
+        name = 'officeSought';
+        break;
+      case 'officeState':
+        name = 'officeState';
+        break;
+      case 'district':
+        name = 'district';
+        break;
+      case 'entity_name':
+        name= 'entity_name';
+        break;
       default:
     }
     return name ? name : '';
   }
-
-
   /**
    * Map front-end model fields to server fields.
    *
@@ -335,15 +352,19 @@ export class ContactsService {
     serverObject.name =  model.name;
     serverObject.type = model.type;
     serverObject.id = model.id;
-    serverObject.street1 = model.street1;
+    serverObject.street1 = model.street;
     serverObject.street2 = model.street2;
     serverObject.city = model.city;
     serverObject.state = model.state;
     serverObject.zip = model.zip;
     serverObject.employer = model.employer;
     serverObject.occupation = model.occupation;
+    serverObject.phoneNumber = model.phoneNumber;
+    serverObject.officeSought = model.officeSought;
+    serverObject.officeState = model.officeState;
+    serverObject.district = model.district;
+    serverObject.district = model.entity_name;
     
-
     return serverObject;
   }
 
@@ -637,44 +658,29 @@ export class ContactsService {
    * @param      {string}           formType  The form type
    * @param      {ContactActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSchedule(formType: string, scheduleAction: ContactActions): Observable<any> {
+  public saveContact(scheduleAction: ContactActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sa/schedA';
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    const url: string = '/core/contacts';
+    /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
     if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-    }
+    }*/
 
-    const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-    const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
+    //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
+    const contact: any = JSON.parse(localStorage.getItem(`contactObj`));
     const formData: FormData = new FormData();
-
+    console.log(" saveContact called ...!");
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    /**
-     * This has to be removed.
-     * I'm not hard coding anything any more.
-     * Or this has to be changed to just lower case.  This is not a
-     * good practice at all.  Please do better then this.
-     */
-    formData.append('cmte_id', committeeDetails.committeeid);
-    // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
-      formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
-      formData.append('report_id', reportType.reportid);
-    }
-
-    console.log();
-
-    for (const [key, value] of Object.entries(receipt)) {
+    console.log(" saveContact contact object ...!", contact);
+    for (const [key, value] of Object.entries(contact)) {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
+          console.log(" saveContact contact formdata object ...!", key, " ", value );
         }
       }
     }
@@ -687,6 +693,7 @@ export class ContactsService {
         .pipe(
           map(res => {
             if (res) {
+              console.log(" saveContact called res...!", res);
               return res;
             }
             return false;
@@ -729,7 +736,7 @@ export class ContactsService {
    * Saves a schedule a using POST.  The POST API supports saving an existing
    * transaction.  Therefore, transaction_id is required in this API call.
    *
-   * TODO consider modifying saveScheduleA() to support both POST and PUT.
+   * TODO consider modifying saveContactA() to support both POST and PUT.
    *
    * @param      {string}  formType  The form type
    */

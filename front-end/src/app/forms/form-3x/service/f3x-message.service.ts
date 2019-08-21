@@ -14,6 +14,7 @@ export class F3xMessageService {
 
   private populateFormSubject = new Subject<any>();
   private clearFormSubject = new Subject<any>();
+  private loadFormFieldsSubject = new Subject<any>();
 
 
   /**
@@ -66,6 +67,31 @@ export class F3xMessageService {
    */
   public getInitFormMessage(): Observable<any> {
     return this.clearFormSubject.asObservable();
+  }
+
+  /**
+   * Send a message to Load the form fields.
+   *
+   * @param message
+   */
+  public sendLoadFormFieldsMessage(message: any) {
+    this.loadFormFieldsSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Load Form Fields message.
+   */
+  public clearLoadFormFieldsMessage() {
+    this.loadFormFieldsSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Load Form Fields message.
+   */
+  public getLoadFormFieldsMessage(): Observable<any> {
+    return this.loadFormFieldsSubject.asObservable();
   }
 
 }

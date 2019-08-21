@@ -148,7 +148,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": false,
+                "seperator": true,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -206,33 +206,10 @@
                     }
                 ]
             },
+ 
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
-                "cols": [
-                    {
-                        "inputGroup": false,
-                        "inputIcon": "",
-                        "text": "Telephone",
-                        "infoIcon": false,
-                        "infoText": "Request language from RAD",
-                        "name": "phone_number",
-                        "type": "text",
-                        "value": null,
-                        "scroll": false,
-                        "height": "30px",
-                        "width": "154px",
-                        "validation": {
-                            "required": true,
-                            "max": 20,
-                            "alphaNumeric": true
-                        }
-                    }
-                ]
-            },
-            {
-                "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -394,7 +371,7 @@
                         "height": "30px",
                         "width": "98.35px",
                         "validation": {
-                            "required": false,
+                            "required": true,
                             "max": 10,
                             "alphaNumeric": true
                         }
@@ -506,7 +483,7 @@
      
             {
                 "colClassName": "col col-md-4",
-                "seperator": false,
+                "seperator": true,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -532,7 +509,7 @@
                         "text": "Office State",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "state",
+                        "name": "Office_State",
                         "type": "select",
                         "value": null,
                         "scroll": false,
@@ -557,7 +534,7 @@
                         "height": "30px",
                         "width": "98.35px",
                         "validation": {
-                            "required": true,
+                            "required": false,
                             "max": 10,
                             "alphaNumeric": true
                         }
@@ -566,7 +543,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -620,7 +597,7 @@
                         "text": "Committee Name",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "name",
+                        "name": "entity_name",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -638,7 +615,7 @@
                         "text": "Commitee ID",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "id",
+                        "name": "commitee_id",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -767,7 +744,7 @@
                         "text": "Organization Name",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "name",
+                        "name": "entity_name",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -1170,15 +1147,15 @@
      "officeSought": [
             {
                 "name": "House",
-                "code": "House"
+                "code": "H"
             },
             {
                 "name": "Senate",
-                "code": "Senate"
+                "code": "S"
             },
             {
                 "name": "Presidential",
-                "code": "Presidential"
+                "code": "P"
             }
         ],
     "officeState": [

@@ -39,7 +39,7 @@ MANDATORY_CHILD_FIELDS_SCHED_A = ['report_id', 'child_transaction_type_identifie
                             'child_contribution_amount', 'child_entity_type']
 
 # madatory fields for aggregate amount api call
-MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier']
+MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier', 'contribution_date']
 
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
@@ -409,21 +409,35 @@ def find_aggregate_date(form_type, contribution_date):
             'The aggregate_start_date function is throwing an error: ' + str(e))
 
 
-def func_aggregate_amount(aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id):
+def func_aggregate_amount(contribution_date, transaction_type_identifier, entity_id, cmte_id):
     """
     query aggregate amount based on start/end date, transaction_type, entity_id and cmte_id
     """
     try:
         with connection.cursor() as cursor:
 
-            cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
-                           entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
+AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
+AND contribution_date <= %s::date
+AND memo_code IS NULL 
+AND delete_ind is distinct FROM 'Y' 
+ORDER BY contribution_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
 
-            aggregate_amt = cursor.fetchone()[0]
+            # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
+            # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
+            #                entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            print(cursor.query)
+            result = cursor.fetchone()
+            print(result)
+        if result is None:
+          aggregate_amt = 0
+        elif result[0] is None:
+          aggregate_amt = 0
+        else:
+          aggregate_amt = result[0]
         return aggregate_amt
     except Exception as e:
-        raise Exception(
-            'The aggregate_amount function is throwing an error: ' + str(e))
+        raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 
 def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id):
@@ -1066,19 +1080,20 @@ def contribution_aggregate(request):
             check_mandatory_fields_SA(
                 request.query_params, MANDATORY_FIELDS_AGGREGATE)
             cmte_id = request.user.username
-            if not('report_id' in request.query_params):
-                raise Exception('Missing Input: Report_id is mandatory')
-            # handling null,none value of report_id
-            if check_null_value(request.query_params.get('report_id')):
-                report_id = check_report_id(request.query_params.get('report_id'))
-            else:
-                report_id = "0"
-            # end of handling
-            if report_id == "0":
-                aggregate_date = datetime.datetime.today()
-            else:
-                aggregate_date = report_end_date(report_id, cmte_id)
+            # if not('report_id' in request.query_params):
+            #     raise Exception('Missing Input: Report_id is mandatory')
+            # # handling null,none value of report_id
+            # if check_null_value(request.query_params.get('report_id')):
+            #     report_id = check_report_id(request.query_params.get('report_id'))
+            # else:
+            #     report_id = "0"
+            # # end of handling
+            # if report_id == "0":
+            #     aggregate_date = datetime.datetime.today()
+            # else:
+            #     aggregate_date = report_end_date(report_id, cmte_id)
             transaction_type_identifier = request.query_params.get('transaction_type_identifier')
+            contribution_date = date_format(request.query_params.get('contribution_date'))
             if 'entity_id' in request.query_params and check_null_value(request.query_params.get('entity_id')):
                 entity_id = request.query_params.get('entity_id')
             else:
@@ -1088,11 +1103,9 @@ def contribution_aggregate(request):
                     request.query_params.get('contribution_amount'))
             else:
                 contribution_amount = "0"
-            form_type = find_form_type(report_id, cmte_id)
-            aggregate_start_date, aggregate_end_date = find_aggregate_date(
-                form_type, aggregate_date)
-            aggregate_amt = func_aggregate_amount(
-                aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
+            # form_type = find_form_type(report_id, cmte_id)
+            # aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, aggregate_date)
+            aggregate_amt = func_aggregate_amount(contribution_date, transaction_type_identifier, entity_id, cmte_id)
             total_amt = aggregate_amt + Decimal(contribution_amount)
             return JsonResponse({"contribution_aggregate": total_amt}, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -1114,4 +1127,98 @@ def report_end_date(report_id, cmte_id):
         return cvg_end_date
     except Exception as e:
         raise Exception(
-            'The report_end_date function is throwing an error: ' + str(e))
+            'The report_end_date function is throwing an error: ' + str(e)
+
+
+"""
+******************************************************************************************************************************
+END - AGGREGATE AMOUNT API - SCHED_A APP
+******************************************************************************************************************************
+"""
+"""
+******************************************************************************************************************************
+TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP TO AVOID FUNCTION USAGE RESTRICTIONS) - PRAVEEN
+******************************************************************************************************************************
+"""
+def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
+    """trash or restore sched_a transaction by updating delete_ind"""
+    try:
+        with connection.cursor() as cursor:
+            # UPDATE delete_ind flag to Y in DB
+            _sql = """
+            UPDATE public.sched_a 
+            SET delete_ind = '{}'
+            WHERE report_id = '{}'
+            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
+            cursor.execute(_sql)
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The transaction ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
+    except Exception:
+        raise
+
+@api_view(['PUT'])
+def trash_restore_transactions(request):
+    """api for trash and resore transactions. 
+       we are doing soft-delete only, mark delete_ind to 'Y'
+       
+       request payload in this format:
+{
+    "actions": [
+        {
+            "action": "restore",
+            "reportid": "123",
+            "transactionId": "SA20190610000000087"
+        },
+        {
+            "action": "trash",
+            "reportid": "456",
+            "transactionId": "SA20190610000000087"
+        }
+    ]
+}
+ 
+    """
+    for _action in request.data.get('actions', []):
+        report_id = _action.get('report_id', '')
+        transaction_id = _action.get('transaction_id', '')
+        print(transaction_id[0:2])
+        cmte_id = request.user.username
+
+        action = _action.get('action', '')
+        _delete = 'Y' if action == 'trash' else ''
+        try:
+            #Handling aggregate amount updation for sched A transactions
+            if _delete == 'Y' and transaction_id[0:2] == 'SA':
+                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
+                ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
+            elif transaction_id[0:2] == 'SA':
+                print('IN')
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
+                    ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
+            else:
+            #end of handling
+                trash_restore_sql_transaction( 
+                    report_id,
+                    transaction_id, 
+                    _delete)
+        except Exception as e:
+            return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"result":"success"}, status=status.HTTP_200_OK)
+"""
+******************************************************************************************************************************
+END - TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP)
+******************************************************************************************************************************
+"""
+
