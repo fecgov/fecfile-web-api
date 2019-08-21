@@ -782,7 +782,8 @@ def sample_sql_generate(request):
                 file.close()
 
                 List_SB_similar_OPEX__CC = ['OPEXP_CC_PAY','OPEXP_PMT_TO_PROL','OTH_DISB_CC_PAY','OTH_DISB_PMT_TO_PROL','OTH_DISB_RECNT', 
-                'OTH_DISB_NP_RECNT_ACC', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL']
+                'OTH_DISB_NP_RECNT_ACC', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL', 'OPEXP_HQ_ACC_TRIB_REF', 
+                'OPEXP_CONV_ACC_TRIB_REF', 'OTH_DISB_NP_RECNT_TRIB_REF']
 
 
                 OPEX__CC_STRING = ""
@@ -822,7 +823,8 @@ def sample_sql_generate(request):
 
 
 
-                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO','REF_CONT_IND', 'REF_CONT_IND_VOID','OTH_DISB_PMT_TO_PROL_MEMO', 'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO']
+                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO','REF_CONT_IND', 'REF_CONT_IND_VOID','OTH_DISB_PMT_TO_PROL_MEMO', 
+                'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO', 'OPEXP_HQ_ACC_IND_REF', 'OPEXP_CONV_ACC_IND_REF', 'OTH_DISB_NP_RECNT_IND_REF']
 
                 PAY_MEMO_STRING = ""
                 for tran in List_SB_similar_PAY_MEMO:
@@ -865,7 +867,8 @@ def sample_sql_generate(request):
 
 
 
-                List_SB_similar_OPEX_TRAN = ['TRAN_TO_AFFI', 'CONT_TO_OTH_CMTE', 'REF_CONT_PARTY', 'REF_CONT_PARTY_VOID']
+                List_SB_similar_OPEX_TRAN = ['TRAN_TO_AFFI', 'CONT_TO_OTH_CMTE', 'REF_CONT_PARTY', 'REF_CONT_PARTY_VOID', 'OPEXP_HQ_ACC_REG_REF', 
+                'OPEXP_CONV_ACC_REG_REF', 'OTH_DISB_NP_RECNT_REG_REF']
 
                 OPEX_TRAN_STRING = ""
                 for tran in List_SB_similar_OPEX_TRAN:
