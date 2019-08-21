@@ -451,7 +451,11 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT contribution_amount, transaction_id, report_id, line_number, contribution_date FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' ORDER BY contribution_date ASC, create_date ASC""", [
+            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id)
+FROM public.sched_a t1 
+WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
+AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
+ORDER BY contribution_date ASC, create_date ASC""", [
                            entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
             transactions_list = cursor.fetchall()
         return transactions_list
@@ -484,20 +488,21 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
         aggregate_amount = 0
         for transaction in transactions_list:
-            aggregate_amount += transaction[0]
-            # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
-            # if str(report_id) == str(transaction[2]):
-            if contribution_date <= transaction[4]:
-                if transaction_type_identifier in itemization_transaction_type_identifier_list:
-                    if aggregate_amount <= itemization_value:
-                        put_sql_linenumber_schedA(
-                            cmte_id, "11AII", transaction[1], entity_id, aggregate_amount)
+            if transaction[5] != 'Y':
+                aggregate_amount += transaction[0]
+                # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
+                # if str(report_id) == str(transaction[2]):
+                if contribution_date <= transaction[4]:
+                    if transaction_type_identifier in itemization_transaction_type_identifier_list:
+                        if aggregate_amount <= itemization_value:
+                            put_sql_linenumber_schedA(
+                                cmte_id, "11AII", transaction[1], entity_id, aggregate_amount)
+                        else:
+                            put_sql_linenumber_schedA(
+                                cmte_id, "11AI", transaction[1], entity_id, aggregate_amount)
                     else:
                         put_sql_linenumber_schedA(
-                            cmte_id, "11AI", transaction[1], entity_id, aggregate_amount)
-                else:
-                    put_sql_linenumber_schedA(
-                            cmte_id, transaction[3], transaction[1], entity_id, aggregate_amount)
+                                cmte_id, transaction[3], transaction[1], entity_id, aggregate_amount)
     except Exception as e:
         raise Exception(
             'The update_linenumber_aggamt_transactions_SA function is throwing an error: ' + str(e))
@@ -1153,7 +1158,7 @@ def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
             cursor.execute(_sql)
             if (cursor.rowcount == 0):
                 raise Exception(
-                    'The transaction ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
+                    'The transaction ID: {} is either already deleted or does not exist in SCHEDULE A table'.format(transaction_id))
     except Exception:
         raise
 
@@ -1182,7 +1187,7 @@ def trash_restore_transactions(request):
     for _action in request.data.get('actions', []):
         report_id = _action.get('report_id', '')
         transaction_id = _action.get('transaction_id', '')
-        print(transaction_id[0:2])
+        # print(transaction_id[0:2])
         cmte_id = request.user.username
 
         action = _action.get('action', '')
@@ -1198,7 +1203,7 @@ def trash_restore_transactions(request):
                 update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
                 ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
             elif transaction_id[0:2] == 'SA':
-                print('IN')
+                # print('IN')
                 trash_restore_sql_transaction( 
                     report_id,
                     transaction_id, 
