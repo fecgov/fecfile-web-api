@@ -1131,8 +1131,7 @@ def report_end_date(report_id, cmte_id):
             cvg_end_date = cursor.fetchone()[0]
         return cvg_end_date
     except Exception as e:
-        raise Exception(
-            'The report_end_date function is throwing an error: ' + str(e)
+        raise Exception('The report_end_date function is throwing an error: ' + str(e))
 
 
 """
