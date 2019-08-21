@@ -557,7 +557,7 @@
                         "height": "30px",
                         "width": "98.35px",
                         "validation": {
-                            "required": true,
+                            "required": false,
                             "max": 10,
                             "alphaNumeric": true
                         }
