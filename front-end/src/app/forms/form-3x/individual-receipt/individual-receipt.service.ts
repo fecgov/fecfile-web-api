@@ -41,7 +41,7 @@ export class IndividualReceiptService {
   public getConEarDepMockData(): Observable<any> {
     const resp = JSON.parse(
       `
-        {  
+      {  
          "data":{  
             "formFields":[  
                {  
@@ -399,6 +399,7 @@ export class IndividualReceiptService {
                         }
                      },
                      {  
+                        "isReadonly":false,
                         "entityGroup":null,
                         "toggle":false,
                         "inputGroup":false,
@@ -436,7 +437,7 @@ export class IndividualReceiptService {
                         "infoText":"Request language from RAD",
                         "name":"purpose_description",
                         "type":"text",
-                        "value":null,
+                        "value":"Earmarked for ",
                         "scroll":true,
                         "height":"40px",
                         "width":"380px",
@@ -474,34 +475,6 @@ export class IndividualReceiptService {
                   "colClassName":"col col-md-12 fieldset childForm",
                   "seperator":false,
                   "cols":null
-               },
-               {  
-                  "childForm":false,
-                  "childFormTitle":null,
-                  "colClassName":"col col-md-4",
-                  "seperator":false,
-                  "cols":[  
-                     {  
-                        "entityGroup":null,
-                        "toggle":false,
-                        "inputGroup":false,
-                        "inputIcon":"",
-                        "text":"Entity Type",
-                        "infoIcon":true,
-                        "infoText":null,
-                        "name":"child*entity_type",
-                        "type":"select",
-                        "value":"COM",
-                        "scroll":false,
-                        "height":"30px",
-                        "width":"98px",
-                        "validation":{  
-                           "required":true,
-                           "max":3,
-                           "alphaNumeric":true
-                        }
-                     }
-                  ]
                },
                {  
                   "childForm":false,
@@ -682,8 +655,8 @@ export class IndividualReceiptService {
                         "infoIcon":false,
                         "infoText":null,
                         "name":"child*election_code",
-                        "type":"text",
-                        "value":"General",
+                        "type":"select",
+                        "value":null,
                         "scroll":false,
                         "height":"30px",
                         "width":"98px",
@@ -810,6 +783,7 @@ export class IndividualReceiptService {
                         }
                      },
                      {  
+                        "isReadonly":true,
                         "entityGroup":null,
                         "toggle":false,
                         "inputGroup":false,
@@ -819,7 +793,7 @@ export class IndividualReceiptService {
                         "infoText":"Request language from RAD",
                         "name":"child*memo_code",
                         "type":"checkbox",
-                        "value":null,
+                        "value":"X",
                         "scroll":false,
                         "height":"24px",
                         "width":"24px",
@@ -847,7 +821,7 @@ export class IndividualReceiptService {
                         "infoText":"Request language from RAD",
                         "name":"child*purpose_description",
                         "type":"text",
-                        "value":"Earmarked from ",
+                        "value":"Earmarked for ",
                         "scroll":true,
                         "height":"40px",
                         "width":"380px",
@@ -882,7 +856,7 @@ export class IndividualReceiptService {
                {  
                   "childForm":true,
                   "childFormTitle":"Candidate Information:",
-                  "colClassName":"col col-md-12 fieldset childForm",
+                  "colClassName":"col col-md-12 childForm forms__candidate-title",
                   "seperator":false,
                   "cols":null
                },
@@ -900,7 +874,7 @@ export class IndividualReceiptService {
                         "text":"Last Name",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_last_name",
+                        "name":"child*cand_last_name",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -920,7 +894,7 @@ export class IndividualReceiptService {
                         "text":"First Name",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_first_name",
+                        "name":"child*cand_first_name",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -940,7 +914,7 @@ export class IndividualReceiptService {
                         "text":"Middle Name",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_middle_name",
+                        "name":"child*cand_middle_name",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -968,7 +942,7 @@ export class IndividualReceiptService {
                         "text":"Prefix",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_prefix",
+                        "name":"child*cand_prefix",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -988,7 +962,7 @@ export class IndividualReceiptService {
                         "text":"Suffix",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_suffix",
+                        "name":"child*cand_suffix",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -1016,7 +990,7 @@ export class IndividualReceiptService {
                         "text":"Office",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_office",
+                        "name":"child*cand_office",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -1036,7 +1010,7 @@ export class IndividualReceiptService {
                         "text":"State",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_office_state",
+                        "name":"child*cand_state",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -1056,7 +1030,7 @@ export class IndividualReceiptService {
                         "text":"District",
                         "infoIcon":false,
                         "infoText":null,
-                        "name":"cand_office_district",
+                        "name":"child*cand_district",
                         "type":"text",
                         "value":null,
                         "scroll":false,
@@ -1074,13 +1048,18 @@ export class IndividualReceiptService {
             "hiddenFields":[  
                {  
                   "type":"hidden",
-                  "name":"child*beneficiary_cand_id",
-                  "value":null
+                  "name":"entity_type",
+                  "value":"ORG"
                },
                {  
                   "type":"hidden",
-                  "name":"transaction_type_identifier",
-                  "value":"CON_EAR_DEP"
+                  "name":"line_number",
+                  "value":"11A"
+               },
+               {  
+                  "type":"hidden",
+                  "name":"transaction_id",
+                  "value":null
                },
                {  
                   "type":"hidden",
@@ -1094,23 +1073,18 @@ export class IndividualReceiptService {
                },
                {  
                   "type":"hidden",
-                  "name":"transaction_type",
-                  "value":"15E"
+                  "name":"transaction_type_identifier",
+                  "value":"CON_EAR_UNDEP"
                },
                {  
                   "type":"hidden",
-                  "name":"entity_type",
-                  "value":"IND"
+                  "name":"child*entity_type",
+                  "value":"CCM"
                },
                {  
                   "type":"hidden",
-                  "name":"line_number",
-                  "value":"11AI"
-               },
-               {  
-                  "type":"hidden",
-                  "name":"transaction_id",
-                  "value":null
+                  "name":"child*line_number",
+                  "value":"11A"
                },
                {  
                   "type":"hidden",
@@ -1124,12 +1098,12 @@ export class IndividualReceiptService {
                },
                {  
                   "type":"hidden",
-                  "name":"child*line_number",
-                  "value":"23"
+                  "name":"child*back_ref_sched_name",
+                  "value":null
                },
                {  
                   "type":"hidden",
-                  "name":"child*back_ref_sched_name",
+                  "name":"child*beneficiary_cand_id",
                   "value":null
                },
                {  
@@ -1141,6 +1115,11 @@ export class IndividualReceiptService {
                   "type":"hidden",
                   "name":"child*transaction_type_identifier",
                   "value":"CON_EAR_OUT_DEP"
+               },
+               {  
+                  "type":"hidden",
+                  "name":"transaction_type",
+                  "value":"15I"
                }
             ],
             "states":[  
@@ -1396,22 +1375,44 @@ export class IndividualReceiptService {
                   "label":"Contributor Information:"
                }
             ],
-            "entityTypes":[  
+            "entityTypes":null,
+            "electionTypes":[  
                {  
-                  "entityType":"COM",
-                  "entityTypeDescription":"Committee",
-                  "group":"org-group",
-                  "selected":true
+                  "electionType":"P",
+                  "electionTypeDescription":"Primary"
                },
                {  
-                  "entityType":"ORG",
-                  "entityTypeDescription":"Organization (not a committee and not a person)",
-                  "group":"org-group",
-                  "selected":false
+                  "electionType":"G",
+                  "electionTypeDescription":"General"
+               },
+               {  
+                  "electionType":"R",
+                  "electionTypeDescription":"Runoff"
+               },
+               {  
+                  "electionType":"S",
+                  "electionTypeDescription":"Special General"
+               },
+               {  
+                  "electionType":"SP",
+                  "electionTypeDescription":"Special Primary"
+               },
+               {  
+                  "electionType":"SR",
+                  "electionTypeDescription":"Special Runoff"
+               },
+               {  
+                  "electionType":"C",
+                  "electionTypeDescription":"Convention"
+               },
+               {  
+                  "electionType":"O",
+                  "electionTypeDescription":"Other"
                }
             ]
          }
-      }        
+      }
+        
         `
     );
     return Observable.of(resp);
