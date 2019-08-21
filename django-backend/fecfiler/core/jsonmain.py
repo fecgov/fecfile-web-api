@@ -816,7 +816,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/opex_cc_sql.sql", 'w')
                 file.write(OPEX__CC_STRING)
                 file.close()
 
@@ -860,7 +860,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/pay_memo_sql.sql", 'w')
                 file.write(PAY_MEMO_STRING)
                 file.close()
 
@@ -903,12 +903,12 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/opex_tran_sql.sql", 'w')
                 file.write(OPEX_TRAN_STRING)
                 file.close()
 
 
-
+                
                 List_SB_similar_NONFED_PAC_RFD = ['REF_CONT_PAC', 'REF_CONT_NON_FED']
 
                 NONFED_PAC_RFD_STRING = ""
@@ -953,14 +953,14 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/nonfed_pac_sql.sql", 'w')
                 file.write(NONFED_PAC_RFD_STRING)
                 file.close()
 
-
-
+                
+               
                 List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID', 'FEA_CC_PAY']
-
+                import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
                 for tran in List_SB_similar_CONTR_CAND:
 
@@ -996,16 +996,17 @@ def sample_sql_generate(request):
                     COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
                     COALESCE(t1.memo_code, '''') AS "memoCode", 
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-
+                    
                     CONTR_CAND_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/contr_can_sql.sql", 'w')
                 file.write(CONTR_CAND_STRING)
                 file.close()
 
@@ -1055,7 +1056,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/void_pac_sql.sql", 'w')
                 file.write(VOID_RFND_PAC_STRING)
                 file.close()
 
@@ -1113,7 +1114,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/fea_apym_sql.sql", 'w')
                 file.write(FEA_PAYM_STRING)
                 file.close()
 
@@ -1166,7 +1167,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/fea_rcc_sql.sql", 'w')
                 file.write(FEA_CC_STRING)
                 file.close()
 
@@ -1224,7 +1225,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/fea_cc_memo_sql.sql", 'w')
                 file.write(FEA_CC_MEMO_STRING)
                 file.close()
 
@@ -1280,7 +1281,7 @@ def sample_sql_generate(request):
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                file = open("/tmp/indv_rec_sql.sql", 'w')
+                file = open("/tmp/fea_pay_memo_sql.sql", 'w')
                 file.write(FEA_PAY_MEMO_STRING)
                 file.close()
 
@@ -1296,8 +1297,6 @@ def sample_sql_generate(request):
                 file.write(FEA_CC_STRING)
                 file.write(FEA_CC_MEMO_STRING)
                 file.write(FEA_PAY_MEMO_STRING)
-
-
 
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:
