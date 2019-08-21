@@ -62,6 +62,11 @@
     section {
       .row {
         margin-bottom: 20px;
+        .forms__candidate-title {
+          font-size: 1.25em;
+          font-family: sans-serif;
+          font-weight: bold;
+        }
         .col {
           &.info-text {
             padding-top: 45px;
