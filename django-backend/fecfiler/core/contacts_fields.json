@@ -532,7 +532,7 @@
                         "text": "Office State",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "state",
+                        "name": "Office_State",
                         "type": "select",
                         "value": null,
                         "scroll": false,
@@ -620,7 +620,7 @@
                         "text": "Committee Name",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "name",
+                        "name": "entity_name",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -638,7 +638,7 @@
                         "text": "Commitee ID",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "id",
+                        "name": "commitee_id",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -767,7 +767,7 @@
                         "text": "Organization Name",
                         "infoIcon": false,
                         "infoText": null,
-                        "name": "name",
+                        "name": "entity_name",
                         "type": "text",
                         "value": null,
                         "scroll": false,
@@ -1170,15 +1170,15 @@
      "officeSought": [
             {
                 "name": "House",
-                "code": "House"
+                "code": "H"
             },
             {
                 "name": "Senate",
-                "code": "Senate"
+                "code": "S"
             },
             {
                 "name": "Presidential",
-                "code": "Presidential"
+                "code": "P"
             }
         ],
     "officeState": [
