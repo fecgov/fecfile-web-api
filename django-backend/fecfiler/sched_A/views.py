@@ -31,24 +31,6 @@ from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-
-"""
-some questions to discuss:
-1. remove line_number, trsaction_type from mandatory fields.
-2. expenditure purpose = ? 
-3. one sched_a each request ?
-4. one sched_a one entity each request ?
-"""
-
-"""
-********************************************************************************************************************************
-SCHEDULE A TRANSACTION API - SCHED_A APP - SPRINT 7 - FNE 552 - BY PRAVEEN JINKA
-********************************************************************************************************************************
-"""
-
-"""
-**************************************************** FUNCTIONS - TRANSACTION IDS **********************************************************
-"""
 # mandatory fields for shcedule_a records
 MANDATORY_FIELDS_SCHED_A = ['report_id', 'transaction_type_identifier', 'contribution_date', 
                             'contribution_amount', 'entity_type']
@@ -111,19 +93,6 @@ SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
 
 #list of all transaction type identifiers that should auto generate sched_b item in DB
 AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
-# "IK_TRAN": "IK_TRAN_OUT", 
-#                                                     "IK_TRAN_FEA": "IK_TRAN_FEA_OUT",
-#                                                     # "IK_REC_PTY": "IK_OUT_PTY",
-#                                                     # "IK_REC_PAC": "IK_OUT_PAC", 
-#                                                     "IK_REC": "IK_OUT",
-#                                                     "IK_BC_REC": "IK_BC_OUT",
-#                                                     # "CON_EM": "EM_OUT",
-#                                                     # "CON_EM_MEMO": "EM_OUT_MEMO",
-#                                                     "CON_EAR_DEP": "CON_EAR_DEP_MEMO",
-#                                                     "CON_EAR_UNDEP": "CON_EAR_DEP_MEMO",
-#                                                     "PAC_EM": "EM_OUT",
-#                                                     "PAC_EM_MEMO": "EM_OUT_MEMO"
-#                                                     }
                                     "IK_REC" : "IK_OUT",
                                     "IK_BC_REC" : "IK_BC_OUT",
                                     "REATT_FROM" : "REATT_MEMO",
@@ -589,7 +558,7 @@ def post_schedA(datum):
                     if not 'child_datum' in datum:
                         raise Exception('child data missing!!!') 
                     child_datum = datum.get('child_datum')
-                    # update some filds and make sure the parent-child relationashp
+                    # update some filds and ensure the parent-child relationaship
                     child_datum['cmte_id'] = datum.get('cmte_id')
                     child_datum['report_id'] = datum.get('report_id')
                     child_datum['transaction_type_identifier'] = TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT.get(
@@ -652,6 +621,8 @@ def put_schedA(datum):
     try:
         check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         transaction_id = check_transaction_id(datum.get('transaction_id'))
+
+        # TODO: need to discuss biz logic behind prev_transation_data???
         prev_transaction_data = get_schedA(datum)[0]
         entity_flag = False
         if 'entity_id' in datum:
@@ -697,9 +668,32 @@ def put_schedA(datum):
                     else:
                         child_datum['transaction_id'] = child_transaction_id
                         child_data = put_schedA(child_datum)
+                    # TODO: not sure why we need to delete a sched_b item here?    
                     child_SB_transaction_id = get_child_transaction_schedB(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
                     if child_SB_transaction_id is not None:
                         delete_sql_schedB(child_SB_transaction_id, datum.get('report_id'), datum.get('cmte_id'))
+                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT:
+                    if not 'child_datum' in datum:
+                        raise Exception('child data missing!!!') 
+                    child_datum = datum.get('child_datum')
+                    # update some filds and ensure the parent-child relationaship
+                    child_datum['cmte_id'] = datum.get('cmte_id')
+                    child_datum['report_id'] = datum.get('report_id')
+                    child_datum['transaction_type_identifier'] = TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT.get(
+                        datum.get('transaction_type_identifier'))
+                    child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(
+                        child_datum.get('transaction_type_identifier')
+                    )
+                    child_datum['back_ref_transaction_id'] = transaction_id
+                    if not 'transaction_id' in child_datum:
+                        child_SB_transaction_id = get_child_transaction_schedB(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
+                        if not child_SB_transaction_id:
+                            child_data = post_schedB(child_datum)
+                        else:
+                            child_datum['transaction_id'] = child_SB_transaction_id
+                            child_data = put_schedB(child_datum)
+                    else:
+                        child_data = put_schedB(child_datum)
             except:
                 put_sql_schedA(prev_transaction_data.get('cmte_id'), prev_transaction_data.get('report_id'), prev_transaction_data.get('line_number'), prev_transaction_data.get('transaction_type'), transaction_id, prev_transaction_data.get('back_ref_transaction_id'), prev_transaction_data.get('back_ref_sched_name'), entity_id, prev_transaction_data.get('contribution_date'), prev_transaction_data.get(
                 'contribution_amount'), prev_transaction_data.get('purpose_description'), prev_transaction_data.get('memo_code'), prev_transaction_data.get('memo_text'), prev_transaction_data.get('election_code'), prev_transaction_data.get('election_other_description'), prev_transaction_data.get('donor_cmte_id'), prev_transaction_data.get('donor_cmte_name'), prev_transaction_data.get('transaction_type_identifier'))
@@ -978,7 +972,7 @@ def schedA(request):
     sched_a api supporting POST, GET, DELETE, PUT
     """
 
-    # create new transactions and children transactions if any
+    # POST api: create new transactions and children transactions if any
     if request.method == 'POST':
         try:
             validate_sa_data(request.data)
@@ -995,9 +989,6 @@ def schedA(request):
         except Exception as e:
             return Response("The schedA API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    """
-    *********************************************** SCHED A - GET API CALL STARTS HERE **********************************************************
-    """
     # Get records from schedA table
     if request.method == 'GET':
 
@@ -1025,11 +1016,8 @@ def schedA(request):
             logger.debug(e)
             return Response("The schedA API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    """
-    ************************************************* SCHED A - PUT API CALL STARTS HERE **********************************************************
-    """
+    # PUT api call handled here
     if request.method == 'PUT':
-
         try:
             validate_sa_data(request.data)
             datum = schedA_sql_dict(request.data)
@@ -1053,9 +1041,7 @@ def schedA(request):
         except Exception as e:
             return Response("The schedA API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    """
-    ************************************************ SCHED A - DELETE API CALL STARTS HERE **********************************************************
-    """
+    # delete api call handled here
     if request.method == 'DELETE':
 
         try:
@@ -1080,16 +1066,6 @@ def schedA(request):
             return Response("The schedA API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-"""
-******************************************************************************************************************************
-END - SCHEDULE A TRANSACTIONS API - SCHED_A APP
-******************************************************************************************************************************
-"""
-"""
-********************************************************************************************************************************
-AGGREGATE AMOUNT API - SCHED_A APP - SPRINT 11 - FNE 871 - BY PRAVEEN JINKA 
-********************************************************************************************************************************
-"""
 @api_view(['GET'])
 def contribution_aggregate(request):
     """
@@ -1149,10 +1125,3 @@ def report_end_date(report_id, cmte_id):
     except Exception as e:
         raise Exception(
             'The report_end_date function is throwing an error: ' + str(e))
-
-
-"""
-******************************************************************************************************************************
-END - AGGREGATE AMOUNT API - SCHED_A APP
-******************************************************************************************************************************
-"""
