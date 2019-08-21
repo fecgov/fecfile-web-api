@@ -1286,6 +1286,18 @@ def sample_sql_generate(request):
 
                 file = open("/tmp/SB_sql.sql", 'w')
                 file.write(OPEX_REC_STRING)
+                file.write(OPEX__CC_STRING)
+                file.write(PAY_MEMO_STRING)
+                file.write(OPEX_TRAN_STRING)
+                file.write(NONFED_PAC_RFD_STRING)
+                file.write(CONTR_CAND_STRING)
+                file.write(VOID_RFND_PAC_STRING)
+                file.write(FEA_PAYM_STRING)
+                file.write(FEA_CC_STRING)
+                file.write(FEA_CC_MEMO_STRING)
+                file.write(FEA_PAY_MEMO_STRING)
+
+
 
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:
