@@ -745,7 +745,8 @@ def sample_sql_generate(request):
 
                 OPEX_REC_STRING = ""
                 for tran in List_SB_similar_OPEX_REC:
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -771,11 +772,13 @@ def sample_sql_generate(request):
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
             
                     OPEX_REC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/opex_rec_sql.sql", 'w')
                 file.write(OPEX_REC_STRING)
@@ -788,7 +791,8 @@ def sample_sql_generate(request):
 
                 OPEX__CC_STRING = ""
                 for tran in List_SB_similar_OPEX__CC:
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -810,11 +814,13 @@ def sample_sql_generate(request):
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     OPEX__CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/opex_cc_sql.sql", 'w')
                 file.write(OPEX__CC_STRING)
@@ -828,7 +834,8 @@ def sample_sql_generate(request):
 
                 PAY_MEMO_STRING = ""
                 for tran in List_SB_similar_PAY_MEMO:
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -854,7 +861,8 @@ def sample_sql_generate(request):
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     PAY_MEMO_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
@@ -873,7 +881,8 @@ def sample_sql_generate(request):
                 OPEX_TRAN_STRING = ""
                 for tran in List_SB_similar_OPEX_TRAN:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -897,11 +906,13 @@ def sample_sql_generate(request):
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     OPEX_TRAN_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/opex_tran_sql.sql", 'w')
                 file.write(OPEX_TRAN_STRING)
@@ -914,7 +925,8 @@ def sample_sql_generate(request):
                 NONFED_PAC_RFD_STRING = ""
                 for tran in List_SB_similar_NONFED_PAC_RFD:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -946,12 +958,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     NONFED_PAC_RFD_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/nonfed_pac_sql.sql", 'w')
                 file.write(NONFED_PAC_RFD_STRING)
@@ -960,11 +975,12 @@ def sample_sql_generate(request):
                 
                
                 List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID', 'FEA_CC_PAY']
-                import ipdb;ipdb.set_trace()
+                #import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
                 for tran in List_SB_similar_CONTR_CAND:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -999,12 +1015,15 @@ def sample_sql_generate(request):
                     
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
                     
                     CONTR_CAND_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/contr_can_sql.sql", 'w')
                 file.write(CONTR_CAND_STRING)
@@ -1016,7 +1035,8 @@ def sample_sql_generate(request):
                 VOID_RFND_PAC_STRING = ""
                 for tran in List_SB_similar_VOID_RFND_PAC:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -1049,12 +1069,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     VOID_RFND_PAC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/void_pac_sql.sql", 'w')
                 file.write(VOID_RFND_PAC_STRING)
@@ -1068,7 +1091,8 @@ def sample_sql_generate(request):
                 FEA_PAYM_STRING = ""
                 for tran in List_SB_similar_FEA_PAYM:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -1107,12 +1131,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     FEA_PAYM_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/fea_apym_sql.sql", 'w')
                 file.write(FEA_PAYM_STRING)
@@ -1125,7 +1152,8 @@ def sample_sql_generate(request):
                 FEA_CC_STRING = ""
                 for tran in List_SB_similar_FEA_CC:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -1160,12 +1188,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     FEA_CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/fea_rcc_sql.sql", 'w')
                 file.write(FEA_CC_STRING)
@@ -1178,7 +1209,8 @@ def sample_sql_generate(request):
                 FEA_CC_MEMO_STRING = ""
                 for tran in List_SB_similar_FEA_CC_MEMO:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -1218,12 +1250,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     FEA_CC_MEMO_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/fea_cc_memo_sql.sql", 'w')
                 file.write(FEA_CC_MEMO_STRING)
@@ -1235,7 +1270,8 @@ def sample_sql_generate(request):
                 FEA_PAY_MEMO_STRING = ""
                 for tran in List_SB_similar_FEA_PAY_MEMO:
 
-                    query = """SELECT t1.line_number AS "lineNumber", 
+                    query = """
+                    SELECT t1.line_number AS "lineNumber", 
                     t1.transaction_type AS "transactionTypeCode",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
@@ -1274,12 +1310,15 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
 
                     FEA_PAY_MEMO_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                    VALUES ('F3X', 'SB', '{0}', '{1}');\n
+                    """.format(tran, query)
 
                 file = open("/tmp/fea_pay_memo_sql.sql", 'w')
                 file.write(FEA_PAY_MEMO_STRING)
