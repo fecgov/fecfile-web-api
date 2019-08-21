@@ -52,11 +52,12 @@ urlpatterns = [
         views.get_all_trashed_transactions,
         name="get_all_trashed_transactions",
     ),
-    url(
-        r"^core/trash_restore_transactions$",
-        views.trash_restore_transactions,
-        name="trash_restore_transactions",
-    ),
+    # Moved this API to Sched_A APP as there were few functions restricting its use
+    # url(
+    #     r"^core/trash_restore_transactions$",
+    #     views.trash_restore_transactions,
+    #     name="trash_restore_transactions",
+    # ),
     url(
         r"^core/get_summary_table$", 
         views.get_summary_table, 

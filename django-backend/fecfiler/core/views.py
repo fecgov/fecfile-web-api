@@ -1418,62 +1418,6 @@ def filter_get_all_trans(request, param_string):
 #         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 
-@api_view(['PUT'])
-def trash_restore_transactions(request):
-    """api for trash and resore transactions. 
-       we are doing soft-delete only, mark delete_ind to 'Y'
-       
-       request payload in this format:
-{
-    "actions": [
-        {
-            "action": "restore",
-            "reportid": "123",
-            "transactionId": "SA20190610000000087"
-        },
-        {
-            "action": "trash",
-            "reportid": "456",
-            "transactionId": "SA20190610000000087"
-        }
-    ]
-}
- 
-    """
-    for _action in request.data.get('actions', []):
-        report_id = _action.get('report_id', '')
-        transaction_id = _action.get('transaction_id', '')
-
-        action = _action.get('action', '')
-        _delete = 'Y' if action == 'trash' else ''
-        try:
-            trash_restore_sql_transaction( 
-                report_id,
-                transaction_id, 
-                _delete)
-        except Exception as e:
-            return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({"result":"success"}, status=status.HTTP_200_OK)
-
-
-def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
-    """trash or restore sched_a transaction by updating delete_ind"""
-    try:
-        with connection.cursor() as cursor:
-            # UPDATE delete_ind flag to Y in DB
-            _sql = """
-            UPDATE public.sched_a 
-            SET delete_ind = '{}'
-            WHERE report_id = '{}'
-            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
-            cursor.execute(_sql)
-            if (cursor.rowcount == 0):
-                raise Exception(
-                    'The transaction ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
-    except Exception:
-        raise
-
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
