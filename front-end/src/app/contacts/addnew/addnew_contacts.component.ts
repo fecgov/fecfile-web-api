@@ -29,8 +29,9 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { AddNewContactModel } from './model/addnew_contacts.model';
+//import { AddNewContactModel } from './model/add/new_contacts.model';
 import { ContactsMessageService } from '../service/contacts-message.service';
+import { ContactModel } from '../model/contacts.model';
 
 export enum ContactActions {
   add = 'add',
@@ -50,7 +51,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
-  @Input() scheduleAction: ContactActions = null;
+  //@Input() scheduleAction: ContactActions = null;
+  @Input() scheduleAction: ContactActions = ContactActions.add;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -92,6 +94,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private _contributionAmountMax: number;
   private _entityType: string = 'IND';
   private _loading: boolean =  true;
+  private _selectedEntityChild: any;
+  private _selectedChangeWarn: any;
+  private _selectedChangeWarnChild: any;
+  private readonly _childFieldNamePrefix = 'child*';
+  private _contactToEdit: ContactModel;
+
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
@@ -121,6 +129,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._selectedEntity = null;
     this._contributionAggregateValue = 0.0;
     this._contributionAmount = '';
+    this._contactToEdit = null;
     /*this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');*/
@@ -146,63 +155,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   ngDoCheck(): void {
-    /*if (this.selectedOptions) {
-      if (this.selectedOptions.length >= 1) {
-        this.formVisible = true;
-      }
-    }*/
-
- 
-    /*this._getTransactionType();
-
-    this._validateContributionDate();*/
-
-    if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
-      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-      if (typeof this._reportType === 'object') {
-        if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
-          if (typeof this._reportType.cvgStartDate === 'string' && typeof this._reportType.cvgEndDate === 'string') {
-            this.cvgStartDate = this._reportType.cvgStartDate;
-            this.cvgEndDate = this._reportType.cvgEndDate;
-          }
-        }
-      }
-    }
-
-    if (this.frmContact) {
-      if (Array.isArray(this.frmContact.controls)) {
-        if (this.frmContact.controls['contribution_date']) {
-          if (this.cvgStartDate === null && this.cvgEndDate === null && this._reportType === null) {
-            if (localStorage.getItem(`form_${this._formType}_report_type`) !== null) {
-              this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-              if (this._reportType.hasOwnProperty('cvgEndDate') && this._reportType.hasOwnProperty('cvgStartDate')) {
-                if (
-                  typeof this._reportType.cvgStartDate === 'string' &&
-                  typeof this._reportType.cvgEndDate === 'string'
-                ) {
-                  this.cvgStartDate = this._reportType.cvgStartDate;
-                  this.cvgEndDate = this._reportType.cvgEndDate;
-
-                  /*this.frmContact.controls['contribution_date'].setValidators([
-                    contributionDate(this.cvgStartDate, this.cvgEndDate),
-                    Validators.required
-                  ]);
-
-                  this.frmContact.controls['contribution_date'].updateValueAndValidity();*/
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
+    
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
     this._populateFormSubscription.unsubscribe();
-    localStorage.removeItem('form_3X_saved');
+    localStorage.removeItem('contact_saved');
   }
 
   public debug(obj: any): void {
@@ -221,11 +180,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-          if (e.name === 'contribution_amount') {
+          /*if (e.name === 'contribution_amount') {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
-          }
+          }*/
         });
       }
     });
@@ -446,10 +405,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     ) {
       if (this._selectedEntity) {
         this.frmContact.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
-        this.showWarn(col.text);
+        //this.showWarn(col.text);
       }
-    } else if (col.name === 'contribution_amount') {
-      this.contributionAmountKeyup($event);
     } else {
       return null;
     }
@@ -510,7 +467,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    */
   public handleStateChange(stateOption: any, col: any) {
     if (this._selectedEntity) {
-      this.showWarn(col.text);
+      //this.showWarn(col.text);
       this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
     } else {
       let stateCode = null;
@@ -527,107 +484,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Vaidates the form on submit.
-   */
-  public doValidateReceipt() {
-    if (this.frmContact.valid) {
-      const receiptObj: any = {};
-
-      for (const field in this.frmContact.controls) {
-        if (field === 'contribution_date') {
-          receiptObj[field] = this._utilService.formatDate(this.frmContact.get(field).value);
-        } else if (field === 'memo_code') {
-          if (this.memoCode) {
-            receiptObj[field] = this.frmContact.get(field).value;
-            console.log('memo code val ' + receiptObj[field]);
-          }
-        } else if (field === 'last_name' || field === 'first_name') {
-          if (this._selectedEntity) {
-            // If the typeahead was used to load the entity into the form,
-            // we don't allow users to make changes to the entity. Non-Typeahead
-            // field (address, middle name, etc) are reset onKeyup.  Typeahead
-            // fields must be reset here.  This is a known UI design issue with the
-            // typeahead and not being able to disable fields because of add functionality.
-            // We are tolerating this limitation where the user may change the last or
-            // first name, it will reflect the change in the UI but won't be save to API.
-            receiptObj[field] = this._selectedEntity[field];
-          } else {
-            // TODO Possible defect with typeahead setting field as the entity object
-            // rather than the string defined by the inputFormatter();
-            // If an object is received, find the value on the object by fields type
-            // otherwise use the string value.  This is not desired and this patch
-            // should be removed if the issue is resolved.
-            const typeAheadField = this.frmContact.get(field).value;
-            if (typeof typeAheadField !== 'string') {
-              receiptObj[field] = typeAheadField[field];
-            } else {
-              receiptObj[field] = typeAheadField;
-            }
-          }
-        } else if (field === 'contribution_amount') {
-          receiptObj[field] = this._contributionAmount;
-        } else {
-          receiptObj[field] = this.frmContact.get(field).value;
-        }
-      }
-
-      this.hiddenFields.forEach(el => {
-        receiptObj[el.name] = el.value;
-      });
-
-      // If entity ID exist, the transaction will be added to the existing entity by the API
-      // Otherwise it will create a new Entity.
-      if (this._selectedEntity) {
-        receiptObj.entity_id = this._selectedEntity.entity_id;
-      }
-
-      localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
-
-      this._contactsService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
-        if (res) {
-          if (res.hasOwnProperty('memo_code')) {
-            if (typeof res.memo_code === 'object') {
-              if (res.memo_code === null) {
-                this._contactsService.getSchedule(this._formType, res).subscribe(resp => {
-                  const message: any = {
-                    formType: this._formType,
-                    totals: resp
-                  };
-
-                  this._messageService.sendMessage(message);
-                });
-              }
-            }
-          }
-
-          this._contributionAmount = '';
-          this._contributionAggregateValue = 0.0;
-          const contributionAggregateValue: string = this._decimalPipe.transform(
-            this._contributionAggregateValue,
-            '.2-2'
-          );
-          //this.frmContact.controls['contribution_aggregate'].setValue(contributionAggregateValue);
-
-          this._formSubmitted = true;
-         /* this.memoCode = false;
-          this.frmContact.reset();
-          this.frmContact.controls['memo_code'].setValue(null);*/
-          this._selectedEntity = null;
-
-          localStorage.removeItem(`form_${this._formType}_receipt`);
-          localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
-          window.scrollTo(0, 0);
-        }
-      });
-    } else {
-      this.frmContact.markAsDirty();
-      this.frmContact.markAsTouched();
-      localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: false }));
-      window.scrollTo(0, 0);
-    }
-  }
-
+ 
   /**
    * Goes to the previous step.
    */
@@ -666,6 +523,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
+    
+    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    this.frmContact.patchValue({ officeSought: contact.officeSought}, { onlySelf: true });
+    this.frmContact.patchValue({ officeState: contact.officeState }, { onlySelf: true });
+    this.frmContact.patchValue({ district: contact.district }, { onlySelf: true });
+    
   }
 
   /**
@@ -697,6 +560,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
+
+    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    this.frmContact.patchValue({ officeSought: contact.officeSought}, { onlySelf: true });
+    this.frmContact.patchValue({ officeState: contact.officeState }, { onlySelf: true });
+    this.frmContact.patchValue({ district: contact.district }, { onlySelf: true });
 
     let transactionTypeIdentifier = '';
     // Use this if transaction_tye_identifier is to come from dynamic form data
@@ -926,7 +794,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     // using the field from the message in case there is a race condition with Input().
     if (editOrView !== null) {
       if (editOrView.transactionModel) {
-        const formData: AddNewContactModel = editOrView.transactionModel;
+        const formData: ContactModel = editOrView.transactionModel;
 
         this.hiddenFields.forEach(el => {
           if (el.name === 'id') {
@@ -946,7 +814,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
         this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
-
+       
         this.frmContact.patchValue({ street_1: formData.street }, { onlySelf: true });
         this.frmContact.patchValue({ street_2: formData.street2 }, { onlySelf: true });
         this.frmContact.patchValue({ city: formData.city }, { onlySelf: true });
@@ -955,6 +823,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
         this.frmContact.patchValue({ employer: formData.employer }, { onlySelf: true });
         this.frmContact.patchValue({ occupation: formData.occupation }, { onlySelf: true });
+
+        this.frmContact.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
+        this.frmContact.patchValue({ officeSought: formData.officeSought}, { onlySelf: true });
+        this.frmContact.patchValue({ officeState: formData.officeState }, { onlySelf: true });
+        this.frmContact.patchValue({ district: formData.district }, { onlySelf: true });
       }
     }
   }
@@ -962,7 +835,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public selectTypeChange(e): void {
      this._entityType= e.target.value;
      this.loadDynamiceFormFields();
+     console.log("selectTypeChange this._entityType = ", this._entityType);
   }
+
   public loadDynamiceFormFields(): void {
     if  (this._entityType === 'IND'){
       this.formFields  =  this.individualFormFields;
@@ -983,9 +858,114 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.reset();
   }
   public saveAndExit(): void {
-    //this._router.navigate([`/contacts`]);
-  }
-  public saveAndAddMore(): void {
+    this.doValidateContact();
     this._router.navigate([`/contacts`]);
   }
+  public saveAndAddMore(): void {
+    this.doValidateContact();
+    window.scrollTo(0, 0);
+     //this._router.navigate([`/contacts`]);
+  }
+
+  public isFieldName(fieldName: string, nameString: string): boolean {
+    return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
+  }
+
+  /**
+   * Vaidates the form on submit.
+   */
+  public doValidateContact() {
+    console.log("doValidateContact accessing");
+    if (this.frmContact.valid) {
+      console.log("doValidateContact form valid");
+      const contactObj: any = {};
+
+      for (const field in this.frmContact.controls) {
+         if (field === 'last_name' ||
+                   field === 'first_name' ||
+                   this.isFieldName(field, 'cmte_id') ||
+                   this.isFieldName(field, 'cmte_name') ||
+                   this.isFieldName(field, 'entity_name')
+                   ) {
+          // if (this._selectedEntity) {
+          // If the typeahead was used to load the entity into the form,
+          // we don't allow users to make changes to the entity. Non-Typeahead
+          // field (address, middle name, etc) are reset onKeyup.  Typeahead
+          // fields must be reset here.  This is a known UI design issue with the
+          // typeahead and not being able to disable fields because of add functionality.
+          // We are tolerating this limitation where the user may change the last or
+          // first name, it will reflect the change in the UI but won't be save to API.
+          // contactObj[field] = this._selectedEntity[field];
+          // } else {
+          // TODO Possible defect with typeahead setting field as the entity object
+          // rather than the string defined by the inputFormatter();
+          // If an object is received, find the value on the object by fields type
+          // otherwise use the string value.  This is not desired and this patch
+          // should be removed if the issue is resolved.
+          const typeAheadField = this.frmContact.get(field).value;
+          if (typeAheadField && typeof typeAheadField !== 'string') {
+            contactObj[field] = typeAheadField[field];
+          } else {
+            contactObj[field] = typeAheadField;
+          }
+          // }
+         } else {
+          contactObj[field] = this.frmContact.get(field).value;
+        }
+      }
+
+      console.log("doValidateContact accessing1");
+
+      // There is a race condition with populating hiddenFields
+      // and receiving transaction data to edit from the message service.
+      // If editing, set transaction ID at this point to avoid race condition issue.
+      if (this._contactToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'id') {
+            el.value = this._contactToEdit.id;
+          }
+        });
+      }
+
+      this.hiddenFields.forEach(el => {
+        contactObj[el.name] = el.value;
+      });
+      console.log("doValidateContact accessing2");
+
+      // If entity ID exist, the transaction will be added to the existing entity by the API
+      // Otherwise it will create a new Entity.
+      if (this._selectedEntity) {
+        contactObj.entity_id = this._selectedEntity.entity_id;
+      }
+      contactObj.entity_type= this._entityType;
+      console.log("contactObj before saving", contactObj);
+      localStorage.setItem('contactObj', JSON.stringify(contactObj));
+
+      this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
+        if (res) {
+          console.log("_contactsService.saveContact res", res);
+          this._contactToEdit = null;
+          this._formSubmitted = true;
+          this.frmContact.reset();
+          
+          //this.frmContact.controls['memo_code'].setValue(null);
+          this._selectedEntity = null;
+          this._selectedChangeWarn = null;
+          this._selectedEntityChild = null;
+          this._selectedChangeWarnChild = null;
+
+          localStorage.removeItem(contactObj);
+          this._router.navigate([`/contacts`]);
+          //localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
+          //window.scrollTo(0, 0);
+        }
+      });
+    } else {
+      this.frmContact.markAsDirty();
+      this.frmContact.markAsTouched();
+      //localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: false }));
+      window.scrollTo(0, 0);
+    }
+  }
+
 }

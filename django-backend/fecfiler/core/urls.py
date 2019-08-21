@@ -143,5 +143,10 @@ urlpatterns = [
         views.get_entityTypes, 
         name="get_entityTypes"
     ),
+    url(
+        r"^core/contactsTable$",
+        views.contactsTable,
+        name="contactsTable",
+    ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 ]
