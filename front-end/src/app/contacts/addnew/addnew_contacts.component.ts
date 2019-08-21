@@ -385,7 +385,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   public handleFormFieldKeyup($event: any, col: any) {
-    if (!col) {
+  /*  if (!col) {
       return;
     }
     if (!col.name) {
@@ -409,7 +409,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       }
     } else {
       return null;
-    }
+    }*/
   }
 
   /**
