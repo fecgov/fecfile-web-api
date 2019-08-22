@@ -405,25 +405,24 @@ def sample_sql_generate(request):
                             "JF_TRAN_NP_HQ_IND_MEMO", "EAR_REC_RECNT_ACC", "EAR_REC_CONVEN_ACC", "EAR_REC_HQ_ACC"]
                 INDV_REC_STRING = ""
                 for tran in List_SA_similar_INDV_REC:
-
-                        query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
-                        t1.transaction_id AS "transactionId",
-                        COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
-                        to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
-                        COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription", COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
-                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.last_name, '''') AS "contributorLastName", COALESCE(t2.first_name, '''') AS "contributorFirstName",
-                        COALESCE(t2.middle_name, '''') AS "contributorMiddleName", COALESCE(t2.preffix, '''') AS "contributorPrefix", COALESCE(t2.suffix, '''') AS "contributorSuffix",
-                        COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
-                        COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode", COALESCE(t2.employer, '''') AS "contributorEmployer",
-                        COALESCE(t2.occupation, '''') AS "contributorOccupation"
-                        FROM public.sched_a t1
-                        LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                        WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                        (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-                        INDV_REC_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
+                    query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
+                    COALESCE(t1.purpose_description, '''') AS "contributionPurposeDescription", COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
+                    COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.last_name, '''') AS "contributorLastName", COALESCE(t2.first_name, '''') AS "contributorFirstName",
+                    COALESCE(t2.middle_name, '''') AS "contributorMiddleName", COALESCE(t2.preffix, '''') AS "contributorPrefix", COALESCE(t2.suffix, '''') AS "contributorSuffix",
+                    COALESCE(t2.street_1, '''') AS "contributorStreet1", COALESCE(t2.street_2, '''') AS "contributorStreet2", COALESCE(t2.city, '''') AS "contributorCity",
+                    COALESCE(t2.state, '''') AS "contributorState", COALESCE(t2.zip_code, '''') AS "contributorZipCode", COALESCE(t2.employer, '''') AS "contributorEmployer",
+                    COALESCE(t2.occupation, '''') AS "contributorOccupation"
+                    FROM public.sched_a t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
+                    INDV_REC_STRING += """
+                    UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                    AND form_type = '{2}' AND sched_type = '{3}';\n
+                    """.format(query, tran, 'F3X', 'SA')
 #                       INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 # VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
@@ -816,12 +815,12 @@ def sample_sql_generate(request):
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-
+                    print(query)
                     OPEX__CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
                     """.format(tran, query)
-
+      
                 file = open("/tmp/opex_cc_sql.sql", 'w')
                 file.write(OPEX__CC_STRING)
                 file.close()
@@ -958,7 +957,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
@@ -974,7 +973,7 @@ def sample_sql_generate(request):
 
                 
                
-                List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID', 'FEA_CC_PAY']
+                List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID', 'FEA_CC_PAY', 'CONT_REDESIG_MEMO']
                 #import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
                 for tran in List_SB_similar_CONTR_CAND:
@@ -996,7 +995,7 @@ def sample_sql_generate(request):
                     COALESCE(t2.zip_code, '''') AS "payeeZipCode",
                     COALESCE(t1.election_code, '''') AS "electionCode", 
                     COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                    to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", 
+                    to_char(t1.expenditure_date,'MM/DD/YYYY') AS "expenditureDate", 
                     t1.expenditure_amount AS "expenditureAmount",
                     COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
                     COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId", 
@@ -1012,12 +1011,11 @@ def sample_sql_generate(request):
                     COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
                     COALESCE(t1.memo_code, '''') AS "memoCode", 
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
-                    
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
-                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
+                    WHERE t1.transaction_type_identifier = '{}' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from 'Y'
                     """.format(tran)
                     
                     CONTR_CAND_STRING += """
@@ -1069,7 +1067,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
@@ -1131,7 +1129,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
@@ -1188,7 +1186,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
@@ -1250,7 +1248,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
@@ -1310,7 +1308,7 @@ def sample_sql_generate(request):
                     COALESCE(t1.memo_text, '''') AS "memoDescription"
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                    LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
