@@ -1418,62 +1418,6 @@ def filter_get_all_trans(request, param_string):
 #         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 
-@api_view(['PUT'])
-def trash_restore_transactions(request):
-    """api for trash and resore transactions. 
-       we are doing soft-delete only, mark delete_ind to 'Y'
-       
-       request payload in this format:
-{
-    "actions": [
-        {
-            "action": "restore",
-            "reportid": "123",
-            "transactionId": "SA20190610000000087"
-        },
-        {
-            "action": "trash",
-            "reportid": "456",
-            "transactionId": "SA20190610000000087"
-        }
-    ]
-}
- 
-    """
-    for _action in request.data.get('actions', []):
-        report_id = _action.get('report_id', '')
-        transaction_id = _action.get('transaction_id', '')
-
-        action = _action.get('action', '')
-        _delete = 'Y' if action == 'trash' else ''
-        try:
-            trash_restore_sql_transaction( 
-                report_id,
-                transaction_id, 
-                _delete)
-        except Exception as e:
-            return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({"result":"success"}, status=status.HTTP_200_OK)
-
-
-def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
-    """trash or restore sched_a transaction by updating delete_ind"""
-    try:
-        with connection.cursor() as cursor:
-            # UPDATE delete_ind flag to Y in DB
-            _sql = """
-            UPDATE public.sched_a 
-            SET delete_ind = '{}'
-            WHERE report_id = '{}'
-            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
-            cursor.execute(_sql)
-            if (cursor.rowcount == 0):
-                raise Exception(
-                    'The transaction ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
-    except Exception:
-        raise
-
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
@@ -2617,7 +2561,8 @@ Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 """
 
 @api_view(['GET', 'POST'])
-def contacts(request):
+def contactsTable(request):
+
     try:
         
         if request.method == 'POST':
@@ -2702,7 +2647,7 @@ def contacts(request):
         return Response(json_result, status=status_value)
     
     except Exception as e:
-        return Response("The contact_views API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("The contactsTable API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -3156,3 +3101,188 @@ def get_entityTypes(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_entityTypes API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+ 
+def post_sql_contact(data):
+    """persist one contact item."""
+    try:
+        entity_id = get_next_entity_id(data['entity_type'])  
+        data['entity_id'] = entity_id
+        with connection.cursor() as cursor:
+            # Insert data into entity table
+            cursor.execute("""INSERT INTO public.entity (cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
+                                [ data['cmte_id'], data['entity_id'], data['entity_type'], data['entity_name'], data['first_name'], data['last_name'], data['middle_name'], data['preffix'], data['suffix'], data['street_1'], data['street_2'], data['city'], data['state'], data['zip_code'], data['occupation'], data['employer'], data['cand_office'], data['cand_office_state'], data['cand_office_district'], data['ref_cand_cmte_id'] ])
+
+    except Exception:
+        raise
+
+def post_contact(datum):
+    """save contact."""
+    #post_sql_contact(datum.get('cmte_id'), datum.get('entity_type'), datum.get('entity_name'), datum.get('first_name'), datum.get('last_name'), datum.get('middle_name'), datum.get('preffix'), datum.get('suffix'), datum.get('street_1'), datum.get('street_2'), datum.get('city'), datum.get('state'), datum.get('zip_code'), datum.get('occupation'), datum.get('employer'), datum.get('officeSought'), datum.get('officeState'), datum.get('district'), datum.get('ref_cand_cmte_id'))
+    post_sql_contact(datum)
+
+def contact_sql_dict(data):
+    """
+    filter data, validate fields and build entity item dic
+    """
+    try:
+        datum = {
+         # 'cmte_id' : data.get('cmte_id'), 
+          'entity_type'  : is_null(data.get('entity_type')), 
+          'entity_name'  : is_null(data.get('entity_name')), 
+          'first_name'  : is_null(data.get('first_name')), 
+          'last_name'  : is_null(data.get('last_name')), 
+          'middle_name' : is_null(data.get('middle_name')), 
+          'preffix'  : is_null(data.get('preffix')), 
+          'suffix' : is_null(data.get('suffix')), 
+          'street_1'  : is_null(data.get('street_1')), 
+          'street_2'  : is_null(data.get('street_2')), 
+          'city'  : is_null(data.get('city')),  
+          'state' : is_null(data.get('state')), 
+          'zip_code' : is_null(data.get('zip_code')), 
+          'occupation'  : is_null(data.get('occupation')), 
+          'employer' : is_null(data.get('employer')), 
+          'cand_office'  : is_null(data.get('officeSought')), 
+          'cand_office_state'  : is_null(data.get('officeState')), 
+          'cand_office_district'  : is_null(data.get('district')), 
+          'ref_cand_cmte_id'  : is_null(data.get('ref_cand_cmte_id')), 
+        }
+
+        return datum
+    except:
+        raise
+
+@api_view(['POST', 'GET', 'DELETE', 'PUT'])
+def contacts(request):
+    """
+    contacts api supporting POST, GET, DELETE, PUT
+    """
+
+    if request.method == 'POST':
+        try:
+            #cmte_id = request.user.username
+            datum = contact_sql_dict(request.data)
+            datum['cmte_id'] = request.user.username
+            #datum['cmte_id'] = cmte_id
+            post_contact(datum)
+            print ("datum", datum)
+            output = get_contact(datum)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The contacts API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    *********************************************** contact - GET API CALL STARTS HERE **********************************************************
+    """
+    # Get records from entity table
+    if request.method == 'GET':
+        datum=[]
+        return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+    """
+    ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
+    """
+    if request.method == 'PUT':
+        output=[]
+        return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+
+    """
+    ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
+    """
+    if request.method == 'DELETE':
+
+        try:
+            data = {
+                'cmte_id': request.user.username
+            }
+            if 'id' in request.query_params and check_null_value(request.query_params.get('id')):
+                data['id'] = request.query_params.get('id')
+            else:
+                raise Exception('Missing Input: entity_id is mandatory')
+            delete_contact(data)
+
+            return Response("entity ID: {} has been successfully deleted".format(data.get('id')), status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The contacts API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def delete_contact(data):
+    """delete contact
+    """
+    try:
+        cmte_id = data.get('cmte_id')
+        entity_id = data.get('id')
+        delete_sql_contact(cmte_id, entity_id)
+    except:
+        raise
+
+def delete_sql_contact(cmte_id, entity_id):
+    """delete a contact
+    """
+    try:
+        with connection.cursor() as cursor:
+
+            cursor.execute("""UPDATE public.entity SET delete_ind = 'Y' WHERE cmte_id = %s AND entiy_id = %s AND delete_ind is distinct from 'Y'""", [
+                           cmte_id, entity_id ])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The entity ID: {} is either already deleted or does not exist in entity table'.format(entity_id))
+    except Exception:
+        raise
+
+def get_contact(data):
+    """load contacts"""
+    try:
+        cmte_id = data['cmte_id']
+        entity_id = data['entity_id']
+        if 'entity_id' in data:
+            forms_obj = get_list_contact(cmte_id, entity_id)
+        return forms_obj
+    except:
+        raise
+
+def get_list_contact(cmte_id, entity_id = None):
+
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from entity table
+            if entity_id:
+                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
+
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                            """) t""", [cmte_id, entity_id])
+            else:
+                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
+
+                cursor.execute("""SELECT json_agg(t) FROM (""" +
+                           query_string + """) t""", [cmte_id])           
+ 
+            contact_list = cursor.fetchone()[0]
+            print("contact_list", contact_list)
+            if not contact_list:
+                raise NoOPError(
+                    'No entity found for cmte_id {} '.format(cmte_id))
+            merged_list = []
+            for dictA in contact_list:
+                entity_id = dictA.get('entity_id')
+                data = {
+                    'entity_id': entity_id,
+                    'cmte_id': cmte_id
+                }
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                merged_dict = {**dictA, **dictEntity}
+                merged_list.append(merged_dict)
+        return merged_list
+    except Exception:
+        raise
+
+def is_null(check_value):
+    if check_value == None or check_value in ["null", " ", "", "none","Null"]:
+        return ""
+    else:
+        return check_value
+
+    
+

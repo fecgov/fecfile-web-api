@@ -115,6 +115,7 @@
                         display: block;
                         width: 100%;
                         padding: 1em;
+                        padding-left: 3em;
                         &:nth-child(even) {
                           background-color: $seaShell !important;
                         }

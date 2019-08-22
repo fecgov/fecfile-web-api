@@ -350,15 +350,18 @@ export class ReportTypeComponent implements OnInit {
 
                     return 0;
                   } else if (res === 'ReportExist') {
+                    console.log('report type Existing_Report_id', reportId.toString());
                     let reporturl = '/reports?reportId=';
                     this._router.navigateByUrl(`${reporturl}{reportId}`);
 
                     localStorage.setItem('Existing_Report_id', reportId.toString());
-                    localStorage.removeItem(`form_${this._formType}_saved`);
+                    //this._router.navigate(['/reports`'], { queryParams: { reportId: reportId} });
+                    //localStorage.removeItem(`form_${this._formType}_saved`);
                     localStorage.removeItem('reports.filters');
                     localStorage.removeItem('Reports.view');
                   }
                 });
+                return 0;
             }
           }
           this.status.emit({
@@ -370,7 +373,7 @@ export class ReportTypeComponent implements OnInit {
         }
       });
 
-      return 1;
+      return 0;
     } else {
       if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
         this.invalidDates = false;

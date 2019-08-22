@@ -29,6 +29,7 @@ from fecfiler.core.views import (
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_b_transactions,
+    transaction_exists,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,20 +42,35 @@ list_mandatory_fields_schedB = [
     "expenditure_date",
     "expenditure_amount",
     "transaction_type_identifier",
-    "entity_type"
+    "entity_type",
 ]
 
 # a list of transactions with negative transaction_amount
 NEGATIVE_TRANSACTIONS = [
-    'OPEXP_VOID',
-    'CONT_TO_OTH_CMTE_VOID',
-    'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID',
-    'FEA_100PCT_PAY_VOID',
-    'REF_CONT_IND_VOID',
-    'REF_CONT_PARTY_VOID',
-    'REF_CONT_PAC_VOID',
-    'REF_CONT_NON_FED_VOID',
+    "OPEXP_VOID",
+    "CONT_TO_OTH_CMTE_VOID",
+    "OTH_DISB_NC_ACC_PMT_TO_PROL_VOID",
+    "FEA_100PCT_PAY_VOID",
+    "REF_CONT_IND_VOID",
+    "REF_CONT_PARTY_VOID",
+    "REF_CONT_PAC_VOID",
+    "REF_CONT_NON_FED_VOID",
 ]
+
+# for child transactions, we'll validate parent_id exists in the db
+# TODO: later on chagne it to load this list from DB
+CHILD_PARENT_SB_SB_TRANSACTIONS = {
+    "OTH_DISB_CC_PAY_MEMO": ("OTH_DISB_CC_PAY", "sched_b"),
+    "OTH_DISB_STAF_REIM_MEMO": ("OTH_DISB_STAF_REIM", "sched_b"),
+    "OTH_DISB_PMT_TO_PROL_MEMO": ("OTH_DISB_PMT_TO_PROL", "sched_b"),
+    "OTH_DISB_NC_ACC_CC_PAY_MEMO": ("OTH_DISB_NC_ACC_CC_PAY", "sched_b"),
+    "OTH_DISB_NC_ACC_STAF_REIM_MEMO": ("OTH_DISB_NC_ACC_STAF_REIM", "sched_b"),
+    "OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO": ("OTH_DISB_NC_ACC_PMT_TO_PROL", "sched_b"),
+    "FEA_PAY_TO_PROL_MEMO": ("FEA_PAY_TO_PROL", "sched_b"),
+    "FEA_CC_PAY_MEMO": ("FEA_CC_PAY", "sched_b"),
+    "FEA_STAF_REIM_MEMO": ("FEA_STAF_REIM", "sched_b"),
+}
+
 
 
 def get_next_transaction_id(trans_char):
@@ -97,11 +113,13 @@ def check_type_list(data):
     """
     try:
         if not type(data) is list:
-            raise Exception("""
+            raise Exception(
+                """
                 The child transactions have to be sent in as an array or list. 
                 Input received: {}""".format(
-                data
-            )
+                    data
+                )
+
             )
         else:
             return data
@@ -117,11 +135,13 @@ def check_decimal(value):
         check_value = Decimal(value)
         return value
     except Exception as e:
-        raise Exception("""
+        raise Exception(
+            """
             Invalid Input: Expecting a decimal value like 18.11, 24.07. 
             Input received: {}""".format(
-            value
-        )
+                value
+            )
+
         )
 
 
@@ -234,7 +254,10 @@ def post_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt
                 )
-                VALUES (""" + ','.join(['%s']*37) + ')',
+                VALUES ("""
+                + ",".join(["%s"] * 37)
+                + ")",
+
                 [
                     cmte_id,
                     report_id,
@@ -298,7 +321,40 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
     get all children sched_b items:
     back_ref_transaction_id == transaction_id
     """
-    return get_sched_b_transactions(report_id, cmte_id, back_ref_transaction_id=transaction_id)
+    return get_sched_b_transactions(
+        report_id, cmte_id, back_ref_transaction_id=transaction_id
+    )
+
+def get_list_child_transactionId_schedB(cmte_id, transaction_id):
+    """
+    get all children sched_b items:
+    back_ref_transaction_id == transaction_id
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT transaction_id
+                FROM public.sched_b 
+                WHERE cmte_id = %s 
+                AND back_ref_transaction_id = %s 
+                AND delete_ind is distinct from 'Y'""", [cmte_id, transaction_id])
+            transactions_list = cursor.fetchall()
+        return transactions_list
+    except Exception as e:
+        raise Exception( 'The get_list_child_transactionId_schedB function is throwing an error: ' + str(e))
+
+def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
+    """
+    update aggregate amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                           [aggregate_amount, transaction_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table'.format(transaction_id))
+    except Exception:
+        raise
 
 
 def put_sql_schedB(
@@ -444,7 +500,9 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
         with connection.cursor() as cursor:
 
             # UPDATE delete_ind flag on a single row from Sched_B table
-            cursor.execute("""
+            cursor.execute(
+                """
+
                 UPDATE public.sched_b 
                 SET delete_ind = 'Y' 
                 WHERE transaction_id = %s 
@@ -452,8 +510,9 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
                 """,
-                           [transaction_id, report_id, cmte_id],
-                           )
+                [transaction_id, report_id, cmte_id],
+            )
+
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} is either already deleted or does not exist in schedB table".format(
@@ -545,8 +604,7 @@ def post_schedB(datum):
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    cmte_id), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
@@ -574,8 +632,7 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedB(
-                report_id, cmte_id, transaction_id)
+            child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -584,6 +641,9 @@ def get_schedB(data):
 
     except:
         raise
+
+# TODO: need to add beneficiary fields
+
 
 # TODO: need to add beneficiary fields
 
@@ -653,8 +713,7 @@ def put_schedB(datum):
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
@@ -684,8 +743,34 @@ def validate_negative_transaction(data):
     validate transaction amount if negative transaction encounterred.
     """
     if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
-        if not float(data.get('expenditure_amount')) < 0:
+        if not float(data.get("expenditure_amount")) < 0:
             raise Exception("current transaction amount need to be negative!")
+
+
+def parent_transaction_exists(tran_id, sched_tp):
+    """
+    check if parent transaction exists
+    """
+    return transaction_exists(tran_id, sched_tp)
+
+
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    if data.get("transaction_type_identifier") in CHILD_PARENT_SB_SB_TRANSACTIONS:
+        if not data.get("back_ref_transaction_id"):
+            raise Exception("Error: parent transaction id missing.")
+        elif not parent_transaction_exists(
+            data.get("back_ref_transaction_id"),
+            CHILD_PARENT_SB_SB_TRANSACTIONS.get(
+                data.get("transaction_type_identifier")
+            )[1],
+        ):
+            raise Exception("Error: parent transaction not found.")
+        else:
+            pass
+
 
 
 def schedB_sql_dict(data):
@@ -695,6 +780,8 @@ def schedB_sql_dict(data):
     """
     try:
         validate_negative_transaction(data)
+        validate_parent_transaction_exist(data)
+
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
@@ -729,9 +816,7 @@ def schedB_sql_dict(data):
             "beneficiary_cand_middle_name": data.get("beneficiary_cand_middle_name"),
             "beneficiary_cand_prefix": data.get("beneficiary_cand_prefix"),
             "beneficiary_cand_suffix": data.get("beneficiary_cand_suffix"),
-            "aggregate_amt": check_decimal(
-                data.get("aggregate_amt", None)
-            ),
+            "aggregate_amt": check_decimal(data.get("aggregate_amt", None)),
             "entity_type": data.get("entity_type"),
             "entity_name": data.get("entity_name"),
             "first_name": data.get("first_name"),
@@ -749,10 +834,11 @@ def schedB_sql_dict(data):
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
         }
-        if 'entity_id' in data and check_null_value(data.get('entity_id')):
-            datum['entity_id'] = data.get('entity_id')
-        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
-            data.get('transaction_type_identifier'))
+        if "entity_id" in data and check_null_value(data.get("entity_id")):
+            datum["entity_id"] = data.get("entity_id")
+        datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
+            data.get("transaction_type_identifier")
+        )
         return datum
     except:
         raise
