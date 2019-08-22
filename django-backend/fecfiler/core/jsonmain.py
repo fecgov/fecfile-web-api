@@ -405,7 +405,7 @@ def sample_sql_generate(request):
                             "JF_TRAN_NP_HQ_IND_MEMO", "EAR_REC_RECNT_ACC", "EAR_REC_CONVEN_ACC", "EAR_REC_HQ_ACC"]
                 INDV_REC_STRING = ""
                 for tran in List_SA_similar_INDV_REC:
-                    query = """SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                     to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -437,7 +437,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_PAR_CON:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -472,7 +472,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_COND_EARM_PAC:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -506,7 +506,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_OFFSET:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -531,7 +531,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_OTH_REC:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -557,7 +557,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_REF_NFED_CAN:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -582,7 +582,7 @@ def sample_sql_generate(request):
                 for tran in list_SA_similar_REF_FED_CAN:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.contribution_date,''MM/DD/YYYY'') AS "contributionDate", t1.contribution_amount AS "contributionAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -618,7 +618,7 @@ def sample_sql_generate(request):
                 for tran in list_SB_similar_IK_OUT:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", t1.expenditure_amount AS "expenditureAmount",
@@ -642,7 +642,7 @@ def sample_sql_generate(request):
                 for tran in list_SB_similar_IK_TF_OUT:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", t1.expenditure_amount AS "expenditureAmount",
@@ -666,7 +666,7 @@ def sample_sql_generate(request):
                 for tran in list_SB_similar_EAR_OUT:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", t1.expenditure_amount AS "expenditureAmount",
@@ -702,7 +702,7 @@ def sample_sql_generate(request):
                 for tran in list_SB_similar_IK_OUT_PTY:
 
                         query = """
-                        SELECT t1.line_number AS "lineNumber", t1.transaction_type AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                        SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
                         t1.transaction_id AS "transactionId",
                         COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
                         to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", t1.expenditure_amount AS "expenditureAmount", COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",
@@ -745,9 +745,9 @@ def sample_sql_generate(request):
                 OPEX_REC_STRING = ""
                 for tran in List_SB_similar_OPEX_REC:
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
-                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier",
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
                     COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
@@ -791,8 +791,8 @@ def sample_sql_generate(request):
                 OPEX__CC_STRING = ""
                 for tran in List_SB_similar_OPEX__CC:
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -834,8 +834,8 @@ def sample_sql_generate(request):
                 PAY_MEMO_STRING = ""
                 for tran in List_SB_similar_PAY_MEMO:
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -881,8 +881,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_OPEX_TRAN:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -925,8 +925,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_NONFED_PAC_RFD:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -979,8 +979,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_CONTR_CAND:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -1034,8 +1034,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_VOID_RFND_PAC:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -1090,8 +1090,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_FEA_PAYM:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -1151,8 +1151,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_FEA_CC:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -1208,8 +1208,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_FEA_CC_MEMO:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
@@ -1269,8 +1269,8 @@ def sample_sql_generate(request):
                 for tran in List_SB_similar_FEA_PAY_MEMO:
 
                     query = """
-                    SELECT t1.line_number AS "lineNumber", 
-                    t1.transaction_type AS "transactionTypeCode",
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
                     t1.transaction_id AS "transactionId",
                     COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
