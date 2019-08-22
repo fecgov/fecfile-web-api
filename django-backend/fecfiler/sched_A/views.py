@@ -1168,11 +1168,13 @@ def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
             UPDATE public.sched_a 
             SET delete_ind = '{}'
             WHERE report_id = '{}'
-            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
+                    AND transaction_id = '{}'
+            """.format(_delete, report_id, transaction_id)
             cursor.execute(_sql)
-            if (cursor.rowcount == 0):
+            if not cursor.rowcount:
                 raise Exception(
-                    'The transaction ID: {} is either already deleted or does not exist in SCHEDULE A table'.format(transaction_id))
+                    """The transaction ID: {} is either already deleted
+                     or does not exist in SCHEDULE A table""".format(transaction_id))
     except Exception:
         raise
 
@@ -1182,20 +1184,20 @@ def trash_restore_transactions(request):
        we are doing soft-delete only, mark delete_ind to 'Y'
        
        request payload in this format:
-{
-    "actions": [
         {
-            "action": "restore",
-            "reportid": "123",
-            "transactionId": "SA20190610000000087"
-        },
-        {
-            "action": "trash",
-            "reportid": "456",
-            "transactionId": "SA20190610000000087"
+            "actions": [
+                {
+                    "action": "restore",
+                    "report_id": "123",
+                    "transaction_id": "SA20190610000000087"
+                },
+                {
+                    "action": "trash",
+                    "report_id": "456",
+                    "transaction_id": "SA20190610000000087"
+                }
+            ]
         }
-    ]
-}
  
     """
     for _action in request.data.get('actions', []):
@@ -1206,6 +1208,8 @@ def trash_restore_transactions(request):
 
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
+        # TODO: need to simplify the logic and remove if--elif--else:
+        # get_schedA data, do sql transaction, update aggregation
         try:
             #Handling aggregate amount updation for sched A transactions
             if _delete == 'Y' and transaction_id[0:2] == 'SA':
