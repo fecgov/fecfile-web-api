@@ -125,6 +125,7 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
                                             "CON_EAR_DEP": "CON_EAR_OUT_DEP",
+
                                         }
 
 def get_next_transaction_id(trans_char):
@@ -499,6 +500,7 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
             child_flag = True
             child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
+
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
@@ -517,6 +519,7 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
                     for child_SB_transaction in child_SB_transaction_list:
                         put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
+
 
     except Exception as e:
         raise Exception(
@@ -568,6 +571,7 @@ def post_schedA(datum):
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
+
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:

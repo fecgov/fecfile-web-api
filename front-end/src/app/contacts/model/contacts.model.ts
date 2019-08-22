@@ -1,5 +1,6 @@
 export class ContactModel {
     type: string;
+    name: string;
     id: string;
     name: string;
     entity_name: string;
