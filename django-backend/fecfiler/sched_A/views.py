@@ -25,7 +25,8 @@ from fecfiler.core.transaction_util import get_line_number_trans_type
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
-                                    schedB_sql_dict, put_sql_schedB, post_sql_schedB)
+                                    schedB_sql_dict, put_sql_schedB, post_sql_schedB,
+                                    put_sql_agg_amount_schedB, get_list_child_transactionId_schedB)
 
 
 # Create your views here.
@@ -463,6 +464,17 @@ ORDER BY contribution_date ASC, create_date ASC""", [
         raise Exception(
             'The list_all_transactions_entity function is throwing an error: ' + str(e))
 
+def get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, line_number):
+    try:
+        if transaction_type_identifier in itemization_transaction_type_identifier_list:
+            if aggregate_amount <= itemization_value:
+                return "11AII"
+            else:
+                return "11AI" 
+        else:
+            return line_number
+    except Exception as e:
+        raise Exception('The get_linenumber_itemization function is throwing an error: ' + str(e))
 
 def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type_identifier, entity_id, cmte_id, report_id):
     """
@@ -477,12 +489,16 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
     """
     try:
-        
+        child_flag = False
         itemization_value = 200
         itemized_transaction_list = []
         unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
+        # checking for child tranaction identifer for updating auto generated SB transactions
+        if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
+            child_flag = True
+            child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
@@ -493,16 +509,15 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
-                    if transaction_type_identifier in itemization_transaction_type_identifier_list:
-                        if aggregate_amount <= itemization_value:
-                            put_sql_linenumber_schedA(
-                                cmte_id, "11AII", transaction[1], entity_id, aggregate_amount)
-                        else:
-                            put_sql_linenumber_schedA(
-                                cmte_id, "11AI", transaction[1], entity_id, aggregate_amount)
-                    else:
-                        put_sql_linenumber_schedA(
-                                cmte_id, transaction[3], transaction[1], entity_id, aggregate_amount)
+                    line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
+                    put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
+                    
+                #Updating aggregate amount to child auto generate sched B transactions
+                if child_flag:
+                    child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
+                    for child_SB_transaction in child_SB_transaction_list:
+                        put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
+
     except Exception as e:
         raise Exception(
             'The update_linenumber_aggamt_transactions_SA function is throwing an error: ' + str(e))
