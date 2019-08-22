@@ -373,7 +373,23 @@
                       [attr.maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
                     ></textarea>
-                  </ng-container>                
+                  </ng-container>
+                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">                 
+                    <ng-select #candOfficeTypeSelect [items]="candidateOfficeTypes"
+                      (change)="handleCandOfficeChange($event, col)"
+                      class="forms__select"
+                      [formControlName]="col?.name"
+                      bindValue="officeCode"
+                      bindLabel="officeDescription"
+                      [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'forms__select-error'
+                          : ''
+                      "
+                    >
+                    </ng-select>
+                  </ng-container>                                   
                   <ng-container *ngIf="col?.type === 'select' && 
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
@@ -392,12 +408,11 @@
                         {{ item.code }} - {{ item.name }}
                       </ng-option>
                     </ng-select>
-                  </ng-container>
-                  <ng-container *ngIf="col?.type === 'select' && 
-                      isFieldName(col?.name, 'election_code')">  
+                  </ng-container>                  
+                  <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'election_code')">  
                     <ng-select
                       (change)="handleElectionCodeChange($event, col)"
-                      class="election-code-select"
+                      class="forms__select election-code-select"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -414,7 +429,7 @@
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
                     <ng-select
                       (change)="handleEntityTypeChange($event, col)"
-                      class="entity-type-select"
+                      class="forms__select entity-type-select"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -427,7 +442,7 @@
                         {{entityType.entityTypeDescription}}
                       </ng-option>
                     </ng-select>
-                  </ng-container>                
+                  </ng-container>                                 
                 </div>
               </div>
             </ng-container>
