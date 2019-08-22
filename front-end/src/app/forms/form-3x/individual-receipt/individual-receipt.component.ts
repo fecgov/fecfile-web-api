@@ -261,17 +261,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             }
           }
           if (this.isFieldName(e.name, 'memo_code')) {
+            const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
             if (memoCodeValue === this._memoCodeValue) {
-
-              const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
               if (isChildForm) {
                 this.memoCodeChild = true;
-                this._readOnlyMemoCodeChild = true;
+                // this._readOnlyMemoCodeChild = true;
               } else {
                 this.memoCode = true;
-                this._readOnlyMemoCode = true;
+                // this._readOnlyMemoCode = true;
               }
+            }
+            if (isChildForm) {
+              this._readOnlyMemoCodeChild = e.isReadonly;
+            } else {
+              this._readOnlyMemoCode = e.isReadonly;
             }
           }
         });
@@ -1023,6 +1027,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       this.frmIndividualReceipt.markAsTouched();
       localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
+
+      const invalid = [];
+      const controls = this.frmIndividualReceipt.controls;
+      for (const name in controls) {
+          if (controls[name].invalid) {
+              invalid.push(name);
+              console.log('invalid form field on submit = ' + name);
+          }
+      }
     }
   }
 
@@ -1647,7 +1660,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   // private ___getFormFields(): void {
   //   console.log('get transaction type form fields ' + this.transactionType);
-  //   if (this.transactionType === 'CON_EAR_DEP') {
+  //   if (this.transactionType === 'CON_EAR_DEP_1' || this.transactionType === 'CON_EAR_UNDEP') {
   //     this._receiptService.getConEarDepMockData().subscribe(res => {
   //       if (res) {
   //         if (res.hasOwnProperty('data')) {
@@ -1655,7 +1668,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //             if (res.data.hasOwnProperty('formFields')) {
   //               if (Array.isArray(res.data.formFields)) {
   //                 this.formFields = res.data.formFields;
-
   //                 this._setForm(this.formFields);
   //               }
   //             }
@@ -1667,6 +1679,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //             if (res.data.hasOwnProperty('states')) {
   //               if (Array.isArray(res.data.states)) {
   //                 this.states = res.data.states;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('electionTypes')) {
+  //               if (Array.isArray(res.data.electionTypes)) {
+  //                 this.electionTypes = res.data.electionTypes;
+  
+  //                 // // temp: add Other until API sends it.
+  //                 // const other = {
+  //                 //   'electionType': 'O',
+  //                 //   'electionTypeDescription': 'Other'
+  //                 // };
+  //                 // this.electionTypes.unshift(other);
   //               }
   //             }
   //             if (res.data.hasOwnProperty('titles')) {
@@ -1710,7 +1734,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //             if (res.data.hasOwnProperty('formFields')) {
   //               if (Array.isArray(res.data.formFields)) {
   //                 this.formFields = res.data.formFields;
-
   //                 this._setForm(this.formFields);
   //               }
   //             }
@@ -1722,6 +1745,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //             if (res.data.hasOwnProperty('states')) {
   //               if (Array.isArray(res.data.states)) {
   //                 this.states = res.data.states;
+  //               }
+  //             }
+  //             if (res.data.hasOwnProperty('electionTypes')) {
+  //               if (Array.isArray(res.data.electionTypes)) {
+  //                 this.electionTypes = res.data.electionTypes;
+  
+  //                 // // temp: add Other until API sends it.
+  //                 // const other = {
+  //                 //   'electionType': 'O',
+  //                 //   'electionTypeDescription': 'Other'
+  //                 // };
+  //                 // this.electionTypes.unshift(other);
   //               }
   //             }
   //             if (res.data.hasOwnProperty('titles')) {
@@ -1959,17 +1994,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     }
   }
 
-  public isMemoCodeReadOnly(fieldName: string) {
-    if (this.isFieldName(fieldName, 'memo_code')) {
-      const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
-      if (isChildField) {
-        return this._readOnlyMemoCodeChild;
-      } else {
-        return this._readOnlyMemoCode;
-      }
-    }
-    return false;
-  }
+  // public isMemoCodeReadOnly(fieldName: string) {
+  //   if (this.isFieldName(fieldName, 'memo_code')) {
+  //     const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+  //     if (isChildField) {
+  //       return this._readOnlyMemoCodeChild;
+  //     } else {
+  //       return this._readOnlyMemoCode;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   private _clearFormValues(): void {
     this._selectedEntity = null;
