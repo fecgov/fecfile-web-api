@@ -991,7 +991,7 @@ export class IndividualReceiptService {
                         "infoIcon":false,
                         "infoText":null,
                         "name":"child*cand_office",
-                        "type":"text",
+                        "type":"select",
                         "value":null,
                         "scroll":false,
                         "height":"30px",
