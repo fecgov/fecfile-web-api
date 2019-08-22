@@ -125,6 +125,21 @@
               }
             }
           }
+          .ng-select.forms__select {
+            &.forms__select-error {
+              .ng-select-container {
+                border: 1px solid $red;
+              }
+            }
+            .ng-select-container {
+              height: 45px;
+              // .ng-input {
+              //   input[type='text'] {
+              //     border: none;
+              //   }
+              // }
+            }
+          }          
           .ng-dropdown-panel {
             .ng-dropdown-panel-items {
               .ng-option {
