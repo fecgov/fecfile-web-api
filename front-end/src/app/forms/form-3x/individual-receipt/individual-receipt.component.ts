@@ -783,6 +783,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Select elements width is set on the form-group level not the select element
+   * as done with text and date fields.
+   */
+  public setSelectTypeWidth(col: any) {
+    if (col.type === 'select') {
+      // TODO Once API has correct data for all selects, remove
+      // conditin checking for specific columns.
+      if (this.isFieldName(col.name, 'cand_office')) {
+        return col.width;
+      }
+    }
+    return null;
+  }
+
+  /**
    * State select options are formatted " AK - Alaska ".  Once selected
    * the input field should display on the state code and the API must receive
    * only the state code.  When an optin is selected, the $ngOptionLabel
@@ -846,10 +861,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.showWarnCandidate(col.text, col.name);
       }
     }
-    const vo = {};
-    vo[col.name] = item.officeCode ? item.officeCode : null;
-    // this.frmIndividualReceipt.patchValue(vo, { onlySelf: true });
-
   }
 
   /**
