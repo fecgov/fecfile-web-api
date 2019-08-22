@@ -141,6 +141,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     if (this._reportType === null || typeof this._reportType === 'undefined') {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }*/
+    this.getFormFields();
+    this._entityType = "IND";
+    // this.loadDynamiceFormFields();
+    this.formFields  =  this.individualFormFields;
 
     this.frmContact = this._fb.group({});
     if (this.selectedOptions) {
@@ -148,10 +152,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.formVisible = true;
       }
     }
-    this.getFormFields();
 
-    console.log("this._entityType =", this._entityType);
-    this.loadDynamiceFormFields();
+ 
   }
 
   ngDoCheck(): void {
@@ -577,7 +579,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     // default to indiv-receipt for sprint 17 - use input field in sprint 18.
     transactionTypeIdentifier = 'INDV_REC';
-    console.log('transaction type from input is ' + this.transactionType);
 
     //const reportId = this.getReportIdFromStorage();
    }
@@ -683,7 +684,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
   private getFormFields(): void {
  
-    console.log('get transaction type form fields ' + this.transactionType);
+    console.log('get contact form fields ' + this.transactionType);
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
              console.log("getFormFields res =", res );
@@ -700,7 +701,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                   if (Array.isArray(res.data.individualFormFields)) {
                     this.individualFormFields = res.data.individualFormFields;
                   }
-                  console.log("this.individualFormFields =", this.individualFormFields );
                 }
       
                 if (res.data.hasOwnProperty('committeeFormFields')) {
@@ -708,14 +708,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                     this.committeeFormFields = res.data.committeeFormFields;
                 }
                 }   
-                  console.log("this.committeeFormFields =", this.committeeFormFields );
 
                 if (res.data.hasOwnProperty('organizationFormFields')) {
                   if (Array.isArray(res.data.organizationFormFields)) {
                     this.organizationFormFields = res.data.organizationFormFields;
                   }
                 }   
-                  console.log("this.organizationFormFields =", this.organizationFormFields );
 
                 if (res.data.hasOwnProperty('candidateFormFields')) {
                   if (Array.isArray(res.data.candidateFormFields)) {
@@ -723,14 +721,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                   }
                 }  
 
-                  console.log("this.organizationFormFields =", this.organizationFormFields );
-
                 if (res.data.hasOwnProperty('hiddenFields')) {
                   if (Array.isArray(res.data.hiddenFields)) {
                     this.hiddenFields = res.data.hiddenFields;
                   }
                 }
-                  console.log("this.organizationFormFields =", this.organizationFormFields );
 
                 if (res.data.hasOwnProperty('states')) {
                   if (Array.isArray(res.data.states)) {
@@ -738,34 +733,30 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                   }
                 }
 
-                  console.log("this.organizationFormFields =", this.organizationFormFields );
                 
                   if (res.data.hasOwnProperty('prefixes')) {
                   if (Array.isArray(res.data.prefixes)) {
                     this.prefixes = res.data.prefixes;
                   }
                 } 
-                    console.log("this.prefixes =", this.prefixes );
 
                 if (res.data.hasOwnProperty('suffixes')) {
                   if (Array.isArray(res.data.suffixes)) {
                     this.suffixes = res.data.suffixes;
                   }
                 }   
-                  console.log("this.suffixes =", this.suffixes );
+
                 if (res.data.hasOwnProperty('entityTypes')) {
                   if (Array.isArray(res.data.entityTypes)) {
                     this.entityTypes = res.data.entityTypes;
                   }
                 }   
-                  console.log("this.entityTypes =", this.entityTypes );
-                
-                  if (res.data.hasOwnProperty('officeSought')) {
+               
+                if (res.data.hasOwnProperty('officeSought')) {
                   if (Array.isArray(res.data.officeSought)) {
                     this.officeSought = res.data.officeSought;
                   }
                 }   
-                console.log("this.officeSought =", this.officeSought );
 
                 if (res.data.hasOwnProperty('officeState')) {
                   if (Array.isArray(res.data.officeState)) {
@@ -773,13 +764,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                   }
                 }   
 
-                console.log("this.officeState =", this.officeState );
                 if (res.data.hasOwnProperty('titles')) {
                   if (Array.isArray(res.data.titles)) {
                     this.titles = res.data.titles;
                   }
                 }
-                console.log("this.titles =", this.titles );
+
                 this._loading = false;
                 console.log(new Date().toISOString());
       
@@ -856,14 +846,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
   public cancelStep(): void {
     this.frmContact.reset();
-  }
-  public saveAndExit(): void {
-    this.doValidateContact();
     this._router.navigate([`/contacts`]);
   }
+  public saveAndExit(): void {
+    this.doValidateContact("saveAndExit");
+  }
   public saveAndAddMore(): void {
-    this.doValidateContact();
-    window.scrollTo(0, 0);
+    this.doValidateContact("saveAndAddMore");
      //this._router.navigate([`/contacts`]);
   }
 
@@ -874,10 +863,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   /**
    * Vaidates the form on submit.
    */
-  public doValidateContact() {
-    console.log("doValidateContact accessing");
+  public doValidateContact(callFrom: string) {
+
     if (this.frmContact.valid) {
-      console.log("doValidateContact form valid");
+
       const contactObj: any = {};
 
       for (const field in this.frmContact.controls) {
@@ -914,8 +903,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log("doValidateContact accessing1");
-
       // There is a race condition with populating hiddenFields
       // and receiving transaction data to edit from the message service.
       // If editing, set transaction ID at this point to avoid race condition issue.
@@ -930,7 +917,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       this.hiddenFields.forEach(el => {
         contactObj[el.name] = el.value;
       });
-      console.log("doValidateContact accessing2");
+
 
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.
@@ -938,9 +925,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         contactObj.entity_id = this._selectedEntity.entity_id;
       }
       contactObj.entity_type= this._entityType;
-      console.log("contactObj before saving", contactObj);
-      localStorage.setItem('contactObj', JSON.stringify(contactObj));
 
+      localStorage.setItem('contactObj', JSON.stringify(contactObj));
+      console.log("callFrom before saving=", callFrom);
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
           console.log("_contactsService.saveContact res", res);
@@ -955,7 +942,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           this._selectedChangeWarnChild = null;
 
           localStorage.removeItem(contactObj);
-          this._router.navigate([`/contacts`]);
+          if (callFrom ==='saveAndExit'){
+            this._router.navigate([`/contacts`]);
+          }
           //localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
         }
