@@ -81,7 +81,7 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
         with connection.cursor() as cursor:
             sql_query = """SELECT json_agg(t) FROM ({}) t""".format(query)
             cursor.execute(sql_query, query_values_list)
-            print(cursor.query.decode("utf-8"))
+            #print(cursor.query.decode("utf-8"))
             result = cursor.fetchone()[0]
             if result is None:
                 # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer using this condition
@@ -198,8 +198,8 @@ def get_f3x_summary_details(report_id, cmte_id):
     except NoOPError:
         raise NoOPError(
             'The Committee ID: {} does not exist in Committee Master Table'.format(cmte_id))
-    # except Exception:
-    #     raise
+    except Exception:
+        raise
 
 
 def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, transaction_id_list):
@@ -210,8 +210,7 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
                             "tran_query_string", False)[0]
         query = output.get('query_string')
         if transaction_id_list:
-                query = query + \
-                    " AND transaction_id in ('{}')".format(
+                query = query + " AND transaction_id in ('{}')".format(
                         "', '".join(transaction_id_list))
         query_values_list = [report_id, cmte_id,
             back_ref_transaction_id, back_ref_transaction_id]
@@ -342,8 +341,7 @@ def create_json_builders(request):
                                         output['data']['schedules'][schedule].append(
                                             transaction)
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        tmp_filename = cmte_id + '_' + \
-            str(report_id)+'_'+str(up_datetime)+'.json'
+        tmp_filename = cmte_id + '_' + str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path = '/tmp/'+tmp_filename
         json.dump(output, open(tmp_path, 'w'), indent=4)
 
@@ -814,7 +812,7 @@ def sample_sql_generate(request):
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-                    print(query)
+                    #print(query)
                     OPEX__CC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
