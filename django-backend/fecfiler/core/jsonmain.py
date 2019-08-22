@@ -734,7 +734,6 @@ def sample_sql_generate(request):
                 file.write(PAR_CON_STRING)
                 file.write(COND_EARM_PAC_STRING)
                 file.write(SA_OTHER_STRING)
-                file.write(SB_SA_CHILD_STRING)
                 file.close()
 
                 List_SB_similar_OPEX_REC = ['OPEXP', 'OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO', 'OPEXP_PMT_TO_PROL_VOID', 'OTH_DISB', 
