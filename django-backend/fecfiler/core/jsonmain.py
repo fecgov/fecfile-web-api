@@ -688,7 +688,7 @@ def sample_sql_generate(request):
                         COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
                         FROM public.sched_b t1
                         LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
-                        LEFT JOIN public.candidate_master t3 ON t3.cand_id = t3.beneficiary_cand_id
+                        LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
@@ -973,7 +973,7 @@ def sample_sql_generate(request):
 
                 
                
-                List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID', 'FEA_CC_PAY', 'CONT_REDESIG_MEMO']
+                List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID']
                 #import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
                 for tran in List_SB_similar_CONTR_CAND:
@@ -995,7 +995,7 @@ def sample_sql_generate(request):
                     COALESCE(t2.zip_code, '''') AS "payeeZipCode",
                     COALESCE(t1.election_code, '''') AS "electionCode", 
                     COALESCE(t1.election_other_description, '''') AS "electionOtherDescription",
-                    to_char(t1.expenditure_date,'MM/DD/YYYY') AS "expenditureDate", 
+                    to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", 
                     t1.expenditure_amount AS "expenditureAmount",
                     COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
                     COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId", 
@@ -1014,8 +1014,8 @@ def sample_sql_generate(request):
                     FROM public.sched_b t1
                     LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     LEFT JOIN public.candidate_master t3 ON t3.cand_id = t1.beneficiary_cand_id
-                    WHERE t1.transaction_type_identifier = '{}' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
-                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from 'Y'
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
                     
                     CONTR_CAND_STRING += """
@@ -1145,7 +1145,7 @@ def sample_sql_generate(request):
 
 
 
-                List_SB_similar_FEA_CC = ['FEA_CC_PAY', 'FEA_PAY_TO_PROL']
+                List_SB_similar_FEA_CC = ['FEA_PAY_TO_PROL', 'FEA_CC_PAY']
 
                 FEA_CC_STRING = ""
                 for tran in List_SB_similar_FEA_CC:
