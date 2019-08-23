@@ -58,6 +58,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * Subscription for pre-populating the form for view or edit.
    */
   private _populateFormSubscription: Subscription;
+  private _loadFormFieldsSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
   public cvgStartDate: string = null;
@@ -100,6 +101,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private readonly _childFieldNamePrefix = 'child*';
   private _contactToEdit: ContactModel;
 
+
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
@@ -115,15 +117,23 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
-    private _f3xMessageService: ContactsMessageService
+    private _contactsMessageService: ContactsMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
+    this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
       this.populateFormForEditOrView(message);
-    });
-  }
+      console.log(" Here Got form fieds...");
+      this.getFormFields();
+      });
+
+    this._loadFormFieldsSubscription = this._contactsMessageService.getLoadFormFieldsMessage()
+      .subscribe(message => {
+        this.getFormFields();
+        
+    });   
+ }
 
   ngOnInit(): void {
     this._selectedEntity = null;
@@ -141,7 +151,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     if (this._reportType === null || typeof this._reportType === 'undefined') {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
     }*/
+   
     this.getFormFields();
+    
     this._entityType = "IND";
     // this.loadDynamiceFormFields();
     this.formFields  =  this.individualFormFields;
@@ -805,7 +817,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
        
-        this.frmContact.patchValue({ street_1: formData.street }, { onlySelf: true });
+        this.frmContact.patchValue({ street_1: formData.street1 }, { onlySelf: true });
         this.frmContact.patchValue({ street_2: formData.street2 }, { onlySelf: true });
         this.frmContact.patchValue({ city: formData.city }, { onlySelf: true });
         this.frmContact.patchValue({ state: formData.state }, { onlySelf: true });
