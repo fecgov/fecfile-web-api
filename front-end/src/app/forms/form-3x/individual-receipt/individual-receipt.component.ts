@@ -788,11 +788,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   public setSelectTypeWidth(col: any) {
     if (col.type === 'select') {
-      // TODO Once API has correct data for all selects, remove
-      // conditin checking for specific columns.
-      if (this.isFieldName(col.name, 'cand_office')) {
-        return col.width;
-      }
+      // // TODO Once API has correct data for all selects, remove
+      // // conditin checking for specific columns.
+      // if (this.isFieldName(col.name, 'cand_office')) {
+      //   return col.width;
+      // }
+      return col.width;
     }
     return null;
   }
