@@ -58,7 +58,7 @@
 
             <ng-container *ngFor="let col of row.cols">
               <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
-                <div class="form-group"> 
+                <div class="form-group" [style.width]="setSelectTypeWidth(col)"> 
                   <label [for]="col?.name">
                     {{ col?.text }}
                     <button
@@ -395,12 +395,12 @@
                        isFieldName(col?.name, 'cand_office_state'))">  
                     <ng-select
                       (change)="handleStateChange($event, col)"
-                      class="state-select"
+                      class="forms__select"
                       [formControlName]="col?.name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'state-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
@@ -417,7 +417,7 @@
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'state-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
@@ -434,7 +434,7 @@
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'org-type-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
