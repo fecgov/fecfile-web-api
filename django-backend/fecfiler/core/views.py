@@ -858,22 +858,118 @@ def check_mandatory_fields_entity(data):
     except:
         raise
 
-def post_sql_entity(entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id):
+def post_sql_entity(
+    entity_id, 
+    entity_type, 
+    cmte_id, 
+    entity_name, 
+    first_name, 
+    last_name, 
+    middle_name, 
+    preffix, 
+    suffix, 
+    street_1, 
+    street_2, 
+    city, 
+    state, 
+    zip_code, 
+    occupation, 
+    employer, 
+    ref_cand_cmte_id,
+    cand_office,
+    cand_office_state,
+    cand_office_district,
+    cand_election_year):
 
     try:
         with connection.cursor() as cursor:
 
             # Insert data into Entity table
-            cursor.execute("""INSERT INTO public.entity (entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, create_date)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, datetime.datetime.now()])
+            cursor.execute(
+                """INSERT INTO public.entity 
+                    (entity_id, 
+                    entity_type, 
+                    cmte_id, 
+                    entity_name, 
+                    first_name, 
+                    last_name, 
+                    middle_name, 
+                    preffix, 
+                    suffix, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    occupation, 
+                    employer, 
+                    ref_cand_cmte_id, 
+                    cand_office,
+                    cand_office_state,
+                    cand_office_district,
+                    cand_election_year
+                    create_date)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """,
+                [
+                    entity_id, 
+                    entity_type, 
+                    cmte_id, 
+                    entity_name, 
+                    first_name, 
+                    last_name, 
+                    middle_name, 
+                    preffix, 
+                    suffix, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    occupation, 
+                    employer, 
+                    ref_cand_cmte_id, 
+                    cand_office,
+                    cand_office_state,
+                    cand_office_dsitrict,
+                    cand_election_year,
+                    datetime.datetime.now(),
+                ]
+                    )
     except Exception:
         raise
 
 def get_list_entity(entity_id, cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
-                                                    FROM public.entity WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
+        query_string = """
+        SELECT 
+            entity_id, 
+            entity_type, 
+            cmte_id, 
+            entity_name, 
+            first_name, 
+            last_name, 
+            middle_name, 
+            preffix as prefix, 
+            suffix, 
+            street_1, 
+            street_2, 
+            city, 
+            state, 
+            zip_code, 
+            occupation, 
+            employer, 
+            ref_cand_cmte_id,
+            cand_office,
+            cand_office_state,
+            cand_office_dsitrict,
+            cand_election_year
+        FROM public.entity 
+        WHERE entity_id = %s 
+        AND cmte_id = %s 
+        AND delete_ind is distinct from 'Y'
+        """
         forms_obj = None
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [entity_id, cmte_id])
@@ -889,8 +985,33 @@ def get_list_entity(entity_id, cmte_id):
 def get_list_all_entity(cmte_id):
 
     try:
-        query_string = """SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
-                                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y'"""
+        query_string = """
+        SELECT 
+            entity_id, 
+            entity_type, 
+            cmte_id, 
+            entity_name, 
+            first_name, 
+            last_name, 
+            middle_name, 
+            preffix as prefix, 
+            suffix, 
+            street_1, 
+            street_2, 
+            city, 
+            state, 
+            zip_code, 
+            occupation, 
+            employer, 
+            ref_cand_cmte_id,
+            cand_office,
+            cand_office_state,
+            cand_office_dsitrict,
+            cand_election_year
+        FROM public.entity 
+        WHERE cmte_id = %s 
+        AND delete_ind is distinct from 'Y'
+        """
         forms_obj = None
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id])
@@ -910,10 +1031,57 @@ def put_sql_entity(entity_type, entity_name, first_name, last_name, middle_name,
             # Put data into Entity table
             # cursor.execute("""UPDATE public.entity SET entity_type = %s, entity_name = %s, first_name = %s, last_name = %s, middle_name = %s, preffix = %s, suffix = %s, street_1 = %s, street_2 = %s, city = %s, state = %s, zip_code = %s, occupation = %s, employer = %s, ref_cand_cmte_id = %s, last_update_date = %s WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct FROM 'Y'""",
             #             (entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, last_update_date, entity_id, cmte_id))                       
-            cursor.execute("""UPDATE public.entity SET entity_type = %s, entity_name = %s, first_name = %s, last_name = %s, middle_name = %s, preffix = %s, suffix = %s, street_1 = %s, street_2 = %s, city = %s, state = %s, zip_code = %s, occupation = %s, employer = %s, ref_cand_cmte_id = %s WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct FROM 'Y'""",
-                        [entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, entity_id, cmte_id])                       
+            cursor.execute(
+                """
+                UPDATE public.entity SET 
+                    entity_type = %s, 
+                    entity_name = %s, 
+                    first_name = %s, 
+                    last_name = %s, 
+                    middle_name = %s, 
+                    preffix = %s, 
+                    suffix = %s, 
+                    street_1 = %s, 
+                    street_2 = %s, 
+                    city = %s, 
+                    state = %s, 
+                    zip_code = %s, 
+                    occupation = %s, 
+                    employer = %s, 
+                    ref_cand_cmte_id = %s,
+                    cand_office = %s,
+                    cand_office_state = %s,
+                    cand_office_dsitrict = %s,
+                    cand_election_year = %s 
+                WHERE entity_id = %s AND cmte_id = %s 
+                AND delete_ind is distinct FROM 'Y'
+                """,
+                [
+                    entity_type, 
+                    entity_name, 
+                    first_name, 
+                    last_name, 
+                    middle_name, 
+                    preffix, 
+                    suffix, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    occupation, 
+                    employer, 
+                    ref_cand_cmte_id, 
+                    cand_office,
+                    cand_office_state,
+                    cand_office_district,
+                    cand_election_year,
+                    entity_id, 
+                    cmte_id,
+                    ])                       
             if (cursor.rowcount == 0):
-                raise Exception('The Entity ID: {} does not exist in Entity table'.format(entity_id))
+                raise Exception(
+                    'The Entity ID: {} does not exist in Entity table'.format(entity_id))
     except Exception:
         raise
 
@@ -923,9 +1091,19 @@ def delete_sql_entity(entity_id, cmte_id):
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
             # cursor.execute("""UPDATE public.entity SET delete_ind = 'Y', last_update_date = %s WHERE entity_id = '""" + entity_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
-            cursor.execute("""UPDATE public.entity SET delete_ind = 'Y' WHERE entity_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [entity_id, cmte_id])
+            cursor.execute(
+                """
+                UPDATE public.entity 
+                SET delete_ind = 'Y' 
+                WHERE entity_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """, 
+                [entity_id, cmte_id])
             if (cursor.rowcount == 0):
-                raise Exception('The Entity ID: {} is either already deleted or does not exist in Entity table'.format(entity_id))
+                raise Exception(
+                    """The Entity ID: {} is either already deleted or does not 
+                    exist in Entity table""".format(entity_id))
     except Exception:
         raise
 
@@ -935,9 +1113,18 @@ def undo_delete_sql_entity(entity_id, cmte_id):
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
             # cursor.execute("""UPDATE public.entity SET delete_ind = 'Y', last_update_date = %s WHERE entity_id = '""" + entity_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
-            cursor.execute("""UPDATE public.entity SET delete_ind = '' WHERE entity_id = %s AND cmte_id = %s AND delete_ind = 'Y'""", [entity_id, cmte_id])
+            cursor.execute(
+                """
+                UPDATE public.entity 
+                SET delete_ind = '' 
+                WHERE entity_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind = 'Y'
+                """, 
+                [entity_id, cmte_id])
             if (cursor.rowcount == 0):
-                raise Exception('The Entity ID: {} is not deleted or does not exist in Entity table'.format(entity_id))
+                raise Exception(
+                    'The Entity ID: {} is not deleted or does not exist in Entity table'.format(entity_id))
     except Exception:
         raise
 
@@ -946,9 +1133,16 @@ def remove_sql_entity(entity_id, cmte_id):
     try:
         with connection.cursor() as cursor:
             # DELETE row from entity table    
-            cursor.execute("""DELETE FROM public.entity WHERE entity_id = %s AND cmte_id = %s""", [entity_id, cmte_id])
+            cursor.execute(
+                """
+                DELETE FROM public.entity 
+                WHERE entity_id = %s 
+                AND cmte_id = %s
+                """, 
+                [entity_id, cmte_id])
             if (cursor.rowcount == 0):
-                raise Exception('The Entity ID: {} does not exist in Entity table'.format(entity_id))
+                raise Exception(
+                    'The Entity ID: {} does not exist in Entity table'.format(entity_id))
     except Exception:
         raise
 """
@@ -962,7 +1156,29 @@ def post_entities(data):
         check_entity_type(entity_type)
         entity_id = get_next_entity_id(entity_type)
         data['entity_id'] = entity_id
-        post_sql_entity(entity_id, data.get('entity_type'), data.get('cmte_id'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'),data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'))
+        post_sql_entity(
+            entity_id, 
+            data.get('entity_type'), 
+            data.get('cmte_id'), 
+            data.get('entity_name'), 
+            data.get('first_name'), 
+            data.get('last_name'), 
+            data.get('middle_name'),
+            data.get('preffix'), 
+            data.get('suffix'), 
+            data.get('street_1'), 
+            data.get('street_2'), 
+            data.get('city'), 
+            data.get('state'), 
+            data.get('zip_code'), 
+            data.get('occupation'), 
+            data.get('employer'), 
+            data.get('ref_cand_cmte_id'),
+            data.get('cand_office'),
+            data.get('cand_office_state'),
+            data.get('cand_office_dsitrict'),
+            data.get('cand_election_year')
+            )
         output = get_entities(data)
         return output[0]
     except:
@@ -997,7 +1213,28 @@ def put_entities(data):
         check_entity_type(entity_type)
         entity_id = data.get('entity_id')
         check_entity_id(entity_id)
-        put_sql_entity(data.get('entity_type'), data.get('entity_name'), data.get('first_name'), data.get('last_name'), data.get('middle_name'), data.get('preffix'), data.get('suffix'), data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state'), data.get('zip_code'), data.get('occupation'), data.get('employer'), data.get('ref_cand_cmte_id'), data.get('entity_id'), cmte_id)
+        put_sql_entity(
+            data.get('entity_type'), 
+            data.get('entity_name'), 
+            data.get('first_name'), 
+            data.get('last_name'), 
+            data.get('middle_name'), 
+            data.get('preffix'), 
+            data.get('suffix'), 
+            data.get('street_1'), 
+            data.get('street_2'), 
+            data.get('city'), 
+            data.get('state'), 
+            data.get('zip_code'), 
+            data.get('occupation'), 
+            data.get('employer'), 
+            data.get('ref_cand_cmte_id'), 
+            data.get('entity_id'), 
+            data.get('cand_office'),
+            data.get('cand_office_state'),
+            data.get('cand_office_district'),
+            data.get('cand_election_year'),
+            cmte_id)
         output = get_entities(data)
         return output[0]
     except:
@@ -1062,6 +1299,10 @@ def entities(request):
                     'occupation': request.data.get('occupation'),
                     'employer': request.data.get('employer'),
                     'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
+                    'cand_office': request.data.get('cand_office'),
+                    'cand_office_state': request.data.get('cand_office_state'),
+                    'cand_office_district': request.data.get('cand_office_district'),
+                    'cand_election_year': request.data.get('cand_election_year')
                 }     
             data = post_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -1114,6 +1355,10 @@ def entities(request):
                 'occupation': request.data.get('occupation'),
                 'employer': request.data.get('employer'),
                 'ref_cand_cmte_id': request.data.get('ref_cand_cmte_id'),
+                'cand_office': request.data.get('cand_office'),
+                'cand_office_state': request.data.get('cand_office_state'),
+                'cand_office_district': request.data.get('cand_office_district'),
+                'cand_election_year': request.data.get('cand_election_year')
             }      
             data = put_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
