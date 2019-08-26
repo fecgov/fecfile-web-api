@@ -1610,6 +1610,31 @@ export class IndividualReceiptService {
    * @param      {string}  formType  The form type
    * @param      {any}     receipt   The receipt
    */
+  public getDataScheduleA(reportId: string, transactionId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/sa/schedA`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+    if (transactionId) {
+      params = params.append('transaction_id', transactionId);
+    }
+
+    return this._http.get(url, {
+      headers: httpOptions,
+      params: params
+    });
+  }
+
+  /**
+   * Gets the schedule after submitted.
+   *
+   * @param      {string}  formType  The form type
+   * @param      {any}     receipt   The receipt
+   */
   public getSchedule(formType: string, receipt: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/thirdNavTransactionTypes`;
