@@ -31,6 +31,11 @@ logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_F = ['cmte_id', 'report_id', 'transaction_id']
 
+# need to validate negative transaction amount
+NEGATIVE_SCHED_F_TRANSACTIONS = [
+    'COEXP_PARTY_VOID',
+]
+
 # need to verify those child memo transactions have:
 # 1. back_ref_transaction_id 
 # 2. parent transaction exist in the db
@@ -62,6 +67,14 @@ def validate_parent_transaction_exist(data):
         else:
             pass
 
+def validate_negative_transaction(data):
+    """
+    validate transaction amount if negative transaction encounterred.
+    """
+    if data.get("transaction_type_identifier") in NEGATIVE_SCHED_F_TRANSACTIONS:
+        if not float(data.get("expenditure_amount")) < 0:
+            raise Exception("current transaction amount need to be negative!")
+
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SF"):
         raise Exception(
@@ -91,6 +104,7 @@ def schedF_sql_dict(data):
     filter out valid fileds for sched_F
 
     """
+    validate_negative_transaction(data)
     validate_parent_transaction_exist(data)
     valid_fields = [
 
