@@ -37,6 +37,9 @@
   // }
   
   section {
+    .form-sidebar-item:hover{
+      cursor: pointer !important;
+    }
     .form-sidebar__links {
       list-style-type: none;
       margin-top: 15px;

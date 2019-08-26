@@ -121,13 +121,13 @@ export class TypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
-    if(e.target.checked) {
+    //if(e.target.checked) {
       this.typeSelected = e.target.value;
       this.typeFailed = false;
-    } else {
+    /*} else {
       this.typeSelected = '';
       this.typeFailed = true;
-    }
+    }*/
   }
 
   /**
@@ -181,6 +181,15 @@ export class TypeComponent implements OnInit {
 
   public cancel(): void {
     this._router.navigateByUrl('/dashboard');
+  }
+
+  /*
+    This function is called while selecting a list from report screen
+  */
+  public optionsListClick(type): void {
+    if(document.getElementById(type) != null) {
+      document.getElementById(type).click();
+    }
   }
 
 }

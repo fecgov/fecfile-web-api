@@ -152,19 +152,16 @@ export class TransactionTypeComponent implements OnInit {
    * Updates the type selected when radio button clicked.
    *
    * @param      {Object}  e            The event object.
-   * @param      {Object}  childOption  The child option selected
-   *                                    from the selectedOptions.
    */
-  public updateTypeSelected(e, childOption): void {
+  public updateTypeSelected(e): void {
     const val: string = e.target.value;
-
     this.transactionType = val;
-    this.transactionTypeText = childOption.text;
-
+    this.transactionTypeText = e.target.placeholder;
     this.frmOption.controls['secondaryOption'].setValue(val);
-
     this.transactionTypeFailed = false;
   }
+
+
 
   /**
    * Sets the secondary transaction categories.
@@ -215,4 +212,16 @@ export class TransactionTypeComponent implements OnInit {
       step: 'step_2'
     });
   }
+
+  /*
+    This function is called while selecting a list from transaction screen
+  */
+  public childOptionsListClick(id): void {
+    if(document.getElementById(id) != null) {
+        var obj = <HTMLInputElement>document.getElementById('option_'+id);
+        obj.click();
+    }
+  }
+
+
 }

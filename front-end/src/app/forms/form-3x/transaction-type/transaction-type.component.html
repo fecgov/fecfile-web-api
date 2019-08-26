@@ -44,11 +44,12 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <ngb-accordion class="secondary-options" (pannelChange)="beforeChange($event)">
-                <ngb-panel class="secondary-options__item" *ngFor="let option of secondaryOptions; index as i">
+                <ngb-panel class="secondary-options__item" *ngFor="let option of secondaryOptions; index as i" >
                   <ng-template ngbPanelHeader let-opened="opened">
+                    <button class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
                     <div class="option-header">
                       <div class="option-header-text">
-                        <button class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
+                        <button id="option_{{i}}" class="btn btn-link">
                           {{ option?.text }}
                         </button>
                         <ng-container *ngIf="option?.infoIcon">
@@ -67,17 +68,21 @@
                         </button>
                       </div>
                     </div>
+                    </button>
                   </ng-template>
                   <ng-template ngbPanelContent>
                     <ul class="child-options">
-                      <li class="child-options__item" *ngFor="let childOption of option.options">
+                      <li class="child-options__item" *ngFor="let childOption of option.options"
+                      (click)="childOptionsListClick(childOption.value)">
+                        <label for="option_{{childOption.value}}" class="child-options-label">
                         <input
-                          [type]="childOption.type"
+                          id="option_{{childOption.value}}"
+                          placeholder="{{childOption.text}}"
+                          type="radio"
                           [name]="secondaryOption"
                           [value]="childOption.value"
-                          (change)="updateTypeSelected($event, childOption)"
+                          (change)="updateTypeSelected($event)"
                         />
-                        <label for="{{ childOption.name }}" class="child-options-label">
                           {{ childOption.text }}
                         </label>
                         <ng-container *ngIf="childOption?.infoIcon">

@@ -7,6 +7,7 @@
     margin: 0 auto 5px auto;
     width: 99%;
   }
+
   .form__type {
     float: left;
     height: 400px;
@@ -189,5 +190,14 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
   } // .form__type
+  }
+  .type-item:hover {
+    cursor: pointer !important;
+  }
+  .type-text:hover {
+    cursor: pointer !important;
+  }
+  input[type="radio"]:hover {
+    cursor: pointer !important;
   }
 } // .form__type-container

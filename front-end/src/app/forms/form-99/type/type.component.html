@@ -34,6 +34,7 @@
               <ul class="type-list">
                 <li class="type-item"
                   [ngClass]="{'selected': typeSelected === 'mst'}"
+                  (click)="optionsListClick('mst-radio')"
                 >
                   <div class="type-item__box">
                     <div class="type-item__box--top">
@@ -43,6 +44,7 @@
                         value="MST"
                         (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
+                        name="reasonTypeRadio"
                       />
                       <label
                         for="mst-radio"
@@ -75,6 +77,7 @@
                 </li>
                 <li class="type-item"
                   [ngClass]="{'selected': typeSelected === 'msm'}"
+                  (click)="optionsListClick('msm-radio')"
                 >
                   <div class="type-item__box">
                     <div class="type-item__box--top">
@@ -84,6 +87,7 @@
                         value="MSM"
                         (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
+                        name="reasonTypeRadio"
                       />
                       <label
                         for="msm-radio"
@@ -116,6 +120,7 @@
                 </li>
                 <li class="type-item"
                   [ngClass]="typeSelected === 'msi'? 'selected' : ''"
+                  (click)="optionsListClick('msi-radio')"
                 >
                   <div class="type-item__box">
                     <div class="type-item__box--top">
@@ -125,6 +130,7 @@
                         value="MSI"
                         (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
+                        name="reasonTypeRadio"
                       />
                       <label
                         for="msi-radio"
@@ -158,6 +164,7 @@
                 </li>
                 <li class="type-item"
                   [ngClass]="typeSelected === 'msw'? 'selected' : ''"
+                  (click)="optionsListClick('msw-radio')"
                 >
                   <div class="type-item__box">
                     <div class="type-item__box--top">
@@ -167,6 +174,7 @@
                         value="MSW"
                         (change)="updateTypeSelected($event)"
                         formControlName="reasonTypeRadio"
+                        name="reasonTypeRadio"
                       />
                       <label
                         for="msw-radio"
