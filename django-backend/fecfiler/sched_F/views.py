@@ -19,15 +19,48 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
+from fecfiler.core.transaction_util import transaction_exists                                 
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
 
+
+# TODO: still need to add line_number and transaction_code to sched_f
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_F = ['cmte_id', 'report_id', 'transaction_id']
 
+# need to verify those child memo transactions have:
+# 1. back_ref_transaction_id 
+# 2. parent transaction exist in the db
+MEMO_SCHED_F_TRANSACTIONS = [
+    'COEXP_CC_PAY_MEMO',
+    'COEXP_STAF_REIM_MEMO',
+    'COEXP_PMT_PROL_MEMO',
+]
+
+def parent_transaction_exists(tran_id, sched_tp):
+    """
+    check if parent transaction exists
+    """
+    return transaction_exists(tran_id, sched_tp)
+
+
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    if data.get("transaction_type_identifier") in MEMO_SCHED_F_TRANSACTIONS:
+        if not data.get("back_ref_transaction_id"):
+            raise Exception("Error: parent transaction id missing.")
+        elif not parent_transaction_exists(
+            data.get("back_ref_transaction_id"),
+            'sched_f'
+        ):
+            raise Exception("Error: parent transaction not found.")
+        else:
+            pass
 
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SF"):
@@ -58,6 +91,7 @@ def schedF_sql_dict(data):
     filter out valid fileds for sched_F
 
     """
+    validate_parent_transaction_exist(data)
     valid_fields = [
 
             'transaction_type_identifier',
