@@ -14,6 +14,14 @@
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
 
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt">
     <header>
@@ -96,7 +104,7 @@
                             && !isFieldName(col?.name, 'donor_cmte_id')
                             && !isFieldName(col?.name, 'donor_cmte_name')
                             && !isFieldName(col?.name, 'beneficiary_cmte_id')
-                            && !isFieldName(col?.name, 'beneficiary_cmte_name')                                                     
+                            && !isFieldName(col?.name, 'beneficiary_cmte_name')
                             "
                         class="form-control"
                         [style.width]="col?.width"
@@ -109,6 +117,7 @@
                         [formControlName]="col?.name"
                         (blur)="isFieldName(col?.name, 'contribution_amount') ? 
                           contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
+
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -117,6 +126,7 @@
                         "
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (change)="isFieldName(col?.name, 'contribution_date') ? doContributionDateChange(col?.name) : null"
+
                       />
                       <input
                         *ngIf="col?.name === 'last_name'"
@@ -245,6 +255,7 @@
                       <input
                         *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
                                isFieldName(col?.name, 'beneficiary_cmte_id')"
+
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -292,6 +303,7 @@
                         (selectItem)="handleSelectedOrg($event, col?.name)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />                                       
+
                     </div>
                     <div
                       class="error-text"
@@ -352,7 +364,7 @@
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"
                       [attr.value]="col?.value"
-                      
+
                       [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                       [formControlName]="col?.name"
                       (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null"
@@ -393,6 +405,7 @@
                   <ng-container *ngIf="col?.type === 'select' && 
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
+
                     <ng-select
                       (change)="handleStateChange($event, col)"
                       class="state-select"
@@ -438,6 +451,7 @@
                           : ''
                       "
                     >
+
                       <ng-option *ngFor="let entityType of entityTypes" value="{{entityType.entityType}}">
                         {{entityType.entityTypeDescription}}
                       </ng-option>
