@@ -239,20 +239,28 @@ def get_list_all_schedA(report_id, cmte_id):
     """
     return get_list_schedA(report_id, cmte_id)
 
-def get_list_schedA(report_id, cmte_id, transaction_id = None):
+def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
 
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
             if transaction_id:
-                query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                if not include_deleted_trans_flag:
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                else:
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                             """) t""", [report_id, cmte_id, transaction_id])
             else:
-                query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                if not include_deleted_trans_flag:
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                else:
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
                            query_string + """) t""", [report_id, cmte_id])           
@@ -1172,11 +1180,13 @@ def trash_restore_sql_transaction(report_id, transaction_id, _delete='Y'):
             UPDATE public.sched_a 
             SET delete_ind = '{}'
             WHERE report_id = '{}'
-            AND transaction_id = '{}'""".format(_delete, report_id, transaction_id)
+                    AND transaction_id = '{}'
+            """.format(_delete, report_id, transaction_id)
             cursor.execute(_sql)
-            if (cursor.rowcount == 0):
+            if not cursor.rowcount:
                 raise Exception(
-                    'The transaction ID: {} is either already deleted or does not exist in SCHEDULE A table'.format(transaction_id))
+                    """The transaction ID: {} is either already deleted
+                     or does not exist in SCHEDULE A table""".format(transaction_id))
     except Exception:
         raise
 
@@ -1186,20 +1196,20 @@ def trash_restore_transactions(request):
        we are doing soft-delete only, mark delete_ind to 'Y'
        
        request payload in this format:
-{
-    "actions": [
         {
-            "action": "restore",
-            "reportid": "123",
-            "transactionId": "SA20190610000000087"
-        },
-        {
-            "action": "trash",
-            "reportid": "456",
-            "transactionId": "SA20190610000000087"
+            "actions": [
+                {
+                    "action": "restore",
+                    "report_id": "123",
+                    "transaction_id": "SA20190610000000087"
+                },
+                {
+                    "action": "trash",
+                    "report_id": "456",
+                    "transaction_id": "SA20190610000000087"
+                }
+            ]
         }
-    ]
-}
  
     """
     for _action in request.data.get('actions', []):
@@ -1210,31 +1220,15 @@ def trash_restore_transactions(request):
 
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
+        # get_schedA data, do sql transaction, update aggregation
         try:
-            #Handling aggregate amount updation for sched A transactions
-            if _delete == 'Y' and transaction_id[0:2] == 'SA':
-                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-                trash_restore_sql_transaction( 
-                    report_id,
-                    transaction_id, 
-                    _delete)
-                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
-                ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
-            elif transaction_id[0:2] == 'SA':
-                # print('IN')
-                trash_restore_sql_transaction( 
-                    report_id,
-                    transaction_id, 
-                    _delete)
-                datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-                update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
-                    ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
-            else:
-            #end of handling
-                trash_restore_sql_transaction( 
-                    report_id,
-                    transaction_id, 
-                    _delete)
+            datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
+            trash_restore_sql_transaction( 
+                report_id,
+                transaction_id, 
+                _delete)
+            update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
+            ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
         except Exception as e:
             return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 

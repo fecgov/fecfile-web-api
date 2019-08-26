@@ -21,7 +21,7 @@ export class ContactsMessageService {
   private removeFilterSubject = new Subject<any>();
   private switchFilterViewSubject = new Subject<any>();
   private populateFormSubject = new Subject<any>();
-
+  private loadFormFieldsSubject = new Subject<any>();
   /**
    * A publisher uses this method to send a message to subscribers
    * indicating the Pin Column options are to be shown.
@@ -199,5 +199,9 @@ export class ContactsMessageService {
    */
   public getPopulateFormMessage(): Observable<any> {
     return this.populateFormSubject.asObservable();
+  }
+
+  public getLoadFormFieldsMessage(): Observable<any> {
+    return this.loadFormFieldsSubject.asObservable();
   }
 }

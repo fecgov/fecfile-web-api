@@ -325,6 +325,7 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
 
+
 def get_list_child_transactionId_schedB(cmte_id, transaction_id):
     """
     get all children sched_b items:
@@ -340,7 +341,9 @@ def get_list_child_transactionId_schedB(cmte_id, transaction_id):
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
-        raise Exception( 'The get_list_child_transactionId_schedB function is throwing an error: ' + str(e))
+        raise Exception(
+            'The get_list_child_transactionId_schedB function is throwing an error: ' + str(e))
+
 
 def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
     """
@@ -604,7 +607,8 @@ def post_schedB(datum):
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    cmte_id), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
@@ -632,7 +636,8 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
+            child_forms_obj = get_list_child_schedB(
+                report_id, cmte_id, transaction_id)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -713,7 +718,8 @@ def put_schedB(datum):
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)

@@ -8,7 +8,7 @@ export class ContactModel {
     middleName: string;
     suffix: string;
     prefix: string;
-    street: string;
+    street1: string;
     street2: string;
     city: string;
     state: string;
@@ -32,7 +32,7 @@ export class ContactModel {
         this.middleName = contact.middleName ? contact.middleName : '';
         this.suffix = contact.suffix ? contact.suffix : '';
         this.prefix = contact.prefix ? contact.prefix : '';
-        this.street = contact.street ? contact.street : '';
+        this.street1 = contact.street1 ? contact.street1 : '';
         this.street2 = contact.street2 ? contact.street2 : '';
         this.city = contact.city ? contact.city : '';
         this.state = contact.state ? contact.state : '';

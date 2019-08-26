@@ -251,8 +251,8 @@ export class ContactsService {
       model.type = row.type;
       model.id = row.id;
       model.name = row.name;
-      model.street = row.street1;
-      model.street2 = row.street_2;
+      model.street1 = row.street1;
+      model.street2 = row.street2;
       model.city = row.city;
       model.state = row.state;
       model.zip = row.zip;
@@ -352,7 +352,7 @@ export class ContactsService {
     serverObject.name =  model.name;
     serverObject.type = model.type;
     serverObject.id = model.id;
-    serverObject.street1 = model.street;
+    serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;
     serverObject.city = model.city;
     serverObject.state = model.state;

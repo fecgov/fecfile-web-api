@@ -70,6 +70,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public titles: any = [];
   public states: any = [];
   public electionTypes: any = [];
+  public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
   public selectedEntityType: any;
 
@@ -155,6 +156,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._contributionAggregateValueChild = 0.0;
     this._contributionAmount = '';
     this._contributionAmountChlid = '';
+
+    this._getCandidateOfficeTypes();
+
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
@@ -254,7 +258,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name))
           if (this.isFieldName(e.name, 'contribution_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
@@ -266,10 +270,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             if (memoCodeValue === this._memoCodeValue) {
               if (isChildForm) {
                 this.memoCodeChild = true;
-                // this._readOnlyMemoCodeChild = true;
               } else {
                 this.memoCode = true;
-                // this._readOnlyMemoCode = true;
               }
             }
             if (isChildForm) {
@@ -295,7 +297,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     // Set it to value from dynamic forms as some should be checked and disabled by default.
     this._setMemoCodeForForm();
 
-    if (this.frmIndividualReceipt.contains('election_code')) {
+    if (this.frmIndividualReceipt.get('election_code')) {
       this.frmIndividualReceipt.patchValue({ election_code: null }, { onlySelf: true });
     }
     const childElectCodeName = this._childFieldNamePrefix + 'election_code';
@@ -794,6 +796,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param stateOption the state selected in the dropdown.
    */
   public handleStateChange(stateOption: any, col: any) {
+    // TODO change template to use the ng-select inputs as done with
+    // candidate office.
+
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
     if (isChildForm) {
@@ -826,9 +831,34 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   /**
+   *
+   * @param item
+   * @param col
+   */
+  public handleCandOfficeChange(item: any, col: any) {
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
+    if (isChildForm) {
+      if (this._selectedCandidateChild) {
+        this.showWarnCandidate(col.text, col.name);
+      }
+    } else {
+      if (this._selectedCandidate) {
+        this.showWarnCandidate(col.text, col.name);
+      }
+    }
+    const vo = {};
+    vo[col.name] = item.officeCode ? item.officeCode : null;
+    // this.frmIndividualReceipt.patchValue(vo, { onlySelf: true });
+
+  }
+
+  /**
    * Set the Election Code on the form when it changes in the UI.
    */
   public handleElectionCodeChange(item: any, col: any) {
+
+    // TODO change template to use the ng-select inputs as done with
+    // candidate office.
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
@@ -857,7 +887,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     const electionCodeVO = {};
     electionCodeVO[col.name] = item.electionTypeDescription;
     this.frmIndividualReceipt.patchValue(electionCodeVO, { onlySelf: true });
-    
+
     if (isChildForm) {
       this._selectedElectionCodeChild = item.electionType;
     } else {
@@ -1658,7 +1688,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //   return null;
   // }
 
-  // private ___getFormFields(): void {
+  // private _getFormFields__(): void {
   //   console.log('get transaction type form fields ' + this.transactionType);
   //   if (this.transactionType === 'CON_EAR_DEP_1' || this.transactionType === 'CON_EAR_UNDEP') {
   //     this._receiptService.getConEarDepMockData().subscribe(res => {
@@ -2347,6 +2377,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
       // TODO need to handle child form apart from non-child
     });
+  }
+
+  /**
+   * Office types may be hard coded as they are never expected to Change for now.
+   */
+  private _getCandidateOfficeTypes() {
+    this.candidateOfficeTypes = [
+      {officeCode: 'H', officeDescription: 'House'},
+      {officeCode: 'S', officeDescription: 'Senate'},
+      {officeCode: 'P', officeDescription: 'Presidential'}
+    ];
   }
 
   private _setMemoCodeForForm() {
