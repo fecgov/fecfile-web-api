@@ -1396,38 +1396,96 @@ MODIFIED - CORE APP - SPRINT 15 - FNE 1222 - BY PRAVEEN JINKA
 @api_view(['GET'])
 ############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
 def autolookup_search_contacts(request):
+    """
+    We are changing autoloopup to the converged entity table:
+    Parameter name remapping for candidate and committee:
+    cmte_id --> ref_cand_cmte_id
+    cmte_name --> entity_name
+    cand_id --> ref_cand_cmte_id
+    cand_last_name --> last_name
+    cand_first_name --> first_name
+    """
+    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id'] 
+    field_remapper = {
+        'cmte_id': 'ref_cand_cmte_id',
+        'cmte_name': 'entity_name',
+        'cand_id': 'ref_cand_cmte_id',
+        'cand_last_name': 'last_name',
+        'cand_first_name': 'first_name' 
+    }
 
     try:
-        commmitte_id = request.user.username
+        print(request.user.username)
+        committee_id = request.user.username
         param_string = ""
         order_string = ""
         search_string = ""
         query_string = ""
+        cand_q = False
+        cmte_q = False
 
-        for key, value in request.query_params.items():
-            order_string = str(key)
-            if key in ['entity_name', 'first_name', 'last_name']:
-                parameters = [commmitte_id]
+        for k in request.query_params:
+            if k.startswith('cand_'):
+                cand_q = True
+            if k.startswith('cmte_'):
+                cmte_q = True
+
+        
+        # rename parameters for candidate and committee
+        query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
+        query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
+        print(query_params)
+        for key, value in query_params.items():
+            if key in allowed_params:
+                order_string = str(key)
+                parameters = [committee_id, committee_id]
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                query_string = """SELECT json_agg(t) FROM (SELECT entity_id, entity_type, cmte_id, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id
-                                                    FROM public.entity WHERE cmte_id = %s""" + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                if cand_q:
+                    query_string = """
+                    SELECT json_agg(t) FROM 
+                    (SELECT e.preffix as cand_prefix, 
+                            e.last_name as cand_last_name,
+                            e.first_name as cand_first_name,
+                            e.middle_name as cand_middle_name,
+                            e.suffix as cand_suffix,
+                            *
+                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                elif cmte_q:
+                    query_string = """
+                    SELECT json_agg(t) FROM 
+                    (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
+                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                    pass
+                else:
+                    query_string = """
+                    SELECT json_agg(t) FROM 
+                    (SELECT e.preffix as prefix, *
+                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+
                 parameters.append(value + '%')
-            elif key in ['cmte_id', 'cmte_name']:
-                param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
-                                                    FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-                parameters = [value + '%']
-            elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
-                param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
-                                                    FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-                parameters = [value + '%']
-            else:
-                raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
+            # elif key in ['cmte_id', 'cmte_name']:
+            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
+            #     query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
+            #                                         FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
+            #     parameters = [value + '%']
+            # elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
+            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
+            #     query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
+            #                                         FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
+            #     parameters = [value + '%']
+            # else:
+            #     raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
             raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
-        
+        print(query_string)
+        print(parameters)
         with connection.cursor() as cursor:
             cursor.execute(query_string, parameters)
             for row in cursor.fetchall():
