@@ -907,7 +907,7 @@ def post_sql_entity(
                     cand_office,
                     cand_office_state,
                     cand_office_district,
-                    cand_election_year
+                    cand_election_year,
                     create_date)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
