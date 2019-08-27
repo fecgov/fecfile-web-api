@@ -931,7 +931,7 @@ def post_sql_entity(
                     ref_cand_cmte_id, 
                     cand_office,
                     cand_office_state,
-                    cand_office_dsitrict,
+                    cand_office_district,
                     cand_election_year,
                     datetime.datetime.now(),
                 ]
@@ -963,7 +963,7 @@ def get_list_entity(entity_id, cmte_id):
             ref_cand_cmte_id,
             cand_office,
             cand_office_state,
-            cand_office_dsitrict,
+            cand_office_district,
             cand_election_year
         FROM public.entity 
         WHERE entity_id = %s 
@@ -1006,7 +1006,7 @@ def get_list_all_entity(cmte_id):
             ref_cand_cmte_id,
             cand_office,
             cand_office_state,
-            cand_office_dsitrict,
+            cand_office_district,
             cand_election_year
         FROM public.entity 
         WHERE cmte_id = %s 
@@ -1051,7 +1051,7 @@ def put_sql_entity(entity_type, entity_name, first_name, last_name, middle_name,
                     ref_cand_cmte_id = %s,
                     cand_office = %s,
                     cand_office_state = %s,
-                    cand_office_dsitrict = %s,
+                    cand_office_district = %s,
                     cand_election_year = %s 
                 WHERE entity_id = %s AND cmte_id = %s 
                 AND delete_ind is distinct FROM 'Y'
@@ -1176,7 +1176,7 @@ def post_entities(data):
             data.get('ref_cand_cmte_id'),
             data.get('cand_office'),
             data.get('cand_office_state'),
-            data.get('cand_office_dsitrict'),
+            data.get('cand_office_district'),
             data.get('cand_election_year')
             )
         output = get_entities(data)
