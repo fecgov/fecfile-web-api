@@ -8,7 +8,7 @@ import { UtilService } from '../../shared/utils/util.service';
 import { ActiveView } from '../reportheader/reportheader.component';
 import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { GetReportsResponse } from '../../reports/service/report.service';
 import { reportModel } from '../model/report.model';
@@ -45,6 +45,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public view: string;
 
   @Input()
+  public tableview: string;
+
+  @Input()
   public formType: string;
 
   @Input()
@@ -76,7 +79,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
-
+  public reportID = 0;
   // private keywords = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
@@ -123,7 +126,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   private allReportsSelected: boolean;
 
   constructor(
-    private _ReportsService: ReportsService,
+    private _reportsService: ReportsService,
     private _reportsMessageService: ReportsMessageService,
     private _tableService: TableService,
     private _utilService: UtilService,
@@ -153,7 +156,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
     const paginateConfig: PaginationInstance = {
-      id: 'forms__trx-table-pagination',
+      id: 'forms__rep-table-pagination',
       itemsPerPage: 30,
       currentPage: 1
     };
@@ -200,7 +203,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.getFilterNames();
         break;
       case this.recycleBinView:
-        this.getReportsPage(page);
+        this.getRecyclingPage(page);
         break;
       default:
         break;
@@ -270,7 +273,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     console.log('view', this.view);
     console.log('existingReportId', this.existingReportId);
 
-    this._ReportsService
+    this._reportsService
       .getReports(
         this.view,
         page,
@@ -283,12 +286,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
       .subscribe((res: GetReportsResponse) => {
         this.reportsModel = [];
-        this._ReportsService.mockApplyFilters(res, this.filters);
-        const reportsModelL = this._ReportsService.mapFromServerFields(res.reports);
+        this._reportsService.mockApplyFilters(res, this.filters);
+        const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
         console.log(' getReportsPage reportsModelL', reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
-        this.reportsModel = this._ReportsService.sortReports(
+        this.reportsModel = this._reportsService.sortReports(
           reportsModelL,
           this.currentSortedColumnName,
           sortedCol.descending
@@ -304,14 +307,59 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }
 
+  public getRecyclingPage(page: number): void {
+    this.config.currentPage = page;
+
+    const sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
+
+    console.log('view', this.view);
+    console.log('existingReportId', this.existingReportId);
+
+    this._reportsService
+      .getTrashedReports(
+        this.view,
+        page,
+        this.config.itemsPerPage,
+        this.currentSortedColumnName,
+        sortedCol.descending,
+        this.filters,
+        this.existingReportId
+      )
+
+      .subscribe((res: GetReportsResponse) => {
+        this.reportsModel = [];
+        this._reportsService.mockApplyFilters(res, this.filters);
+        const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
+        console.log(' getRecyclingPage reportsModelL', reportsModelL);
+
+        this.config.totalItems = this.reportsModel.length;
+        this.reportsModel = this._reportsService.sortReports(
+          reportsModelL,
+          this.currentSortedColumnName,
+          sortedCol.descending
+        );
+
+        console.log(' getRecyclingPage this.reportsModel= ', this.reportsModel);
+        this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
+        this.numberOfPages =
+          res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+
+        console.log('getRecyclingPage this.numberOfPages = ', this.numberOfPages);
+        this.allReportsSelected = false;
+      });
+  }
+
   public getFilterNames() {
-    this._ReportsService.getStatuss().subscribe(res => {
+    this._reportsService.getStatuss().subscribe(res => {
       this.statusDescriptions = res.data;
     });
-    this._ReportsService.getAmendmentIndicators().subscribe(res => {
+    this._reportsService.getAmendmentIndicators().subscribe(res => {
       this.getAmendmentIndicatorsDescriptions = res.data;
     });
-    this._ReportsService.getReportTypes().subscribe(res => {
+    this._reportsService.getReportTypes().subscribe(res => {
       this.getReportTypesDescriptions = res;
     });
   }
@@ -640,9 +688,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /*public trashAllSelected(): void {
 
     const selectedReports: Array<ReportModel> = [];
-    for (const trx of this.reportsModel) {
-      if (trx.selected) {
-        selectedReports.push(trx);
+    for (const rep of this.reportsModel) {
+      if (rep.selected) {
+        selectedReports.push(rep);
       }
     }
     // this.trashModal.reports = selectedReports;
@@ -655,8 +703,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           let i = 1;
-          for (const trx of selectedReports) {
-            this._reportsService.trashReport(trx)
+          for (const rep of selectedReports) {
+            this._reportsService.trashReport(rep)
               .subscribe((res: GetReportsResponse) => {
                 // on last delete get page and show success
                 if (i === selectedReports.length) {
@@ -708,7 +756,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    */
   public editReport(report: reportModel): void {
     if (report.form_type === 'F99') {
-      this._ReportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
         console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
         //return false;
@@ -719,7 +767,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         console.log(new Date().toISOString());
       }, 1500);
     } else if (report.form_type === 'F3X') {
-      this._ReportsService
+      this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
           console.log('getReportInfo res =', res);
@@ -730,12 +778,12 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         });
       console.log(new Date().toISOString());
       setTimeout(() => {
-        // this._router.navigate([`/forms/transactions/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
         this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'transactions', reportId: report.report_id }
+          queryParams: { step: 'reports', reportId: report.report_id }
         });
         console.log(new Date().toISOString());
       }, 1500);
@@ -745,21 +793,21 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Trash the report selected by the user.
    *
-   * @param trx the Report to trash
+   * @param rep the Report to trash
    */
-  /*public trashReport(trx: ReportModel): void {
+  /*public trashReport(rep: ReportModel): void {
 
     this._dialogService
-      .confirm('You are about to trash report ' + trx.reportId + '.',
+      .confirm('You are about to trash report ' + rep.reportId + '.',
         ConfirmModalComponent,
         'Caution!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.trashReport(trx)
+          this._reportsService.trashReport(rep)
             .subscribe((res: GetReportsResponse) => {
               this.getReportsPage(this.config.currentPage);
               this._dialogService
-                .confirm('Report ' + trx.reportId +
+                .confirm('Report ' + rep.reportId +
                     ' has been successfully deleted and sent to the recycle bin',
                   ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
             });
@@ -772,40 +820,44 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   /**
    * Restore a trashed report from the recyle bin.
    *
-   * @param trx the Report to restore
+   * @param rep the Report to restore
    */
-  /*public restoreReport(trx: ReportModel): void {
+  public restoreReport(rep: reportModel): void {
 
     this._dialogService
-      .confirm('You are about to restore report ' + trx.reportId + '.',
-        ConfirmModalComponent,
-        'Caution!')
+      .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.restoreReport(trx)
+          this._reportsService
+            .trashOrRestoreReports('restore', rep)
             .subscribe((res: GetReportsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
-              this._dialogService
-                .confirm('Report ' + trx.reportId + ' has been restored!',
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+              this._dialogService.confirm(
+                'Report ' + rep.report_id + ' has been restored!',
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
             });
         } else if (res === 'cancel') {
         }
       });
-  }*/
+  }
+  
 
   /**
    * Delete selected reports from the the recyle bin.
    *
-   * @param trx the Report to delete
+   * @param rep the Report to delete
    */
   /*public deleteRecyleBin(): void {
 
     let beforeMessage = '';
     const selectedReports: Array<ReportModel> = [];
-    for (const trx of this.reportsModel) {
-      if (trx.selected) {
-        selectedReports.push(trx);
+    for (const rep of this.reportsModel) {
+      if (rep.selected) {
+        selectedReports.push(rep);
       }
     }
 
@@ -986,8 +1038,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     const key = this.reportSortableColumnsLSK;
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
-      const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
-      for (const col of trxCols) {
+      const repCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
+      for (const col of repCols) {
         this._tableService.getColumnByName(col.colName, this.sortableColumns).visible = col.visible;
       }
     }
@@ -1084,10 +1136,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param pageKey current page key from the cache
    */
   private setCacheValuesforView(columnsKey: string, sortedColKey: string, pageKey: string) {
-    // shared between trx and recycle tables
+    // shared between rep and recycle tables
     localStorage.setItem(columnsKey, JSON.stringify(this.sortableColumns));
 
-    // shared between trx and recycle tables
+    // shared between rep and recycle tables
     localStorage.setItem(this.filtersLSK, JSON.stringify(this.filters));
 
     const currentSortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
@@ -1157,4 +1209,138 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     if (status === 'Failed') return true;
     else return false;
   }
+  /*public trashAllSelected(): void {
+    let repIds = '';
+    const selectedReports: Array<reportModel> = [];
+    for (const rep of this.reportsModel) {
+      if (rep.selected) {
+        selectedReports.push(rep);
+        repIds += rep.report_id + ', ';
+      }
+    }
+
+    repIds = repIds.substr(0, repIds.length - 2);
+
+    this._dialogService
+      .confirm('You are about to delete these reports.   ' + repIds, ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._reportsService
+            .trashOrRestoreReports('trash', selectedReports)
+            .subscribe((res: GetReportsResponse) => {
+              this.getReportsPage(this.config.currentPage);
+
+              let afterMessage = '';
+              if (selectedReports.length === 1) {
+                afterMessage = `report ${selectedReports[0].report_id}
+                  has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'reports have been successfully deleted and sent to the recycle bin.   ' + repIds;
+              }
+
+              this._dialogService.confirm(
+                afterMessage,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }*/
+
+public trashReport(rep: reportModel): void {
+    console.log("trashReport ",rep);
+    this._dialogService
+      .confirm('You are about to delete this report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
+      .then(res => {
+        if (res === 'okay') {
+          this._reportsService
+            .trashOrRestoreReports('trash', rep)
+            .subscribe((res: GetReportsResponse) => {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+ public restorereport(rep: reportModel): void {
+    this._dialogService
+      .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          // this._reportsService.restorereport(rep)
+          //   .subscribe((res: GetReportsResponse) => {
+          this._reportsService
+            .trashOrRestoreReports('restore', rep)
+            .subscribe((res: GetReportsResponse) => {
+              this.getRecyclingPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'report ' + rep.report_id + ' has been restored!',
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+  public deleteRecyleBin(): void {
+    let repIds = '';
+    const selectedReports: Array<reportModel> = [];
+    for (const rep of this.reportsModel) {
+      if (rep.selected) {
+        selectedReports.push(rep);
+        repIds += rep.report_id + ', ';
+      }
+    }
+    repIds = repIds.substr(0, repIds.length - 2);
+
+    let beforeMessage = '';
+    if (selectedReports.length === 1) {
+      beforeMessage = `Are you sure you want to permanently delete
+       Report ${selectedReports[0].report_id}?`;
+    } else {
+      beforeMessage = 'Are you sure you want to permanently delete these Reports?   ' + repIds;
+    }
+
+    this._dialogService.confirm(beforeMessage, ConfirmModalComponent, 'Caution!').then(res => {
+      if (res === 'okay') {
+        this._reportsService
+          .deleteRecycleBinReport(selectedReports)
+          .subscribe((res: GetReportsResponse) => {
+            this.getRecyclingPage(this.config.currentPage);
+
+            let afterMessage = '';
+            if (selectedReports.length === 1) {
+              afterMessage = `Report ${selectedReports[0].report_id} has been successfully deleted`;
+            } else {
+              afterMessage = 'Reports have been successfully deleted.   ' + repIds;
+            }
+            this._dialogService.confirm(
+              afterMessage,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          });
+      } else if (res === 'cancel') {
+      }
+    });
+  }
+
+  
 }
