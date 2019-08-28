@@ -435,9 +435,9 @@ ORDER BY contribution_date DESC;""", [entity_id, transaction_type_identifier, cm
             # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
             # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
             #                entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
-            print(cursor.query)
+            # print(cursor.query)
             result = cursor.fetchone()
-            print(result)
+            # print(result)
         if result is None:
           aggregate_amt = 0
         elif result[0] is None:
@@ -554,10 +554,14 @@ def post_schedA(datum):
     try:
         # save entities first
         if 'entity_id' in datum:
+            # print('entity_id passed:{}'.format(datum.get('entity_id')))
+            # print(datum.get('cmte_id'))
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
             }
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
             entity_flag = True
@@ -567,6 +571,7 @@ def post_schedA(datum):
 
         # continue to save transaction
         entity_id = entity_data.get('entity_id')
+        # print('post_scheda {}'.format(entity_id))
         datum['entity_id'] = entity_id
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
