@@ -1229,8 +1229,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCandidate(result: any) {
-    const street1 = result.cand_street_1 ? result.cand_street_1.trim() : '';
-    const street2 = result.cand_street_2 ? result.cand_street_2.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
     const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
     const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
 
