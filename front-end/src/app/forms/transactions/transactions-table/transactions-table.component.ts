@@ -57,7 +57,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
-  public pageReceived: boolean = false;
+  // public pageReceived: boolean = false;
+  public pageReceivedTransactions: boolean = false;
+  public pageReceivedReports: boolean = false;
 
   // ngx-pagination config
   public maxItemsPerPage = 10;
@@ -143,14 +145,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
-    // reportId is converted to String when used as @Input().  Convert back to Number.
-    // If it can't be converted, make it 0.
-    // this.reportId = isNaN(this.reportId) ? Number(this.reportId) : this.reportId;
-
-    // if (typeof this.reportId === 'string') {
-    //   this.reportId = Number(this.reportId);
-    // }
-    // this.reportId = isNaN(this.reportId) ? 0 : this.reportId;
+    this.pageReceivedTransactions = false;
+    this.pageReceivedReports = false;
 
     const paginateConfig: PaginationInstance = {
       id: 'forms__trx-table-pagination',
@@ -183,19 +179,42 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  // TODO: DANGER - this ngDoCheck() implementation can get is an infinite loop and should be replaced by a message service
   public ngDoCheck(): void {
     const step: string = this._activatedRoute.snapshot.queryParams.step;
 
-    if (this.reportId !== undefined && !this.pageReceived) {
-      this.getPage(this.config.currentPage);
+    // // TODO replace this with a message.  The report ID is needed when viewing transactions
+    // // from the indv-recipt.
+    // if (this.reportId !== undefined && !this.pageReceived) {
+    //   this.getPage(this.config.currentPage);
 
-      if (!this.pageReceived) {
-        this.pageReceived = true;
+    //   if (!this.pageReceived) {
+    //     this.pageReceived = true;
+    //   }
+    // }
+    // // Prevent looping
+    // if (step !== 'transactions' && !this.routeData.reportId) {
+    //   this.pageReceived = false;
+    // }
+
+    if (step === 'transactions') {
+      if (this.reportId !== undefined && !this.pageReceivedTransactions) {
+        this.getPage(this.config.currentPage);
+
+        if (!this.pageReceivedTransactions) {
+          this.pageReceivedTransactions = true;
+        }
       }
-    }
-    // Prevent looping
-    if (step !== 'transactions' && !this.routeData.reportId) {
-      this.pageReceived = false;
+    } else if (step === 'reports') {
+      if (this.reportId !== undefined && !this.pageReceivedReports) {
+        this.getPage(this.config.currentPage);
+
+        if (!this.pageReceivedReports) {
+          this.pageReceivedReports = true;
+        }
+      }
+    } else {
+      console.log(`step ${step} not supported`);
     }
   }
 
