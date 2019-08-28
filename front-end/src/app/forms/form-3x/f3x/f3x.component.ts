@@ -271,6 +271,14 @@ export class F3xComponent implements OnInit {
 
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             this.transactionType = e.transactionType ? e.transactionType : '';
+
+            // Inform the child component, the add is for a sub-transaction
+            if (e.action) {
+              if (e.action in ScheduleActions) {
+                this.scheduleAction = e.action;
+              }
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
             if (this.previousStep === 'transactions') {
