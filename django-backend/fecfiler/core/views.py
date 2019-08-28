@@ -1489,14 +1489,14 @@ def autolookup_search_contacts(request):
         order_string = ""
         search_string = ""
         query_string = ""
-        cand_q = False
-        cmte_q = False
+        # cand_q = False
+        # cmte_q = False
 
-        for k in request.query_params:
-            if k.startswith('cand_'):
-                cand_q = True
-            if k.startswith('cmte_'):
-                cmte_q = True
+        # for k in request.query_params:
+        #     if k.startswith('cand_'):
+        #         cand_q = True
+        #     if k.startswith('cmte_'):
+        #         cmte_q = True
 
         
         # rename parameters for candidate and committee
@@ -1508,31 +1508,61 @@ def autolookup_search_contacts(request):
                 order_string = str(key)
                 parameters = [committee_id, committee_id]
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                if cand_q:
-                    query_string = """
+                # if cand_q:
+                #     query_string = """
+                #     SELECT json_agg(t) FROM 
+                #     (SELECT e.preffix as cand_prefix, 
+                #             e.last_name as cand_last_name,
+                #             e.first_name as cand_first_name,
+                #             e.middle_name as cand_middle_name,
+                #             e.suffix as cand_suffix,
+                #             *
+                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                # elif cmte_q:
+                #     query_string = """
+                #     SELECT json_agg(t) FROM 
+                #     (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
+                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                #     pass
+                # else:
+                query_string = """
                     SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as cand_prefix, 
-                            e.last_name as cand_last_name,
-                            e.first_name as cand_first_name,
-                            e.middle_name as cand_middle_name,
-                            e.suffix as cand_suffix,
-                            *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                elif cmte_q:
-                    query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                    pass
-                else:
-                    query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as prefix, *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                    (SELECT 
+                    e.ref_cand_cmte_id as cmte_id,
+                    e.preffix as cand_prefix,
+                    e.last_name as cand_last_name,
+                    e.first_name as cand_first_name,
+                    e.middle_name as cand_middle_name,
+                    e.suffix as cand_suffix,
+                    e.entity_id,
+                    e.entity_type,
+                    e.entity_name as cmte_name,
+                    e.entity_name,
+                    e.first_name,
+                    e.last_name,
+                    e.middle_name,
+                    e.preffix,
+                    e.suffix,
+                    e.street_1,
+                    e.street_2,
+                    e.city,
+                    e.state,
+                    e.zip_code,
+                    e.occupation,
+                    e.employer,
+                    e.ref_cand_cmte_id,
+                    e.delete_ind,
+                    e.create_date,
+                    e.last_update_date,
+                    e.cand_office,
+                    e.cand_office_state,
+                    e.cand_office_district,
+                    e.cand_election_year
+                    FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
                     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
