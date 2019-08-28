@@ -818,7 +818,7 @@ ENTITIES API- CORE APP - SPRINT 7 - FNE 553 - BY PRAVEEN JINKA
 """
 def check_entity_type(entity_type):
 
-    entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]
+    entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY", "FEC"]
     if not (entity_type in entity_type_list):
         raise Exception('The Entity Type is not within the specified list: [' + ', '.join(entity_type_list) + ']. Input received: ' + entity_type)
 
@@ -1024,7 +1024,28 @@ def get_list_all_entity(cmte_id):
     except Exception:
         raise
 
-def put_sql_entity(entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, entity_id, cmte_id):
+def put_sql_entity(
+    entity_type, 
+    entity_name, 
+    first_name, 
+    last_name, 
+    middle_name, 
+    preffix, 
+    suffix, 
+    street_1, 
+    street_2, 
+    city, 
+    state, 
+    zip_code, 
+    occupation, 
+    employer, 
+    ref_cand_cmte_id, 
+    entity_id, 
+    cand_office,
+    cand_office_state,
+    cand_office_district,
+    cand_election_year,
+    cmte_id):
 
     try:
         with connection.cursor() as cursor:
@@ -1204,6 +1225,45 @@ def get_entities(data):
     except:
         raise
 
+def clone_fec_entity(cmte_id, entity_type, entity_id):
+    """
+    clone FEC entity and mark it for future query exclusion
+    """
+    new_entity_id = get_next_entity_id(entity_type)
+    clone_sql = """
+            INSERT INTO public.entity(
+                entity_id, entity_type, cmte_id, entity_name, 
+                first_name, last_name, middle_name, preffix, 
+                suffix, street_1, street_2, city, state, zip_code, 
+                occupation, employer, ref_cand_cmte_id, delete_ind, 
+                create_date, last_update_date, cand_office, cand_office_state, 
+                cand_office_district, cand_election_year)
+            SELECT %s, entity_type, %s, entity_name, 
+                first_name, last_name, middle_name, preffix, 
+                suffix, street_1, street_2, city, state, zip_code, 
+                occupation, employer, ref_cand_cmte_id, delete_ind, 
+                create_date, last_update_date, cand_office, cand_office_state, 
+                cand_office_district, cand_election_year
+            FROM public.entity e 
+            WHERE e.entity_id = %s;
+            """
+    exclude_sql = """
+    INSERT INTO excluded_entity(entity_id, cmte_id) values(%s, %s);
+    """
+    with connection.cursor() as cursor:
+        # UPDATE delete_ind flag to Y in DB
+        # cursor.execute("""UPDATE public.entity SET delete_ind = 'Y', last_update_date = %s WHERE entity_id = '""" + entity_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
+        cursor.execute(clone_sql, [new_entity_id, cmte_id, entity_id])
+        if (cursor.rowcount == 0):
+            raise Exception(
+                """ FEC Entity ID: {} clone failure.""".format(entity_id))
+        cursor.execute(exclude_sql, [entity_id, cmte_id])
+        if (cursor.rowcount == 0):
+            raise Exception(
+                """ FEC Entity ID: {} exclusion failure.""".format(entity_id))
+    return new_entity_id
+
+
 def put_entities(data):
 
     try:
@@ -1213,6 +1273,14 @@ def put_entities(data):
         check_entity_type(entity_type)
         entity_id = data.get('entity_id')
         check_entity_id(entity_id)
+
+        # adding code for handling FEC entity
+        # add a clone version of FEC entity and update it with current data
+        if entity_id.startswith('FEC'):
+            new_entity_id = clone_fec_entity(cmte_id, entity_type, entity_id)
+            data['entity_id'] = new_entity_id
+
+
         put_sql_entity(
             data.get('entity_type'), 
             data.get('entity_name'), 
