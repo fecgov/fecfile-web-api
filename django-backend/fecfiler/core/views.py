@@ -2417,6 +2417,9 @@ def summary_receipts_for_sumamry_table(args):
         sql_output = period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
+            if data_row[0] == '11A':
+                XIA_amount = XIA_amount + data_row[1]
+                XIA_amount_ytd = data_row[2]
             if data_row[0] == '11AI':
                 XIAI_amount = XIAI_amount + data_row[1]
                 XIAI_amount_ytd = data_row[2]
@@ -2454,8 +2457,8 @@ def summary_receipts_for_sumamry_table(args):
                 XVIIIB_amount = XVIIIB_amount + data_row[1]
                 XVIIIB_amount_ytd = data_row[2]
 
-        XIA_amount = XIAI_amount + XIAII_amount
-        XIA_amount_ytd = XIAI_amount_ytd + XIAII_amount_ytd
+        XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
+        XIA_amount_ytd = XIA_amount_ytd + XIAI_amount_ytd + XIAII_amount_ytd
 
         XID_amount = XIA_amount + XIB_amount + XIC_amount
         XID_amount_ytd = XIA_amount_ytd + XIB_amount_ytd + XIC_amount_ytd
