@@ -330,16 +330,21 @@ def get_list_child_transactionId_schedB(cmte_id, transaction_id):
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT transaction_id
+            cursor.execute(
+                """SELECT transaction_id
                 FROM public.sched_b 
                 WHERE cmte_id = %s 
                 AND back_ref_transaction_id = %s 
-                AND delete_ind is distinct from 'Y'""", [cmte_id, transaction_id])
+                AND delete_ind is distinct from 'Y'""",
+                [cmte_id, transaction_id],
+            )
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
         raise Exception(
-            'The get_list_child_transactionId_schedB function is throwing an error: ' + str(e))
+            "The get_list_child_transactionId_schedB function is throwing an error: "
+            + str(e)
+        )
 
 
 def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
@@ -348,11 +353,16 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                           [aggregate_amount, transaction_id, cmte_id])
-            if (cursor.rowcount == 0):
+            cursor.execute(
+                """UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                [aggregate_amount, transaction_id, cmte_id],
+            )
+            if cursor.rowcount == 0:
                 raise Exception(
-                    'put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table'.format(transaction_id))
+                    "put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table".format(
+                        transaction_id
+                    )
+                )
     except Exception:
         raise
 
@@ -549,6 +559,8 @@ def post_schedB(datum):
                 "cmte_id": datum.get("cmte_id"),
                 "entity_id": datum.get("entity_id"),
             }
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
@@ -602,8 +614,7 @@ def post_schedB(datum):
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    cmte_id), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
@@ -631,8 +642,7 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedB(
-                report_id, cmte_id, transaction_id)
+            child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -661,6 +671,8 @@ def put_schedB(datum):
                 "cmte_id": datum.get("cmte_id"),
                 "entity_id": datum.get("entity_id"),
             }
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
@@ -711,8 +723,7 @@ def put_schedB(datum):
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
