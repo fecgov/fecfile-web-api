@@ -139,7 +139,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName"
-                        (selectItem)="handleSelectedIndividual($event, col?.name)"
+                        (selectItem)="handleSelectedIndividual($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -164,7 +164,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName"
-                        (selectItem)="handleSelectedIndividual($event, col?.name)"
+                        (selectItem)="handleSelectedIndividual($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -264,7 +264,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCommitteeId"
                         [inputFormatter]="formatterCommitteeId"                        
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />  
                       <input
