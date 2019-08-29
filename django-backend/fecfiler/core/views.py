@@ -1528,7 +1528,7 @@ def autolookup_search_contacts(request):
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
-        logger.debug("autolookup with parameters {}".foramt(query_params))
+        logger.debug("autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
                 order_string = str(key)
