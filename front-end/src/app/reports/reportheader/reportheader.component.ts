@@ -126,8 +126,12 @@ private readonly filtersLSK = 'reports.filters';
     }
   }
 
-    private recycleReports() : void {
-    alert("Recycle report is not yet supported");
+  private recycleReports() : void {
+    this.view = ActiveView.recycleBin;
+  }
+
+  public showReports() {
+    this.view = ActiveView.reports;
   }
 
   /**

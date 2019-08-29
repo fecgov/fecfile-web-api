@@ -33,7 +33,11 @@
   
                       <button class="btn btn-primary" (click)="recycleReports()">
                       <i class="fas fa-recycle"></i> Recycle
-                      </button>      
+                      </button>  &nbsp;&nbsp;&nbsp;      
+
+                      <button class="btn btn-primary" (click)="showReports()">
+                        <i class="fas fa-recycle"></i> Show Reports
+                        </button>      
   
                       <!--<div class="input-group pl-0 transactions__trx-search">
                           <div class="input-group-append" (click)="clearSearch()" 
@@ -98,23 +102,41 @@
             <div class="tab-container" [ngSwitch]="viewMode">
               <div id="tab1" *ngSwitchCase="'tab1'" >
                   <app-reportdetails
-                    (status)='onNotify($event)'
-                    [reports]="reports"
-                    tableType="{{reportsView}}"
-                    view="current"
-                    existingReportId="{{existingReportId}}"
+                      *ngIf="isReportViewActive()"
+                      (status)='onNotify($event)'
+                      [reports]="reports"
+                      tableType="{{reportsView}}"
+                      view="current"
+                      existingReportId="{{existingReportId}}"
                   ></app-reportdetails>
+                  <app-reportdetails
+                      *ngIf="isRecycleBinViewActive()"
+                      (status)='onNotify($event)'
+                      [reports]="reports"
+                      tableType="{{recycleBinView}}"
+                      view="current"
+                      existingReportId="{{existingReportId}}"
+                ></app-reportdetails>
               </div> 
             </div> 
             <div class="tab-container" [ngSwitch]="viewMode">
               <div id="tab2" *ngSwitchCase="'tab2'">
                   <app-reportdetails
+                      *ngIf="isReportViewActive()"
                       (status)='onNotify($event)'
                       [reports]="reports"
                       tableType="{{reportsView}}"
                       view="archieve"
                       existingReportId="{{existingReportId}}"
                   ></app-reportdetails>
+                  <app-reportdetails
+                      *ngIf="isRecycleBinViewActive()"
+                      (status)='onNotify($event)'
+                      [reports]="reports"
+                      tableType="{{recycleBinView}}"
+                      view="archieve"
+                      existingReportId="{{existingReportId}}"
+              ></app-reportdetails>
               </div> 
             </div>                     
           </div> 

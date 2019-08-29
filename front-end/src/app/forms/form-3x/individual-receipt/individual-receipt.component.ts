@@ -981,14 +981,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       });
 
       // If entity ID exist, the transaction will be added to the existing entity by the API
-      // Otherwise it will create a new Entity.
-      if (this._selectedEntity) {
-        receiptObj.entity_id = this._selectedEntity.entity_id;
-      }
+      // Otherwise it will create a new Entity.  Since there may be more than 1 entity
+      // saved in a form, entity IDs must be unique for each.  The name of the property
+      // for each entity ID comes from the dynamic form fields as setEntityIdTo.
+      // If setEntityIdTo not sent by API, default to entity_id.
 
-      if (this._selectedEntityChild) {
-        receiptObj['child*entity_id'] = this._selectedEntityChild.entity_id;
-      }
+      this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
+
+      this._setReceiptObjectEntityId(this._selectedEntityChild, receiptObj, true);
+
+      this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
+
+      this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
@@ -1062,31 +1066,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           } else {
             console.log('schedA save has no transaction_id property');
           }
-
-          // // If save is for user click addChild, save parent id and emit to chow new child form.
-          // if (isParent) {
-
-          //   if (this.scheduleAction === ScheduleActions.add) {
-          //     this._parentTransactionId = transactionId;
-          //   } else if (this.scheduleAction === ScheduleActions.edit) {
-          //     this._parentTransactionId = this._transactionToEdit.transactionId;
-          //   } else {
-          //     console.log('invalid schedule action ' +  this.scheduleAction);
-          //   }
-
-          //   const addChildEmitObj = {
-          //     form: {},
-          //     direction: 'next',
-          //     step: 'step_3',
-          //     previousStep: 'step_2',
-          //     transactionTypeText: this.transactionTypeText + '- Child',
-          //     transactionType: 'OPEXP', // this.transactionType
-          //     // transactionId: ''
-          //   };
-          //   this.status.emit(addChildEmitObj);
-          // } else {
-          //   this._parentTransactionId = null;
-          // }
         }
       });
     } else {
@@ -1104,6 +1083,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           }
       }
       return Observable.of('invalid');
+    }
+  }
+
+  private _setReceiptObjectEntityId(userSelectedEntity: any, receiptObj: any, isChild: boolean) {
+    if (userSelectedEntity) {
+      if (userSelectedEntity.setEntityIdTo) {
+        receiptObj[userSelectedEntity.setEntityIdTo] = userSelectedEntity.entity_id;
+      } else {
+        receiptObj.entity_id = userSelectedEntity.entity_id;
+      }
+    }
+  }
+
+  private _setSetEntityIdTo(userSelectedEntity: any, col: any) {
+    if (col.setEntityIdTo) {
+      userSelectedEntity.setEntityIdTo = col.setEntityIdTo;
     }
   }
 
@@ -1229,8 +1224,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCandidate(result: any) {
-    const street1 = result.cand_street_1 ? result.cand_street_1.trim() : '';
-    const street2 = result.cand_street_2 ? result.cand_street_2.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
     const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
     const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
 
@@ -1243,22 +1238,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
   public handleSelectedCandidate($event: NgbTypeaheadSelectItemEvent,
-    fieldName: string) {
+    col: any) {
 
     // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
     // TODO need a way to determine if key was tab.
 
     const entity = $event.item;
 
-    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
 
     if (isChildForm) {
-      this._selectedCandidateChild = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedCandidateChild, col);
       this._selectedCandidateChangeWarnChild = {};
       namePrefix = this._childFieldNamePrefix;
     } else {
       this._selectedCandidate = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedCandidate, col);
       this._selectedCandidateChangeWarn = {};
     }
 
@@ -1288,22 +1284,24 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
   public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent,
-      fieldName: string) {
+      col: any) {
 
     // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
     // TODO need a way to determine if key was tab.
 
     const entity = $event.item;
 
-    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
 
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedEntityChild, col);
       this._selectedChangeWarnChild = {};
       namePrefix = this._childFieldNamePrefix;
     } else {
       this._selectedEntity = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
 
@@ -1348,18 +1346,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
    */
   // TODO use the factory method approach a done with individual to avoid hard coding
   // child name field prefix and it's let error prone.
-  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, fieldName: string) {
+  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
     const entity = $event.item;
 
-    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
     let namePrefix = '';
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedEntityChild, col);
       this._selectedChangeWarnChild = {};
       namePrefix = this._childFieldNamePrefix;
     } else {
       this._selectedEntity = this._utilService.deepClone(entity);
+      this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
 
@@ -1375,6 +1375,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._patchFormFields(fieldNames, entity, namePrefix);
 
     // These fields names do not map to the same name in the form
+    const fieldName = col.name;
     if (isChildForm) {
       if (fieldName === this._childFieldNamePrefix + 'entity_name') {
         if (this.frmIndividualReceipt.contains('child*donor_cmte_id')) {
@@ -1394,7 +1395,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       }
       if (fieldName === this._childFieldNamePrefix + 'beneficiary_cmte_name') {
         this.frmIndividualReceipt.patchValue({ 'child*beneficiary_cmte_id': entity.cmte_id }, { onlySelf: true });
-      }      
+      }
       if (fieldName === this._childFieldNamePrefix + 'donor_cmte_id') {
         this.frmIndividualReceipt.patchValue({ 'child*donor_cmte_name': entity.cmte_name }, { onlySelf: true });
       }
@@ -1979,6 +1980,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         // Mapping may need to be added here.  See transactions service
         // mapToServerFields(model: TransactionModel) as it may
         // be used or cloned to a mapping method in the contact.service.
+
+        // TODO need to get the entity from the look up service using entity_id
         this._selectedEntity = formData;
         this._selectedChangeWarn = {};
 
@@ -2414,81 +2417,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       // Store the entity aggregate to be added to the contribution amount
       // if it changes in the UI.  See contributionAmountChange();
       this._contributionAggregateValue = parseFloat(contributionAggregate);
-    });
-  }
-
-  // Use this when ready to handle both child and non-child
-  private _getContributionAggregate_NEW(contributionDate: string, fieldName: string) {
-    console.log('transaction type from input is ' + this.transactionType);
-    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
-
-    let entityId = null;
-    if (isChildForm) {
-      entityId = this._selectedEntityChild.entity_id;
-    } else {
-      entityId = this._selectedEntity.entity_id;
-    }
-
-    let cmteId = null;
-    if (isChildForm) {
-      entityId = this._selectedEntityChild.cmte_id;
-    } else {
-      entityId = this._selectedEntity.cmte_id;
-    }
-
-    const reportId = this._getReportIdFromStorage();
-    this._receiptService.getContributionAggregate(reportId, entityId, cmteId,
-      this.transactionType, contributionDate).subscribe(res => {
-      // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-      // Entity selected from the typeahead list.
-
-      // TODO make this 1 method code for child/non-child with variable for the distinction
-      if (isChildForm) {
-        let contributionAmount = this.frmIndividualReceipt.get('child*contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
-
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        console.log(`child contributionAMount: + ${contributionAmount} + contributionAggregate:
-            ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
-
-        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': value }, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValueChild = parseFloat(contributionAggregate);
-      } else {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
-
-        let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
-
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        let contributionAggregate: string = String(res.contribution_aggregate);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-            ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
-
-        this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValue = parseFloat(contributionAggregate);
-      }
-
-      // TODO need to handle child form apart from non-child
     });
   }
 

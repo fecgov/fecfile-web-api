@@ -560,6 +560,8 @@ def post_schedA(datum):
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
             }
+
+            # need this update for FEC entity
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             prev_entity_list = get_entities(get_data)
@@ -668,6 +670,9 @@ def put_schedA(datum):
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
             }
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
