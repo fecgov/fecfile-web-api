@@ -909,13 +909,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public doValidateReceipt(): Observable<any> {
 
     let isSaveParent = false;
-    if (this.subTransaction) {
-      if (this.subTransaction.hasOwnProperty('isParent')) {
-        if (this.subTransaction.isParent) {
-          isSaveParent = true;
-        }
-      }
-    }
+    // if (this.subTransaction) {
+    //   if (this.subTransaction.hasOwnProperty('isParent')) {
+    //     if (this.subTransaction.isParent) {
+    //       isSaveParent = true;
+    //     }
+    //   }
+    // }
 
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
@@ -1308,6 +1308,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     let namePrefix = '';
 
     if (isChildForm) {
+      this._selectedCandidateChild = this._utilService.deepClone(entity);
       this._setSetEntityIdTo(this._selectedCandidateChild, col);
       this._selectedCandidateChangeWarnChild = {};
       namePrefix = this._childFieldNamePrefix;
@@ -1328,12 +1329,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
 
-    // this._patchFormFields(fieldNames, entity, '');
-    for (const field of fieldNames) {
-      const patch = {};
-      patch[namePrefix + field] = entity[field];
-      this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-    }
+    this._patchFormFields(fieldNames, entity, namePrefix);
+    // for (const field of fieldNames) {
+    //   const patch = {};
+    //   patch[namePrefix + field] = entity[field];
+    //   this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+    // }
 
   }
 
