@@ -205,6 +205,7 @@ def post_sql_schedB(
     beneficiary_cand_prefix,
     beneficiary_cand_suffix,
     aggregate_amt,
+    beneficiary_cand_entity_id,
 ):
     """
     db transaction for post a db transaction
@@ -250,10 +251,11 @@ def post_sql_schedB(
                     beneficiary_cand_middle_name,
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
-                    aggregate_amt
+                    aggregate_amt,
+                    beneficiary_cand_entity_id
                 )
                 VALUES ("""
-                + ",".join(["%s"] * 37)
+                + ",".join(["%s"] * 38)
                 + ")",
                 [
                     cmte_id,
@@ -293,6 +295,7 @@ def post_sql_schedB(
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
                     aggregate_amt,
+                    beneficiary_cand_entity_id,
                 ],
             )
     except Exception:
@@ -405,6 +408,7 @@ def put_sql_schedB(
     beneficiary_cand_prefix,
     beneficiary_cand_suffix,
     aggregate_amt,
+    beneficiary_cand_entity_id,
 ):
     """
     db transaction for saving current sched_b item
@@ -446,7 +450,8 @@ def put_sql_schedB(
                             beneficiary_cand_middle_name = %s,
                             beneficiary_cand_prefix = %s,
                             beneficiary_cand_suffix = %s,
-                            aggregate_amt = %s
+                            aggregate_amt = %s,
+                            beneficiary_cand_entity_id = %s
                     WHERE transaction_id = %s 
                     AND report_id = %s 
                     AND cmte_id = %s 
@@ -487,6 +492,7 @@ def put_sql_schedB(
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
                     aggregate_amt,
+                    beneficiary_cand_entity_id,
                     transaction_id,
                     report_id,
                     cmte_id,
@@ -548,12 +554,44 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
         raise
 
 
+# not sure this function will ever be used - will implement this later
+def post_cand_entity(data):
+    pass
+
+
+def put_cand_entity(data):
+    """
+    save a candiate entity
+    """
+    entity_fields_with_cand = [
+        "cand_office",
+        "cand_office_state",
+        "cand_office_district",
+        "cand_election_year",
+    ]
+    cand_data = {k: v for k, v in data.items() if k in entity_fields_with_cand}
+    cand_data.update(
+        {
+            k.replace("cand_", ""): v
+            for k, v in data.items()
+            if "cand_" in k and k not in entity_fields_with_cand
+        }
+    )
+    cand_data["entity_id"] = data.get("beneficiary_cand_entity_id")
+    cand_data["cmte_id"] = data.get("cmte_id")
+    cand_data["entity_type"] = "CAN"
+    logger.debug("cand_data to be saved:{}".format(cand_data))
+    return put_entities(cand_data)
+    # rename cand fields and remove 'cand_' to match entity fields
+
+
 def post_schedB(datum):
     """
     create and save current sched_b item
     """
     try:
         check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
+        logger.debug("...mandatory check done.")
         if "entity_id" in datum:
             get_data = {
                 "cmte_id": datum.get("cmte_id"),
@@ -565,8 +603,24 @@ def post_schedB(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
+        logger.debug("...entity saved")
+        if "beneficiary_cand_entity_id" in datum:
+            logger.debug("saving cand data...")
+            # get_data = {
+            #     "cmte_id": datum.get("cmte_id"),
+            #     "entity_id": datum.get("entity_id"),
+            # }
+            # prev_entity_list = get_entities(get_data)
+            cand_data = put_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+            logger.debug(
+                "cand data saved with entity_id:{}".format(cand_data.get("entity_id"))
+            )
+        # else:
+        #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
@@ -609,6 +663,7 @@ def post_schedB(datum):
                 datum.get("beneficiary_cand_prefix"),
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
+                datum.get("beneficiary_cand_entity_id"),
             )
         except Exception as e:
             if "entity_id" in datum:
@@ -677,8 +732,20 @@ def put_schedB(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
+        if "beneficiary_cand_entity_id" in datum:
+            # get_data = {
+            #     "cmte_id": datum.get("cmte_id"),
+            #     "entity_id": datum.get("entity_id"),
+            # }
+            # prev_entity_list = get_entities(get_data)
+            cand_data = put_cand_entity(datum)
+        else:
+            cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
+        datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # entity_id = entity_data.get("entity_id")
+        # datum["entity_id"] = entity_id
         try:
             put_sql_schedB(
                 datum.get("cmte_id"),
@@ -718,6 +785,7 @@ def put_schedB(datum):
                 datum.get("beneficiary_cand_prefix"),
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
+                datum.get("beneficiary_cand_entity_id"),
             )
         except Exception as e:
             if flag:
@@ -815,6 +883,7 @@ def schedB_sql_dict(data):
             "other_state": data.get("other_state"),
             "other_zip": data.get("other_zip"),
             "nc_soft_account": data.get("nc_soft_account"),
+            "beneficiary_cand_entity_id": data.get("beneficiary_cand_entity_id"),
             "beneficiary_cand_office": data.get("beneficiary_cand_office"),
             "beneficiary_cand_state": data.get("beneficiary_cand_state"),
             "beneficiary_cand_district": data.get("beneficiary_cand_district"),
