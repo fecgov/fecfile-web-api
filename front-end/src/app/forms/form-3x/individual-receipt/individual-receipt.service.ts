@@ -1426,7 +1426,7 @@ export class IndividualReceiptService {
    */
   public saveSchedule(formType: string, scheduleAction: ScheduleActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sa/schedA';
+    let url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
@@ -1465,6 +1465,12 @@ export class IndividualReceiptService {
         }
       }
     }
+
+    // get api url from data base for a transaction 
+    if(receipt['api_call'] !== null) {
+       url = receipt['api_call'];
+    }
+
 
     if (scheduleAction === ScheduleActions.add) {
       return this._http

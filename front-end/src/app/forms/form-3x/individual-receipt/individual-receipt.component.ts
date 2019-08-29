@@ -104,6 +104,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
   private _parentTransactionId: string;
+  
 
   constructor(
     private _http: HttpClient,
@@ -260,7 +261,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name))
-          if (this.isFieldName(e.name, 'contribution_amount')) {
+          if (this.isFieldName(e.name, 'contribution_amount') || this.isFieldName(e.name, 'expenditure_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
@@ -336,7 +337,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
      */
     if (this.isFieldName(fieldName, 'zip_code')) {
       formValidators.push(alphaNumeric());
-    } else if (this.isFieldName(fieldName, 'contribution_date')) {
+    } else if (this.isFieldName(fieldName, 'contribution_date') 
+              || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
       if (this._reportType !== null) {
         const cvgStartDate: string = this._reportType.cvgStartDate;
@@ -513,11 +515,19 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
 
     if (isChildForm) {
-      this.frmIndividualReceipt.patchValue({ 'child*contribution_amount': amountValue }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
+      if(this.frmIndividualReceipt.get('expenditure_amount')) {
+        this.frmIndividualReceipt.patchValue({ 'child*expenditure_amount': amountValue }, { onlySelf: true });
+      } else {
+        this.frmIndividualReceipt.patchValue({ 'child*contribution_amount': amountValue }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
+      }
     } else {
-      this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      if(this.frmIndividualReceipt.get('expenditure_amount')) {
+        this.frmIndividualReceipt.patchValue({ 'expenditure_amount': amountValue }, { onlySelf: true });  
+      } else {
+        this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      }
     }
   }
 
@@ -921,7 +931,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
-        if (field === 'contribution_date') {
+        if ((field === 'contribution_date') || (field === 'expenditure_date')) {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === this._childFieldNamePrefix + 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
@@ -1714,14 +1724,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  public doContributionDateChange(fieldName: string) {
+  public doDateChange(fieldName: string) {
     console.log('date has changed!');
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
     if (isChildForm) {
       if (this.frmIndividualReceipt.contains(
-          this._childFieldNamePrefix + 'contribution_date')) {
+          this._childFieldNamePrefix + fieldName)) {
         const dateValue = this.frmIndividualReceipt.get(
-            this._childFieldNamePrefix + 'contribution_date').value;
+            this._childFieldNamePrefix + fieldName).value;
         if (!dateValue) {
           return;
         }
@@ -1730,25 +1740,30 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           const cmteId = this._selectedEntityChild.cmte_id ? this._selectedEntityChild.cmte_id : null;
           const contribDate =
             this._utilService.formatDate(dateValue);
-          this._getContributionAggregate(contribDate, entityId, cmteId);
+          if(fieldName === 'contribution_date') {
+            this._getContributionAggregate(contribDate, entityId, cmteId);
+          }  
         }
       }
     } else {
-      if (this.frmIndividualReceipt.contains('contribution_date')) {
-        const dateValue = this.frmIndividualReceipt.get('contribution_date').value;
+      if (this.frmIndividualReceipt.contains(fieldName)) {
+        const dateValue = this.frmIndividualReceipt.get(fieldName).value;
         if (!dateValue) {
           return;
         }
         if (this._selectedEntity) {
           if (this._selectedEntity.entity_id) {
             const contribDate =
-              this._utilService.formatDate(dateValue);
-            this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+            this._utilService.formatDate(dateValue);    
+              if(fieldName === 'contribution_date') {
+                this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+              }
           }
         }
       }
     }
   }
+  
 
   /**
    * Obtain the Report ID from local storage.
@@ -2099,7 +2114,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             if (trx.transaction_id === transactionId) {
               for (const prop in trx) {
                 if (this.frmIndividualReceipt.get(prop)) {
-                  if (this.isFieldName(prop, 'contribution_amount')) {
+                  if (this.isFieldName(prop, 'contribution_amount') || 
+                      this.isFieldName(prop, 'expenditure_amount')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this.contributionAmountChange({target: {value: amount.toString()}}, prop);
                   }
@@ -2114,10 +2130,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       }
                     }
                   }
-                  const patch = {};
-                  patch[prop] = trx[prop];
-                  this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
                 }
+                const patch = {};
+                patch[prop] = trx[prop];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
               }
             }
           }
