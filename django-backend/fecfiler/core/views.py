@@ -566,9 +566,7 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
-            # print("before put_sql_report")
             put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
-            # print("after put_sql_report")
             old_dict_report = old_list_report[0]
             prev_report_type = old_dict_report.get('report_type')
             prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
@@ -709,7 +707,6 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-        # print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
                 amend_ind = request.data.get('amend_ind')
@@ -746,9 +743,6 @@ def reports(request):
             else:
                 additional_email_2 = ""
 
-            # print("f_status = ", f_status)
-            # print("additional_email_1 = ", additional_email_1)
-            # print("additional_email_2 = ", additional_email_2)
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -772,7 +766,6 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-            # print("data = ", data)
             if (f_status == 'Submitted' and data):
                 return JsonResponse({'Submitted': True}, status=status.HTTP_201_CREATED, safe=False)    
             elif type(data) is dict:
@@ -841,6 +834,33 @@ def check_entity_id(entity_id):
     except Exception as e:
         raise Exception('The Entity ID is not in the specified format. Input received: ' + entity_id)
         
+
+def save_cand_entity(data, new=False):
+    """
+    save a candiate entity
+    """
+    entity_fields_with_cand = [
+        "cand_office",
+        "cand_office_state",
+        "cand_office_district",
+        "cand_election_year",
+    ]
+    cand_data = {k: v for k, v in data.items() if k in entity_fields_with_cand}
+    cand_data.update(
+        {
+            k.replace("cand_", ""): v
+            for k, v in data.items()
+            if "cand_" in k and k not in entity_fields_with_cand
+        }
+    )
+    if not new:
+        cand_data["entity_id"] = data.get("beneficiary_cand_entity_id")
+    else:
+        cand_data['entity_id'] = get_next_entity_id('CAN')
+    cand_data["cmte_id"] = data.get("cmte_id")
+    cand_data["entity_type"] = "CAN"
+    logger.debug("cand_data to be saved:{}".format(cand_data))
+    return put_entities(cand_data)
 
 def check_mandatory_fields_entity(data):
     try:
@@ -940,7 +960,7 @@ def post_sql_entity(
         raise
 
 def get_list_entity(entity_id, cmte_id):
-    print(entity_id)
+    logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
     try:
         query_string = """
         SELECT 
@@ -1211,7 +1231,7 @@ def get_entities(data):
         cmte_id = data.get('cmte_id')
         entity_flag = False
         if 'entity_id' in data:
-            print('get entity with {}'.format(data.get('entity_id')))
+            logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get('entity_id'))
                 entity_flag = True
@@ -1265,7 +1285,7 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 """ FEC Entity ID: {} exclusion failure.""".format(entity_id))
     return new_entity_id
 
-# TODO: need to dsicuss if we need to handle clone-and-update senario
+# TODO: need to dsicuss if we need to handle clone-and-update scenario
 def put_entities(data):
 
     try:
@@ -1284,12 +1304,8 @@ def put_entities(data):
             # combine db entity data and request entity data
             data['entity_id'] = new_entity_id
             cloned_data = get_entities(data)[0]
+            logger.debug('cloned cand entity data:{}'.format(cloned_data))
             return cloned_data
-            # print('cloned data:{}'.format(cloned_data))
-            # print('reqt data:{}'.format(data))
-            # # print(type(cloned_data))
-            # _data = cloned_data.update(data)
-            # print('combined data:{}'.format(_data))
 
 
         put_sql_entity(
@@ -1315,9 +1331,6 @@ def put_entities(data):
             data.get('cand_election_year', None),
             cmte_id)
         output = get_entities(data)
-        #print('data:{}'.format(data))
-        #print(output)
-        # print('cloned cand entity:{}'.format(output[0]))
         return output[0]
     except:
         raise
@@ -1497,7 +1510,6 @@ def autolookup_search_contacts(request):
     }
 
     try:
-        print(request.user.username)
         committee_id = request.user.username
         param_string = ""
         order_string = ""
@@ -1516,7 +1528,7 @@ def autolookup_search_contacts(request):
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
-        print(query_params)
+        logger.debug("autolookup with parameters {}".foramt(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
                 order_string = str(key)
@@ -1596,9 +1608,9 @@ def autolookup_search_contacts(request):
 
         if query_string == "":
             raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
-        print(query_string)
-        print(parameters)
         with connection.cursor() as cursor:
+            logger.debug("autolookup query:{}".format(query_string))
+            logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
             for row in cursor.fetchall():
                 data_row = list(row)

@@ -25,6 +25,7 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    save_cand_entity,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -556,33 +557,17 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
 
 # not sure this function will ever be used - will implement this later
 def post_cand_entity(data):
-    pass
+    """
+    create a new entity
+    """
+    return save_cand_entity(data, new=True)
 
 
 def put_cand_entity(data):
     """
-    save a candiate entity
+    save/update an existing candiate entity
     """
-    entity_fields_with_cand = [
-        "cand_office",
-        "cand_office_state",
-        "cand_office_district",
-        "cand_election_year",
-    ]
-    cand_data = {k: v for k, v in data.items() if k in entity_fields_with_cand}
-    cand_data.update(
-        {
-            k.replace("cand_", ""): v
-            for k, v in data.items()
-            if "cand_" in k and k not in entity_fields_with_cand
-        }
-    )
-    cand_data["entity_id"] = data.get("beneficiary_cand_entity_id")
-    cand_data["cmte_id"] = data.get("cmte_id")
-    cand_data["entity_type"] = "CAN"
-    logger.debug("cand_data to be saved:{}".format(cand_data))
-    return put_entities(cand_data)
-    # rename cand fields and remove 'cand_' to match entity fields
+    return save_cand_entity(data)
 
 
 def post_schedB(datum):
@@ -674,6 +659,7 @@ def post_schedB(datum):
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
             )
+        logger.debug("sched_b transaction saved successfully.")
         return datum
     except:
         raise
