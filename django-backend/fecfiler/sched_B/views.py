@@ -852,7 +852,7 @@ def schedB_sql_dict(data):
             "expenditure_date": date_format(data.get("expenditure_date")),
             "expenditure_amount": check_decimal(data.get("expenditure_amount", None)),
             "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount", None)
+                data.get("semi_annual_refund_bundled_amount", 0)
             ),
             "expenditure_purpose": data.get("expenditure_purpose"),
             "category_code": data.get("category_code"),
