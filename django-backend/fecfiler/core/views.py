@@ -940,7 +940,7 @@ def post_sql_entity(
         raise
 
 def get_list_entity(entity_id, cmte_id):
-
+    print(entity_id)
     try:
         query_string = """
         SELECT 
@@ -1211,6 +1211,7 @@ def get_entities(data):
         cmte_id = data.get('cmte_id')
         entity_flag = False
         if 'entity_id' in data:
+            print('get entity with {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get('entity_id'))
                 entity_flag = True
@@ -1277,6 +1278,7 @@ def put_entities(data):
         # adding code for handling FEC entity
         # add a clone version of FEC entity and update it with current data
         if entity_id.startswith('FEC'):
+            logger.debug('current entity {} is FEC entity, need to clone it.'.format(entity_id))
             new_entity_id = clone_fec_entity(cmte_id, entity_type, entity_id)
             data['entity_id'] = new_entity_id
 
@@ -1304,6 +1306,8 @@ def put_entities(data):
             data.get('cand_election_year'),
             cmte_id)
         output = get_entities(data)
+        print('data:{}'.format(data))
+        print(output)
         return output[0]
     except:
         raise
@@ -2139,6 +2143,7 @@ def get_list_report_data(report_id, cmte_id):
                 forms_obj=data_row[0]
         if forms_obj is None:
             raise NoOPError('The report ID: {} does not exist or is deleted'.format(report_id))   
+
         return forms_obj
     except Exception:
         raise
