@@ -1228,6 +1228,7 @@ def get_entities(data):
 
 def clone_fec_entity(cmte_id, entity_type, entity_id):
     """
+    a helper function for handling FEC entity:
     clone FEC entity and mark it for future query exclusion
     """
     new_entity_id = get_next_entity_id(entity_type)
@@ -1264,7 +1265,7 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 """ FEC Entity ID: {} exclusion failure.""".format(entity_id))
     return new_entity_id
 
-
+# TODO: need to dsicuss if we need to handle clone-and-update senario
 def put_entities(data):
 
     try:
@@ -1280,7 +1281,15 @@ def put_entities(data):
         if entity_id.startswith('FEC'):
             logger.debug('current entity {} is FEC entity, need to clone it.'.format(entity_id))
             new_entity_id = clone_fec_entity(cmte_id, entity_type, entity_id)
+            # combine db entity data and request entity data
             data['entity_id'] = new_entity_id
+            cloned_data = get_entities(data)[0]
+            return cloned_data
+            # print('cloned data:{}'.format(cloned_data))
+            # print('reqt data:{}'.format(data))
+            # # print(type(cloned_data))
+            # _data = cloned_data.update(data)
+            # print('combined data:{}'.format(_data))
 
 
         put_sql_entity(
@@ -1303,11 +1312,12 @@ def put_entities(data):
             data.get('cand_office'),
             data.get('cand_office_state'),
             data.get('cand_office_district'),
-            data.get('cand_election_year'),
+            data.get('cand_election_year', None),
             cmte_id)
         output = get_entities(data)
-        print('data:{}'.format(data))
-        print(output)
+        #print('data:{}'.format(data))
+        #print(output)
+        # print('cloned cand entity:{}'.format(output[0]))
         return output[0]
     except:
         raise
