@@ -105,10 +105,11 @@
                         [attr.name]="col?.name"                      
                         [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
                         [attr.value]="col?.value"
-                        [maxlength]="isFieldName(col?.name, 'contribution_amount') ? col?.validation?.max + 5: col?.validation?.max"
+                        [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
+                          ? col?.validation?.max + 5: col?.validation?.max"
                         [formControlName]="col?.name"
-                        (blur)="isFieldName(col?.name, 'contribution_amount') ? 
-                          contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
+                        (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
+                                ? contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -116,7 +117,8 @@
                             : ''
                         "
                         (keyup)="handleFormFieldKeyup($event, col)"
-                        (change)="isFieldName(col?.name, 'contribution_date') ? doContributionDateChange(col?.name) : null"
+                        (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
+                                  ? doDateChange(col?.name) : null;"
                       />
                       <input
                         *ngIf="col?.name === 'last_name'"
