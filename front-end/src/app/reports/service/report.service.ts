@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from 'src/environments/environment';
-//import { TransactionModel } from '../model/report.model';
+//import { ReportModel } from '../model/report.model';
 import { reportModel } from '../model/report.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
@@ -28,11 +28,11 @@ export class ReportsService {
   /** The array of items to show in the recycle bin. TODO rename it */
   private mockRestoreTrxArray = [];
   /** The array of items trashed from the transaction table to be added to the recyle bin */
-  //private mockTrashedTrxArray: Array<TransactionModel> = [];
-  /** The array of items restored from the recycle bin to be readded to the transactions table. TODO rename */
+  //private mockTrashedTrxArray: Array<ReportModel> = [];
+  /** The array of items restored from the recycle bin to be readded to the reports table. TODO rename */
   private mockRecycleBinArray = [];
-  private mockTransactionId = 'TID12345';
-  private mockTransactionIdRecycle = 'TIDRECY';
+  private mockReportId = 'TID12345';
+  private mockReportIdRecycle = 'TIDRECY';
 
   // only for mock data - end
   // only for mock data - end
@@ -142,6 +142,35 @@ export class ReportsService {
     });
   }
 
+  public getTrashedReports(
+    view: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filter: ReportFilterModel,
+    reportId: number
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    const url = '/core/get_all_trashed_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('view', view);
+    params = params.append('reportId', reportId.toString());
+
+    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
   /**
    * Map server fields from the response to the model.
    */
@@ -190,14 +219,14 @@ export class ReportsService {
    * @param response the server data
    */
   public mockAddUIFileds(response: any) {
-    for (const trx of response.transactions) {
-      trx.transaction_date_ui = this._datePipe.transform(trx.transaction_date, 'MM/dd/yyyy');
-      trx.deleted_date_ui = this._datePipe.transform(trx.deleted_date, 'MM/dd/yyyy');
+    for (const rep of response.reports) {
+      rep.transaction_date_ui = this._datePipe.transform(rep.transaction_date, 'MM/dd/yyyy');
+      rep.deleted_date_ui = this._datePipe.transform(rep.deleted_date, 'MM/dd/yyyy');
     }
   }
 
   /**
-   * This method handles filtering the transactions array and will be replaced
+   * This method handles filtering the reports array and will be replaced
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: ReportFilterModel) {
@@ -395,5 +424,59 @@ export class ReportsService {
           return res;
         });
     }
+  }
+  public trashOrRestoreReports(action: string,  reports: reportModel) {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/trash_restore_report';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    const actions = [];
+    actions.push({
+        action: action,
+        report_id: reports.report_id
+      });
+
+    request.actions = actions;
+    console.log ("trashOrRestoreReports request.actions =", request.actions );
+    return this._http
+      .put(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .map(res => {
+          if (res) {
+            console.log('Report Trash Restore response: ', res);
+            return res;
+          }
+          return false;
+      });
+  }
+  public deleteRecycleBinReport(reports: Array<reportModel>): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/delete_trashed_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    const actions = [];
+    for (const rep of reports) {
+      actions.push({
+        transaction_id: rep.report_id
+      });
+    }
+    request.actions = actions;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+     .map(res => {
+          return false;
+        });
   }
 }
