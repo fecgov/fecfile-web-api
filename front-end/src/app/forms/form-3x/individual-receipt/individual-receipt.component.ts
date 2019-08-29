@@ -8,7 +8,8 @@ import {
   ViewEncapsulation,
   ViewChild,
   OnDestroy,
-  HostListener
+  HostListener,
+  OnChanges
 } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -42,7 +43,7 @@ import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None
 })
-export class IndividualReceiptComponent implements OnInit, OnDestroy {
+export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() formOptionsVisible = false;
@@ -72,6 +73,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   public electionTypes: any = [];
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
+  public subTransaction: any = [];
+  // public subTransactionDetail: any;
   public selectedEntityType: any;
 
   private _formType = '';
@@ -171,7 +174,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this.frmIndividualReceipt = this._fb.group({});
   }
 
-  ngDoCheck(): void {
+  public ngOnChanges() {
+  // ngDoCheck(): void {
     // TODO consider changes this to ngOnChanges()
     this._prepareForm();
   }
@@ -439,7 +443,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
 
   public addChild() {
 
-    this.doValidateReceipt(true);
+    // TODO this will save parent when editing even if it did not change.
+    this.doValidateReceipt();
 
     // const addChildEmitObj = {
     //   form: {},
@@ -901,7 +906,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   /**
    * Vaidates the form on submit.
    */
-  public doValidateReceipt(isParent: boolean): Observable<any> {
+  public doValidateReceipt(): Observable<any> {
+
+    let isSaveParent = false;
+    if (this.subTransaction) {
+      if (this.subTransaction.hasOwnProperty('isParent')) {
+        if (this.subTransaction.isParent) {
+          isSaveParent = true;
+        }
+      }
+    }
+
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
@@ -968,13 +983,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         });
       }
 
-      if (this._parentTransactionId) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'parent_transaction_id') {
-            el.value = this._transactionToEdit.transactionId;
-          }
-        });
-      }
+      // TODO is this needed since we are using back_ref_transaction_id?
+      // if (this._parentTransactionId) {
+      //   this.hiddenFields.forEach((el: any) => {
+      //     if (el.name === 'parent_transaction_id') {
+      //       el.value = this._transactionToEdit.transactionId;
+      //     }
+      //   });
+      // }
+
+      // // for saving sub trans to parent
+      // if (this._parentTransactionId) {
+      //   this.hiddenFields.forEach((el: any) => {
+      //     if (el.name === 'back_ref_transaction_id') {
+      //       el.value = this._parentTransactionId;
+      //     }
+      //   });
+      // }
 
       this.hiddenFields.forEach(el => {
         receiptObj[el.name] = el.value;
@@ -993,6 +1018,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
 
       this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+
+      // set the back ref id for save on a sub tran.
+      if (this._parentTransactionId && this.scheduleAction === ScheduleActions.addSubTransaction) {
+        receiptObj.back_ref_transaction_id = this._parentTransactionId;
+      }
 
       localStorage.setItem(`form_${this._formType}_receipt`, JSON.stringify(receiptObj));
 
@@ -1040,13 +1070,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             }
           }
 
+          // Replace this with clearForm() if possible
           this._formSubmitted = true;
           this.memoCode = false;
           this.memoCodeChild = false;
           this.frmIndividualReceipt.reset();
-
           this._setMemoCodeForForm();
-
           this._selectedEntity = null;
           this._selectedChangeWarn = null;
           this._selectedEntityChild = null;
@@ -1055,6 +1084,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
+          // Replace this with clearForm() if possible - END
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -1065,6 +1095,35 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             transactionId = res.transaction_id;
           } else {
             console.log('schedA save has no transaction_id property');
+          }
+
+          // If save is for user click addChild, we are saving parent on behalf of the user
+          // before presenting a new sub tran to add.  Save parent id and emit to show new child form.
+          if (isSaveParent) {
+
+            if (this.scheduleAction === ScheduleActions.add) {
+              this._parentTransactionId = transactionId;
+            } else if (this.scheduleAction === ScheduleActions.edit) {
+              this._parentTransactionId = this._transactionToEdit.transactionId;
+            } else {
+              console.log('invalid schedule action ' +  this.scheduleAction);
+            }
+
+            const addSubTransEmitObj = {
+              form: {},
+              direction: 'next',
+              step: 'step_3',
+              previousStep: 'step_2',
+              transactionTypeText: this.subTransaction.subTransactionTypeDescription,
+              transactionType: this.subTransaction.subTransactionType,
+              action: ScheduleActions.addSubTransaction
+            };
+            this.status.emit(addSubTransEmitObj);
+          } else {
+            // reset the parent ID if action is NOT for add sub transaction.
+            if (this.scheduleAction !== ScheduleActions.addSubTransaction) {
+              this._parentTransactionId = null;
+            }
           }
         }
       });
@@ -1862,10 +1921,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   //       } // res
   //     });
   //   }
-  // }
+  // } http://localhost:8080/api/v1/core/get_dynamic_forms_fields?form_type=F3X&transaction_type=PARTN_MEMO
 
   private _getFormFields(): void {
     console.log('get transaction type form fields ' + this.transactionType);
+
+    // init some of the dynamic form data for each call.
+    // TODO may need to add others.
+    this.subTransaction = [];
+    // this.subTransactionDetail = null; Add this once API passes sub tran support
+
     this._receiptService.getDynamicFormFields(this._formType, this.transactionType).subscribe(res => {
       if (res) {
         if (res.hasOwnProperty('data')) {
@@ -1921,6 +1986,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 );
               }
             }
+            if (res.data.hasOwnProperty('subTransactions')) {
+              if (Array.isArray(res.data.subTransactions)) {
+                // TODO this should not be an array as only 1 is expected.
+                this.subTransaction = res.data.subTransactions[0];
+              }
+            }
+            // // temo code - API should return this when sub tran
+            // if (this.subTransactions[0].transactionType === 'PARTN_REC') {
+            //   this.subTransactionDetail = this.subTransactions[0];
+            // }
+            // if (res.data.hasOwnProperty('subTransactionDetail')) {
+            //   // this.subTransactionDetail = res.data.subTransactionDetail;
+            // }
+
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res

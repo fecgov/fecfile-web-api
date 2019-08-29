@@ -189,7 +189,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandLastName"
-                        (selectItem)="handleSelectedCandidate($event, col?.name)"
+                        (selectItem)="handleSelectedCandidate($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -214,7 +214,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandFirstName"
-                        (selectItem)="handleSelectedCandidate($event, col?.name)"
+                        (selectItem)="handleSelectedCandidate($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />                      
@@ -239,7 +239,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtOrg"
                         [inputFormatter]="formatterOrgName"
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
@@ -289,7 +289,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCommitteeName"
                         [inputFormatter]="formatterCommitteeName"
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />                                       
                     </div>
@@ -491,9 +491,9 @@
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
               </a>
-              <!-- <a class="btn btn-previous btn-right" (click)="addChild()">
+              <a class="btn btn-previous btn-right" (click)="addChild()">
                 Add Child
-              </a> -->
+              </a>
             </div>
           </div>
         </div>
