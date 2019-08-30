@@ -2865,6 +2865,7 @@ Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 
 @api_view(['GET', 'POST'])
 def contactsTable(request):
+
     try:
         
         if request.method == 'POST':
@@ -3822,3 +3823,4 @@ def trash_restore_report(request):
     return Response({"result":"success"}, status=status.HTTP_200_OK)    
 
     
+
