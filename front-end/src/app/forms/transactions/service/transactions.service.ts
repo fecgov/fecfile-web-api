@@ -234,6 +234,7 @@ export class TransactionsService {
     for (const row of serverData) {
       const model = new TransactionModel({});
       model.type = row.transaction_type_desc;
+      model.entityId = row.entity_id;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionId = row.transaction_id;
       model.name = row.name;
@@ -279,6 +280,9 @@ export class TransactionsService {
       case 'type':
         name = 'transaction_type_desc';
         break;
+      case 'entityId':
+        name = 'entity_id';
+        break;  
       case 'transactionTypeIdentifier':
         name = 'transaction_type_identifier';
         break;
@@ -339,7 +343,7 @@ export class TransactionsService {
     if (!model) {
       return serverObject;
     }
-
+    serverObject.entity_id = model.entityId;
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
     serverObject.transaction_id = model.transactionId;

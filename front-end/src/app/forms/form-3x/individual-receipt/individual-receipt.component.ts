@@ -982,17 +982,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         }
       }
 
-      // There is a race condition with populating hiddenFields
-      // and receiving transaction data to edit from the message service.
-      // If editing, set transaction ID at this point to avoid race condition issue.
-      if (this._transactionToEdit) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'transaction_id') {
-            el.value = this._transactionToEdit.transactionId;
-          }
-        });
-      }
-
       // TODO is this needed since we are using back_ref_transaction_id?
       // if (this._parentTransactionId) {
       //   this.hiddenFields.forEach((el: any) => {
@@ -1011,10 +1000,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       //   });
       // }
 
-      this.hiddenFields.forEach(el => {
-        receiptObj[el.name] = el.value;
-      });
-
+      
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.  Since there may be more than 1 entity
       // saved in a form, entity IDs must be unique for each.  The name of the property
@@ -1028,6 +1014,26 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
 
       this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+
+      // There is a race condition with populating hiddenFields
+      // and receiving transaction data to edit from the message service.
+      // If editing, set transaction ID at this point to avoid race condition issue.
+      // Two transactions one screen is messing up..
+      // we might need to revisit to fix the two transactions one screen
+      if (this._transactionToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          } else if(el.name === 'entity_id') {
+            el.value = this._transactionToEdit.entityId;
+          }
+        });
+      }
+
+      this.hiddenFields.forEach(el => {
+        receiptObj[el.name] = el.value;
+      });
+
 
       // set the back ref id for save on a sub tran.
       if (this._parentTransactionId && this.scheduleAction === ScheduleActions.addSubTransaction) {
