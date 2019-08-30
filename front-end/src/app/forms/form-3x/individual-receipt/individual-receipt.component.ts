@@ -999,13 +999,25 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       //     }
       //   });
       // }
-
+      
+      // for each entity ID comes from the dynamic form fields as setEntityIdTo.
+      // If setEntityIdTo not sent by API, default to entity_id.
+      if (this._transactionToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          } 
+        });
+      }
+     
+      this.hiddenFields.forEach(el => {
+        receiptObj[el.name] = el.value;
+      });
       
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.  Since there may be more than 1 entity
       // saved in a form, entity IDs must be unique for each.  The name of the property
-      // for each entity ID comes from the dynamic form fields as setEntityIdTo.
-      // If setEntityIdTo not sent by API, default to entity_id.
+      
 
       this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
 
@@ -1015,24 +1027,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
       this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
 
+      if (this._transactionToEdit) {
+        if(receiptObj['entity_id'] === null || receiptObj['entity_id'] === undefined) {
+          receiptObj['entity_id'] = this._transactionToEdit.entityId;
+        }
+      }
+
+      
+
       // There is a race condition with populating hiddenFields
       // and receiving transaction data to edit from the message service.
       // If editing, set transaction ID at this point to avoid race condition issue.
       // Two transactions one screen is messing up..
       // we might need to revisit to fix the two transactions one screen
-      if (this._transactionToEdit) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'transaction_id') {
-            el.value = this._transactionToEdit.transactionId;
-          } else if(el.name === 'entity_id') {
-            el.value = this._transactionToEdit.entityId;
-          }
-        });
-      }
+      
 
-      this.hiddenFields.forEach(el => {
-        receiptObj[el.name] = el.value;
-      });
+      
 
 
       // set the back ref id for save on a sub tran.
@@ -1045,6 +1055,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
+          //this.scheduleAction = ScheduleActions.add;
 
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
@@ -1141,6 +1152,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this._parentTransactionId = null;
             }
           }
+          // setting default action to add when we edit transaction
+          this.scheduleAction = ScheduleActions.add;
         }
       });
     } else {
