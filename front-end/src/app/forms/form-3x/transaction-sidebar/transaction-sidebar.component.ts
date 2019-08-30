@@ -156,4 +156,13 @@ export class TransactionSidebarComponent implements OnInit {
       return true;
     }
   }
+
+  /*
+    This function is called while selecting a list from report screen
+  */
+  public optionsListClick(type): void {
+    if(document.getElementById(type) != null) {
+        document.getElementById(type).click();
+    }
+  }
 }

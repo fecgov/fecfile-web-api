@@ -148,5 +148,20 @@ urlpatterns = [
         views.contactsTable,
         name="contactsTable",
     ),
+    url(
+        r"^core/get_all_trashed_reports$",
+        views.get_all_trashed_reports,
+        name="get_all_trashed_reports",
+    ),
+    url(
+        r"^core/delete_trashed_reports$",
+        views.delete_trashed_reports,
+        name="delete_trashed_reports",
+    ),
+     url(
+        r"^core/trash_restore_report$",
+        views.trash_restore_report,
+        name="trash_restore_report",
+    ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 ]

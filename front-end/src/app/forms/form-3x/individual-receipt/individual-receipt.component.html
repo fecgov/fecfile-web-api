@@ -66,7 +66,7 @@
 
             <ng-container *ngFor="let col of row.cols">
               <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
-                <div class="form-group"> 
+                <div class="form-group" [style.width]="setSelectTypeWidth(col)"> 
                   <label [for]="col?.name">
                     {{ col?.text }}
                     <button
@@ -406,55 +406,58 @@
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
 
-                    <ng-select
+                    <ng-select #stateSelect [items]="states"
+
                       (change)="handleStateChange($event, col)"
-                      class="state-select"
+                      class="forms__select"
                       [formControlName]="col?.name"
+                      bindValue="code"
+
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'state-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
-                      <ng-option *ngFor="let item of states" [ngValue]="item">
-                        {{ item.code }} - {{ item.name }}
-                      </ng-option>
-                    </ng-select>
+                      <ng-template ng-label-tmp let-item="item">
+                        <span >{{ item.code }}</span>
+                      </ng-template>
+                      <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                            <span >{{ item.code + ' - ' + item.name }}</span>
+                      </ng-template>
+                    </ng-select>                      
                   </ng-container>                  
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'election_code')">  
-                    <ng-select
+                    <ng-select #electionCodeSelect [items]="electionTypes"
                       (change)="handleElectionCodeChange($event, col)"
                       class="forms__select election-code-select"
                       [formControlName]="col?.name"
+                      bindValue="electionType"
+                      bindLabel="electionTypeDescription"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'state-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
-                      <ng-option *ngFor="let item of electionTypes" [value]="item">
-                        {{ item.electionTypeDescription }}
-                      </ng-option>
                     </ng-select>
                   </ng-container>                  
                   <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">  
-                    <ng-select
+                    <ng-select #entityTypeSelect [items]="entityTypes"
                       (change)="handleEntityTypeChange($event, col)"
                       class="forms__select entity-type-select"
                       [formControlName]="col?.name"
+                      bindValue="entityType"
+                      bindLabel="entityTypeDescription"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                          ? 'org-type-select-error'
+                          ? 'forms__select-error'
                           : ''
                       "
                     >
-
-                      <ng-option *ngFor="let entityType of entityTypes" value="{{entityType.entityType}}">
-                        {{entityType.entityTypeDescription}}
-                      </ng-option>
                     </ng-select>
                   </ng-container>                                 
                 </div>
@@ -501,6 +504,9 @@
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
               </a>
+              <!-- <a class="btn btn-previous btn-right" (click)="addChild()">
+                Add Child
+              </a> -->
             </div>
           </div>
         </div>

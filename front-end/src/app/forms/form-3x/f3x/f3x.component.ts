@@ -19,6 +19,7 @@ import {
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
+import { TransactionModel } from '../../transactions/model/transaction.model';
 
 @Component({
   selector: 'app-f3x',
@@ -278,8 +279,13 @@ export class F3xComponent implements OnInit {
               // fields to the previous value.  Result is fields can't be changed.
               this._f3xMessageService.sendPopulateFormMessage(e.editOrView);
               this.scheduleAction = e.editOrView.action;
+              const transactionModel: TransactionModel = e.editOrView.transactionModel;
+              this.transactionTypeText = transactionModel.type;
+              this.transactionType = transactionModel.transactionTypeIdentifier;
             } else {
               this.scheduleAction = ScheduleActions.add;
+              this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
+              this.transactionType = e.transactionType ? e.transactionType : '';
             }
           }
           this.canContinue();

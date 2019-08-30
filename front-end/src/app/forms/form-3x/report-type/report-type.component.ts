@@ -571,4 +571,13 @@ export class ReportTypeComponent implements OnInit {
 
     return dueDate;
   }
+
+  /*
+    This function is called while selecting a list from report screen
+  */
+  public optionsListClick(type): void {
+    if(document.getElementById(type) != null) {
+        document.getElementById(type).click();
+    }
+  }
 }

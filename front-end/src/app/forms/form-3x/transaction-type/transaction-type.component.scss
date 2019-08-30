@@ -145,4 +145,20 @@
       @include clearfix();
     }
   }
+  .child-options__item:hover{
+     cursor: pointer !important;
+  }
+  .child-options-label:hover{
+     cursor: pointer !important;
+  }
+  input[type="radio"]:hover{
+     cursor: pointer !important;
+  }
+
+  ngb-accordion .card-header > button {
+      text-align: left;
+      width: 100%;
+      height: 100%;
+  }
+
 }

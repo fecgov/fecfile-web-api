@@ -863,7 +863,7 @@ def get_form99list(request):
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
                                         END AS viewtype
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
@@ -874,7 +874,7 @@ def get_form99list(request):
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
                                         END AS viewtype
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
@@ -906,7 +906,7 @@ def get_form99list(request):
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
                                         END AS viewtype
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                         FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
@@ -917,7 +917,7 @@ def get_form99list(request):
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
                                         END AS viewtype
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null 
+                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 

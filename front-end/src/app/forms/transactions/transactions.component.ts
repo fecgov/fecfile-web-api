@@ -660,33 +660,45 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Show edit for a single transaction.
    */
   public showEdit() {
-    let accessedByRoute = false;
-    if (this.routeData) {
-      if (this.routeData.accessedByRoute && this.routeData.reportId) {
-        accessedByRoute = true;
+    const emptyValidForm = this._fb.group({});
+    this.showTransaction.emit({
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      editOrView: {
+        action: ScheduleActions.edit,
+        transactionModel: this.transactionToEdit
       }
-    }
+    });
 
-    // TODO remove for edit route and accessedByRoute if not used.  Does not appear to be.
-    if (accessedByRoute) {
-      // this._router.navigate([`/forms/form/${this.formType}`], {
-      //   queryParams: { step: 'step_3' }
-      // });
+    // let accessedByRoute = false;
+    // if (this.routeData) {
+    //   if (this.routeData.accessedByRoute && this.routeData.reportId) {
+    //     accessedByRoute = true;
+    //   }
+    // }
 
-      this._router.navigate([`/forms/form/edit/${this.formType}/${this.routeData.reportId}`]);
-      const editOrView = { action: ScheduleActions.edit, transactionModel: this.transactionToEdit };
-      this._f3xMessageService.sendPopulateFormMessage(editOrView);
-      // this.showEditTransaction = true;
-    } else {
-      const emptyValidForm = this._fb.group({});
-      this.showTransaction.emit({
-        form: emptyValidForm,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'transactions',
-        editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
-      });
-    }
+    // // TODO remove for edit route and accessedByRoute if not used.  Does not appear to be.
+    // if (accessedByRoute) {
+    //   // this._router.navigate([`/forms/form/${this.formType}`], {
+    //   //   queryParams: { step: 'step_3' }
+    //   // });
+
+    //   this._router.navigate([`/forms/form/edit/${this.formType}/${this.routeData.reportId}`]);
+    //   const editOrView = { action: ScheduleActions.edit, transactionModel: this.transactionToEdit };
+    //   this._f3xMessageService.sendPopulateFormMessage(editOrView);
+    //   // this.showEditTransaction = true;
+    // } else {
+    //   const emptyValidForm = this._fb.group({});
+    //   this.showTransaction.emit({
+    //     form: emptyValidForm,
+    //     direction: 'next',
+    //     step: 'step_3',
+    //     previousStep: 'transactions',
+    //     editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
+    //   });
+    // }
   }
 
   /**
@@ -750,7 +762,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    console.log("TransactionsTableComponent printPreview...!");
+    console.log('TransactionsTableComponent printPreview...!');
+
     this._reportTypeService.printPreview('transaction_table_screen', '3X');
   }
 }

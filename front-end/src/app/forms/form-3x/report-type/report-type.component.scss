@@ -49,4 +49,16 @@
     height: 100%;
     margin-bottom: 10px;
   }
+  .options-list__item:hover{
+     cursor: pointer !important;
+  }
+  .child-options-label {
+    padding-left: 2em;
+  }
+  .child-options-label:hover{
+     cursor: pointer !important;
+  }
+  input[type="radio"]:hover{
+     cursor: pointer !important;
+  }
 }

@@ -69,6 +69,7 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "FEA_PAY_TO_PROL_MEMO": ("FEA_PAY_TO_PROL", "sched_b"),
     "FEA_CC_PAY_MEMO": ("FEA_CC_PAY", "sched_b"),
     "FEA_STAF_REIM_MEMO": ("FEA_STAF_REIM", "sched_b"),
+    "CONT_REDESIG_MEMO": ("CONT_REDESIG", "sched_b"),
 }
 
 

@@ -94,14 +94,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   private _selectedChangeWarnChild: any;
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
-  private _selectedElectionCode: string;
-  private _selectedElectionCodeChild: string;
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
+  private _parentTransactionId: string;
 
   constructor(
     private _http: HttpClient,
@@ -147,8 +146,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
-    this._selectedElectionCode = null;
-    this._selectedElectionCodeChild = null;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this._transactionToEdit = null;
@@ -290,7 +287,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     // as it is in F3X component, the form data must be set in this way
     // to avoid race condition
     if (this._transactionToEdit) {
-      this._setFormDataValues();
+      this._setFormDataValues(this._transactionToEdit.transactionId);
     }
 
     // get form data API is passing X for memo code value.
@@ -366,7 +363,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         }
       }
     }
-
     return formValidators;
   }
 
@@ -439,6 +435,43 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.frmIndividualReceipt.controls['child*contribution_aggregate'].updateValueAndValidity();
       }
     }
+  }
+
+  public addChild() {
+
+    this.doValidateReceipt(true);
+
+    // const addChildEmitObj = {
+    //   form: {},
+    //   direction: 'next',
+    //   step: 'step_3',
+    //   previousStep: 'step_2',
+    //   transactionTypeText: this.transactionTypeText + '- Child',
+    //   transactionType: 'OPEXP', // this.transactionType
+    //   // transactionId: ''
+    // };
+
+    // if (this.scheduleAction === ScheduleActions.add) {
+
+    //   const foo = this.doValidateReceipt();
+    //   foo.subscribe(res => {
+
+    //     // Send message to form (indv-receipt) to clear form field vals if they are still populated.
+    //     // TODO this may need to be done later in parent as form is not yet populated.
+    //     // this._f3xMessageService.sendInitFormMessage('');
+
+    //     if (res.trasaction_id) {
+    //       this._parentTransactionId = res.transaction_id;
+    //       this.status.emit(addChildEmitObj);
+    //     }
+    //   });
+    // } else {
+    //   if (this._transactionToEdit.transactionId) {
+    //     this._parentTransactionId = this._transactionToEdit.transactionId;
+    //     this.status.emit(addChildEmitObj);
+    //   }
+    // }
+
   }
 
   /**
@@ -783,22 +816,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * State select options are formatted " AK - Alaska ".  Once selected
-   * the input field should display on the state code and the API must receive
-   * only the state code.  When an optin is selected, the $ngOptionLabel
-   * is received here having the state code - name format.  Parse it
-   * for the state code.  This should be modified if possible.  Look into
-   * options for ng-select and ng-option.
-   *
-   * NOTE: If the format of the option changes in the html template, the parsing
-   * logic will most likely need to change here.
-   *
-   * @param stateOption the state selected in the dropdown.
+   * Select elements width is set on the form-group level not the select element
+   * as done with text and date fields.
+   */
+  public setSelectTypeWidth(col: any) {
+    if (col.type === 'select') {
+      return col.width;
+    }
+    return null;
+  }
+
+  /**
+   * Handle warnings when state changes.
    */
   public handleStateChange(stateOption: any, col: any) {
-    // TODO change template to use the ng-select inputs as done with
-    // candidate office.
-
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
     if (isChildForm) {
@@ -814,20 +845,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.showWarnCandidate(col.text, col.name);
       }
     }
-
-    let stateCode = null;
-    if (stateOption.$ngOptionLabel) {
-      stateCode = stateOption.$ngOptionLabel;
-      if (stateCode) {
-        stateCode = stateCode.trim();
-        if (stateCode.length > 1) {
-          stateCode = stateCode.substring(0, 2);
-        }
-      }
-    }
-    const stateVO = {};
-    stateVO[col.name] = stateCode;
-    this.frmIndividualReceipt.patchValue(stateVO, { onlySelf: true });
   }
 
   /**
@@ -846,10 +863,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.showWarnCandidate(col.text, col.name);
       }
     }
-    const vo = {};
-    vo[col.name] = item.officeCode ? item.officeCode : null;
-    // this.frmIndividualReceipt.patchValue(vo, { onlySelf: true });
-
   }
 
   /**
@@ -883,22 +896,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
       }
     }
-
-    const electionCodeVO = {};
-    electionCodeVO[col.name] = item.electionTypeDescription;
-    this.frmIndividualReceipt.patchValue(electionCodeVO, { onlySelf: true });
-
-    if (isChildForm) {
-      this._selectedElectionCodeChild = item.electionType;
-    } else {
-      this._selectedElectionCode = item.electionType;
-    }
   }
 
   /**
    * Vaidates the form on submit.
    */
-  public doValidateReceipt() {
+  public doValidateReceipt(isParent: boolean): Observable<any> {
     if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
@@ -949,10 +952,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
-        } else if (field === 'election_code') {
-          receiptObj[field] = this._selectedElectionCode;
-        } else if (field === this._childFieldNamePrefix + 'election_code') {
-          receiptObj[field] = this._selectedElectionCodeChild;
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
@@ -964,6 +963,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (this._transactionToEdit) {
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          }
+        });
+      }
+
+      if (this._parentTransactionId) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'parent_transaction_id') {
             el.value = this._transactionToEdit.transactionId;
           }
         });
@@ -1044,12 +1051,42 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
-          this._selectedElectionCode = null;
-          this._selectedElectionCodeChild = null;
 
           localStorage.removeItem(`form_${this._formType}_receipt`);
           localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
           window.scrollTo(0, 0);
+
+          let transactionId = null;
+          if (res.hasOwnProperty('transaction_id')) {
+            transactionId = res.transaction_id;
+          } else {
+            console.log('schedA save has no transaction_id property');
+          }
+
+          // // If save is for user click addChild, save parent id and emit to chow new child form.
+          // if (isParent) {
+
+          //   if (this.scheduleAction === ScheduleActions.add) {
+          //     this._parentTransactionId = transactionId;
+          //   } else if (this.scheduleAction === ScheduleActions.edit) {
+          //     this._parentTransactionId = this._transactionToEdit.transactionId;
+          //   } else {
+          //     console.log('invalid schedule action ' +  this.scheduleAction);
+          //   }
+
+          //   const addChildEmitObj = {
+          //     form: {},
+          //     direction: 'next',
+          //     step: 'step_3',
+          //     previousStep: 'step_2',
+          //     transactionTypeText: this.transactionTypeText + '- Child',
+          //     transactionType: 'OPEXP', // this.transactionType
+          //     // transactionId: ''
+          //   };
+          //   this.status.emit(addChildEmitObj);
+          // } else {
+          //   this._parentTransactionId = null;
+          // }
         }
       });
     } else {
@@ -1066,6 +1103,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
               console.log('invalid form field on submit = ' + name);
           }
       }
+      return Observable.of('invalid');
     }
   }
 
@@ -1850,13 +1888,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('electionTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.electionTypes = res.data.electionTypes;
-
-                // // temp: add Other until API sends it.
-                // const other = {
-                //   'electionType': 'O',
-                //   'electionTypeDescription': 'Other'
-                // };
-                // this.electionTypes.unshift(other);
               }
             }
             if (res.data.hasOwnProperty('titles')) {
@@ -1871,6 +1902,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                   for (const field of this.entityTypes) {
                     // If API sets selected to true it can be used to set the default.
                     // If none are set, use the first.
+                    // If none are set, default to first.
                     if (field.selected) {
                       this.selectedEntityType = field;
                     }
@@ -1883,7 +1915,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
                 }
                 this._entityTypeDefault = this.selectedEntityType;
                 this.frmIndividualReceipt.patchValue(
-                  { entity_type: this.selectedEntityType.entityTypeDescription },
+                  { entity_type: this.selectedEntityType.entityType },
                   { onlySelf: true }
                 );
               }
@@ -1894,34 +1926,39 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     });
   }
 
-  public handleEntityTypeChange(entityTypeCode: any, col: any, entityType: any) {
+  /**
+   * Toggle fields in the form depending on entity type.
+   */
+  public handleEntityTypeChange(item: any, col: any, entityType: any) {
+
+    // Set the selectedEntityType for the toggle method to check.
     for (const entityTypeObj of this.entityTypes) {
-      if (entityTypeObj.entityType === entityTypeCode) {
+      if (entityTypeObj.entityType === item.entityType) {
         entityTypeObj.selected = true;
         this.selectedEntityType = entityTypeObj;
-        this.frmIndividualReceipt.patchValue({ entity_type: entityTypeCode }, { onlySelf: true });
       } else {
         entityTypeObj.selected = false;
       }
     }
 
-    // set validations based on the selected org type
-    if (this.selectedEntityType.group === 'org-group') {
-      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
-      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
-      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+    if (item) {
+      if (item.group === 'org-group') {
+        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
 
-      this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
-    } else {
-      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+      } else {
+        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
 
-      this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
-      this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+      }
     }
   }
 
@@ -1932,6 +1969,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
       if (editOrView.transactionModel) {
         const formData: TransactionModel = editOrView.transactionModel;
 
+        // TODO this data will come from the API not the transaction table
+        // may need to set it after API for race condition problem when come from Reports.
         this._transactionToEdit = formData;
 
         // TODO property names are not the same in TransactionModel
@@ -1946,19 +1985,90 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
         // TODO need to handle child data once passed
         this._selectedEntityChild = editOrView.childTransactionModel ? editOrView.childTransactionModel : null;
         this._selectedChangeWarnChild = {};
+
         // TODO need to handle candidate from child form once data is passed.
+        // this._selectedCandidate = null; Do we need the actual data set or just boolean if there is data
+        // For edit we can always show warning so we might not need to set the selectedAutolookup warn fields
+        this._selectedCandidateChangeWarn = {};
+        // this._selectedCandidateChild = null;
+        this._selectedCandidateChangeWarnChild = {};
 
-        this.transactionType = formData.transactionTypeIdentifier;
+        // this.transactionType = formData.transactionTypeIdentifier;
 
-        this._setFormDataValues();
+        this._setFormDataValues(formData.transactionId);
       }
     }
   }
 
   /**
+   * Set the values from the API in the form.
+   * 
+   * @param transactionId
+   */
+  private _setFormDataValues(transactionId: string) {
+
+    const reportId = this._getReportIdFromStorage();
+    this._receiptService.getDataScheduleA(reportId, transactionId).subscribe(res => {
+
+      if (Array.isArray(res)) {
+        for (const trx of res) {
+          if (trx.hasOwnProperty('transaction_id')) {
+            if (trx.transaction_id === transactionId) {
+              for (const prop in trx) {
+                if (this.frmIndividualReceipt.get(prop)) {
+                  if (this.isFieldName(prop, 'contribution_amount')) {
+                    const amount = trx[prop] ? trx[prop] : 0;
+                    this.contributionAmountChange({target: {value: amount.toString()}}, prop);
+                  }
+                  if (this.isFieldName(prop, 'memo_code')) {
+                    const memoCodeValue = trx[prop];
+                    if (memoCodeValue === this._memoCodeValue) {
+                      const isChildField = prop.startsWith(this._childFieldNamePrefix) ? true : false;
+                      if (isChildField) {
+                        this.memoCodeChild = true;
+                      } else {
+                        this.memoCode = true;
+                      }
+                    }
+                  }
+                  const patch = {};
+                  patch[prop] = trx[prop];
+                  this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // if (res) {
+      //   if (res.hasOwnProperty('data')) {
+      //     if (typeof res.data === 'object') {
+      //       if (res.data.hasOwnProperty('fieldValues')) {
+      //         if (Array.isArray(res.data.fieldValues)) {
+      //           const fieldValues = res.data.fieldValues;
+      //           for (const field of fieldValues) {
+      //             if (field.hasOwnProperty('name') &&
+      //                 field.hasOwnProperty('value')) {
+      //               if (this.frmIndividualReceipt.get(field.name)) {
+      //                 const patch = {};
+      //                 patch[field.name] = field.value;
+      //                 this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+      //               }
+      //             }
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+    });
+  }
+
+  /**
    * When editing a transaction, set the form values.
    */
-  private _setFormDataValues() {
+  private _setFormDataValues__() {
     const formData = this._transactionToEdit;
 
     const nameArray = formData.name.split(',');
@@ -2037,6 +2147,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
   // }
 
   private _clearFormValues(): void {
+
+    this._transactionToEdit = null;
+
     this._selectedEntity = null;
     this._selectedEntityChild = null;
     this._selectedChangeWarn = {};
@@ -2058,7 +2171,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy {
     if (this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue(
-        { entity_type: this.selectedEntityType.entityTypeDescription },
+        { entity_type: this.selectedEntityType.entityType },
         { onlySelf: true }
       );
     }
