@@ -463,7 +463,8 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id)
+            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, 
+(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code
 FROM public.sched_a t1 
 WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
 AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
@@ -516,7 +517,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         aggregate_amount = 0
         for transaction in transactions_list:
             if transaction[5] != 'Y':
-                aggregate_amount += transaction[0]
+                if transaction[6] != 'X':
+                    aggregate_amount += transaction[0]
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
