@@ -1053,6 +1053,11 @@ export class IndividualReceiptService {
                },
                {  
                   "type":"hidden",
+                  "name":"entity_id",
+                  "value":null
+               },
+               {  
+                  "type":"hidden",
                   "name":"line_number",
                   "value":"11A"
                },
@@ -1079,6 +1084,11 @@ export class IndividualReceiptService {
                {  
                   "type":"hidden",
                   "name":"child*entity_type",
+                  "value":"CCM"
+               },
+               {  
+                  "type":"hidden",
+                  "name":"child*entity_id",
                   "value":"CCM"
                },
                {  
@@ -2173,6 +2183,11 @@ export class IndividualReceiptService {
                  "type":"hidden",
                  "name":"entity_type",
                  "value":"IND"
+              },
+              {  
+               "type":"hidden",
+               "name":"entity_id",
+               "value":null
               },
               {  
                  "type":"hidden",
