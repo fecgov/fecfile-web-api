@@ -879,7 +879,7 @@ def schedB_sql_dict(data):
             "beneficiary_cand_middle_name": data.get("beneficiary_cand_middle_name"),
             "beneficiary_cand_prefix": data.get("beneficiary_cand_prefix"),
             "beneficiary_cand_suffix": data.get("beneficiary_cand_suffix"),
-            "aggregate_amt": check_decimal(data.get("aggregate_amt", None)),
+            # "aggregate_amt": check_decimal(data.get("aggregate_amt", None)),
             "entity_type": data.get("entity_type"),
             "entity_name": data.get("entity_name"),
             "first_name": data.get("first_name"),
@@ -897,6 +897,8 @@ def schedB_sql_dict(data):
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
         }
+        if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
+            datum["aggregate_amt"] = data.get("aggregate_amt")
         if "entity_id" in data and check_null_value(data.get("entity_id")):
             datum["entity_id"] = data.get("entity_id")
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
