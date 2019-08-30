@@ -98,13 +98,13 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_BC_REC" : "IK_BC_OUT",
                                     "REATT_FROM" : "REATT_MEMO",
                                     #"CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
-                                    "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                    # "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
                                     "PARTY_IK_REC" : "PARTY_IK_OUT",
                                     "PARTY_IK_BC_REC" : "PARTY_IK_BC_OUT",
                                     "PAC_IK_REC" : "PAC_IK_OUT",
                                     "PAC_IK_BC_REC" : "PAC_IK_BC_OUT",
-                                    "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
-                                    "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
+                                    # "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                    # "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                     "IK_TRAN" : "IK_TRAN_OUT",
                                     "IK_TRAN_FEA" : "IK_TRAN_FEA_OUT"
 }
@@ -125,6 +125,9 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
                                             "CON_EAR_DEP": "CON_EAR_OUT_DEP",
+                                            "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                            "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                            "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                         }
 
 def get_next_transaction_id(trans_char):
