@@ -14,6 +14,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.core.transaction_util import get_line_number_trans_type
+
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -240,7 +242,12 @@ def schedD_sql_dict(data):
         "line_number",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+        valid_data["line_number"] = line_num
+        return valid_data
     except:
         raise Exception("invalid request data.")
 
