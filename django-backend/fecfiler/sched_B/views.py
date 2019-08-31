@@ -896,6 +896,21 @@ def schedB_sql_dict(data):
             "employer": data.get("employer"),
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
+            # cand_entity_data
+            "cand_office": data.get("cand_office"),
+            "cand_office_state": data.get("cand_office_state"),
+            "cand_office_district": data.get("cand_office_district"),
+            # "beneficiary_cmte_name": data.get("beneficiary_cmte_name"),
+            "cand_last_name": data.get("cand_last_name"),
+            "cand_first_name": data.get("cand_first_name"),
+            "cand_middle_name": data.get("cand_middle_name"),
+            "cand_prefix": data.get("cand_prefix"),
+            "cand_suffix": data.get("cand_suffix"),
+            "cand_street_1": data.get("cand_street_1"),
+            "cand_street_2": data.get("cand_street_2"),
+            "cand_city": data.get("cand_city"),
+            "cand_state": data.get("cand_state"),
+            "cand_zip_code": data.get("cand_zip_code"),
         }
         if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
             datum["aggregate_amt"] = data.get("aggregate_amt")
