@@ -109,7 +109,7 @@
                           ? col?.validation?.max + 5: col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
-                                ? contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
+                                ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
