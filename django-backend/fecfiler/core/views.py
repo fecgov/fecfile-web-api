@@ -839,6 +839,7 @@ def save_cand_entity(data, new=False):
     """
     save a candiate entity
     """
+    logger.debug('saving cand_entity with data:{}'.format(data))
     entity_fields_with_cand = [
         "cand_office",
         "cand_office_state",
@@ -850,7 +851,7 @@ def save_cand_entity(data, new=False):
         {
             k.replace("cand_", ""): v
             for k, v in data.items()
-            if "cand_" in k and k not in entity_fields_with_cand
+            if k.startswith('cand_') and k not in entity_fields_with_cand
         }
     )
     if not new:
@@ -1302,12 +1303,19 @@ def put_entities(data):
             logger.debug('current entity {} is FEC entity, need to clone it.'.format(entity_id))
             new_entity_id = clone_fec_entity(cmte_id, entity_type, entity_id)
             # combine db entity data and request entity data
+            # fields from api request take priority here
             data['entity_id'] = new_entity_id
             cloned_data = get_entities(data)[0]
-            logger.debug('cloned cand entity data:{}'.format(cloned_data))
-            return cloned_data
-
-
+            # remove None value field from data
+            data = { k:v for k,v in data.items() if v }
+            cloned_data.update(data)
+            data = cloned_data
+            # logger.debug('cloned cand entity data:{}'.format(cloned_data))
+            # return cloned_data
+        # filter out cand_fields for non-can entity
+        if data['entity_type'] != 'CAN':
+            data = { k:v for k,v in data.items() if not k.startswith('cand_') }
+        logger.debug('put_sql_entity with data:{}'.format(data))
         put_sql_entity(
             data.get('entity_type'), 
             data.get('entity_name'), 
