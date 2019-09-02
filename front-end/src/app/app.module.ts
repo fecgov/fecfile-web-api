@@ -74,6 +74,7 @@ import { ContactsTableComponent } from './contacts/contacts-table/contacts-table
 import { ContactsFilterComponent } from './contacts/filter/contacts-filter.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
+import { SubTransactionsTableComponent } from './forms/transactions/sub-transactions-table/sub-transactions-table.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -98,6 +99,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionsTableComponent,
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
+    SubTransactionsTableComponent,
     TrashConfirmComponent,
     F99Component,
     TypeComponent,
