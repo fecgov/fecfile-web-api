@@ -362,7 +362,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           if (validators[validation] !== null) {
             formValidators.push(Validators.maxLength(validators[validation]));
           }
-        } else if (validation === 'dollarAmount') {
+        } else if ((validation === 'dollarAmount') || (validation === 'dollarAmountNegative')) {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
@@ -487,7 +487,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param      {Object}  e         The event object.
    * @param      {string}  fieldName The name of the field
    */
-  public contributionAmountChange(e: any, fieldName: string): void {
+  public contributionAmountChange(e: any, fieldName: string, negativeAmount: boolean): void {
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
     let contributionAmount: string = e.target.value;
 
@@ -509,7 +509,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       contributionAggregate = String(this._contributionAggregateValue);
     }
 
-    const contributionAmountNum = parseFloat(contributionAmount);
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      this._contributionAmount = String(contributionAmountNum);
+    }
+    
     const aggregateTotal: number = contributionAmountNum + parseFloat(contributionAggregate);
     const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
@@ -973,24 +979,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = typeAheadField;
           }
           // }
-        } else if (field === 'contribution_amount') {
+        } else if ((field === 'donor_cmte_id') || (field === 'beneficiary_cmte_id')) {
+          // added this condition as some times we are getting entire json object
+          // when we perform auto lookup. 
+          // TODO we might need to revisit to see if we need this condition
+          const typeAheadField = this.frmIndividualReceipt.get(field).value;
+          if (typeAheadField && typeof typeAheadField !== 'string') {
+            receiptObj[field] = typeAheadField['cmte_id'];
+          } else {
+            receiptObj[field] = typeAheadField;
+          }
+        } else if (field === 'contribution_amount' || field === 'expenditure_amount') {
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
-      }
-
-      // There is a race condition with populating hiddenFields
-      // and receiving transaction data to edit from the message service.
-      // If editing, set transaction ID at this point to avoid race condition issue.
-      if (this._transactionToEdit) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'transaction_id') {
-            el.value = this._transactionToEdit.transactionId;
-          }
-        });
       }
 
       // TODO is this needed since we are using back_ref_transaction_id?
@@ -1010,16 +1015,25 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       //     }
       //   });
       // }
-
+      
+      // for each entity ID comes from the dynamic form fields as setEntityIdTo.
+      // If setEntityIdTo not sent by API, default to entity_id.
+      if (this._transactionToEdit) {
+        this.hiddenFields.forEach((el: any) => {
+          if (el.name === 'transaction_id') {
+            el.value = this._transactionToEdit.transactionId;
+          } 
+        });
+      }
+     
       this.hiddenFields.forEach(el => {
         receiptObj[el.name] = el.value;
       });
-
+      
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.  Since there may be more than 1 entity
       // saved in a form, entity IDs must be unique for each.  The name of the property
-      // for each entity ID comes from the dynamic form fields as setEntityIdTo.
-      // If setEntityIdTo not sent by API, default to entity_id.
+      
 
       this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
 
@@ -1028,6 +1042,24 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
 
       this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+
+      if (this._transactionToEdit) {
+        if(receiptObj['entity_id'] === null || receiptObj['entity_id'] === undefined) {
+          receiptObj['entity_id'] = this._transactionToEdit.entityId;
+        }
+      }
+
+      
+
+      // There is a race condition with populating hiddenFields
+      // and receiving transaction data to edit from the message service.
+      // If editing, set transaction ID at this point to avoid race condition issue.
+      // Two transactions one screen is messing up..
+      // we might need to revisit to fix the two transactions one screen
+      
+
+      
+
 
       // set the back ref id for save on a sub tran.
       if (this._parentTransactionId && this.scheduleAction === ScheduleActions.addSubTransaction) {
@@ -1039,6 +1071,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this._receiptService.saveSchedule(this._formType, this.scheduleAction).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
+          //this.scheduleAction = ScheduleActions.add;
 
           if (res.hasOwnProperty('memo_code')) {
             if (typeof res.memo_code === 'object') {
@@ -1135,6 +1168,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this._parentTransactionId = null;
             }
           }
+          // setting default action to add when we edit transaction
+          this.scheduleAction = ScheduleActions.add;
         }
       });
     } else {
@@ -2117,7 +2152,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   if (this.isFieldName(prop, 'contribution_amount') || 
                       this.isFieldName(prop, 'expenditure_amount')) {
                     const amount = trx[prop] ? trx[prop] : 0;
-                    this.contributionAmountChange({target: {value: amount.toString()}}, prop);
+                    this.contributionAmountChange({target: {value: amount.toString()}}, prop, false);
                   }
                   if (this.isFieldName(prop, 'memo_code')) {
                     const memoCodeValue = trx[prop];

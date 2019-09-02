@@ -217,6 +217,7 @@ export class TransactionTypeComponent implements OnInit {
     This function is called while selecting a list from transaction screen
   */
   public childOptionsListClick(id): void {
+    console.log('transaction type selected: ', id);
     if(document.getElementById(id) != null) {
         var obj = <HTMLInputElement>document.getElementById('option_'+id);
         obj.click();

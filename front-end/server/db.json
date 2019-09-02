@@ -313,6 +313,10 @@
          "value": "IND"
       }, {
          "type": "hidden",
+         "name": "entity_id",
+         "value": null
+      }, {
+         "type": "hidden",
          "name": "transaction_id",
          "value": null
       }, {
