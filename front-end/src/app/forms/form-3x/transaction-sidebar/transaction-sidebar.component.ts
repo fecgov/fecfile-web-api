@@ -7,6 +7,8 @@ import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from '../../../shared/partials/confirm-modal/confirm-modal.component';
+import { TransactionTypeService } from '../../../forms/form-3x/transaction-type/transaction-type.service';
+import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
 
 @Component({
   selector: 'transaction-sidebar',
@@ -22,12 +24,17 @@ export class TransactionSidebarComponent implements OnInit {
 
   public itemSelected: string = '';
   public receiptsTotal: number = 0.0;
+  public cashOnHandTotal: number = 0.0;
 
   private _formType: string = '';
+  public transactionCategory: string = '';
+
+  public cashOnHand: CashOnHandModel;
 
   constructor(
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
+    private _transactionTypeService: TransactionTypeService,
     private _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
     private _router: Router,
@@ -40,6 +47,17 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
+      if (res) {
+        this.transactionCategories = res.data.transactionCategories;
+        this.cashOnHand = res.data.cashOnHand;
+
+        console.log('this.transactionCategories: ', this.transactionCategories);
+        console.log('response: ', this.cashOnHand.showCashOnHand);
+
+      }
+    });
+
   
   }
 
@@ -54,8 +72,10 @@ export class TransactionSidebarComponent implements OnInit {
                   if (res.totals.hasOwnProperty('Receipts')) {
                     if (typeof res.totals.Receipts === 'number') {
                       this.receiptsTotal = res.totals.Receipts;
+                      this.cashOnHandTotal = res.totals.COH;
                       const totals: any = {
-                        receipts: this.receiptsTotal
+                        receipts: this.receiptsTotal,
+                        cashOnHand : this.cashOnHandTotal
                       };
                       localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
                     }
@@ -74,6 +94,7 @@ export class TransactionSidebarComponent implements OnInit {
       if (totals.hasOwnProperty('receipts')) {
         if (typeof totals.receipts === 'number') {
           this.receiptsTotal = totals.receipts;
+          this.cashOnHandTotal = totals.cashOnHand;
         }
       }
     }
