@@ -666,8 +666,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       direction: 'next',
       step: 'step_3',
       previousStep: 'transactions',
-      editOrView: {
-        action: ScheduleActions.edit,
+      action: ScheduleActions.edit,
+      transactionDetail: {
         transactionModel: this.transactionToEdit
       }
     });
