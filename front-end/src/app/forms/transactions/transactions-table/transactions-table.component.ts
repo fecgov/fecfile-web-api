@@ -303,9 +303,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  getSubTransactions(transactionId) {
+  getSubTransactions(transactionId, apiCall) {
     // const reportId = this._getReportIdFromStorage();
-    this._receiptService.getDataScheduleA(this.reportId, transactionId).subscribe(res => {
+    this._receiptService.getDataSchedule(this.reportId, transactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {
