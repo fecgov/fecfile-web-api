@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 import { ActiveView } from '../transactions.component';
 
-
 /**
  * A message service for sending and receiving messages of any type
  * between transaction components.
@@ -12,7 +11,6 @@ import { ActiveView } from '../transactions.component';
   providedIn: 'root'
 })
 export class TransactionsMessageService {
-
   private subject = new Subject<any>();
   private applyFiltersSubject = new Subject<any>();
   private doKeywordFilterSearchSubject = new Subject<any>();
@@ -20,7 +18,7 @@ export class TransactionsMessageService {
   private showTransactionsSubject = new Subject<any>();
   private removeFilterSubject = new Subject<any>();
   private switchFilterViewSubject = new Subject<any>();
-
+  private loadTransactionsSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -32,14 +30,12 @@ export class TransactionsMessageService {
     this.subject.next(message);
   }
 
-
   /**
    * Clear the Pin Column message
    */
   public clearShowPinColumnMessage() {
     this.subject.next();
   }
-
 
   /**
    * A method for subscribers of the show PIN Column message.
@@ -48,17 +44,15 @@ export class TransactionsMessageService {
     return this.subject.asObservable();
   }
 
-
   /**
    * A publisher uses this method to send a message to subscribers
    * indicating the filters are to be applies to the transactions.
-   * 
+   *
    * @param message
    */
   public sendApplyFiltersMessage(message: any) {
     this.applyFiltersSubject.next(message);
   }
-
 
   /**
    * Clear the filters message.
@@ -67,7 +61,6 @@ export class TransactionsMessageService {
     this.applyFiltersSubject.next();
   }
 
-
   /**
    * A method for subscribers of the Apply Filters message.
    */
@@ -75,17 +68,15 @@ export class TransactionsMessageService {
     return this.applyFiltersSubject.asObservable();
   }
 
-
   /**
    * A publisher uses this method to send a message to subscribers
    * to run the Keyword + Filter search
-   * 
+   *
    * @param message
    */
   public sendDoKeywordFilterSearchMessage(message: any) {
     this.doKeywordFilterSearchSubject.next(message);
   }
-
 
   /**
    * Clear the "do keyword + filters" message.
@@ -94,14 +85,12 @@ export class TransactionsMessageService {
     this.doKeywordFilterSearchSubject.next();
   }
 
-
   /**
    * A method for subscribers of the Keyword + Filter search message.
    */
   public getDoKeywordFilterSearchMessage(): Observable<any> {
     return this.doKeywordFilterSearchSubject.asObservable();
   }
-
 
   public sendMessage(message: any) {
     this.subject.next(message);
@@ -115,7 +104,6 @@ export class TransactionsMessageService {
     return this.subject.asObservable();
   }
 
-
   public sendEditTransactionMessage(message: any) {
     this.editTransactionSubject.next(message);
   }
@@ -127,7 +115,6 @@ export class TransactionsMessageService {
   public getEditTransactionMessage(): Observable<any> {
     return this.editTransactionSubject.asObservable();
   }
-
 
   public sendShowTransactionsMessage(message: any) {
     this.showTransactionsSubject.next(message);
@@ -151,7 +138,6 @@ export class TransactionsMessageService {
     this.removeFilterSubject.next(message);
   }
 
-
   /**
    * Clear the Remove Filter message.
    */
@@ -159,14 +145,12 @@ export class TransactionsMessageService {
     this.removeFilterSubject.next();
   }
 
-
   /**
    * A method for subscribers of the Remove Filter message.
    */
   public getRemoveFilterMessage(): Observable<any> {
     return this.removeFilterSubject.asObservable();
   }
-
 
   /**
    * A publisher uses this method to send a message to the Transactions Filter
@@ -178,14 +162,12 @@ export class TransactionsMessageService {
     this.switchFilterViewSubject.next(message);
   }
 
-
   /**
    * Clear the Switch Filter View message.
    */
   public clearSwitchFilterViewMessage() {
     this.switchFilterViewSubject.next();
   }
-
 
   /**
    * A method for subscribers of the Switch Filter View message.
@@ -194,4 +176,17 @@ export class TransactionsMessageService {
     return this.switchFilterViewSubject.asObservable();
   }
 
+
+
+  public sendLoadTransactionsMessage(message: any) {
+    this.loadTransactionsSubject.next(message);
+  }
+
+  public clearLoadTransactionsMessage() {
+    this.loadTransactionsSubject.next();
+  }
+
+  public getLoadTransactionsMessage(): Observable<any> {
+    return this.loadTransactionsSubject.asObservable();
+  }
 }
