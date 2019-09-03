@@ -65,7 +65,7 @@
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
-              <i class="trash-icon"></i>
+              <i class="undo-icon"></i>
             </button>
           </div>          
         </th>
@@ -87,8 +87,8 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('cand_office_state')">{{cnt.candOfficeState}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('cand_office_district')">{{cnt.candOfficeDistrict}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
+        <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
 
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
@@ -115,7 +115,7 @@
           </div>
         </td>
       </tr>
-      <tr *ngIf="isContactViewActive()">
+      <!--<tr *ngIf="isContactViewActive()">
         <td></td>
         <td *ngIf="isColumnVisible('name')"></td>
         <td *ngIf="isColumnVisible('type')"></td>
@@ -131,7 +131,7 @@
         <td *ngIf="isColumnVisible('candOfficeState')"></td>
         <td *ngIf="isColumnVisible('candOfficeDistrict')"></td>
         <td></td>
-      </tr>
+      </tr>-->
     </tbody>
 
   </table>
