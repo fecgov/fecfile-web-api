@@ -3020,8 +3020,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer' ]
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer']
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3049,9 +3049,9 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view
-                                        where cmte_id='""" + cmte_id + """' """ + param_string 
-            # print("trans_query_string: ",trans_query_string)
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                                        where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
+            print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
             if sortcolumn and sortcolumn != 'default':
                 trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
