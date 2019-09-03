@@ -685,7 +685,22 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public linkAllSelected(): void {
     alert('Link multiple report requirements have not been finalized');
   }
+  
+  public printReport(): void{
+    alert('Print report is not yet supported');
+  }
 
+  public uploadReport(): void{
+    alert('Upload report is not yet supported');
+  }
+
+  public downloadReport(): void{
+    alert('Download report is not yet supported');
+  }
+
+  
+
+  
   /**
    * Trash all reports selected by the user.
    */

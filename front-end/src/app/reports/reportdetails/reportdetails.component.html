@@ -158,20 +158,17 @@
 
 
                         <div id="forms__trx-dropdown-action1" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="viewReport(report)">
-                                <i class="fas fa-eye"></i>View
-                            </button>
                             <button class="dropdown-item" (click)="editReport(report)">
-                                <i class="fas fa-edit"></i>Edit
+                                <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
-                                <i class="fa fa-file-text"></i>Download JSON
-                            </button>
-                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
-                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            <button class="dropdown-item" (click)="printReport(report)">
+                                <i class="fas fa-print"></i> Print
+                            </button>                            
+                            <button class="dropdown-item" (click)="uploadReport(report)">
+                                <i class="fas fa-upload"></i> Upload
                             </button>
                             <button class="dropdown-item" (click)="trashReport(report)">
-                                <i class="fas fa-trash"></i>Trash
+                                <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
                     </div>
@@ -185,17 +182,17 @@
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
-                                <i class="fas fa-eye"></i>View
+                                <i class="fas fa-eye"></i> View
                             </button>
                             <button class="dropdown-item" (click)="amendReport(report)">
-                                <i class="fas fa-edit"></i>Amend
+                                <i class="fas fa-edit"></i> Amend
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
-                                <i class="fa fa-file-text"></i>Download JSON
+                            <button class="dropdown-item" (click)="downloadReport(report)">
+                                <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
-                                <i class=" fa fa-file-pdf-o"></i>Download PDF
-                            </button>
+                            <button class="dropdown-item" (click)="printReport(report)">
+                                <i class="fas fa-print"></i> Print
+                            </button> 
                         </div>
                     </div>
 
@@ -208,14 +205,14 @@
                         </button>
                         <div id="forms__trx-dropdown-action3" class="dropdown-menu" ngbDropdownMenu>
                             <button class="dropdown-item" (click)="viewReport(report)">
-                                <i class="fas fa-eye"></i>View
+                                <i class="fas fa-eye"></i> View
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
-                                <i class="fa fa-file-text"></i>Download JSON
+                            <button class="dropdown-item" (click)="downloadReport(report)">
+                                <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
-                                <i class=" fa fa-file-pdf-o"></i>Download PDF
-                            </button>
+                            <button class="dropdown-item" (click)="printReport(report)">
+                                <i class="fas fa-print"></i> Print
+                            </button> 
                         </div>
                     </div>
 
@@ -227,20 +224,17 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action4" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="viewReport(report)">
-                                <i class="fas fa-eye"></i>View
-                            </button>
                             <button class="dropdown-item" (click)="editReport(report)">
-                                <i class="fas fa-edit"></i>Edit
+                                <i class="fas fa-edit"></i> Edit
                             </button>
-                            <button class="dropdown-item" (click)="downloadReportAsJSON(report)">
-                                <i class="fa fa-file-text"></i>Download JSON
-                            </button>
-                            <button class="dropdown-item" (click)="downloadReportAsPDF(report)">
-                                <i class=" fa fa-file-pdf-o"></i>Download PDF
+                            <button class="dropdown-item" (click)="printReport(report)">
+                                <i class="fas fa-print"></i> Print
+                            </button>                            
+                            <button class="dropdown-item" (click)="uploadReport(report)">
+                                <i class="fas fa-upload"></i> Upload
                             </button>
                             <button class="dropdown-item" (click)="trashReport(report)">
-                                <i class="fas fa-trash"></i>Trash
+                                <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
 
