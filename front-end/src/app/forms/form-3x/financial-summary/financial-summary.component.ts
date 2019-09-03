@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { FinancialSummaryService } from '../financial-summary/financial-summary.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 
 @Component({
   selector: 'f3x-financial-summary',
@@ -31,6 +32,7 @@ export class FinancialSummaryComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
     private _financialSummaryService: FinancialSummaryService,
+    private _transactionsMessageService: TransactionsMessageService,
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _router: Router
@@ -92,6 +94,7 @@ export class FinancialSummaryComponent implements OnInit {
       }
     }
     console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
+    this._transactionsMessageService.sendLoadTransactionsMessage(this.reportId);
     this._router.navigate([`/forms/form/${this._formType}`], {
       queryParams: { step: 'transactions', reportId: this.reportId }
     });
