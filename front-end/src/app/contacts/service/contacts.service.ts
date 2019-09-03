@@ -160,8 +160,6 @@ export class ContactsService {
    * @return     {Observable}
    */
   public getUserDeletedContacts(
-    formType: string,
-    reportId: string,
     page: number,
     itemsPerPage: number,
     sortColumnName: string,
@@ -259,10 +257,11 @@ export class ContactsService {
       model.employer = row.employer;
       model.occupation = row.occupation;
       model.phoneNumber = row.phoneNumber;
-      model.officeSought = row.officeSought;
-      model.officeState = row.officeState;
-      model.district = row.district;
       model.entity_name = row.entity_name;
+      model.candOffice = row.candOffice;
+      model.candOfficeState = row.candOfficeState;
+      model.candOfficeDistrict = row.candOfficeDistrict;
+      model.candCmteId = row.candCmteId;
       modelArray.push(model);
     }
     return modelArray;
@@ -321,21 +320,25 @@ export class ContactsService {
       case 'phoneNumber':
         name = 'phoneNumber';
         break;  
-      case 'officeSought':
-        name = 'officeSought';
+      case 'entityName':
+        name= 'entityName';
         break;
-      case 'officeState':
-        name = 'officeState';
+      case 'candOffice':
+        name= 'candOffice';
         break;
-      case 'district':
-        name = 'district';
+      case 'candOfficeState':
+        name= 'candOfficeState';
         break;
-      case 'entity_name':
-        name= 'entity_name';
-        break;
+      case 'candOfficeDistrict':
+        name= 'candOfficeDistrict';
+        break;       
+      case 'candCmteId':
+        name= 'candCmteId';
+        break;       
       default:
     }
     return name ? name : '';
+
   }
   /**
    * Map front-end model fields to server fields.
@@ -360,11 +363,11 @@ export class ContactsService {
     serverObject.employer = model.employer;
     serverObject.occupation = model.occupation;
     serverObject.phoneNumber = model.phoneNumber;
-    serverObject.officeSought = model.officeSought;
-    serverObject.officeState = model.officeState;
-    serverObject.district = model.district;
-    serverObject.district = model.entity_name;
-    
+    serverObject.entityName = model.entity_name;
+    serverObject.candOffice = model.candOffice;
+    serverObject.candOfficeState = model.candOfficeState;
+    serverObject.candOfficeDistrict = model.candOfficeDistrict;
+    serverObject.candCmteId = model.candCmteId;
     return serverObject;
   }
 
@@ -483,28 +486,6 @@ export class ContactsService {
     return array;
   }
 
-  /**
-   * Delete contacts from the Recyling Bin.
-   *
-   * @param contacts the contacts to delete
-   */
-  public deleteRecycleBinContact(contacts: Array<ContactModel>): Observable<any> {
-
-
-    // mocking the server API until it is ready.
-
-    for (const cnt of contacts) {
-      const index = this.mockRestoreTrxArray.findIndex(
-        item => item.transaction_id === cnt.id);
-
-      if (index !== -1) {
-        this.mockRestoreTrxArray.splice(index, 1);
-      }
-    }
-
-    return Observable.of('');
-  }
-
 
   /**
    * Get transaction category types
@@ -593,11 +574,11 @@ export class ContactsService {
     * @param reportId the unique identifier for the Report
     * @param contacts the contacts to trash or restore
     */
-   public trashOrRestoreContacts(action: string, reportId: string, contacts: Array<ContactModel>) {
+   public trashOrRestoreContacts(action: string, contacts: Array<ContactModel>) {
 
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/core/trash_restore_contacts';
+    const url = '/core/trash_restore_contact';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -740,7 +721,7 @@ export class ContactsService {
    *
    * @param      {string}  formType  The form type
    */
-  public putScheduleA(formType: string): Observable<any> {
+  /*public putScheduleA(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -837,6 +818,32 @@ export class ContactsService {
           return false;
         })
       );
+  }*/
+
+  public deleteRecycleBinContact(contacts: Array<ContactModel>): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/delete_trashed_contacts';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    const actions = [];
+    for (const con of contacts) {
+      actions.push({
+        id: con.id
+      });
+    }
+    request.actions = actions;
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+     .map(res => {
+          return false;
+        });
   }
 
 }
