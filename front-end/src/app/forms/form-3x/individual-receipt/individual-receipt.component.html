@@ -478,24 +478,41 @@
         </ng-container>
 
       </ng-container>
+      <app-sub-transactions-table
+        [hidden]="!isShowChildTransactions()"
+        [subTransactions]="subTransactions"
+      ></app-sub-transactions-table>
+      <div class="forms__btn-container">
+        <button *ngIf="subTransactionInfo?.isParent" 
+          class="btn btn-primary btn-left" (click)="doValidateReceipt(true)">
+          <i class="plus-icon-circle" aria-hidden="true"></i>
+          Add {{ subTransactionInfo.subTransactionTypeDescription }}
+        </button>
+      </div>
     </section>
     <footer>
       <footer>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+              <div class="forms__btn-container">
+              <button *ngIf="!subTransactionInfo" 
+                class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
-              <button class="btn btn-secondary btn-right" (click)="doValidateReceipt()">
+              <button *ngIf="subTransactionInfo" 
+                class="btn btn-previous btn-left" type="button" (click)="cancel()">
+                Cancel
+              </button>
+              <button class="btn btn-secondary btn-right" (click)="doValidateReceipt(false)">
                 Save &amp; Add Transaction
               </button>
+              <a *ngIf="subTransactionInfo?.isParent === false" 
+                class="btn btn-primary btn-right" (click)="returnToParent()">
+                Return to {{ subTransactionInfo.transactionTypeDescription }}
+              </a> 
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
-              </a>
-              <!-- <a class="btn btn-previous btn-right" (click)="addChild()">
-                Add Child
-              </a> -->
+              </a>             
             </div>
           </div>
         </div>

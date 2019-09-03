@@ -127,6 +127,29 @@
           }
         }
       }
+      .forms__btn-container {
+        margin: 0 auto;
+        padding: 0;
+        width: 80%;
+        @include media(tablet) {
+          margin: 0;
+          padding: 0;
+          width: 95%;
+        }
+        @include media(mediumDesktop) {
+          width: 95%;
+          .btn-right {
+            margin-right: 20px;
+          }
+        }
+        @include media(largeDesktop) {
+          width: 95%;
+          .btn-right {
+            margin-right: 20px;
+          }
+        }
+        @include clearfix();
+      }
     }
   }
   footer {
