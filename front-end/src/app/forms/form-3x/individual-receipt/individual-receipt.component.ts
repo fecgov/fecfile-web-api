@@ -293,7 +293,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // as it is in F3X component, the form data must be set in this way
     // to avoid race condition
     if (this._transactionToEdit) {
-      this._setFormDataValues(this._transactionToEdit.transactionId);
+      this._setFormDataValues(this._transactionToEdit.transactionId, this._transactionToEdit.apiCall);
     }
 
     // get form data API is passing X for memo code value.
@@ -987,6 +987,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
             el.value = this._transactionToEdit.transactionId;
+          } else if (el.name === 'api_call') {
+            el.value = this._transactionToEdit.apiCall;
           } 
         });
       }
@@ -1976,8 +1978,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this._selectedCandidateChangeWarnChild = {};
 
         // this.transactionType = formData.transactionTypeIdentifier;
-
-        this._setFormDataValues(formData.transactionId);
+        this._setFormDataValues(formData.transactionId, formData.apiCall);
       }
     }
   }
@@ -1987,10 +1988,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    *
    * @param transactionId
    */
-  private _setFormDataValues(transactionId: string) {
+  private _setFormDataValues(transactionId: string, apiCall: string) {
     const reportId = this._getReportIdFromStorage();
     this.subTransactions = [];
-    this._receiptService.getDataScheduleA(reportId, transactionId).subscribe(res => {
+    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {

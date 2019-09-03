@@ -237,12 +237,13 @@ export class IndividualReceiptService {
   /**
    * Gets the schedule after submitted.
    *
-   * @param      {string}  formType  The form type
-   * @param      {any}     receipt   The receipt
+   * @param      {string}  reportId  The report Id
+   * @param      {string}  transactionId   The Transaction Id
+   * @param      {string}  apiCall   This parameter derives the API call
    */
-  public getDataScheduleA(reportId: string, transactionId: string): Observable<any> {
+  public getDataSchedule(reportId: string, transactionId: string, apiCall: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/sa/schedA`;
+    const url: string = `${environment.apiUrl}${apiCall}`;
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);

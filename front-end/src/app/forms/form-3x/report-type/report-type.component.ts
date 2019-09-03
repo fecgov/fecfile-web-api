@@ -579,6 +579,7 @@ export class ReportTypeComponent implements OnInit {
     console.log('report type selected: ', type);
     if(document.getElementById(type) != null) {
         document.getElementById(type).click();
+        console.log(type, ' report clicked');
     }
   }
 }

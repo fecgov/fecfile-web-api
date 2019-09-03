@@ -187,8 +187,10 @@ export class TypeComponent implements OnInit {
     This function is called while selecting a list from report screen
   */
   public optionsListClick(type): void {
+    console.log("Selected report =", type);
     if(document.getElementById(type) != null) {
       document.getElementById(type).click();
+      console.log("Selected report clicked");
     }
   }
 
