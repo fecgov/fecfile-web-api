@@ -26,7 +26,6 @@ import { TransactionModel } from '../model/transaction.model';
   public transactionsModel: Array<TransactionModel>;
 
   public constructor(
-    private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService
   ) { }
 
