@@ -8,7 +8,10 @@ import { UtilService } from '../../shared/utils/util.service';
 import { ActiveView } from '../reportheader/reportheader.component';
 import { ReportsMessageService } from '../service/reports-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { GetReportsResponse } from '../../reports/service/report.service';
 import { reportModel } from '../model/report.model';
@@ -21,6 +24,7 @@ import {
   form99PrintPreviewResponse,
   form3xReportTypeDetails
 } from '../../shared/interfaces/FormsService/FormsService';
+import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
 
 @Component({
   selector: 'app-reportdetails',
@@ -823,28 +827,24 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * @param rep the Report to restore
    */
   public restoreReport(rep: reportModel): void {
-
     this._dialogService
       .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService
-            .trashOrRestoreReports('restore', rep)
-            .subscribe((res: GetReportsResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'Report ' + rep.report_id + ' has been restored!',
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
+          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+            this.getRecyclingPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'Report ' + rep.report_id + ' has been restored!',
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          });
         } else if (res === 'cancel') {
         }
       });
   }
-  
 
   /**
    * Delete selected reports from the the recyle bin.
@@ -1251,48 +1251,44 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       });
   }*/
 
-public trashReport(rep: reportModel): void {
-    console.log("trashReport ",rep);
+  public trashReport(rep: reportModel): void {
+    console.log('trashReport ', rep);
     this._dialogService
       .confirm('You are about to delete this report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService
-            .trashOrRestoreReports('trash', rep)
-            .subscribe((res: GetReportsResponse) => {
-              this.getReportsPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
+          this._reportsService.trashOrRestoreReports('trash', rep).subscribe((res: GetReportsResponse) => {
+            this.getReportsPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          });
         } else if (res === 'cancel') {
         }
       });
   }
 
- public restorereport(rep: reportModel): void {
+  public restorereport(rep: reportModel): void {
     this._dialogService
       .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
           // this._reportsService.restorereport(rep)
           //   .subscribe((res: GetReportsResponse) => {
-          this._reportsService
-            .trashOrRestoreReports('restore', rep)
-            .subscribe((res: GetReportsResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'report ' + rep.report_id + ' has been restored!',
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
+          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+            this.getRecyclingPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'report ' + rep.report_id + ' has been restored!',
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          });
         } else if (res === 'cancel') {
         }
       });
@@ -1318,29 +1314,25 @@ public trashReport(rep: reportModel): void {
 
     this._dialogService.confirm(beforeMessage, ConfirmModalComponent, 'Caution!').then(res => {
       if (res === 'okay') {
-        this._reportsService
-          .deleteRecycleBinReport(selectedReports)
-          .subscribe((res: GetReportsResponse) => {
-            this.getRecyclingPage(this.config.currentPage);
+        this._reportsService.deleteRecycleBinReport(selectedReports).subscribe((res: GetReportsResponse) => {
+          this.getRecyclingPage(this.config.currentPage);
 
-            let afterMessage = '';
-            if (selectedReports.length === 1) {
-              afterMessage = `Report ${selectedReports[0].report_id} has been successfully deleted`;
-            } else {
-              afterMessage = 'Reports have been successfully deleted.   ' + repIds;
-            }
-            this._dialogService.confirm(
-              afterMessage,
-              ConfirmModalComponent,
-              'Success!',
-              false,
-              ModalHeaderClassEnum.successHeader
-            );
-          });
+          let afterMessage = '';
+          if (selectedReports.length === 1) {
+            afterMessage = `Report ${selectedReports[0].report_id} has been successfully deleted`;
+          } else {
+            afterMessage = 'Reports have been successfully deleted.   ' + repIds;
+          }
+          this._dialogService.confirm(
+            afterMessage,
+            ConfirmModalComponent,
+            'Success!',
+            false,
+            ModalHeaderClassEnum.successHeader
+          );
+        });
       } else if (res === 'cancel') {
       }
     });
   }
-
-  
 }
