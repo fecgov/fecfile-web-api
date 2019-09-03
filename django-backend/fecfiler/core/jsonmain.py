@@ -41,8 +41,8 @@ SCHED_SCHED_CODES_DICT = {
         # 'sched_c1': 'SC1',
         # 'sched_c2': 'SC2',
         # 'sched_d': 'SD',
-        # 'sched_e': 'SE',
-        # 'sched_f': 'SF',
+        'sched_e': 'SE',
+        'sched_f': 'SF',
         # 'sched_h1': 'SH1',
         # 'sched_h2': 'SH2',
         # 'sched_h3': 'SH3',
@@ -60,7 +60,9 @@ FORMTYPE_SCHEDULES_DICT = {
 # Dictionary mapping schedules to DB table name
 SCHEDULES_DBTABLES_DICT = {
     'SA': 'public.sched_a',
-    'SB': 'public.sched_b'
+    'SB': 'public.sched_b',
+    'SE': 'public.sched_e',
+    'SF': 'public.sched_f'
 }
 
 # Dictionary that excludes line numbers from final json
@@ -299,7 +301,7 @@ def create_json_builders(request):
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [
-            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}]
+            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_e'}, {'sched_type': 'sched_f'}]
         # Adding Summary data to output based on form type
         if form_type == 'F3X' and (not transaction_flag):
             # Iterating through schedules list and populating data into output
@@ -1331,6 +1333,461 @@ def sample_sql_generate(request):
                 file.write(FEA_CC_STRING)
                 file.write(FEA_CC_MEMO_STRING)
                 file.write(FEA_PAY_MEMO_STRING)
+
+
+                List_SE_similar_IE = ['IE', 'IE_CC_PAY_MEMO', 'IE_STAF_REIM_MEMO', 'IE_VOID']
+                IE_STRING = ""
+                for tran in List_SE_similar_IE:
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType", 
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode", 
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    to_char(t1.dissemination_date, ''MM/DD/YYYY'') AS "disseminationDate", 
+                    t1.expenditure_amount AS "expenditureAmount",
+                    to_char(t1.disbursement_date,''MM/DD/YYYY'') AS "disbursementDate",
+                    t1.calendar_ytd_amount AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    to_char(t1.date_signed,''MM/DD/YYYY'') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_STRING += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_sql.sql", 'w')
+                file.write(IE_STRING)
+                file.close()
+                List_SE_similar_IE_CC = ['IE_CC_PAY', 'IE_PMT_TO_PROL']
+                IE_CC_STRING = ""
+                for tran in List_SE_similar_IE_CC:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType", 
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode",
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    to_char(t1.dissemination_date,''MM/DD/YYYY'') AS "disseminationDate", 
+                    t1.expenditure_amount AS "expenditureAmount",
+                    to_char(t1.disbursement_date,''MM/DD/YYYY'') AS "disbursementDate",
+                    t1.calendar_ytd_amount AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    to_char(t1.date_signed,''MM/DD/YYYY'') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_CC_STRING  += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_CC_sql.sql", 'w')
+                file.write(IE_CC_STRING)
+                file.close()
+
+
+                List_SE_similar_IE_STAF_REIM = ['IE_STAF_REIM', 'IE_PMT_TO_PROL_MEMO']
+                IE_STAF_REIM_STRING = ""
+                for tran in List_SE_similar_IE_STAF_REIM:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode", 
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    to_char(t1.dissemination_date,''MM/DD/YYYY'') AS "disseminationDate", 
+                    t1.expenditure_amount AS "expenditureAmount",
+                    to_char(t1.disbursement_date,''MM/DD/YYYY'') AS "disbursementDate",
+                    t1.calendar_ytd_amount AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    to_char(t1.date_signed,''MM/DD/YYYY'') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_STAF_REIM_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_STAF_REIM_sql.sql", 'w')
+                file.write(IE_STAF_REIM_STRING)
+                file.close()
+
+                file = open("/tmp/SE_sql.sql", 'w')
+                file.write(IE_STRING)
+                file.write(IE_CC_STRING)
+                file.write(IE_STAF_REIM_STRING)
+                file.close()
+
+                List_SF_similar_CORD_EXP = ['COEXP_PARTY']
+                CORD_EXP_STRING = ""
+                for tran in List_SF_similar_CORD_EXP:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    t1.expenditure_amount AS "expenditureAmount",
+                    t1.aggregate_general_elec_exp AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_EXP_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_EXP_sql.sql", 'w')
+                file.write(CORD_EXP_STRING)
+                file.close()
+
+
+                List_SF_similar_CORD_EXP_CC = ['COEXP_CC_PAY', 'COEXP_PMT_PROL']
+
+                CORD_EXP_CC_STRING = ""
+                for tran in List_SF_similar_CORD_EXP_CC:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    t1.expenditure_amount AS "expenditureAmount",
+                    t1.aggregate_general_elec_exp AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_EXP_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_EXP_CC_sql.sql", 'w')
+                file.write(CORD_EXP_CC_STRING)
+                file.close()
+
+                List_SF_similar_CORD_CC_MEMO = ['COEXP_CC_PAY_MEMO', 'COEXP_STAF_REIM_MEMO', 'COEXP_PARTY_VOID']
+
+                CORD_CC_MEMO_STRING = ""
+                for tran in List_SF_similar_CORD_CC_MEMO:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    t1.expenditure_amount AS "expenditureAmount",
+                    t1.aggregate_general_elec_exp AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_CC_MEMO_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_CC_MEMO_sql.sql", 'w')
+                file.write(CORD_CC_MEMO_STRING)
+                file.close()
+
+                List_SF_similar_CORD_REIM = ['COEXP_STAF_REIM', 'COEXP_PMT_PROL_MEMO']
+                CORD_REIM_STRING = ""
+                for tran in List_SF_similar_CORD_REIM:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    t1.expenditure_amount AS "expenditureAmount",
+                    t1.aggregate_general_elec_exp AS "aggregateGeneralElectionExpanded",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_REIM_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_REIM_sql.sql", 'w')
+                file.write(CORD_REIM_STRING)
+                file.close()
+                
+                file = open("/tmp/SF_sql.sql", 'w')
+                file.write(CORD_EXP_STRING)
+                file.write(CORD_EXP_CC_STRING)
+                file.write(CORD_CC_MEMO_STRING)
+                file.write(CORD_REIM_STRING)
+                file.close()
 
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:

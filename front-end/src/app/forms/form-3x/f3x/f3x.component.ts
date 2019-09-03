@@ -271,19 +271,29 @@ export class F3xComponent implements OnInit {
 
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             this.transactionType = e.transactionType ? e.transactionType : '';
+
+            if (e.action) {
+              if (e.action in ScheduleActions) {
+                this.scheduleAction = e.action;
+              }
+            }
+            // default to add if not set.
+            if (!this.scheduleAction) {
+              this.scheduleAction = ScheduleActions.add;
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
-            if (this.previousStep === 'transactions') {
+
+            if (this.scheduleAction === ScheduleActions.edit) {
               // message the child component rather than sending data as input because
               // ngOnChanges fires when the form fields are changed, thereby reseting the
               // fields to the previous value.  Result is fields can't be changed.
-              this._f3xMessageService.sendPopulateFormMessage(e.editOrView);
-              this.scheduleAction = e.editOrView.action;
-              const transactionModel: TransactionModel = e.editOrView.transactionModel;
+              this._f3xMessageService.sendPopulateFormMessage(e.transactionDetail);
+              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
               this.transactionTypeText = transactionModel.type;
               this.transactionType = transactionModel.transactionTypeIdentifier;
             } else {
-              this.scheduleAction = ScheduleActions.add;
               this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               this.transactionType = e.transactionType ? e.transactionType : '';
             }

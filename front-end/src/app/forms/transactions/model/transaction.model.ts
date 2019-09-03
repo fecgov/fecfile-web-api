@@ -1,5 +1,6 @@
 export class TransactionModel {
   type: string;
+  entityId: string;
   transactionId: string;
   transactionTypeIdentifier: string;
   name: string;
@@ -23,6 +24,7 @@ export class TransactionModel {
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
+    this.entityId = transaction.entityId ? transaction.entityId : '';
     this.transactionId = transaction.transactionId ? transaction.transactionId : '';
     this.transactionTypeIdentifier = transaction.transactionTypeIdentifier ? transaction.transactionTypeIdentifier : '';
     this.name = transaction.name ? transaction.name : '';

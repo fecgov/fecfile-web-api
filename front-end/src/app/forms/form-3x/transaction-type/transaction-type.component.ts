@@ -10,6 +10,7 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { TransactionTypeService } from './transaction-type.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { F3xMessageService } from '../service/f3x-message.service';
+import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -109,6 +110,7 @@ export class TransactionTypeComponent implements OnInit {
         direction: 'next',
         step: 'step_3',
         previousStep: 'step_2',
+        action: ScheduleActions.add,
         transactionTypeText: this.transactionTypeText,
         transactionType: this.transactionType
       });
@@ -161,8 +163,6 @@ export class TransactionTypeComponent implements OnInit {
     this.transactionTypeFailed = false;
   }
 
-
-
   /**
    * Sets the secondary transaction categories.
    */
@@ -204,7 +204,6 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   public printPreview(): void {
-    
     this._reportTypeService.printPreview('transaction_category_screen', this._formType);
     this.status.emit({
       form: {},
@@ -217,11 +216,10 @@ export class TransactionTypeComponent implements OnInit {
     This function is called while selecting a list from transaction screen
   */
   public childOptionsListClick(id): void {
-    if(document.getElementById(id) != null) {
-        var obj = <HTMLInputElement>document.getElementById('option_'+id);
-        obj.click();
+    console.log('transaction type selected: ', id);
+    if (document.getElementById(id) != null) {
+      var obj = <HTMLInputElement>document.getElementById('option_' + id);
+      obj.click();
     }
   }
-
-
 }

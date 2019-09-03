@@ -19,6 +19,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { environment } from 'src/environments/environment';
+import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 
 @Component({
   selector: 'app-transactions-table',
@@ -46,6 +47,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public reportId: string;
 
   @Input()
+  public transactionId: string;
+
+  @Input()
   public routeData: any;
 
   @Input()
@@ -57,7 +61,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
-  // public pageReceived: boolean = false;
   public pageReceivedTransactions: boolean = false;
   public pageReceivedReports: boolean = false;
 
@@ -99,7 +102,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private currentSortedColumnName: string;
 
   /**
-   * Subscription for messags sent from the parent component to show the PIN Column
+   * Subscription for messages sent from the parent component to show the PIN Column
    * options.
    */
   private showPinColumnsSubscription: Subscription;
@@ -109,6 +112,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * to the transactions obtained from the server.
    */
   private keywordFilterSearchSubscription: Subscription;
+
+  private loadTransactionsSubscription: Subscription;
 
   private columnOptionCount = 0;
   private maxColumnOption = 6;
@@ -122,7 +127,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _reportTypeService: ReportTypeService,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _receiptService: IndividualReceiptService
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -137,6 +143,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             this.formType = filters.formType;
           }
         }
+        this.getPage(this.config.currentPage);
+      });
+
+    this.loadTransactionsSubscription = this._transactionsMessageService
+      .getLoadTransactionsMessage()
+      .subscribe((reportId: any) => {
+        this.reportId = reportId;
         this.getPage(this.config.currentPage);
       });
   }
@@ -164,6 +177,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
+
+    // If this does work send message from f3x when step is reports
+    // If it does work, put get reportIdfrom stor in common service
+    if (!this.reportId) {
+      // this.reportId = this._getReportIdFromStorage();
+    }
+    if (this.reportId) {
+      this.getPage(this.config.currentPage);
+    }
+
     // When coming from transaction route the reportId is not received
     // from the input perhaps due to the ngDoCheck in transactions-component.
     // TODO look at replacing ngDoCheck and reportId as Input()
@@ -179,44 +202,75 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  // /**
+  //  * Obtain the Report ID from local storage.
+  //  */
+  // private _getReportIdFromStorage() {
+  //   let reportId = '0';
+  //   let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+
+  //   if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+  //     form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+  //   }
+
+  //   console.log('viewTransactions form3XReportType', form3XReportType);
+
+  //   if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+  //     if (form3XReportType.hasOwnProperty('reportId')) {
+  //       reportId = form3XReportType.reportId;
+  //     } else if (form3XReportType.hasOwnProperty('reportid')) {
+  //       reportId = form3XReportType.reportid;
+  //     }
+  //   }
+  //   return reportId;
+  // }
+
   // TODO: DANGER - this ngDoCheck() implementation can get is an infinite loop and should be replaced by a message service
-  public ngDoCheck(): void {
-    const step: string = this._activatedRoute.snapshot.queryParams.step;
+  // public ngDoCheck(): void {
+  //   const step: string = this._activatedRoute.snapshot.queryParams.step;
+  //   const forceGet: string = this._activatedRoute.snapshot.queryParams.forceGet;
 
-    // // TODO replace this with a message.  The report ID is needed when viewing transactions
-    // // from the indv-recipt.
-    // if (this.reportId !== undefined && !this.pageReceived) {
-    //   this.getPage(this.config.currentPage);
+  //   // // TODO replace this with a message.  The report ID is needed when viewing transactions
+  //   // // from the indv-recipt.
+  //   // if (this.reportId !== undefined && !this.pageReceived) {
+  //   //   this.getPage(this.config.currentPage);
 
-    //   if (!this.pageReceived) {
-    //     this.pageReceived = true;
-    //   }
-    // }
-    // // Prevent looping
-    // if (step !== 'transactions' && !this.routeData.reportId) {
-    //   this.pageReceived = false;
-    // }
+  //   //   if (!this.pageReceived) {
+  //   //     this.pageReceived = true;
+  //   //   }
+  //   // }
+  //   // // Prevent looping
+  //   // if (step !== 'transactions' && !this.routeData.reportId) {
+  //   //   this.pageReceived = false;
+  //   // }
 
-    if (step === 'transactions') {
-      if (this.reportId !== undefined && !this.pageReceivedTransactions) {
-        this.getPage(this.config.currentPage);
+  //   if (step === 'transactions') {
+  //     // if (
+  //     //   (this.reportId !== undefined && !this.pageReceivedTransactions) ||
+  //     //   (this.reportId !== undefined && forceGet === 'true')
+  //     // ) {
+  //     if (this.reportId !== undefined && !this.pageReceivedTransactions) {
+  //       this.getPage(this.config.currentPage);
 
-        if (!this.pageReceivedTransactions) {
-          this.pageReceivedTransactions = true;
-        }
-      }
-    } else if (step === 'reports') {
-      if (this.reportId !== undefined && !this.pageReceivedReports) {
-        this.getPage(this.config.currentPage);
+  //       if (!this.pageReceivedTransactions) {
+  //         this.pageReceivedTransactions = true;
+  //       }
+  //     }
+  //   } else if (step === 'reports') {
+  //     if (this.reportId !== undefined && !this.pageReceivedReports) {
+  //       this.getPage(this.config.currentPage);
 
-        if (!this.pageReceivedReports) {
-          this.pageReceivedReports = true;
-        }
-      }
-    } else {
-      console.log(`step ${step} not supported`);
-    }
-  }
+  //       if (!this.pageReceivedReports) {
+  //         this.pageReceivedReports = true;
+  //       }
+  //     }
+  //   } else {
+  //     // console.log(`step ${step} not supported`);
+  //     // if (this.transactionId) {
+  //     //   this.getPage(this.config.currentPage);
+  //     // }
+  //   }
+  // }
 
   /**
    * A method to run when component is destroyed.
@@ -225,6 +279,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
+    this.loadTransactionsSubscription.unsubscribe();
   }
 
   /**
@@ -248,12 +303,34 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  getSubTransactions(transactionId) {
+    // const reportId = this._getReportIdFromStorage();
+    this._receiptService.getDataScheduleA(this.reportId, transactionId).subscribe(res => {
+      if (Array.isArray(res)) {
+        for (const trx of res) {
+          if (trx.hasOwnProperty('transaction_id')) {
+            if (trx.transaction_id === transactionId) {
+              if (trx.hasOwnProperty('child')) {
+                for (const subTrx of trx.child) {
+                  console.log('sub tran id ' + subTrx.transaction_id);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   /**
    * The Transactions for a given page.
    *
    * @param page the page containing the transactions to get
    */
   public getTransactionsPage(page: number): void {
+    if (!this.reportId) {
+      return;
+    }
     this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel = this._tableService.getColumnByName(
@@ -570,7 +647,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public printAllSelected(): void {
     //alert('Print all transactions is not yet supported');
-    console.log("TransactionsTableComponent printAllSelected...!");
+    console.log('TransactionsTableComponent printAllSelected...!');
 
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
