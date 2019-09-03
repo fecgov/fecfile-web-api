@@ -726,11 +726,12 @@ def put_schedB(datum):
             # }
             # prev_entity_list = get_entities(get_data)
             cand_data = put_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # else:
         #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
-        datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # entity_id = entity_data.get("entity_id")
         # datum["entity_id"] = entity_id
         try:
