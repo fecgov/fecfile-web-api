@@ -589,7 +589,8 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         logger.debug("...entity saved")
-        if "beneficiary_cand_entity_id" in datum:
+        logger.debug("***datum:{}".format(datum))
+        if datum.get("beneficiary_cand_entity_id"):
             logger.debug("saving cand data...")
             # get_data = {
             #     "cmte_id": datum.get("cmte_id"),
@@ -718,15 +719,15 @@ def put_schedB(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
-        if "beneficiary_cand_entity_id" in datum:
+        if datum.get("beneficiary_cand_entity_id"):
             # get_data = {
             #     "cmte_id": datum.get("cmte_id"),
             #     "entity_id": datum.get("entity_id"),
             # }
             # prev_entity_list = get_entities(get_data)
             cand_data = put_cand_entity(datum)
-        else:
-            cand_data = post_cand_entity(datum)
+        # else:
+        #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
         datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
