@@ -726,11 +726,12 @@ def put_schedB(datum):
             # }
             # prev_entity_list = get_entities(get_data)
             cand_data = put_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # else:
         #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
-        datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # entity_id = entity_data.get("entity_id")
         # datum["entity_id"] = entity_id
         try:
@@ -852,9 +853,9 @@ def schedB_sql_dict(data):
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "expenditure_date": date_format(data.get("expenditure_date")),
             "expenditure_amount": check_decimal(data.get("expenditure_amount", None)),
-            "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount", 0)
-            ),
+            # "semi_annual_refund_bundled_amount": check_decimal(
+            #     data.get("semi_annual_refund_bundled_amount", 0)
+            # ),
             "expenditure_purpose": data.get("expenditure_purpose"),
             "category_code": data.get("category_code"),
             "memo_code": data.get("memo_code"),
@@ -915,6 +916,14 @@ def schedB_sql_dict(data):
         }
         if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
             datum["aggregate_amt"] = data.get("aggregate_amt")
+
+        if "semi_annual_refund_bundled_amount" in data and check_decimal(
+            data.get("semi_annual_refund_bundled_amount")
+        ):
+            datum["semi_annual_refund_bundled_amount"] = data.get(
+                "semi_annual_refund_bundled_amount"
+            )
+
         if "entity_id" in data and check_null_value(data.get("entity_id")):
             datum["entity_id"] = data.get("entity_id")
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(

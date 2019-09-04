@@ -588,10 +588,12 @@ export class ContactsService {
     for (const cnt of contacts) {
       actions.push({
         action: action,
-        transaction_id: cnt.id
+        id: cnt.id
       });
     }
     request.actions = actions;
+
+    console.log(" trashOrRestoreContacts request", request)
 
     return this._http
     .put(

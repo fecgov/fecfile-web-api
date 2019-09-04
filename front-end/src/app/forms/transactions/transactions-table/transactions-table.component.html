@@ -66,17 +66,11 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="viewAllSelected()">
-                <i class="view-icon"></i> View
-              </button>
               <button class="dropdown-item" (click)="printAllSelected()">
                 <i class="print-icon"></i> Print
               </button>
               <button class="dropdown-item" (click)="exportAllSelected()">
                 <i class="file-export-icon"></i> Export
-              </button>
-              <button class="dropdown-item" (click)="linkAllSelected()">
-                <i class="link-icon"></i> Link
               </button>
               <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
                 <i class="trash-icon"></i> Trash
@@ -130,17 +124,14 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                <i class="copy-icon"></i> Clone
-              </button>
-              <button class="dropdown-item" (click)="linkTransaction(trx)">
-                <i class="link-icon"></i> Link
-              </button>
-              <button class="dropdown-item" (click)="viewTransaction(trx)">
-                <i class="view-icon"></i> View
-              </button>
               <button class="dropdown-item" (click)="editTransaction(trx)">
                 <i class="edit-icon"></i> Edit
+              </button>
+              <button class="dropdown-item" (click)="printPreview(report)">
+                <i class="fas fa-print"></i> Print
+            </button>  
+              <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                <i class="far fa-copy"></i> Clone
               </button>
               <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trx)">
                 <i class="trash-icon"></i> Trash

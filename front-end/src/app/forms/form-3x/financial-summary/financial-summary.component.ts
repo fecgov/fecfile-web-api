@@ -108,6 +108,10 @@ export class FinancialSummaryComponent implements OnInit {
     alert('This functionality not yet implemented...!');
   }
 
+  public ImportTransactions(): void {
+    alert('Import transaction is not yet supported');
+  }
+  
   /**
    * A method to run when component is destroyed.
    */

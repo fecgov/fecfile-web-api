@@ -114,7 +114,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private readonly maxColumnOption = 4;
+  private readonly maxColumnOption = 5;
   private allContactsSelected: boolean;
 
   constructor(
@@ -309,6 +309,11 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
         this.contactsModel = res.contacts;
 
+        this._contactsService.addUIFileds(res);
+        this._contactsService.mockApplyFilters(res, this.filters);
+        const contactsModelL = this._contactsService.mapFromServerFields(res.contacts);
+        this.contactsModel = contactsModelL;
+
         // handle non-numeric amounts
         // TODO handle this server side in API
         // for (const model of this.contactsModel) {
@@ -319,6 +324,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
         this.allContactsSelected = false;
+
+
+        
       });
   }
 
@@ -1013,18 +1021,19 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       case this.contactsView:
         this.setCacheValuesforView(this.contactSortableColumnsLSK,
           this.contactCurrentSortedColLSK, this.contactPageLSK);
+          this.contactPageLSK
         break;
       case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+          this.recyclePageLSK
         break;
       default:
         break;
     }
   }
 
-
-  /**
+ /**
    * Set the currently sorted column and current page in the cache.
    *
    * @param columnsKey the column settings key for the cache

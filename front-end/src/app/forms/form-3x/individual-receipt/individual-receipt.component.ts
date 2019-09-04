@@ -1239,6 +1239,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public printPreview(): void {
     this._reportTypeService.printPreview('individual_receipt', this._formType);
   }
+  public ImportTransactions(): void {
+    alert('Import transaction is not yet supported');
+  }
+  
 
   /**
    * @deprecated

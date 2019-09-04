@@ -3980,15 +3980,13 @@ def delete_trashed_contacts(request):
     except Exception as e:
         return Response('The delete_trashed_contacts API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def get_all_trashed_contacts(request):
     """
     API that provides all the deleted contacts for a specific committee
     """
-    if request.method == 'GET':
+    if request.method == 'POST':
         try:
-        
-            if request.method == 'POST':
                 # print("request.data: ", request.data)
                 cmte_id = request.user.username
                 param_string = ""
@@ -4044,14 +4042,16 @@ def get_all_trashed_contacts(request):
 
                 trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
-                print("contacts recycle trans_query_string: ",trans_query_string)
-
+                
                 if sortcolumn and sortcolumn != 'default':
                     trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
                 elif sortcolumn == 'default':
                     trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+                
+                print("contacts recycle trans_query_string: ",trans_query_string)
+
                 with connection.cursor() as cursor:
-                    cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """, [cmte_id])) t""")
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
                     for row in cursor.fetchall():
                         data_row = list(row)
                         forms_obj=data_row[0]
@@ -4075,7 +4075,7 @@ def get_all_trashed_contacts(request):
                 forms_obj = paginator.page(page_num)
                 json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
                             'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
-            return Response(json_result, status=status_value)
+                return Response(json_result, status=status_value)
     
         except Exception as e:
             return Response("The contactsTable API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -4100,7 +4100,8 @@ def trash_restore_contact(request):
 
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
-
+        print("entity_id =", entity_id)
+        print("_delete =", _delete)
         try:
             trash_restore_sql_contact(cmte_id,
                 entity_id,
