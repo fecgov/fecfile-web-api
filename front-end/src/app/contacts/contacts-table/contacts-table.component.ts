@@ -582,7 +582,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     conIds = conIds.substr(0, conIds.length - 2);
 
     this._dialogService
-      .confirm('You are about to delete these transactions.   ' + conIds, ConfirmModalComponent, 'Caution!')
+      .confirm('You are about to delete these contacts.   ' + conIds, ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
           this._contactsService
@@ -668,7 +668,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   public trashContact(ctn: ContactModel): void {
     this._dialogService
-      .confirm('You are about to delete this transaction ' + ctn.id + '.', ConfirmModalComponent, 'Caution!')
+      .confirm('You are about to delete this contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
           this._contactsService
@@ -697,7 +697,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   public restoreContact(ctn: ContactModel): void {
     this._dialogService
-      .confirm('You are about to restore transaction ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
+      .confirm('You are about to restore contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
           // this._transactionsService.restoreTransaction(trx)
