@@ -987,6 +987,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
             el.value = this._transactionToEdit.transactionId;
+            // If Transaction Id is present, setting Action to Edit
+            this.scheduleAction = ScheduleActions.edit;
           } else if (el.name === 'api_call') {
             el.value = this._transactionToEdit.apiCall;
           } 
