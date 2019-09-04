@@ -4091,25 +4091,55 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
 
 @api_view(['PUT'])
 def trash_restore_contact(request):
-    """api for trash and resore report. """
-
+    """api for trash and restore contact. """
+    cmte_id = request.user.username
     print("trash_restore_contact  request.data =", request.data.get('actions', []))
     for _action in request.data.get('actions', []):
         entity_id = _action.get('id', '')
-        cmte_id = request.user.username
 
+        result='failed'
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
-        print("entity_id =", entity_id)
-        print("_delete =", _delete)
         try:
-            trash_restore_sql_contact(cmte_id,
-                entity_id,
-                _delete)
+            if _delete == 'Y':
+                if check_contact_to_delete(cmte_id, entity_id) == 'N':
+                    result = 'failed'
+                else:
+                    trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                    result = 'success'
+            else:
+                trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                result = 'success'
+
+            if result=='success':
+                return Response({"result":"success"}, status=status.HTTP_200_OK)
+            else:   
+                return Response({"result":"failed"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response("The trash_restore_contact API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"result":"success"}, status=status.HTTP_200_OK)    
-    
+def check_contact_to_delete(cmte_id, entity_id):
+    try:
+        _delete = 'Y'
+        entity_id_found=''
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT entity_id FROM public.all_transactions_view vw, public.reports rp 
+                            WHERE rp.cmte_id = %s 
+                            AND rp.cmte_id = vw.cmte_id 
+                            AND rp.report_id = vw.report_id  
+                            AND  rp.status= 'Filed'
+                            AND vw.entity_id = %s """, [cmte_id, entity_id])           
+
+            entity_ids = cursor.fetchone()
+            entity_id_found = entity_ids[0]
+
+            if entity_id_found == '':
+                _delete = 'Y'
+            else:
+                _delete = 'N'
+
+        return _delete    
+    except Exception as e:
+        return Response("The check_contact_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     

@@ -674,14 +674,26 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
           this._contactsService
             .trashOrRestoreContacts('trash', [ctn])
             .subscribe((res: GetContactsResponse) => {
-              this.getContactsPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
+              console.log("trashContact res =", res);
+              if (res['result'] === 'success') {
+                this.getContactsPage(this.config.currentPage);
+                this._dialogService.confirm(
+                  'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  ConfirmModalComponent,
+                  'Success!',
+                  false,
+                  ModalHeaderClassEnum.successHeader
+                );
+              } else
+              {
+                this._dialogService.confirm(
+                  'Contact has not been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  ConfirmModalComponent,
+                  'Warning!',
+                  false,
+                  ModalHeaderClassEnum.errorHeader
+                );
+              }
             });
         } else if (res === 'cancel') {
         }
