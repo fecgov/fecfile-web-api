@@ -1126,6 +1126,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               previousStep: 'step_2',
               transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
               transactionType: this.subTransactionInfo.subTransactionType,
+              apiCall: this.subTransactionInfo.api_call,
               action: ScheduleActions.addSubTransaction
             };
             this.status.emit(addSubTransEmitObj);
@@ -1173,6 +1174,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
+    transactionModel.apiCall = this.subTransactionInfo.api_call;
     const emitObj = {
       form: {},
       direction: 'next',
@@ -1892,6 +1894,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   { onlySelf: true }
                 );
               }
+              
             }
             if (res.data.hasOwnProperty('subTransactions')) {
               if (Array.isArray(res.data.subTransactions)) {
