@@ -1021,6 +1021,8 @@ def schedB(request):
                     request.query_params.get("transaction_id")
                 )
             datum = get_schedB(data)
+            for obj in datum:
+                obj.update({"api_call": "sb/schedB"})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)

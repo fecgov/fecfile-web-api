@@ -1054,6 +1054,8 @@ def schedA(request):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
             datum = get_schedA(data)
+            for obj in datum:
+                obj.update({'api_call' : 'sa/schedA'})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
