@@ -645,15 +645,29 @@ def get_schedA(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
+            for obj in forms_obj:
+                obj.update({'api_call' : 'sa/schedA'})
+
             childA_forms_obj = get_list_child_schedA(
                 report_id, cmte_id, transaction_id)
+            for obj in childA_forms_obj:
+                obj.update({'api_call' : 'sa/schedA'})
+
             childB_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
+            for obj in childB_forms_obj:
+                obj.update({'api_call' : 'sb/schedB'})
+
             child_forms_obj = childA_forms_obj + childB_forms_obj
+            # for obj in childB_forms_obj:
+            #     obj.update({'api_call':''})
             if len(child_forms_obj) > 0:
                 forms_obj[0]['child'] = child_forms_obj
         else:
             forms_obj = get_list_all_schedA(report_id, cmte_id)
+            for obj in forms_obj:
+                obj.update({'api_call' : 'sa/schedA'})
+
         return forms_obj
     except:
         raise
