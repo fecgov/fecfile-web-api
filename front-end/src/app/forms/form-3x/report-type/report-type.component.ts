@@ -41,6 +41,7 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = null;
+  @ViewChild('myDiv') myDiv: ElementRef;
 
   public frmReportType: FormGroup;
   public fromDateSelected: boolean = false;
@@ -213,7 +214,8 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
-      this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
+      //this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
+      this.reportTypeSelected = e.target.getAttribute('id');
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
       const dataReportType: string = e.target.getAttribute('data-report-type');
@@ -221,7 +223,6 @@ export class ReportTypeComponent implements OnInit {
       const currentReport: any = this.committeeReportTypes.filter(el => {
         return el.report_type === this.reportType;
       });
-
       if (dataReportType !== 'S') {
         this.toDateSelected = true;
         this.fromDateSelected = true;
@@ -268,7 +269,6 @@ export class ReportTypeComponent implements OnInit {
           window.localStorage.removeItem(`form_${this._formType}_report_type`);
         }
       }
-
       this.status.emit({
         form: this._formType,
         reportTypeRadio: this.reportTypeSelected
