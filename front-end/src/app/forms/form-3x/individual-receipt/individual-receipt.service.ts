@@ -6,12 +6,21 @@ import { CookieService } from 'ngx-cookie-service';
 import { UtilService } from '../../../shared/utils/util.service';
 import { environment } from '../../../../environments/environment';
 import { ScheduleActions } from './schedule-actions.enum';
+import { TransactionModel } from '../../transactions/model/transaction.model';
+import { DecimalPipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IndividualReceiptService {
-  constructor(private _http: HttpClient, private _cookieService: CookieService, private _utilService: UtilService) {}
+  constructor(
+    private _http: HttpClient,
+    private _cookieService: CookieService,
+    private _utilService: UtilService,
+    private _decimalPipe: DecimalPipe
+  ) {
+    console.log();
+  }
 
   /**
    * Gets the dynamic form fields.
@@ -282,50 +291,6 @@ export class IndividualReceiptService {
     });
   }
 
-  // /**
-  //  * Returns aggregate total for contributor.
-  //  *
-  //  * @param      {number}  reportId            The report identifier
-  //  * @param      {string}  transactionType     The transaction type
-  //  * @param      {string}  contributionDate    The contribution date
-  //  * @param      {string}  entityId            The entity identifier
-  //  * @param      {number}  contributionAmount  The contribution amount
-  //  */
-  // public aggregateAmount(
-  //   reportId: number,
-  //   transactionType: string,
-  //   contributionDate: string,
-  //   entityId: string,
-  //   contributionAmount: number
-  // ): Observable<any> {
-  //   const token: string = JSON.parse(this._cookieService.get('user'));
-  //   const url: string = `${environment.apiUrl}/sa/aggregate_amount`;
-  //   const data: any = {
-  //     report_id: reportId,
-  //     transaction_type: transactionType,
-  //     contribution_date: contributionDate,
-  //     entity_id: entityId,
-  //     contribution_amount: contributionAmount
-  //   };
-  //   let httpOptions = new HttpHeaders();
-
-  //   httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-  //   return this._http
-  //     .post(url, data, {
-  //       headers: httpOptions
-  //     })
-  //     .pipe(
-  //       map(res => {
-  //         if (res) {
-  //           console.log('res: ', res);
-  //           return res;
-  //         }
-  //         return false;
-  //       })
-  //     );
-  // }
-
   /**
    * Returns aggregate total for contributor.
    *
@@ -362,5 +327,86 @@ export class IndividualReceiptService {
       headers: httpOptions,
       params
     });
+  }
+
+  /**
+   * Obtain the Report ID from local storage.
+   */
+  public getReportIdFromStorage(formType: string) {
+    let reportId = '0';
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }
+
+    console.log('viewTransactions form3XReportType', form3XReportType);
+
+    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+      if (form3XReportType.hasOwnProperty('reportId')) {
+        reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
+      }
+    }
+    return reportId;
+  }
+
+  /**
+   *
+   * @param selectedEntityAggregate
+   * @param amount
+   * @param scheduleAction
+   * @param memoCode
+   * @param selectedEntity
+   * @param transactionToEdit
+   * @param transactionType
+   */
+  public determineAggregate(
+    selectedEntityAggregate: number,
+    amount: number,
+    scheduleAction: string,
+    memoCode: boolean,
+    selectedEntity: any,
+    transactionToEdit: TransactionModel,
+    transactionType: string
+  ): string {
+    let aggregate = 0;
+    amount = amount ? amount : 0;
+    selectedEntityAggregate = selectedEntityAggregate ? selectedEntityAggregate : 0;
+
+    if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
+      if (memoCode) {
+        aggregate = selectedEntityAggregate;
+      } else {
+        aggregate = amount + selectedEntityAggregate;
+      }
+    } else if (scheduleAction === ScheduleActions.edit) {
+      if (!transactionToEdit) {
+        return this._decimalPipe.transform(aggregate, '.2-2');
+      }
+      if (selectedEntity) {
+        if (selectedEntity.entity_id) {
+          if (selectedEntity.entity_id === transactionToEdit.entityId) {
+            // selected entity is same on saved transaction
+            // backout the old amount from aggregate
+            // apply new if memo not checked.
+            aggregate = selectedEntityAggregate - transactionToEdit.amount;
+            if (!memoCode) {
+              aggregate = aggregate + amount;
+            }
+          } else {
+            // selected entity differs from saved transaction
+            // don't back the saved amount from aggregate
+            // apply new if memo not checked.
+            if (!memoCode) {
+              aggregate = selectedEntityAggregate + amount;
+            }
+          }
+        }
+      }
+    } else {
+    }
+    return this._decimalPipe.transform(aggregate, '.2-2');
   }
 }
