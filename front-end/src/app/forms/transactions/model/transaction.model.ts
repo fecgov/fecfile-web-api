@@ -3,6 +3,7 @@ export class TransactionModel {
   entityId: string;
   apiCall: string;
   transactionId: string;
+  backRefTransactionId: string;
   transactionTypeIdentifier: string;
   name: string;
   street: string;
@@ -28,6 +29,7 @@ export class TransactionModel {
     this.entityId = transaction.entityId ? transaction.entityId : '';
     this.apiCall = transaction.apiCall ? transaction.apiCall : '';
     this.transactionId = transaction.transactionId ? transaction.transactionId : '';
+    this.backRefTransactionId = transaction.backRefTransactionId ? transaction.backRefTransactionId : '';
     this.transactionTypeIdentifier = transaction.transactionTypeIdentifier ? transaction.transactionTypeIdentifier : '';
     this.name = transaction.name ? transaction.name : '';
     this.street = transaction.street ? transaction.street : '';

@@ -1,4 +1,8 @@
-<table class="table table-striped table-hover table__sortable transactions__table">
+<table
+  [@fadeInOut]
+  *ngIf="transactionsModel?.length > 0"
+  class="table table-striped table-hover table__sortable transactions__table"
+>
   <thead>
     <tr>
       <th>Name</th>
@@ -25,17 +29,8 @@
             <i class="ellipsis-icon"></i>
           </button>
           <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-            <!-- <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                <i class="copy-icon"></i> Clone
-              </button> -->
-            <!-- <button class="dropdown-item" (click)="linkTransaction(trx)">
-                <i class="link-icon"></i> Link
-              </button> -->
-            <button class="dropdown-item" (click)="viewTransaction(trx)"><i class="view-icon"></i> View</button>
             <button class="dropdown-item" (click)="editTransaction(trx)"><i class="edit-icon"></i> Edit</button>
-            <!-- <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trx)">
-                <i class="trash-icon"></i> Trash
-              </button> -->
+            <button class="dropdown-item" (click)="trashTransaction(trx)"><i class="trash-icon"></i> Trash</button>
           </div>
         </div>
       </td>
