@@ -108,7 +108,7 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
           this._transactionsService
             .trashOrRestoreTransactions('trash', reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
-              this._getSubTransactions(reportId, trx.backRefTransactionId);
+              this._getSubTransactions(reportId, trx.backRefTransactionId, trx.apiCall);
               this._dialogService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transactionId,
                 ConfirmModalComponent,
@@ -122,9 +122,9 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
       });
   }
 
-  private _getSubTransactions(reportId: string, transactionId: string): void {
+  private _getSubTransactions(reportId: string, transactionId: string, apiCall: string): void {
     this.transactionsModel = [];
-    this._receiptService.getDataScheduleA(reportId, transactionId).subscribe(res => {
+    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {
