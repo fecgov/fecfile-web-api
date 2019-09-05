@@ -2332,7 +2332,7 @@ def summary_disbursements_for_sumamry_table(args):
         sql_output = period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
-            if data_row[0] == '21AI':
+            if data_row[0] in ['21AI', '21A']:
                 XXIAI_amount = XXIAI_amount + data_row[1]
                 XXIAI_amount_ytd = data_row[2]
             if data_row[0] == '21AII':
@@ -2482,10 +2482,7 @@ def summary_receipts_for_sumamry_table(args):
         sql_output = period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
-            if data_row[0] == '11A':
-                XIA_amount = XIA_amount + data_row[1]
-                XIA_amount_ytd = data_row[2]
-            if data_row[0] == '11AI':
+            if data_row[0] in ['11AI', '11A']:
                 XIAI_amount = XIAI_amount + data_row[1]
                 XIAI_amount_ytd = data_row[2]
             if data_row[0] == '11AII':
