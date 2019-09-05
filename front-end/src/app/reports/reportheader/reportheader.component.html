@@ -15,7 +15,10 @@
           <header>
               <div class="header-container">
                 <!--<h1 class="pb-1 m-3 border-bottom">Reports</h1>-->
-                  <h1>Reports</h1>
+                  <h1>Reports
+                  <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
+                    <span class="trash-icon"></span>
+                  </span></h1>
                 </div>
             </header>      
             <div> 
@@ -31,13 +34,13 @@
                       <i class="fas fa-filter"></i> Filter
                       </button> &nbsp;&nbsp;&nbsp;
   
-                      <button class="btn btn-primary" (click)="recycleReports()">
-                      <i class="fas fa-recycle"></i> Recycle
+                      <button *ngIf="isReportViewActive()"class="btn btn-primary" (click)="recycleReports()">
+                      <i class="trash-icon"></i> Recycle
                       </button>  &nbsp;&nbsp;&nbsp;      
 
-                      <button class="btn btn-primary" (click)="showReports()">
-                        <i class="fas fa-recycle"></i> Show Reports
-                        </button>      
+                      <button  *ngIf="isRecycleBinViewActive()" class="btn btn-primary" (click)="showReports()">
+                      <i class="table-icon"></i> Show Reports
+                      </button>      
   
                       <!--<div class="input-group pl-0 transactions__trx-search">
                           <div class="input-group-append" (click)="clearSearch()" 

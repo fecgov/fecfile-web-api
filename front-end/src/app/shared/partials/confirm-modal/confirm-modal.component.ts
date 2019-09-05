@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation, Input, HostListener } from '@angular/core';
 import { NgbActiveModal, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 export enum ModalHeaderClassEnum {
@@ -40,6 +40,13 @@ export class ConfirmModalComponent implements OnInit {
   private defaultMessage = 'You have unsaved changes! If you leave, your changes will be lost.';
   private defaultHeaderClass = ModalHeaderClassEnum.warningHeader;
   
+  @HostListener("document:keydown", ["$event"])
+  handleKeyup(event: KeyboardEvent) {
+      if (event.keyCode === 8) {
+          event.preventDefault();
+      }
+  }
+
   constructor(
     private _modalService: NgbModal,
     public activeModal: NgbActiveModal

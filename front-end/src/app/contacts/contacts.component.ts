@@ -548,12 +548,12 @@ export class ContactsComponent implements OnInit, OnDestroy {
    * Show the table of contacts in the recycle bin for the user.
    */
   public showRecycleBin() {
-    /*this.view = ActiveView.recycleBin;
+    this.view = ActiveView.recycleBin
 
       // Inform the filter component of the view change
-      this._contactsMessageService.sendSwitchFilterViewMessage(ActiveView.recycleBin);*/
+    this._contactsMessageService.sendSwitchFilterViewMessage(ActiveView.recycleBin);
 
-      alert('Recycle Bin functionality is not yet supported');
+    //  alert('Recycle Bin functionality is not yet supported');
   }
 
 

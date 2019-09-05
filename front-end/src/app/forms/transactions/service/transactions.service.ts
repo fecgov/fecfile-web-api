@@ -236,6 +236,7 @@ export class TransactionsService {
       model.type = row.transaction_type_desc;
       model.entityId = row.entity_id;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
+      model.apiCall = row.api_call;
       model.transactionId = row.transaction_id;
       model.name = row.name;
       model.street = row.street_1;
@@ -289,6 +290,9 @@ export class TransactionsService {
       case 'transactionId':
         name = 'transaction_id';
         break;
+      case 'apiCall':
+        name = 'api_call';
+        break;  
       case 'street':
         name = 'street_1';
         break;
@@ -346,6 +350,7 @@ export class TransactionsService {
     serverObject.entity_id = model.entityId;
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
+    serverObject.api_call = model.apiCall;
     serverObject.transaction_id = model.transactionId;
     serverObject.name = model.name;
     serverObject.street_1 = model.street;

@@ -589,7 +589,8 @@ def post_schedB(datum):
         else:
             entity_data = post_entities(datum)
         logger.debug("...entity saved")
-        if "beneficiary_cand_entity_id" in datum:
+        logger.debug("***datum:{}".format(datum))
+        if datum.get("beneficiary_cand_entity_id"):
             logger.debug("saving cand data...")
             # get_data = {
             #     "cmte_id": datum.get("cmte_id"),
@@ -683,11 +684,18 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
+            # adding hard-coded api call info to get object details
+            for obj in forms_obj:
+                obj.update({"api_call": "sb/schedB"})
             child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
+            for obj in forms_obj:
+                obj.update({"api_call": "sb/schedB"})
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
             forms_obj = get_list_all_schedB(report_id, cmte_id)
+            for obj in forms_obj:
+                obj.update({"api_call": "sb/schedB"})
         return forms_obj
 
     except:
@@ -718,18 +726,19 @@ def put_schedB(datum):
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
-        if "beneficiary_cand_entity_id" in datum:
+        if datum.get("beneficiary_cand_entity_id"):
             # get_data = {
             #     "cmte_id": datum.get("cmte_id"),
             #     "entity_id": datum.get("entity_id"),
             # }
             # prev_entity_list = get_entities(get_data)
             cand_data = put_cand_entity(datum)
-        else:
-            cand_data = post_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # else:
+        #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
-        datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # entity_id = entity_data.get("entity_id")
         # datum["entity_id"] = entity_id
         try:
@@ -851,9 +860,9 @@ def schedB_sql_dict(data):
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "expenditure_date": date_format(data.get("expenditure_date")),
             "expenditure_amount": check_decimal(data.get("expenditure_amount", None)),
-            "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount", 0)
-            ),
+            # "semi_annual_refund_bundled_amount": check_decimal(
+            #     data.get("semi_annual_refund_bundled_amount", 0)
+            # ),
             "expenditure_purpose": data.get("expenditure_purpose"),
             "category_code": data.get("category_code"),
             "memo_code": data.get("memo_code"),
@@ -914,6 +923,14 @@ def schedB_sql_dict(data):
         }
         if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
             datum["aggregate_amt"] = data.get("aggregate_amt")
+
+        if "semi_annual_refund_bundled_amount" in data and check_decimal(
+            data.get("semi_annual_refund_bundled_amount")
+        ):
+            datum["semi_annual_refund_bundled_amount"] = data.get(
+                "semi_annual_refund_bundled_amount"
+            )
+
         if "entity_id" in data and check_null_value(data.get("entity_id")):
             datum["entity_id"] = data.get("entity_id")
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
@@ -1011,6 +1028,8 @@ def schedB(request):
                     request.query_params.get("transaction_id")
                 )
             datum = get_schedB(data)
+            # for obj in datum:
+            #     obj.update({"api_call": "sb/schedB"})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)

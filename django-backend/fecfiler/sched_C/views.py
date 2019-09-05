@@ -21,7 +21,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  undo_delete_entities)
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
-
+from fecfiler.core.transaction_util import get_line_number_trans_type
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -62,8 +62,8 @@ def schedC_sql_dict(data):
     filter out valid fileds for sched_c
     """
     valid_fields = [
-            'line_number',
-            'transaction_type',
+            # 'line_number',
+            # 'transaction_type',
             'transaction_type_identifier',
             'entity_id',
             'election_code',
@@ -90,7 +90,11 @@ def schedC_sql_dict(data):
             'memo_text',
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        datum =  { k: v for k, v in data.items() if k in valid_fields }
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
+
     except:
         raise Exception('invalid request data.')
 
@@ -198,7 +202,7 @@ def post_schedC(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         data['transaction_id'] = get_next_transaction_id('SC')
-        print(data)
+        # print(data)
         validate_sc_data(data)
         try:
             post_sql_schedC(data)
@@ -458,7 +462,7 @@ def schedC(request):
                     request.data.get('transaction_id'))
                 data = put_schedC(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedC(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -549,8 +553,8 @@ def schedC(request):
 
 def schedC1_sql_dict(data):
     valid_fields = [
-            'line_number',
-            'transaction_type',
+            # 'line_number',
+            # 'transaction_type',
             'transaction_type_identifier',
             'lender_entity_id',
             'loan_amount',
@@ -585,7 +589,10 @@ def schedC1_sql_dict(data):
             'authorized_signed_date',
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        datum =  {k: v for k, v in data.items() if k in valid_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
     except:
         raise Exception('invalid request data.')
 
@@ -952,14 +959,15 @@ def get_list_schedC1(report_id, cmte_id, transaction_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC1_list = cursor.fetchone()[0]
+            if not schedC1_list:
                 raise NoOPError(
                     'No sched_c1 transaction found for transaction_id {}'.format(transaction_id))
-            merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
-        return merged_list
+            return schedC1_list
+            # merged_list = []
+            # for dictC1 in schedC1_list:
+            #     merged_list.append(dictC1)
+        # return merged_list
     except Exception:
         raise 
 
@@ -1006,12 +1014,12 @@ def schedC1(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
-            print(cmte_id)
-            print(report_id)
+            # print(cmte_id)
+            # print(report_id)
             datum = schedC1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
-            print(datum)
+            # print(datum)
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -1365,7 +1373,11 @@ def schedC2_sql_dict(data):
         'guaranteed_amount',
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        datum = {k: v for k, v in data.items() if k in valid_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
+
     except:
         raise Exception('invalid request data.')
 
@@ -1390,8 +1402,8 @@ def schedC2(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
-            print(cmte_id)
-            print(report_id)
+            # print(cmte_id)
+            # print(report_id)
             datum = schedC2_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -1401,7 +1413,7 @@ def schedC2(request):
                     request.data.get('transaction_id'))
                 data = put_schedC2(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedC2(datum)
             # Associating child transactions to parent and storing them to DB
 

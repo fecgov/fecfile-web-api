@@ -148,7 +148,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -206,7 +206,30 @@
                     }
                 ]
             },
- 
+            {
+                "colClassName": "col col-md-4",
+                "seperator": true,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Phone Number",
+                        "infoIcon": false,
+                        "infoText": null,
+                        "name": "phone_number",
+                        "type": "text",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "197px",
+                        "validation": {
+                            "required": false,
+                            "max": 10,
+                            "alphaNumeric": false
+                        }
+                    }
+                ]
+            },       
             {
                 "colClassName": "col col-md-4",
                 "seperator": false,
@@ -422,7 +445,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -480,7 +503,30 @@
                     }
                 ]
             },
-     
+            {
+                "colClassName": "col col-md-4",
+                "seperator": true,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Phone Number",
+                        "infoIcon": false,
+                        "infoText": null,
+                        "name": "phone_number",
+                        "type": "text",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "197px",
+                        "validation": {
+                            "required": false,
+                            "max": 10,
+                            "alphaNumeric": false
+                        }
+                    }
+                ]
+            },   
             {
                 "colClassName": "col col-md-4",
                 "seperator": true,
@@ -673,7 +719,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -730,7 +776,31 @@
                         }
                     }
                 ]
-            }      
+            },
+            {
+                "colClassName": "col col-md-4",
+                "seperator": true,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Phone Number",
+                        "infoIcon": false,
+                        "infoText": null,
+                        "name": "phone_number",
+                        "type": "text",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "197px",
+                        "validation": {
+                            "required": false,
+                            "max": 10,
+                            "alphaNumeric": false
+                        }
+                    }
+                ]
+            }           
          ],
      "organizationFormFields": [
            
@@ -802,7 +872,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": true,
+                "seperator": false,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -859,7 +929,31 @@
                         }
                     }
                 ]
-            }      
+            },
+            {
+                "colClassName": "col col-md-4",
+                "seperator": true,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Phone Number",
+                        "infoIcon": false,
+                        "infoText": null,
+                        "name": "phone_number",
+                        "type": "text",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "197px",
+                        "validation": {
+                            "required": false,
+                            "max": 10,
+                            "alphaNumeric": false
+                        }
+                    }
+                ]
+            }         
          ],
      "hiddenFields": [
             {

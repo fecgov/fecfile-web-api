@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ContactFilterModel } from '../model/contacts-filter.model';
+import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 
 @Component({
   selector: 'app-contacts-table',
@@ -291,8 +292,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     // const serverSortColumnName = this._contactsService.
     //   mapToSingleServerName(this.currentSortedColumnName);
 
-    this._contactsService.getUserDeletedContacts(this.formType, this.reportId,
-      page, this.config.itemsPerPage,
+    this._contactsService.getUserDeletedContacts(page, this.config.itemsPerPage,
       this.currentSortedColumnName,
       sortedCol.descending, this.filters)
       .subscribe((res: GetContactsResponse) => {
@@ -309,6 +309,11 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
         this.contactsModel = res.contacts;
 
+        this._contactsService.addUIFileds(res);
+        this._contactsService.mockApplyFilters(res, this.filters);
+        const contactsModelL = this._contactsService.mapFromServerFields(res.contacts);
+        this.contactsModel = contactsModelL;
+
         // handle non-numeric amounts
         // TODO handle this server side in API
         // for (const model of this.contactsModel) {
@@ -319,6 +324,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
         this.allContactsSelected = false;
+
+
+        
       });
   }
 
@@ -562,38 +570,46 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * Trash all contacts selected by the user.
    */
   public trashAllSelected(): void {
-    // alert('Trash all contacts is not yet supported');
-
-    let ctnIds = '';
+    let conIds = '';
     const selectedContacts: Array<ContactModel> = [];
-    for (const ctn of this.contactsModel) {
-      if (ctn.selected) {
-        selectedContacts.push(ctn);
-        ctnIds += ctn.id + ', ';
+    for (const con of this.contactsModel) {
+      if (con.selected) {
+        selectedContacts.push(con);
+        conIds += con.id + ', ';
       }
     }
 
-    // ctnIds.trimRight();
-    // ctnIds = ctnIds.trimRight();
-    ctnIds = ctnIds.substr(0, ctnIds.length - 2);
+    conIds = conIds.substr(0, conIds.length - 2);
 
     this._dialogService
-    .confirm('You are about to delete these contacts. ' + ctnIds,
-      ConfirmModalComponent,
-      'Caution!')
-    .then(res => {
-      if (res === 'okay') {
-        this._contactsService.trashOrRestoreContacts('trash', this.reportId, this.contactsModel)
-          .subscribe((res: GetContactsResponse) => {
-            this.getContactsPage(this.config.currentPage);
-            this._dialogService
-              .confirm('Contact has been successfully deleted and sent to the recycle bin. '
-                + ctnIds,
-                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-          });
-      } else if (res === 'cancel') {
-      }
-    });
+      .confirm('You are about to delete these contacts.   ' + conIds, ConfirmModalComponent, 'Warning!')
+      .then(res => {
+        if (res === 'okay') {
+          this._contactsService
+            .trashOrRestoreContacts('trash', selectedContacts)
+            .subscribe((res: GetContactsResponse) => {
+              this.getContactsPage(this.config.currentPage);
+
+              let afterMessage = '';
+              if (selectedContacts.length === 1) {
+                afterMessage = `Transaction ${selectedContacts[0].id}
+                  has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + conIds;
+              }
+
+              this._dialogService.confirm(
+                afterMessage,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+
   }
 
 
@@ -651,25 +667,39 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * @param ctn the Contact to trash
    */
   public trashContact(ctn: ContactModel): void {
-
     this._dialogService
-    .confirm('You are about to delete this contact ' + ctn.id + '.',
-      ConfirmModalComponent,
-      'Caution!')
-    .then(res => {
-      if (res === 'okay') {
-        this._contactsService.trashOrRestoreContacts('trash', this.reportId, [ctn])
-          .subscribe((res: GetContactsResponse) => {
-            this.getContactsPage(this.config.currentPage);
-            this._dialogService
-              .confirm('Contact has been successfully deleted and sent to the recycle bin.'
-                + ctn.id,
-                ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-          });
-      } else if (res === 'cancel') {
-      }
-    });
+      .confirm('You are about to delete this contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
+      .then(res => {
+        if (res === 'okay') {
+          this._contactsService
+            .trashOrRestoreContacts('trash', [ctn])
+            .subscribe((res: GetContactsResponse) => {
+              console.log("trashContact res =", res);
+              if (res['result'] === 'success') {
+                this.getContactsPage(this.config.currentPage);
+                this._dialogService.confirm(
+                  'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  ConfirmModalComponent,
+                  'Success!',
+                  false,
+                  ModalHeaderClassEnum.successHeader
+                );
+              } else
+              {
+                this._dialogService.confirm(
+                  'Contact has not been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  ConfirmModalComponent,
+                  'Warning!',
+                  false,
+                  ModalHeaderClassEnum.errorHeader
+                );
+              }
+            });
+        } else if (res === 'cancel') {
+        }
+      });
   }
+
 
 
   /**
@@ -678,27 +708,28 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * @param ctn the Contact to restore
    */
   public restoreContact(ctn: ContactModel): void {
-
     this._dialogService
-      .confirm('You are about to restore contact ' + ctn.id + '.',
-        ConfirmModalComponent,
-        'Caution!')
+      .confirm('You are about to restore contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          // this._contactsService.restoreContact(ctn)
-          //   .subscribe((res: GetContactsResponse) => {
-          this._contactsService.trashOrRestoreContacts('restore', this.reportId, [ctn])
+          // this._transactionsService.restoreTransaction(trx)
+          //   .subscribe((res: GetTransactionsResponse) => {
+          this._contactsService
+            .trashOrRestoreContacts('restore', [ctn])
             .subscribe((res: GetContactsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
-              this._dialogService
-                .confirm('Contact ' + ctn.id + ' has been restored!',
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+              this._dialogService.confirm(
+                'Contact ' + ctn.id + ' has been restored!',
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
             });
         } else if (res === 'cancel') {
         }
       });
   }
-
 
   /**
    * Delete selected contacts from the the recyle bin.
@@ -1002,18 +1033,19 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       case this.contactsView:
         this.setCacheValuesforView(this.contactSortableColumnsLSK,
           this.contactCurrentSortedColLSK, this.contactPageLSK);
+          this.contactPageLSK
         break;
       case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
+          this.recyclePageLSK
         break;
       default:
         break;
     }
   }
 
-
-  /**
+ /**
    * Set the currently sorted column and current page in the cache.
    *
    * @param columnsKey the column settings key for the cache
@@ -1047,8 +1079,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     
-    const defaultSortColumns = ['name', 'type', 'employer', 'occupation',];
-    const otherSortColumns = ['id','street', 'city', 'state', 'zip'];
+    const defaultSortColumns = ['name', 'type', 'employer', 'occupation'];
+    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId'];
+  
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
