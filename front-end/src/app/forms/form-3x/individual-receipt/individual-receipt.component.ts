@@ -2262,19 +2262,27 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   private toggleValidationIndOrg(entityType: string) {
     if (entityType === 'ORG' || entityType === 'org-group') {
-      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
-      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
-      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      if(this.frmIndividualReceipt.controls['last_name']) {
+        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      }
+      if(this.frmIndividualReceipt.controls['first_name']) {
+        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      }
       if(this.frmIndividualReceipt.controls['entity_name']) {
         this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
       }
     } else {
-      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      if(this.frmIndividualReceipt.controls['last_name']) {
+        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      }
+      if(this.frmIndividualReceipt.controls['first_name']) {
+        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      }
       if(this.frmIndividualReceipt.controls['entity_name']) {
         this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
