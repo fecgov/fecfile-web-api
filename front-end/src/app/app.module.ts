@@ -75,6 +75,8 @@ import { ContactsFilterComponent } from './contacts/filter/contacts-filter.compo
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 import { SubTransactionsTableComponent } from './forms/transactions/sub-transactions-table/sub-transactions-table.component';
+import { DecimalPipe } from '@angular/common';
+import { UtilService } from './shared/utils/util.service';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -172,7 +174,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
       useFactory: appInitializerFn,
       multi: true,
       deps: [AppConfigService]
-    }
+    },
+    DecimalPipe,
+    UtilService
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

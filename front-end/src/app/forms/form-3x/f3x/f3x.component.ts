@@ -289,6 +289,7 @@ export class F3xComponent implements OnInit {
               // message the child component rather than sending data as input because
               // ngOnChanges fires when the form fields are changed, thereby reseting the
               // fields to the previous value.  Result is fields can't be changed.
+              e.transactionDetail.action = this.scheduleAction;
               this._f3xMessageService.sendPopulateFormMessage(e.transactionDetail);
               const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
               this.transactionTypeText = transactionModel.type;
