@@ -2092,11 +2092,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       const amount = trx[prop] ? trx[prop] : 0;
 
                       // Name mapping until aggregate_amt is renamed to contribution_aggregate
-                      if (trx.hasOwnProperty('aggregate_amt')) {
+                      // if (trx.hasOwnProperty('aggregate_amt')) {
+                      //   const patchAgg = {};
+                      //   patchAgg['contribution_aggregate'] = trx['aggregate_amt'];
+                      //   this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
+                      //   this._contributionAggregateValue = trx['aggregate_amt'];
+                      // }
+                      if (trx.hasOwnProperty('contribution_aggregate')) {
                         const patchAgg = {};
-                        patchAgg['contribution_aggregate'] = trx['aggregate_amt'];
+                        patchAgg['contribution_aggregate'] = trx['contribution_aggregate'];
                         this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
-                        this._contributionAggregateValue = trx['aggregate_amt'];
+                        this._contributionAggregateValue = trx['contribution_aggregate'];
                       }
                       this.contributionAmountChange({target: {value: amount.toString()}}, prop, false);
                     }
