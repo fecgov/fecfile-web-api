@@ -87,6 +87,7 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         model.transactionTypeIdentifier = trx.transaction_type_identifier;
         model.transactionId = trx.transaction_id;
         model.backRefTransactionId = trx.back_ref_transaction_id;
+        model.apiCall = trx.api_call;
 
         modelArray.push(model);
       }
