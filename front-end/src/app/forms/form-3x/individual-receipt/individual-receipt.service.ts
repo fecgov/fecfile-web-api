@@ -352,6 +352,16 @@ export class IndividualReceiptService {
     return reportId;
   }
 
+  /**
+   *
+   * @param selectedEntityAggregate
+   * @param amount
+   * @param scheduleAction
+   * @param memoCode
+   * @param selectedEntity
+   * @param transactionToEdit
+   * @param transactionType
+   */
   public determineAggregate(
     selectedEntityAggregate: number,
     amount: number,
