@@ -41,8 +41,7 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = null;
-  @ViewChild('myDiv') myDiv: ElementRef;
-
+  
   public frmReportType: FormGroup;
   public fromDateSelected: boolean = false;
   public reportTypeSelected: string = null;
@@ -214,7 +213,8 @@ export class ReportTypeComponent implements OnInit {
    */
   public updateTypeSelected(e): void {
     if (e.target.checked) {
-      //this.reportTypeSelected = this.frmReportType.get('reportTypeRadio').value;
+      // for some reason selected radio button value is coming as 'on'
+      // temporarily using id to set correct report type
       this.reportTypeSelected = e.target.getAttribute('id');
       this.optionFailed = false;
       this.reportType = this.reportTypeSelected;
