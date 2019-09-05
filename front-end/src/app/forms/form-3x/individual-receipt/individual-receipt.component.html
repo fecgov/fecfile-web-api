@@ -396,12 +396,13 @@
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
 
+                       <!-- [searchFn]="customStateSearchFn" -->
                     <ng-select #stateSelect [items]="states"
                       (change)="handleStateChange($event, col)"
                       class="forms__select"
                       [formControlName]="col?.name"
                       bindValue="code"
-
+                      bindLabel="code"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -409,9 +410,6 @@
                           : ''
                       "
                     >
-                      <ng-template ng-label-tmp let-item="item">
-                        <span >{{ item.code }}</span>
-                      </ng-template>
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                             <span >{{ item.code + ' - ' + item.name }}</span>
                       </ng-template>
