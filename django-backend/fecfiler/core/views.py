@@ -1937,7 +1937,7 @@ def get_all_transactions(request):
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
         
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
@@ -3020,8 +3020,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer' ]
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer']
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3049,9 +3049,9 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view
-                                        where cmte_id='""" + cmte_id + """' """ + param_string 
-            # print("trans_query_string: ",trans_query_string)
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                                        where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
+            print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
             if sortcolumn and sortcolumn != 'default':
                 trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
@@ -3956,5 +3956,190 @@ def trash_restore_report(request):
             return Response("The trash_restore_report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     return Response({"result":"success"}, status=status.HTTP_200_OK)    
+
+@api_view(['POST'])
+def delete_trashed_contacts(request):
+    try:
+        #import ipdb;ipdb.set_trace()
+        #message_dict = {}
+        cmte_id = request.user.username
+        #entity_id = _action.get('id', '')
+        entity_id = request.get('id')
+        with connection.cursor() as cursor:
+             cursor.execute("""DELETE FROM public.entity WHERE cmte_id = %s AND entity_id = %s;""",[cmte_id, entity_id])
+      
+        
+        message = 'contact deleted successfully'
+    except Exception as e:
+        print(e)
+        message = 'Error in deleting the transaction'
+        message_dict[trans_id] = message
+
+        json_result = {'message':message}
+        return Response(json_result, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response('The delete_trashed_contacts API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'POST'])
+def get_all_trashed_contacts(request):
+    """
+    API that provides all the deleted contacts for a specific committee
+    """
+    if request.method == 'POST':
+        try:
+                # print("request.data: ", request.data)
+                cmte_id = request.user.username
+                param_string = ""
+                page_num = int(request.data.get('page', 1))
+                descending = request.data.get('descending', 'false')
+                sortcolumn = request.data.get('sortColumnName')
+                itemsperpage = request.data.get('itemsPerPage', 5)
+                search_string = request.data.get('search')
+                #import ipdb;ipdb.set_trace()
+                params = request.data.get('filters', {})
+                keywords = params.get('keywords')
+                if str(descending).lower() == 'true':
+                    descending = 'DESC'
+                else:
+                    descending = 'ASC'
+
+                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+                if search_string:
+                    for key in search_keys:
+                        if not param_string:
+                            param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " )"
+                keywords_string = ''
+                if keywords:
+                    for key in keys:
+                        for word in keywords:
+                            if '"' in word:
+                                continue
+                            elif "'" in word:
+                                if not keywords_string:
+                                    keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                                else:
+                                    keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+                            else:
+                                if not keywords_string:
+                                    keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                                else:
+                                    keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                    keywords_string = keywords_string + " )"
+                param_string = param_string + keywords_string
+                
+                
+                #trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view where cmte_id='""" + cmte_id + """' """ + param_string 
+
+                trans_query_string= """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id =  AND delete_ind = 'Y' """
+                #cursor.execute("""SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id = %s AND delete_ind = 'Y' """.format(cmte_id))
+
+                # print("trans_query_string: ",trans_query_string)
+                # import ipdb;ipdb.set_trace()
+
+                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                    where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
+                
+                if sortcolumn and sortcolumn != 'default':
+                    trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+                elif sortcolumn == 'default':
+                    trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+                
+                print("contacts recycle trans_query_string: ",trans_query_string)
+
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+                    for row in cursor.fetchall():
+                        data_row = list(row)
+                        forms_obj=data_row[0]
+                        forms_obj = data_row[0]
+                        if forms_obj is None:
+                            forms_obj =[]
+                            status_value = status.HTTP_200_OK
+                        else:
+                            for d in forms_obj:
+                                for i in d:
+                                    if not d[i]:
+                                        d[i] = ''
+                            
+                            status_value = status.HTTP_200_OK
+                
+                #import ipdb; ipdb.set_trace()
+                total_count = len(forms_obj)
+                paginator = Paginator(forms_obj, itemsperpage)
+                if paginator.num_pages < page_num:
+                    page_num = paginator.num_pages
+                forms_obj = paginator.page(page_num)
+                json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
+                            'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+                return Response(json_result, status=status_value)
+    
+        except Exception as e:
+            return Response("The contactsTable API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
+    """trash or restore contacts table by updating delete_ind"""
+    try:
+        with connection.cursor() as cursor:
+            # UPDATE delete_ind flag to Y in DB
+            cursor.execute("""UPDATE public.entity SET delete_ind = '{}' WHERE cmte_id = '{}' AND entity_id = '{}'  """.format(_delete, cmte_id, entity_id))
+    except Exception:
+        raise
+
+@api_view(['PUT'])
+def trash_restore_contact(request):
+    """api for trash and restore contact. """
+    cmte_id = request.user.username
+    print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    for _action in request.data.get('actions', []):
+        entity_id = _action.get('id', '')
+
+        result='failed'
+        action = _action.get('action', '')
+        _delete = 'Y' if action == 'trash' else ''
+        try:
+            if _delete == 'Y':
+                if check_contact_to_delete(cmte_id, entity_id) == 'N':
+                    result = 'failed'
+                else:
+                    trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                    result = 'success'
+            else:
+                trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                result = 'success'
+
+            if result=='success':
+                return Response({"result":"success"}, status=status.HTTP_200_OK)
+            else:   
+                return Response({"result":"failed"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response("The trash_restore_contact API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def check_contact_to_delete(cmte_id, entity_id):
+    try:
+        _delete = 'Y'
+        entity_id_found=''
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT entity_id FROM public.all_transactions_view vw, public.reports rp 
+                            WHERE rp.cmte_id = %s 
+                            AND rp.cmte_id = vw.cmte_id 
+                            AND rp.report_id = vw.report_id  
+                            AND  rp.status= 'Filed'
+                            AND vw.entity_id = %s """, [cmte_id, entity_id])           
+
+            entity_ids = cursor.fetchone()
+            entity_id_found = entity_ids[0]
+
+            if entity_id_found == '':
+                _delete = 'Y'
+            else:
+                _delete = 'N'
+
+        return _delete    
+    except Exception as e:
+        return Response("The check_contact_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     

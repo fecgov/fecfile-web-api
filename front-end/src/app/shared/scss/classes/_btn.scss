@@ -35,6 +35,18 @@
   }
 }
 
+.btn-secondary-dark-gray {
+  background-color: $shuttleGray;
+  border-color: $shuttleGray;
+  color: $white;
+  
+  font-family: $mainFontFamily;
+  &:hover {
+    background-color: darken($mercury, 10%);
+    border-color: darken($mercury, 10%);
+  }
+}
+
 .btn-previous {
   @extend .btn-secondary-gray;
 }

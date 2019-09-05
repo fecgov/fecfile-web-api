@@ -54,13 +54,13 @@
               for="{{ committeeReportType.report_type }}"
             >
             <input
-              id="{{ committeeReportType.report_type }}"
+              id="{{ committeeReportType.report_type }}" 
               type="radio"
               name="reportTypeRadio"
               [value]="committeeReportType.report_type"
               [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
               [attr.checked]="committeeReportType.report_type === reportTypeSelected"
-              (change)="updateTypeSelected($event)"
+              (click)="updateTypeSelected($event)"
               formControlName="reportTypeRadio"
             />
               {{ committeeReportType.report_type_desciption }}

@@ -56,18 +56,29 @@
       </ul>
     </ng-container> -->
   </section>
-  <footer>
-    <div class="form-sidebar__item" *ngIf="cashOnHand?.showCashOnHand">
+  <div class="flex-wrapper">
+      <div class="container"></div>
+  <footer >
+    <div class="form-sidebar__item">
       <div class="form-sidebar-item__text">
-        {{ cashOnHand.text }}
+        Cash on Hand
       </div>
       <div class="form-sidebar-item__value">
-        $0
+        ${{cashOnHandTotal | number: '1.2-2'}}
       </div>
     </div>
     <div class="form-sidebar__btns">
       <div class="btn-row">
-        <button
+          <div class="btn-toolbar">
+            <button
+            style = "align-self:stretch;"
+            type="button"
+            class="btn btn-secondary-dark-gray mr-2"
+          >
+            All Transactions
+          </button>
+          <button
+          style = "align-self:stretch;"
           type="button"
           class="btn btn-secondary-gray"
           (click)="viewSummary()"
@@ -75,15 +86,18 @@
           [queryParams]="{ step: 'financial_summary' }"
         >
           Summary
-        </button>
+        </button> 
+            </div>
+       
       </div>
       <ng-container *ngIf="step !== 'step_3'">
-        <div class="btn-row">
-          <button type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
+        <div class="btn-row signAndSubmit">
+          <button id ="sidebar_signBtn" type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
             Sign &amp; Submit
           </button>
         </div>
       </ng-container>
     </div>
   </footer>
+</div>
 </div>

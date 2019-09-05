@@ -328,7 +328,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // as it is in F3X component, the form data must be set in this way
     // to avoid race condition
     if (this._transactionToEdit) {
-      this._setFormDataValues(this._transactionToEdit.transactionId);
+      this._setFormDataValues(this._transactionToEdit.transactionId, this._transactionToEdit.apiCall);
     }
 
     // get form data API is passing X for memo code value.
@@ -1069,6 +1069,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
             el.value = this._transactionToEdit.transactionId;
+            // If Transaction Id is present, setting Action to Edit
+            this.scheduleAction = ScheduleActions.edit;
+          } else if (el.name === 'api_call') {
+            el.value = this._transactionToEdit.apiCall;
           }
         });
       }
@@ -1187,6 +1191,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               previousStep: 'step_2',
               transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
               transactionType: this.subTransactionInfo.subTransactionType,
+              apiCall: this.subTransactionInfo.api_call,
               action: ScheduleActions.addSubTransaction
             };
             this.status.emit(addSubTransEmitObj);
@@ -1249,6 +1254,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
+    transactionModel.apiCall = this.subTransactionInfo.api_call;
     const emitObj = {
       form: {},
       direction: 'next',
@@ -1315,6 +1321,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public printPreview(): void {
     this._reportTypeService.printPreview('individual_receipt', this.formType);
   }
+  public ImportTransactions(): void {
+    alert('Import transaction is not yet supported');
+  }
+  
 
   /**
    * @deprecated
@@ -1941,12 +1951,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                     }
                   }
                 }
+                // expecting default entity type to be IND
+                this.toggleValidationIndOrg(this.selectedEntityType.entityType);
                 this._entityTypeDefault = this.selectedEntityType;
                 this.frmIndividualReceipt.patchValue(
                   { entity_type: this.selectedEntityType.entityType },
                   { onlySelf: true }
                 );
               }
+              
             }
             if (res.data.hasOwnProperty('subTransactions')) {
               if (Array.isArray(res.data.subTransactions)) {
@@ -1982,23 +1995,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     if (item) {
-      if (item.group === 'org-group') {
-        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
-        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
-        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
-
-        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
-        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
-      } else {
-        this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
-        this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
-        this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
-        this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
-
-        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
-        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
-      }
+      this.toggleValidationIndOrg(item.group);
     }
   }
 
@@ -2046,8 +2043,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this._selectedCandidateChangeWarnChild = {};
 
         // this.transactionType = formData.transactionTypeIdentifier;
-
-        this._setFormDataValues(formData.transactionId);
+        this._setFormDataValues(formData.transactionId, formData.apiCall);
       }
     }
   }
@@ -2057,10 +2053,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    *
    * @param transactionId
    */
-  private _setFormDataValues(transactionId: string) {
+  private _setFormDataValues(transactionId: string, apiCall: string) {
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
     this.subTransactions = [];
-    this._receiptService.getDataScheduleA(reportId, transactionId).subscribe(res => {
+    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {
@@ -2117,6 +2113,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   if (prop === 'entity_id') {
                     this._selectedEntity = {};
                     this._selectedEntity.entity_id = trx[prop];
+                  }
+                  if (prop === 'entity_type') {
+                    if (this.entityTypes) {
+                      for (const field of this.entityTypes) {
+                        if (trx[prop] === field.entityType) {
+                          field.selected = true;
+                          this.selectedEntityType = field;
+                          this.toggleValidationIndOrg(trx[prop]);
+                          break;
+                        }
+                      }
+                    }
                   }
                   if (prop === this._childFieldNamePrefix + 'entity_id') {
                     this._selectedEntityChild = {};
@@ -2182,6 +2190,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  public showHideEntityType(entityTypeGroup: string) {
+    
+  }
+
   // public isMemoCodeReadOnly(fieldName: string) {
   //   if (this.isFieldName(fieldName, 'memo_code')) {
   //     const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
@@ -2214,7 +2226,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this.frmIndividualReceipt.reset();
-
     if (this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
@@ -2223,6 +2234,28 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // for (const hiddenField of this.hiddenFields) {
     //   hiddenField.value = null;
     // }
+  }
+
+  private toggleValidationIndOrg(entityType: string) {
+    if (entityType === 'ORG' || entityType === 'org-group') {
+      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
+      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
+      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      if(this.frmIndividualReceipt.controls['entity_name']) {
+        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+      }
+    } else {
+      this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
+      this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
+      if(this.frmIndividualReceipt.controls['entity_name']) {
+        this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
+        this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
+      }
+    }
   }
 
   /**

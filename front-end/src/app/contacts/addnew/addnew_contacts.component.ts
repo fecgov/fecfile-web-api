@@ -827,9 +827,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ occupation: formData.occupation }, { onlySelf: true });
 
         this.frmContact.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
-        this.frmContact.patchValue({ officeSought: formData.officeSought}, { onlySelf: true });
-        this.frmContact.patchValue({ officeState: formData.officeState }, { onlySelf: true });
-        this.frmContact.patchValue({ district: formData.district }, { onlySelf: true });
+        this.frmContact.patchValue({ officeSought: formData.candOffice}, { onlySelf: true });
+        this.frmContact.patchValue({ officeState: formData.candOfficeState }, { onlySelf: true });
+        this.frmContact.patchValue({ district: formData.candOfficeState }, { onlySelf: true });
       }
     }
   }
