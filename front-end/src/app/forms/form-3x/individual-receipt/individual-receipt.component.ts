@@ -920,6 +920,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     return null;
   }
 
+  public customStateSearchFn(term: string, state: any) {
+    term = term.toLowerCase();
+    return state.name.toLowerCase().indexOf(term) > -1 || state.code.toLowerCase() === term;
+  }
+
   /**
    * Handle warnings when state changes.
    */
