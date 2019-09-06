@@ -13,6 +13,8 @@ import { DecimalPipe } from '@angular/common';
   providedIn: 'root'
 })
 export class IndividualReceiptService {
+  private readonly _memoCodeValue: string = 'X';
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
@@ -353,6 +355,17 @@ export class IndividualReceiptService {
   }
 
   /**
+   * Calculate the aggregate amount to display based on business rules.
+   *
+   * Some of the variables are:
+   * 1) Add or Edit action
+   * 2) Selected entity is true or false
+   * 3) Memo is checked or not
+   * 4) Is sub transaction
+   * 5) Did data change on an edit (date, memo, amount)
+   *
+   * Note: the FormGroup could be passed in rather than overloading the method with arguments.
+   * It is not to allow for easier test scripting but should be changed later if desired.
    *
    * @param selectedEntityAggregate
    * @param amount
@@ -370,58 +383,113 @@ export class IndividualReceiptService {
     selectedEntity: any,
     transactionToEdit: TransactionModel,
     transactionType: string,
-    isSubTranaction: boolean
+    isSubTransaction: boolean,
+    transactionDate: string
   ): string {
     let aggregate = 0;
     amount = amount ? amount : 0;
     selectedEntityAggregate = selectedEntityAggregate ? selectedEntityAggregate : 0;
 
     if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
-      if (isSubTranaction === false) {
-        if (memoCode) {
-          aggregate = selectedEntityAggregate;
-        } else {
-          aggregate = amount + selectedEntityAggregate;
-        }
-      } else {
-        aggregate = amount + selectedEntityAggregate;
-      }
-
+      aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+      return this._decimalPipe.transform(aggregate, '.2-2');
+      // if (isSubTransaction === false) {
+      //   if (memoCode) {
+      //     aggregate = selectedEntityAggregate;
+      //   } else {
+      //     aggregate = amount + selectedEntityAggregate;
+      //   }
+      // } else {
+      //   aggregate = amount + selectedEntityAggregate;
+      // }
     } else if (scheduleAction === ScheduleActions.edit) {
       if (!transactionToEdit) {
         return this._decimalPipe.transform(aggregate, '.2-2');
       }
-      if (selectedEntity) {
-        if (selectedEntity.entity_id) {
-          if (selectedEntity.entity_id === transactionToEdit.entityId) {
-            if (isSubTranaction === false) {
-              // selected entity is same on saved transaction
-              // backout the old amount from aggregate
-              // apply new if memo not checked.
-              aggregate = selectedEntityAggregate - transactionToEdit.amount;
-              if (!memoCode) {
-                aggregate = aggregate + amount;
-              }
-            } else {
-              aggregate = selectedEntityAggregate - transactionToEdit.amount;
-              aggregate = aggregate + amount;
-            }
-          } else {
-            // selected entity differs from saved transaction
-            // don't back the saved amount from aggregate
-            // apply new if memo not checked.
-            if (isSubTranaction === false) {
-              if (!memoCode) {
-                aggregate = selectedEntityAggregate + amount;
-              }
-            } else {
-              aggregate = selectedEntityAggregate + amount;
-            }
+      // If nothing has changed, show the original.
+      const origDate = transactionToEdit.date.toString();
+      if (transactionDate === origDate) {
+        if (
+          (memoCode && transactionToEdit.memoCode === this._memoCodeValue) ||
+          (!memoCode && transactionToEdit.memoCode !== this._memoCodeValue)
+        ) {
+          if (amount === transactionToEdit.amount) {
+            aggregate = transactionToEdit.aggregate;
+            return this._decimalPipe.transform(aggregate, '.2-2');
           }
         }
       }
+      if (selectedEntity) {
+        if (selectedEntity.entity_id) {
+          if (selectedEntity.entity_id === transactionToEdit.entityId) {
+            let origAmt = transactionToEdit.amount ? transactionToEdit.amount : 0;
+            if (isSubTransaction === false) {
+              if (transactionToEdit.memoCode === this._memoCodeValue) {
+                origAmt = 0;
+              }
+              if (memoCode) {
+                amount = 0;
+              }
+            }
+            // selected entity is same on saved transaction
+            // backout the old amount from aggregate and
+            // apply new (if memo was check on old or new they will be 0 for parent).
+            aggregate = selectedEntityAggregate - origAmt + amount;
+          } else {
+            // selected entity differs from saved transaction
+            // don't back out the saved amount from aggregate
+            // apply new if memo not checked.
+
+            aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+            return this._decimalPipe.transform(aggregate, '.2-2');
+
+            // if (isSubTransaction === false) {
+            //   if (memoCode) {
+            //     aggregate = selectedEntityAggregate;
+            //   } else {
+            //     aggregate = amount + selectedEntityAggregate;
+            //   }
+            // } else {
+            //   aggregate = amount + selectedEntityAggregate;
+            // }
+          }
+        }
+      } else {
+        // edit for entity not selected, same as add no entity aggregate to include
+        aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+        return this._decimalPipe.transform(aggregate, '.2-2');
+        // if (isSubTransaction === false) {
+        //   if (memoCode) {
+        //     aggregate = selectedEntityAggregate;
+        //   } else {
+        //     aggregate = amount + selectedEntityAggregate;
+        //   }
+        // } else {
+        //   aggregate = amount + selectedEntityAggregate;
+        // }
+      }
     } else {
+      // some other action
     }
     return this._decimalPipe.transform(aggregate, '.2-2');
+  }
+
+  private _determineAggregateHelper(
+    selectedEntityAggregate: number,
+    amount: number,
+    memoCode: boolean,
+    isSubTransaction: boolean
+  ): number {
+    let aggregate = 0;
+    if (isSubTransaction === false) {
+      if (memoCode) {
+        aggregate = selectedEntityAggregate;
+      } else {
+        aggregate = amount + selectedEntityAggregate;
+      }
+    } else {
+      aggregate = amount + selectedEntityAggregate;
+    }
+    return aggregate;
   }
 }
