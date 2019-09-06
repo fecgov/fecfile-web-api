@@ -10,18 +10,33 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  */
 export function contributionDate(cvgStartDate: string, cvgEndDate: string): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } => {
+    // TODO make this an angular injectable class and inject the util service so that it can
+    // be used in an angular way
+    function formatDateToYYYMMDD(date: string): string {
+      try {
+        const dateArr = date.split('/');
+        const month: string = dateArr[0];
+        const day: string = dateArr[1];
+        const year: string = dateArr[2];
+
+        return `${year}-${month}-${day}`;
+      } catch (e) {
+        return '';
+      }
+    }
+
     const text: string = control.value;
-    let isDateBetween: boolean = true;
 
     if (typeof text === 'string') {
       if (text.length >= 1) {
         const date: any = new Date(`${text}T01:00:00`);
-        const formattedDate: string = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date
-          .getDate()
-          .toString()
-          .padStart(2, '0')}/${date.getFullYear()}`;
 
-        if (!(formattedDate >= cvgStartDate && formattedDate <= cvgEndDate)) {
+        const cvgStartDateYYYYMMDD = formatDateToYYYMMDD(cvgStartDate);
+        const cvgEndDateYYYYMMDD = formatDateToYYYMMDD(cvgEndDate);
+        const cvgStartDateDate: any = new Date(`${cvgStartDateYYYYMMDD}T01:00:00`);
+        const cvgEndDateDate: any = new Date(`${cvgEndDateYYYYMMDD}T01:00:00`);
+
+        if (!(date >= cvgStartDateDate && date <= cvgEndDateDate)) {
           return { contributionDateInvalid: true };
         }
       }
