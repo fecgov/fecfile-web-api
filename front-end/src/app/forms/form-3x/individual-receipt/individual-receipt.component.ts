@@ -1240,7 +1240,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   public saveAndReturnToParent(): void {
-    this._doValidateReceipt(SaveActions.saveForReturnToParent);
+    if (!this.frmIndividualReceipt.dirty) {
+      this.returnToParent();
+    } else {
+      this._doValidateReceipt(SaveActions.saveForReturnToParent);
+    }
   }
 
   public saveForAddSub(): void {
