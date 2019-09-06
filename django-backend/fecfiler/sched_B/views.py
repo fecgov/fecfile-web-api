@@ -73,6 +73,9 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "CONT_REDESIG_MEMO": ("CONT_REDESIG", "sched_b"),
 }
 
+# adding election_year field needed by front end
+REQT_ELECTION_YR = ""
+
 
 def get_next_transaction_id(trans_char):
     """
@@ -687,15 +690,18 @@ def get_schedB(data):
             # adding hard-coded api call info to get object details
             for obj in forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
             child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
             for obj in child_forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
             forms_obj = get_list_all_schedB(report_id, cmte_id)
             for obj in forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
         return forms_obj
 
     except:
@@ -946,7 +952,12 @@ def schedB(request):
     """
     CRUD api for sched_b
     """
+    global REQT_ELECTION_YR
     if request.method == "POST":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
         try:
             cmte_id = request.user.username
             if not ("report_id" in request.data):
@@ -1010,6 +1021,10 @@ def schedB(request):
 
     # Get records from schedB table
     if request.method == "GET":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
             data = {"cmte_id": request.user.username}
@@ -1046,6 +1061,10 @@ def schedB(request):
 
     # Modify a single record from schedB table
     if request.method == "PUT":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
             datum = schedB_sql_dict(request.data)
