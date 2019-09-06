@@ -130,6 +130,10 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = {
                                             "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                         }
 
+API_CALL_SA = {'api_call' : '/sa/schedA'}
+API_CALL_SB = {'api_call' : '/sb/schedB'}
+
+
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
     try:
@@ -646,17 +650,17 @@ def get_schedA(data):
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
             for obj in forms_obj:
-                obj.update({'api_call' : 'sa/schedA'})
+                obj.update(API_CALL_SA)
 
             childA_forms_obj = get_list_child_schedA(
                 report_id, cmte_id, transaction_id)
             for obj in childA_forms_obj:
-                obj.update({'api_call' : 'sa/schedA'})
+                obj.update(API_CALL_SA)
 
             childB_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
             for obj in childB_forms_obj:
-                obj.update({'api_call' : 'sb/schedB'})
+                obj.update(API_CALL_SB)
 
             child_forms_obj = childA_forms_obj + childB_forms_obj
             # for obj in childB_forms_obj:
@@ -666,7 +670,7 @@ def get_schedA(data):
         else:
             forms_obj = get_list_all_schedA(report_id, cmte_id)
             for obj in forms_obj:
-                obj.update({'api_call' : 'sa/schedA'})
+                obj.update(API_CALL_SA)
 
         return forms_obj
     except:
@@ -1068,8 +1072,8 @@ def schedA(request):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
             datum = get_schedA(data)
-            for obj in datum:
-                obj.update({'api_call' : 'sa/schedA'})
+            # # for obj in datum:
+            #     obj.update({'api_call' : 'sa/schedA'})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
