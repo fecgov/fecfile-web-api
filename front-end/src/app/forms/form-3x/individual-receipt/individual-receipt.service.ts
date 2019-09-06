@@ -369,18 +369,24 @@ export class IndividualReceiptService {
     memoCode: boolean,
     selectedEntity: any,
     transactionToEdit: TransactionModel,
-    transactionType: string
+    transactionType: string,
+    isSubTranaction: boolean
   ): string {
     let aggregate = 0;
     amount = amount ? amount : 0;
     selectedEntityAggregate = selectedEntityAggregate ? selectedEntityAggregate : 0;
 
     if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
-      if (memoCode) {
-        aggregate = selectedEntityAggregate;
+      if (isSubTranaction === false) {
+        if (memoCode) {
+          aggregate = selectedEntityAggregate;
+        } else {
+          aggregate = amount + selectedEntityAggregate;
+        }
       } else {
         aggregate = amount + selectedEntityAggregate;
       }
+
     } else if (scheduleAction === ScheduleActions.edit) {
       if (!transactionToEdit) {
         return this._decimalPipe.transform(aggregate, '.2-2');
@@ -388,18 +394,27 @@ export class IndividualReceiptService {
       if (selectedEntity) {
         if (selectedEntity.entity_id) {
           if (selectedEntity.entity_id === transactionToEdit.entityId) {
-            // selected entity is same on saved transaction
-            // backout the old amount from aggregate
-            // apply new if memo not checked.
-            aggregate = selectedEntityAggregate - transactionToEdit.amount;
-            if (!memoCode) {
+            if (isSubTranaction === false) {
+              // selected entity is same on saved transaction
+              // backout the old amount from aggregate
+              // apply new if memo not checked.
+              aggregate = selectedEntityAggregate - transactionToEdit.amount;
+              if (!memoCode) {
+                aggregate = aggregate + amount;
+              }
+            } else {
+              aggregate = selectedEntityAggregate - transactionToEdit.amount;
               aggregate = aggregate + amount;
             }
           } else {
             // selected entity differs from saved transaction
             // don't back the saved amount from aggregate
             // apply new if memo not checked.
-            if (!memoCode) {
+            if (isSubTranaction === false) {
+              if (!memoCode) {
+                aggregate = selectedEntityAggregate + amount;
+              }
+            } else {
               aggregate = selectedEntityAggregate + amount;
             }
           }

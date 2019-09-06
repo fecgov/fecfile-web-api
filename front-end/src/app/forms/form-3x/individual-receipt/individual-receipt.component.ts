@@ -534,39 +534,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       }
     }
 
-    ///////////////////////////////////////////////////////////////////////
-    // Don't add amount to aggregate if checked or if action is edit
-    // let aggregateTotal = 0;
-    // let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-    // // remove commas
-    // contributionAmount = contributionAmount.replace(/,/g, ``);
-    // const contributionAmountNum: number = parseFloat(contributionAmount);
-    
-
-    // if (isChildForm) {
-    //   // TODO child concept may go away. TBD.
-    // } else {
-    //   if (this.memoCode) {
-    //     aggregateTotal = this._contributionAggregateValue;
-    //   } else {
-    //     if (this.scheduleAction === ScheduleActions.edit) {
-    //         aggregateTotal = contributionAmountNum;
-    //     } else {
-    //       aggregateTotal = this._contributionAggregateValue + contributionAmountNum;
-    //     }
-    //   }
-    // }
-
     const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
-
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
       this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType
+       this.transactionType, this._isParentOfSub()
     );
-    // const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
-    ///////////////////////////////////////////////////////////////////////
   }
 
   /**
@@ -645,7 +619,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
       this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType
+       this.transactionType, this._isSubOfParent()
     );
 
     if (isChildForm) {
@@ -1480,8 +1454,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
   public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent, col: any) {
-    // FNE-1438 Need to detect if tab key caused the event. And don't load if true.
-    // TODO need a way to determine if key was tab.
 
     const entity = $event.item;
 
@@ -2173,32 +2145,90 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Determine if the child transactions should be shown.
    */
   public isShowChildTransactions(): boolean {
-    if (this.subTransactionInfo) {
-      if (this.subTransactionInfo.isParent) {
-        if (this.subTransactions) {
-          if (this.subTransactions.length > 0) {
-            return true;
-          }
+    if (this._isParentOfSub()) {
+      if (this.subTransactions) {
+        if (this.subTransactions.length > 0) {
+          return true;
         }
       }
     }
     return false;
   }
 
-  public cancel() {
-    if (this.subTransactionInfo) {
-      if (this.subTransactionInfo.isParent) {
-        // TODO what should happen here?  Clear form or view transactions?
-        // this._clearFormValues();
-        // this._f3xMessageService.sendLoadFormFieldsMessage('');
 
-        this._clearFormValues();
-        this._getFormFields();
-        this._validateContributionDate();
-      } else {
-        this.returnToParent();
+  // public isShowChildTransactions(): boolean {
+  //   if (this.subTransactionInfo) {
+  //     if (this.subTransactionInfo.isParent) {
+  //       if (this.subTransactions) {
+  //         if (this.subTransactions.length > 0) {
+  //           return true;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  // public cancel() {
+  //   if (this.subTransactionInfo) {
+  //     if (this.subTransactionInfo.isParent) {
+        
+  //       // TODO what should happen here?  Clear form or view transactions?
+  //       // this._clearFormValues();
+  //       // this._f3xMessageService.sendLoadFormFieldsMessage('');
+
+  //       this._clearFormValues();
+  //       this._getFormFields();
+  //       this._validateContributionDate();
+  //     } else {
+  //       this.returnToParent();
+  //     }
+  //   }
+  // }
+
+  public cancel() {
+    if (this._isParentOfSub()) {
+
+      // TODO what should happen here?  Clear form or view transactions?
+      // this._clearFormValues();
+      // this._f3xMessageService.sendLoadFormFieldsMessage('');
+
+      this._clearFormValues();
+      this._getFormFields();
+      this._validateContributionDate();
+    } else {
+      this.returnToParent();
+    }
+  }
+
+  /**
+   * Returns true if the transaction type is a parent of
+   * a parent/ sub-transaction relationship.  It will return false for
+   *  1) transaction types that are sub-transactions of a parent
+   *  2) transaction types that have NO parent / sub-transaction relationship
+   */
+  private _isParentOfSub(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isParent === true) {
+        return true;
       }
     }
+    return false;
+  }
+
+  /**
+   * Returns true if the transaction type is a sub-transaction of
+   * a parent/ sub-transaction relationship.  It will return false for
+   *  1) transaction types that are parents of a parent / sub-transaction relationship
+   *  2) transaction types that have NO parent / sub-transaction relationship
+   */
+  private _isSubOfParent(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isParent === false) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -2512,7 +2542,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         const aggregateValue: string = this._receiptService.determineAggregate(
           this._contributionAggregateValue, contributionAmountNum,
           this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-           this.transactionType
+           this.transactionType, this._isSubOfParent()
         );
 
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
