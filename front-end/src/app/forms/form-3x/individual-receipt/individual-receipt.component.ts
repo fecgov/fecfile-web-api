@@ -1080,9 +1080,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this._receiptService.saveSchedule(this.formType, this.scheduleAction).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
-          if (res.hasOwnProperty('memo_code')) {
-            if (typeof res.memo_code === 'object') {
-              if (res.memo_code === null) {
+          // commented below condition to update summary (Third navigation)
+          // irrespective of memo code condition
+          //if (res.hasOwnProperty('memo_code')) {
+            //if (typeof res.memo_code === 'object') {
+              //if (res.memo_code === null) {
                 this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
                   const message: any = {
                     formType: this.formType,
@@ -1091,9 +1093,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
                   this._messageService.sendMessage(message);
                 });
-              }
-            }
-          }
+              //}
+            //}
+          //}
 
           this._contributionAmount = '';
           this._contributionAmountChlid = '';
