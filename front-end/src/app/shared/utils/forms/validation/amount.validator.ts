@@ -2,16 +2,12 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 
 /**
  * Custom validator to validate input for only amount.
+ * Currently it will validate for {12,2} format
+ * we can make it dynamic so that it will validate for any amount formats  
  *
- * @param      {Object}  control     The control
- * @param      {String}  key         The key
  */
 export function validateAmount(): ValidatorFn {
-    let maxlength = 12;
-    let decimal_number = 2
-	return (control: AbstractControl): { [key: string]: any } => {
-        //const regex: any = new RegExp(/^(?=[0-9.]{1,${maxlength}}$)[0-9]+(?:\.[0-9]{0,${decimal_number}})?$/);
-        
+    return (control: AbstractControl): { [key: string]: any } => {
         const regex: any = new RegExp(/^\d{0,10}(\.\d{0,2})?$/);
         let text: string = control.value;
         if (text) {
@@ -22,7 +18,6 @@ export function validateAmount(): ValidatorFn {
 				}
 			}
 		}
-
 		return null;
 	};
 }
