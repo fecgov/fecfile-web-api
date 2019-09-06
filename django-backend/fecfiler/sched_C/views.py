@@ -23,7 +23,7 @@ from fecfiler.sched_A.views import (get_next_transaction_id,
                                     get_list_child_schedA,
                                     post_schedA)
 from fecfiler.sched_D.views import do_transaction
-from fecfiler.sched_B.views import get_list_child_schedB
+from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
 from fecfiler.core.transaction_util import get_line_number_trans_type
 
 # Create your views here.
@@ -112,8 +112,11 @@ def schedC_sql_dict(data):
     ]
     try:
         datum =  { k: v for k, v in data.items() if k in valid_fields }
-        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
-            data.get('transaction_type_identifier'))
+        # TODO: disable this line for now and wait for db update
+        # datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            # data.get('transaction_type_identifier'))
+        datum['line_number'] = 'DUMMY'
+        datum['transaction_type'] = 'DUMMY'
         return datum
 
     except:
@@ -250,7 +253,40 @@ def auto_generate_sched_a(data):
     post_schedA(data)
 
 def auto_generate_sched_b(data):
-    pass
+    """
+    auto generate a sched_b transaction when a loan is made:
+    1. need to check the auto_map
+    2. map the fields from sched_c to sched_b
+    3. create a sched_b and make it a child of sched_c( fill in back_ref fields)
+    """
+    logger.debug('auto_generate_sched_b with data:{}'.format(data))
+    field_mapper = {
+        "expenditure_date" : "loan_incurred_date",
+        "expenditure_amount" : "loan_amount_original",
+    }
+    # set up parent
+    data['back_ref_transaction_id'] = data['transaction_id']
+    # get a new sched_a id
+    
+    data['transaction_id'] = get_next_transaction_id('SB')
+    # fill in purpose - hardcoded - TODO: confirm on this
+    data['expenditure_purpose'] = 'Loan out: {}'.format(
+        data.get('transaction_type_identifier')
+        )
+    # update transaction type and line num
+    data['transaction_type_identifier'] = AUTO_SCHED_A_MAP.get(
+        data['transaction_type_identifier']
+        )
+    # TODO: will enable this when db update done
+    # data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+    #     data.get('transaction_type_identifier')
+    #     )
+    for _f in field_mapper:
+        data[_f] = data.get(field_mapper.get(_f))
+    # TODO: not sure we need to return child data or not
+    logger.debug('save a auto sched_a item with loan data:{}'.format(data))
+    post_schedB(data)
+    
 
 def post_schedC(data):
     """
@@ -263,13 +299,16 @@ def post_schedC(data):
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         parent_id = get_next_transaction_id('SC')
         data['transaction_id'] = parent_id
-        
+        logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:
+            logger.info('saving sched_c item...')
             post_sql_schedC(data)
             if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
+                logger.info('auto-generating a sched_a transaction...')
                 auto_generate_sched_a(data)
             if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
+                logger.info('auto-generating a sched_b transaction...')
                 auto_generate_sched_b(data)
         except Exception as e:
             raise Exception(
@@ -532,6 +571,7 @@ def schedC(request):
 
     # create new sched_c1 transaction
     if request.method == 'POST':
+        logger.debug('POST request received.')
         try:
             cmte_id = request.user.username
             if not('report_id' in request.data):
@@ -545,6 +585,7 @@ def schedC(request):
             datum = schedC_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            logger.debug('data before saving to db:{}'.format(datum))
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
