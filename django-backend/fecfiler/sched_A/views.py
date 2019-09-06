@@ -468,7 +468,7 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, 
-(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code
+(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code, t1.back_ref_transaction_id
 FROM public.sched_a t1 
 WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
 AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
@@ -497,12 +497,17 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
     helper function for updating private contribution line number based on aggrgate amount
     the aggregate amount is a contribution_date-based on incremental update, the line number
     is updated accordingly:
-
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+            and only when it is NOT add contribution_amount to aggregate amount
+    edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+            if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
     e.g.
     date, contribution_amount, aggregate_amount, line_number
     1/1/2018, 50, 50, 11AII
     2/1/2018, 60, 110, 11AII
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
+
     """
     try:
         child_flag = False
@@ -520,8 +525,11 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
         aggregate_amount = 0
         for transaction in transactions_list:
+            # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != 'Y':
-                if transaction[6] != 'X':
+                # checking if the back_ref_transaction_id is null or not. 
+                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
                     aggregate_amount += transaction[0]
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
