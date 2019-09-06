@@ -542,10 +542,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
+    let transactionDate = null;
+    if (this.frmIndividualReceipt.get('contribution_date')) {
+      transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+    }
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
       this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType, this._isParentOfSub()
+       this.transactionType, this._isParentOfSub(), transactionDate
     );
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
   }
@@ -600,33 +604,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
       }
     }
-
-    ///////////////////////////////////////////////////////////////////////
-    // don't add amount to aggregate when memo code is checked or is for edit
-    // let aggregateTotal: number = parseFloat(contributionAggregate);
-    // if (isChildForm) {
-    //   if (!this.memoCodeChild) {
-    //     if (this.scheduleAction === ScheduleActions.edit) {
-    //       aggregateTotal = contributionAmountNum;
-    //     } else {
-    //       aggregateTotal += contributionAmountNum;
-    //     }
-    //   }
-    // } else {
-    //   if (!this.memoCode) {
-    //     if (this.scheduleAction === ScheduleActions.edit) {
-    //       aggregateTotal = contributionAmountNum;
-    //     } else {
-    //       aggregateTotal += contributionAmountNum;
-    //     }
-    //   }
-    // }  
-    // const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
-
+    let transactionDate = null;
+    if (this.frmIndividualReceipt.get('contribution_date')) {
+      transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+    }
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
       this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType, this._isSubOfParent()
+       this.transactionType, this._isSubOfParent(), transactionDate
     );
 
     if (isChildForm) {
@@ -634,8 +619,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
     }
-    ///////////////////////////////////////////////////////////////////////
-
   }
 
 
@@ -2512,44 +2495,26 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-
   private _getContributionAggregate(contribDate: string, entityId: number, cmteId: string) {
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
     this._receiptService
       .getContributionAggregate(reportId, entityId, cmteId, this.transactionType, contribDate)
       .subscribe(res => {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
 
-        // let contributionAmount = this.frmIndividualReceipt.get('contribution_amount').value;
-        // contributionAmount = contributionAmount ? contributionAmount : 0;
-        // // remove commas
-        // if (typeof contributionAmount === 'string') {
-        //   contributionAmount = contributionAmount.replace(/,/g, ``);
-        // }
         const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
 
         let contributionAggregate: string = String(res.contribution_aggregate);
         contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        // const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        // const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        // console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-        //   ${contributionAggregate} = ${total}`);
-        // console.log(`value = ${value}`);
-
-        // this.frmIndividualReceipt.patchValue({ contribution_aggregate: value }, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-
         this._contributionAggregateValue = parseFloat(contributionAggregate);
 
+        let transactionDate = null;
+        if (this.frmIndividualReceipt.get('contribution_date')) {
+          transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+        }
         const aggregateValue: string = this._receiptService.determineAggregate(
           this._contributionAggregateValue, contributionAmountNum,
           this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-           this.transactionType, this._isSubOfParent()
+           this.transactionType, this._isSubOfParent(), transactionDate
         );
 
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
