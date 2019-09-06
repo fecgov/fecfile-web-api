@@ -105,8 +105,8 @@
                         [attr.name]="col?.name"                      
                         [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
                         [attr.value]="col?.value"
-                        [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
-                          ? col?.validation?.max + 5: col?.validation?.max"
+                        [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
+                                    || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
                                 ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
@@ -312,6 +312,14 @@
                         >
                           Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
                           allowed.
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonValidAmount"
+                        >
+                          Please enter a valid amount.
                         </div>
                       </ng-container>
                       <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">

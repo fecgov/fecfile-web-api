@@ -38,6 +38,8 @@ import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
 import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
+																						
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -404,8 +406,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            formValidators.push(Validators.maxLength(validators[validation]));
-          }
+            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount') 
+                && (fieldName !== 'contribution_aggregate')) {
+              formValidators.push(Validators.maxLength(validators[validation]));
+            } else {
+              formValidators.push(validateAmount());
+            }
+					}
         } else if ((validation === 'dollarAmount') || (validation === 'dollarAmountNegative')) {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
