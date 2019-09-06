@@ -213,7 +213,7 @@
                     {
                         "inputGroup": false,
                         "inputIcon": "",
-                        "text": "Phone Number",
+                        "text": "Telephone",
                         "infoIcon": false,
                         "infoText": null,
                         "name": "phone_number",
@@ -510,7 +510,7 @@
                     {
                         "inputGroup": false,
                         "inputIcon": "",
-                        "text": "Phone Number",
+                        "text": "Telephone",
                         "infoIcon": false,
                         "infoText": null,
                         "name": "phone_number",
@@ -784,7 +784,7 @@
                     {
                         "inputGroup": false,
                         "inputIcon": "",
-                        "text": "Phone Number",
+                        "text": "Telephone",
                         "infoIcon": false,
                         "infoText": null,
                         "name": "phone_number",
@@ -937,7 +937,7 @@
                     {
                         "inputGroup": false,
                         "inputIcon": "",
-                        "text": "Phone Number",
+                        "text": "Telephone",
                         "infoIcon": false,
                         "infoText": null,
                         "name": "phone_number",
