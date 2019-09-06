@@ -232,11 +232,9 @@ def auto_generate_sched_a(data):
     
     data['transaction_id'] = get_next_transaction_id('SA')
     # fill in purpose - hardcoded - TODO: confirm on this
-    print(data)
     data['purpose_description'] = 'Loan received: {}'.format(
         data.get('transaction_type_identifier')
         )
-    print(data)
     # update transaction type and line num
     data['transaction_type_identifier'] = AUTO_SCHED_A_MAP.get(
         data['transaction_type_identifier']
@@ -248,7 +246,7 @@ def auto_generate_sched_a(data):
     for _f in field_mapper:
         data[_f] = data.get(field_mapper.get(_f))
     # TODO: not sure we need to return child data or not
-    logger.debug('save a sched_a item with loan data:{}'.format(data))
+    logger.debug('save a auto sched_a item with loan data:{}'.format(data))
     post_schedA(data)
 
 def auto_generate_sched_b(data):
@@ -283,80 +281,6 @@ def post_schedC(data):
         raise
 
 def post_sql_schedC(data):
-    try:
-        _sql = """
-        INSERT INTO public.sched_c (
-            cmte_id,
-            report_id,
-            line_number,
-            transaction_type,
-            transaction_type_identifier,
-            transaction_id,
-            entity_id,
-            election_code,
-            election_other_description,
-            loan_amount_original,
-            loan_payment_to_date,
-            loan_balance,
-            loan_incurred_date,
-            loan_due_date,
-            loan_intrest_rate,
-            is_loan_secured,
-            is_personal_funds,
-            lender_cmte_id,
-            lender_cand_id,
-            lender_cand_last_name,
-            lender_cand_first_name,
-            lender_cand_middle_name,
-            lender_cand_prefix,
-            lender_cand_suffix,
-            lender_cand_office,
-            lender_cand_state,
-            lender_cand_district,
-            memo_code,
-            memo_text,
-            create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
-        """
-        _v = (
-            data.get('cmte_id'),
-            data.get('report_id'),
-            data.get('line_number'),
-            data.get('transaction_type'),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_id'),
-            data.get('entity_id', ''),
-            data.get('election_code', ''),
-            data.get('election_other_description', ''),
-            data.get('loan_amount_original', None),
-            data.get('loan_payment_to_date', None),
-            data.get('loan_balance', None),
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
-            data.get('loan_intrest_rate', ''),
-            data.get('is_loan_secured', ''),
-            data.get('is_personal_funds', ''),
-            data.get('lender_cmte_id', ''),
-            data.get('lender_cand_id', ''),
-            data.get('lender_cand_last_name', ''),
-            data.get('lender_cand_first_name', ''),
-            data.get('lender_cand_middle_name', ''),
-            data.get('lender_cand_prefix', ''),
-            data.get('lender_cand_suffix', ''),
-            data.get('lender_cand_office', ''),
-            data.get('lender_cand_state', ''),
-            data.get('lender_cand_district', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
-            datetime.datetime.now(),
-        )
-        with connection.cursor() as cursor:
-            # Insert data into schedD table
-            cursor.execute(_sql, _v)
-    except Exception:
-        raise
-
-def post_sql__schedC(data):
     """
     db transaction for creating new sched_c item
     """
@@ -396,81 +320,46 @@ def post_sql__schedC(data):
             create_date)
             VALUES({});
             """.format(','.join(['%s']*30))
-        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        # """
         logger.debug('sql:{}'.format(_sql))
-        # _v = (
-        #     data.get('cmte_id'),
-        #     data.get('report_id'),
-        #     data.get('line_number'),
-        #     data.get('transaction_type'),
-        #     data.get('transaction_type_identifier', ''),
-        #     data.get('transaction_id'),
-        #     data.get('entity_id', ''),
-        #     data.get('election_code', ''),
-        #     data.get('election_other_description', ''),
-        #     data.get('loan_amount_original', None),
-        #     data.get('loan_payment_to_date', None),
-        #     data.get('loan_balance', None),
-        #     data.get('loan_incurred_date', None),
-        #     data.get('loan_due_date', None),
-        #     data.get('loan_intrest_rate', ''),
-        #     data.get('is_loan_secured', ''),
-        #     data.get('is_personal_funds', ''),
-        #     data.get('lender_cmte_id', ''),
-        #     data.get('lender_cand_id', ''),
-        #     data.get('lender_cand_last_name', ''),
-        #     data.get('lender_cand_first_name', ''),
-        #     data.get('lender_cand_middle_name', ''),
-        #     data.get('lender_cand_prefix', ''),
-        #     data.get('lender_cand_suffix', ''),
-        #     data.get('lender_cand_office', ''),
-        #     data.get('lender_cand_state', ''),
-        #     data.get('lender_cand_district', None),
-        #     data.get('memo_code', ''),
-        #     data.get('memo_text', ''),
-        #     datetime.datetime.now(),
-        # )
+
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('line_number', ''),
-            data.get('transaction_type', ''),
+            data.get('line_number'),
+            data.get('transaction_type'),
             data.get('transaction_type_identifier'),
             data.get('transaction_id'),
-            data.get('entity_id', ''),
-            data.get('election_code', ''),
-            data.get('election_other_description', None),
-            data.get('loan_amount_original', None),
-            data.get('loan_payment_to_date', None),
-            data.get('loan_balance', None),
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
-            data.get('loan_intrest_rate', None),
-            data.get('is_loan_secured', None),
-            data.get('is_personal_funds', None),
-            data.get('lender_cmte_id', None),
-            data.get('lender_cand_id', None),
-            data.get('lender_cand_last_name', None),
-            data.get('lender_cand_first_name', None),
-            data.get('lender_cand_middle_name', None),
-            data.get('lender_cand_prefix', None),
-            data.get('lender_cand_suffix', None),
-            data.get('lender_cand_office', None),
-            data.get('lender_cand_state', None),
-            data.get('lender_cand_district', None),
-            data.get('memo_code', None),
-            data.get('memo_text', None),
+            data.get('entity_id'),
+            data.get('election_code'),
+            data.get('election_other_description'),
+            data.get('loan_amount_original'),
+            data.get('loan_payment_to_date'),
+            data.get('loan_balance'),
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'),
+            data.get('loan_intrest_rate'),
+            data.get('is_loan_secured'),
+            data.get('is_personal_funds'),
+            data.get('lender_cmte_id'),
+            data.get('lender_cand_id'),
+            data.get('lender_cand_last_name'),
+            data.get('lender_cand_first_name'),
+            data.get('lender_cand_middle_name'),
+            data.get('lender_cand_prefix'),
+            data.get('lender_cand_suffix'),
+            data.get('lender_cand_office'),
+            data.get('lender_cand_state'),
+            data.get('lender_cand_district'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now()
         )
         logger.debug('values:{}'.format(_v))
         with connection.cursor() as cursor:
             # Insert data into schedD table
             cursor.execute(_sql, _v)
-            # if not cursor.fetchone():
-            #     raise Exception('Exception: sched_c not saved')
     except Exception:
-        pass
+        raise
 
 
 def get_schedC(data):
