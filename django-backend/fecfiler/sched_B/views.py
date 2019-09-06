@@ -686,16 +686,16 @@ def get_schedB(data):
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
             # adding hard-coded api call info to get object details
             for obj in forms_obj:
-                obj.update({"api_call": "sb/schedB"})
+                obj.update({"api_call": "/sb/schedB"})
             child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
-            for obj in forms_obj:
-                obj.update({"api_call": "sb/schedB"})
+            for obj in child_forms_obj:
+                obj.update({"api_call": "/sb/schedB"})
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
             forms_obj = get_list_all_schedB(report_id, cmte_id)
             for obj in forms_obj:
-                obj.update({"api_call": "sb/schedB"})
+                obj.update({"api_call": "/sb/schedB"})
         return forms_obj
 
     except:
