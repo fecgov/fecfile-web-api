@@ -25,6 +25,9 @@ export class TransactionSidebarComponent implements OnInit {
   public itemSelected: string = '';
   public receiptsTotal: number = 0.0;
   public cashOnHandTotal: number = 0.0;
+  public disbursementsTotal: number = 0.0;
+  public loansanddebtsTotal: number = 0.0;
+  public othersTotal: number = 0.0;
 
   private _formType: string = '';
   public transactionCategory: string = '';
@@ -71,6 +74,7 @@ export class TransactionSidebarComponent implements OnInit {
                 if (typeof res.totals === 'object') {
                   if (res.totals.hasOwnProperty('Receipts')) {
                     if (typeof res.totals.Receipts === 'number') {
+                      console.log("res.totals.Receipts",res.totals.Receipts )
                       this.receiptsTotal = res.totals.Receipts;
                       this.cashOnHandTotal = res.totals.COH;
                       const totals: any = {
@@ -85,9 +89,32 @@ export class TransactionSidebarComponent implements OnInit {
             }
           }
         }
+
+        if (res.hasOwnProperty('formType')) {
+          if (typeof res.formType === 'string') {
+            if (res.formType === this._formType) {
+              if (res.hasOwnProperty('totals')) {
+                if (typeof res.totals === 'object') {
+                  if (res.totals.hasOwnProperty('Disbursements')) {
+                    if (typeof res.totals.Disbursements === 'number') {
+                      console.log("res.totals.Disbursements",res.totals.Disbursements )
+                      this.disbursementsTotal = res.totals.Disbursements;
+                      const totals: any = {
+                        receipts: this.receiptsTotal,
+                        cashOnHand : this.cashOnHandTotal,
+                        disbursements: this.disbursementsTotal
+                      };
+                      localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     });
-
+    
     if (this.receiptsTotal === 0 && localStorage.getItem(`form_${this._formType}_totals`) !== null) {
       const totals: any = JSON.parse(localStorage.getItem(`form_${this._formType}_totals`));
 

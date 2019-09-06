@@ -27,11 +27,15 @@
         <ng-container *ngIf="categoryType?.value === 'receipts'">
           <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
         </ng-container>
-        <ng-container *ngIf="categoryType?.value !== 'receipts'">
-          <span class="float-right amount">
-            $0.00
-          </span>
-        </ng-container>
+        <ng-container *ngIf="categoryType?.value === 'disbursements'">
+          <span class="float-right amount"> ${{ disbursementsTotal | number: '1.2-2' }} </span>
+        </ng-container>     
+        <ng-container *ngIf="categoryType?.value === 'loans-and-debts'">
+          <span class="float-right amount"> ${{ loansanddebtsTotal | number: '1.2-2' }} </span>
+        </ng-container>            
+        <ng-container *ngIf="categoryType?.value === 'other'">
+          <span class="float-right amount"> ${{ othersTotal | number: '1.2-2' }} </span>
+        </ng-container>     
       </li>
     </ul>
     <!-- </ng-container> -->
