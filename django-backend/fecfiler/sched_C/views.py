@@ -19,19 +19,39 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
-from fecfiler.sched_A.views import get_next_transaction_id
+from fecfiler.sched_A.views import (get_next_transaction_id, 
+                                    get_list_child_schedA,
+                                    post_schedA)
 from fecfiler.sched_D.views import do_transaction
+from fecfiler.sched_B.views import get_list_child_schedB
 from fecfiler.core.transaction_util import get_line_number_trans_type
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+# TODO: need to back_ref_transaction_id for c1 and c2
+# both pointing to a sched_c item - need to code to enforce this after the db update is done
 MANDATORY_FIELDS_SCHED_C2 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_C1 = ['cmte_id', 'report_id',
                              'line_number', 'transaction_type', 'transaction_id']
-MANDATORY_FIELDS_SCHED_C = ['cmte_id', 'report_id',
-                            'line_number', 'transaction_type', 'transaction_id']
+MANDATORY_FIELDS_SCHED_C = [
+    'cmte_id', 
+    'report_id',
+    'transaction_type_identifier', 
+    'transaction_id',
+    ]
 
+API_CALL_SC = {'api_call':'/sc/schedC'}
+# need to generate auto sched_a items when a loan is made by a committee
+AUTO_SCHED_A_MAP = { 
+    'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
+    'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
+    }
+
+# need to generate auto sched_b item when 
+AUTO_SCHED_B_MAP = {
+    'LOAN_OWN_TO_CMTE' : 'LOAN_OWN_TO_CMTE_OUT',
+}
 
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SC"):
@@ -88,6 +108,7 @@ def schedC_sql_dict(data):
             'lender_cand_district',
             'memo_code',
             'memo_text',
+            'entity_type',
     ]
     try:
         datum =  { k: v for k, v in data.items() if k in valid_fields }
@@ -191,6 +212,47 @@ def validate_sc_data(data):
     """
     check_mandatory_fields_SC(data)
 
+def auto_generate_sched_a(data):
+    """
+    auto generate a sched_a transaction when a loan is made:
+    1. need to check the auto_map
+    2. map the fields from sched_c to sched_a
+    3. create a sched_a and make it a child of sched_c( fill in back_ref fields)
+
+    Q1: do we need to update the aggregate_amt and update line_number
+    """
+    logger.debug('auto_generate_sched_a with data:{}'.format(data))
+    field_mapper = {
+        "contribution_date" : "loan_incurred_date",
+        "contribution_amount" : "loan_amount_original",
+    }
+    # set up parent
+    data['back_ref_transaction_id'] = data['transaction_id']
+    # get a new sched_a id
+    
+    data['transaction_id'] = get_next_transaction_id('SA')
+    # fill in purpose - hardcoded - TODO: confirm on this
+    print(data)
+    data['purpose_description'] = 'Loan received: {}'.format(
+        data.get('transaction_type_identifier')
+        )
+    print(data)
+    # update transaction type and line num
+    data['transaction_type_identifier'] = AUTO_SCHED_A_MAP.get(
+        data['transaction_type_identifier']
+        )
+    # TODO: will enable this when db update done
+    # data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+    #     data.get('transaction_type_identifier')
+    #     )
+    for _f in field_mapper:
+        data[_f] = data.get(field_mapper.get(_f))
+    # TODO: not sure we need to return child data or not
+    logger.debug('save a sched_a item with loan data:{}'.format(data))
+    post_schedA(data)
+
+def auto_generate_sched_b(data):
+    pass
 
 def post_schedC(data):
     """
@@ -201,18 +263,24 @@ def post_schedC(data):
     """
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
-        data['transaction_id'] = get_next_transaction_id('SC')
-        # print(data)
+        parent_id = get_next_transaction_id('SC')
+        data['transaction_id'] = parent_id
+        
         validate_sc_data(data)
         try:
             post_sql_schedC(data)
+            if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
+                auto_generate_sched_a(data)
+            if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
+                auto_generate_sched_b(data)
         except Exception as e:
             raise Exception(
                 'The post_sql_schedC function is throwing an error: ' + str(e))
+        data['transaction_id'] = parent_id
+        # return get_schedC(data)
         return data
     except:
         raise
-
 
 def post_sql_schedC(data):
     try:
@@ -288,6 +356,122 @@ def post_sql_schedC(data):
     except Exception:
         raise
 
+def post_sql__schedC(data):
+    """
+    db transaction for creating new sched_c item
+    """
+    logger.debug('post_sql_schedC with data:{}'.format(data))
+    try:
+        _sql = """
+        INSERT INTO public.sched_c (
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type,
+            transaction_type_identifier,
+            transaction_id,
+            entity_id,
+            election_code,
+            election_other_description,
+            loan_amount_original,
+            loan_payment_to_date,
+            loan_balance,
+            loan_incurred_date,
+            loan_due_date,
+            loan_intrest_rate,
+            is_loan_secured,
+            is_personal_funds,
+            lender_cmte_id,
+            lender_cand_id,
+            lender_cand_last_name,
+            lender_cand_first_name,
+            lender_cand_middle_name,
+            lender_cand_prefix,
+            lender_cand_suffix,
+            lender_cand_office,
+            lender_cand_state,
+            lender_cand_district,
+            memo_code,
+            memo_text,
+            create_date)
+            VALUES({});
+            """.format(','.join(['%s']*30))
+        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        # """
+        logger.debug('sql:{}'.format(_sql))
+        # _v = (
+        #     data.get('cmte_id'),
+        #     data.get('report_id'),
+        #     data.get('line_number'),
+        #     data.get('transaction_type'),
+        #     data.get('transaction_type_identifier', ''),
+        #     data.get('transaction_id'),
+        #     data.get('entity_id', ''),
+        #     data.get('election_code', ''),
+        #     data.get('election_other_description', ''),
+        #     data.get('loan_amount_original', None),
+        #     data.get('loan_payment_to_date', None),
+        #     data.get('loan_balance', None),
+        #     data.get('loan_incurred_date', None),
+        #     data.get('loan_due_date', None),
+        #     data.get('loan_intrest_rate', ''),
+        #     data.get('is_loan_secured', ''),
+        #     data.get('is_personal_funds', ''),
+        #     data.get('lender_cmte_id', ''),
+        #     data.get('lender_cand_id', ''),
+        #     data.get('lender_cand_last_name', ''),
+        #     data.get('lender_cand_first_name', ''),
+        #     data.get('lender_cand_middle_name', ''),
+        #     data.get('lender_cand_prefix', ''),
+        #     data.get('lender_cand_suffix', ''),
+        #     data.get('lender_cand_office', ''),
+        #     data.get('lender_cand_state', ''),
+        #     data.get('lender_cand_district', None),
+        #     data.get('memo_code', ''),
+        #     data.get('memo_text', ''),
+        #     datetime.datetime.now(),
+        # )
+        _v = (
+            data.get('cmte_id'),
+            data.get('report_id'),
+            data.get('line_number', ''),
+            data.get('transaction_type', ''),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_id'),
+            data.get('entity_id', ''),
+            data.get('election_code', ''),
+            data.get('election_other_description', None),
+            data.get('loan_amount_original', None),
+            data.get('loan_payment_to_date', None),
+            data.get('loan_balance', None),
+            data.get('loan_incurred_date', None),
+            data.get('loan_due_date', None),
+            data.get('loan_intrest_rate', None),
+            data.get('is_loan_secured', None),
+            data.get('is_personal_funds', None),
+            data.get('lender_cmte_id', None),
+            data.get('lender_cand_id', None),
+            data.get('lender_cand_last_name', None),
+            data.get('lender_cand_first_name', None),
+            data.get('lender_cand_middle_name', None),
+            data.get('lender_cand_prefix', None),
+            data.get('lender_cand_suffix', None),
+            data.get('lender_cand_office', None),
+            data.get('lender_cand_state', None),
+            data.get('lender_cand_district', None),
+            data.get('memo_code', None),
+            data.get('memo_text', None),
+            datetime.datetime.now()
+        )
+        logger.debug('values:{}'.format(_v))
+        with connection.cursor() as cursor:
+            # Insert data into schedD table
+            cursor.execute(_sql, _v)
+            # if not cursor.fetchone():
+            #     raise Exception('Exception: sched_c not saved')
+    except Exception:
+        pass
+
 
 def get_schedC(data):
     """
@@ -299,6 +483,22 @@ def get_schedC(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedC(report_id, cmte_id, transaction_id)
+            logger.debug('getting all sched_a childs...')
+            childA_forms_obj = get_list_child_schedA(
+                report_id, cmte_id, transaction_id)
+            for obj in childA_forms_obj:
+                obj.update(API_CALL_SC)
+            logger.debug('getting all sched_b childs...')
+            childB_forms_obj = get_list_child_schedB(
+                report_id, cmte_id, transaction_id)
+            for obj in childB_forms_obj:
+                obj.update(API_CALL_SC)
+
+            child_forms_obj = childA_forms_obj + childB_forms_obj
+            # for obj in childB_forms_obj:
+            #     obj.update({'api_call':''})
+            if len(child_forms_obj) > 0:
+                forms_obj[0]['child'] = child_forms_obj
         else:
             forms_obj = get_list_all_schedC(report_id, cmte_id)
         return forms_obj

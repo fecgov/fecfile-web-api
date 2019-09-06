@@ -510,6 +510,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         itemized_transaction_list = []
         unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
+        if isinstance(contribution_date, str):
+            contribution_date = date_format(contribution_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
         # checking for child tranaction identifer for updating auto generated SB transactions
         if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
