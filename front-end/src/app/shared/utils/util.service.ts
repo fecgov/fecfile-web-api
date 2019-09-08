@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class UtilService {
-
-  constructor() { }
+  constructor() {}
 
   /**
    * Deep clone an object with lodash.  Useful when shallow cloning
@@ -20,28 +18,25 @@ export class UtilService {
     return _.cloneDeep(objToClone);
   }
 
-
   /**
-	 * Determine if an object is a number.
-	 *
-	 * @param value the object to check
-	 * @return true if it is a number
-	 */
+   * Determine if an object is a number.
+   *
+   * @param value the object to check
+   * @return true if it is a number
+   */
   public isNumber(value: any): boolean {
     return !isNaN(value);
   }
 
-
   /**
-	 * Convert a string to a number.
-	 *
-	 * @param value string to convert
-	 * @returns numeric respresentaion of the value
-	 */
+   * Convert a string to a number.
+   *
+   * @param value string to convert
+   * @returns numeric respresentaion of the value
+   */
   public toInteger(value: any): number {
     return parseInt(`${value}`, 10);
   }
-
 
   /**
    * Removes all items from local storage based on a string value.
@@ -64,7 +59,7 @@ export class UtilService {
   }
 
   /**
-   * Changes format of date from m/d/yyyy to yyyy-m-d.
+   * Changes format of date from yyyy-m-d to m/d/yyyy to
    *
    * @param      {string}  date    The date
    * @return     {string}  The new formatted date.
@@ -83,15 +78,33 @@ export class UtilService {
   }
 
   /**
-	 * Compare 2 dates and determine if date2 falls after date1.
-	 *
-	 * @param date1
-	 * @param date2
-	 * @returns true if date2 is after (more recent) than date1.  If either dates are null or undefined,
-	 *          return null.
-	 */
-  public compareDatesAfter(date1: Date, date2: Date): boolean {
+   * Changes format of date from m/d/yyyy to yyyy-m-d
+   *
+   * @param      {string}  date    The date
+   * @return     {string}  The new formatted date.
+   */
+  public formatDateToYYYMMDD(date: string): string {
+    try {
+      const dateArr = date.split('/');
+      const month: string = dateArr[0];
+      const day: string = dateArr[1];
+      const year: string = dateArr[2];
 
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
+   * Compare 2 dates and determine if date2 falls after date1.
+   *
+   * @param date1
+   * @param date2
+   * @returns true if date2 is after (more recent) than date1.  If either dates are null or undefined,
+   *          return null.
+   */
+  public compareDatesAfter(date1: Date, date2: Date): boolean {
     if (!date1 || !date2) {
       return null;
     }
@@ -102,17 +115,16 @@ export class UtilService {
   }
 
   /**
-	 * Compates 2 dates for equality.  Returns true if the dates are equal by
-	 * millisecond using getTime() from the Date class, otherwise return false.
-	 * If both are null, false is returned.  If 1 is null and the other is not,
-	 * false is returned.
-	 *
-	 * @param date1
-	 * @param date2
-	 * @returns true if equal
-	 */
+   * Compates 2 dates for equality.  Returns true if the dates are equal by
+   * millisecond using getTime() from the Date class, otherwise return false.
+   * If both are null, false is returned.  If 1 is null and the other is not,
+   * false is returned.
+   *
+   * @param date1
+   * @param date2
+   * @returns true if equal
+   */
   public compareDatesEqual(date1: Date, date2: Date): boolean {
-
     if (!date1 && !date2) {
       return true;
     }
@@ -129,5 +141,4 @@ export class UtilService {
     }
     return true;
   }
-
 }
