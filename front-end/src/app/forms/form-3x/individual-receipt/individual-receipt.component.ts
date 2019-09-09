@@ -1209,8 +1209,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this.subTransactions = [];
             }
           }
-          // setting default action to add when we edit transaction
-          this.scheduleAction = ScheduleActions.add;
+          // setting default action to add/addSub when we save transaction
+          // as it should not be for edit after save.
+          if (this._isSubOfParent()) {
+            this.scheduleAction = ScheduleActions.addSubTransaction;
+          } else {
+            this.scheduleAction = ScheduleActions.add;
+          }
         }
       });
     } else {
