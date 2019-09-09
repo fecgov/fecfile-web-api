@@ -15,6 +15,7 @@
   <tbody>
     <tr *ngFor="let trx of transactionsModel">
       <td>{{ trx.name }}</td>
+      <!-- <td>{{ determineName() }}</td> -->
       <td>{{ trx.date | date: 'MM/dd/yyyy' }}</td>
       <td class="transactions__amount">
         {{ trx.amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
