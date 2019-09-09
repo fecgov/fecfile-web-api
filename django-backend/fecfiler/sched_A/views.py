@@ -436,9 +436,9 @@ def func_aggregate_amount(contribution_date, transaction_type_identifier, entity
             cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
 AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
 AND contribution_date <= %s::date
-AND memo_code IS NULL 
+AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
 AND delete_ind is distinct FROM 'Y' 
-ORDER BY contribution_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
+ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
 
             # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
             # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [

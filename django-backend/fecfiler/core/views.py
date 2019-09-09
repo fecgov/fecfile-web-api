@@ -1315,6 +1315,15 @@ def put_entities(data):
         # filter out cand_fields for non-can entity
         if data['entity_type'] != 'CAN':
             data = { k:v for k,v in data.items() if not k.startswith('cand_') }
+
+        # for sched_a only, update ref_cand_cmte_id with donor_cmte_id if not null
+        if data.get('donor_cmte_id'):
+            data['ref_cand_cmte_id'] = data.get('donor_cmte_id')
+
+        # for sched_b only, update ref_cand_cmte-id with beneficiary_cmte_id if not null
+        if data.get('beneficiary_cmte_id'):
+            data['ref_cand_cmte_id'] = data.get('beneficiary_cmte_id')
+            
         logger.debug('put_sql_entity with data:{}'.format(data))
         put_sql_entity(
             data.get('entity_type'), 
