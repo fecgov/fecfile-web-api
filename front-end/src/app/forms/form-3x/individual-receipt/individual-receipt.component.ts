@@ -573,7 +573,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
       this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType, this._isParentOfSub(), transactionDate
+       this.transactionType, this._isSubOfParent(), transactionDate
     );
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
   }

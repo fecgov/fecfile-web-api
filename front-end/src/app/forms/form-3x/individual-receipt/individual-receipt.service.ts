@@ -407,7 +407,7 @@ export class IndividualReceiptService {
         return this._decimalPipe.transform(aggregate, '.2-2');
       }
       // If nothing has changed, show the original.
-      const origDate = transactionToEdit.date.toString();
+      const origDate = transactionToEdit.date ? transactionToEdit.date.toString() : null;
       if (transactionDate === origDate) {
         if (
           (memoCode && transactionToEdit.memoCode === this._memoCodeValue) ||
@@ -488,6 +488,9 @@ export class IndividualReceiptService {
         aggregate = amount + selectedEntityAggregate;
       }
     } else {
+      // Sub transactions always get the amount added to aggregate
+      // even if memo is checked/disabled.  If the rules change or we encounter
+      // a memo subtran that requires user changes to memo, handle it here.
       aggregate = amount + selectedEntityAggregate;
     }
     return aggregate;
