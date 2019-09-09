@@ -44,7 +44,8 @@ import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.val
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
-  saveForAddSub = 'saveForAddSub'
+  saveForAddSub = 'saveForAddSub',
+  updateOnly = 'updateOnly'
 }
 
 @Component({
@@ -1192,6 +1193,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
           } else if (saveAction === SaveActions.saveForReturnToParent) {
             this.returnToParent();
+          } else if (saveAction === SaveActions.updateOnly) {
+            this.viewTransactions();
           } else {
             // reset the parent ID if action is NOT for add sub transaction.
             // if (this.scheduleAction !== ScheduleActions.addSubTransaction) {
@@ -1242,6 +1245,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   public saveOnly(): void {
     this._doValidateReceipt(SaveActions.saveOnly);
+  }
+
+  public updateOnly(): void {
+    this._doValidateReceipt(SaveActions.updateOnly);
   }
 
   /**
