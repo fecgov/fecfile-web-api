@@ -108,7 +108,25 @@ def schedC_sql_dict(data):
             'lender_cand_district',
             'memo_code',
             'memo_text',
-            'entity_type',
+            'entity_type',   # entity data after this line 
+            'entity_name', 
+            'first_name', 
+            'last_name', 
+            'middle_name',
+            'preffix', 
+            'suffix', 
+            'street_1', 
+            'street_2', 
+            'city', 
+            'state', 
+            'zip_code', 
+            'occupation', 
+            'employer', 
+            'ref_cand_cmte_id',
+            'cand_office',
+            'cand_office_state',
+            'cand_office_district',
+            'cand_election_year',
     ]
     try:
         datum =  { k: v for k, v in data.items() if k in valid_fields }
@@ -130,10 +148,47 @@ def put_schedC(data):
     """
     try:
         check_mandatory_fields_SC(data)
+        # save entity first
+        if 'entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('entity_id')
+            }
+
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            rollback_flag = True
+        else:
+            new_entity = post_entities(data)
+            rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get('entity_id')
+        # print('post_scheda {}'.format(entity_id))
+        data['entity_id'] = entity_id
+
+        #save entity first
+
         #check_transaction_id(data.get('transaction_id'))
         try:
+            # rollback_data = get_schedC(data)
             put_sql_schedC(data)
+
         except Exception as e:
+            # rollback entity data
+                        # remove entiteis if saving sched_a fails
+            if rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': entity_id
+                }
+                remove_entities(get_data)
+            # put_sql_schedC(rollback_data)
             raise Exception(
                 'The put_sql_schedC function is throwing an error: ' + str(e))
         return data
@@ -214,6 +269,7 @@ def validate_sc_data(data):
     validate sc json data
     """
     check_mandatory_fields_SC(data)
+    # check_data_types(data)
 
 def auto_generate_sched_a(data):
     """
@@ -286,34 +342,105 @@ def auto_generate_sched_b(data):
     # TODO: not sure we need to return child data or not
     logger.debug('save a auto sched_a item with loan data:{}'.format(data))
     post_schedB(data)
-    
+
+def remove_sql_schedC(transaction_id, report_id, cmte_id):
+    """
+    sql and db access for removing sched_c item
+    """
+    try:
+        with connection.cursor() as cursor:
+
+            # UPDATE delete_ind flag on a single row from Sched_A table
+            cursor.execute("""
+            DELETE FROM public.sched_c 
+            WHERE transaction_id = %s 
+            AND report_id = %s 
+            AND cmte_id = %s""", 
+            [transaction_id, report_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    """The Transaction ID: {} is either already deleted
+                    or does not exist in schedC table""".format(transaction_id))
+    except Exception:
+        raise
+
+
+def remove_schedC(data):
+    """
+    helper function for removing a sched_c item
+    """
+    try:
+        cmte_id = data.get('cmte_id')
+        report_id = data.get('report_id')
+        transaction_id = check_transaction_id(data.get('transaction_id'))
+        remove_sql_schedC(transaction_id, report_id, cmte_id)
+    except:
+        raise
 
 def post_schedC(data):
     """
     function for handling POST request for sc, need to:
+    1. save entity
     1. generatye new transaction_id
     2. validate data
-    3. save data to db
+    3. save sched_c
+    4. generate child transaction if necessary
+    5. if fails, do clean up: rollback saved data
     """
     try:
-        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
-        parent_id = get_next_transaction_id('SC')
-        data['transaction_id'] = parent_id
+        # save entity first
+        if 'entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('entity_id')
+            }
+
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            rollback_flag = True
+        else:
+            new_entity = post_entities(data)
+            rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get('entity_id')
+        # print('post_scheda {}'.format(entity_id))
+        data['entity_id'] = entity_id
+        new_transaction_id = get_next_transaction_id('SC')
+        data['transaction_id'] = new_transaction_id
         logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:
             logger.info('saving sched_c item...')
             post_sql_schedC(data)
-            if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
-                logger.info('auto-generating a sched_a transaction...')
-                auto_generate_sched_a(data)
-            if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
-                logger.info('auto-generating a sched_b transaction...')
-                auto_generate_sched_b(data)
+            try:
+                if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
+                    logger.info('auto-generating a sched_a transaction...')
+                    auto_generate_sched_a(data)
+                if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
+                    logger.info('auto-generating a sched_b transaction...')
+                    auto_generate_sched_b(data)
+            except Exception as e:
+                # remove sched_a if autogeneration fails
+                remove_schedC(data)
+                raise Exception('auto generation failed on sched C: ' + str(e))
         except Exception as e:
+            # remove entiteis if saving sched_a fails
+            if rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': entity_id
+                }
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedC function is throwing an error: ' + str(e))
-        data['transaction_id'] = parent_id
+        # reset data transaction_id, it will be used loading the data again
+        data['transaction_id'] = new_transaction_id
         # return get_schedC(data)
         return data
     except:
@@ -680,6 +807,9 @@ def schedC(request):
     else:
         raise NotImplementedError
 
+"""
+start of sched_C1
+"""
 
 def schedC1_sql_dict(data):
     valid_fields = [
@@ -1242,6 +1372,10 @@ def schedC1(request):
 
     else:
         raise NotImplementedError
+
+"""
+start of sched_C2
+"""
 
 def check_mandatory_fields_SC2(data):
     """
