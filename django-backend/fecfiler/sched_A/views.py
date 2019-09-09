@@ -624,6 +624,7 @@ def post_schedA(datum):
                 remove_schedA(datum)
                 raise
         except Exception as e:
+            # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
