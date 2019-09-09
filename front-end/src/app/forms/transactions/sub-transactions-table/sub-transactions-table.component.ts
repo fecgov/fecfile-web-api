@@ -114,7 +114,7 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         if (res === 'okay') {
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
           this._transactionsService
-            .trashOrRestoreTransactions('trash', reportId, [trx])
+            .trashOrRestoreTransactions(this.formType,'trash', reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this._getSubTransactions(reportId, trx.backRefTransactionId, trx.apiCall);
               this._dialogService.confirm(

@@ -507,7 +507,7 @@
                 class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
-              <button *ngIf="_transactionToEdit" 
+              <button *ngIf="_transactionToEdit || (subTransactionInfo && subTransactionInfo.isParent)" 
                 class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
                 Cancel
               </button>

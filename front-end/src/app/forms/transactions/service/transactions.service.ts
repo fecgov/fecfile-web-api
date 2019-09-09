@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { CookieService } from 'ngx-cookie-service';
+import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { environment } from '../../../../environments/environment';
 import { TransactionModel } from '../model/transaction.model';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
@@ -42,7 +44,8 @@ export class TransactionsService {
   private _datePipe: DatePipe;
   private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
-  constructor(private _http: HttpClient, private _cookieService: CookieService) {
+  constructor(private _http: HttpClient, private _cookieService: CookieService, 
+              private _receiptService: IndividualReceiptService, private _messageService: MessageService,) {
     // mock out the recycle trx
     for (let i = 0; i < 13; i++) {
       const t1: any = this.createMockTrx();
@@ -688,11 +691,13 @@ export class TransactionsService {
   /**
    * Trash or restore tranactions to/from the Recycling Bin.
    *
+   * @param formType the form type for this report
    * @param action the action to be applied to the transactions (e.g. trash, restore)
    * @param reportId the unique identifier for the Report
    * @param transactions the transactions to trash or restore
    */
-  public trashOrRestoreTransactions(action: string, reportId: string, transactions: Array<TransactionModel>) {
+  public trashOrRestoreTransactions(formType: string, action: string, reportId: string, 
+                                    transactions: Array<TransactionModel>) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_transactions';
@@ -719,6 +724,15 @@ export class TransactionsService {
         map(res => {
           if (res) {
             console.log('Trash Restore response: ', res);
+            // refresh the left summary menu 
+            this._receiptService.getSchedule(formType, {report_id: reportId}).subscribe(resp => {
+              const message: any = {
+                formType: formType,
+                totals: resp
+              };
+              this._messageService.sendMessage(message);
+            });
+
             return res;
           }
           return false;
