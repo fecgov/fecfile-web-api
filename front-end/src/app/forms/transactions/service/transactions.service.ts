@@ -246,7 +246,7 @@ export class TransactionsService {
       model.zip = row.zip_code;
       model.date = row.transaction_date;
       model.amount = row.transaction_amount;
-      model.aggregate = row.aggregate_amt ? row.aggregate_amt : 0;
+      model.aggregate = row.aggregate_amt;
       model.purposeDescription = row.purpose_description;
       model.contributorEmployer = row.employer;
       model.contributorOccupation = row.occupation;
@@ -283,7 +283,7 @@ export class TransactionsService {
         break;
       case 'entityId':
         name = 'entity_id';
-        break;  
+        break;
       case 'transactionTypeIdentifier':
         name = 'transaction_type_identifier';
         break;
@@ -292,7 +292,7 @@ export class TransactionsService {
         break;
       case 'apiCall':
         name = 'api_call';
-        break;  
+        break;
       case 'street':
         name = 'street_1';
         break;
