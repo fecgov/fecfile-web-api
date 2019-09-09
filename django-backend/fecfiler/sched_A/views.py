@@ -132,7 +132,8 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = {
 
 API_CALL_SA = {'api_call' : '/sa/schedA'}
 API_CALL_SB = {'api_call' : '/sb/schedB'}
-
+REQ_ELECTION_YR = ''
+ELECTION_YR = {'election_year': REQ_ELECTION_YR}
 
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
@@ -515,6 +516,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         itemized_transaction_list = []
         unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
+        if isinstance(contribution_date, str):
+            contribution_date = date_format(contribution_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
         # checking for child tranaction identifer for updating auto generated SB transactions
         if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
@@ -630,6 +633,7 @@ def post_schedA(datum):
                 remove_schedA(datum)
                 raise
         except Exception as e:
+            # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
@@ -659,16 +663,21 @@ def get_schedA(data):
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
             for obj in forms_obj:
                 obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
 
             childA_forms_obj = get_list_child_schedA(
                 report_id, cmte_id, transaction_id)
             for obj in childA_forms_obj:
                 obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
 
             childB_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
             for obj in childB_forms_obj:
                 obj.update(API_CALL_SB)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
 
             child_forms_obj = childA_forms_obj + childB_forms_obj
             # for obj in childB_forms_obj:
@@ -679,6 +688,8 @@ def get_schedA(data):
             forms_obj = get_list_schedA(report_id, cmte_id)
             for obj in forms_obj:
                 obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
 
         return forms_obj
     except:
@@ -1046,7 +1057,12 @@ def schedA(request):
     """
 
     # POST api: create new transactions and children transactions if any
+    global REQ_ELECTION_YR
     if request.method == 'POST':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
         try:
             validate_sa_data(request.data)
             cmte_id = request.user.username
@@ -1064,6 +1080,10 @@ def schedA(request):
 
     # Get records from schedA table
     if request.method == 'GET':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
 
         try:
             data = {
@@ -1093,6 +1113,10 @@ def schedA(request):
 
     # PUT api call handled here
     if request.method == 'PUT':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
         try:
             validate_sa_data(request.data)
             datum = schedA_sql_dict(request.data)
@@ -1118,6 +1142,10 @@ def schedA(request):
 
     # delete api call handled here
     if request.method == 'DELETE':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
 
         try:
             data = {

@@ -44,7 +44,8 @@ import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.val
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
-  saveForAddSub = 'saveForAddSub'
+  saveForAddSub = 'saveForAddSub',
+  updateOnly = 'updateOnly'
 }
 
 @Component({
@@ -148,7 +149,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
       this._getFormFields();
-      this._validateContributionDate();
+      this._validateTransactionDate();
     });
   }
 
@@ -227,7 +228,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
     this._getTransactionType();
 
-    this._validateContributionDate();
+    this._validateTransactionDate();
 
     if (localStorage.getItem(`form_${this.formType}_report_type`) !== null) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
@@ -424,9 +425,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
-   * Validates the contribution date selected.
+   * Validates the transaction date selected.
    */
-  private _validateContributionDate(): void {
+  private _validateTransactionDate(): void {
+    let dateField: string;
+    let amountField: string;
+    // checking for expenditure_date in form parameter
+    // If expenditure_date is not found setting contribution_date and contribution_amount
+    if(this.frmIndividualReceipt.controls['expenditure_date']) {
+      dateField = 'expenditure_date';
+      amountField = 'expenditure_amount'
+    } else {
+      dateField = 'contribution_date';
+      amountField = 'contribution_amount'
+    }
+
+
     this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
 
     if (this._reportType !== null) {
@@ -434,40 +448,40 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
       if (this.memoCode) {
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['contribution_date']) {
-          this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        if (this.frmIndividualReceipt.controls[dateField]) {
+          this.frmIndividualReceipt.controls[dateField].setValidators([
             contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
           ]);
 
-          this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+          this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
         }
       }
       if (this.memoCodeChild) {
-        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['child*contribution_date']) {
-          this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([
+        if (this.frmIndividualReceipt.controls['child*'+dateField]) {
+          this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
             contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
           ]);
 
-          this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+          this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
         }
       }
     }
 
     if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['contribution_amount']) {
-        this.frmIndividualReceipt.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
+      if (this.frmIndividualReceipt.controls[amountField]) {
+        this.frmIndividualReceipt.controls[amountField].setValidators([floatingPoint(), Validators.required]);
 
-        this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls[amountField].updateValueAndValidity();
       }
 
       if (this.frmIndividualReceipt.controls['contribution_aggregate']) {
@@ -477,13 +491,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       }
 
       // Do same as above for child amount
-      if (this.frmIndividualReceipt.controls['child*contribution_amount']) {
-        this.frmIndividualReceipt.controls['child*contribution_amount'].setValidators([
+      if (this.frmIndividualReceipt.controls['child*'+amountField]) {
+        this.frmIndividualReceipt.controls['child*'+amountField].setValidators([
           floatingPoint(),
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['child*contribution_amount'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*'+amountField].updateValueAndValidity();
       }
 
       if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
@@ -502,49 +516,59 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public memoCodeChange(e, fieldName: string): void {
     const { checked } = e.target;
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
-
+    let dateField: string;
+    let amountField: string;
+    // checking for expenditure_date in form parameter
+    // If expenditure_date is not found setting contribution_date and contribution_amount
+    if(this.frmIndividualReceipt.controls['expenditure_date']) {
+      dateField = 'expenditure_date';
+      amountField = 'expenditure_amount'
+    } else {
+      dateField = 'contribution_date';
+      amountField = 'contribution_amount'
+    }
     if (isChildForm) {
       if (checked) {
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(this._memoCodeValue);
-        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
       } else {
-        this._validateContributionDate();
+        this._validateTransactionDate();
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(null);
-        this.frmIndividualReceipt.controls['child*contribution_date'].setValidators([
+        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
           contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       }
     } else {
       if (checked) {
         this.memoCode = checked;
         this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       } else {
-        this._validateContributionDate();
+        this._validateTransactionDate();
         this.memoCode = checked;
         this.frmIndividualReceipt.controls['memo_code'].setValue(null);
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        this.frmIndividualReceipt.controls[dateField].setValidators([
           contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['contribution_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       }
     }
 
     const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
     let transactionDate = null;
-    if (this.frmIndividualReceipt.get('contribution_date')) {
-      transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+    if (this.frmIndividualReceipt.get(dateField)) {
+      transactionDate = this.frmIndividualReceipt.get(dateField).value;
     }
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue, contributionAmountNum,
@@ -1169,6 +1193,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
           } else if (saveAction === SaveActions.saveForReturnToParent) {
             this.returnToParent();
+          } else if (saveAction === SaveActions.updateOnly) {
+            this.viewTransactions();
           } else {
             // reset the parent ID if action is NOT for add sub transaction.
             // if (this.scheduleAction !== ScheduleActions.addSubTransaction) {
@@ -1219,6 +1245,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   public saveOnly(): void {
     this._doValidateReceipt(SaveActions.saveOnly);
+  }
+
+  public updateOnly(): void {
+    this._doValidateReceipt(SaveActions.updateOnly);
   }
 
   /**
@@ -2187,7 +2217,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
       this._clearFormValues();
       this._getFormFields();
-      this._validateContributionDate();
+      this._validateTransactionDate();
     } else {
       this.returnToParent();
     }
@@ -2486,7 +2516,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   private _convertFormattedAmountToDecimal(formatedAmount: string): number {
     if (!formatedAmount) {
-      formatedAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+      if(this.frmIndividualReceipt.get('expenditure_amount')) {
+        formatedAmount = this.frmIndividualReceipt.get('expenditure_amount').value;  
+      } else {
+        formatedAmount = this.frmIndividualReceipt.get('contribution_amount').value;
+      }
     }
     if (typeof formatedAmount === 'string') {
       // remove commas

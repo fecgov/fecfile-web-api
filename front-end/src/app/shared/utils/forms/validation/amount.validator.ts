@@ -8,7 +8,7 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
  */
 export function validateAmount(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } => {
-        const regex: any = new RegExp(/^\d{0,10}(\.\d{0,2})?$/);
+        const regex: any = new RegExp(/^-?\d{0,10}(\.\d{0,2})?$/);
         let text: string = control.value;
         if (text) {
 			if (text.length >= 1) {
