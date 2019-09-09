@@ -79,7 +79,14 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         const suffix = trx.suffix ? trx.suffix.trim() : '';
         const prefix = trx.prefix ? trx.prefix.trim() : '';
 
-        model.name = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
+        if (trx.entity_type === 'IND' || trx.entity_type === 'CAND') {
+          model.name = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
+        } else if (trx.entity_type === 'ORG') {
+          model.name = trx.entity_name;
+        } else {
+          model.name = null;
+        }
+
         model.amount = trx.expenditure_amount ? trx.expenditure_amount : trx.contribution_amount;
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;

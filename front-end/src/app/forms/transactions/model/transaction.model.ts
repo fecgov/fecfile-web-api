@@ -1,6 +1,7 @@
 export class TransactionModel {
   type: string;
   entityId: string;
+  entityType: string;
   apiCall: string;
   transactionId: string;
   backRefTransactionId: string;
@@ -27,6 +28,7 @@ export class TransactionModel {
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
     this.entityId = transaction.entityId ? transaction.entityId : '';
+    this.entityType = transaction.entityType ? transaction.entityType : '';
     this.apiCall = transaction.apiCall ? transaction.apiCall : '';
     this.transactionId = transaction.transactionId ? transaction.transactionId : '';
     this.backRefTransactionId = transaction.backRefTransactionId ? transaction.backRefTransactionId : '';
