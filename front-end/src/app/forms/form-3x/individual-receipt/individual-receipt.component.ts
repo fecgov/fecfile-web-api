@@ -1265,6 +1265,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
     transactionModel.apiCall = this.subTransactionInfo.api_call;
+    this.memoCode = false;
+    this.memoCodeChild = false;
     const emitObj = {
       form: {},
       direction: 'next',
