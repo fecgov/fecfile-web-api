@@ -3007,6 +3007,7 @@ Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 
 @api_view(['GET', 'POST'])
 def contactsTable(request):
+
     try:
         
         if request.method == 'POST':
@@ -4149,3 +4150,4 @@ def check_contact_to_delete(cmte_id, entity_id):
         return Response("The check_contact_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     
+

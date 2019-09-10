@@ -77,6 +77,7 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
 REQT_ELECTION_YR = ""
 
 
+
 def get_next_transaction_id(trans_char):
     """
     query the db for next transarion id
@@ -123,6 +124,7 @@ def check_type_list(data):
                 Input received: {}""".format(
                     data
                 )
+
             )
         else:
             return data
@@ -144,6 +146,7 @@ def check_decimal(value):
             Input received: {}""".format(
                 value
             )
+
         )
 
 
@@ -261,6 +264,7 @@ def post_sql_schedB(
                 VALUES ("""
                 + ",".join(["%s"] * 38)
                 + ")",
+
                 [
                     cmte_id,
                     report_id,
@@ -522,6 +526,7 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
             # UPDATE delete_ind flag on a single row from Sched_B table
             cursor.execute(
                 """
+
                 UPDATE public.sched_b 
                 SET delete_ind = 'Y' 
                 WHERE transaction_id = %s 
@@ -531,6 +536,7 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
                 """,
                 [transaction_id, report_id, cmte_id],
             )
+
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} is either already deleted or does not exist in schedB table".format(
@@ -707,6 +713,8 @@ def get_schedB(data):
     except:
         raise
 
+# TODO: need to add beneficiary fields
+
 
 # TODO: need to add beneficiary fields
 
@@ -851,6 +859,7 @@ def validate_parent_transaction_exist(data):
             pass
 
 
+
 def schedB_sql_dict(data):
     """
     build a formulated data dictionary based on loaded 
@@ -859,6 +868,7 @@ def schedB_sql_dict(data):
     try:
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
+
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
