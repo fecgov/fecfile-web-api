@@ -16,11 +16,12 @@ export class ContactModel {
     phoneNumber: string;
     employer: string;
     occupation: string;
-    officeSought: string;
-    officeState: string;
-    district: string;
-    selected: boolean;
+    candOffice: string;
+    candOfficeState: string;
+    candOfficeDistrict: string;
+    candCmteId: string;
 
+    selected: boolean;
 
     constructor(contact: any) {
         this.type = contact.type ? contact.type : '';
@@ -40,9 +41,11 @@ export class ContactModel {
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.employer = contact.employer ? contact.employer : '';
         this.occupation = contact.occupation ? contact.occupation : '';
-        this.officeSought = contact.officeSought ? contact.officeSought : '';
-        this.officeState = contact.officeState ? contact.officeState : '';
-        this.district = contact.district ? contact.district : '';
+        this.candOffice = contact.candOffice ? contact.candOffice : '';
+        this.candOfficeState = contact.candOfficeState ? contact.candOfficeState : '';
+        this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
+        this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
+        this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
         this.selected = contact.selected;
     }
 }

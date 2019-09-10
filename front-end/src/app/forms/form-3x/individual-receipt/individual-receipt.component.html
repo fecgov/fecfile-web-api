@@ -30,6 +30,7 @@
           <h1>
             Form 3X
             <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="_transactionToEdit"> / Edit </ng-container>
           </h1>
         </div>
         <div class="float-right" ngbDropdown>
@@ -38,8 +39,8 @@
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item"><i class="view-icon"></i> View</button>
             <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item"><i class="file-import-icon" (click)="ImportTransactions()"></i> Import</button>
           </div>
         </div>
       </div>
@@ -113,11 +114,11 @@
                         [attr.name]="col?.name"                      
                         [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
                         [attr.value]="col?.value"
-                        [maxlength]="isFieldName(col?.name, 'contribution_amount') ? col?.validation?.max + 5: col?.validation?.max"
+                        [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
+                                    || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
                         [formControlName]="col?.name"
-                        (blur)="isFieldName(col?.name, 'contribution_amount') ? 
-                          contributionAmountChange($event, col?.name) : populatePurpose(col?.name)"
-
+                        (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
+                                ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
                         [ngClass]="
                           frmIndividualReceipt.get(col?.name)?.invalid &&
                           (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -125,7 +126,8 @@
                             : ''
                         "
                         (keyup)="handleFormFieldKeyup($event, col)"
-                        (change)="isFieldName(col?.name, 'contribution_date') ? doContributionDateChange(col?.name) : null"
+                        (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
+                                  ? dateChange(col?.name) : null;"
 
                       />
                       <input
@@ -149,7 +151,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName"
-                        (selectItem)="handleSelectedIndividual($event, col?.name)"
+                        (selectItem)="handleSelectedIndividual($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -174,7 +176,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName"
-                        (selectItem)="handleSelectedIndividual($event, col?.name)"
+                        (selectItem)="handleSelectedIndividual($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -199,7 +201,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandLastName"
-                        (selectItem)="handleSelectedCandidate($event, col?.name)"
+                        (selectItem)="handleSelectedCandidate($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />
@@ -224,7 +226,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCandidate"
                         [inputFormatter]="formatterCandFirstName"
-                        (selectItem)="handleSelectedCandidate($event, col?.name)"
+                        (selectItem)="handleSelectedCandidate($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                         (blur)="populatePurpose(col?.name)"
                       />                      
@@ -249,7 +251,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtOrg"
                         [inputFormatter]="formatterOrgName"
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />
                       <input
@@ -275,7 +277,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCommitteeId"
                         [inputFormatter]="formatterCommitteeId"                        
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />  
                       <input
@@ -300,7 +302,7 @@
                         [focusFirst]=false
                         [resultTemplate]="rtCommitteeName"
                         [inputFormatter]="formatterCommitteeName"
-                        (selectItem)="handleSelectedOrg($event, col?.name)"
+                        (selectItem)="handleSelectedOrg($event, col)"
                         (keyup)="handleFormFieldKeyup($event, col)"
                       />                                       
 
@@ -322,6 +324,14 @@
                         >
                           Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
                           allowed.
+                        </div>
+                      </ng-container>
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                        <div
+                          class="text-error text-left"
+                          *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonValidAmount"
+                        >
+                          Please enter a valid amount.
                         </div>
                       </ng-container>
                       <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
@@ -406,13 +416,14 @@
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
 
+                       <!-- [searchFn]="customStateSearchFn" -->
                     <ng-select #stateSelect [items]="states"
 
                       (change)="handleStateChange($event, col)"
                       class="forms__select"
                       [formControlName]="col?.name"
                       bindValue="code"
-
+                      bindLabel="code"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -420,9 +431,6 @@
                           : ''
                       "
                     >
-                      <ng-template ng-label-tmp let-item="item">
-                        <span >{{ item.code }}</span>
-                      </ng-template>
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                             <span >{{ item.code + ' - ' + item.name }}</span>
                       </ng-template>
@@ -489,24 +497,54 @@
         </ng-container>
 
       </ng-container>
+      <app-sub-transactions-table
+        [hidden]="!isShowChildTransactions()"
+        [subTransactions]="subTransactions"
+        [formType]="formType"
+      ></app-sub-transactions-table>
+      <div class="forms__btn-container">
+        <button *ngIf="subTransactionInfo?.isParent" 
+          class="btn btn-primary btn-left" (click)="saveForAddSub()">
+          <i class="plus-icon-circle" aria-hidden="true"></i>
+          Add {{ subTransactionInfo.subTransactionTypeDescription }}
+        </button>
+      </div>
     </section>
     <footer>
       <footer>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+              <div class="forms__btn-container">
+              <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent) && !_transactionToEdit" 
+                class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
-              <button class="btn btn-secondary btn-right" (click)="doValidateReceipt()">
+              <button *ngIf="_transactionToEdit || (subTransactionInfo && subTransactionInfo.isParent)" 
+                class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                Cancel
+              </button>
+              <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" 
+                class="btn btn-previous btn-left" type="button" (click)="cancel()">
+                Cancel
+              </button>
+              <button *ngIf="!_transactionToEdit" class="btn btn-secondary btn-right" 
+                (click)="saveOnly()">
                 Save &amp; Add Transaction
               </button>
+              <button *ngIf="_transactionToEdit" class="btn btn-secondary btn-right" 
+                (click)="updateOnly()">
+                Save
+              </button>
+              
+              <a *ngIf="subTransactionInfo?.isParent === false"                 
+                class="btn btn-primary btn-right" (click)="saveAndReturnToParent()">
+                Return to {{ subTransactionInfo.transactionTypeDescription }}
+              </a> 
+              <ng-container *ngIf="!_transactionToEdit">
               <a class="btn btn-previous btn-right" (click)="viewTransactions()">
                 View Transactions
               </a>
-              <!-- <a class="btn btn-previous btn-right" (click)="addChild()">
-                Add Child
-              </a> -->
+              </ng-container>             
             </div>
           </div>
         </div>

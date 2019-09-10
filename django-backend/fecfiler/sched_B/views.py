@@ -25,6 +25,7 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    save_cand_entity,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -71,6 +72,9 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "FEA_STAF_REIM_MEMO": ("FEA_STAF_REIM", "sched_b"),
     "CONT_REDESIG_MEMO": ("CONT_REDESIG", "sched_b"),
 }
+
+# adding election_year field needed by front end
+REQT_ELECTION_YR = ""
 
 
 
@@ -208,6 +212,7 @@ def post_sql_schedB(
     beneficiary_cand_prefix,
     beneficiary_cand_suffix,
     aggregate_amt,
+    beneficiary_cand_entity_id,
 ):
     """
     db transaction for post a db transaction
@@ -253,10 +258,11 @@ def post_sql_schedB(
                     beneficiary_cand_middle_name,
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
-                    aggregate_amt
+                    aggregate_amt,
+                    beneficiary_cand_entity_id
                 )
                 VALUES ("""
-                + ",".join(["%s"] * 37)
+                + ",".join(["%s"] * 38)
                 + ")",
 
                 [
@@ -297,6 +303,7 @@ def post_sql_schedB(
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
                     aggregate_amt,
+                    beneficiary_cand_entity_id,
                 ],
             )
     except Exception:
@@ -334,16 +341,21 @@ def get_list_child_transactionId_schedB(cmte_id, transaction_id):
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT transaction_id
+            cursor.execute(
+                """SELECT transaction_id
                 FROM public.sched_b 
                 WHERE cmte_id = %s 
                 AND back_ref_transaction_id = %s 
-                AND delete_ind is distinct from 'Y'""", [cmte_id, transaction_id])
+                AND delete_ind is distinct from 'Y'""",
+                [cmte_id, transaction_id],
+            )
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
         raise Exception(
-            'The get_list_child_transactionId_schedB function is throwing an error: ' + str(e))
+            "The get_list_child_transactionId_schedB function is throwing an error: "
+            + str(e)
+        )
 
 
 def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
@@ -352,11 +364,16 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                           [aggregate_amount, transaction_id, cmte_id])
-            if (cursor.rowcount == 0):
+            cursor.execute(
+                """UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                [aggregate_amount, transaction_id, cmte_id],
+            )
+            if cursor.rowcount == 0:
                 raise Exception(
-                    'put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table'.format(transaction_id))
+                    "put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table".format(
+                        transaction_id
+                    )
+                )
     except Exception:
         raise
 
@@ -399,6 +416,7 @@ def put_sql_schedB(
     beneficiary_cand_prefix,
     beneficiary_cand_suffix,
     aggregate_amt,
+    beneficiary_cand_entity_id,
 ):
     """
     db transaction for saving current sched_b item
@@ -440,7 +458,8 @@ def put_sql_schedB(
                             beneficiary_cand_middle_name = %s,
                             beneficiary_cand_prefix = %s,
                             beneficiary_cand_suffix = %s,
-                            aggregate_amt = %s
+                            aggregate_amt = %s,
+                            beneficiary_cand_entity_id = %s
                     WHERE transaction_id = %s 
                     AND report_id = %s 
                     AND cmte_id = %s 
@@ -481,6 +500,7 @@ def put_sql_schedB(
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
                     aggregate_amt,
+                    beneficiary_cand_entity_id,
                     transaction_id,
                     report_id,
                     cmte_id,
@@ -544,23 +564,58 @@ def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
         raise
 
 
+# not sure this function will ever be used - will implement this later
+def post_cand_entity(data):
+    """
+    create a new entity
+    """
+    return save_cand_entity(data, new=True)
+
+
+def put_cand_entity(data):
+    """
+    save/update an existing candiate entity
+    """
+    return save_cand_entity(data)
+
+
 def post_schedB(datum):
     """
     create and save current sched_b item
     """
     try:
         check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
+        logger.debug("...mandatory check done.")
         if "entity_id" in datum:
             get_data = {
                 "cmte_id": datum.get("cmte_id"),
                 "entity_id": datum.get("entity_id"),
             }
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
+        logger.debug("...entity saved")
+        logger.debug("***datum:{}".format(datum))
+        if datum.get("beneficiary_cand_entity_id"):
+            logger.debug("saving cand data...")
+            # get_data = {
+            #     "cmte_id": datum.get("cmte_id"),
+            #     "entity_id": datum.get("entity_id"),
+            # }
+            # prev_entity_list = get_entities(get_data)
+            cand_data = put_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+            logger.debug(
+                "cand data saved with entity_id:{}".format(cand_data.get("entity_id"))
+            )
+        # else:
+        #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
@@ -603,17 +658,18 @@ def post_schedB(datum):
                 datum.get("beneficiary_cand_prefix"),
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
+                datum.get("beneficiary_cand_entity_id"),
             )
         except Exception as e:
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    cmte_id), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
             )
+        logger.debug("sched_b transaction saved successfully.")
         return datum
     except:
         raise
@@ -637,12 +693,21 @@ def get_schedB(data):
 
         if flag:
             forms_obj = get_list_schedB(report_id, cmte_id, transaction_id)
-            child_forms_obj = get_list_child_schedB(
-                report_id, cmte_id, transaction_id)
+            # adding hard-coded api call info to get object details
+            for obj in forms_obj:
+                obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
+            child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
+            for obj in child_forms_obj:
+                obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
             forms_obj = get_list_all_schedB(report_id, cmte_id)
+            for obj in forms_obj:
+                obj.update({"api_call": "/sb/schedB"})
+                obj.update({"election_year": REQT_ELECTION_YR})
         return forms_obj
 
     except:
@@ -669,12 +734,27 @@ def put_schedB(datum):
                 "cmte_id": datum.get("cmte_id"),
                 "entity_id": datum.get("entity_id"),
             }
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
             entity_data = post_entities(datum)
+        if datum.get("beneficiary_cand_entity_id"):
+            # get_data = {
+            #     "cmte_id": datum.get("cmte_id"),
+            #     "entity_id": datum.get("entity_id"),
+            # }
+            # prev_entity_list = get_entities(get_data)
+            cand_data = put_cand_entity(datum)
+            datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # else:
+        #     cand_data = post_cand_entity(datum)
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
+        # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
+        # entity_id = entity_data.get("entity_id")
+        # datum["entity_id"] = entity_id
         try:
             put_sql_schedB(
                 datum.get("cmte_id"),
@@ -714,13 +794,13 @@ def put_schedB(datum):
                 datum.get("beneficiary_cand_prefix"),
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
+                datum.get("beneficiary_cand_entity_id"),
             )
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
@@ -796,9 +876,9 @@ def schedB_sql_dict(data):
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "expenditure_date": date_format(data.get("expenditure_date")),
             "expenditure_amount": check_decimal(data.get("expenditure_amount", None)),
-            "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount", None)
-            ),
+            # "semi_annual_refund_bundled_amount": check_decimal(
+            #     data.get("semi_annual_refund_bundled_amount", 0)
+            # ),
             "expenditure_purpose": data.get("expenditure_purpose"),
             "category_code": data.get("category_code"),
             "memo_code": data.get("memo_code"),
@@ -814,6 +894,7 @@ def schedB_sql_dict(data):
             "other_state": data.get("other_state"),
             "other_zip": data.get("other_zip"),
             "nc_soft_account": data.get("nc_soft_account"),
+            "beneficiary_cand_entity_id": data.get("beneficiary_cand_entity_id"),
             "beneficiary_cand_office": data.get("beneficiary_cand_office"),
             "beneficiary_cand_state": data.get("beneficiary_cand_state"),
             "beneficiary_cand_district": data.get("beneficiary_cand_district"),
@@ -823,7 +904,7 @@ def schedB_sql_dict(data):
             "beneficiary_cand_middle_name": data.get("beneficiary_cand_middle_name"),
             "beneficiary_cand_prefix": data.get("beneficiary_cand_prefix"),
             "beneficiary_cand_suffix": data.get("beneficiary_cand_suffix"),
-            "aggregate_amt": check_decimal(data.get("aggregate_amt", None)),
+            # "aggregate_amt": check_decimal(data.get("aggregate_amt", None)),
             "entity_type": data.get("entity_type"),
             "entity_name": data.get("entity_name"),
             "first_name": data.get("first_name"),
@@ -840,7 +921,32 @@ def schedB_sql_dict(data):
             "employer": data.get("employer"),
             "ref_cand_cmte_id": data.get("ref_cand_cmte_id"),
             "back_ref_transaction_id": data.get("back_ref_transaction_id"),
+            # cand_entity_data
+            "cand_office": data.get("cand_office"),
+            "cand_office_state": data.get("cand_office_state"),
+            "cand_office_district": data.get("cand_office_district"),
+            # "beneficiary_cmte_name": data.get("beneficiary_cmte_name"),
+            "cand_last_name": data.get("cand_last_name"),
+            "cand_first_name": data.get("cand_first_name"),
+            "cand_middle_name": data.get("cand_middle_name"),
+            "cand_prefix": data.get("cand_prefix"),
+            "cand_suffix": data.get("cand_suffix"),
+            "cand_street_1": data.get("cand_street_1"),
+            "cand_street_2": data.get("cand_street_2"),
+            "cand_city": data.get("cand_city"),
+            "cand_state": data.get("cand_state"),
+            "cand_zip_code": data.get("cand_zip_code"),
         }
+        if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
+            datum["aggregate_amt"] = data.get("aggregate_amt")
+
+        if "semi_annual_refund_bundled_amount" in data and check_decimal(
+            data.get("semi_annual_refund_bundled_amount")
+        ):
+            datum["semi_annual_refund_bundled_amount"] = data.get(
+                "semi_annual_refund_bundled_amount"
+            )
+
         if "entity_id" in data and check_null_value(data.get("entity_id")):
             datum["entity_id"] = data.get("entity_id")
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
@@ -856,7 +962,12 @@ def schedB(request):
     """
     CRUD api for sched_b
     """
+    global REQT_ELECTION_YR
     if request.method == "POST":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
         try:
             cmte_id = request.user.username
             if not ("report_id" in request.data):
@@ -920,6 +1031,10 @@ def schedB(request):
 
     # Get records from schedB table
     if request.method == "GET":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
             data = {"cmte_id": request.user.username}
@@ -938,6 +1053,8 @@ def schedB(request):
                     request.query_params.get("transaction_id")
                 )
             datum = get_schedB(data)
+            # for obj in datum:
+            #     obj.update({"api_call": "sb/schedB"})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
@@ -954,6 +1071,10 @@ def schedB(request):
 
     # Modify a single record from schedB table
     if request.method == "PUT":
+        if "election_year" in request.data:
+            REQT_ELECTION_YR = request.data.get("election_year")
+        if "election_year" in request.query_params:
+            REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
             datum = schedB_sql_dict(request.data)

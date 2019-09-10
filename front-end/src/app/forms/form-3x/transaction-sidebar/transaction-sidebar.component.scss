@@ -5,7 +5,7 @@
   margin-right: auto;
   min-height: 500px;
   position: relative;
-
+  
  
  .search {
   margin: auto;
@@ -33,6 +33,25 @@
    top: 12px;
    right: 10%;
  }
+ .btn-toolbar button{
+  margin: auto;
+  width: 44%;
+  position: relative;
+  display: inline-block;
+  
+}
+ #sidebar_signBtn{
+  margin: auto;
+  width: 90%;
+  position: relative;
+  display: inline-block;
+ }
+ .flex-wrapper {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: space-between
+}
 
   // }
   
@@ -84,20 +103,20 @@
   }
   footer {
     background-color: $mineShaft;
-    //bottom: 0;
+    bottom: 0; 
     position: absolute;
     width: 100%;
     .form-sidebar__item {
       border-bottom: 1px solid $white;
       color: $white;
-      height: 25px;
-      line-height: 25px;
+      height: 45px;
+      line-height: 45px;
       padding-bottom: 10px;
       vertical-align: middle;
       .form-sidebar-item__text {
         color: $white;
         float: left;
-        padding-left: 5px;
+        padding-left: 65px;
       }
       .form-sidebar-item__value {
         color: $white;

@@ -363,11 +363,11 @@ export class ReportsService {
       response.reports = filteredFiledDateArray;
     }
   }
-  private getDateMMDDYYYYformat(dateValue: Date): string {
-    var year = dateValue.getUTCFullYear() + '';
-    var month = dateValue.getUTCMonth() + 1 + '';
-    var day = dateValue.getUTCDate() + '';
-    return month + day + year;
+  private getDateMMDDYYYYformat(dateValue: Date): Date {
+    
+    var utc = new Date(dateValue.getUTCFullYear(), dateValue.getUTCMonth() + 1, dateValue.getUTCDate());
+    utc.setUTCHours(0,0,0,0);
+    return utc
   }
 
   public getReportInfo(form_type: string, report_id: string): Observable<any> {

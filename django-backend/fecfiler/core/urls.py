@@ -163,5 +163,20 @@ urlpatterns = [
         views.trash_restore_report,
         name="trash_restore_report",
     ),
+   url(
+        r"^core/get_all_trashed_contacts$",
+        views.get_all_trashed_contacts,
+        name="get_all_trashed_contacts",
+    ),
+    url(
+        r"^core/delete_trashed_contacts$",
+        views.delete_trashed_contacts,
+        name="delete_trashed_contacts",
+    ),
+     url(
+        r"^core/trash_restore_contact$",
+        views.trash_restore_contact,
+        name="trash_restore_contact",
+    ), 
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 ]

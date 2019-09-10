@@ -98,13 +98,13 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_BC_REC" : "IK_BC_OUT",
                                     "REATT_FROM" : "REATT_MEMO",
                                     #"CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
-                                    "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                    # "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
                                     "PARTY_IK_REC" : "PARTY_IK_OUT",
                                     "PARTY_IK_BC_REC" : "PARTY_IK_BC_OUT",
                                     "PAC_IK_REC" : "PAC_IK_OUT",
                                     "PAC_IK_BC_REC" : "PAC_IK_BC_OUT",
-                                    "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
-                                    "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
+                                    # "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                    # "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                     "IK_TRAN" : "IK_TRAN_OUT",
                                     "IK_TRAN_FEA" : "IK_TRAN_FEA_OUT"
 }
@@ -125,8 +125,16 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
                                             "CON_EAR_DEP": "CON_EAR_OUT_DEP",
+                                            "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                            "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                            "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
 
                                         }
+
+API_CALL_SA = {'api_call' : '/sa/schedA'}
+API_CALL_SB = {'api_call' : '/sb/schedB'}
+REQ_ELECTION_YR = ''
+ELECTION_YR = {'election_year': REQ_ELECTION_YR}
 
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
@@ -233,11 +241,11 @@ def post_sql_schedA(cmte_id,
         raise
 
 
-def get_list_all_schedA(report_id, cmte_id):
-    """
-    load sched_a items from DB
-    """
-    return get_list_schedA(report_id, cmte_id)
+# def get_list_all_schedA(report_id, cmte_id):
+#     """
+#     load sched_a items from DB
+#     """
+#     return get_list_schedA(report_id, cmte_id)
 
 def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
 
@@ -246,20 +254,20 @@ def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_t
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                                     FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                                     FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                             """) t""", [report_id, cmte_id, transaction_id])
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                                 FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                                 FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
@@ -293,7 +301,7 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt, purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                             FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
@@ -429,16 +437,16 @@ def func_aggregate_amount(contribution_date, transaction_type_identifier, entity
             cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
 AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
 AND contribution_date <= %s::date
-AND memo_code IS NULL 
+AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
 AND delete_ind is distinct FROM 'Y' 
-ORDER BY contribution_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
+ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
 
             # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
             # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
             #                entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
-            print(cursor.query)
+            # print(cursor.query)
             result = cursor.fetchone()
-            print(result)
+            # print(result)
         if result is None:
           aggregate_amt = 0
         elif result[0] is None:
@@ -461,7 +469,8 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id)
+            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, 
+(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code, t1.back_ref_transaction_id
 FROM public.sched_a t1 
 WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
 AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
@@ -490,12 +499,17 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
     helper function for updating private contribution line number based on aggrgate amount
     the aggregate amount is a contribution_date-based on incremental update, the line number
     is updated accordingly:
-
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+            and only when it is NOT add contribution_amount to aggregate amount
+    edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+            if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
     e.g.
     date, contribution_amount, aggregate_amount, line_number
     1/1/2018, 50, 50, 11AII
     2/1/2018, 60, 110, 11AII
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
+
     """
     try:
         child_flag = False
@@ -503,6 +517,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         itemized_transaction_list = []
         unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
+        if isinstance(contribution_date, str):
+            contribution_date = date_format(contribution_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
         # checking for child tranaction identifer for updating auto generated SB transactions
         if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
@@ -514,8 +530,12 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
         aggregate_amount = 0
         for transaction in transactions_list:
+            # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != 'Y':
-                aggregate_amount += transaction[0]
+                # checking if the back_ref_transaction_id is null or not. 
+                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                    aggregate_amount += transaction[0]
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
@@ -557,10 +577,16 @@ def post_schedA(datum):
     try:
         # save entities first
         if 'entity_id' in datum:
+            # print('entity_id passed:{}'.format(datum.get('entity_id')))
+            # print(datum.get('cmte_id'))
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
             }
+
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
             entity_flag = True
@@ -570,6 +596,7 @@ def post_schedA(datum):
 
         # continue to save transaction
         entity_id = entity_data.get('entity_id')
+        # print('post_scheda {}'.format(entity_id))
         datum['entity_id'] = entity_id
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -610,6 +637,7 @@ def post_schedA(datum):
                 remove_schedA(datum)
                 raise
         except Exception as e:
+            # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
@@ -637,15 +665,36 @@ def get_schedA(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
+            for obj in forms_obj:
+                obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
+
             childA_forms_obj = get_list_child_schedA(
                 report_id, cmte_id, transaction_id)
+            for obj in childA_forms_obj:
+                obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
+
             childB_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
+            for obj in childB_forms_obj:
+                obj.update(API_CALL_SB)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
+
             child_forms_obj = childA_forms_obj + childB_forms_obj
+            # for obj in childB_forms_obj:
+            #     obj.update({'api_call':''})
             if len(child_forms_obj) > 0:
                 forms_obj[0]['child'] = child_forms_obj
         else:
-            forms_obj = get_list_all_schedA(report_id, cmte_id)
+            forms_obj = get_list_schedA(report_id, cmte_id)
+            for obj in forms_obj:
+                obj.update(API_CALL_SA)
+                obj.update({'election_year':REQ_ELECTION_YR})
+                # obj.update(ELECTION_YR)
+
         return forms_obj
     except:
         raise
@@ -667,6 +716,9 @@ def put_schedA(datum):
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
             }
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
             prev_entity_list = get_entities(get_data)
             entity_data = put_entities(datum)
         else:
@@ -1009,7 +1061,12 @@ def schedA(request):
     """
 
     # POST api: create new transactions and children transactions if any
+    global REQ_ELECTION_YR
     if request.method == 'POST':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
         try:
             validate_sa_data(request.data)
             cmte_id = request.user.username
@@ -1027,6 +1084,10 @@ def schedA(request):
 
     # Get records from schedA table
     if request.method == 'GET':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
 
         try:
             data = {
@@ -1043,6 +1104,8 @@ def schedA(request):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
             datum = get_schedA(data)
+            # # for obj in datum:
+            #     obj.update({'api_call' : 'sa/schedA'})
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
@@ -1054,6 +1117,10 @@ def schedA(request):
 
     # PUT api call handled here
     if request.method == 'PUT':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
         try:
             validate_sa_data(request.data)
             datum = schedA_sql_dict(request.data)
@@ -1079,6 +1146,10 @@ def schedA(request):
 
     # delete api call handled here
     if request.method == 'DELETE':
+        if 'election_year' in request.data:
+            REQ_ELECTION_YR = request.data.get('election_year')
+        if 'election_year' in request.query_params:
+            REQ_ELECTION_YR = request.query_params.get('election_year')
 
         try:
             data = {

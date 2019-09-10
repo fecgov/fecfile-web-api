@@ -14,6 +14,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.core.transaction_util import get_line_number_trans_type
+
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -36,7 +38,12 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_D = ["report_id", "cmte_id", "transaction_id", "line_number"]
+MANDATORY_FIELDS_SCHED_D = [
+    "report_id",
+    "cmte_id",
+    "transaction_id",
+    "transaction_type_identifier",
+]
 # Create your views here.
 
 
@@ -46,7 +53,8 @@ def check_transaction_id(transaction_id):
         # transaction_type = transaction_id[0:2]
         if not (transaction_id[0:2] == "SD"):
             raise Exception(
-                "The Transaction ID: {} is not in the specified format. Transaction IDs start with SD characters".format(
+                """The Transaction ID: {} is not in the specified format. 
+                Transaction IDs start with SD characters""".format(
                     transaction_id
                 )
             )
@@ -218,6 +226,10 @@ def delete_sql_schedD(cmte_id, report_id, transaction_id):
 def schedD_sql_dict(data):
     """
     filter data and build sched_d dictionary
+    
+    Note: those are fields from json data, not the fields in the db 
+    table - they are not 100% match:
+    like line_number, it is 'line_num' in db for now
     """
     valid_fields = [
         "transaction_type_identifier",
@@ -230,7 +242,12 @@ def schedD_sql_dict(data):
         "line_number",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+        valid_data["line_number"] = line_num
+        return valid_data
     except:
         raise Exception("invalid request data.")
 
@@ -407,7 +424,10 @@ def put_sql_schedD(data):
                 incurred_amount = %s,
                 payment_amount = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y';
+            WHERE transaction_id = %s 
+            AND report_id = %s 
+            AND cmte_id = %s 
+            AND delete_ind is distinct from 'Y';
         """
     _v = (
         data.get("transaction_type_identifier", ""),
@@ -459,18 +479,22 @@ def get_list_all_schedD(report_id, cmte_id):
         with connection.cursor() as cursor:
             # GET all rows from schedA table
             # GET single row from schedA table
-            query_string = """SELECT cmte_id, 
-            report_id, 
-            line_num,
-            transaction_type_identifier, 
-            transaction_id, 
-            creditor_entity_id, 
-            beginning_balance, 
-            balance_at_close, 
-            incurred_amount, 
-            payment_amount, 
-            last_update_date
-            FROM public.sched_d WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y';
+            query_string = """
+            SELECT cmte_id, 
+                    report_id, 
+                    line_num,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    creditor_entity_id, 
+                    beginning_balance, 
+                    balance_at_close, 
+                    incurred_amount, 
+                    payment_amount, 
+                    last_update_date
+            FROM public.sched_d 
+            WHERE report_id = %s 
+            AND cmte_id = %s 
+            AND delete_ind is distinct from 'Y';
             """
 
             cursor.execute(
@@ -507,17 +531,18 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            query_string = """SELECT cmte_id,
-            report_id,
-            line_num,
-            transaction_type_identifier,
-            transaction_id,
-            creditor_entity_id,
-            beginning_balance,
-            balance_at_close,
-            incurred_amount,
-            payment_amount,
-            last_update_date
+            query_string = """
+            SELECT cmte_id,
+                    report_id,
+                    line_num,
+                    transaction_type_identifier,
+                    transaction_id,
+                    creditor_entity_id,
+                    beginning_balance,
+                    balance_at_close,
+                    incurred_amount,
+                    payment_amount,
+                    last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'
             """

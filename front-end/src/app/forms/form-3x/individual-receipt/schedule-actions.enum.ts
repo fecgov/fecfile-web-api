@@ -1,4 +1,5 @@
 export enum ScheduleActions {
   add = 'add',
-  edit = 'edit'
+  edit = 'edit',
+  addSubTransaction = 'addSubTransaction'
 }

@@ -566,9 +566,7 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
-            # print("before put_sql_report")
             put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
-            # print("after put_sql_report")
             old_dict_report = old_list_report[0]
             prev_report_type = old_dict_report.get('report_type')
             prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
@@ -709,7 +707,6 @@ def reports(request):
     ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-        # print("request.data", request.data)
         try:
             if 'amend_ind' in request.data:
                 amend_ind = request.data.get('amend_ind')
@@ -746,9 +743,6 @@ def reports(request):
             else:
                 additional_email_2 = ""
 
-            # print("f_status = ", f_status)
-            # print("additional_email_1 = ", additional_email_1)
-            # print("additional_email_2 = ", additional_email_2)
             datum = {
                 'report_id': request.data.get('report_id'),
                 'cmte_id': request.user.username,
@@ -772,7 +766,6 @@ def reports(request):
                 datum['election_code'] = request.data.get('election_code')
 
             data = put_reports(datum)
-            # print("data = ", data)
             if (f_status == 'Submitted' and data):
                 return JsonResponse({'Submitted': True}, status=status.HTTP_201_CREATED, safe=False)    
             elif type(data) is dict:
@@ -818,7 +811,7 @@ ENTITIES API- CORE APP - SPRINT 7 - FNE 553 - BY PRAVEEN JINKA
 """
 def check_entity_type(entity_type):
 
-    entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY",]
+    entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY", "FEC"]
     if not (entity_type in entity_type_list):
         raise Exception('The Entity Type is not within the specified list: [' + ', '.join(entity_type_list) + ']. Input received: ' + entity_type)
 
@@ -841,6 +834,34 @@ def check_entity_id(entity_id):
     except Exception as e:
         raise Exception('The Entity ID is not in the specified format. Input received: ' + entity_id)
         
+
+def save_cand_entity(data, new=False):
+    """
+    save a candiate entity
+    """
+    logger.debug('saving cand_entity with data:{}'.format(data))
+    entity_fields_with_cand = [
+        "cand_office",
+        "cand_office_state",
+        "cand_office_district",
+        "cand_election_year",
+    ]
+    cand_data = {k: v for k, v in data.items() if k in entity_fields_with_cand}
+    cand_data.update(
+        {
+            k.replace("cand_", ""): v
+            for k, v in data.items()
+            if k.startswith('cand_') and k not in entity_fields_with_cand
+        }
+    )
+    if not new:
+        cand_data["entity_id"] = data.get("beneficiary_cand_entity_id")
+    else:
+        cand_data['entity_id'] = get_next_entity_id('CAN')
+    cand_data["cmte_id"] = data.get("cmte_id")
+    cand_data["entity_type"] = "CAN"
+    logger.debug("cand_data to be saved:{}".format(cand_data))
+    return put_entities(cand_data)
 
 def check_mandatory_fields_entity(data):
     try:
@@ -907,7 +928,7 @@ def post_sql_entity(
                     cand_office,
                     cand_office_state,
                     cand_office_district,
-                    cand_election_year
+                    cand_election_year,
                     create_date)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
@@ -931,7 +952,7 @@ def post_sql_entity(
                     ref_cand_cmte_id, 
                     cand_office,
                     cand_office_state,
-                    cand_office_dsitrict,
+                    cand_office_district,
                     cand_election_year,
                     datetime.datetime.now(),
                 ]
@@ -940,7 +961,7 @@ def post_sql_entity(
         raise
 
 def get_list_entity(entity_id, cmte_id):
-
+    logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
     try:
         query_string = """
         SELECT 
@@ -963,7 +984,7 @@ def get_list_entity(entity_id, cmte_id):
             ref_cand_cmte_id,
             cand_office,
             cand_office_state,
-            cand_office_dsitrict,
+            cand_office_district,
             cand_election_year
         FROM public.entity 
         WHERE entity_id = %s 
@@ -1006,7 +1027,7 @@ def get_list_all_entity(cmte_id):
             ref_cand_cmte_id,
             cand_office,
             cand_office_state,
-            cand_office_dsitrict,
+            cand_office_district,
             cand_election_year
         FROM public.entity 
         WHERE cmte_id = %s 
@@ -1024,7 +1045,28 @@ def get_list_all_entity(cmte_id):
     except Exception:
         raise
 
-def put_sql_entity(entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, ref_cand_cmte_id, entity_id, cmte_id):
+def put_sql_entity(
+    entity_type, 
+    entity_name, 
+    first_name, 
+    last_name, 
+    middle_name, 
+    preffix, 
+    suffix, 
+    street_1, 
+    street_2, 
+    city, 
+    state, 
+    zip_code, 
+    occupation, 
+    employer, 
+    ref_cand_cmte_id, 
+    entity_id, 
+    cand_office,
+    cand_office_state,
+    cand_office_district,
+    cand_election_year,
+    cmte_id):
 
     try:
         with connection.cursor() as cursor:
@@ -1051,7 +1093,7 @@ def put_sql_entity(entity_type, entity_name, first_name, last_name, middle_name,
                     ref_cand_cmte_id = %s,
                     cand_office = %s,
                     cand_office_state = %s,
-                    cand_office_dsitrict = %s,
+                    cand_office_district = %s,
                     cand_election_year = %s 
                 WHERE entity_id = %s AND cmte_id = %s 
                 AND delete_ind is distinct FROM 'Y'
@@ -1176,7 +1218,7 @@ def post_entities(data):
             data.get('ref_cand_cmte_id'),
             data.get('cand_office'),
             data.get('cand_office_state'),
-            data.get('cand_office_dsitrict'),
+            data.get('cand_office_district'),
             data.get('cand_election_year')
             )
         output = get_entities(data)
@@ -1190,6 +1232,7 @@ def get_entities(data):
         cmte_id = data.get('cmte_id')
         entity_flag = False
         if 'entity_id' in data:
+            logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get('entity_id'))
                 entity_flag = True
@@ -1204,6 +1247,46 @@ def get_entities(data):
     except:
         raise
 
+def clone_fec_entity(cmte_id, entity_type, entity_id):
+    """
+    a helper function for handling FEC entity:
+    clone FEC entity and mark it for future query exclusion
+    """
+    new_entity_id = get_next_entity_id(entity_type)
+    clone_sql = """
+            INSERT INTO public.entity(
+                entity_id, entity_type, cmte_id, entity_name, 
+                first_name, last_name, middle_name, preffix, 
+                suffix, street_1, street_2, city, state, zip_code, 
+                occupation, employer, ref_cand_cmte_id, delete_ind, 
+                create_date, last_update_date, cand_office, cand_office_state, 
+                cand_office_district, cand_election_year)
+            SELECT %s, entity_type, %s, entity_name, 
+                first_name, last_name, middle_name, preffix, 
+                suffix, street_1, street_2, city, state, zip_code, 
+                occupation, employer, ref_cand_cmte_id, delete_ind, 
+                create_date, last_update_date, cand_office, cand_office_state, 
+                cand_office_district, cand_election_year
+            FROM public.entity e 
+            WHERE e.entity_id = %s;
+            """
+    exclude_sql = """
+    INSERT INTO excluded_entity(entity_id, cmte_id) values(%s, %s);
+    """
+    with connection.cursor() as cursor:
+        # UPDATE delete_ind flag to Y in DB
+        # cursor.execute("""UPDATE public.entity SET delete_ind = 'Y', last_update_date = %s WHERE entity_id = '""" + entity_id + """' AND cmte_id = '""" + cmte_id + """' AND delete_ind is distinct from 'Y'""", (datetime.now()))
+        cursor.execute(clone_sql, [new_entity_id, cmte_id, entity_id])
+        if (cursor.rowcount == 0):
+            raise Exception(
+                """ FEC Entity ID: {} clone failure.""".format(entity_id))
+        cursor.execute(exclude_sql, [entity_id, cmte_id])
+        if (cursor.rowcount == 0):
+            raise Exception(
+                """ FEC Entity ID: {} exclusion failure.""".format(entity_id))
+    return new_entity_id
+
+# TODO: need to dsicuss if we need to handle clone-and-update scenario
 def put_entities(data):
 
     try:
@@ -1213,6 +1296,35 @@ def put_entities(data):
         check_entity_type(entity_type)
         entity_id = data.get('entity_id')
         check_entity_id(entity_id)
+
+        # adding code for handling FEC entity
+        # add a clone version of FEC entity and update it with current data
+        if entity_id.startswith('FEC'):
+            logger.debug('current entity {} is FEC entity, need to clone it.'.format(entity_id))
+            new_entity_id = clone_fec_entity(cmte_id, entity_type, entity_id)
+            # combine db entity data and request entity data
+            # fields from api request take priority here
+            data['entity_id'] = new_entity_id
+            cloned_data = get_entities(data)[0]
+            # remove None value field from data
+            data = { k:v for k,v in data.items() if v }
+            cloned_data.update(data)
+            data = cloned_data
+            # logger.debug('cloned cand entity data:{}'.format(cloned_data))
+            # return cloned_data
+        # filter out cand_fields for non-can entity
+        if data['entity_type'] != 'CAN':
+            data = { k:v for k,v in data.items() if not k.startswith('cand_') }
+
+        # for sched_a only, update ref_cand_cmte_id with donor_cmte_id if not null
+        if data.get('donor_cmte_id'):
+            data['ref_cand_cmte_id'] = data.get('donor_cmte_id')
+
+        # for sched_b only, update ref_cand_cmte-id with beneficiary_cmte_id if not null
+        if data.get('beneficiary_cmte_id'):
+            data['ref_cand_cmte_id'] = data.get('beneficiary_cmte_id')
+            
+        logger.debug('put_sql_entity with data:{}'.format(data))
         put_sql_entity(
             data.get('entity_type'), 
             data.get('entity_name'), 
@@ -1233,7 +1345,7 @@ def put_entities(data):
             data.get('cand_office'),
             data.get('cand_office_state'),
             data.get('cand_office_district'),
-            data.get('cand_election_year'),
+            data.get('cand_election_year', None),
             cmte_id)
         output = get_entities(data)
         return output[0]
@@ -1415,56 +1527,85 @@ def autolookup_search_contacts(request):
     }
 
     try:
-        print(request.user.username)
         committee_id = request.user.username
         param_string = ""
         order_string = ""
         search_string = ""
         query_string = ""
-        cand_q = False
-        cmte_q = False
+        # cand_q = False
+        # cmte_q = False
 
-        for k in request.query_params:
-            if k.startswith('cand_'):
-                cand_q = True
-            if k.startswith('cmte_'):
-                cmte_q = True
+        # for k in request.query_params:
+        #     if k.startswith('cand_'):
+        #         cand_q = True
+        #     if k.startswith('cmte_'):
+        #         cmte_q = True
 
         
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
-        print(query_params)
+        logger.debug("autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
                 order_string = str(key)
                 parameters = [committee_id, committee_id]
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                if cand_q:
-                    query_string = """
+                # if cand_q:
+                #     query_string = """
+                #     SELECT json_agg(t) FROM 
+                #     (SELECT e.preffix as cand_prefix, 
+                #             e.last_name as cand_last_name,
+                #             e.first_name as cand_first_name,
+                #             e.middle_name as cand_middle_name,
+                #             e.suffix as cand_suffix,
+                #             *
+                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                # elif cmte_q:
+                #     query_string = """
+                #     SELECT json_agg(t) FROM 
+                #     (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
+                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                #     pass
+                # else:
+                query_string = """
                     SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as cand_prefix, 
-                            e.last_name as cand_last_name,
-                            e.first_name as cand_first_name,
-                            e.middle_name as cand_middle_name,
-                            e.suffix as cand_suffix,
-                            *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                elif cmte_q:
-                    query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                    pass
-                else:
-                    query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT e.preffix as prefix, *
-                    FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
+                    (SELECT 
+                    e.ref_cand_cmte_id as cmte_id,
+                    e.preffix as cand_prefix,
+                    e.last_name as cand_last_name,
+                    e.first_name as cand_first_name,
+                    e.middle_name as cand_middle_name,
+                    e.suffix as cand_suffix,
+                    e.entity_id,
+                    e.entity_type,
+                    e.entity_name as cmte_name,
+                    e.entity_name,
+                    e.first_name,
+                    e.last_name,
+                    e.middle_name,
+                    e.preffix,
+                    e.suffix,
+                    e.street_1,
+                    e.street_2,
+                    e.city,
+                    e.state,
+                    e.zip_code,
+                    e.occupation,
+                    e.employer,
+                    e.ref_cand_cmte_id,
+                    e.delete_ind,
+                    e.create_date,
+                    e.last_update_date,
+                    e.cand_office,
+                    e.cand_office_state,
+                    e.cand_office_district,
+                    e.cand_election_year
+                    FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
                     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
@@ -1484,9 +1625,9 @@ def autolookup_search_contacts(request):
 
         if query_string == "":
             raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
-        print(query_string)
-        print(parameters)
         with connection.cursor() as cursor:
+            logger.debug("autolookup query:{}".format(query_string))
+            logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
             for row in cursor.fetchall():
                 data_row = list(row)
@@ -1805,7 +1946,7 @@ def get_all_transactions(request):
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
         
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
+        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
@@ -2041,6 +2182,7 @@ def get_list_report_data(report_id, cmte_id):
                 forms_obj=data_row[0]
         if forms_obj is None:
             raise NoOPError('The report ID: {} does not exist or is deleted'.format(report_id))   
+
         return forms_obj
     except Exception:
         raise
@@ -2199,7 +2341,7 @@ def summary_disbursements_for_sumamry_table(args):
         sql_output = period_disbursements_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
-            if data_row[0] == '21AI':
+            if data_row[0] in ['21AI', '21A']:
                 XXIAI_amount = XXIAI_amount + data_row[1]
                 XXIAI_amount_ytd = data_row[2]
             if data_row[0] == '21AII':
@@ -2349,7 +2491,7 @@ def summary_receipts_for_sumamry_table(args):
         sql_output = period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id )
         for row in sql_output:
             data_row = list(row)
-            if data_row[0] == '11AI':
+            if data_row[0] in ['11AI', '11A']:
                 XIAI_amount = XIAI_amount + data_row[1]
                 XIAI_amount_ytd = data_row[2]
             if data_row[0] == '11AII':
@@ -2386,8 +2528,8 @@ def summary_receipts_for_sumamry_table(args):
                 XVIIIB_amount = XVIIIB_amount + data_row[1]
                 XVIIIB_amount_ytd = data_row[2]
 
-        XIA_amount = XIAI_amount + XIAII_amount
-        XIA_amount_ytd = XIAI_amount_ytd + XIAII_amount_ytd
+        XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
+        XIA_amount_ytd = XIA_amount_ytd + XIAI_amount_ytd + XIAII_amount_ytd
 
         XID_amount = XIA_amount + XIB_amount + XIC_amount
         XID_amount_ytd = XIA_amount_ytd + XIB_amount_ytd + XIC_amount_ytd
@@ -2885,8 +3027,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer' ]
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer']
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -2914,9 +3056,9 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view
-                                        where cmte_id='""" + cmte_id + """' """ + param_string 
-            # print("trans_query_string: ",trans_query_string)
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                                        where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
+            print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
             if sortcolumn and sortcolumn != 'default':
                 trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
@@ -3821,6 +3963,191 @@ def trash_restore_report(request):
             return Response("The trash_restore_report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     return Response({"result":"success"}, status=status.HTTP_200_OK)    
+
+@api_view(['POST'])
+def delete_trashed_contacts(request):
+    try:
+        #import ipdb;ipdb.set_trace()
+        #message_dict = {}
+        cmte_id = request.user.username
+        #entity_id = _action.get('id', '')
+        entity_id = request.get('id')
+        with connection.cursor() as cursor:
+             cursor.execute("""DELETE FROM public.entity WHERE cmte_id = %s AND entity_id = %s;""",[cmte_id, entity_id])
+      
+        
+        message = 'contact deleted successfully'
+    except Exception as e:
+        print(e)
+        message = 'Error in deleting the transaction'
+        message_dict[trans_id] = message
+
+        json_result = {'message':message}
+        return Response(json_result, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response('The delete_trashed_contacts API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'POST'])
+def get_all_trashed_contacts(request):
+    """
+    API that provides all the deleted contacts for a specific committee
+    """
+    if request.method == 'POST':
+        try:
+                # print("request.data: ", request.data)
+                cmte_id = request.user.username
+                param_string = ""
+                page_num = int(request.data.get('page', 1))
+                descending = request.data.get('descending', 'false')
+                sortcolumn = request.data.get('sortColumnName')
+                itemsperpage = request.data.get('itemsPerPage', 5)
+                search_string = request.data.get('search')
+                #import ipdb;ipdb.set_trace()
+                params = request.data.get('filters', {})
+                keywords = params.get('keywords')
+                if str(descending).lower() == 'true':
+                    descending = 'DESC'
+                else:
+                    descending = 'ASC'
+
+                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+                if search_string:
+                    for key in search_keys:
+                        if not param_string:
+                            param_string = param_string + " AND (CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                        else:
+                            param_string = param_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(search_string) +"%'"
+                    param_string = param_string + " )"
+                keywords_string = ''
+                if keywords:
+                    for key in keys:
+                        for word in keywords:
+                            if '"' in word:
+                                continue
+                            elif "'" in word:
+                                if not keywords_string:
+                                    keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) = " + str(word)
+                                else:
+                                    keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) = " + str(word)
+                            else:
+                                if not keywords_string:
+                                    keywords_string = keywords_string + " AND ( CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                                else:
+                                    keywords_string = keywords_string + " OR CAST(" + key + " as CHAR(100)) ILIKE '%" + str(word) +"%'"
+                    keywords_string = keywords_string + " )"
+                param_string = param_string + keywords_string
+                
+                
+                #trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view where cmte_id='""" + cmte_id + """' """ + param_string 
+
+                trans_query_string= """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id =  AND delete_ind = 'Y' """
+                #cursor.execute("""SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id = %s AND delete_ind = 'Y' """.format(cmte_id))
+
+                # print("trans_query_string: ",trans_query_string)
+                # import ipdb;ipdb.set_trace()
+
+                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                    where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
+                
+                if sortcolumn and sortcolumn != 'default':
+                    trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
+                elif sortcolumn == 'default':
+                    trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+                
+                print("contacts recycle trans_query_string: ",trans_query_string)
+
+                with connection.cursor() as cursor:
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+                    for row in cursor.fetchall():
+                        data_row = list(row)
+                        forms_obj=data_row[0]
+                        forms_obj = data_row[0]
+                        if forms_obj is None:
+                            forms_obj =[]
+                            status_value = status.HTTP_200_OK
+                        else:
+                            for d in forms_obj:
+                                for i in d:
+                                    if not d[i]:
+                                        d[i] = ''
+                            
+                            status_value = status.HTTP_200_OK
+                
+                #import ipdb; ipdb.set_trace()
+                total_count = len(forms_obj)
+                paginator = Paginator(forms_obj, itemsperpage)
+                if paginator.num_pages < page_num:
+                    page_num = paginator.num_pages
+                forms_obj = paginator.page(page_num)
+                json_result = {'contacts': list(forms_obj), 'totalcontactsCount': total_count,
+                            'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+                return Response(json_result, status=status_value)
+    
+        except Exception as e:
+            return Response("The contactsTable API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
+    """trash or restore contacts table by updating delete_ind"""
+    try:
+        with connection.cursor() as cursor:
+            # UPDATE delete_ind flag to Y in DB
+            cursor.execute("""UPDATE public.entity SET delete_ind = '{}' WHERE cmte_id = '{}' AND entity_id = '{}'  """.format(_delete, cmte_id, entity_id))
+    except Exception:
+        raise
+
+@api_view(['PUT'])
+def trash_restore_contact(request):
+    """api for trash and restore contact. """
+    cmte_id = request.user.username
+    print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    for _action in request.data.get('actions', []):
+        entity_id = _action.get('id', '')
+
+        result='failed'
+        action = _action.get('action', '')
+        _delete = 'Y' if action == 'trash' else ''
+        try:
+            if _delete == 'Y':
+                if check_contact_to_delete(cmte_id, entity_id) == 'N':
+                    result = 'failed'
+                else:
+                    trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                    result = 'success'
+            else:
+                trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                result = 'success'
+
+            if result=='success':
+                return Response({"result":"success"}, status=status.HTTP_200_OK)
+            else:   
+                return Response({"result":"failed"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response("The trash_restore_contact API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def check_contact_to_delete(cmte_id, entity_id):
+    try:
+        _delete = 'Y'
+        entity_id_found=''
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT entity_id FROM public.all_transactions_view vw, public.reports rp 
+                            WHERE rp.cmte_id = %s 
+                            AND rp.cmte_id = vw.cmte_id 
+                            AND rp.report_id = vw.report_id  
+                            AND  rp.status= 'Filed'
+                            AND vw.entity_id = %s """, [cmte_id, entity_id])           
+
+            entity_ids = cursor.fetchone()
+            entity_id_found = entity_ids[0]
+
+            if entity_id_found == '':
+                _delete = 'Y'
+            else:
+                _delete = 'N'
+
+        return _delete    
+    except Exception as e:
+        return Response("The check_contact_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     
 

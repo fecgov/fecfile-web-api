@@ -135,12 +135,17 @@ export class TypeComponent implements OnInit {
    *
    */
   public doValidateType() {
-    if (this.frmType.get('reasonTypeRadio').value) {
+    // get the selected F99 option, instead of defaulting
+    let reasonType = this.typeSelected;
+    if(!reasonType) {
+      reasonType = this.frmType.get('reasonTypeRadio').value;
+    }
+    if (reasonType) {
         this.typeFailed = false;
         this.isValidType = true;
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
 
-        this._form99Details.reason = this.frmType.get('reasonTypeRadio').value;
+        this._form99Details.reason = reasonType;
 
         window.localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
 
@@ -187,8 +192,10 @@ export class TypeComponent implements OnInit {
     This function is called while selecting a list from report screen
   */
   public optionsListClick(type): void {
+    console.log("Selected report =", type);
     if(document.getElementById(type) != null) {
       document.getElementById(type).click();
+      console.log("Selected report clicked");
     }
   }
 

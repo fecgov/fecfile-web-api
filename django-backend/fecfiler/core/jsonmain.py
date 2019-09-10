@@ -40,9 +40,9 @@ SCHED_SCHED_CODES_DICT = {
         # 'sched_c': 'SC',
         # 'sched_c1': 'SC1',
         # 'sched_c2': 'SC2',
-        # 'sched_d': 'SD',
-        # 'sched_e': 'SE',
-        # 'sched_f': 'SF',
+        'sched_d': 'SD',
+        'sched_e': 'SE',
+        'sched_f': 'SF',
         # 'sched_h1': 'SH1',
         # 'sched_h2': 'SH2',
         # 'sched_h3': 'SH3',
@@ -60,13 +60,16 @@ FORMTYPE_SCHEDULES_DICT = {
 # Dictionary mapping schedules to DB table name
 SCHEDULES_DBTABLES_DICT = {
     'SA': 'public.sched_a',
-    'SB': 'public.sched_b'
+    'SB': 'public.sched_b',
+    'SE': 'public.sched_e',
+    'SF': 'public.sched_f'
 }
 
 # Dictionary that excludes line numbers from final json
 EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
 
-
+# List of all sched D transction type identifiers. This has no back_ref_transaction_id column so modifying SQL based on this list
+list_of_SD_transaction_types = ['DEBT_TO_VENDOR']
 def get_header_details():
     return {
         "version": "8.3",
@@ -80,6 +83,7 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
     try:
         with connection.cursor() as cursor:
             sql_query = """SELECT json_agg(t) FROM ({}) t""".format(query)
+            # print(sql_query)
             cursor.execute(sql_query, query_values_list)
             #print(cursor.query.decode("utf-8"))
             result = cursor.fetchone()[0]
@@ -212,9 +216,13 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
         if transaction_id_list:
                 query = query + " AND transaction_id in ('{}')".format(
                         "', '".join(transaction_id_list))
-        query_values_list = [report_id, cmte_id,
-            back_ref_transaction_id, back_ref_transaction_id]
-        error_string = "SCHED_A. Get all transactions"
+        # Addressing no back_ref_transaction_id column in sched_D
+        if identifier in list_of_SD_transaction_types:
+            query_values_list = [report_id, cmte_id]
+        else:
+            query_values_list = [report_id, cmte_id,
+                back_ref_transaction_id, back_ref_transaction_id]
+        error_string = identifier + ". Get all transactions"
         return json_query(query, query_values_list, error_string, True)
     except Exception:
         raise
@@ -223,9 +231,18 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
 def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id_list):
         try:
                 if transaction_id_list:
+                    # Addressing no back_ref_transaction_id column in sched_D
+                    if DB_table == "public.sched_d":
+                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
+                            DB_table, "', '".join(transaction_id_list))
+                    else:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
                             DB_table, "', '".join(transaction_id_list))
                 else:
+                    # Addressing no back_ref_transaction_id column in sched_D
+                    if DB_table == "public.sched_d":
+                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(DB_table)
+                    else:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(DB_table)
                 query_values_list = [report_id, cmte_id]
                 result = json_query(query, query_values_list, DB_table, True)
@@ -299,7 +316,8 @@ def create_json_builders(request):
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [
-            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}]
+            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_d'}, {'sched_type': 'sched_e'}, {'sched_type': 'sched_f'},
+            {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'}]
         # Adding Summary data to output based on form type
         if form_type == 'F3X' and (not transaction_flag):
             # Iterating through schedules list and populating data into output
@@ -310,36 +328,37 @@ def create_json_builders(request):
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
                     schedule_name.get('sched_type'))
-                output['data']['schedules'][schedule] = []
-                DB_table = "public." + schedule_name.get('sched_type')
-                list_identifier = get_transaction_type_identifier(
-                    DB_table, report_id, cmte_id, transaction_id_list)
-                for identifier in list_identifier:
-                        identifier = identifier.get('transaction_type_identifier')
-                        child_identifier_list = get_child_identifer(
-                            identifier, form_type)
-                        # SQL QUERY to get all transactions of the specific identifier
-                        if identifier:
-                            parent_transactions = get_transactions(
-                                identifier, report_id, cmte_id, None, transaction_id_list)
-                            for transaction in parent_transactions:
-                                if child_identifier_list:
-                                    for child_identifier in child_identifier_list:
-                                        child_identifier = child_identifier.get(
-                                            'tran_identifier')
-                                        if child_identifier:
-                                                child_transactions = get_transactions(
-                                                    child_identifier, report_id, cmte_id, transaction.get('transactionId'), transaction_id_list)
-                                                # print(child_transactions)
-                                                if child_transactions:
-                                                    if 'child' in transaction:
-                                                        transaction['child'].extend(
-                                                            child_transactions)
-                                                    else:
-                                                        transaction['child'] = child_transactions
-                                if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
-                                        output['data']['schedules'][schedule].append(
-                                            transaction)
+                if schedule:
+                    output['data']['schedules'][schedule] = []
+                    DB_table = "public." + schedule_name.get('sched_type')
+                    list_identifier = get_transaction_type_identifier(
+                        DB_table, report_id, cmte_id, transaction_id_list)
+                    for identifier in list_identifier:
+                            identifier = identifier.get('transaction_type_identifier')
+                            child_identifier_list = get_child_identifer(
+                                identifier, form_type)
+                            # SQL QUERY to get all transactions of the specific identifier
+                            if identifier:
+                                parent_transactions = get_transactions(
+                                    identifier, report_id, cmte_id, None, transaction_id_list)
+                                for transaction in parent_transactions:
+                                    if child_identifier_list:
+                                        for child_identifier in child_identifier_list:
+                                            child_identifier = child_identifier.get(
+                                                'tran_identifier')
+                                            if child_identifier:
+                                                    child_transactions = get_transactions(
+                                                        child_identifier, report_id, cmte_id, transaction.get('transactionId'), transaction_id_list)
+                                                    # print(child_transactions)
+                                                    if child_transactions:
+                                                        if 'child' in transaction:
+                                                            transaction['child'].extend(
+                                                                child_transactions)
+                                                        else:
+                                                            transaction['child'] = child_transactions
+                                    if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
+                                            output['data']['schedules'][schedule].append(
+                                                transaction)
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         tmp_filename = cmte_id + '_' + str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path = '/tmp/'+tmp_filename
@@ -421,8 +440,8 @@ def sample_sql_generate(request):
                     UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
                     AND form_type = '{2}' AND sched_type = '{3}';\n
                     """.format(query, tran, 'F3X', 'SA')
-#                       INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                    INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 file = open("/tmp/indv_rec_sql.sql", 'w')
                 file.write(INDV_REC_STRING)
@@ -448,12 +467,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        PAR_CON_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       PAR_CON_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # PAR_CON_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        PAR_CON_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 file = open("/tmp/par_con_sql.sql", 'w')
                 file.write(PAR_CON_STRING)
@@ -484,12 +503,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        COND_EARM_PAC_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       COND_EARM_PAC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # COND_EARM_PAC_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        COND_EARM_PAC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 file = open("/tmp/con_earm_sql.sql", 'w')
                 file.write(COND_EARM_PAC_STRING)
@@ -519,12 +538,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SA_OTHER_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # SA_OTHER_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SA_similar_OTH_REC:
 
@@ -545,12 +564,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SA_OTHER_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # SA_OTHER_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SA_similar_REF_NFED_CAN:
 
@@ -570,12 +589,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SA_OTHER_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # SA_OTHER_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SA_similar_REF_FED_CAN:
 
@@ -595,12 +614,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SA_OTHER_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SA')
-#                       SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
+                        # SA_OTHER_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SA')
+                        SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 file = open("/tmp/sa_oth_sql.sql", 'w')
                 file.write(SA_OTHER_STRING)
@@ -630,12 +649,12 @@ def sample_sql_generate(request):
                         LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(tran)
-                        SB_SA_CHILD_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SB')
-#                       SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                        # SB_SA_CHILD_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SB')
+                        SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SB_similar_IK_TF_OUT:
 
@@ -654,12 +673,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SB_SA_CHILD_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SB')
-#                       SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                        # SB_SA_CHILD_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SB')
+                        SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SB_similar_EAR_OUT:
 
@@ -690,12 +709,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SB_SA_CHILD_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SB')
-#                       SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                        # SB_SA_CHILD_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SB')
+                        SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 for tran in list_SB_similar_IK_OUT_PTY:
 
@@ -715,12 +734,12 @@ def sample_sql_generate(request):
                         WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                         (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                         """.format(tran)
-                        SB_SA_CHILD_STRING += """
-                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
-                        AND form_type = '{2}' AND sched_type = '{3}';\n
-                        """.format(query, tran, 'F3X', 'SB')
-#                       SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-# VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
+                        # SB_SA_CHILD_STRING += """
+                        # UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                        # AND form_type = '{2}' AND sched_type = '{3}';\n
+                        # """.format(query, tran, 'F3X', 'SB')
+                        SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 file = open("/tmp/sb_sa_child_sql.sql", 'w')
                 file.write(SB_SA_CHILD_STRING)
@@ -737,7 +756,7 @@ def sample_sql_generate(request):
                 List_SB_similar_OPEX_REC = ['OPEXP', 'OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO', 'OPEXP_PMT_TO_PROL_VOID', 'OTH_DISB', 
                 'OTH_DISB_CC_PAY_MEMO', 'OTH_DISB_STAF_REIM', 'OTH_DISB_STAF_REIM_MEMO', 'OPEXP_HQ_ACC_OP_EXP_NP', 
                 'OPEXP_CONV_ACC_OP_EXP_NP', 'OTH_DISB_NC_ACC', 'OTH_DISB_NC_ACC_CC_PAY_MEMO', 'OTH_DISB_NC_ACC_STAF_REIM', 
-                'OTH_DISB_NC_ACC_STAF_REIM_MEMO', 'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID'] 
+                'OTH_DISB_NC_ACC_STAF_REIM_MEMO', 'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID', 'OPEXP_DEBT', 'OTH_DISB_DEBT']
 
                 OPEX_REC_STRING = ""
                 for tran in List_SB_similar_OPEX_REC:
@@ -868,9 +887,6 @@ def sample_sql_generate(request):
                 file.write(PAY_MEMO_STRING)
                 file.close()
 
-
-
-
                 List_SB_similar_OPEX_TRAN = ['TRAN_TO_AFFI', 'CONT_TO_OTH_CMTE', 'REF_CONT_PARTY', 'REF_CONT_PARTY_VOID', 'OPEXP_HQ_ACC_REG_REF', 
                 'OPEXP_CONV_ACC_REG_REF', 'OTH_DISB_NP_RECNT_REG_REF']
 
@@ -913,8 +929,6 @@ def sample_sql_generate(request):
                 file = open("/tmp/opex_tran_sql.sql", 'w')
                 file.write(OPEX_TRAN_STRING)
                 file.close()
-
-
                 
                 List_SB_similar_NONFED_PAC_RFD = ['REF_CONT_PAC', 'REF_CONT_NON_FED']
 
@@ -967,8 +981,6 @@ def sample_sql_generate(request):
                 file = open("/tmp/nonfed_pac_sql.sql", 'w')
                 file.write(NONFED_PAC_RFD_STRING)
                 file.close()
-
-                
                
                 List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID']
                 #import ipdb;ipdb.set_trace()
@@ -1024,7 +1036,6 @@ def sample_sql_generate(request):
                 file.write(CONTR_CAND_STRING)
                 file.close()
 
-
                 List_SB_similar_VOID_RFND_PAC = ['REF_CONT_PAC_VOID', 'REF_CONT_NON_FED_VOID']
 
                 VOID_RFND_PAC_STRING = ""
@@ -1077,9 +1088,6 @@ def sample_sql_generate(request):
                 file = open("/tmp/void_pac_sql.sql", 'w')
                 file.write(VOID_RFND_PAC_STRING)
                 file.close()
-
-
-
 
                 List_SB_similar_FEA_PAYM = ['FEA_100PCT_PAY']
 
@@ -1140,8 +1148,6 @@ def sample_sql_generate(request):
                 file.write(FEA_PAYM_STRING)
                 file.close()
 
-
-
                 List_SB_similar_FEA_CC = ['FEA_PAY_TO_PROL', 'FEA_CC_PAY']
 
                 FEA_CC_STRING = ""
@@ -1197,9 +1203,7 @@ def sample_sql_generate(request):
                 file.write(FEA_CC_STRING)
                 file.close()
 
-
-
-                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID']
+                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID', 'FEA_100PCT_DEBT_PAY']
 
                 FEA_CC_MEMO_STRING = ""
                 for tran in List_SB_similar_FEA_CC_MEMO:
@@ -1258,7 +1262,6 @@ def sample_sql_generate(request):
                 file = open("/tmp/fea_cc_memo_sql.sql", 'w')
                 file.write(FEA_CC_MEMO_STRING)
                 file.close()
-
 
                 List_SB_similar_FEA_PAY_MEMO = ['FEA_PAY_TO_PROL_MEMO']
 
@@ -1331,6 +1334,595 @@ def sample_sql_generate(request):
                 file.write(FEA_CC_STRING)
                 file.write(FEA_CC_MEMO_STRING)
                 file.write(FEA_PAY_MEMO_STRING)
+                file.close()
+
+                List_SE_similar_IE = ['IE', 'IE_CC_PAY_MEMO', 'IE_STAF_REIM_MEMO', 'IE_VOID', 'IE_B4_DISSE_MEMO']
+                IE_STRING = ""
+                for tran in List_SE_similar_IE:
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t2.entity_type, '''') AS "entityType", 
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode", 
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+                    COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_STRING += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_sql.sql", 'w')
+                file.write(IE_STRING)
+                file.close()
+
+                List_SE_similar_IE_CC = ['IE_CC_PAY', 'IE_PMT_TO_PROL']
+                IE_CC_STRING = ""
+                for tran in List_SE_similar_IE_CC:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t2.entity_type, '''') AS "entityType", 
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode",
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+                    COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_CC_STRING  += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_CC_sql.sql", 'w')
+                file.write(IE_CC_STRING)
+                file.close()
+
+
+                List_SE_similar_IE_STAF_REIM = ['IE_STAF_REIM', 'IE_PMT_TO_PROL_MEMO']
+                IE_STAF_REIM_STRING = ""
+                for tran in List_SE_similar_IE_STAF_REIM:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.election_code, '''') AS "electionCode", 
+                    COALESCE(t1.election_other_desc, '''') AS "electionOtherDescription",
+                    COALESCE(to_char(t1.dissemination_date, ''MM/DD/YYYY''), '''') AS "disseminationDate",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(to_char(t1.disbursement_date,''MM/DD/YYYY''), '''') AS "disbursementDate",
+                    COALESCE(t1.calendar_ytd_amount, 0.0) AS "calendarYTDPerElectionForOffice",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.support_oppose_code, '''') AS "support/opposeCode",
+                    COALESCE(t1.so_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.so_cand_last_name, '''') AS "candidateLastName", 
+                    COALESCE(t1.so_cand_fist_name, '''') AS "candidateFirstName", 
+                    COALESCE(t1.so_cand_middle_name, '''') AS "candidateMiddleName", 
+                    COALESCE(t1.so_cand_prefix, '''') AS "candidatePrefix",
+                    COALESCE(t1.so_cand_suffix, '''') AS "candidateSuffix",
+                    COALESCE(t1.so_cand_office, '''') AS "candidateOffice",
+                    COALESCE(t1.so_cand_state, '''') AS "candidateState",
+                    COALESCE(t1.so_cand_district, '''') AS "candidateDistrict",
+                    COALESCE(t3.last_name, '''') AS "completingLastName", 
+                    COALESCE(t3.first_name, '''') AS "completingFirstName",
+                    COALESCE(t3.middle_name, '''') AS "completingMiddleName", 
+                    COALESCE(t3.preffix, '''') AS "completingPrefix", 
+                    COALESCE(t3.suffix, '''') AS "completingSuffix",
+                    COALESCE(to_char(t1.date_signed,''MM/DD/YYYY''), '''') AS "dateSigned",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_e t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    LEFT JOIN public.entity t3 ON t3.entity_id = t1.completing_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    IE_STAF_REIM_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SE', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/IE_STAF_REIM_sql.sql", 'w')
+                file.write(IE_STAF_REIM_STRING)
+                file.close()
+
+                file = open("/tmp/SE_sql.sql", 'w')
+                file.write(IE_STRING)
+                file.write(IE_CC_STRING)
+                file.write(IE_STAF_REIM_STRING)
+                file.close()
+
+                List_SF_similar_CORD_EXP = ['COEXP_PARTY', 'COEXP_PARTY_DEBT']
+                CORD_EXP_STRING = ""
+                for tran in List_SF_similar_CORD_EXP:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_EXP_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_EXP_sql.sql", 'w')
+                file.write(CORD_EXP_STRING)
+                file.close()
+
+
+                List_SF_similar_CORD_EXP_CC = ['COEXP_CC_PAY', 'COEXP_PMT_PROL']
+
+                CORD_EXP_CC_STRING = ""
+                for tran in List_SF_similar_CORD_EXP_CC:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_EXP_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_EXP_CC_sql.sql", 'w')
+                file.write(CORD_EXP_CC_STRING)
+                file.close()
+
+                List_SF_similar_CORD_CC_MEMO = ['COEXP_CC_PAY_MEMO', 'COEXP_STAF_REIM_MEMO', 'COEXP_PARTY_VOID']
+
+                CORD_CC_MEMO_STRING = ""
+                for tran in List_SF_similar_CORD_CC_MEMO:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_CC_MEMO_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_CC_MEMO_sql.sql", 'w')
+                file.write(CORD_CC_MEMO_STRING)
+                file.close()
+
+                List_SF_similar_CORD_REIM = ['COEXP_STAF_REIM', 'COEXP_PMT_PROL_MEMO']
+                CORD_REIM_STRING = ""
+                for tran in List_SF_similar_CORD_REIM:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier", 
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t1.coordinated_exp_ind, '''') AS "coordinateExpenditure",
+                    COALESCE(t1.designating_cmte_id, '''') AS "designatingCommitteeId",
+                    COALESCE(t1.designating_cmte_name, '''') AS "designatingCommitteeName",
+                    COALESCE(t1.subordinate_cmte_id, '''') AS "subordinateCommitteeId",
+                    COALESCE(t1.subordinate_cmte_name, '''') AS "subordinateCommitteeName",
+                    COALESCE(t1.subordinate_cmte_street_1, '''') AS "subordinateCommitteeStreet1",
+                    COALESCE(t1.subordinate_cmte_street_2, '''') AS "subordinateCommitteeStreet2",
+                    COALESCE(t1.subordinate_cmte_city, '''') AS "subordinateCommitteeCity",
+                    COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
+                    COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                    COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState", 
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.expenditure_amount, 0.0) AS "expenditureAmount",
+                    COALESCE(t1.aggregate_general_elec_exp, 0.0) AS "aggregateGeneralElectionExpended",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.payee_cmte_id, '''') AS "payeeCommitteeId",
+                    COALESCE(t1.payee_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.payee_cand_last_name, '''') AS "payeeCandidateLastName", 
+                    COALESCE(t1.payee_cand_fist_name, '''') AS "payeeCandidateFirstName", 
+                    COALESCE(t1.payee_cand_middle_name, '''') AS "payeeCandidateMiddleName", 
+                    COALESCE(t1.payee_cand_prefix, '''') AS "payeeCandidatePrefix",
+                    COALESCE(t1.payee_cand_suffix, '''') AS "payeeCandidateSuffix",
+                    COALESCE(t1.payee_cand_office, '''') AS "payeeCandidateOffice",
+                    COALESCE(t1.payee_cand_state, '''') AS "payeeCandidateState",
+                    COALESCE(t1.payee_cand_district, '''') AS "payeeCandidateDistrict",
+                    COALESCE(t1.memo_code, '''') AS "memoCode", 
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_f t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    CORD_REIM_STRING+= """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SF', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/CORD_REIM_sql.sql", 'w')
+                file.write(CORD_REIM_STRING)
+                file.close()
+                
+                file = open("/tmp/SF_sql.sql", 'w')
+                file.write(CORD_EXP_STRING)
+                file.write(CORD_EXP_CC_STRING)
+                file.write(CORD_CC_MEMO_STRING)
+                file.write(CORD_REIM_STRING)
+                file.close()
+
+                List_SD_similar_DEBT= ['DEBT_TO_VENDOR']
+                DEBT_STRING = ""
+                for tran in List_SD_similar_DEBT:
+
+                    query = """
+                    SELECT COALESCE(t1.line_num, '''') AS "lineNumber",
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "creditorOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "creditorLastName",
+                    COALESCE(t2.first_name, '''') AS "creditorFirstName",
+                    COALESCE(t2.middle_name, '''') AS "creditorMiddleName",
+                    COALESCE(t2.preffix, '''') AS "creditorPrefix",
+                    COALESCE(t2.suffix, '''') AS "creditorSuffix",
+                    COALESCE(t2.street_1, '''') AS "creditorStreet1",
+                    COALESCE(t2.street_2, '''') AS "creditorStreet2",
+                    COALESCE(t2.city, '''') AS "creditorCity",
+                    COALESCE(t2.state, '''') AS "creditorState",
+                    COALESCE(t2.zip_code, '''') AS "creditorZipCode",
+                    COALESCE(t1.purpose, '''') AS "purposeOfDebtOrObligation",
+                    COALESCE(t1.beginning_balance, 0.0) AS "beginningBalance",
+                    COALESCE(t1.incurred_amount, 0.0) AS "incurredAmount",
+                    COALESCE(t1.payment_amount, 0.0) AS "paymentAmount",
+                    COALESCE(t1.balance_at_close, 0.0) AS "balanceAtClose"
+                    FROM public.sched_d t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.creditor_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    DEBT_STRING += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SD', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/SD_DEBT_STRING_sql.sql", 'w')
+                file.write(DEBT_STRING)
+                file.close()
+
+
+                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEC_DISB_DEBT']
+                ALLOC_FEA_DEBT_VEN_STRING = ""
+                for tran in List_SH6_similar_ALLOC_FEA_DEBT_VEN:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName",
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+                    COALESCE(t2.preffix, '''') AS "payeePrefix",
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1",
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2",
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState",
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.account_event_identifier, '''') AS "accountEventIdentifier",
+                    COALESCE(to_char(t1.expenditure_date,''MM/DD/YYYY''), '''') AS "expenditureDate",
+                    COALESCE(t1.total_fed_levin_amount, 0.0) AS "totalFedLevinAmount",
+                    COALESCE(t1.federal_share, 0.0) AS "federalShare",
+                    COALESCE(t1.levin_share, 0.0) AS "levinShare",
+                    COALESCE(t1.activity_event_total_ytd, 0.0) AS "activityEventTotalYTD",
+                    COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.activity_event_type, '''') AS "activityEventType",
+                    COALESCE(t1.memo_code, '''') AS "memoCode",
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_h6 t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    ALLOC_FEA_DEBT_VEN_STRING += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SH6', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/SH6_ALLOC_FEA_DEBT_VEN_STRING_sql.sql", 'w')
+                file.write(ALLOC_FEA_DEBT_VEN_STRING)
+                file.close()
+
+                List_SH4_similar_ALLOC_EXP_DEBT= ['ALLOC_EXP_DEBT']
+                ALLOC_EXP_DEBT_STRING = ""
+                for tran in List_SH4_similar_ALLOC_EXP_DEBT:
+
+                    query = """
+                    SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                    COALESCE(t1.transaction_type, '''') AS "transactionTypeCode",
+                    t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                    t1.transaction_id AS "transactionId",
+                    COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber",
+                    COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                    COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
+                    COALESCE(t2.last_name, '''') AS "payeeLastName",
+                    COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                    COALESCE(t2.middle_name, '''') AS "payeeMiddleName",
+                    COALESCE(t2.preffix, '''') AS "payeePrefix",
+                    COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                    COALESCE(t2.street_1, '''') AS "payeeStreet1",
+                    COALESCE(t2.street_2, '''') AS "payeeStreet2",
+                    COALESCE(t2.city, '''') AS "payeeCity",
+                    COALESCE(t2.state, '''') AS "payeeState",
+                    COALESCE(t2.zip_code, '''') AS "payeeZipCode",
+                    COALESCE(t1.activity_event_identifier, '''') AS "accountEventIdentifier",
+                    COALESCE(to_char(t1.expenditure_date,''MM/DD/YYYY''), '''') AS "expenditureDate",
+                    COALESCE(t1.total_amount, 0.0) AS "totalFedNonfedAmount",
+                    COALESCE(t1.fed_share_amount, 0.0) AS "federalShare",
+                    COALESCE(t1.non_fed_share_amount, 0.0) AS "nonfederalShare",
+                    COALESCE(t1.activity_event_amount_ytd, 0.0) AS "activityEventTotalYTD",
+                    COALESCE(t1.purpose, '''') AS "expenditurePurposeDescription",
+                    COALESCE(t1.category_code, '''') AS "categoryCode",
+                    COALESCE(t1.activity_event_type, '''') AS "activityEventType",
+                    COALESCE(t1.memo_code, '''') AS "memoCode",
+                    COALESCE(t1.memo_text, '''') AS "memoDescription"
+                    FROM public.sched_h4 t1
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.payee_entity_id
+                    WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                    (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
+                    """.format(tran)
+
+                    ALLOC_EXP_DEBT_STRING += """
+                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3X', 'SH4', '{0}', '{1}');\n
+                    """.format(tran, query)
+
+                file = open("/tmp/SH4_ALLOC_EXP_DEBT_STRING_sql.sql", 'w')
+                file.write(ALLOC_EXP_DEBT_STRING)
+                file.close()
 
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:
