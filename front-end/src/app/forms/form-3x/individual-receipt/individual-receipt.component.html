@@ -13,7 +13,6 @@
 <ng-template #rtCandidate let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
-
 <div class="individual-receipt-container">
   <form [formGroup]="frmIndividualReceipt">
     <header>
@@ -22,7 +21,7 @@
           <h1>
             Form 3X
             <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
-            <ng-container *ngIf="_transactionToEdit"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
           </h1>
         </div>
         <div class="float-right" ngbDropdown>
@@ -56,7 +55,6 @@
         </ng-container>
         <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-
             <ng-container *ngFor="let col of row.cols">
               <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
                 <div class="form-group" [style.width]="setSelectTypeWidth(col)"> 
@@ -404,7 +402,6 @@
                   <ng-container *ngIf="col?.type === 'select' && 
                       (isFieldName(col?.name, 'state') ||
                        isFieldName(col?.name, 'cand_office_state'))">  
-
                        <!-- [searchFn]="customStateSearchFn" -->
                     <ng-select #stateSelect [items]="states"
                       (change)="handleStateChange($event, col)"
@@ -470,7 +467,6 @@
             </div>
           </div>
         </ng-container>
-
         <ng-container *ngIf="row.childForm">
           <div class="row">
             <div [class]="row.colClassName">
@@ -483,7 +479,6 @@
               </div>
             </div>
         </ng-container>
-
       </ng-container>
       <app-sub-transactions-table
         [hidden]="!isShowChildTransactions()"
@@ -502,36 +497,49 @@
       <footer>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-              <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent) && !_transactionToEdit" 
+            <div class="forms__btn-container">
+              <!-- <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent) && !_transactionToEdit"  -->
+              <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent === true) && 
+                                scheduleAction === addScheduleAction"
                 class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
-              </button>
-              <button *ngIf="_transactionToEdit" 
+              </button> 
+              <!-- <button *ngIf="_transactionToEdit || (subTransactionInfo && subTransactionInfo.isParent)"  -->
+              <button 
+                *ngIf="scheduleAction === editScheduleAction || 
+                        (subTransactionInfo && subTransactionInfo?.isParent === true)" 
                 class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
                 Cancel
               </button>
-              <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" 
-                class="btn btn-previous btn-left" type="button" (click)="cancel()">
+              <button 
+                *ngIf="scheduleAction === addSubScheduleAction && 
+                  subTransactionInfo && subTransactionInfo.isParent === false" 
+                class="btn btn-previous btn-left" type="button" (click)="returnToParent()">
                 Cancel
               </button>
-              <button *ngIf="!_transactionToEdit" class="btn btn-secondary btn-right" 
+              <!-- <button *ngIf="!_transactionToEdit" class="btn btn-secondary btn-right"  -->
+              <button 
+                *ngIf="scheduleAction === addScheduleAction || 
+                       scheduleAction === addSubScheduleAction" 
+                class="btn btn-secondary btn-right"
                 (click)="saveOnly()">
                 Save &amp; Add Transaction
               </button>
-              <button *ngIf="_transactionToEdit" class="btn btn-secondary btn-right" 
+              <!-- <button *ngIf="_transactionToEdit" class="btn btn-secondary btn-right"  -->
+              <button *ngIf="scheduleAction === editScheduleAction" class="btn btn-secondary btn-right" 
                 (click)="updateOnly()">
                 Save
-              </button>
-              
+              </button>              
               <a *ngIf="subTransactionInfo?.isParent === false"                 
                 class="btn btn-primary btn-right" (click)="saveAndReturnToParent()">
                 Return to {{ subTransactionInfo.transactionTypeDescription }}
               </a> 
-              <ng-container *ngIf="!_transactionToEdit">
-              <a class="btn btn-previous btn-right" (click)="viewTransactions()">
-                View Transactions
-              </a>
+              <!-- <ng-container *ngIf="!_transactionToEdit"> -->
+              <ng-container
+                *ngIf="scheduleAction === addScheduleAction">
+                <a class="btn btn-previous btn-right" (click)="viewTransactions()">
+                  View Transactions
+                </a>
               </ng-container>             
             </div>
           </div>
