@@ -513,8 +513,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
     try:
         child_flag = False
         itemization_value = 200
-        itemized_transaction_list = []
-        unitemized_transaction_list = []
+        # itemized_transaction_list = []
+        # unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
         if isinstance(contribution_date, str):
             contribution_date = date_format(contribution_date)

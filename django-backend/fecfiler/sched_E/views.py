@@ -232,6 +232,13 @@ def validate_se_data(data):
     check_mandatory_fields_se(data)
 
 
+def update_aggregate_amt_se(data):
+    """
+    update related se aggrgate amount
+    """
+    pass
+
+
 def post_schedE(data):
     """
     function for handling POST request for se, need to:
@@ -242,14 +249,17 @@ def post_schedE(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         data["transaction_id"] = get_next_transaction_id("SE")
-        print(data)
+        # print(data)
         validate_se_data(data)
+        # TODO: add code for saving payee entity
+
         try:
             post_sql_schedE(data)
         except Exception as e:
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
+        update_aggregate_amt_se(data)
         return data
     except:
         raise
