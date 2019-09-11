@@ -468,13 +468,30 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, 
-(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code, t1.back_ref_transaction_id
-FROM public.sched_a t1 
-WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
-AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
-ORDER BY contribution_date ASC, create_date ASC""", [
-                           entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""
+            SELECT t1.contribution_amount, 
+                t1.transaction_id, 
+                t1.report_id, 
+                t1.line_number, 
+                t1.contribution_date, 
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
+                t1.memo_code, 
+                t1.back_ref_transaction_id
+            FROM public.sched_a t1 
+            WHERE entity_id = %s 
+            AND transaction_type_identifier = %s 
+            AND cmte_id = %s 
+            AND contribution_date >= %s 
+            AND contribution_date <= %s 
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY contribution_date ASC, create_date ASC
+            """, [
+                    entity_id, 
+                    transaction_type_identifier, 
+                    cmte_id, 
+                    aggregate_start_date, 
+                    aggregate_end_date
+                ])
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
