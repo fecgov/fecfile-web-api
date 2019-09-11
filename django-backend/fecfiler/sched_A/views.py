@@ -795,7 +795,10 @@ def put_schedA(datum):
                 'The put_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+        update_date = datetime.datetime.strptime(prev_transaction_data.get('contribution_date'), '%Y-%m-%d').date()
+        if update_date > datum.get('contribution_date'):
+            update_date = datum.get('contribution_date')
+        update_linenumber_aggamt_transactions_SA(update_date, datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
     except:

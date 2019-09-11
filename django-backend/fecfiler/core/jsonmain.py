@@ -37,7 +37,7 @@ FORMTYPE_FORM_DICT = {
 SCHED_SCHED_CODES_DICT = {
         'sched_a': 'SA',
         'sched_b': 'SB',
-        # 'sched_c': 'SC',
+        'sched_c': 'SC',
         # 'sched_c1': 'SC1',
         # 'sched_c2': 'SC2',
         'sched_d': 'SD',
@@ -53,17 +53,18 @@ SCHED_SCHED_CODES_DICT = {
 
 }
 # Dictionary that maps form type to the schedules that it should include
-FORMTYPE_SCHEDULES_DICT = {
-    'F3X': ['SA', 'SB']
-}
+# FORMTYPE_SCHEDULES_DICT = {
+#     'F3X': ['SA', 'SB']
+# }
 
 # Dictionary mapping schedules to DB table name
-SCHEDULES_DBTABLES_DICT = {
-    'SA': 'public.sched_a',
-    'SB': 'public.sched_b',
-    'SE': 'public.sched_e',
-    'SF': 'public.sched_f'
-}
+# SCHEDULES_DBTABLES_DICT = {
+#     'SA': 'public.sched_a',
+#     'SB': 'public.sched_b',
+#     'SE': 'public.sched_e',
+#     'SF': 'public.sched_f',
+#     'SC': 'public.sched_c'
+# }
 
 # Dictionary that excludes line numbers from final json
 EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
@@ -232,7 +233,7 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
         try:
                 if transaction_id_list:
                     # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table == "public.sched_d":
+                    if DB_table in ["public.sched_d", "public.sched_c"]:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
                             DB_table, "', '".join(transaction_id_list))
                     else:
@@ -240,7 +241,7 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
                             DB_table, "', '".join(transaction_id_list))
                 else:
                     # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table == "public.sched_d":
+                    if DB_table in ["public.sched_d", "public.sched_c"]:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(DB_table)
                     else:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(DB_table)
@@ -316,8 +317,8 @@ def create_json_builders(request):
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [
-            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_d'}, {'sched_type': 'sched_e'}, {'sched_type': 'sched_f'},
-            {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'}]
+            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'}, {'sched_type': 'sched_e'}, 
+            {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'}, {'sched_type': 'sched_c1'}, {'sched_type': 'sched_c2'}]
         # Adding Summary data to output based on form type
         if form_type == 'F3X' and (not transaction_flag):
             # Iterating through schedules list and populating data into output
@@ -348,7 +349,7 @@ def create_json_builders(request):
                                                 'tran_identifier')
                                             if child_identifier:
                                                     child_transactions = get_transactions(
-                                                        child_identifier, report_id, cmte_id, transaction.get('transactionId'), transaction_id_list)
+                                                        child_identifier, report_id, cmte_id, transaction.get('transactionId'), [])
                                                     # print(child_transactions)
                                                     if child_transactions:
                                                         if 'child' in transaction:

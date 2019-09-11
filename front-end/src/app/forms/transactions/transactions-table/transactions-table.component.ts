@@ -703,7 +703,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           this._transactionsService
-            .trashOrRestoreTransactions('trash', this.reportId, selectedTransactions)
+            .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, selectedTransactions)
             .subscribe((res: GetTransactionsResponse) => {
               this.getTransactionsPage(this.config.currentPage);
 
@@ -775,7 +775,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           this._transactionsService
-            .trashOrRestoreTransactions('trash', this.reportId, [trx])
+            .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getTransactionsPage(this.config.currentPage);
               this._dialogService.confirm(
@@ -804,7 +804,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           // this._transactionsService.restoreTransaction(trx)
           //   .subscribe((res: GetTransactionsResponse) => {
           this._transactionsService
-            .trashOrRestoreTransactions('restore', this.reportId, [trx])
+            .trashOrRestoreTransactions(this.formType,'restore', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService.confirm(
