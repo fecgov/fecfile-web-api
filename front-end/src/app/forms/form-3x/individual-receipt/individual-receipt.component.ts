@@ -24,7 +24,6 @@ import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
-import { contributionDate } from '../../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
@@ -39,7 +38,7 @@ import { TransactionsMessageService } from '../../transactions/service/transacti
 import { ActiveView } from '../../transactions/transactions.component';
 import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
 import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-																						
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -89,7 +88,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public selectedEntityType: any;
   public subTransactions: any[];
   public formType = '';
-  
+  public editScheduleAction: ScheduleActions = ScheduleActions.edit;
+  public addScheduleAction: ScheduleActions = ScheduleActions.add;
+  public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
+
   private _reportType: any = null;
   private _types: any = [];
   private _transaction: any = {};
@@ -134,7 +136,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     private _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
-    private _transactionsMessageService: TransactionsMessageService
+    private _transactionsMessageService: TransactionsMessageService,
+    private _contributionDateValidator: ContributionDateValidator
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -258,7 +261,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   this.cvgEndDate = this._reportType.cvgEndDate;
 
                   this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-                    contributionDate(this.cvgStartDate, this.cvgEndDate),
+                    this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
                     Validators.required
                   ]);
 
@@ -386,7 +389,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         const cvgStartDate: string = this._reportType.cvgStartDate;
         const cvgEndDate: string = this._reportType.cvgEndDate;
 
-        formValidators.push(contributionDate(cvgStartDate, cvgEndDate));
+        formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
       }
     }
 
@@ -454,7 +457,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       } else {
         if (this.frmIndividualReceipt.controls[dateField]) {
           this.frmIndividualReceipt.controls[dateField].setValidators([
-            contributionDate(cvgStartDate, cvgEndDate),
+            this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
           ]);
 
@@ -468,7 +471,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       } else {
         if (this.frmIndividualReceipt.controls['child*'+dateField]) {
           this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
-            contributionDate(cvgStartDate, cvgEndDate),
+            this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
           ]);
 
@@ -539,7 +542,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(null);
         this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
-          contributionDate(this.cvgStartDate, this.cvgEndDate),
+          this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
 
@@ -557,7 +560,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.memoCode = checked;
         this.frmIndividualReceipt.controls['memo_code'].setValue(null);
         this.frmIndividualReceipt.controls[dateField].setValidators([
-          contributionDate(this.cvgStartDate, this.cvgEndDate),
+          this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
 
@@ -2215,20 +2218,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   //   }
   // }
 
-  public cancel() {
-    if (this._isParentOfSub()) {
+  // public cancel() {
+  //   if (this._isParentOfSub()) {
 
-      // TODO what should happen here?  Clear form or view transactions?
-      // this._clearFormValues();
-      // this._f3xMessageService.sendLoadFormFieldsMessage('');
+  //     // TODO what should happen here?  Clear form or view transactions?
+  //     // this._clearFormValues();
+  //     // this._f3xMessageService.sendLoadFormFieldsMessage('');
 
-      this._clearFormValues();
-      this._getFormFields();
-      this._validateTransactionDate();
-    } else {
-      this.returnToParent();
-    }
-  }
+  //     this._clearFormValues();
+  //     this._getFormFields();
+  //     this._validateTransactionDate();
+  //   } else {
+  //     this.returnToParent();
+  //   }
+  // }
 
   /**
    * Returns true if the transaction type is a parent of

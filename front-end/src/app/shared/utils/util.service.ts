@@ -83,7 +83,7 @@ export class UtilService {
    * @param      {string}  date    The date
    * @return     {string}  The new formatted date.
    */
-  public formatDateToYYYMMDD(date: string): string {
+  public formatDateToYYYYMMDD(date: string): string {
     try {
       const dateArr = date.split('/');
       const month: string = dateArr[0];
