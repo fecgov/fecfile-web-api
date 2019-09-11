@@ -1867,6 +1867,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         if (!dateValue) {
           return;
         }
+        /*
+          Memo transactions should not validate for transaction date
+        */
+        if (this.memoCode) {
+          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].setValidators([Validators.required]);
+          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].updateValueAndValidity();
+        }
         if (this._selectedEntityChild) {
           const entityId = this._selectedEntityChild.entity_id ? this._selectedEntityChild.entity_id : null;
           const cmteId = this._selectedEntityChild.cmte_id ? this._selectedEntityChild.cmte_id : null;
@@ -1881,6 +1888,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         const dateValue = this.frmIndividualReceipt.get(fieldName).value;
         if (!dateValue) {
           return;
+        }
+        /*
+          Memo transactions should not validate for transaction date
+        */
+        if (this.memoCode) {
+          this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
+          this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
         }
         if (this._selectedEntity) {
           if (this._selectedEntity.entity_id) {
