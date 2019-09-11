@@ -498,48 +498,36 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <!-- <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent) && !_transactionToEdit"  -->
-              <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent === true) && 
-                                scheduleAction === addScheduleAction"
-                class="btn btn-previous btn-left" type="button" (click)="previousStep()">
-                Previous
-              </button> 
-              <!-- <button *ngIf="_transactionToEdit || (subTransactionInfo && subTransactionInfo.isParent)"  -->
-              <button 
-                *ngIf="scheduleAction === editScheduleAction &&
-                        (subTransactionInfo && subTransactionInfo?.isParent === true)" 
-                class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
-                Cancel
-              </button>
-              <button 
-                *ngIf="scheduleAction === addSubScheduleAction" 
-                class="btn btn-previous btn-left" type="button" (click)="returnToParent()">
-                Cancel
-              </button>
-              <!-- <button *ngIf="!_transactionToEdit" class="btn btn-secondary btn-right"  -->
-              <button 
-                *ngIf="scheduleAction === addScheduleAction || 
-                       scheduleAction === addSubScheduleAction" 
-                class="btn btn-secondary btn-right"
-                (click)="saveOnly()">
-                Save &amp; Add Transaction
-              </button>
-              <!-- <button *ngIf="_transactionToEdit" class="btn btn-secondary btn-right"  -->
-              <button *ngIf="scheduleAction === editScheduleAction" class="btn btn-secondary btn-right" 
-                (click)="updateOnly()">
-                Save
-              </button>              
-              <a *ngIf="subTransactionInfo?.isParent === false"                 
-                class="btn btn-primary btn-right" (click)="saveAndReturnToParent()">
-                Return to {{ subTransactionInfo.transactionTypeDescription }}
-              </a> 
-              <!-- <ng-container *ngIf="!_transactionToEdit"> -->
-              <ng-container
-                *ngIf="scheduleAction === addScheduleAction">
-                <a class="btn btn-previous btn-right" (click)="viewTransactions()">
+              <div *ngIf="scheduleAction === editScheduleAction; else createActions">
+                <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  Cancel
+                </button>
+                <button class="btn btn-secondary btn-right" (click)="updateOnly()">
+                  Save
+                </button>
+              </div>
+              <ng-template #createActions>
+                <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent"
+                  class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                  Previous
+                </button>
+                <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false"
+                  class="btn btn-previous btn-left" type="button" (click)="returnToParent()">
+                  Cancel
+                </button>
+                <button class="btn btn-secondary btn-right"
+                  (click)="saveOnly()">
+                  Save &amp; Add Transaction
+                </button>
+                <a *ngIf="subTransactionInfo?.isParent === false"
+                  class="btn btn-primary btn-right" (click)="saveAndReturnToParent()">
+                  Return to {{ subTransactionInfo.transactionTypeDescription }}
+                </a>
+                <a *ngIf="scheduleAction === addScheduleAction"
+                  class="btn btn-previous btn-right" (click)="viewTransactions()">
                   View Transactions
                 </a>
-              </ng-container>             
+              </ng-template>
             </div>
           </div>
         </div>
