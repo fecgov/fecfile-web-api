@@ -192,6 +192,55 @@
           </div>          
         </div>
       </div> 
+
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleDeletedDateFilterItem()">
+          Deleted Date
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideDeletedDateFilter)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideDeletedDateFilter ? 'open' : 'closed'">
+          <div *ngIf="deletedDateFilterValidation.isError" class="text-error text-center">
+            {{ deletedDateFilterValidation.message }}
+          </div>
+          <label for="filter-deleted-date-from">From</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-from-deleted-date">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="date"
+              name="txtFromDelDate"
+              [(ngModel)]="filterDeletedDateFrom"
+              class="form-control"
+              id="filter-deleted-date-from"
+              aria-label="Filter From Deleted Date"
+              aria-describedby="filter-from-deleted-date"
+            >                        
+          </div>
+          <label for="filter-deleted-date-to">To</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-to-deleted-date">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="date"
+              name="txtToDelDate"
+              [(ngModel)]="filterDeletedDateTo"
+              class="form-control"
+              id="filter-deleted-date-to"
+              aria-label="Filter To Deleted Date"
+              aria-describedby="filter-to-deleted-date"
+            >                        
+          </div>          
+        </div>
+      </div> 
+
     </div> 
   </section>
   <footer>

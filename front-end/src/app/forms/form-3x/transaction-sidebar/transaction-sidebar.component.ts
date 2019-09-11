@@ -54,10 +54,6 @@ export class TransactionSidebarComponent implements OnInit {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
-
-        console.log('this.transactionCategories: ', this.transactionCategories);
-        console.log('response: ', this.cashOnHand.showCashOnHand);
-
       }
     });
 
@@ -74,7 +70,6 @@ export class TransactionSidebarComponent implements OnInit {
                 if (typeof res.totals === 'object') {
                   if (res.totals.hasOwnProperty('Receipts')) {
                     if (typeof res.totals.Receipts === 'number') {
-                      console.log("res.totals.Receipts",res.totals.Receipts )
                       this.receiptsTotal = res.totals.Receipts;
                       this.cashOnHandTotal = res.totals.COH;
                       const totals: any = {
@@ -97,7 +92,6 @@ export class TransactionSidebarComponent implements OnInit {
                 if (typeof res.totals === 'object') {
                   if (res.totals.hasOwnProperty('Disbursements')) {
                     if (typeof res.totals.Disbursements === 'number') {
-                      console.log("res.totals.Disbursements",res.totals.Disbursements )
                       this.disbursementsTotal = res.totals.Disbursements;
                       const totals: any = {
                         receipts: this.receiptsTotal,
@@ -166,14 +160,13 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public viewSummary(): void {
-    console.log(" Form3x viewSummary clicked ...!")    
+
     localStorage.setItem('Summary_Screen', 'Yes');
     localStorage.setItem(`form_${this._formType}_summary_screen`, 'Yes');
     this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'financial_summary' } });
   }
 
   public signandSubmit(): void {
-    console.log(" Form3x signandSubmit clicked ...!")
     this._router.navigate([`/signandSubmit/${this._formType}`]);
   }
 
@@ -185,7 +178,6 @@ export class TransactionSidebarComponent implements OnInit {
   public async canDeactivate(): Promise<boolean> {
     if (this._formsService.formHasUnsavedData(this._formType)) {
       let result: boolean = null;
-      console.log(' form not saved...');
       result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
         let val: boolean = null;
 
@@ -200,7 +192,6 @@ export class TransactionSidebarComponent implements OnInit {
 
       return result;
     } else {
-      console.log('Not any unsaved data...');
       return true;
     }
   }

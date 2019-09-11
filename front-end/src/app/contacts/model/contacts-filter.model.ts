@@ -7,6 +7,8 @@ export class ContactFilterModel {
     formType: string;
     filterStates: string[];
     filterTypes: string[];
+    filterDeletedDateFrom: Date;
+    filterDeletedDateTo: Date;
     keywords: string[] = [];
     selected: boolean;
     constructor() {

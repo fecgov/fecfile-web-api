@@ -1080,7 +1080,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private setSortableColumns(): void {
     
     const defaultSortColumns = ['name', 'type', 'employer', 'occupation'];
-    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId'];
+    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
   
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
@@ -1090,6 +1090,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     for (const field of otherSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }
+
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
@@ -1142,5 +1143,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  
 
 }

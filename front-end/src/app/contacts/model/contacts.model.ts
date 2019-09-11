@@ -20,7 +20,7 @@ export class ContactModel {
     candOfficeState: string;
     candOfficeDistrict: string;
     candCmteId: string;
-
+    deletedDate: string;
     selected: boolean;
 
     constructor(contact: any) {
@@ -46,6 +46,9 @@ export class ContactModel {
         this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
+        this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
         this.selected = contact.selected;
+       
+
     }
 }

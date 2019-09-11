@@ -22,6 +22,8 @@ export class ReportFilterModel {
     filterReports: string[];
     filterAmendmentIndicators: string[];
     filterStatuss: string[];
+    filterDeletedDateFrom: Date;
+    filterDeletedDateTo: Date;
     constructor() {
     }
 }

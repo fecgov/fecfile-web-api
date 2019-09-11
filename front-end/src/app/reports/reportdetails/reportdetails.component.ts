@@ -429,6 +429,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.filters.filterFiledDateFrom = null;
         this.filters.filterFiledDateTo = null;
         this.getReportsPage(1);
+      case 'filterDeletedDate':
+        this.filters.filterDeletedDateFrom = null;
+        this.filters.filterDeletedDateTo = null;
+        this.getReportsPage(1);  
         break;
       default:
         console.log('unexpected type received for remove tag');
@@ -1183,7 +1187,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       'cvg_end_date',
       'report_type_desc',
       'filed_date',
-      'last_update_date'
+      'last_update_date',
+      'deleted_date',
     ];
 
     /*let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
@@ -1273,15 +1278,29 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           this._reportsService.trashOrRestoreReports('trash', rep).subscribe((res: GetReportsResponse) => {
-            this.getReportsPage(this.config.currentPage);
-            this._dialogService.confirm(
-              'report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
-              ConfirmModalComponent,
-              'Success!',
-              false,
-              ModalHeaderClassEnum.successHeader
-            );
+            console.log("trashReport res =", res);
+            if (res['result'] === 'success') {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            } else
+            {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Report has not been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+                ConfirmModalComponent,
+                'Warning!',
+                false,
+                ModalHeaderClassEnum.errorHeader
+              );
+            }
           });
+          
         } else if (res === 'cancel') {
         }
       });
@@ -1297,7 +1316,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
           this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
             this.getRecyclingPage(this.config.currentPage);
             this._dialogService.confirm(
-              'report ' + rep.report_id + ' has been restored!',
+              'Report ' + rep.report_id + ' has been restored!',
               ConfirmModalComponent,
               'Success!',
               false,
