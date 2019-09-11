@@ -1861,6 +1861,61 @@ def filter_get_all_trans(request, param_string):
 #         return False
 #         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
+def load_child_transactions(cmte_id, report_id):
+    """
+    a helper function to query and load all child transactions
+    """
+    child_query_string = """
+    SELECT json_agg(t) FROM
+        (SELECT transaction_type, 
+                transaction_type_desc, 
+                transaction_id, 
+                api_call, 
+                name, 
+                street_1, 
+                street_2, 
+                city, 
+                state, 
+                zip_code, 
+                transaction_date, 
+                transaction_amount, 
+                aggregate_amt, 
+                purpose_description, 
+                occupation, 
+                employer, 
+                memo_code, 
+                memo_text, 
+                itemized, 
+                transaction_type_identifier, 
+                entity_id,
+                back_ref_transaction_id 
+        FROM all_transactions_view
+        WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+        AND delete_ind is distinct from 'Y') t;
+        """
+    child_dic = {}
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(child_query_string, (report_id, cmte_id))
+            child_list = cursor.fetchone()[0]
+            # TODO : update null value, NOT SURE it is necessary
+            # just go with parent function
+            for child in child_list:
+                for i in child:
+                    if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
+                        child[i] = ''
+                    elif not child[i]:
+                        child[i] = 0
+                if child['back_ref_transaction_id'] not in child_dic:
+                    child_dic[child['back_ref_transaction_id']] = [child]
+                else:
+                    child_dic[child['back_ref_transaction_id']].append(child)
+    except Exception as e:
+        logger.debug("loading child errors:" + str(e))
+        raise
+    logger.debug('child dictionary loaded with {} items'.format(child_dic))
+    return child_dic
+
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
@@ -1945,7 +2000,8 @@ def get_all_transactions(request):
         memo_code_d = filters_post.get('filterMemoCode', False)
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
-        
+
+        child_tran_dic = load_child_transactions(cmte_id, report_id)
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                                     # + """ ORDER BY """ + order_string
@@ -1966,6 +2022,10 @@ def get_all_transactions(request):
                     status_value = status.HTTP_200_OK
                 else:
                     for d in forms_obj:
+                        if d['transaction_id'] in child_tran_dic:
+                            logger.debug('child found for transaction:{}'.format(d['transaction_id']))
+                            d['child'] = child_tran_dic.get(d['transaction_id'])
+                            # print('***'+str(d))
                         for i in d:
                             if not d[i] and i not in ['transaction_amount', 'aggregate_amt']:
                                 d[i] = ''
