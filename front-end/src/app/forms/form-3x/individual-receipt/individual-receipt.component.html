@@ -506,14 +506,13 @@
               </button> 
               <!-- <button *ngIf="_transactionToEdit || (subTransactionInfo && subTransactionInfo.isParent)"  -->
               <button 
-                *ngIf="scheduleAction === editScheduleAction || 
+                *ngIf="scheduleAction === editScheduleAction &&
                         (subTransactionInfo && subTransactionInfo?.isParent === true)" 
                 class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
                 Cancel
               </button>
               <button 
-                *ngIf="scheduleAction === addSubScheduleAction && 
-                  subTransactionInfo && subTransactionInfo.isParent === false" 
+                *ngIf="scheduleAction === addSubScheduleAction" 
                 class="btn btn-previous btn-left" type="button" (click)="returnToParent()">
                 Cancel
               </button>
