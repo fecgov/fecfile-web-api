@@ -38,7 +38,7 @@
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')" [class]="getSortClass('candOfficeDistrict')" (click)="changeSortDirection('candOfficeDistrict')">Candidate Office <br /> District
         </th>
-        <th [@fadeInOut] *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())" [class]="getSortClass('deletedDate')" (click)="changeSortDirection('deletedDate')">Deleted Date <br />and time
+        <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')" (click)="changeSortDirection('deletedDate')">Deleted Date <br />and time
         </th>
 
         <th class="bulk_action">
@@ -67,7 +67,7 @@
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
-              <i class="undo-icon"></i>
+              <i class="trash-icon"></i>
             </button>
           </div>          
         </th>
@@ -91,7 +91,7 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('deletedDate')">{{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+        <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
         </td>
         <!--<td [@fadeInOut] *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
         </td>-->
@@ -150,7 +150,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" id="contacts__pin-modal-header">
-          <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+          <h4 class="modal-title pull-left">Column Options (Select up to {{maxColumnOption}})</h4>
           <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
             <span aria-hidden="true">×</span>
           </button>

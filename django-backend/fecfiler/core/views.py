@@ -4092,6 +4092,7 @@ def trash_restore_contact(request):
     """api for trash and restore contact. """
     cmte_id = request.user.username
     print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    result=''
     for _action in request.data.get('actions', []):
         entity_id = _action.get('id', '')
 
@@ -4110,13 +4111,13 @@ def trash_restore_contact(request):
                 trash_restore_sql_contact(cmte_id, entity_id, _delete)
                 result = 'success'
 
-            if result=='success':
-                return Response({"result":"success"}, status=status.HTTP_200_OK)
-            else:   
-                return Response({"result":"failed"}, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response("The trash_restore_contact API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
+    if result=='success':
+        return Response({"result":"success"}, status=status.HTTP_200_OK)
+    else:   
+        return Response({"result":"failed"}, status=status.HTTP_200_OK)
 def check_contact_to_delete(cmte_id, entity_id):
     try:
         print("cmte_id",cmte_id)

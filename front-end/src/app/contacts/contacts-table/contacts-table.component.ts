@@ -114,7 +114,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private readonly maxColumnOption = 5;
+  private maxColumnOption = 5;
   private allContactsSelected: boolean;
 
   constructor(
@@ -201,6 +201,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
+        this.maxColumnOption=6;
         break;
       default:
         break;
