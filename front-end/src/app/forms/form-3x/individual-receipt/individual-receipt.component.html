@@ -79,9 +79,9 @@
                       <ng-container *ngIf="col?.inputGroup">
                         <div class="input-group-prepend">
                           <span class="input-group-text">
-                            <!-- <i *ngIf="col?.inputIcon" [class]="col?.inputIcon" aria-hidden="true"></i>
-                            <span *ngIf="col?.value && !col?.inputIcon">{{col?.value}}</span> -->
-                            <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                            <i *ngIf="col?.inputIcon" [class]="col?.inputIcon" aria-hidden="true"></i>
+                            <span *ngIf="col?.value && !col?.inputIcon">{{col?.value}}</span>
+                            <!-- <i [class]="col?.inputIcon" aria-hidden="true"></i> -->
                           </span>
                         </div>
                       </ng-container>
@@ -390,8 +390,8 @@
                       (change)="handleCandOfficeChange($event, col)"
                       class="forms__select"
                       [formControlName]="col?.name"
-                      bindValue="officeCode"
-                      bindLabel="officeDescription"
+                      bindValue="code"
+                      bindLabel="name"
                       [ngClass]="
                         frmIndividualReceipt.get(col?.name)?.invalid &&
                         (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
