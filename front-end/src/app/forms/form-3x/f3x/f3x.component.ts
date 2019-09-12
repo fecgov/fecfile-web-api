@@ -30,6 +30,7 @@ import { TransactionModel } from '../../transactions/model/transaction.model';
 })
 export class F3xComponent implements OnInit {
   public currentStep: string = 'step_1';
+  public editMode: boolean = true;
   public step: string = '';
   public steps: any = {};
   public frm: any;
@@ -75,6 +76,7 @@ export class F3xComponent implements OnInit {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.edit : true;
 
     this._reportTypeService.getReportTypes(this.formType).subscribe(res => {
       if (typeof res === 'object') {

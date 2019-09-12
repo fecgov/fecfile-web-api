@@ -768,8 +768,40 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    *
    * @param report the Report to view
    */
-  public viewReport(): void {
-    alert('View report is not yet supported');
+  public viewReport(report: reportModel): void {
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: false } });
+        console.log(new Date().toISOString());
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+        this._router.navigate([`/forms/form/${formType}`], {
+          queryParams: { step: 'reports', reportId: report.report_id, edit: false }
+        });
+        console.log(new Date().toISOString());
+      }, 1500);
+    }
   }
 
   /**
