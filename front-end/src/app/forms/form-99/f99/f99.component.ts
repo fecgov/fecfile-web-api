@@ -24,6 +24,7 @@ export class F99Component implements OnInit {
 
   public frm: any;
   public direction: string;
+  public editMode: boolean = true;
   public step: string = 'step_1';
   public currentStep: string = 'step_1';
   public previousStep: string = '';
@@ -53,6 +54,7 @@ export class F99Component implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.edit : true;
 
     if(this._committeeDetails) {
       if(this._committeeDetails.committeeid) {

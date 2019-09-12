@@ -193,7 +193,7 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="viewReport(report)">
+                            <button class="dropdown-item" *ngIf="report.status === 'Filed'" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
                             <button class="dropdown-item" (click)="amendReport(report)">
