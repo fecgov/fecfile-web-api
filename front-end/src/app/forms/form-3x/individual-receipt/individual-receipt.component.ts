@@ -40,6 +40,7 @@ import { ActiveView } from '../../transactions/transactions.component';
 import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
 import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -127,6 +128,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     private _fb: FormBuilder,
     private _formService: FormsService,
     private _receiptService: IndividualReceiptService,
+    private _contactsService: ContactsService,
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
@@ -482,14 +484,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
         formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
       }
-    } else if (this.isFieldName(fieldName, 'purpose_description')) {
-      // Purpose description is required when prefix with In-kind #
-      if (fieldValue) {
-        if (fieldValue.trim().length > 0) {
-          formValidators.push(validatePurposeInKindRequired(fieldName, fieldValue));
-        }
-      }
-    }
+    } 
+    // else if (this.isFieldName(fieldName, 'purpose_description')) {
+    //   // Purpose description is required when prefix with In-kind #
+    //   if (fieldValue) {
+    //     if (fieldValue.trim().length > 0) {
+    //       formValidators.push(validatePurposeInKindRequired(fieldName, fieldValue));
+    //     }
+    //   }
+    // }
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
@@ -2031,7 +2034,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // init some of the dynamic form data for each call.
     // TODO may need to add others.
     this.subTransactionInfo = null;
-    this.multipleSubTransactionInfo = [];
+    this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
 
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
@@ -2095,25 +2098,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               if (Array.isArray(res.data.subTransactions)) {
                 if (res.data.subTransactions.length > 0) {
                   this.subTransactionInfo = res.data.subTransactions[0];
-
-                  // // TEMP
-                  // this.multipleSubTransactionInfo = [];
-                  // this.multipleSubTransactionInfo.push(res.data.subTransactions[0]);
-                  // this.multipleSubTransactionInfo.push(res.data.subTransactions[0]);
-
                   if (res.data.subTransactions.length > 1) {
                     this.multipleSubTransactionInfo = res.data.subTransactions;
                   }
                 }
               }
             }
-            // // temo code - API should return this when sub tran
-            // if (this.subTransactions[0].transactionType === 'PARTN_REC') {
-            //   this.subTransactionDetail = this.subTransactions[0];
-            // }
-            // if (res.data.hasOwnProperty('subTransactionDetail')) {
-            //   // this.subTransactionDetail = res.data.subTransactionDetail;
-            // }
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
@@ -2736,11 +2726,27 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Office types may be hard coded as they are never expected to Change for now.
    */
   private _getCandidateOfficeTypes() {
-    this.candidateOfficeTypes = [
-      { officeCode: 'H', officeDescription: 'House' },
-      { officeCode: 'S', officeDescription: 'Senate' },
-      { officeCode: 'P', officeDescription: 'Presidential' }
-    ];
+
+    this._contactsService.getContactsDynamicFormFields().subscribe(res => {
+      if (res) {
+        console.log('getFormFields res =', res);
+        if (res.hasOwnProperty('data')) {
+          if (typeof res.data === 'object') {
+            if (res.data.hasOwnProperty('officeSought')) {
+              if (Array.isArray(res.data.officeSought)) {
+                this.candidateOfficeTypes = res.data.officeSought;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // this.candidateOfficeTypes = [
+    //   { officeCode: 'H', officeDescription: 'House' },
+    //   { officeCode: 'S', officeDescription: 'Senate' },
+    //   { officeCode: 'P', officeDescription: 'Presidential' }
+    // ];
   }
 
   private _setMemoCodeForForm() {
