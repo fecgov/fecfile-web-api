@@ -247,7 +247,7 @@
                       />
                       <input
                         *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
-                               isFieldName(col?.name, 'beneficiary_cmte_id')"
+                              isFieldName(col?.name, 'beneficiary_cmte_id')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -272,7 +272,7 @@
                       />  
                       <input
                         *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
-                               isFieldName(col?.name, 'beneficiary_cmte_name')"
+                              isFieldName(col?.name, 'beneficiary_cmte_name')"
                         class="form-control"
                         [style.width]="col?.width"
                         [style.height]="col?.height"
@@ -403,8 +403,8 @@
                   </ng-container>                                   
                   <ng-container *ngIf="col?.type === 'select' && 
                       (isFieldName(col?.name, 'state') ||
-                       isFieldName(col?.name, 'cand_office_state'))">  
-                       <!-- [searchFn]="customStateSearchFn" -->
+                      isFieldName(col?.name, 'cand_office_state'))">  
+                      <!-- [searchFn]="customStateSearchFn" -->
                     <ng-select #stateSelect [items]="states"
                       (change)="handleStateChange($event, col)"
                       class="forms__select"
@@ -494,21 +494,21 @@
           Add {{ subTransactionInfo.subTransactionTypeDescription }}
         </button>
 
-        <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" 
-            ngbDropdown class="d-inline-block" placement="bottom-right">
-          <button class="btn btn-primary" id="jfMemoDropdwon" ngbDropdownToggle>
-              <i class="plus-icon-circle" aria-hidden="true"></i>
-              Add JF Transfer Memo
-          </button>
-          <div ngbDropdownMenu aria-labelledby="jfMemoDropdwon">
-              <ng-container *ngFor="let jfMemo of multipleSubTransactionInfo">
-                  <button ngbDropdownItem (click)="saveForAddMemoSub(jfMemo)">
-                    {{jfMemo.subTransactionTypeDescription}}
-                  </button>
-              </ng-container>
-            <!-- <button ngbDropdownItem>Action - 1</button>
-            <button ngbDropdownItem>Another Action</button>
-            <button ngbDropdownItem>Something else is here</button> -->
+        <div [ngStyle]="{'margin-bottom': dropdownMarginBottom}">
+          <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" 
+              ngbDropdown class="d-inline-block" placement="bottom-right"
+              (openChange)="multipleMemoDropdownChanged($event)">
+            <button class="btn btn-primary" id="jfMemoDropdwon" ngbDropdownToggle>
+                <i class="plus-icon-circle" aria-hidden="true"></i>
+                Add JF Transfer Memo
+            </button>
+            <div ngbDropdownMenu aria-labelledby="jfMemoDropdwon">
+                <ng-container *ngFor="let jfMemo of multipleSubTransactionInfo">
+                    <button ngbDropdownItem (click)="saveForAddMemoSub(jfMemo)">
+                      {{jfMemo.subTransactionTypeDescription}}
+                    </button>
+                </ng-container>
+            </div>
           </div>
         </div>
 
