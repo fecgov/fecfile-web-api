@@ -997,6 +997,7 @@ def get_list_entity(entity_id, cmte_id):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
+        logger.debug('entity data loaded:{}'.format(forms_obj))
         if forms_obj is None:
             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(entity_id))   
         return forms_obj
