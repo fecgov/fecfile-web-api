@@ -24,6 +24,7 @@ import { IndividualReceiptService } from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
@@ -85,6 +86,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
   public subTransactionInfo: any;
+  public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
   public subTransactions: any[];
   public formType = '';
@@ -192,7 +194,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
-   * 
+   * Apply the validation rules when aggregate changes.
    */
   private  _listenForAggregateChanges(): void {
     this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
@@ -217,6 +219,74 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         occupationControl.updateValueAndValidity();
     });
   }
+
+  /**
+   * Force user to keep prefix for purpose when enforced by API.
+   */
+  private  _listenForPurposeChanges(prefix: string, control: AbstractControl): void {
+    const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
+    control.valueChanges.subscribe(purposeVal => {
+      const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
+      if (!purposeValCompare.startsWith(prefixCompare)) {
+
+        // If user is deleting part of the prefix, set field to whole prefix
+        // else set it to prefix + the value they entered.
+        if (prefixCompare.startsWith(purposeValCompare) ||
+            prefixCompare.endsWith(purposeValCompare)) {
+              control.patchValue(prefix);
+              return;
+        }
+
+        // if start with a partial prefix because they try to delete from the left,
+        // replace the partial prefix with the who;e while keeping post prefix.
+        for (let i = 1; i < prefixCompare.length; i++) {
+          if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
+            const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
+            // text = text.replace(/,/g, ``);
+            control.patchValue(prefix + finalVal);
+            return;
+          }
+        }
+
+        // if none of the above, then there is no prefix so add it to the user value.
+        control.patchValue(prefix + purposeVal);
+      }
+    });
+  }
+
+  // /**
+  //  * Force user to keep prefix for purpose when enforced by API.
+  //  */
+  // private  _listenForPurposeChanges(prefix: string): void {
+  //   const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
+  //   this.frmIndividualReceipt.get('purpose_description').valueChanges.subscribe(purposeVal => {
+  //     const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
+  //     if (!purposeValCompare.startsWith(prefixCompare)) {
+
+  //       // If user is deleting part of the prefix, set field to whole prefix
+  //       // else set it to prefix + the value they entered.
+  //       if (prefixCompare.startsWith(purposeValCompare) ||
+  //           prefixCompare.endsWith(purposeValCompare)) {
+  //             this.frmIndividualReceipt.get('purpose_description').patchValue(prefix);
+  //             return;
+  //       }
+
+  //       // if start with a partial prefix because they try to delete from the left,
+  //       // replace the partial prefix with the who;e while keeping post prefix.
+  //       for (let i = 1; i < prefixCompare.length; i++) {
+  //         if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
+  //           const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
+  //           // text = text.replace(/,/g, ``);
+  //           this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + finalVal);
+  //           return;
+  //         }
+  //       }
+
+  //       // if none of the above, then there is no prefix so add it to the user value.
+  //       this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + purposeVal);
+  //     }
+  //   });
+  // }
 
   public ngOnChanges() {
     this._prepareForm();
@@ -302,12 +372,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-          if (this.isFieldName(e.name, 'contribution_amount') || this.isFieldName(e.name, 'expenditure_amount')) {
+          formGroup[e.name] = new FormControl(e.value || null,
+            this._mapValidators(e.validation, e.name, e.value));
+          if (this.isFieldName(e.name, 'contribution_amount') ||
+              this.isFieldName(e.name, 'expenditure_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
+          // Listen for change on purpose description when API forces
+          // prefix.
+          // if (this.isFieldName(e.name, 'purpose_description')) {
+          //   if (e.value.trim().length > 0) {
+          //     this._listenForPurposeChanges(e.value, formGroup[e.name]);
+          //   }
+          // }
           if (this.isFieldName(e.name, 'memo_code')) {
             const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
@@ -353,6 +432,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     if (this._employerOccupationRequired) {
       this._listenForAggregateChanges();
     }
+
+    // // Rather than set a flag as a check for setting up a change listener
+    // // on the formGroup control field for purpose as done with the employerOccupation,
+    // // iterate over the dynamic api form fields for the purpose.  The flag option
+    // // can be fragile with forgetting to init the flag.  And with purpose, the value
+    // // from the API is needed.
+    // fields.forEach(el => {
+    //   if (el.hasOwnProperty('cols') && el.cols) {
+    //     el.cols.forEach((e:any) => {
+    //     });
+    //   }
+    // });
   }
 
   /**
@@ -373,7 +464,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param      {String} fieldName The name of the field.
    * @return     {Array}  The validations in an Array.
    */
-  private _mapValidators(validators: any, fieldName: string): Array<any> {
+  private _mapValidators(validators: any, fieldName: string, fieldValue: string): Array<any> {
     const formValidators = [];
 
     /**
@@ -390,6 +481,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         const cvgEndDate: string = this._reportType.cvgEndDate;
 
         formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
+      }
+    } else if (this.isFieldName(fieldName, 'purpose_description')) {
+      // Purpose description is required when prefix with In-kind #
+      if (fieldValue) {
+        if (fieldValue.trim().length > 0) {
+          formValidators.push(validatePurposeInKindRequired(fieldName, fieldValue));
+        }
       }
     }
 
@@ -1247,6 +1345,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  public saveForAddMemoSub(jfMemo: any): void {
+    this.subTransactionInfo = jfMemo;
+    this._doValidateReceipt(SaveActions.saveForAddSub);
+  }
+
   public saveForAddSub(): void {
     this._doValidateReceipt(SaveActions.saveForAddSub);
   }
@@ -1914,6 +2017,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // init some of the dynamic form data for each call.
     // TODO may need to add others.
     this.subTransactionInfo = null;
+    this.multipleSubTransactionInfo = [];
     this.subTransactions = [];
 
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
@@ -1972,12 +2076,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   { onlySelf: true }
                 );
               }
-              
             }
             if (res.data.hasOwnProperty('subTransactions')) {
               if (Array.isArray(res.data.subTransactions)) {
-                // TODO this should not be an array as only 1 is expected.
-                this.subTransactionInfo = res.data.subTransactions[0];
+                if (res.data.subTransactions.length > 0) {
+                  this.subTransactionInfo = res.data.subTransactions[0];
+
+                  // // TEMP
+                  // this.multipleSubTransactionInfo = [];
+                  // this.multipleSubTransactionInfo.push(res.data.subTransactions[0]);
+                  // this.multipleSubTransactionInfo.push(res.data.subTransactions[0]);
+
+                  if (res.data.subTransactions.length > 1) {
+                    this.multipleSubTransactionInfo = res.data.subTransactions;
+                  }
+                }
               }
             }
             // // temo code - API should return this when sub tran
