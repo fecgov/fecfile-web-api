@@ -2002,8 +2002,12 @@ def get_all_transactions(request):
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
 
         child_tran_dic = load_child_transactions(cmte_id, report_id)
+        # update in FNE-1524: only load non-child transaction, child transaction will add as
+        # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'
+                                    AND back_ref_transaction_id is null
+                                    """
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
         # import ipdb;ipdb.set_trace()
@@ -2015,12 +2019,13 @@ def get_all_transactions(request):
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
-                forms_obj=data_row[0]
+                # forms_obj=data_row[0]
                 forms_obj = data_row[0]
                 if forms_obj is None:
                     forms_obj =[]
                     status_value = status.HTTP_200_OK
                 else:
+                    logger.debug('total transactions loaded:{}'.format(len(forms_obj)))
                     for d in forms_obj:
                         if d['transaction_id'] in child_tran_dic:
                             logger.debug('child found for transaction:{}'.format(d['transaction_id']))
