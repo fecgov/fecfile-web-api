@@ -41,6 +41,7 @@ import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggrega
 import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { trigger, transition, style, animate, state } from '@angular/animations';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -94,6 +95,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public editScheduleAction: ScheduleActions = ScheduleActions.edit;
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
   public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
+  public dropdownMarginBottom = null;
 
   private _reportType: any = null;
   private _types: any = [];
@@ -177,6 +179,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._contributionAmount = '';
     this._contributionAmountChlid = '';
     this._employerOccupationRequired = false;
+    this.dropdownMarginBottom = null;
 
     this._getCandidateOfficeTypes();
 
@@ -1348,6 +1351,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  public multipleMemoDropdownChanged(open: boolean) {
+    if (open) {
+
+      // TEMP hack for testing
+      // this.multipleSubTransactionInfo.push(this.multipleSubTransactionInfo[0]);
+
+      // 23 px for each item and add 30px for default.
+      let size = this.multipleSubTransactionInfo ?
+        this.multipleSubTransactionInfo.length : 0;
+      size = (size > 0) ? ((size * 23) + 30) : 0;
+      this.dropdownMarginBottom = size + 'px';
+    } else {
+      this.dropdownMarginBottom = null;
+    }
+  }
+
   public saveForAddMemoSub(jfMemo: any): void {
     this.subTransactionInfo = jfMemo;
     this._doValidateReceipt(SaveActions.saveForAddSub);
@@ -2036,6 +2055,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this.subTransactionInfo = null;
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
+    this.dropdownMarginBottom = null;
 
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
       if (res) {
@@ -2437,10 +2457,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
-    // this.hiddenFields = [];
-    // for (const hiddenField of this.hiddenFields) {
-    //   hiddenField.value = null;
-    // }
+    this.dropdownMarginBottom = null;
   }
 
   private toggleValidationIndOrg(entityType: string) {
