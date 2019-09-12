@@ -114,7 +114,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private readonly maxColumnOption = 5;
+  private maxColumnOption = 5;
   private allContactsSelected: boolean;
 
   constructor(
@@ -201,6 +201,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
+        this.maxColumnOption=6;
         break;
       default:
         break;
@@ -1080,7 +1081,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private setSortableColumns(): void {
     
     const defaultSortColumns = ['name', 'type', 'employer', 'occupation'];
-    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId'];
+    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
   
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
@@ -1090,6 +1091,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     for (const field of otherSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }
+
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
@@ -1142,5 +1144,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  
 
 }

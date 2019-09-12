@@ -56,6 +56,13 @@
                                     <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterFiledDate')"></i>
                                 </button>
                             </div>
+                            <div *ngIf="filters.filterDeletedDateFrom && filters.filterDeletedDateTo">
+                                <button class="btn transactions__tag_btn transactions__btn-search-filter">
+                                    {{filters.filterDeletedDateFrom | date: 'MM/dd/yyyy'}} -
+                                    {{filters.filterDeletedDateTo | date: 'MM/dd/yyyy'}}
+                                    <i class="fas fa-window-close transactions__close-tag" (click)="removeTag('filterDeletedDate')"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -89,14 +96,17 @@
                     (click)="changeSortDirection('amend_ind')">Amendment <br /> Indicator
                 </th>
                 <th [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')" [class]="getSortClass('cvg_start_date')"
-                    (click)="changeSortDirection('cvg_start_date')">Coverage Date Cycle
+                    (click)="changeSortDirection('cvg_start_date')">Coverage Date <br />Cycle
                 </th>
                 <th [@fadeInOut] *ngIf="isColumnVisible('report_type_desc')" [class]="getSortClass('report_type_desc')"
                     (click)="changeSortDirection('report_type_desc')">Report
                 </th>
                 <th [@fadeInOut] *ngIf="isColumnVisible('filed_date')" [class]="getSortClass('filed_date')"
-                    (click)="changeSortDirection('filed_date')">Filed/Saved Date Time
+                    (click)="changeSortDirection('filed_date')">Filed/Saved <br />Date Time
                 </th>
+                <th [@fadeInOut] *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())" [class]="getSortClass('deleted_date')"
+                    (click)="changeSortDirection('deleted_date')">Deleted Date <br />Time
+                 </th>
                 <th>
                     &nbsp;
                 </th>
@@ -140,7 +150,9 @@
                 <td *ngIf="isColumnVisible('filed_date')">
                     {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
                 </td>
-
+                <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
+                    {{(report.deleted_date| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
+                </td>
                 <td>
                     <div *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-primary" (click)="restoreReport(report)">
@@ -352,6 +364,19 @@
                                         <span
                                             [ngClass]="{'disabled-column-option':getSortableColumn('last_update_date').disabled}">
                                             Filed Date
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="checkbox">
+                                    <label>
+                                        <input [(ngModel)]="getSortableColumn('deleted_date').checked"
+                                            (change)="toggleVisibility('deleted_date', $event)" type="checkbox"
+                                            [disabled]="getSortableColumn('deleted_date').disabled">
+                                        <span
+                                            [ngClass]="{'disabled-column-option':getSortableColumn('deleted_date').disabled}">
+                                            Deleted Date
                                         </span>
                                     </label>
                                 </div>
