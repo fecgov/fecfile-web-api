@@ -1115,6 +1115,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
+        } else if (this.isFieldName(field, 'purpose_description')) {          
+          const preTextHiddenField = this._findHiddenField('name', 'pretext');
+          const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+          receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
         } else if (
           field === 'last_name' ||
           field === 'first_name' ||
@@ -1343,6 +1347,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  /**
+   * Save a child transaction and show its parent.  If the form has not been
+   * changed (dirty) then don't save and just show parent.
+   */
   public saveAndReturnToParent(): void {
     if (!this.frmIndividualReceipt.dirty) {
       this.returnToParent();
@@ -1351,6 +1359,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  /**
+   * Set CSS properties when the memo dropdown opens and closes.
+   */
   public multipleMemoDropdownChanged(open: boolean) {
     if (open) {
 
@@ -2230,27 +2241,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       hiddenField.value = trx[prop];
                     }
                   }
-                  // temp until name if fixed for aggregate in API
                   if (this.frmIndividualReceipt.get(prop)) {
-                    if (this.isFieldName(prop, 'contribution_amount') ||
-                        this.isFieldName(prop, 'expenditure_amount')) {
-                      const amount = trx[prop] ? trx[prop] : 0;
-
-                      // Name mapping until aggregate_amt is renamed to contribution_aggregate
-                      // if (trx.hasOwnProperty('aggregate_amt')) {
-                      //   const patchAgg = {};
-                      //   patchAgg['contribution_aggregate'] = trx['aggregate_amt'];
-                      //   this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
-                      //   this._contributionAggregateValue = trx['aggregate_amt'];
-                      // }
-                      // if (trx.hasOwnProperty('contribution_aggregate')) {
-                      //   const patchAgg = {};
-                      //   patchAgg['contribution_aggregate'] = trx['contribution_aggregate'];
-                      //   this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
-                      //   this._contributionAggregateValue = trx['contribution_aggregate'];
-                      // }
-                      // this.contributionAmountChange({target: {value: amount.toString()}}, prop, false);
-                    }
                     if (this.isFieldName(prop, 'contribution_aggregate')) {
                         this._contributionAggregateValue = trx[prop];
                     }
@@ -2262,6 +2253,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                           this.memoCodeChild = true;
                         } else {
                           this.memoCode = true;
+                        }
+                      }
+                    }
+                    if (this.isFieldName(prop, 'purpose_description')) {
+                      const preTextHiddenField = this._findHiddenField('name', 'pretext');
+                      const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                      if (preText) {
+                        // remove it from the input field.  It will be readded on save.
+                        if (trx[prop].startsWith(preText)) {
+                          trx[prop] = trx[prop].replace(preText, '');
                         }
                       }
                     }
@@ -2758,12 +2759,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         }
       }
     });
-
-    // this.candidateOfficeTypes = [
-    //   { officeCode: 'H', officeDescription: 'House' },
-    //   { officeCode: 'S', officeDescription: 'Senate' },
-    //   { officeCode: 'P', officeDescription: 'Presidential' }
-    // ];
   }
 
   private _setMemoCodeForForm() {
@@ -2793,5 +2788,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     ) {
       return true;
     }
+  }
+
+  private _findHiddenField(property: string, value: any) {
+    return this.hiddenFields.find((hiddenField: any) => hiddenField[property] === value);
   }
 }
