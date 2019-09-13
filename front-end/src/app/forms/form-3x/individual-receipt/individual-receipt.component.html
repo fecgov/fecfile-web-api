@@ -341,15 +341,15 @@
             <i class="plus-icon-circle" aria-hidden="true"></i>
             Add {{ subTransactionInfo.subTransactionTypeDescription }}
           </button>
-    
           <div [ngStyle]="{'margin-bottom': dropdownMarginBottom}">
             <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" ngbDropdown class="d-inline-block"
               placement="bottom-right" (openChange)="multipleMemoDropdownChanged($event)">
-              <button class="btn btn-primary" id="jfMemoDropdwon" ngbDropdownToggle>
+              <button class="btn btn-primary" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
                 Add JF Transfer Memo
+                <i class="dropdown-icon" aria-hidden="true"></i>
               </button>
-              <div ngbDropdownMenu aria-labelledby="jfMemoDropdwon">
+              <div ngbDropdownMenu aria-labelledby="jfMemoDropdown">
                 <ng-container *ngFor="let jfMemo of multipleSubTransactionInfo">
                   <button ngbDropdownItem (click)="saveForAddMemoSub(jfMemo)">
                     {{jfMemo.subTransactionTypeDescription}}
@@ -358,17 +358,6 @@
               </div>
             </div>
           </div>
-    
-          <!-- multipleSubTransactionInfo -->
-          <!-- <div class="dropdown">
-                Dropdown button
-              </button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Link 1</a>
-                <a class="dropdown-item" href="#">Link 2</a>
-                <a class="dropdown-item" href="#">Link 3</a>
-              </div>
-            </div> -->
         </div>
       </div>
     </section>

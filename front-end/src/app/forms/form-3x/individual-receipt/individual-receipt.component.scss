@@ -135,6 +135,11 @@
         margin: 0 auto;
         padding: 0;
         width: 80%;
+        #jfMemoDropdown {
+          &:after {
+            display: none;
+          }
+        }
         @include media(tablet) {
           margin: 0;
           padding: 0;
