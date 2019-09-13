@@ -109,6 +109,7 @@
         .toolbar {
         }
         .editor {
+          width: -webkit-fill-available;
           border: 1px solid black;
           box-shadow: 0 0.1rem 0.4rem black;
           cursor: text;
