@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from . import views, jsonmain
+from . import views, jsonmain, jsonsqlgenerate
 
 
 urlpatterns = [
@@ -104,7 +104,7 @@ urlpatterns = [
     ),
     url(
         r"^core/sample_sql_generate$",
-        jsonmain.sample_sql_generate,
+        jsonsqlgenerate.sample_sql_generate,
         name="sample_sql_generate",
     ),
     url(r"^core/print_preview_pdf$", 
