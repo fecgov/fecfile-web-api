@@ -40,6 +40,10 @@
   display: inline-block;
   
 }
+#scrollable-dropdown-menu ngb-typeahead-window {
+  max-height: 150px;
+  overflow-y: auto;
+ }
  #sidebar_signBtn{
   margin: auto;
   width: 90%;
