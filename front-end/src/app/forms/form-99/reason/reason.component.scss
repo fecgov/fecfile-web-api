@@ -138,6 +138,9 @@
             padding-inline-start: 40px;
           }
         }
+        .editor.full-width-textarea {
+          width: -webkit-fill-available;
+        }
         @include clearfix();
       }
       .file-attached-container {
