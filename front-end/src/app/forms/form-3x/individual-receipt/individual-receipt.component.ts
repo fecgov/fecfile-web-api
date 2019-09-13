@@ -95,7 +95,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public editScheduleAction: ScheduleActions = ScheduleActions.edit;
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
   public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
-  public dropdownMarginBottom = null;
+  public memoDropdownSize = null;
 
   private _reportType: any = null;
   private _types: any = [];
@@ -179,7 +179,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._contributionAmount = '';
     this._contributionAmountChlid = '';
     this._employerOccupationRequired = false;
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
 
     this._getCandidateOfficeTypes();
 
@@ -1361,9 +1361,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       let size = this.multipleSubTransactionInfo ?
         this.multipleSubTransactionInfo.length : 0;
       size = (size > 0) ? ((size * 23) + 30) : 0;
-      this.dropdownMarginBottom = size + 'px';
+      this.memoDropdownSize = size + 'px';
     } else {
-      this.dropdownMarginBottom = null;
+      this.memoDropdownSize = null;
     }
   }
 
@@ -2055,7 +2055,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this.subTransactionInfo = null;
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
 
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
       if (res) {
@@ -2457,7 +2457,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
   }
 
   private toggleValidationIndOrg(entityType: string) {
