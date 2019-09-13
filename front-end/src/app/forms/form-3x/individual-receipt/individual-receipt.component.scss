@@ -60,6 +60,10 @@
       @include clearfix();
     }
     section {
+      .content {
+        min-height: 100vh;
+        position: relative;
+      }
       .row {
         margin-bottom: 20px;
         .forms__candidate-title {

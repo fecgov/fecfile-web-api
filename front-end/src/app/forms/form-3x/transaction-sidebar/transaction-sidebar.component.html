@@ -5,8 +5,15 @@
     <hr />
 
     <div class="search">
-      <span class="fa fa-search"></span>
-      <input type="text" placeholder="Search by Type" />
+      <button class="fa fa-search" (click)="selectedTypeAheadValue(itemSelected)"></button>
+      <ng-template #rt let-r="result" let-t="term">
+        {{ r.text}}
+      </ng-template>
+      <div id="scrollable-dropdown-menu">
+        <input type="search" #instance="ngbTypeahead" placeholder="Search by type" aria-label="Search by type"
+          [(ngModel)]="itemSelected" [ngbTypeahead]="searchByType" [resultTemplate]="rt" [inputFormatter]="formatter"
+          (focus)="focus$.next($event.target.value)" placement="bottom">
+      </div>
     </div>
     <!-- </ng-container> -->
   </header>

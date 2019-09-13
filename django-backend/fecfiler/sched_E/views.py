@@ -35,6 +35,7 @@ from fecfiler.sched_D.views import do_transaction
 logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_E = ["cmte_id", "report_id", "transaction_id"]
+NEGATIVE_TRANSACTIONS = ["IE_VOID"]
 
 
 def check_transaction_id(transaction_id):
@@ -232,6 +233,22 @@ def validate_se_data(data):
     check_mandatory_fields_se(data)
 
 
+def update_aggregate_amt_se(data):
+    """
+    update related se aggrgate amount
+    """
+    pass
+
+
+def validate_negative_transaction(data):
+    """
+    validate transaction amount if negative transaction encounterred.
+    """
+    if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
+        if not float(data.get("expenditure_amount")) < 0:
+            raise Exception("current transaction amount need to be negative!")
+
+
 def post_schedE(data):
     """
     function for handling POST request for se, need to:
@@ -241,15 +258,50 @@ def post_schedE(data):
     """
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        logger.debug("saving sched_e with data:{}".format(data))
+        if "payee_entity_id" in data:
+            logger.debug("update payee entity with data:{}".format(data))
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("payee_entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            rollback_flag = True
+        else:
+            logger.debug("saving new entity:{}".format(data))
+            new_entity = post_entities(data)
+            logger.debug("new entity created:{}".format(new_entity))
+            rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get("entity_id")
+        # print('post_scheda {}'.format(entity_id))
+        data["payee_entity_id"] = entity_id
         data["transaction_id"] = get_next_transaction_id("SE")
-        print(data)
+        # print(data)
         validate_se_data(data)
+        validate_negative_transaction(data)
+        # TODO: add code for saving payee entity
+
         try:
+            logger.debug("saving new sched_e item with data:{}".format(data))
             post_sql_schedE(data)
         except Exception as e:
+            # remove entiteis if saving sched_a fails
+            if rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
+        update_aggregate_amt_se(data)
         return data
     except:
         raise
@@ -295,8 +347,10 @@ def post_sql_schedE(data):
             line_number,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
-        """
+        VALUES ({})
+        """.format(
+            ",".join(["%s"] * 32)
+        )
         _v = (
             data.get("cmte_id"),
             data.get("report_id"),
@@ -311,7 +365,7 @@ def post_sql_schedE(data):
             data.get("expenditure_amount"),
             data.get("disbursement_date"),
             data.get("calendar_ytd_amount"),
-            data.get("purpose,"),
+            data.get("purpose"),
             data.get("category_code"),
             data.get("payee_cmte_id"),
             data.get("support_oppose_code"),
@@ -331,9 +385,14 @@ def post_sql_schedE(data):
             data.get("line_number"),
             datetime.datetime.now(),
         )
+        logger.debug("sql:{}".format(_sql))
+        logger.debug("parameters:{}".format(_v))
         with connection.cursor() as cursor:
+            logger.info("sched_e db transaction: POST")
             # Insert data into schedD table
             cursor.execute(_sql, _v)
+            logger.info("transaction done.")
+
     except Exception:
         raise
 
