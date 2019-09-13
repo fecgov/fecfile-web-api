@@ -76,8 +76,7 @@
                           <div class="input-group-prepend">
                             <span class="input-group-text">
                               <i *ngIf="col?.inputIcon" [class]="col?.inputIcon" aria-hidden="true"></i>
-                              <span *ngIf="col?.value && !col?.inputIcon">{{col?.value}}</span>
-                              <!-- <i [class]="col?.inputIcon" aria-hidden="true"></i> -->
+                              <span *ngIf="col?.preText">{{col?.preText}}</span>
                             </span>
                           </div>
                         </ng-container>
