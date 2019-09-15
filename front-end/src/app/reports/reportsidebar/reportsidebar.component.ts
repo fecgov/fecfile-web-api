@@ -149,6 +149,7 @@ export class ReportsidebarComponent implements OnInit {
     this.filterStatuss = [];
     this.filterAmendmentIndicators = [];
     this.filterDeletedDateTo = null;
+    this.filterDeletedDateFrom = null;
     this.isHideDeletedDateFilter = true;
 
     this.initValidationErrors();
@@ -357,6 +358,15 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
     if (this.filterFiledDateTo !== null) {
+      modified = true;
+    }
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
       modified = true;
     }
 
@@ -620,6 +630,8 @@ export class ReportsidebarComponent implements OnInit {
     this.filterCvgDateFrom = this.handleDateAsSpaces(this.filterCvgDateFrom);
     this.filterFiledDateTo = this.handleDateAsSpaces(this.filterFiledDateTo);
     this.filterFiledDateFrom = this.handleDateAsSpaces(this.filterFiledDateFrom);
+    this.filterDeletedDateTo = this.handleDateAsSpaces(this.filterDeletedDateTo);
+    this.filterDeletedDateFrom = this.handleDateAsSpaces(this.filterDeletedDateFrom);
 
     this.initValidationErrors();
     if (this.filterCvgDateFrom !== null && (this.filterCvgDateTo === null)) {
