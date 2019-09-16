@@ -342,13 +342,13 @@
           </button>
           <div [ngStyle]="{'min-height': memoDropdownSize}" style="height: auto">
             <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" ngbDropdown class="d-inline-block"
-              placement="bottom-right" (openChange)="multipleMemoDropdownChanged($event)">
-              <button class="btn btn-primary" id="jfMemoDropdown" ngbDropdownToggle>
+              placement="bottom-left" (openChange)="multipleMemoDropdownChanged($event)">
+              <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
                 Add JF Transfer Memo
                 <i class="dropdown-icon" aria-hidden="true"></i>
               </button>
-              <div ngbDropdownMenu aria-labelledby="jfMemoDropdown">
+              <div ngbDropdownMenu aria-labelledby="jfMemoDropdown" id="jfMemoDropdown-menu">
                 <ng-container *ngFor="let jfMemo of multipleSubTransactionInfo">
                   <button ngbDropdownItem (click)="saveForAddMemoSub(jfMemo)">
                     {{jfMemo.subTransactionTypeDescription}}
