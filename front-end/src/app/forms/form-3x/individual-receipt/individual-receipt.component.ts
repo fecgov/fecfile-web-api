@@ -196,6 +196,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.frmIndividualReceipt = this._fb.group({});
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   /**
@@ -295,6 +299,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   public ngOnChanges() {
     this._prepareForm();
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   private _prepareForm() {
@@ -1115,7 +1123,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
-        } else if (this.isFieldName(field, 'purpose_description')) {          
+        } else if (this.isFieldName(field, 'purpose_description')) {
           const preTextHiddenField = this._findHiddenField('name', 'pretext');
           const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
           receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
