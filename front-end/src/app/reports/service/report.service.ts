@@ -425,7 +425,7 @@ export class ReportsService {
         });
     }
   }
-  public trashOrRestoreReports(action: string,  reports: reportModel) {
+  public trashOrRestoreReports(action: string,  reports: Array<reportModel>) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_report';
@@ -435,12 +435,14 @@ export class ReportsService {
 
     const request: any = {};
     const actions = [];
-    actions.push({
+    for (const rpt of reports) {
+      actions.push({
         action: action,
-        report_id: reports.report_id
+        id: rpt.report_id
       });
-
+    }
     request.actions = actions;
+
     console.log ("trashOrRestoreReports request.actions =", request.actions );
     return this._http
       .put(`${environment.apiUrl}${url}`, request, {
