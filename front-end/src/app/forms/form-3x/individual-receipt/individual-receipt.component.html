@@ -18,11 +18,11 @@
     <header>
       <div class="header-content">
         <div class="float-left">
-          <h1>
+          <h2>
             Form 3X
             <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
-          </h1>
+          </h2>
         </div>
         <div class="float-right" ngbDropdown>
           <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
@@ -41,13 +41,13 @@
         </div>
       </div>
     </header>
-    <section>
+    <section class ="paragraph">
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
       <ng-container *ngFor="let row of formFields; let i = index">
         <ng-container *ngIf="titles[i]?.fieldset">
-          <div class="row">
+          <div class="subtitle-indv">
             <div [class]="titles[i]?.colClassName">
               {{ titles[i]?.label }}
             </div>
