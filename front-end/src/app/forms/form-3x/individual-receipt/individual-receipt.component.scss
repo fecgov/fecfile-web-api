@@ -140,6 +140,13 @@
             display: none;
           }
         }
+        #jfMemoDropdown,
+        #jfMemoDropdown-menu {
+          width: 16em;
+        }
+        #jfMemoDropdown-menu {
+          left: 0 !important;
+        }
         @include media(tablet) {
           margin: 0;
           padding: 0;

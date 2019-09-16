@@ -42,6 +42,7 @@ import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.val
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
+import { heLocale } from 'ngx-bootstrap';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -55,7 +56,7 @@ export enum SaveActions {
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
-  encapsulation: ViewEncapsulation.None
+  // encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
@@ -1125,7 +1126,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         } else if (this.isFieldName(field, 'purpose_description')) {
           const preTextHiddenField = this._findHiddenField('name', 'pretext');
-          const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+          let preText = '';
+          if (preTextHiddenField) {
+            preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+          }
           receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
         } else if (
           field === 'last_name' ||
@@ -1376,10 +1380,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       // TEMP hack for testing
       // this.multipleSubTransactionInfo.push(this.multipleSubTransactionInfo[0]);
 
-      // 23 px for each item and add 30px for default.
+      // 23 px for each item and add 40px for default.
       let size = this.multipleSubTransactionInfo ?
         this.multipleSubTransactionInfo.length : 0;
-      size = (size > 0) ? ((size * 23) + 30) : 0;
+      size = (size > 0) ? ((size * 23) + 40) : 0;
       this.memoDropdownSize = size + 'px';
     } else {
       this.memoDropdownSize = null;
@@ -2265,12 +2269,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       }
                     }
                     if (this.isFieldName(prop, 'purpose_description')) {
+                      // const preTextHiddenField = this._findHiddenField('name', 'pretext');
+                      // const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+
                       const preTextHiddenField = this._findHiddenField('name', 'pretext');
-                      const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                      let preText = '';
+                      if (preTextHiddenField) {
+                        preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                      }
+
                       if (preText) {
                         // remove it from the input field.  It will be readded on save.
-                        if (trx[prop].startsWith(preText)) {
-                          trx[prop] = trx[prop].replace(preText, '');
+                        if (trx[prop]) {
+                          if (typeof trx[prop] === 'string') {
+                            if (trx[prop].startsWith(preText)) {
+                              trx[prop] = trx[prop].replace(preText, '');
+                            }
+                          }
                         }
                       }
                     }
