@@ -1130,7 +1130,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           if (preTextHiddenField) {
             preText = preTextHiddenField.value ? preTextHiddenField.value : '';
           }
-          receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
+          const purposeVal = this.frmIndividualReceipt.get(field).value;
+          if (purposeVal) {
+            receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
+          } else {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          }
         } else if (
           field === 'last_name' ||
           field === 'first_name' ||
@@ -2269,15 +2274,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       }
                     }
                     if (this.isFieldName(prop, 'purpose_description')) {
-                      // const preTextHiddenField = this._findHiddenField('name', 'pretext');
-                      // const preText = preTextHiddenField.value ? preTextHiddenField.value : '';
-
                       const preTextHiddenField = this._findHiddenField('name', 'pretext');
                       let preText = '';
                       if (preTextHiddenField) {
                         preText = preTextHiddenField.value ? preTextHiddenField.value : '';
                       }
-
                       if (preText) {
                         // remove it from the input field.  It will be readded on save.
                         if (trx[prop]) {

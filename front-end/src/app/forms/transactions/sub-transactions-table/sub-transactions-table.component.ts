@@ -79,12 +79,12 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         const suffix = trx.suffix ? trx.suffix.trim() : '';
         const prefix = trx.prefix ? trx.prefix.trim() : '';
 
-        if (trx.entity_type === 'IND' || trx.entity_type === 'CAND') {
+        if (trx.entity_type === 'IND' || trx.entity_type === 'CAN') {
           model.name = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
-        } else if (trx.entity_type === 'ORG') {
-          model.name = trx.entity_name;
         } else {
-          model.name = null;
+          if (trx.hasOwnProperty('entity_name')) {
+            model.name = trx.entity_name;
+          }
         }
 
         model.amount = trx.expenditure_amount ? trx.expenditure_amount : trx.contribution_amount;
@@ -114,7 +114,7 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         if (res === 'okay') {
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
           this._transactionsService
-            .trashOrRestoreTransactions(this.formType,'trash', reportId, [trx])
+            .trashOrRestoreTransactions(this.formType, 'trash', reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this._getSubTransactions(reportId, trx.backRefTransactionId, trx.apiCall);
               this._dialogService.confirm(
