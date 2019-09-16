@@ -23,6 +23,9 @@ export class LoginComponent implements OnInit {
   public appTitle: string = null;
   public loggedOut: any = '';
   private _subscription: Subscription;
+  public titleF: string;
+  public titleR: string;
+  public show: boolean;
 
   constructor(
     private _fb: FormBuilder,
@@ -46,10 +49,13 @@ export class LoginComponent implements OnInit {
             this.loggedOut = res;
           }
         });
+    this.show = false;
  }
 
   ngOnInit() {
     this.appTitle = environment.appTitle;
+    this.titleF = this.appTitle.substring(0, 3);
+    this.titleR = this.appTitle.substring(3);
   }
 
   ngOnDestroy() {
@@ -107,5 +113,9 @@ export class LoginComponent implements OnInit {
         this.isBusy = false;
         this.hasFailed = true;
       });
+  }
+
+  showPassword() {
+    this.show = !this.show;
   }
 }
