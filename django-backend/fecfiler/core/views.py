@@ -1901,7 +1901,7 @@ def load_child_transactions(cmte_id, report_id):
             child_list = cursor.fetchone()[0]
             # TODO : update null value, NOT SURE it is necessary
             # just go with parent function
-            if not child_list:
+            if child_list:
                 for child in child_list:
                     for i in child:
                         if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
