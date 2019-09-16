@@ -193,6 +193,8 @@ export class ReportsService {
       model.last_update_date = row.last_update_date;
       model.report_type_desc = row.report_type_desc;
       model.filed_date = row.filed_date;
+      model.deleteddate = row.deleteddate;
+      model.delete_ind = row.delete_ind;
       modelArray.push(model);
     }
 
@@ -362,6 +364,31 @@ export class ReportsService {
 
       response.reports = filteredFiledDateArray;
     }
+
+
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      const deletedFromDate = new Date(filters.filterDeletedDateFrom);
+      const deletedToDate = new Date(filters.filterDeletedDateTo);
+      const filteredDeletedDateArray = [];
+      for (const rep of response.reports) {
+        if (rep.deleteddate) {
+          let d = new Date(rep.deleteddate);
+          d.setUTCHours(0, 0, 0, 0);
+          const repDate = this.getDateMMDDYYYYformat(d);
+          if (repDate >= deletedFromDate && repDate <= deletedToDate) {
+            isFilter = true;
+          } else {
+            isFilter = false;
+          }
+        }
+
+        if (isFilter) {
+          filteredDeletedDateArray.push(rep);
+        }
+      }
+      response.reports = filteredDeletedDateArray;
+    }
+    
   }
   private getDateMMDDYYYYformat(dateValue: Date): Date {
     

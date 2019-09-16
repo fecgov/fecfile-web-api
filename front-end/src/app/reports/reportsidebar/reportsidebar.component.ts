@@ -678,13 +678,13 @@ export class ReportsidebarComponent implements OnInit {
       this.isHideFiledDateFilter = false;
       return false;
     }
-    if (this.filterFiledDateTo !== null && this.filterFiledDateFrom === null) {
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
       this.deletedDateFilterValidation.isError = true;
       this.deletedDateFilterValidation.message = 'From Deleted Date is required';
       this.isHideDeletedDateFilter = false;
       return false;
     }
-    if (this.filterFiledDateFrom > this.filterFiledDateTo) {
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
       this.deletedDateFilterValidation.isError = true;
       this.deletedDateFilterValidation.message = 'From Deleted Date must preceed To Deleted Date';
       this.isHideDeletedDateFilter = false;
