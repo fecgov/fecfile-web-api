@@ -4270,3 +4270,81 @@ def check_report_to_delete(cmte_id, report_id):
     except Exception as e:
         return Response("The check_report_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+def get_next_transaction_id(trans_char):
+    """get next transaction_id with seeding letter, like 'SA' """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT public.get_next_transaction_id(%s)""", [trans_char])
+            transaction_id = cursor.fetchone()[0]
+            # transaction_id = transaction_ids[0]
+        return transaction_id
+    except Exception:
+        raise
+
+@api_view(['POST'])
+def clone_a_transaction(request):
+    """
+    api for clone a transaction. 
+    expect: a transaction_id for transaction to be cloned
+    return: new transaction_id with clone status
+    e.g.: {'transaction_id': 'SA100095', 'status': 'success'}
+    """
+    # TODO: need to update this list for ohter transactions
+    logger.debug('request for cloning a transaction:{}'.format(request.data))
+
+    transaction_tables = {
+        'SA': 'sched_a',
+        'SB': 'sched_b',
+        'SC': 'sched_c',
+        'SD': 'sched_d',
+    }
+    # cmte_id = request.user.username
+    transaction_id = request.data.get('transaction_id')
+
+    if transaction_id[0:2] in transaction_tables:
+        transaction_table = transaction_tables.get(transaction_id[0:2])
+        # raise Exception('Error: invalid transaction id found.')
+    else:
+        raise Exception('Error: invalid transaction id found.')
+
+    table_schema_sql = """
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = '{}'
+    """.format(transaction_table)
+    
+    with connection.cursor() as cursor:
+        logger.debug("fetching transaction table column names...")
+        # cursor.execute(table_schema_sql, (transaction_table))
+        cursor.execute(table_schema_sql)
+        rows = cursor.fetchall()  
+        columns = []
+        for row in rows:
+            columns.append(row[0])
+        logger.debug('table columns: {}'.format(list(columns)))
+
+        insert_str = ','.join(columns)
+        replace_list = ['transaction_id', 'create_date', 'last_update_date']
+        tmp_list = [col if col not in replace_list else '%s' for col in columns]
+        select_str = ','.join(tmp_list)
+        # select_str = insert_str.replace(',transaction_id,', ',%s,'
+        # ).replace('create_date', '%s'
+        # ).replace('last_update_date', '%s')
+        
+        clone_sql = """
+            INSERT INTO public.{table_name}({_insert})
+            SELECT {_select}
+            FROM public.{table_name}
+        """.format(table_name=transaction_table, _insert=insert_str, _select=select_str)
+        clone_sql = clone_sql + ' WHERE transaction_id = %s;'
+        logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+        new_tran_id = get_next_transaction_id(transaction_id[0:2])
+
+        cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
+        if not cursor.rowcount:
+            raise Exception('transaction clone error')
+        return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+
+
+ 
