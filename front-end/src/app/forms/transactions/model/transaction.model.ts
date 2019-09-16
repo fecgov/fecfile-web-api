@@ -24,6 +24,8 @@ export class TransactionModel {
   selected: boolean;
   itemized: string;
   reportStatus: string;
+  toggleChild: boolean;
+  child: TransactionModel[] = [];
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -51,5 +53,7 @@ export class TransactionModel {
     this.selected = transaction.selected;
     this.itemized = transaction.itemized;
     this.reportStatus = transaction.reportStatus;
+    this.toggleChild = transaction.toggleChild;
+    this.child = transaction.child;
   }
 }
