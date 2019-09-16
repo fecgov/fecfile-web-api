@@ -335,6 +335,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
       .subscribe((res: GetReportsResponse) => {
         this.reportsModel = [];
+        console.log(' getRecyclingPage res', res);
         this._reportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
         console.log(' getRecyclingPage reportsModelL', reportsModelL);
@@ -694,8 +695,39 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Print report is not yet supported');
   }
 
-  public uploadReport(): void{
-    alert('Upload report is not yet supported');
+  public uploadReport(report: reportModel): void{
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        //return false;
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        this._router.navigate(['/signandSubmit/99']);
+        console.log(new Date().toISOString());
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          this._router.navigate(['/signandSubmit/3X']);
+        console.log(new Date().toISOString());
+      }, 1500);
+    }
+    
   }
 
   public downloadReport(): void{
@@ -768,40 +800,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    *
    * @param report the Report to view
    */
-  public viewReport(report: reportModel): void {
-    if (report.form_type === 'F99') {
-      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
-        console.log('getReportInfo res =', res);
-        localStorage.setItem('form_99_details', JSON.stringify(res));
-        //return false;
-      });
-      console.log(new Date().toISOString());
-      setTimeout(() => {
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: false } });
-        console.log(new Date().toISOString());
-      }, 1500);
-    } else if (report.form_type === 'F3X') {
-      this._reportsService
-        .getReportInfo(report.form_type, report.report_id)
-        .subscribe((res: form3xReportTypeDetails) => {
-          console.log('getReportInfo res =', res);
-          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
-
-          //return false;
-        });
-      console.log(new Date().toISOString());
-      setTimeout(() => {
-        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-
-        const formType =
-          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-        this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'reports', reportId: report.report_id, edit: false }
-        });
-        console.log(new Date().toISOString());
-      }, 1500);
-    }
+  public viewReport(): void {
+    alert('View report is not yet supported');
   }
 
   /**
@@ -882,7 +882,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+          this._reportsService.trashOrRestoreReports('restore', [rep]).subscribe((res: GetReportsResponse) => {
             this.getRecyclingPage(this.config.currentPage);
             this._dialogService.confirm(
               'Report ' + rep.report_id + ' has been restored!',
@@ -1261,7 +1261,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     if (status === 'Failed') return true;
     else return false;
   }
-  /*public trashAllSelected(): void {
+  public trashAllSelected(): void {
     let repIds = '';
     const selectedReports: Array<reportModel> = [];
     for (const rep of this.reportsModel) {
@@ -1301,7 +1301,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         } else if (res === 'cancel') {
         }
       });
-  }*/
+  }
 
   public trashReport(rep: reportModel): void {
     console.log('trashReport ', rep);
@@ -1309,7 +1309,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.trashOrRestoreReports('trash', rep).subscribe((res: GetReportsResponse) => {
+          this._reportsService.trashOrRestoreReports('trash', [rep]).subscribe((res: GetReportsResponse) => {
             console.log("trashReport res =", res);
             if (res['result'] === 'success') {
               this.getReportsPage(this.config.currentPage);
@@ -1345,7 +1345,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         if (res === 'okay') {
           // this._reportsService.restorereport(rep)
           //   .subscribe((res: GetReportsResponse) => {
-          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+          this._reportsService.trashOrRestoreReports('restore', [rep]).subscribe((res: GetReportsResponse) => {
             this.getRecyclingPage(this.config.currentPage);
             this._dialogService.confirm(
               'Report ' + rep.report_id + ' has been restored!',

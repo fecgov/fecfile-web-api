@@ -197,6 +197,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.frmIndividualReceipt = this._fb.group({});
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   /**
@@ -296,6 +300,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   public ngOnChanges() {
     this._prepareForm();
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   private _prepareForm() {
