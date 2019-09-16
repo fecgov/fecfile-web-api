@@ -1,27 +1,21 @@
 <div class="login">
 
-  <header>
-    <div class="logo">
-      <img src="assets/img/logo.svg" draggable="false" alt="FEC Logo" />
-    </div>
-    <div>
-      <img src="https://www.fec.gov/static/img/wordmark.svg" draggable="false" />
-    </div>
-  </header>
-
   <div class="login-box">
     <form [formGroup]="frm" (ngSubmit)="doSignIn()">
 
       <header>
         <div class="title">
-          <h1>{{ appTitle }}</h1>
+            <h1 class="grid-row">               
+                <div class="grid-row__col grid-row__col--6 text-right title-front">{{ titleF }}</div>
+                <div class="grid-row__col grid-row__col--6 text-left title-rear">{{ titleR }}</div>             
+            </h1>
         </div>
       </header>
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="text-error" *ngIf="hasFailed">
-            Invalid commitee id or password.
+            Invalid username or password.
           </div>
           <div class="logged-out-msg text-info" *ngIf="loggedOut.loggedOut">
             {{ loggedOut?.msg }}
@@ -30,27 +24,19 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--6 text-left">
+        <div class="grid-row__col grid-row__col--3">
           <label class="left-text" for="login-committee-id">
-            Committee ID
+            Username
           </label>
         </div>
-        <div class="grid-row__col grid-row__col--6 text-right">
-          <div class="right-text">
-            <a class="forgot-committee-id-link link" draggable="false" href="https://www.fec.gov/data/" target="_blank">
-              Forgot Committee ID
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-row form-field">
-        <div class="grid-row__col grid-row__col--12">
-          <input
+        
+      
+        <div class="grid-row__col grid-row__col--8">         
+          <input             
             type="text"
             class="login-committee-id login-input"
             id="login-committee-id"
-            placeholder="C00012345"
+            placeholder="Enter Your Username"
             formControlName="commiteeId"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || !committeeIdInputError,
@@ -61,39 +47,35 @@
             *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError "
           >
             <div class="error__committee-id" *ngIf="frm.get('commiteeId').hasError('required')">
-              Please enter your committee id.
+              Please enter your username.
             </div>
           </div>
         </div>
+
+        
+        
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--6 text-left">
+        <div class="grid-row__col grid-row__col--3">
           <label class="left-text" for="login-password">
             Password
           </label>
         </div>
-        <div class="grid-row__col grid-row__col--6 text-right">
-          <div class="right-text">
-            <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
-              Forgot Password
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-row form-field">
-        <div class="grid-row__col grid-row__col--12">
-          <input
-            type="password"
+  
+        <div class="grid-row__col grid-row__col--8">
+          <input            
+            [type]="show ? 'text' : 'password'"
             class="login-password login-input"
             id="login-password"
-            placeholder="e.g. 123456!ABC"
+            placeholder="Enter Your Password"
             formControlName="loginPassword"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || !passwordInputError,
               'login-input-error':  (frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || passwordInputError}"
           />
+          
+
           <div
             class="error"
             *ngIf="(frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || passwordInputError "
@@ -103,21 +85,38 @@
             </div>
           </div>
         </div>
+
+        <div class="grid-row__col grid-row__col--1">
+            <img class="eye-logo" src="assets/img/eye-icon.svg" draggable="false" (click)="showPassword()"/>
+        </div>
+
       </div>
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <button type="submit" class="login__btn" [disabled]="isBusy">
-            <ng-template [ngIf]="!isBusy">Log In</ng-template>
+            <ng-template [ngIf]="!isBusy">Enter</ng-template>
             <ng-template [ngIf]="isBusy">Logging in, please wait...</ng-template>
           </button>
         </div>
       </div>
 
-      <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+      <div class="grid-row form-field__info">
+        
+        <div class="row grid-row__col grid-row__col--9 text-right">
+            
+              <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
+                  Forgot your Password
+              </a>
+              <div class="or-padding"> or </div>
+              <a class="forgot-committee-id-link link" draggable="false" href="https://www.fec.gov/data/" target="_blank">
+                  Username
+              </a>           
+        </div>
+
+        <div class="grid-row__col grid-row__col--3">
           <a class="need-to-register-link link" draggable="false" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
-            Do you need to register your committee?
+           Register
           </a>
         </div>
       </div>

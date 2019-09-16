@@ -1,23 +1,47 @@
 @import '../shared/scss/global';
 
-.login {
-    background-color: $primaryBlue;
+.login {    
+    background-image: url("../../assets/img/fec-logo-5opac.png");
     color: $black;
-    height: 100%;
-    padding-top: 15px;
+    height: 100%;   
+    padding-top: 15px;    
     header {
       .logo {
         margin-bottom: 10px;
         text-align: center;
       }
     }
+  .title-front {
+    color:  #112E51;
+    font-family: Lato Black, Reg;
+    font-size: 100px;
+    font-kerning: -4.3pt;
+  }
+  .title-rear {
+    color: #CA1A0F;
+    font-family: Lato Black, Reg;
+    font-size: 100px;
+    font-kerning: -4.3pt;
+  } 
+  .or-padding {
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #631010;
+  }
+  .eye-logo {
+    width: 30px;
+    height: 30px;
+    color: #112E51;
+    margin-top: 2px;
+    cursor: pointer;
+  }
   .login-box {
-    background-color: $alto;
+    //background-color: $alto;
     min-height: 375px;
     margin-left: auto;
     margin-right: auto;
     padding-bottom: 15px;
-    padding-top: 15px;
+    padding-top: 150px;
     text-align: center;
     width: 300px;
     @include media(tablet) {
@@ -32,6 +56,7 @@
     .grid-row {
       margin: 0;
       &.form-field__info {
+        margin-top: 30px;
         margin-bottom: 10px;
       }
       &.form-field {
@@ -39,13 +64,18 @@
       }
       .grid-row__col {
         padding: 0;
-        label {
-          font-family: $titleFontFamily;
+        label {          
+          font-family: Lato Reg;
+          font-size: 20px;
+          color: #112E51;
         }
         .link {
           font-family: $mainFontFamily;
+          color: #631010;
+          top: 150px;
         }
         .login-input {
+          /*     
           @include make-text-input(265px, 1.5em, 1em, 1em);
           @include media(tablet) {
             @include make-text-input(450px, 1.5em, 1em, 1em);
@@ -56,8 +86,12 @@
           @include media(largeDesktop) {
             @include make-text-input(650px, 1.5em, 1em, 1em);
           }
+          */          
+          width: 450px;
           margin-left: auto;
           margin-right: auto;
+          border: none;
+          border-bottom: 2px solid  $primaryBlue;         
         }
         .left-text {
           padding-left: 15px;
@@ -75,17 +109,11 @@
           cursor: pointer;
           font-family: $mainFontFamily;
           margin-bottom: 15px;
-          margin-top: 30px;
-          width: 275px;
-          @include media(tablet) {
-            width: 460px;
-          }
-          @include media(mediumDesktop) {
-            width: 460px;
-          }
-          @include media(largeDesktop) {
-            width: 460px;
-          }
+          margin-top: 30px;          
+          color: #ffffff;
+          background-color: #164F85;
+          font-family: Lato Bold;
+          font-size: 20px;          
         }
         .logged-out-msg {
           font-size: 1em;
@@ -97,4 +125,3 @@
     }
   }
 }
-
