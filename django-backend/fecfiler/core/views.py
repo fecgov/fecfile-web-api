@@ -1901,16 +1901,17 @@ def load_child_transactions(cmte_id, report_id):
             child_list = cursor.fetchone()[0]
             # TODO : update null value, NOT SURE it is necessary
             # just go with parent function
-            for child in child_list:
-                for i in child:
-                    if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
-                        child[i] = ''
-                    elif not child[i]:
-                        child[i] = 0
-                if child['back_ref_transaction_id'] not in child_dic:
-                    child_dic[child['back_ref_transaction_id']] = [child]
-                else:
-                    child_dic[child['back_ref_transaction_id']].append(child)
+            if not child_list:
+                for child in child_list:
+                    for i in child:
+                        if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
+                            child[i] = ''
+                        elif not child[i]:
+                            child[i] = 0
+                    if child['back_ref_transaction_id'] not in child_dic:
+                        child_dic[child['back_ref_transaction_id']] = [child]
+                    else:
+                        child_dic[child['back_ref_transaction_id']].append(child)
     except Exception as e:
         logger.debug("loading child errors:" + str(e))
         raise
