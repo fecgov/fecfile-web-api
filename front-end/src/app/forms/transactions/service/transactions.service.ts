@@ -236,28 +236,16 @@ export class TransactionsService {
     const modelArray = [];
     for (const row of serverData) {
       const model = new TransactionModel({});
-      model.type = row.transaction_type_desc;
-      model.entityId = row.entity_id;
-      model.transactionTypeIdentifier = row.transaction_type_identifier;
-      model.apiCall = row.api_call;
-      model.transactionId = row.transaction_id;
-      model.name = row.name;
-      model.street = row.street_1;
-      model.street2 = row.street_2;
-      model.city = row.city;
-      model.state = row.state;
-      model.zip = row.zip_code;
-      model.date = row.transaction_date;
-      model.amount = row.transaction_amount;
-      model.aggregate = row.aggregate_amt;
-      model.purposeDescription = row.purpose_description;
-      model.contributorEmployer = row.employer;
-      model.contributorOccupation = row.occupation;
-      model.memoCode = row.memo_code;
-      model.memoText = row.memo_text;
-      model.deletedDate = row.deleted_date ? row.deleted_date : null;
-      model.itemized = row.itemized;
-      model.reportStatus = row.reportStatus;
+      mapDatabaseRowToModel(model, row);
+      if (row.child) {
+        const modelChildArray = [];
+        for (const childRow of row.child) {
+          const childModel = new TransactionModel({});
+          mapDatabaseRowToModel(childModel, childRow);
+          modelChildArray.push(childModel);
+        }
+        model.child = modelChildArray;
+      }
       modelArray.push(model);
     }
     return modelArray;
@@ -740,3 +728,28 @@ export class TransactionsService {
       );
   }
 }
+function mapDatabaseRowToModel(model: TransactionModel, row: any) {
+  model.type = row.transaction_type_desc;
+  model.entityId = row.entity_id;
+  model.transactionTypeIdentifier = row.transaction_type_identifier;
+  model.apiCall = row.api_call;
+  model.transactionId = row.transaction_id;
+  model.name = row.name;
+  model.street = row.street_1;
+  model.street2 = row.street_2;
+  model.city = row.city;
+  model.state = row.state;
+  model.zip = row.zip_code;
+  model.date = row.transaction_date;
+  model.amount = row.transaction_amount;
+  model.aggregate = row.aggregate_amt;
+  model.purposeDescription = row.purpose_description;
+  model.contributorEmployer = row.employer;
+  model.contributorOccupation = row.occupation;
+  model.memoCode = row.memo_code;
+  model.memoText = row.memo_text;
+  model.deletedDate = row.deleted_date ? row.deleted_date : null;
+  model.itemized = row.itemized;
+  model.reportStatus = row.reportStatus;
+}
+
