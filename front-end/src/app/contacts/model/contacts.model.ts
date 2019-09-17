@@ -1,5 +1,5 @@
 export class ContactModel {
-    type: string;
+    entityType: string;
     id: string;
     name: string;
     entity_name: string;
@@ -16,15 +16,16 @@ export class ContactModel {
     phoneNumber: string;
     employer: string;
     occupation: string;
+    officeSought: string;
     candOffice: string;
     candOfficeState: string;
     candOfficeDistrict: string;
     candCmteId: string;
     deletedDate: string;
     selected: boolean;
-
+ 
     constructor(contact: any) {
-        this.type = contact.type ? contact.type : '';
+        this.entityType = contact.entityType ? contact.entityType : '';
         this.id = contact.id ? contact.id : '';
         this.name = contact.name ? contact.name : '';
         this.entity_name = contact.entity_name ? contact.entity_name : '';
@@ -41,6 +42,7 @@ export class ContactModel {
         this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
         this.employer = contact.employer ? contact.employer : '';
         this.occupation = contact.occupation ? contact.occupation : '';
+        this.officeSought = contact.officeSought ? contact.officeSought : '';
         this.candOffice = contact.candOffice ? contact.candOffice : '';
         this.candOfficeState = contact.candOfficeState ? contact.candOfficeState : '';
         this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';

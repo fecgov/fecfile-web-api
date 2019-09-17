@@ -114,9 +114,6 @@
                 <th [@fadeInOut] *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())" [class]="getSortClass('deleted_date')"
                     (click)="changeSortDirection('deleted_date')">Deleted Date <br />Time
                  </th>
-                <th>
-                    &nbsp;
-                </th>
                 <th class="bulk_action">
                     <div [@fadeInOut] *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
@@ -191,7 +188,7 @@
                 <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
                     {{(report.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
                 </td>
-                <td text-align ="center !important" >
+                <td class="bulk_action" >
                     <div *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-primary" (click)="restoreReport(report)">
                             <i class="undo-icon"></i>
