@@ -148,10 +148,11 @@
   /* arrow common style */
   .arrow {
     display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-top: 4px solid #112E51;
-    border-right: 4px solid #112E51;
+    width: 5px;
+    height: 5px;
+    margin-top:  0.4rem;
+    border-top: 0.3rem solid #112E51;
+    border-right: 0.3rem solid #112E51;
     margin-top: 1rem;
     margin-right: 1rem;
   }
