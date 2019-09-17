@@ -114,20 +114,21 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
 
 # DICTIONARY OF ALL TRANSACTIONS TYPE IDENTIFIERS THAT ARE IMPLEMENTED AS 2 TRANSACTIONS IN 1 SCREEN FOR SCHED_A TO SCHED_A TABLE
-# TODO: need to decide if we need add "EAR_REC:EAR_REC_MEMO, PAC_EAR_REC:PAC_EAR_MEMO" to this list
+# the earmark list is emptied becuase the parent and child are saved with different api calls
+# TODO: need to clean up the earmark-related code when the decision is final
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = { 
-                                            "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
-                                            "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
-                                            "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
-                                            "EAR_REC": "EAR_MEMO",
-                                            "PAC_EAR_REC": "PAC_EAR_MEMO" 
+                                            # "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
+                                            # "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
+                                            # "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
+                                            # "EAR_REC": "EAR_MEMO",
+                                            # "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
-                                            "CON_EAR_DEP": "CON_EAR_OUT_DEP",
-                                            "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
-                                            "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
-                                            "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
+                                            # "CON_EAR_DEP": "CON_EAR_OUT_DEP",
+                                            # "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                            # "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                            # "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                         }
 
 API_CALL_SA = {'api_call' : '/sa/schedA'}
