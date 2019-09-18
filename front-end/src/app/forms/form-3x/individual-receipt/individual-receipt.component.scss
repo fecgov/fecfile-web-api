@@ -140,11 +140,11 @@
             display: none;
           }
         }
-        #jfMemoDropdown,
-        #jfMemoDropdown-menu {
+        #jfMemoDropdown {
           width: 16em;
         }
         #jfMemoDropdown-menu {
+          min-width: 16em;
           left: 0 !important;
         }
         @include media(tablet) {
