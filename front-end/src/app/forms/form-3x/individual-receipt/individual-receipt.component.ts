@@ -47,7 +47,9 @@ import { heLocale } from 'ngx-bootstrap';
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
+  saveForReturnToNewParent = 'saveForReturnToNewParent',
   saveForAddSub = 'saveForAddSub',
+  saveForEditSub = 'saveForEditSub',
   updateOnly = 'updateOnly'
 }
 
@@ -125,6 +127,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _entityTypeDefault: any;
   private _parentTransactionId: string;
   private _employerOccupationRequired: boolean;
+  private prePopulateFieldArray: Array<any>;
 
   constructor(
     private _http: HttpClient,
@@ -150,7 +153,26 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._config.triggers = 'click';
 
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
-      this._populateFormForEditOrView(message);
+      if (message.hasOwnProperty('key')) {
+        // See message sender for mesage properties
+        switch (message.key) {
+          case 'fullForm':
+            this._prePopulateFormForEditOrView(message.transactionModel);
+            break;
+          case 'field':
+            // set the field array to class variable to be referenced once the formGroup
+            // has been loaded by the get dynamic fields API call.
+            if (message) {
+              if (message.fieldArray) {
+                this.prePopulateFieldArray = message.fieldArray;
+              }
+            }
+            break;
+          default:
+            console.log('message key not supported: ' + message.key);
+        }
+      }
+
     });
 
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
@@ -1307,7 +1329,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
               this._parentTransactionId = transactionId;
             }
-            const addSubTransEmitObj = {
+            const addSubTransEmitObj: any = {
               form: {},
               direction: 'next',
               step: 'step_3',
@@ -1317,10 +1339,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               apiCall: this.subTransactionInfo.api_call,
               action: ScheduleActions.addSubTransaction
             };
+            const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
+            if (prePopulateFieldArray) {
+              addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
+            }
             this.status.emit(addSubTransEmitObj);
 
+          } else if (saveAction === SaveActions.saveForEditSub) {
+            this._progressToChild(ScheduleActions.edit, res);
           } else if (saveAction === SaveActions.saveForReturnToParent) {
-            this.returnToParent();
+            this.returnToParent(ScheduleActions.edit);
+          } else if (saveAction === SaveActions.saveForReturnToNewParent) {
+            this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
@@ -1365,12 +1395,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
+   * Used by Earmarks or any other transaction where the
+   * "2 transactions / 1 screen" requirement is needed. 
+   */
+  public saveAndReturnToNewParent(): void {
+    this._doValidateReceipt(SaveActions.saveForReturnToNewParent);
+  }
+
+  /**
    * Save a child transaction and show its parent.  If the form has not been
    * changed (dirty) then don't save and just show parent.
    */
   public saveAndReturnToParent(): void {
     if (!this.frmIndividualReceipt.dirty) {
-      this.returnToParent();
+      this.returnToParent(ScheduleActions.edit);
     } else {
       this._doValidateReceipt(SaveActions.saveForReturnToParent);
     }
@@ -1404,6 +1442,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._doValidateReceipt(SaveActions.saveForAddSub);
   }
 
+  public saveForAddEarmark(): void {
+    this._doValidateReceipt(SaveActions.saveForAddSub);
+  }
+
+  public saveForEditEarmark(): void {
+    this._doValidateReceipt(SaveActions.saveForEditSub);
+  }
+
   public saveOnly(): void {
     this._doValidateReceipt(SaveActions.saveOnly);
   }
@@ -1412,10 +1458,51 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._doValidateReceipt(SaveActions.updateOnly);
   }
 
+  private _progressToChild(scheduleAction: ScheduleActions, res: any): void {
+
+    let childTransactionId = null;
+    let apiCall = null;
+    if (res.hasOwnProperty('child')) {
+      if (Array.isArray(res.child)) {
+        if (res.child.length > 0) {
+          if (res.child[0].hasOwnProperty('transaction_id')) {
+            childTransactionId = res.child[0].transaction_id;
+          }
+          if (res.child[0].hasOwnProperty('transaction_id')) {
+            apiCall = res.child[0].api_call;
+          }
+        }
+      }
+    }
+
+    if (childTransactionId && apiCall) {
+      const transactionModel = new TransactionModel({});
+      transactionModel.transactionId = childTransactionId;
+      transactionModel.type = this.subTransactionInfo.subTransactionTypeDescription;
+      transactionModel.transactionTypeIdentifier = this.subTransactionInfo.subTransactionType;
+      transactionModel.apiCall = this.subTransactionInfo.api_call;
+      this.memoCode = false;
+      this.memoCodeChild = false;
+      const emitObj: any = {
+        form: {},
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
+        transactionType: this.subTransactionInfo.subTransactionType,
+        action: scheduleAction,
+      };
+      if (scheduleAction === ScheduleActions.edit) {
+        emitObj.transactionDetail = {transactionModel: transactionModel};
+      }
+      this.status.emit(emitObj);
+    }
+  }
+
   /**
    * Return to the parent transaction from sub tran.
    */
-  public returnToParent(): void {
+  public returnToParent(scheduleAction: ScheduleActions): void {
     const transactionModel = new TransactionModel({});
     transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
@@ -1423,18 +1510,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     transactionModel.apiCall = this.subTransactionInfo.api_call;
     this.memoCode = false;
     this.memoCodeChild = false;
-    const emitObj = {
+    const emitObj: any = {
       form: {},
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       transactionTypeText: this.subTransactionInfo.transactionTypeDescription,
       transactionType: this.subTransactionInfo.transactionType,
-      action: ScheduleActions.edit,
-      transactionDetail: {
-        transactionModel: transactionModel
-      }
+      action: scheduleAction,
     };
+    if (scheduleAction === ScheduleActions.edit) {
+      emitObj.transactionDetail = {transactionModel: transactionModel};
+    }
     this.status.emit(emitObj);
   }
 
@@ -2155,6 +2242,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
+      this._prePopulateFormField(this.prePopulateFieldArray);
+      this.prePopulateFieldArray = null;
     });
   }
 
@@ -2177,7 +2266,30 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  private _populateFormForEditOrView(transactionDetail: any) {
+  /**
+   * Pre-populate form fields with values from the pre-populate array.
+   * 
+   * @param fieldArray an array of field names and values
+   */
+  private _prePopulateFormField(fieldArray: Array<any>) {
+    if (!fieldArray) {
+      return;
+    }
+    if (!Array.isArray(fieldArray)) {
+      return;
+    }
+    for (const field of fieldArray) {
+      if (field.hasOwnProperty('name') && field.hasOwnProperty('value')) {
+        if (this.frmIndividualReceipt.get(field.name)) {
+          const patch = {};
+          patch[field.name] = field.value;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+      }
+    }
+  }
+
+  private _prePopulateFormForEditOrView(transactionDetail: any) {
 
     if (transactionDetail) {
       // The action on the message is the same as the this.scheduleAction from parent.
@@ -2339,6 +2451,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Determine if the child transactions should be shown.
    */
   public isShowChildTransactions(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark) {
+        return false;
+      }
+    }
     if (this._isParentOfSub()) {
       if (this.subTransactions) {
         if (this.subTransactions.length > 0) {
@@ -2348,52 +2465,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
     return false;
   }
-
-
-  // public isShowChildTransactions(): boolean {
-  //   if (this.subTransactionInfo) {
-  //     if (this.subTransactionInfo.isParent) {
-  //       if (this.subTransactions) {
-  //         if (this.subTransactions.length > 0) {
-  //           return true;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // public cancel() {
-  //   if (this.subTransactionInfo) {
-  //     if (this.subTransactionInfo.isParent) {
-        
-  //       // TODO what should happen here?  Clear form or view transactions?
-  //       // this._clearFormValues();
-  //       // this._f3xMessageService.sendLoadFormFieldsMessage('');
-
-  //       this._clearFormValues();
-  //       this._getFormFields();
-  //       this._validateContributionDate();
-  //     } else {
-  //       this.returnToParent();
-  //     }
-  //   }
-  // }
-
-  // public cancel() {
-  //   if (this._isParentOfSub()) {
-
-  //     // TODO what should happen here?  Clear form or view transactions?
-  //     // this._clearFormValues();
-  //     // this._f3xMessageService.sendLoadFormFieldsMessage('');
-
-  //     this._clearFormValues();
-  //     this._getFormFields();
-  //     this._validateTransactionDate();
-  //   } else {
-  //     this.returnToParent();
-  //   }
-  // }
 
   /**
    * Returns true if the transaction type is a parent of
@@ -2817,4 +2888,36 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _findHiddenField(property: string, value: any) {
     return this.hiddenFields.find((hiddenField: any) => hiddenField[property] === value);
   }
+
+  /**
+   * populate the purpose description for child with parent.
+   */
+  private _checkForEarmarkPurposePrePopulate(res: any): Array<any> {
+    let prePopulateFieldArray = null;
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark && this.subTransactionInfo.isParent) {
+        let earmarkMemoPurpose = null;
+
+        if (res.hasOwnProperty('entity_type')) {
+          if (res.entity_type === 'IND' || res.entity_type === 'CAN') {
+            const lastName = res.last_name ? res.last_name.trim() : '';
+            const firstName = res.first_name ? res.first_name.trim() : '';
+            const middleName = res.middle_name ? res.middle_name.trim() : '';
+            const suffix = res.suffix ? res.suffix.trim() : '';
+            const prefix = res.prefix ? res.prefix.trim() : '';
+            earmarkMemoPurpose = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
+          } else {
+            if (res.hasOwnProperty('entity_name')) {
+              earmarkMemoPurpose = res.entity_name;
+            }
+          }
+        }
+        prePopulateFieldArray = [];
+        prePopulateFieldArray.push({name: 'expenditure_purpose',
+          value: earmarkMemoPurpose});
+      }
+    }
+    return prePopulateFieldArray;
+  }
+
 }
