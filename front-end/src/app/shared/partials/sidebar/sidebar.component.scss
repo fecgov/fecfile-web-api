@@ -15,6 +15,8 @@
       @include clearfix();
     }
     .sidebar__nav {
+    
+    
       .sidebar__nav--header {
         position: relative;
         .sidebar-form-icon {
@@ -49,7 +51,7 @@
               }
             }
             .list-item__link {
-              font-family: $titleFontFamily;
+              font-family: $mainFontFamily;
               width: 197px;
             }
             .list-item__info {
@@ -113,7 +115,7 @@
       }
       .header-text {
         display: inline-block;
-        font-family: titleFontFamily;
+        font-family: mainFontFamily;
         margin-left: 5px;
         width: 202px;
       }

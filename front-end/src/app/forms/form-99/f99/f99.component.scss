@@ -56,6 +56,10 @@
     margin: 0 auto;
     width: 100%;
     margin-bottom: 1em;
+    font-family: 'Roboto', 'sans-serif';
+    font-size: 1rem;
+    font-weight: 400;
+    color: #212121;
     @include clearfix();
   }
   .form__container {
