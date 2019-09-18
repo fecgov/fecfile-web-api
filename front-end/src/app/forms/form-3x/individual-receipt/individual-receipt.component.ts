@@ -1844,12 +1844,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.frmIndividualReceipt.patchValue({ 'child*beneficiary_cmte_name': entity.cmte_name }, { onlySelf: true });
       }
     } else {
-      if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id') {
+      if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
         // populate org/committee fields
         if (fieldName === 'entity_name') {
-          this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+          if (this.frmIndividualReceipt.controls['donor_cmte_id']) {
+            this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+          } else if (this.frmIndividualReceipt.controls['beneficiary_cmte_id']) {
+            this.frmIndividualReceipt.patchValue({ beneficiary_cmte_id: entity.cmte_id }, { onlySelf: true });
+          }
         }
-        if (fieldName === 'donor_cmte_id') {
+        if (fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
           this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
         }
       }

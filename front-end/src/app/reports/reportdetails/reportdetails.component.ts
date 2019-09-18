@@ -723,7 +723,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._router.navigate(['/signandSubmit/3X']);
+          this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4' } });
         console.log(new Date().toISOString());
       }, 1500);
     }

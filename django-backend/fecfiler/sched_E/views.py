@@ -32,14 +32,23 @@ from fecfiler.sched_A.views import (
     find_form_type,
     find_aggregate_date,
 )
+from fecfiler.core.transaction_util import transaction_exists
 from fecfiler.sched_D.views import do_transaction
 
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+# TODO: may need to add the code for checking mandatory fields for aggregation
 MANDATORY_FIELDS_SCHED_E = ["cmte_id", "report_id", "transaction_id"]
 NEGATIVE_TRANSACTIONS = ["IE_VOID"]
+
+# a list of child_parent IE transaction types
+CHILD_PARENT_TRANSACTIONS = {
+    "IE_CC_PAY_MEMO": "IE_CC_PAY",
+    "IE_STAF_REIM_MEMO": "IE_STAF_REIM",
+    "IE_PMT_TO_PROL_MEMO": "IE_PMT_TO_PROL_MEMO",
+}
 
 
 def check_transaction_id(transaction_id):
@@ -49,6 +58,28 @@ def check_transaction_id(transaction_id):
             + "Transaction IDs start with SE characters".format(transaction_id)
         )
     return transaction_id
+
+
+def parent_transaction_exists(tran_id, sched_tp):
+    """
+    check if parent transaction exists
+    """
+    return transaction_exists(tran_id, sched_tp)
+
+
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    if data.get("transaction_type_identifier") in CHILD_PARENT_TRANSACTIONS:
+        if not data.get("back_ref_transaction_id"):
+            raise Exception("Error: parent transaction id missing.")
+        elif not parent_transaction_exists(
+            data.get("back_ref_transaction_id"), "sched_e"
+        ):
+            raise Exception("Error: parent transaction not found.")
+        else:
+            pass
 
 
 def check_mandatory_fields_se(data):
@@ -465,6 +496,7 @@ def post_schedE(data):
         # print(data)
         validate_se_data(data)
         validate_negative_transaction(data)
+        validate_parent_transaction_exist(data)
         # TODO: add code for saving payee entity
 
         try:

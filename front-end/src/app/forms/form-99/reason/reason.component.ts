@@ -53,6 +53,7 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
+  public textAreaTextContent: string = '';
 
   private _printPriviewPdfFileLink: string = '';
   private _form99Details: any = {};
@@ -140,7 +141,7 @@ export class ReasonComponent implements OnInit {
    */
   public editorChange(e): void {
     this._reasonTextContent = e.target.textContent;
-
+    this.textAreaTextContent = e.target.textContent;
     if (this._reasonTextContent.length >= 1) {
       this._reasonInnerText = e.target.innerText;
 
