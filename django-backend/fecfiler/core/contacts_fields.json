@@ -1,7 +1,30 @@
 {
     "data": {
         "individualFormFields": [
-           
+            {
+                "colClassName": "col col-md-4",
+                "seperator": false,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Type",
+                        "infoIcon": true,
+                        "infoText": "Language will be provided by RAD",
+                        "name": "entityType",
+                        "type": "select",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "98px",
+                        "validation": {
+                            "required": true,
+                            "max": 30,
+                            "alphaNumeric": true
+                        }
+                     }
+                ]
+            },
             {
                 "colClassName": "col col-md-4",
                 "seperator": false,
@@ -62,6 +85,7 @@
                     }
                 ]
             },
+
             {
                 "colClassName": "col col-md-4",
                 "seperator": true,
@@ -232,7 +256,7 @@
             },       
             {
                 "colClassName": "col col-md-4",
-                "seperator": false,
+                "seperator": true,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -274,7 +298,30 @@
             }
         ],
       "candidateFormFields": [
-           
+            {
+                "colClassName": "col col-md-4",
+                "seperator": false,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Type",
+                        "infoIcon": true,
+                        "infoText": "Language will be provided by RAD",
+                         "name": "entityType",
+                        "type": "select",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "98px",
+                        "validation": {
+                            "required": true,
+                            "max": 30,
+                            "alphaNumeric": true
+                        }
+                    }
+                ]
+            },
             {
                 "colClassName": "col col-md-4",
                 "seperator": false,
@@ -589,7 +636,7 @@
             },
             {
                 "colClassName": "col col-md-4",
-                "seperator": false,
+                "seperator": true,
                 "cols": [
                     {
                         "inputGroup": false,
@@ -632,7 +679,30 @@
         ],
 
      "committeeFormFields": [
-          
+            {
+                "colClassName": "col col-md-4",
+                "seperator": false,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Type",
+                        "infoIcon": true,
+                        "infoText": "Language will be provided by RAD",
+                         "name": "entityType",
+                        "type": "select",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "98px",
+                        "validation": {
+                            "required": true,
+                            "max": 30,
+                            "alphaNumeric": true
+                        }
+                    }
+                ]
+            },
             {
                 "colClassName": "col col-md-4",
                 "seperator": true,
@@ -803,7 +873,30 @@
             }           
          ],
      "organizationFormFields": [
-           
+            {
+                "colClassName": "col col-md-4",
+                "seperator": false,
+                "cols": [
+                    {
+                        "inputGroup": false,
+                        "inputIcon": "",
+                        "text": "Type",
+                        "infoIcon": true,
+                        "infoText": "Language will be provided by RAD",
+                         "name": "entityType",
+                        "type": "select",
+                        "value": null,
+                        "scroll": false,
+                        "height": "30px",
+                        "width": "98px",
+                        "validation": {
+                            "required": true,
+                            "max": 30,
+                            "alphaNumeric": true
+                        }
+                    }
+                ]
+            },
             {
                 "colClassName": "col col-md-4",
                 "seperator": true,

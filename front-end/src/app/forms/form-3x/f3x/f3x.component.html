@@ -43,12 +43,12 @@
     <div class="form__steps">
       <app-steps
         [steps]="[
-          { text: 'Report', step: 'step_1' },
-          { text: 'Type', step: 'step_2' },
-          { text: 'Form', step: 'step_3' },
-          { text: 'Preview', step: 'step_4' },
-          { text: 'Sign', step: 'step_5' },
-          { text: 'Submit', step: 'step_6' }
+        { text: 'Report', step: 'step_1', edit: editMode },
+        { text: 'Type', step: 'step_2', edit: editMode },
+        { text: 'Form', step: 'step_3', edit: editMode },
+        { text: 'Preview', step: 'step_4', edit: editMode },
+        { text: 'Sign', step: 'step_5', edit: editMode },
+        { text: 'Submit', step: 'step_6', edit: editMode }
         ]"
         [current_step]="currentStep"
       >

@@ -152,9 +152,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.getFormFields();
 
     this._entityType = 'IND';
-    // this.loadDynamiceFormFields();
-    this.formFields = this.individualFormFields;
+    //this.loadDynamiceFormFields();
+    //this.formFields = this.individualFormFields;
+    //console.log(" this.formFields",  this.formFields);
 
+    //this._setForm(this.formFields);
     this.frmContact = this._fb.group({});
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
@@ -182,7 +184,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    */
   private _setForm(fields: any): void {
     const formGroup: any = [];
-
+    console.log("_setForm fields ", fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -473,6 +475,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * @param stateOption the state selected in the dropdown.
    */
   public handleStateChange(stateOption: any, col: any) {
+    console.log("handleStateChange stateOption", stateOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
       this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
@@ -484,12 +487,88 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           stateCode = stateCode.trim();
           if (stateCode.length > 1) {
             stateCode = stateCode.substring(0, 2);
+            console.log(" handleStateChange stateCode", stateCode);
           }
         }
       }
+      
       this.frmContact.patchValue({ state: stateCode }, { onlySelf: true });
     }
   }
+
+  public handleCandOfficeChange(candOfficeOption: any, col: any) {
+    console.log("handleCandOfficeChange candOfficeOption", candOfficeOption);
+    if (this._selectedEntity) {
+      //this.showWarn(col.text);
+      this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+    } else {
+      let officeCode = null;
+      if (candOfficeOption.$ngOptionLabel) {
+        officeCode = candOfficeOption.$ngOptionLabel;
+        if (officeCode) {
+          officeCode = officeCode.trim();
+          if (officeCode.length > 1) {
+            officeCode = officeCode.substring(0, 1);
+            console.log(" handleCandOfficeChange officeStofficeCodeateCode", officeCode);
+          }
+        }
+      }
+      
+      this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
+    }
+  }
+  
+  public handleOfficeStateChange(officeStateOption: any, col: any) {
+    console.log("handleOfficeStateChange officeStateOption", officeStateOption);
+    if (this._selectedEntity) {
+      //this.showWarn(col.text);
+      this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+    } else {
+      let officeStateCode = null;
+      if (officeStateOption.$ngOptionLabel) {
+        officeStateCode = officeStateOption.$ngOptionLabel;
+        if (officeStateCode) {
+          officeStateCode = officeStateCode.trim();
+          if (officeStateCode.length > 1) {
+            officeStateCode = officeStateCode.substring(0, 2);
+            console.log(" handleOfficeStateChange officeStateCode", officeStateCode);
+          }
+        }
+      }
+      
+      this.frmContact.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
+    }
+  }
+
+  
+  public handleTypeChange(entityOption: any, col: any) {
+    console.log("handleTypeChange entityOption", entityOption);
+    if (this._selectedEntity) {
+      //this.showWarn(col.text);
+      this.frmContact.patchValue({ entityType: this._selectedEntity.entityType }, { onlySelf: true });
+    } else {
+      let entityCode = null;
+      if (entityOption.$ngOptionLabel) {
+        entityCode = entityOption.$ngOptionLabel;
+        if (entityCode) {
+          entityCode = entityCode.trim();
+          if (entityCode.length > 1) {
+            entityCode = entityCode.substring(0, 3 );
+            console.log(" handleTypeChange entityCode", entityCode);
+          }
+        }
+      }
+      console.log(" handleTypeChange before patching entityCode", entityCode);
+      this.frmContact.patchValue({ entityType: entityCode }, { onlySelf: true });
+
+      this._entityType = entityCode;
+      console.log("handleTypeChange  this._entityType",  this._entityType );
+      this.loadDynamiceFormFields();
+    }
+  }
+
+  
+
 
   /**
    * Goes to the previous step.
@@ -525,14 +604,16 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
 
     this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    this.frmContact.patchValue({ officeSought: contact.officeSought }, { onlySelf: true });
-    this.frmContact.patchValue({ officeState: contact.officeState }, { onlySelf: true });
-    this.frmContact.patchValue({ district: contact.district }, { onlySelf: true });
+    this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
+    this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
+    this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
+
   }
 
   /**
@@ -552,6 +633,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
+    //this.frmContact.patchValue({ type: contact.type }, { onlySelf: true });
     this.frmContact.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.frmContact.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmContact.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -562,13 +644,15 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
 
     this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    this.frmContact.patchValue({ officeSought: contact.officeSought }, { onlySelf: true });
-    this.frmContact.patchValue({ officeState: contact.officeState }, { onlySelf: true });
-    this.frmContact.patchValue({ district: contact.district }, { onlySelf: true });
+    this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
+    this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
+    this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
+
 
     let transactionTypeIdentifier = '';
     // Use this if transaction_tye_identifier is to come from dynamic form data
@@ -701,6 +785,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('individualFormFields')) {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
+                console.log("getFormFields this.individualFormFields = ", this.individualFormFields);
+                this.formFields = res.data.individualFormFields;
+                this._setForm(res.data.individualFormFields);
               }
             }
 
@@ -804,6 +891,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
 
+        this.frmContact.patchValue({ entityType: formData.entityType }, { onlySelf: true });
         this.frmContact.patchValue({ street_1: formData.street1 }, { onlySelf: true });
         this.frmContact.patchValue({ street_2: formData.street2 }, { onlySelf: true });
         this.frmContact.patchValue({ city: formData.city }, { onlySelf: true });
@@ -814,33 +902,31 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ occupation: formData.occupation }, { onlySelf: true });
 
         this.frmContact.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
-        this.frmContact.patchValue({ officeSought: formData.candOffice }, { onlySelf: true });
-        this.frmContact.patchValue({ officeState: formData.candOfficeState }, { onlySelf: true });
-        this.frmContact.patchValue({ district: formData.candOfficeState }, { onlySelf: true });
+        this.frmContact.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
+        this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
+        this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+
       }
     }
   }
 
-  public selectTypeChange(e): void {
+  /*public selectTypeChange(e): void {
     this._entityType = e.target.value;
     this.loadDynamiceFormFields();
     console.log('selectTypeChange this._entityType = ', this._entityType);
-  }
+  }*/
 
   public loadDynamiceFormFields(): void {
     if (this._entityType === 'IND') {
       this.formFields = this.individualFormFields;
-      this._setForm(this.formFields);
     } else if (this._entityType === 'ORG') {
       this.formFields = this.organizationFormFields;
-      this._setForm(this.formFields);
     } else if (this._entityType === 'COM') {
       this.formFields = this.committeeFormFields;
-      this._setForm(this.formFields);
     } else if (this._entityType === 'CAN') {
       this.formFields = this.candidateFormFields;
-      this._setForm(this.formFields);
     }
+    this._setForm(this.formFields);
   }
 
   public cancelStep(): void {

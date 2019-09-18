@@ -246,7 +246,7 @@ export class ContactsService {
     const modelArray = [];
     for (const row of serverData) {
       const model = new ContactModel({});
-      model.type = row.type;
+      model.entityType = row.entityType;
       model.id = row.id;
       model.name = row.name;
       model.street1 = row.street1;
@@ -259,8 +259,9 @@ export class ContactsService {
       model.phoneNumber = row.phoneNumber;
       model.entity_name = row.entity_name;
       model.candOffice = row.candOffice;
-      model.candOfficeState = row.candOfficeState;
+      model.candOfficeState = row.candOfficeState
       model.candOfficeDistrict = row.candOfficeDistrict;
+
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
       modelArray.push(model);
@@ -357,7 +358,7 @@ export class ContactsService {
     }
 
     serverObject.name =  model.name;
-    serverObject.type = model.type;
+    serverObject.entityType = model.entityType;
     serverObject.id = model.id;
     serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;

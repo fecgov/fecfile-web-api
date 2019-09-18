@@ -42,11 +42,14 @@ import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.val
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
+import { heLocale } from 'ngx-bootstrap';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
+  saveForReturnToNewParent = 'saveForReturnToNewParent',
   saveForAddSub = 'saveForAddSub',
+  saveForEditSub = 'saveForEditSub',
   updateOnly = 'updateOnly'
 }
 
@@ -55,7 +58,7 @@ export enum SaveActions {
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
-  encapsulation: ViewEncapsulation.None
+  // encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
@@ -95,7 +98,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public editScheduleAction: ScheduleActions = ScheduleActions.edit;
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
   public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
-  public dropdownMarginBottom = null;
+  public memoDropdownSize = null;
 
   private _reportType: any = null;
   private _types: any = [];
@@ -124,6 +127,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _entityTypeDefault: any;
   private _parentTransactionId: string;
   private _employerOccupationRequired: boolean;
+  private prePopulateFieldArray: Array<any>;
 
   constructor(
     private _http: HttpClient,
@@ -149,7 +153,26 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._config.triggers = 'click';
 
     this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
-      this._populateFormForEditOrView(message);
+      if (message.hasOwnProperty('key')) {
+        // See message sender for mesage properties
+        switch (message.key) {
+          case 'fullForm':
+            this._prePopulateFormForEditOrView(message.transactionModel);
+            break;
+          case 'field':
+            // set the field array to class variable to be referenced once the formGroup
+            // has been loaded by the get dynamic fields API call.
+            if (message) {
+              if (message.fieldArray) {
+                this.prePopulateFieldArray = message.fieldArray;
+              }
+            }
+            break;
+          default:
+            console.log('message key not supported: ' + message.key);
+        }
+      }
+
     });
 
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
@@ -179,7 +202,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._contributionAmount = '';
     this._contributionAmountChlid = '';
     this._employerOccupationRequired = false;
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
 
     this._getCandidateOfficeTypes();
 
@@ -196,6 +219,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.frmIndividualReceipt = this._fb.group({});
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   /**
@@ -225,76 +252,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
-  /**
-   * Force user to keep prefix for purpose when enforced by API.
-   */
-  private  _listenForPurposeChanges(prefix: string, control: AbstractControl): void {
-    const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-    control.valueChanges.subscribe(purposeVal => {
-      const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-      if (!purposeValCompare.startsWith(prefixCompare)) {
-
-        // If user is deleting part of the prefix, set field to whole prefix
-        // else set it to prefix + the value they entered.
-        if (prefixCompare.startsWith(purposeValCompare) ||
-            prefixCompare.endsWith(purposeValCompare)) {
-              control.patchValue(prefix);
-              return;
-        }
-
-        // if start with a partial prefix because they try to delete from the left,
-        // replace the partial prefix with the who;e while keeping post prefix.
-        for (let i = 1; i < prefixCompare.length; i++) {
-          if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-            const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-            // text = text.replace(/,/g, ``);
-            control.patchValue(prefix + finalVal);
-            return;
-          }
-        }
-
-        // if none of the above, then there is no prefix so add it to the user value.
-        control.patchValue(prefix + purposeVal);
-      }
-    });
-  }
-
-  // /**
-  //  * Force user to keep prefix for purpose when enforced by API.
-  //  */
-  // private  _listenForPurposeChanges(prefix: string): void {
-  //   const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-  //   this.frmIndividualReceipt.get('purpose_description').valueChanges.subscribe(purposeVal => {
-  //     const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-  //     if (!purposeValCompare.startsWith(prefixCompare)) {
-
-  //       // If user is deleting part of the prefix, set field to whole prefix
-  //       // else set it to prefix + the value they entered.
-  //       if (prefixCompare.startsWith(purposeValCompare) ||
-  //           prefixCompare.endsWith(purposeValCompare)) {
-  //             this.frmIndividualReceipt.get('purpose_description').patchValue(prefix);
-  //             return;
-  //       }
-
-  //       // if start with a partial prefix because they try to delete from the left,
-  //       // replace the partial prefix with the who;e while keeping post prefix.
-  //       for (let i = 1; i < prefixCompare.length; i++) {
-  //         if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-  //           const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-  //           // text = text.replace(/,/g, ``);
-  //           this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + finalVal);
-  //           return;
-  //         }
-  //       }
-
-  //       // if none of the above, then there is no prefix so add it to the user value.
-  //       this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + purposeVal);
-  //     }
-  //   });
-  // }
-
   public ngOnChanges() {
     this._prepareForm();
+    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+      Validators.required
+    ]);
   }
 
   private _prepareForm() {
@@ -385,13 +348,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
-          // Listen for change on purpose description when API forces
-          // prefix.
-          // if (this.isFieldName(e.name, 'purpose_description')) {
-          //   if (e.value.trim().length > 0) {
-          //     this._listenForPurposeChanges(e.value, formGroup[e.name]);
-          //   }
-          // }
           if (this.isFieldName(e.name, 'memo_code')) {
             const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
@@ -514,13 +470,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount') 
+            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount')
                 && (fieldName !== 'contribution_aggregate')) {
               formValidators.push(Validators.maxLength(validators[validation]));
             } else {
               formValidators.push(validateAmount());
             }
-					}
+          }
         } else if ((validation === 'dollarAmount') || (validation === 'dollarAmountNegative')) {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
@@ -541,12 +497,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // If expenditure_date is not found setting contribution_date and contribution_amount
     if(this.frmIndividualReceipt.controls['expenditure_date']) {
       dateField = 'expenditure_date';
-      amountField = 'expenditure_amount'
+      amountField = 'expenditure_amount';
     } else {
       dateField = 'contribution_date';
-      amountField = 'contribution_amount'
+      amountField = 'contribution_amount';
     }
-
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
 
@@ -569,11 +524,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         }
       }
       if (this.memoCodeChild) {
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*'  + dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['child*'+dateField]) {
+        if (this.frmIndividualReceipt.controls['child*' + dateField]) {
           this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
@@ -632,20 +587,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       amountField = 'expenditure_amount'
     } else {
       dateField = 'contribution_date';
-      amountField = 'contribution_amount'
+      amountField = 'contribution_amount';
     }
     if (isChildForm) {
       if (checked) {
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(this._memoCodeValue);
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
       } else {
         this._validateTransactionDate();
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(null);
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([
           this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
@@ -1115,6 +1070,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
+        } else if (this.isFieldName(field, 'purpose_description')) {
+          const preTextHiddenField = this._findHiddenField('name', 'pretext');
+          let preText = '';
+          if (preTextHiddenField) {
+            preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+          }
+          const purposeVal = this.frmIndividualReceipt.get(field).value;
+          if (purposeVal) {
+            receiptObj[field] = preText + this.frmIndividualReceipt.get(field).value;
+          } else {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value;
+          }
         } else if (
           field === 'last_name' ||
           field === 'first_name' ||
@@ -1286,7 +1253,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
               this._parentTransactionId = transactionId;
             }
-            const addSubTransEmitObj = {
+            const addSubTransEmitObj: any = {
               form: {},
               direction: 'next',
               step: 'step_3',
@@ -1296,10 +1263,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               apiCall: this.subTransactionInfo.api_call,
               action: ScheduleActions.addSubTransaction
             };
+            const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
+            if (prePopulateFieldArray) {
+              addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
+            }
             this.status.emit(addSubTransEmitObj);
 
+          } else if (saveAction === SaveActions.saveForEditSub) {
+            this._progressToChild(ScheduleActions.edit, res);
           } else if (saveAction === SaveActions.saveForReturnToParent) {
-            this.returnToParent();
+            this.returnToParent(ScheduleActions.edit);
+          } else if (saveAction === SaveActions.saveForReturnToNewParent) {
+            this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
@@ -1318,10 +1293,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
           // setting default action to add/addSub when we save transaction
           // as it should not be for edit after save.
-          if (this._isSubOfParent()) {
-            this.scheduleAction = ScheduleActions.addSubTransaction;
-          } else {
-            this.scheduleAction = ScheduleActions.add;
+          if (!this.isEarmark()) {
+            if (this._isSubOfParent()) {
+              this.scheduleAction = ScheduleActions.addSubTransaction;
+            } else {
+              this.scheduleAction = ScheduleActions.add;
+            }
           }
         }
       });
@@ -1343,27 +1320,42 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  /**
+   * Used by Earmarks or any other transaction where the
+   * "2 transactions / 1 screen" requirement is needed. 
+   */
+  public saveAndReturnToNewParent(): void {
+    this._doValidateReceipt(SaveActions.saveForReturnToNewParent);
+  }
+
+  /**
+   * Save a child transaction and show its parent.  If the form has not been
+   * changed (dirty) then don't save and just show parent.
+   */
   public saveAndReturnToParent(): void {
     if (!this.frmIndividualReceipt.dirty) {
-      this.returnToParent();
+      this.returnToParent(ScheduleActions.edit);
     } else {
       this._doValidateReceipt(SaveActions.saveForReturnToParent);
     }
   }
 
+  /**
+   * Set CSS properties when the memo dropdown opens and closes.
+   */
   public multipleMemoDropdownChanged(open: boolean) {
     if (open) {
 
       // TEMP hack for testing
       // this.multipleSubTransactionInfo.push(this.multipleSubTransactionInfo[0]);
 
-      // 23 px for each item and add 30px for default.
+      // 23 px for each item and add 40px for default.
       let size = this.multipleSubTransactionInfo ?
         this.multipleSubTransactionInfo.length : 0;
-      size = (size > 0) ? ((size * 23) + 30) : 0;
-      this.dropdownMarginBottom = size + 'px';
+      size = (size > 0) ? ((size * 23) + 40) : 0;
+      this.memoDropdownSize = size + 'px';
     } else {
-      this.dropdownMarginBottom = null;
+      this.memoDropdownSize = null;
     }
   }
 
@@ -1376,6 +1368,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._doValidateReceipt(SaveActions.saveForAddSub);
   }
 
+  public saveForAddEarmark(): void {
+    this._doValidateReceipt(SaveActions.saveForAddSub);
+  }
+
+  public saveForEditEarmark(): void {
+    this._doValidateReceipt(SaveActions.saveForEditSub);
+  }
+
   public saveOnly(): void {
     this._doValidateReceipt(SaveActions.saveOnly);
   }
@@ -1384,10 +1384,51 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._doValidateReceipt(SaveActions.updateOnly);
   }
 
+  private _progressToChild(scheduleAction: ScheduleActions, res: any): void {
+
+    let childTransactionId = null;
+    let apiCall = null;
+    if (res.hasOwnProperty('child')) {
+      if (Array.isArray(res.child)) {
+        if (res.child.length > 0) {
+          if (res.child[0].hasOwnProperty('transaction_id')) {
+            childTransactionId = res.child[0].transaction_id;
+          }
+          if (res.child[0].hasOwnProperty('api_call')) {
+            apiCall = res.child[0].api_call;
+          }
+        }
+      }
+    }
+
+    if (childTransactionId && apiCall) {
+      const transactionModel = new TransactionModel({});
+      transactionModel.transactionId = childTransactionId;
+      transactionModel.type = this.subTransactionInfo.subTransactionTypeDescription;
+      transactionModel.transactionTypeIdentifier = this.subTransactionInfo.subTransactionType;
+      transactionModel.apiCall = apiCall;
+      this.memoCode = false;
+      this.memoCodeChild = false;
+      const emitObj: any = {
+        form: {},
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
+        transactionType: this.subTransactionInfo.subTransactionType,
+        action: scheduleAction,
+      };
+      if (scheduleAction === ScheduleActions.edit) {
+        emitObj.transactionDetail = {transactionModel: transactionModel};
+      }
+      this.status.emit(emitObj);
+    }
+  }
+
   /**
    * Return to the parent transaction from sub tran.
    */
-  public returnToParent(): void {
+  public returnToParent(scheduleAction: ScheduleActions): void {
     const transactionModel = new TransactionModel({});
     transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
@@ -1395,18 +1436,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     transactionModel.apiCall = this.subTransactionInfo.api_call;
     this.memoCode = false;
     this.memoCodeChild = false;
-    const emitObj = {
+    const emitObj: any = {
       form: {},
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       transactionTypeText: this.subTransactionInfo.transactionTypeDescription,
       transactionType: this.subTransactionInfo.transactionType,
-      action: ScheduleActions.edit,
-      transactionDetail: {
-        transactionModel: transactionModel
-      }
+      action: scheduleAction,
     };
+    if (scheduleAction === ScheduleActions.edit) {
+      emitObj.transactionDetail = {transactionModel: transactionModel};
+    }
     this.status.emit(emitObj);
   }
 
@@ -1729,12 +1770,16 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         this.frmIndividualReceipt.patchValue({ 'child*beneficiary_cmte_name': entity.cmte_name }, { onlySelf: true });
       }
     } else {
-      if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id') {
+      if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
         // populate org/committee fields
         if (fieldName === 'entity_name') {
-          this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+          if (this.frmIndividualReceipt.controls['donor_cmte_id']) {
+            this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+          } else if (this.frmIndividualReceipt.controls['beneficiary_cmte_id']) {
+            this.frmIndividualReceipt.patchValue({ beneficiary_cmte_id: entity.cmte_id }, { onlySelf: true });
+          }
         }
-        if (fieldName === 'donor_cmte_id') {
+        if (fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
           this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
         }
       }
@@ -2055,7 +2100,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this.subTransactionInfo = null;
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
 
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
       if (res) {
@@ -2127,6 +2172,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
+      this._prePopulateFormField(this.prePopulateFieldArray);
+      this.prePopulateFieldArray = null;
     });
   }
 
@@ -2149,7 +2196,30 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  private _populateFormForEditOrView(transactionDetail: any) {
+  /**
+   * Pre-populate form fields with values from the pre-populate array.
+   * 
+   * @param fieldArray an array of field names and values
+   */
+  private _prePopulateFormField(fieldArray: Array<any>) {
+    if (!fieldArray) {
+      return;
+    }
+    if (!Array.isArray(fieldArray)) {
+      return;
+    }
+    for (const field of fieldArray) {
+      if (field.hasOwnProperty('name') && field.hasOwnProperty('value')) {
+        if (this.frmIndividualReceipt.get(field.name)) {
+          const patch = {};
+          patch[field.name] = field.value;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+      }
+    }
+  }
+
+  private _prePopulateFormForEditOrView(transactionDetail: any) {
 
     if (transactionDetail) {
       // The action on the message is the same as the this.scheduleAction from parent.
@@ -2230,27 +2300,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                       hiddenField.value = trx[prop];
                     }
                   }
-                  // temp until name if fixed for aggregate in API
                   if (this.frmIndividualReceipt.get(prop)) {
-                    if (this.isFieldName(prop, 'contribution_amount') ||
-                        this.isFieldName(prop, 'expenditure_amount')) {
-                      const amount = trx[prop] ? trx[prop] : 0;
-
-                      // Name mapping until aggregate_amt is renamed to contribution_aggregate
-                      // if (trx.hasOwnProperty('aggregate_amt')) {
-                      //   const patchAgg = {};
-                      //   patchAgg['contribution_aggregate'] = trx['aggregate_amt'];
-                      //   this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
-                      //   this._contributionAggregateValue = trx['aggregate_amt'];
-                      // }
-                      // if (trx.hasOwnProperty('contribution_aggregate')) {
-                      //   const patchAgg = {};
-                      //   patchAgg['contribution_aggregate'] = trx['contribution_aggregate'];
-                      //   this.frmIndividualReceipt.patchValue(patchAgg, { onlySelf: true });
-                      //   this._contributionAggregateValue = trx['contribution_aggregate'];
-                      // }
-                      // this.contributionAmountChange({target: {value: amount.toString()}}, prop, false);
-                    }
                     if (this.isFieldName(prop, 'contribution_aggregate')) {
                         this._contributionAggregateValue = trx[prop];
                     }
@@ -2262,6 +2312,23 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                           this.memoCodeChild = true;
                         } else {
                           this.memoCode = true;
+                        }
+                      }
+                    }
+                    if (this.isFieldName(prop, 'purpose_description')) {
+                      const preTextHiddenField = this._findHiddenField('name', 'pretext');
+                      let preText = '';
+                      if (preTextHiddenField) {
+                        preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                      }
+                      if (preText) {
+                        // remove it from the input field.  It will be readded on save.
+                        if (trx[prop]) {
+                          if (typeof trx[prop] === 'string') {
+                            if (trx[prop].startsWith(preText)) {
+                              trx[prop] = trx[prop].replace(preText, '');
+                            }
+                          }
                         }
                       }
                     }
@@ -2303,6 +2370,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   }
                 }
               }
+              this._validateTransactionDate();
             }
           }
         }
@@ -2314,6 +2382,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Determine if the child transactions should be shown.
    */
   public isShowChildTransactions(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark) {
+        return false;
+      }
+    }
     if (this._isParentOfSub()) {
       if (this.subTransactions) {
         if (this.subTransactions.length > 0) {
@@ -2323,52 +2396,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
     return false;
   }
-
-
-  // public isShowChildTransactions(): boolean {
-  //   if (this.subTransactionInfo) {
-  //     if (this.subTransactionInfo.isParent) {
-  //       if (this.subTransactions) {
-  //         if (this.subTransactions.length > 0) {
-  //           return true;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // public cancel() {
-  //   if (this.subTransactionInfo) {
-  //     if (this.subTransactionInfo.isParent) {
-        
-  //       // TODO what should happen here?  Clear form or view transactions?
-  //       // this._clearFormValues();
-  //       // this._f3xMessageService.sendLoadFormFieldsMessage('');
-
-  //       this._clearFormValues();
-  //       this._getFormFields();
-  //       this._validateContributionDate();
-  //     } else {
-  //       this.returnToParent();
-  //     }
-  //   }
-  // }
-
-  // public cancel() {
-  //   if (this._isParentOfSub()) {
-
-  //     // TODO what should happen here?  Clear form or view transactions?
-  //     // this._clearFormValues();
-  //     // this._f3xMessageService.sendLoadFormFieldsMessage('');
-
-  //     this._clearFormValues();
-  //     this._getFormFields();
-  //     this._validateTransactionDate();
-  //   } else {
-  //     this.returnToParent();
-  //   }
-  // }
 
   /**
    * Returns true if the transaction type is a parent of
@@ -2394,6 +2421,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _isSubOfParent(): boolean {
     if (this.subTransactionInfo) {
       if (this.subTransactionInfo.isParent === false) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public isEarmark(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark) {
         return true;
       }
     }
@@ -2457,7 +2493,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
-    this.dropdownMarginBottom = null;
+    this.memoDropdownSize = null;
   }
 
   private toggleValidationIndOrg(entityType: string) {
@@ -2758,12 +2794,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         }
       }
     });
-
-    // this.candidateOfficeTypes = [
-    //   { officeCode: 'H', officeDescription: 'House' },
-    //   { officeCode: 'S', officeDescription: 'Senate' },
-    //   { officeCode: 'P', officeDescription: 'Presidential' }
-    // ];
   }
 
   private _setMemoCodeForForm() {
@@ -2794,4 +2824,40 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       return true;
     }
   }
+
+  private _findHiddenField(property: string, value: any) {
+    return this.hiddenFields.find((hiddenField: any) => hiddenField[property] === value);
+  }
+
+  /**
+   * populate the purpose description for child with parent.
+   */
+  private _checkForEarmarkPurposePrePopulate(res: any): Array<any> {
+    let prePopulateFieldArray = null;
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark && this.subTransactionInfo.isParent) {
+        let earmarkMemoPurpose = null;
+
+        if (res.hasOwnProperty('entity_type')) {
+          if (res.entity_type === 'IND' || res.entity_type === 'CAN') {
+            const lastName = res.last_name ? res.last_name.trim() : '';
+            const firstName = res.first_name ? res.first_name.trim() : '';
+            const middleName = res.middle_name ? res.middle_name.trim() : '';
+            const suffix = res.suffix ? res.suffix.trim() : '';
+            const prefix = res.prefix ? res.prefix.trim() : '';
+            earmarkMemoPurpose = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
+          } else {
+            if (res.hasOwnProperty('entity_name')) {
+              earmarkMemoPurpose = res.entity_name;
+            }
+          }
+        }
+        prePopulateFieldArray = [];
+        prePopulateFieldArray.push({name: 'expenditure_purpose',
+          value: earmarkMemoPurpose});
+      }
+    }
+    return prePopulateFieldArray;
+  }
+
 }

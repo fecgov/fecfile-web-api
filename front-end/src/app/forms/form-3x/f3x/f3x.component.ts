@@ -30,6 +30,7 @@ import { TransactionModel } from '../../transactions/model/transaction.model';
 })
 export class F3xComponent implements OnInit {
   public currentStep: string = 'step_1';
+  public editMode: boolean = true;
   public step: string = '';
   public steps: any = {};
   public frm: any;
@@ -75,6 +76,9 @@ export class F3xComponent implements OnInit {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
     this.step = this._activatedRoute.snapshot.queryParams.step;
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit
+      ? this._activatedRoute.snapshot.queryParams.edit
+      : true;
 
     this._reportTypeService.getReportTypes(this.formType).subscribe(res => {
       if (typeof res === 'object') {
@@ -281,7 +285,6 @@ export class F3xComponent implements OnInit {
             if (!this.scheduleAction) {
               this.scheduleAction = ScheduleActions.add;
             }
-
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
 
@@ -290,13 +293,25 @@ export class F3xComponent implements OnInit {
               // ngOnChanges fires when the form fields are changed, thereby reseting the
               // fields to the previous value.  Result is fields can't be changed.
               e.transactionDetail.action = this.scheduleAction;
-              this._f3xMessageService.sendPopulateFormMessage(e.transactionDetail);
+              this._f3xMessageService.sendPopulateFormMessage({
+                key: 'fullForm',
+                transactionModel: e.transactionDetail
+              });
               const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
               this.transactionTypeText = transactionModel.type;
               this.transactionType = transactionModel.transactionTypeIdentifier;
             } else {
               this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               this.transactionType = e.transactionType ? e.transactionType : '';
+
+              if (this.scheduleAction === ScheduleActions.addSubTransaction) {
+                if (e.hasOwnProperty('prePopulateFieldArray') && Array.isArray(e.prePopulateFieldArray)) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'field',
+                    fieldArray: e.prePopulateFieldArray
+                  });
+                }
+              }
             }
           }
           this.canContinue();

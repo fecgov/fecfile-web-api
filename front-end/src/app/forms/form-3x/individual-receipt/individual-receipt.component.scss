@@ -60,6 +60,10 @@
       @include clearfix();
     }
     section {
+      .content {
+        min-height: 100vh;
+        position: relative;
+      }
       .row {
         margin-bottom: 20px;
         .forms__candidate-title {
@@ -131,6 +135,18 @@
         margin: 0 auto;
         padding: 0;
         width: 80%;
+        #jfMemoDropdown {
+          &:after {
+            display: none;
+          }
+        }
+        #jfMemoDropdown {
+          width: 16em;
+        }
+        #jfMemoDropdown-menu {
+          min-width: 16em;
+          left: 0 !important;
+        }
         @include media(tablet) {
           margin: 0;
           padding: 0;

@@ -23,7 +23,7 @@ export class reportModel {
     last_update_date: string;
     viewtype: string;
     selected: boolean;
-    deleted_date: string;
+    deleteddate: string;
     constructor(report: any) {
       this.id = report.id ? report.id : '';
       this.report_id = report.report_id ? report.report_id: '';
@@ -47,8 +47,7 @@ export class reportModel {
       this.create_date = report.create_date ? report.create_date : '';
       this.last_update_date = report.last_update_date ? report.last_update_date : '';
       this.viewtype = report.viewtype ? report.viewtype : '';
-      this.selected = report.selected;
-      this.deleted_date= report.deleted_date;
-     
+      this.deleteddate= report.deleteddate? report.deleteddate : '';
+      this.selected = report.selected;     
     }
    }

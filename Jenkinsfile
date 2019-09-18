@@ -80,7 +80,7 @@ pipeline {
     }
     //End of qa stage 
     stage('UAT'){
-      when { branch 'master'}
+      when { branch 'manual-deployment'}
       stages {
         stage("Build Images"){
           parallel {

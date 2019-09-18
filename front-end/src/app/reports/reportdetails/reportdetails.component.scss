@@ -5,22 +5,22 @@
   margin-bottom: 15px;
   padding-left: 5px;
   margin-top: 15px;
-  .transactions__page-item-range {
+  .reports__page-item-range {
     padding: .5em .1em 0 0 ;
   }
 
-  .transactions__table {
+  .reports__table {
     width: 100%;
-    .transactions__amount {
+    .reports__amount {
       text-align: right;
     }
   }
 
-  .transactions__table-checkbox {
+  .reports__table-checkbox {
     width: 3%;
   }
 
-  .transactions__table-pagination-container {
+  .reports__table-pagination-container {
     padding: 1em;
   }  
 
@@ -29,7 +29,7 @@
     border: none;
   }  
 
-  #transactions__dropdown-action > button > i {
+  #reports__dropdown-action > button > i {
     padding-right: 3px;
   }
 
@@ -37,36 +37,37 @@
     text-align: left;
   }
 
-  .transactions__bulk_action_btn[disabled] {
+  .reports__bulk_action_btn[disabled] {
     background:#6c757d;
     border-color: #6c757d;
+   
   }
 
   .dropdown-menu {
     min-width: 6em;
   }  
 
-  .transactions__item-range {
+  .reports__item-range {
     font-size: 13px;
     color: grey;
     margin: 0 5px;
   }
 
-  .transactions__total-amount {
+  .reports__total-amount {
     float: left;
   }
 
-  .transactions__total-amount-val {
+  .reports__total-amount-val {
     float: right;
   }
 
-  .transactions__total-amount-tip {
+  .reports__total-amount-tip {
     color: #112E51;
     padding-left: 3px;
     float: right;
   }
 
-  .transactions__tooltip {
+  .reports__tooltip {
     top: 0;
     width: 300px;
     .tooltip-inner {
@@ -105,18 +106,18 @@
     }
   }
 
-  .transactions__btn-container {
+  .reports__btn-container {
     height: 100%;
     padding: 1em 1em 0 1em;
   }
 
-  .transactions__tag-outer-wrapper {
+  .reports__tag-outer-wrapper {
     display: inline-block;
     width: 100%;
-    .transactions__tag_wrapper {
+    .reports__tag_wrapper {
       // background-color: #e8e8e8;
       // width: fit-content;
-      .transactions__tag_group {
+      .reports__tag_group {
         // margin-right: 7px;
         background-color: lightgrey;
         // padding: 20px 10px;
@@ -126,23 +127,23 @@
         // margin: 3px;
         margin: 5px 20px 0px 0px;
       }
-      .transactions__tag_btn {
+      .reports__tag_btn {
         margin: 6px;
         // margin: 2px 20px 0px 0px;
       }
-      .transactions__close-tag {
+      .reports__close-tag {
         padding-right: .25em;
       }
     }
   }
 
-  .transactions__btn-search-filter {
+  .reports__btn-search-filter {
     margin: 3px;
     background-color: $shuttleGray;
     color: $white;
   }
 
-  // .transactions__total-amount-container {
+  // .reports__total-amount-container {
   //   margin: 1.5em 0;
   // }
 
@@ -169,7 +170,7 @@
 
   .column-options-modal {
 
-    #transactions__pin-modal-header {
+    #reports__pin-modal-header {
       background-color: $crusta;
     }
 

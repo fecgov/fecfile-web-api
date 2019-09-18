@@ -149,6 +149,7 @@ export class ReportsidebarComponent implements OnInit {
     this.filterStatuss = [];
     this.filterAmendmentIndicators = [];
     this.filterDeletedDateTo = null;
+    this.filterDeletedDateFrom = null;
     this.isHideDeletedDateFilter = true;
 
     this.initValidationErrors();
@@ -357,6 +358,15 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
     if (this.filterFiledDateTo !== null) {
+      modified = true;
+    }
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
       modified = true;
     }
 
@@ -620,6 +630,8 @@ export class ReportsidebarComponent implements OnInit {
     this.filterCvgDateFrom = this.handleDateAsSpaces(this.filterCvgDateFrom);
     this.filterFiledDateTo = this.handleDateAsSpaces(this.filterFiledDateTo);
     this.filterFiledDateFrom = this.handleDateAsSpaces(this.filterFiledDateFrom);
+    this.filterDeletedDateTo = this.handleDateAsSpaces(this.filterDeletedDateTo);
+    this.filterDeletedDateFrom = this.handleDateAsSpaces(this.filterDeletedDateFrom);
 
     this.initValidationErrors();
     if (this.filterCvgDateFrom !== null && (this.filterCvgDateTo === null)) {
@@ -666,13 +678,13 @@ export class ReportsidebarComponent implements OnInit {
       this.isHideFiledDateFilter = false;
       return false;
     }
-    if (this.filterFiledDateTo !== null && this.filterFiledDateFrom === null) {
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
       this.deletedDateFilterValidation.isError = true;
       this.deletedDateFilterValidation.message = 'From Deleted Date is required';
       this.isHideDeletedDateFilter = false;
       return false;
     }
-    if (this.filterFiledDateFrom > this.filterFiledDateTo) {
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
       this.deletedDateFilterValidation.isError = true;
       this.deletedDateFilterValidation.message = 'From Deleted Date must preceed To Deleted Date';
       this.isHideDeletedDateFilter = false;

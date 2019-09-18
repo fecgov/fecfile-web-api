@@ -1,6 +1,6 @@
 <!--<div class="forms__wizard" > -->
-  <div class="transactions__main-container" >  
-    <div class="transactions__sidebar" *ngIf="showSideBar">
+  <div class="reports__main-container" >  
+    <div class="reports__sidebar" *ngIf="showSideBar">
        <app-reportsidebar
             title="Filter Options"
             (status)='onNotify($event)'
@@ -10,7 +10,7 @@
     </div>
   
     <!--<div class="form__container"></div>-->
-    <div class="transactions__container">
+    <div class="reports__container">
         <div class="header-content">
           <header>
               <div class="header-container">
@@ -25,7 +25,7 @@
             <div class="space"></div>       
             <div class="grid-row">
                  <div class="grid-row__col grid-row__col--12">
-                   <div class="transactions__btn-container">                 
+                   <div class="reports__btn-container">                 
                      <!-- <button [@fadeInOut] *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
                       <i class="thumbtack-icon"></i>Pin Columns
                       </button> &nbsp;&nbsp;&nbsp;-->
@@ -42,7 +42,7 @@
                       <i class="table-icon"></i>Show Reports
                       </button>      
   
-                      <!--<div class="input-group pl-0 transactions__trx-search">
+                      <!--<div class="input-group pl-0 reports__trx-search">
                           <div class="input-group-append" (click)="clearSearch()" 
                               ngbTooltip="Clear Keywords" tooltipClass="form-tooltip">
                             <span class="input-group-text" id="">
@@ -65,15 +65,15 @@
             <div class="space"></div>
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12">
-                <div class="transactions__btn-container">
+                <div class="reports__btn-container">
                   <div *ngFor="let searchTextItem of searchTextArray; let i = index">
                     <button
-                      class="btn btn-left transactions__btn-search-filter transactions__btn-container;"
+                      class="btn btn-left reports__btn-search-filter reports__btn-container;"
                       (click)="removeSearchText(i)">
                       <i class="fas fa-window-close"></i>
                       {{ searchTextItem }}
                     </button>
-                    <span class="transactions__btn-search-filter-join" 
+                    <span class="reports__btn-search-filter-join" 
                       *ngIf="i < (searchTextArray.length -1 )">
                         and
                     </span>
