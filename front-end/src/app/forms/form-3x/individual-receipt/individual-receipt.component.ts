@@ -252,74 +252,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
-  /**
-   * Force user to keep prefix for purpose when enforced by API.
-   */
-  private  _listenForPurposeChanges(prefix: string, control: AbstractControl): void {
-    const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-    control.valueChanges.subscribe(purposeVal => {
-      const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-      if (!purposeValCompare.startsWith(prefixCompare)) {
-
-        // If user is deleting part of the prefix, set field to whole prefix
-        // else set it to prefix + the value they entered.
-        if (prefixCompare.startsWith(purposeValCompare) ||
-            prefixCompare.endsWith(purposeValCompare)) {
-              control.patchValue(prefix);
-              return;
-        }
-
-        // if start with a partial prefix because they try to delete from the left,
-        // replace the partial prefix with the who;e while keeping post prefix.
-        for (let i = 1; i < prefixCompare.length; i++) {
-          if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-            const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-            // text = text.replace(/,/g, ``);
-            control.patchValue(prefix + finalVal);
-            return;
-          }
-        }
-
-        // if none of the above, then there is no prefix so add it to the user value.
-        control.patchValue(prefix + purposeVal);
-      }
-    });
-  }
-
-  // /**
-  //  * Force user to keep prefix for purpose when enforced by API.
-  //  */
-  // private  _listenForPurposeChanges(prefix: string): void {
-  //   const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-  //   this.frmIndividualReceipt.get('purpose_description').valueChanges.subscribe(purposeVal => {
-  //     const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-  //     if (!purposeValCompare.startsWith(prefixCompare)) {
-
-  //       // If user is deleting part of the prefix, set field to whole prefix
-  //       // else set it to prefix + the value they entered.
-  //       if (prefixCompare.startsWith(purposeValCompare) ||
-  //           prefixCompare.endsWith(purposeValCompare)) {
-  //             this.frmIndividualReceipt.get('purpose_description').patchValue(prefix);
-  //             return;
-  //       }
-
-  //       // if start with a partial prefix because they try to delete from the left,
-  //       // replace the partial prefix with the who;e while keeping post prefix.
-  //       for (let i = 1; i < prefixCompare.length; i++) {
-  //         if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-  //           const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-  //           // text = text.replace(/,/g, ``);
-  //           this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + finalVal);
-  //           return;
-  //         }
-  //       }
-
-  //       // if none of the above, then there is no prefix so add it to the user value.
-  //       this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + purposeVal);
-  //     }
-  //   });
-  // }
-
   public ngOnChanges() {
     this._prepareForm();
     this.frmIndividualReceipt.controls['contribution_date'].setValidators([
@@ -416,13 +348,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
-          // Listen for change on purpose description when API forces
-          // prefix.
-          // if (this.isFieldName(e.name, 'purpose_description')) {
-          //   if (e.value.trim().length > 0) {
-          //     this._listenForPurposeChanges(e.value, formGroup[e.name]);
-          //   }
-          // }
           if (this.isFieldName(e.name, 'memo_code')) {
             const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
