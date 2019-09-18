@@ -99,7 +99,7 @@
                 <th [@fadeInOut] *ngIf="isColumnVisible('fec_id')" [class]="getSortClass('fec_id')"
                     (click)="changeSortDirection('fec_id')">FEC ID
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('amend_ind')" [class]="getSortClass('amend_ind')"
+                <th [@fadeInOut] *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())" [class]="getSortClass('amend_ind')"
                     (click)="changeSortDirection('amend_ind')">Amendment <br /> Indicator
                 </th>
                 <th [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')" [class]="getSortClass('cvg_start_date')"
@@ -177,7 +177,7 @@
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
                 <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
-                <td *ngIf="isColumnVisible('amend_ind')"></td>
+                <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())"></td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
                     {{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>

@@ -25,7 +25,8 @@ import {
   form3xReportTypeDetails
 } from '../../shared/interfaces/FormsService/FormsService';
 import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
-
+import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { FormsService } from '../../shared/services/FormsService/forms.service';
 @Component({
   selector: 'app-reportdetails',
   templateUrl: './reportdetails.component.html',
@@ -136,7 +137,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private _reportTypeService: ReportTypeService,
+    private _formsService: FormsService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -691,8 +694,55 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Link multiple report requirements have not been finalized');
   }
   
-  public printReport(): void{
-    alert('Print report is not yet supported');
+  public printPreview(): void {
+    console.log('TransactionsTableComponent printPreview...!');
+    this._reportTypeService.printPreview('transaction_table_screen', '3X');
+  }
+
+public printReport(report: reportModel): void{
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        let formSavedObj: any = {
+          saved: true
+        };
+        localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        this._formsService.PreviewForm_Preview_sign_Screen({}, this.formType).subscribe(
+          res => {
+            if (res) {
+              window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+            }
+          },
+          error => {
+            console.log('error: ', error);
+          }
+        );
+        console.log(new Date().toISOString());
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          this._reportTypeService.printPreview('dashboard_report_screen', '3X');
+        console.log(new Date().toISOString());
+      }, 1500);
+    }
   }
 
   public uploadReport(report: reportModel): void{
@@ -700,7 +750,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
         console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
-        //return false;
+        let formSavedObj: any = {
+          saved: true
+        };
+        localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
       });
       console.log(new Date().toISOString());
       setTimeout(() => {

@@ -126,7 +126,7 @@
           <div class="card-header transactions__filter-title" (click)="toggleReportFilterItem()">
             Report Type
             <i class="float-right" aria-hidden="true" 
-              [ngClass]="toggleFilterDirection(isHideFormFilter)">
+              [ngClass]="toggleFilterDirection(isHideTypeFilter)">
             </i>          
           </div>
           <div class="card-body" [@openCloseScroll]="determineScrollState(isHideReportFilter)">
@@ -146,7 +146,7 @@
         </div>
 
       <div class="card">
-        <div class="card-header transactions__filter-title" (click)="toggleDeletedDateFilterItem()">
+        <div class="card-header transactions__filter-title" (click)="toggleFiledDateFilterItem()">
           Filed/Saved Date
           <i class="float-right" aria-hidden="true" 
             [ngClass]="toggleFilterDirection(isHideFiledDateFilter)">

@@ -22,14 +22,12 @@ import { ContactsService } from '../service/contacts.service';
 import { f3xTransactionTypes } from '../../shared/interfaces/FormsService/FormsService';
 import { alphaNumeric } from '../../shared/utils/forms/validation/alpha-numeric.validator';
 import { floatingPoint } from '../../shared/utils/forms/validation/floating-point.validator';
-// import { contributionDate } from '../../shared/utils/forms/validation/contribution-date.validator';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-//import { AddNewContactModel } from './model/add/new_contacts.model';
 import { ContactsMessageService } from '../service/contacts-message.service';
 import { ContactModel } from '../model/contacts.model';
 
@@ -61,13 +59,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private _loadFormFieldsSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
-  public cvgStartDate: string = null;
-  public cvgEndDate: string = null;
   public frmContact: FormGroup;
   public formFields: any = [];
   public formVisible: boolean = false;
   public hiddenFields: any = [];
-  public memoCode: boolean = false;
+  //public memoCode: boolean = false;
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
@@ -82,38 +78,24 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public officeState: any = [];
 
   private _formType: string = '';
-  private _reportType: any = null;
-  private _types: any = [];
-  private _transaction: any = {};
-  private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _formSubmitted: boolean = false;
   private _contributionAggregateValue = 0.0;
-  private _contributionAmount = '';
-  private readonly _memoCodeValue: string = 'X';
   private _selectedEntity: any;
   private _contributionAmountMax: number;
   private _entityType: string = 'IND';
-  private _loading: boolean = true;
-  private _selectedEntityChild: any;
-  private _selectedChangeWarn: any;
-  private _selectedChangeWarnChild: any;
   private readonly _childFieldNamePrefix = 'child*';
   private _contactToEdit: ContactModel;
+  private _loading: boolean = false;
 
   constructor(
     private _http: HttpClient,
     private _fb: FormBuilder,
-    private _formService: FormsService,
     private _contactsService: ContactsService,
-    private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _utilService: UtilService,
     private _messageService: MessageService,
-    private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService,
     private _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _contactsMessageService: ContactsMessageService
@@ -134,8 +116,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._selectedEntity = null;
-    this._contributionAggregateValue = 0.0;
-    this._contributionAmount = '';
     this._contactToEdit = null;
     /*this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
@@ -189,11 +169,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-          /*if (e.name === 'contribution_amount') {
-            if (e.validation) {
-              this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
-            }
-          }*/
         });
       }
     });
@@ -244,76 +219,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     return formValidators;
   }
 
-  // /**
-  //  * Validates the contribution date selected.
-  //  */
-  // private _validateContributionDate(): void {
-  //   this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-  //   if (this._reportType !== null) {
-  //     const cvgStartDate: string = this._reportType.cvgStartDate;
-  //     const cvgEndDate: string = this._reportType.cvgEndDate;
-
-  //     if (this.memoCode) {
-  //       this.frmContact.controls['contribution_date'].setValidators([Validators.required]);
-
-  //       this.frmContact.controls['contribution_date'].updateValueAndValidity();
-  //     } else {
-  //       if (this.frmContact.controls['contribution_date']) {
-  //         this.frmContact.controls['contribution_date'].setValidators([
-  //           contributionDate(cvgStartDate, cvgEndDate),
-  //           Validators.required
-  //         ]);
-
-  //         this.frmContact.controls['contribution_date'].updateValueAndValidity();
-  //       }
-  //     }
-  //   }
-
-  //   if (this.frmContact) {
-  //     if (this.frmContact.controls['contribution_amount']) {
-  //       this.frmContact.controls['contribution_amount'].setValidators([floatingPoint(), Validators.required]);
-
-  //       this.frmContact.controls['contribution_amount'].updateValueAndValidity();
-  //     }
-
-  //     if (this.frmContact.controls['contribution_aggregate']) {
-  //       this.frmContact.controls['contribution_aggregate'].setValidators([floatingPoint()]);
-
-  //       this.frmContact.controls['contribution_aggregate'].updateValueAndValidity();
-  //     }
-  //   }
-  // }
-
-  /**
-   * Updates the contribution aggregate field once contribution ammount is entered.
-   *
-   * @param      {Object}  e       The event object.
-   */
-  public contributionAmountChange(e: any): void {
-    let contributionAmount: string = e.target.value;
-    // default to 0 when no value
-    contributionAmount = contributionAmount ? contributionAmount : '0';
-    // remove commas
-    contributionAmount = contributionAmount.replace(/,/g, ``);
-    // determine if negative, truncate if > max
-    contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
-
-    this._contributionAmount = contributionAmount;
-    // this._contributionAmount = this.formatAmountForAPI(e.target.value)
-
-    const contributionAggregate: string = String(this._contributionAggregateValue);
-
-    const contributionAmountNum = parseFloat(contributionAmount);
-    const aggregateTotal: number = contributionAmountNum + parseFloat(contributionAggregate);
-    const aggregateValue: string = this._decimalPipe.transform(aggregateTotal, '.2-2');
-    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
-
-    this.frmContact.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
-    this.frmContact.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
-  }
-
-  /**
+  
+   /**
    * Prevent user from keying in more than the max allowed by the API.
    * HTML max must allow for commas, decimals and negative sign and therefore
    * this is needed to enforce digit limitation.  This method will remove
@@ -337,13 +244,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   private formatAmountForAPI(contributionAmount): string {
-    // default to 0 when no value
+   /*  // default to 0 when no value
     contributionAmount = contributionAmount ? contributionAmount : '0';
     // remove commas
     contributionAmount = contributionAmount.replace(/,/g, ``);
     // determine if negative, truncate if > max
     contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
-    return contributionAmount;
+    return contributionAmount; */
+    return "";
   }
 
   /**
@@ -374,7 +282,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * Gets the transaction type.
    */
   private _getTransactionType(): void {
-    const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
+   /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
 
     if (typeof transactionType === 'object') {
       if (transactionType !== null) {
@@ -390,7 +298,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         // reload dynamic form fields
         this.getFormFields();
       }
-    }
+    } */
   }
 
   public handleFormFieldKeyup($event: any, col: any) {
@@ -555,15 +463,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           if (entityCode.length > 1) {
             entityCode = entityCode.substring(0, 3 );
             console.log(" handleTypeChange entityCode", entityCode);
+            this.frmContact.patchValue({ entityType: entityCode }, { onlySelf: true });
+            this._entityType = entityCode;
+            this.loadDynamiceFormFields();
           }
         }
       }
-      console.log(" handleTypeChange before patching entityCode", entityCode);
-      this.frmContact.patchValue({ entityType: entityCode }, { onlySelf: true });
-
-      this._entityType = entityCode;
-      console.log("handleTypeChange  this._entityType",  this._entityType );
-      this.loadDynamiceFormFields();
+     
     }
   }
 
@@ -1015,14 +921,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         if (res) {
           console.log('_contactsService.saveContact res', res);
           this._contactToEdit = null;
-          this._formSubmitted = true;
+          //this._formSubmitted = true;
           this.frmContact.reset();
 
           //this.frmContact.controls['memo_code'].setValue(null);
           this._selectedEntity = null;
-          this._selectedChangeWarn = null;
-          this._selectedEntityChild = null;
-          this._selectedChangeWarnChild = null;
+          //this._selectedChangeWarn = null;
+          //this._selectedEntityChild = null;
+          //._selectedChangeWarnChild = null;
 
           localStorage.removeItem(contactObj);
           if (callFrom === 'saveAndExit') {

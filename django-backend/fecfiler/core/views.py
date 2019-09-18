@@ -3093,8 +3093,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3122,7 +3122,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
             #print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
@@ -3988,33 +3988,33 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
             print("trash_restore_sql_report report_id = ", report_id)
             if report_type == 'F99':
                 if (_delete == 'Y'):
-                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True  WHERE committeeid = '{}' AND id = '{}'  """.format(cmte_id, report_id))
+                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 else:
-                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False  WHERE committeeid = '{}' AND id = '{}'  """.format(cmte_id, report_id))
+                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 print("report_type4", report_type)
             else:
                 #form 3X report
-                cursor.execute("""UPDATE public.reports SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
+                cursor.execute("""UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
                 if not cursor.rowcount:
                     raise Exception(
                         """The report ID: {} is either already deleted
                         or does not exist in reports table""".format(report_id))
                 else:
-                    cursor.execute("""UPDATE public.form_3x SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_a SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_b SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c1 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c2 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_d SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_e SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_f SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h1 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h2 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h3 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h4 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h5 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h6 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
+                    cursor.execute("""UPDATE public.form_3x SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_a SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_b SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c1 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c2 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_d SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_e SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_f SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h1 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h2 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h3 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h4 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h5 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h6 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
     
     except Exception:
         raise
@@ -4096,8 +4096,8 @@ def get_all_trashed_contacts(request):
                 else:
                     descending = 'ASC'
 
-                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deleteDate']
-                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deleteDate']
+                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
                 if search_string:
                     for key in search_keys:
                         if not param_string:
@@ -4133,7 +4133,7 @@ def get_all_trashed_contacts(request):
                 # print("trans_query_string: ",trans_query_string)
                 # import ipdb;ipdb.set_trace()
 
-                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deletedDate from all_contacts_view
+                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
                 
                 if sortcolumn and sortcolumn != 'default':
@@ -4176,7 +4176,7 @@ def get_all_trashed_contacts(request):
 def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
     """trash or restore contacts table by updating delete_ind"""
     print("check_report_to_delete cmte_id = ", cmte_id)
-    print("check_report_to_delete report_id = ", report_id)
+    print("check_report_to_delete entity_id = ", entity_id)
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
@@ -4219,7 +4219,7 @@ def trash_restore_contact(request):
 def check_contact_to_delete(cmte_id, entity_id):
     try:
         print("check_contact_to_delete cmte_id = ", cmte_id)
-        print("check_contact_to_delete report_id = ", report_id)
+        print("check_contact_to_delete entity_id = ", entity_id)
         _delete = 'Y'
         entity_id_found=''
         with connection.cursor() as cursor:
