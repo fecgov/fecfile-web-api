@@ -31,6 +31,7 @@ from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_b_transactions,
     transaction_exists,
+    update_parent_purpose,
 )
 
 logger = logging.getLogger(__name__)
@@ -72,6 +73,13 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "FEA_STAF_REIM_MEMO": ("FEA_STAF_REIM", "sched_b"),
     "CONT_REDESIG_MEMO": ("CONT_REDESIG", "sched_b"),
 }
+
+EARMARK_SB_CHILD_LIST = [
+    "CON_EAR_OUT_DEP",
+    "CON_EAR_UNDEP_MEMO",
+    "PAC_CON_EAR_DEP_OUT",
+    "PAC_CON_EAR_UNDEP_MEMO",
+]
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
@@ -1012,6 +1020,9 @@ def schedB(request):
                         else:
                             child_data = post_schedB(child_datum)
             output = get_schedB(data)
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SB_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(
@@ -1099,6 +1110,9 @@ def schedB(request):
 
             data = put_schedB(datum)
             output = get_schedB(data)
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SB_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
 
         except Exception as e:
