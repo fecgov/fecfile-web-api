@@ -20,7 +20,10 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
 
-from fecfiler.core.transaction_util import get_line_number_trans_type
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    update_parent_purpose,
+)
 
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
@@ -123,6 +126,14 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = {
                                             # "EAR_REC": "EAR_MEMO",
                                             # "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
+EARMARK_SA_CHILD_LIST = [
+    "EAR_REC_RECNT_ACC_MEMO",
+    "EAR_REC_CONVEN_ACC_MEMO",
+    "AR_REC_HQ_ACC_MEMO",
+    "EAR_MEMO",
+    "PAC_EAR_MEMO",
+]
+                                            # "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
                                             # "CON_EAR_DEP": "CON_EAR_OUT_DEP",
@@ -1095,6 +1106,9 @@ def schedA(request):
             datum['cmte_id'] = cmte_id
             data = post_schedA(datum)
             output = get_schedA(data)
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SA_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -1157,6 +1171,10 @@ def schedA(request):
             form_type = find_form_type(report_id, datum.get('cmte_id'))
             data = put_schedA(datum)
             output = get_schedA(data)
+
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SA_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
