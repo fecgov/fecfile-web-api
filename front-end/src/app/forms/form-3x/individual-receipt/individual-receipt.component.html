@@ -369,11 +369,8 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <!-- <div *ngIf="subTransactionInfo?.isEarmark === true; then earMark; else notEarMark"> -->
-              <!-- <div *ngIf="subTransactionInfo?.isEarmark === true; then earMarkTrx; else allOtherTrx"> -->
               <div *ngIf="subTransactionInfo?.isEarmark === true; else allOtherTrx">   
-                <!-- <div>The scheduleAction is {{scheduleAction}}</div>              -->
-                
+                <!-- <div>The scheduleAction is {{scheduleAction}}</div>              -->                
                 <ng-template *ngIf="scheduleAction === editScheduleAction; then editEarMarkTrx; else createEarMarkTrx">
                 </ng-template>
 
@@ -384,6 +381,11 @@
                   <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"
                     (click)="saveForEditEarmark()">
                     Next
+                  </button>
+                  <button *ngIf="subTransactionInfo?.isParent === false"
+                    class="btn btn-secondary btn-right" 
+                    (click)="updateOnly()">
+                    Save
                   </button>
                   <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">

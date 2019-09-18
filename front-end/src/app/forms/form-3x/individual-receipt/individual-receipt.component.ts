@@ -1369,10 +1369,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
           // setting default action to add/addSub when we save transaction
           // as it should not be for edit after save.
-          if (this._isSubOfParent()) {
-            this.scheduleAction = ScheduleActions.addSubTransaction;
-          } else {
-            this.scheduleAction = ScheduleActions.add;
+          if (!this.isEarmark()) {
+            if (this._isSubOfParent()) {
+              this.scheduleAction = ScheduleActions.addSubTransaction;
+            } else {
+              this.scheduleAction = ScheduleActions.add;
+            }
           }
         }
       });
@@ -1468,7 +1470,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           if (res.child[0].hasOwnProperty('transaction_id')) {
             childTransactionId = res.child[0].transaction_id;
           }
-          if (res.child[0].hasOwnProperty('transaction_id')) {
+          if (res.child[0].hasOwnProperty('api_call')) {
             apiCall = res.child[0].api_call;
           }
         }
@@ -1480,7 +1482,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       transactionModel.transactionId = childTransactionId;
       transactionModel.type = this.subTransactionInfo.subTransactionTypeDescription;
       transactionModel.transactionTypeIdentifier = this.subTransactionInfo.subTransactionType;
-      transactionModel.apiCall = this.subTransactionInfo.api_call;
+      transactionModel.apiCall = apiCall;
       this.memoCode = false;
       this.memoCodeChild = false;
       const emitObj: any = {
@@ -2494,6 +2496,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _isSubOfParent(): boolean {
     if (this.subTransactionInfo) {
       if (this.subTransactionInfo.isParent === false) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public isEarmark(): boolean {
+    if (this.subTransactionInfo) {
+      if (this.subTransactionInfo.isEarmark) {
         return true;
       }
     }
