@@ -252,74 +252,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
-  /**
-   * Force user to keep prefix for purpose when enforced by API.
-   */
-  private  _listenForPurposeChanges(prefix: string, control: AbstractControl): void {
-    const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-    control.valueChanges.subscribe(purposeVal => {
-      const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-      if (!purposeValCompare.startsWith(prefixCompare)) {
-
-        // If user is deleting part of the prefix, set field to whole prefix
-        // else set it to prefix + the value they entered.
-        if (prefixCompare.startsWith(purposeValCompare) ||
-            prefixCompare.endsWith(purposeValCompare)) {
-              control.patchValue(prefix);
-              return;
-        }
-
-        // if start with a partial prefix because they try to delete from the left,
-        // replace the partial prefix with the who;e while keeping post prefix.
-        for (let i = 1; i < prefixCompare.length; i++) {
-          if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-            const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-            // text = text.replace(/,/g, ``);
-            control.patchValue(prefix + finalVal);
-            return;
-          }
-        }
-
-        // if none of the above, then there is no prefix so add it to the user value.
-        control.patchValue(prefix + purposeVal);
-      }
-    });
-  }
-
-  // /**
-  //  * Force user to keep prefix for purpose when enforced by API.
-  //  */
-  // private  _listenForPurposeChanges(prefix: string): void {
-  //   const prefixCompare: string = prefix ? prefix.trim().toLowerCase() : '';
-  //   this.frmIndividualReceipt.get('purpose_description').valueChanges.subscribe(purposeVal => {
-  //     const purposeValCompare: string = purposeVal ? purposeVal.trim().toLowerCase() : '';
-  //     if (!purposeValCompare.startsWith(prefixCompare)) {
-
-  //       // If user is deleting part of the prefix, set field to whole prefix
-  //       // else set it to prefix + the value they entered.
-  //       if (prefixCompare.startsWith(purposeValCompare) ||
-  //           prefixCompare.endsWith(purposeValCompare)) {
-  //             this.frmIndividualReceipt.get('purpose_description').patchValue(prefix);
-  //             return;
-  //       }
-
-  //       // if start with a partial prefix because they try to delete from the left,
-  //       // replace the partial prefix with the who;e while keeping post prefix.
-  //       for (let i = 1; i < prefixCompare.length; i++) {
-  //         if (purposeValCompare.startsWith(prefixCompare.substring(i))) {
-  //           const finalVal = purposeValCompare.substring(prefixCompare.substring(i).length);
-  //           // text = text.replace(/,/g, ``);
-  //           this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + finalVal);
-  //           return;
-  //         }
-  //       }
-
-  //       // if none of the above, then there is no prefix so add it to the user value.
-  //       this.frmIndividualReceipt.get('purpose_description').patchValue(prefix + purposeVal);
-  //     }
-  //   });
-  // }
-
   public ngOnChanges() {
     this._prepareForm();
     this.frmIndividualReceipt.controls['contribution_date'].setValidators([
@@ -416,13 +348,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
           }
-          // Listen for change on purpose description when API forces
-          // prefix.
-          // if (this.isFieldName(e.name, 'purpose_description')) {
-          //   if (e.value.trim().length > 0) {
-          //     this._listenForPurposeChanges(e.value, formGroup[e.name]);
-          //   }
-          // }
           if (this.isFieldName(e.name, 'memo_code')) {
             const isChildForm = e.name.startsWith(this._childFieldNamePrefix) ? true : false;
             memoCodeValue = e.value;
@@ -545,13 +470,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount') 
+            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount')
                 && (fieldName !== 'contribution_aggregate')) {
               formValidators.push(Validators.maxLength(validators[validation]));
             } else {
               formValidators.push(validateAmount());
             }
-					}
+          }
         } else if ((validation === 'dollarAmount') || (validation === 'dollarAmountNegative')) {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
@@ -572,12 +497,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // If expenditure_date is not found setting contribution_date and contribution_amount
     if(this.frmIndividualReceipt.controls['expenditure_date']) {
       dateField = 'expenditure_date';
-      amountField = 'expenditure_amount'
+      amountField = 'expenditure_amount';
     } else {
       dateField = 'contribution_date';
-      amountField = 'contribution_amount'
+      amountField = 'contribution_amount';
     }
-
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
 
@@ -600,11 +524,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         }
       }
       if (this.memoCodeChild) {
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*'  + dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['child*'+dateField]) {
+        if (this.frmIndividualReceipt.controls['child*' + dateField]) {
           this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
@@ -663,20 +587,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       amountField = 'expenditure_amount'
     } else {
       dateField = 'contribution_date';
-      amountField = 'contribution_amount'
+      amountField = 'contribution_amount';
     }
     if (isChildForm) {
       if (checked) {
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(this._memoCodeValue);
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
       } else {
         this._validateTransactionDate();
         this.memoCodeChild = checked;
         this.frmIndividualReceipt.controls['child*memo_code'].setValue(null);
-        this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
+        this.frmIndividualReceipt.controls['child*' + dateField].setValidators([
           this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
           Validators.required
         ]);
@@ -2446,6 +2370,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   }
                 }
               }
+              this._validateTransactionDate();
             }
           }
         }

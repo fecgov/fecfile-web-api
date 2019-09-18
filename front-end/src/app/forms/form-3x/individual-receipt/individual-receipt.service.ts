@@ -97,10 +97,6 @@ export class IndividualReceiptService {
       }
     }
 
-    // get api url from data base for a transaction
-    //  if(receipt['api_call'] !== null) {
-    //     url = receipt['api_call'];
-    //  }
     if (receipt.hasOwnProperty('api_call')) {
       if (receipt.api_call) {
         url = receipt.api_call;
@@ -225,11 +221,6 @@ export class IndividualReceiptService {
         formData.append('purpose_description', receipt.ContributionPurposeDescription);
       }
     }
-    // if (receipt.ContributionAggregate !== null) {
-    //   if (typeof receipt.ContributionAggregate === 'string') {
-    //     formData.append('contribution_aggregate', receipt.ContributionAggregate);
-    //   }
-    // }
 
     return this._http
       .put(`${environment.apiUrl}${url}`, formData, {
@@ -393,15 +384,6 @@ export class IndividualReceiptService {
     if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
       aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
       return this._decimalPipe.transform(aggregate, '.2-2');
-      // if (isSubTransaction === false) {
-      //   if (memoCode) {
-      //     aggregate = selectedEntityAggregate;
-      //   } else {
-      //     aggregate = amount + selectedEntityAggregate;
-      //   }
-      // } else {
-      //   aggregate = amount + selectedEntityAggregate;
-      // }
     } else if (scheduleAction === ScheduleActions.edit) {
       if (!transactionToEdit) {
         return this._decimalPipe.transform(aggregate, '.2-2');
@@ -442,31 +424,12 @@ export class IndividualReceiptService {
 
             aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
             return this._decimalPipe.transform(aggregate, '.2-2');
-
-            // if (isSubTransaction === false) {
-            //   if (memoCode) {
-            //     aggregate = selectedEntityAggregate;
-            //   } else {
-            //     aggregate = amount + selectedEntityAggregate;
-            //   }
-            // } else {
-            //   aggregate = amount + selectedEntityAggregate;
-            // }
           }
         }
       } else {
         // edit for entity not selected, same as add no entity aggregate to include
         aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
         return this._decimalPipe.transform(aggregate, '.2-2');
-        // if (isSubTransaction === false) {
-        //   if (memoCode) {
-        //     aggregate = selectedEntityAggregate;
-        //   } else {
-        //     aggregate = amount + selectedEntityAggregate;
-        //   }
-        // } else {
-        //   aggregate = amount + selectedEntityAggregate;
-        // }
       }
     } else {
       // some other action
