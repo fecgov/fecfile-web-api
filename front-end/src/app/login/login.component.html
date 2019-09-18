@@ -1,15 +1,15 @@
+<style>
+ @import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i&display=swap&subset=latin-ext');
+</style> 
 <div class="login">
 
   <div class="login-box">
     <form [formGroup]="frm" (ngSubmit)="doSignIn()">
 
       <header>
-        <div class="title">
-            <h1 class="grid-row">               
-                <div class="grid-row__col grid-row__col--6 text-right title-front">{{ titleF }}</div>
-                <div class="grid-row__col grid-row__col--6 text-left title-rear">{{ titleR }}</div>             
-            </h1>
-        </div>
+        <div>
+            <img class="fec-title" src="assets/img/FECtitle.png" draggable="false" alt="FECTitle" />
+        </div>        
       </header>
 
       <div class="grid-row">
@@ -24,7 +24,7 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-row__col grid-row__col--2 title-name text-right">
           <label class="left-text" for="login-committee-id">
             Username
           </label>
@@ -36,7 +36,7 @@
             type="text"
             class="login-committee-id login-input"
             id="login-committee-id"
-            placeholder="Enter Your Username"
+            placeholder="Enter your Username"
             formControlName="commiteeId"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || !committeeIdInputError,
@@ -57,7 +57,7 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-row__col grid-row__col--2 title-name text-right">
           <label class="left-text" for="login-password">
             Password
           </label>
@@ -68,7 +68,7 @@
             [type]="show ? 'text' : 'password'"
             class="login-password login-input"
             id="login-password"
-            placeholder="Enter Your Password"
+            placeholder="Enter your Password"
             formControlName="loginPassword"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('loginPassword').invalid && frm.get('loginPassword').touched) || !passwordInputError,
@@ -86,8 +86,11 @@
           </div>
         </div>
 
-        <div class="grid-row__col grid-row__col--1">
-            <img class="eye-logo" src="assets/img/eye-icon.svg" draggable="false" (click)="showPassword()"/>
+        <div *ngIf="!show" class="grid-row__col grid-row__col--1 text-left">
+            <img class="eye-logo" src="assets/img/eye-icon.svg" draggable="false" (click)="showPassword()"/>            
+        </div>
+        <div *ngIf="show"class="grid-row__col grid-row__col--1 text-left"> 
+            <img class="eye-logo" src="assets/img/eye-icon-red.svg" draggable="false" (click)="showPassword()"/>
         </div>
 
       </div>
@@ -95,26 +98,29 @@
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <button type="submit" class="login__btn" [disabled]="isBusy">
-            <ng-template [ngIf]="!isBusy">Enter</ng-template>
-            <ng-template [ngIf]="isBusy">Logging in, please wait...</ng-template>
+            <ng-template [ngIf]="true">Enter</ng-template>            
           </button>
         </div>
       </div>
 
-      <div class="grid-row form-field__info">
+      <div class="grid-row">
         
-        <div class="row grid-row__col grid-row__col--9 text-right">
-            
+        <div class="grid-row__col grid-row__col--3 link link-text text-right">
+                      
               <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
                   Forgot your Password
               </a>
+        </div>
+        <div class="grid-row__col grid-row__col--1">
               <div class="or-padding"> or </div>
+        </div>
+        <div class="grid-row__col grid-row__col--2 link link-text text-left">
               <a class="forgot-committee-id-link link" draggable="false" href="https://www.fec.gov/data/" target="_blank">
-                  Username
+                  Username?
               </a>           
         </div>
 
-        <div class="grid-row__col grid-row__col--3">
+        <div class="grid-row__col grid-row__col--6">
           <a class="need-to-register-link link" draggable="false" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
            Register
           </a>
