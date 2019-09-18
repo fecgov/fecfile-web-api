@@ -2370,6 +2370,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   }
                 }
               }
+              this._validateTransactionDate();
             }
           }
         }
