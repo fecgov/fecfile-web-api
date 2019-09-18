@@ -46,12 +46,7 @@
   position: relative;
   display: inline-block;
  }
- .flex-wrapper {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  justify-content: space-between
-}
+
 
   // }
   
@@ -103,7 +98,7 @@
   }
   footer {
     background-color: $mineShaft;
-    bottom: 0; 
+    //bottom: 0; 
     position: absolute;
     width: 100%;
     .form-sidebar__item {
