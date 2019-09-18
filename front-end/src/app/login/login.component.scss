@@ -5,8 +5,13 @@
     background-color: #cccccc;
     height: 100%;   
     padding-top: 15px;
-    //background-repeat: no-repeat;
-    //background-size: 100% 100%;
+    //padding-left: 500px;
+    //padding: 25px;
+    background-repeat: no-repeat;
+    //background-size: 100% auto;
+    background-size: 130% auto;
+    background-position: 300px 90px;
+    //background-position: 1% 1%;
     header {
       .logo {
         margin-bottom: 10px;
@@ -112,7 +117,7 @@
             @include make-text-input(650px, 1.5em, 1em, 1em);
           }
           */   
-          @include make-text-input(230px);
+          @include make-text-input(190px);
           @include media(tablet) {
             width: 230px;
           }
@@ -160,7 +165,7 @@
           font-size: 20px;
           font-weight: 700;
           border-radius: 5px;
-          border-style: solid;
+          border-style: solid;          
         }
         .login__btn:hover {
           background-color: #C80505;
