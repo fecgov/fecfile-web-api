@@ -305,9 +305,14 @@
                       </ng-select>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">
-                      <ng-select #entityTypeSelect [items]="entityTypes" (change)="handleEntityTypeChange($event, col)"
-                        class="forms__select entity-type-select" [formControlName]="col?.name" bindValue="entityType"
-                        bindLabel="entityTypeDescription" [ngClass]="
+                      <ng-select #entityTypeSelect 
+                        [items]="entityTypes" 
+                        (change)="handleEntityTypeChange($event, col)"
+                        class="forms__select entity-type-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="entityType"
+                        bindLabel="entityTypeDescription" 
+                        [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                               ? 'forms__select-error'
