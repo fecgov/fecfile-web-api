@@ -1639,6 +1639,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
+    fieldNames.push('beneficiary_cand_id');
 
     this._patchFormFields(fieldNames, entity, namePrefix);
     // for (const field of fieldNames) {
@@ -1739,6 +1740,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('zip_code');
     fieldNames.push('occupation');
     fieldNames.push('employer');
+    fieldNames.push('cand_last_name');
+    fieldNames.push('cand_first_name');
+    fieldNames.push('cand_middle_name');
+    fieldNames.push('cand_suffix');
+    fieldNames.push('cand_prefix');
+    fieldNames.push('cand_office');
+    fieldNames.push('cand_office_state');
+    fieldNames.push('cand_office_district');
     this._patchFormFields(fieldNames, entity, namePrefix);
 
     // These fields names do not map to the same name in the form
