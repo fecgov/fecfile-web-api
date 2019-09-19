@@ -1921,6 +1921,24 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     );
 
   /**
+   * Search for entities when Candidate ID input value changes.
+   */
+  searchCandidateId = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText.length < 3) {
+          return Observable.of([]);
+        } else {
+          const searchTextUpper = searchText.toUpperCase();
+          return this._typeaheadService.getContacts(searchTextUpper, 'cand_id');
+        }
+      })
+    )
+
+
+  /**
    * format the value to display in the input field once selected from the typeahead.
    *
    * For some reason this gets called for all typeahead fields despite the binding in the
