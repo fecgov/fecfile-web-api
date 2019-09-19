@@ -1646,12 +1646,6 @@ def autolookup_search_contacts(request):
                         SELECT json_agg(t) FROM 
                         (SELECT 
                         e.ref_cand_cmte_id as cmte_id,
-                        e.ref_cand_cmte_id as beneficiary_cand_id,
-                        e.preffix as cand_prefix,
-                        e.last_name as cand_last_name,
-                        e.first_name as cand_first_name,
-                        e.middle_name as cand_middle_name,
-                        e.suffix as cand_suffix,
                         e.entity_id,
                         e.entity_type,
                         e.entity_name as cmte_name,
@@ -1671,11 +1665,7 @@ def autolookup_search_contacts(request):
                         e.ref_cand_cmte_id,
                         e.delete_ind,
                         e.create_date,
-                        e.last_update_date,
-                        e.cand_office,
-                        e.cand_office_state,
-                        e.cand_office_district,
-                        e.cand_election_year
+                        e.last_update_date
                         FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
@@ -2165,7 +2155,7 @@ END - STATE API - CORE APP
 """
 ******************************************************************************************************************************
 GET ALL TRASHED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
-REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 744 - BY PRAVEEN JINKA
+REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 74/4 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 @api_view(['POST'])
