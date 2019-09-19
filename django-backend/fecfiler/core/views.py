@@ -4043,34 +4043,38 @@ def trash_restore_report(request):
             else:
                 trash_restore_sql_report(cmte_id, report_id, _delete)
                 result = 'success'
-
-            if result=='success':
-                return Response({"result":"success"}, status=status.HTTP_200_OK)
-            else:   
-                return Response({"result":"failed"}, status=status.HTTP_200_OK)
+        
         except Exception as e:
             return Response("The trash_restore_report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    if result=='success':
+        return Response({"result":"success"}, status=status.HTTP_200_OK)
+    else:   
+        return Response({"result":"failed"}, status=status.HTTP_200_OK)
+    
 
 @api_view(['POST'])
 def delete_trashed_contacts(request):
     try:
-        #import ipdb;ipdb.set_trace()
-        #message_dict = {}
+        """api for trash and restore contact. """
         cmte_id = request.user.username
-        #entity_id = _action.get('id', '')
-        entity_id = request.get('id')
+        print("trash_restore_contact cmte_id = ", cmte_id)
+        print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
+        list_entity_ids="'"
+        for _action in request.data.get('actions', []):
+            entity_id = _action.get('id', '')
+            list_entity_ids = list_entity_ids + str(entity_id) + "','" 
+        print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
+        entity_ids = list_entity_ids[0:len(list_entity_ids)-2]
+        print("delete_trashed_contacts list_entity_ids", entity_ids)    
         with connection.cursor() as cursor:
-             cursor.execute("""DELETE FROM public.entity WHERE cmte_id = %s AND entity_id = %s;""",[cmte_id, entity_id])
+             cursor.execute("""DELETE FROM public.entity WHERE entity_id in (""" + entity_ids + """) AND cmte_id = '""" + cmte_id + """'""")
       
         
-        message = 'contact deleted successfully'
-    except Exception as e:
-        print(e)
-        message = 'Error in deleting the transaction'
-        message_dict[trans_id] = message
-
+        message="success"
         json_result = {'message':message}
         return Response(json_result, status=status.HTTP_201_CREATED)
+
     except Exception as e:
         return Response('The delete_trashed_contacts API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -4217,6 +4221,7 @@ def trash_restore_contact(request):
         return Response({"result":"success"}, status=status.HTTP_200_OK)
     else:   
         return Response({"result":"failed"}, status=status.HTTP_200_OK)
+
 def check_contact_to_delete(cmte_id, entity_id):
     try:
         print("check_contact_to_delete cmte_id = ", cmte_id)

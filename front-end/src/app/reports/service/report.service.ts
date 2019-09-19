@@ -495,7 +495,7 @@ export class ReportsService {
     const actions = [];
     for (const rep of reports) {
       actions.push({
-        transaction_id: rep.report_id
+        id: rep.report_id
       });
     }
     request.actions = actions;
