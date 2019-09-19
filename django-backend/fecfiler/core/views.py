@@ -1577,6 +1577,7 @@ def autolookup_search_contacts(request):
                     SELECT json_agg(t) FROM 
                     (SELECT 
                     e.ref_cand_cmte_id as cmte_id,
+                    e.ref_cand_cmte_id as beneficiary_cand_id,
                     e.preffix as cand_prefix,
                     e.last_name as cand_last_name,
                     e.first_name as cand_first_name,

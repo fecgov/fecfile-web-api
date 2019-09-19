@@ -101,7 +101,8 @@
                                 && !isFieldName(col?.name, 'donor_cmte_id')
                                 && !isFieldName(col?.name, 'donor_cmte_name')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_id')
-                                && !isFieldName(col?.name, 'beneficiary_cmte_name')                                                     
+                                && !isFieldName(col?.name, 'beneficiary_cmte_name') 
+                                && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
@@ -178,7 +179,8 @@
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
-                                  isFieldName(col?.name, 'beneficiary_cmte_id')" class="form-control"
+                                  isFieldName(col?.name, 'beneficiary_cmte_id') ||
+                                  isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
                           [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
                           [formControlName]="col?.name" [ngClass]="
