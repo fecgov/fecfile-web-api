@@ -317,6 +317,18 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     }
     filters.filterTypes = filterTypes;
 
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
+    filters.show = modified;
+
     console.log("filters = ", filters);
     filters.show = modified;
     this._contactsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});

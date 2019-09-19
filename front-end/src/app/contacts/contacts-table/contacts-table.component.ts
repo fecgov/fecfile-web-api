@@ -679,7 +679,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               if (res['result'] === 'success') {
                 this.getContactsPage(this.config.currentPage);
                 this._dialogService.confirm(
-                  'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Success!',
                   false,
@@ -688,7 +688,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               } else
               {
                 this._dialogService.confirm(
-                  'Contact has not been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has not been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Warning!',
                   false,

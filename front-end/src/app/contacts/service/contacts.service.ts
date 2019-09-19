@@ -478,12 +478,12 @@ export class ContactsService {
       const deletedFromDate = new Date(filters.filterDeletedDateFrom);
       const deletedToDate = new Date(filters.filterDeletedDateTo);
       const filteredDeletedDateArray = [];
-      for (const rep of response.reports) {
-        if (rep.deleted_date) {
-          let d = new Date(rep.deleted_date);
+      for (const ctn of response.contacts) {
+        if (ctn.deleteddate) {
+          let d = new Date(ctn.deleteddate);
           d.setUTCHours(0, 0, 0, 0);
-          const repDate = this.getDateMMDDYYYYformat(d);
-          if (repDate >= deletedFromDate && repDate <= deletedToDate) {
+          const ctnDate = this.getDateMMDDYYYYformat(d);
+          if (ctnDate >= deletedFromDate && ctnDate <= deletedToDate) {
             isFilter = true;
           } else {
             isFilter = false;
@@ -491,10 +491,10 @@ export class ContactsService {
         }
 
         if (isFilter) {
-          filteredDeletedDateArray.push(rep);
+          filteredDeletedDateArray.push(ctn);
         }
       }
-      response.reports = filteredDeletedDateArray;
+      response.contacts = filteredDeletedDateArray;
     }
 
     console.log("response.contacts", response.contacts);
