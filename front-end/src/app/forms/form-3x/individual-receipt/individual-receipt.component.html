@@ -8,6 +8,9 @@
 <ng-template #rtCommitteeId let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <ng-template #rtCommitteeName let-r="result" let-t="term">
     <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
 </ng-template>
@@ -191,7 +194,8 @@
                             " id="typeahead-template-committee-id" 
                           [ngbTypeahead]="isFieldName(col?.name, 'beneficiary_cand_id') ? searchCandidateId : searchCommitteeId" 
                           [focusFirst]=false
-                          [resultTemplate]="rtCommitteeId" [inputFormatter]="formatterCommitteeId"
+                          [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
+                          [inputFormatter]="formatterCommitteeId"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
