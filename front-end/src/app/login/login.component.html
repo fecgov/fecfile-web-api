@@ -7,7 +7,7 @@
     <form [formGroup]="frm" (ngSubmit)="doSignIn()">
 
       <header>
-        <div>
+        <div class="text-left offset-1">
             <img class="fec-title" src="assets/img/FECtitle.png" draggable="false" alt="FECTitle" />
         </div>        
       </header>
@@ -96,31 +96,26 @@
       </div>
 
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+        <div class="grid-row__col grid-row__col--12 text-left offset-3">
           <button type="submit" class="login__btn" [disabled]="isBusy">
-            <ng-template [ngIf]="true">Enter</ng-template>            
+            <ng-template [ngIf]="true">Enter</ng-template>
           </button>
         </div>
       </div>
 
       <div class="grid-row">
         
-        <div class="grid-row__col grid-row__col--3 link link-text text-right">
+        <div class="grid-row__col grid-row__col--5 link-text text-center">
                       
               <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
                   Forgot your Password
               </a>
-        </div>
-        <div class="grid-row__col grid-row__col--1">
-              <div class="or-padding"> or </div>
-        </div>
-        <div class="grid-row__col grid-row__col--2 link link-text text-left">
+              or
               <a class="forgot-committee-id-link link" draggable="false" href="https://www.fec.gov/data/" target="_blank">
-                  Username?
-              </a>           
-        </div>
-
-        <div class="grid-row__col grid-row__col--6">
+                Username?
+            </a>   
+        </div>        
+        <div class="grid-row__col grid-row__col--7 link-text">
           <a class="need-to-register-link link" draggable="false" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
            Register
           </a>

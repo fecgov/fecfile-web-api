@@ -9,8 +9,8 @@
     //padding: 25px;
     background-repeat: no-repeat;
     //background-size: 100% auto;
-    background-size: 130% auto;
-    background-position: 300px 90px;
+    background-size: 140% auto; //130% auto;
+    background-position: 330px 1px; //350px 75px;
     //background-position: 1% 1%;
     header {
       .logo {
@@ -43,7 +43,7 @@
   .eye-logo {
     width: 30px;
     height: 30px;
-    color: #112E51;
+    //color: #112E51;
     //margin-top: 2px;
     margin-bottom: 30px;
     cursor: pointer;
@@ -53,7 +53,11 @@
     width: 50%;   
   }
   .link-text {
-    text-align: right;
+    //text-align: right;
+    color: #CA1A0F ;//#C80505;  
+    height: 40px;
+    margin-bottom: 15px;
+    margin-top: 30px;  
   }
   .title-name {
     margin-top: 10px;
@@ -93,14 +97,15 @@
       }
       .grid-row__col {
         padding: 0;
+
         label {          
           font-family: 'Lato-Reg', sans-serif;
           font-size: 20px;
-          color: #164F85;
+          color: #112E51;
         }
         .link {
           font-family: 'Lato-Reg', sans-serif;
-          color: #C80505;
+          color: #CA1A0F;//#C80505;
           top: 150px;
           text-align: right; 
         }
@@ -117,7 +122,7 @@
             @include make-text-input(650px, 1.5em, 1em, 1em);
           }
           */   
-          @include make-text-input(190px);
+          @include make-text-input(90px);
           @include media(tablet) {
             width: 230px;
           }
