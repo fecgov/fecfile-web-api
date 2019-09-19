@@ -1518,6 +1518,8 @@ def autolookup_search_contacts(request):
     cand_last_name --> last_name
     cand_first_name --> first_name
     """
+    logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
+
     allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id'] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
@@ -1572,46 +1574,114 @@ def autolookup_search_contacts(request):
                 #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                 #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
                 #     pass
-                # else:
-                query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT 
-                    e.ref_cand_cmte_id as cmte_id,
-                    e.ref_cand_cmte_id as beneficiary_cand_id,
-                    e.preffix as cand_prefix,
-                    e.last_name as cand_last_name,
-                    e.first_name as cand_first_name,
-                    e.middle_name as cand_middle_name,
-                    e.suffix as cand_suffix,
-                    e.entity_id,
-                    e.entity_type,
-                    e.entity_name as cmte_name,
-                    e.entity_name,
-                    e.first_name,
-                    e.last_name,
-                    e.middle_name,
-                    e.preffix,
-                    e.suffix,
-                    e.street_1,
-                    e.street_2,
-                    e.city,
-                    e.state,
-                    e.zip_code,
-                    e.occupation,
-                    e.employer,
-                    e.ref_cand_cmte_id,
-                    e.delete_ind,
-                    e.create_date,
-                    e.last_update_date,
-                    e.cand_office,
-                    e.cand_office_state,
-                    e.cand_office_district,
-                    e.cand_election_year
-                    FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                # else
+                # 
+                # :
+                # print('haha')
+                # print('cmte-id' in list(request.query_params.items()))
+                if 'cmte_id' in request.query_params:
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as cmte_id,
+                        e.entity_id,
+                        e.entity_type,
+                        e.entity_name as cmte_name,
+                        e.entity_name,
+                        e.first_name,
+                        e.last_name,
+                        e.middle_name,
+                        e.preffix,
+                        e.suffix,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.occupation,
+                        e.employer,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        AND substr(e.ref_cand_cmte_id,1,1)='C'
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                elif (
+                    'cand_id' in request.query_params
+                    or 'cand_first_name' in request.query_params
+                    or 'cand_last_name' in request.query_params
+                    ):
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as beneficiary_cand_id,
+                        e.preffix as cand_prefix,
+                        e.last_name as cand_last_name,
+                        e.first_name as cand_first_name,
+                        e.middle_name as cand_middle_name,
+                        e.suffix as cand_suffix,
+                        e.entity_id,
+                        e.entity_type,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date,
+                        e.cand_office,
+                        e.cand_office_state,
+                        e.cand_office_district,
+                        e.cand_election_year
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                else:
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as cmte_id,
+                        e.ref_cand_cmte_id as beneficiary_cand_id,
+                        e.preffix as cand_prefix,
+                        e.last_name as cand_last_name,
+                        e.first_name as cand_first_name,
+                        e.middle_name as cand_middle_name,
+                        e.suffix as cand_suffix,
+                        e.entity_id,
+                        e.entity_type,
+                        e.entity_name as cmte_name,
+                        e.entity_name,
+                        e.first_name,
+                        e.last_name,
+                        e.middle_name,
+                        e.preffix,
+                        e.suffix,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.occupation,
+                        e.employer,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date,
+                        e.cand_office,
+                        e.cand_office_state,
+                        e.cand_office_district,
+                        e.cand_election_year
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
                 parameters.append(value + '%')
+                # parameters.append('C%')
             # elif key in ['cmte_id', 'cmte_name']:
             #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
             #     query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
@@ -1631,8 +1701,10 @@ def autolookup_search_contacts(request):
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
+            # print('fail..')
             for row in cursor.fetchall():
                 data_row = list(row)
+                # logger.debug('current data row:{}'.format())
                 forms_obj=data_row[0]
         status_value = status.HTTP_200_OK
         if forms_obj is None:
