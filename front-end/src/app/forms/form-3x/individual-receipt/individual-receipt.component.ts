@@ -495,12 +495,14 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     let amountField: string;
     // checking for expenditure_date in form parameter
     // If expenditure_date is not found setting contribution_date and contribution_amount
-    if(this.frmIndividualReceipt.controls['expenditure_date']) {
-      dateField = 'expenditure_date';
-      amountField = 'expenditure_amount';
-    } else {
-      dateField = 'contribution_date';
-      amountField = 'contribution_amount';
+    if(this.frmIndividualReceipt) {
+      if(this.frmIndividualReceipt.controls['expenditure_date']) {
+        dateField = 'expenditure_date';
+        amountField = 'expenditure_amount';
+      } else {
+        dateField = 'contribution_date';
+        amountField = 'contribution_amount';
+      }
     }
 
     this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));

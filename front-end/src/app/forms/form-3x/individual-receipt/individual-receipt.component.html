@@ -47,7 +47,7 @@
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
-      <ng-container *ngFor="let row of formFields; let i = index">
+      <!--<ng-container *ngFor="let row of formFields; let i = index">
         <ng-container *ngIf="titles[i]?.fieldset">
           <div class="subtitle-indv">
             <div [class]="titles[i]?.colClassName">
@@ -55,10 +55,10 @@
             </div>
           </div>
 
-        </ng-container>
+        </ng-container>-->
         <ng-container *ngFor="let row of formFields; let i = index">
           <ng-container *ngIf="titles[i]?.fieldset">
-            <div class="row">
+            <div class="subtitle-indv">
               <div [class]="titles[i]?.colClassName">
                 {{ titles[i]?.label }}
               </div>
@@ -372,7 +372,7 @@
             </div>
           </div>
         </div>
-      </ng-container>
+      <!--</ng-container>-->
     </section>
     <footer>
       <footer>
