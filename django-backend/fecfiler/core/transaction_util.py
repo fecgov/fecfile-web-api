@@ -96,6 +96,8 @@ def get_line_number_trans_type(transaction_type_identifier):
             list_value = trans_dic.get(transaction_type_identifier)
             line_number = list_value[0]
             transaction_type = list_value[1]
+            if transaction_type is None:
+                transaction_type = 0
             return line_number, transaction_type
         else:
             raise Exception(

@@ -5,6 +5,7 @@ import os
 from decimal import Decimal
 
 import requests
+import copy
 from functools import lru_cache
 from django.conf import settings
 from django.db import connection
@@ -29,7 +30,8 @@ from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB,
-                                    put_sql_agg_amount_schedB, get_list_child_transactionId_schedB)
+                                    put_sql_agg_amount_schedB, get_list_child_transactionId_schedB,
+                                    delete_sql_schedB)
 
 
 # Create your views here.
@@ -99,7 +101,6 @@ SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
 AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_REC" : "IK_OUT",
                                     "IK_BC_REC" : "IK_BC_OUT",
-                                    "REATT_FROM" : "REATT_MEMO",
                                     #"CON_EAR_DEP" : "CON_EAR_DEP_MEMO",
                                     # "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
                                     "PARTY_IK_REC" : "PARTY_IK_OUT",
@@ -112,6 +113,12 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
                                     "IK_TRAN_FEA" : "IK_TRAN_FEA_OUT"
 }
 
+#list of all transaction type identifiers that should auto generate sched_b item in DB
+AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {
+                                    "REATT_FROM" : "REATT_MEMO",
+}
+
+CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT = {"REATT_MEMO": "REATT_FROM"}
 # list of all transaction type identifiers that have itemization rule applied to it
 # TODO: need to update this list: PAR_CON?, PAR_MEMO?, REATT_TO?
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
@@ -282,8 +289,7 @@ def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_t
                                 FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [report_id, cmte_id])           
- 
+                           query_string + """) t""", [report_id, cmte_id])
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:
                 raise NoOPError(
@@ -455,9 +461,7 @@ ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_t
             # cursor.execute("""SELECT COALESCE(SUM(contribution_amount),0) FROM public.sched_a WHERE entity_id = %s AND transaction_type_identifier = %s 
             # AND cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct FROM 'Y'""", [
             #                entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
-            # print(cursor.query)
             result = cursor.fetchone()
-            # print(result)
         if result is None:
           aggregate_amt = 0
         elif result[0] is None:
@@ -522,6 +526,25 @@ def get_linenumber_itemization(transaction_type_identifier, aggregate_amount, it
     except Exception as e:
         raise Exception('The get_linenumber_itemization function is throwing an error: ' + str(e))
 
+def put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount):
+    """
+    update aggregate amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE public.sched_a SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                [aggregate_amount, transaction_id, cmte_id],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "put_sql_agg_amount_schedA function: The Transaction ID: {} does not exist in schedA table".format(
+                        transaction_id
+                    )
+                )
+    except Exception:
+        raise
+
 def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type_identifier, entity_id, cmte_id, report_id):
     """
     helper function for updating private contribution line number based on aggrgate amount
@@ -540,7 +563,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
 
     """
     try:
-        child_flag = False
+        child_flag_SB = False
+        child_flag_SA = False
         itemization_value = 200
         # itemized_transaction_list = []
         # unitemized_transaction_list = []
@@ -549,9 +573,13 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             contribution_date = date_format(contribution_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(form_type, contribution_date)
         # checking for child tranaction identifer for updating auto generated SB transactions
-        if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
-            child_flag = True
+        if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
+            child_flag_SB = True
             child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
+        # checking for child tranaction identifer for updating auto generated SA transactions
+        if transaction_type_identifier in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
+            child_flag_SA = True
+            child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
@@ -569,8 +597,14 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                     line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
                     put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
                     
+                #Updating aggregate amount to child auto generate sched A transactions
+                if child_flag_SA:
+                    child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
+                    get_list_child_transactionId_schedB(cmte_id, transaction[1])
+                    for child_SA_transaction in child_SA_transaction_list:
+                        put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
                 #Updating aggregate amount to child auto generate sched B transactions
-                if child_flag:
+                if child_flag_SB:
                     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
                     for child_SB_transaction in child_SB_transaction_list:
                         put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
@@ -603,8 +637,6 @@ def post_schedA(datum):
     try:
         # save entities first
         if 'entity_id' in datum:
-            # print('entity_id passed:{}'.format(datum.get('entity_id')))
-            # print(datum.get('cmte_id'))
             get_data = {
                 'cmte_id': datum.get('cmte_id'),
                 'entity_id': datum.get('entity_id')
@@ -622,7 +654,6 @@ def post_schedA(datum):
 
         # continue to save transaction
         entity_id = entity_data.get('entity_id')
-        # print('post_scheda {}'.format(entity_id))
         datum['entity_id'] = entity_id
         trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -638,6 +669,13 @@ def post_schedA(datum):
                         child_datum['beneficiary_cmte_id'] = None
                         child_datum['other_name'] = None
                     child_data = post_schedB(child_datum)
+                elif datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
+                    child_datum = copy.deepcopy(datum)
+                    child_datum['back_ref_transaction_id'] = datum.get('transaction_id')
+                    child_datum['purpose_description'] = "In-Kind #" + transaction_id
+                    child_datum['transaction_type_identifier'] = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(datum.get('transaction_type_identifier'))
+                    child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(child_datum.get('transaction_type_identifier'))
+                    child_data = post_schedA(child_datum)
                 elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT:
                     check_mandatory_fields_SA(datum, MANDATORY_CHILD_FIELDS_SCHED_A)
                     child_datum = child_SA_to_parent_schedA_dict(datum)
@@ -754,7 +792,7 @@ def put_schedA(datum):
             put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
                 'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
-                if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
+                if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
@@ -767,12 +805,38 @@ def put_schedA(datum):
                         # post_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), child_line_number, child_transaction_type, child_transaction_id, transaction_id, datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), '0.00', expenditure_purpose, None, None, None, datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), None, datum.get('donor_cmte_name'), None, None, None, None, None, None, child_transaction_type_identifier)
                     else:
                         child_datum['transaction_id'] = child_transaction_id
-                        child_data = put_schedB(child_datum)
+                        put_sql_schedB(child_datum.get("cmte_id"), child_datum.get("report_id"), child_datum.get("line_number"), child_datum.get("transaction_type"), child_datum.get("transaction_id"),
+                        child_datum.get("back_ref_transaction_id"), child_datum.get("back_ref_sched_name"), child_datum.get("entity_id"), child_datum.get("expenditure_date"), child_datum.get("expenditure_amount"),
+                        child_datum.get("semi_annual_refund_bundled_amount"), child_datum.get("expenditure_purpose"), child_datum.get("category_code"), child_datum.get("memo_code"), child_datum.get("memo_text"),
+                        child_datum.get("election_code"), child_datum.get("election_other_description"), child_datum.get("beneficiary_cmte_id"), child_datum.get("beneficiary_cand_id"), child_datum.get("other_name"),
+                        child_datum.get("other_street_1"), child_datum.get("other_street_2"), child_datum.get("other_city"), child_datum.get("other_state"), child_datum.get("other_zip"), child_datum.get("nc_soft_account"),
+                        child_datum.get("transaction_type_identifier"), child_datum.get("beneficiary_cand_office"), child_datum.get("beneficiary_cand_state"), child_datum.get("beneficiary_cand_district"),
+                        child_datum.get("beneficiary_cmte_name"), child_datum.get("beneficiary_cand_last_name"), child_datum.get("beneficiary_cand_first_name"), child_datum.get("beneficiary_cand_middle_name"),
+                        child_datum.get("beneficiary_cand_prefix"), child_datum.get("beneficiary_cand_suffix"), child_datum.get("aggregate_amt"), child_datum.get("beneficiary_cand_entity_id"))
                         # put_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), child_line_number, child_transaction_type, child_transaction_id, transaction_id, datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), '0.00', expenditure_purpose, None, None, None, datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), None, datum.get('donor_cmte_name'), None, None, None, None, None, None, child_transaction_type_identifier)
                     child_SA_transaction_id = get_child_transaction_schedA(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
                     if child_SA_transaction_id is not None:
                         delete_sql_schedA(child_SA_transaction_id, datum.get('report_id'), datum.get('cmte_id'))
-                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT.keys():
+                elif datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
+                    child_datum = copy.deepcopy(datum)
+                    child_datum['transaction_type_identifier'] = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(datum.get('transaction_type_identifier'))
+                    child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(
+                        child_datum.get('transaction_type_identifier'))
+                    child_datum['back_ref_transaction_id'] = transaction_id
+                    child_datum['purpose_description'] = "In-Kind #" + transaction_id
+                    child_transaction_id = get_child_transaction_schedA(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
+                    if child_transaction_id is None:
+                        child_data = post_schedA(child_datum)
+                        # child_transaction_id = get_next_transaction_id("SB")
+                        # post_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), child_line_number, child_transaction_type, child_transaction_id, transaction_id, datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), '0.00', expenditure_purpose, None, None, None, datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), None, datum.get('donor_cmte_name'), None, None, None, None, None, None, child_transaction_type_identifier)
+                    else:
+                        child_datum['transaction_id'] = child_transaction_id
+                        put_sql_schedA(child_datum.get('cmte_id'), child_datum.get('report_id'), child_datum.get('line_number'), child_datum.get('transaction_type'), child_datum.get('transaction_id'), child_datum.get('back_ref_transaction_id'), child_datum.get('back_ref_sched_name'), entity_id, child_datum.get('contribution_date'), child_datum.get(
+                        'contribution_amount'), child_datum.get('purpose_description'), child_datum.get('memo_code'), child_datum.get('memo_text'), child_datum.get('election_code'), child_datum.get('election_other_description'), child_datum.get('donor_cmte_id'), child_datum.get('donor_cmte_name'), child_datum.get('transaction_type_identifier'))
+                    child_SB_transaction_id = get_child_transaction_schedB(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
+                    if child_SB_transaction_id is not None:
+                        delete_sql_schedB(child_SB_transaction_id, datum.get('report_id'), datum.get('cmte_id'))
+                elif datum.get('transaction_type_identifier') in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT:
                     child_datum = child_SA_to_parent_schedA_dict(datum)
                     check_mandatory_fields_SA(datum, MANDATORY_CHILD_FIELDS_SCHED_A)
                     child_transaction_id = get_child_transaction_schedA(datum.get('cmte_id'), datum.get('report_id'), transaction_id)
@@ -807,6 +871,19 @@ def put_schedA(datum):
                             child_data = put_schedB(child_datum)
                     else:
                         child_data = put_schedB(child_datum)
+                elif datum.get('transaction_type_identifier') in CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT:
+                    child_datum = copy.deepcopy(datum)
+                    child_datum['transaction_id'] = child_datum.get('back_ref_transaction_id')
+                    transaction_data = get_schedA(child_datum)[0]
+                    transaction_data['entity_id'] = entity_id 
+                    transaction_data['contribution_date'] = child_datum.get('contribution_date') 
+                    transaction_data['contribution_amount'] = child_datum.get('contribution_amount')
+                    transaction_data['election_code'] = child_datum.get('election_code')
+                    transaction_data['election_other_description'] = child_datum.get('election_other_description')
+                    transaction_data['donor_cmte_id'] = child_datum.get('donor_cmte_id')
+                    transaction_data['donor_cmte_name'] = child_datum.get('donor_cmte_name')
+                    put_sql_schedA(transaction_data.get('cmte_id'), transaction_data.get('report_id'), transaction_data.get('line_number'), transaction_data.get('transaction_type'), transaction_data.get('transaction_id'), transaction_data.get('back_ref_transaction_id'), transaction_data.get('back_ref_sched_name'), entity_id, transaction_data.get('contribution_date'), transaction_data.get(
+                    'contribution_amount'), transaction_data.get('purpose_description'), transaction_data.get('memo_code'), transaction_data.get('memo_text'), transaction_data.get('election_code'), transaction_data.get('election_other_description'), transaction_data.get('donor_cmte_id'), transaction_data.get('donor_cmte_name'), transaction_data.get('transaction_type_identifier'))
             except:
                 put_sql_schedA(prev_transaction_data.get('cmte_id'), prev_transaction_data.get('report_id'), prev_transaction_data.get('line_number'), prev_transaction_data.get('transaction_type'), transaction_id, prev_transaction_data.get('back_ref_transaction_id'), prev_transaction_data.get('back_ref_sched_name'), entity_id, prev_transaction_data.get('contribution_date'), prev_transaction_data.get(
                 'contribution_amount'), prev_transaction_data.get('purpose_description'), prev_transaction_data.get('memo_code'), prev_transaction_data.get('memo_text'), prev_transaction_data.get('election_code'), prev_transaction_data.get('election_other_description'), prev_transaction_data.get('donor_cmte_id'), prev_transaction_data.get('donor_cmte_name'), prev_transaction_data.get('transaction_type_identifier'))
@@ -1321,7 +1398,6 @@ def trash_restore_transactions(request):
     for _action in request.data.get('actions', []):
         report_id = _action.get('report_id', '')
         transaction_id = _action.get('transaction_id', '')
-        # print(transaction_id[0:2])
         cmte_id = request.user.username
 
         action = _action.get('action', '')
