@@ -754,18 +754,22 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     //   beforeMessage = 'Are you sure you want to permanently delete these contacts?';
     // }
 
+    let cntIds = '';
     const selectedContacts: Array<ContactModel> = [];
     for (const ctn of this.contactsModel) {
       if (ctn.selected) {
         selectedContacts.push(ctn);
+        cntIds += ctn.id + ', ';
       }
     }
+
+    cntIds = cntIds.substr(0, cntIds.length - 2);
 
     if (selectedContacts.length === 1) {
       beforeMessage = 'Are you sure you want to permanently delete Contact ' +
         selectedContacts[0].id + '?';
     } else {
-      beforeMessage = 'Are you sure you want to permanently delete these contacts?';
+      beforeMessage = 'Are you sure you want to permanently delete these contacts?' + cntIds;
     }
 
     this._dialogService
@@ -782,7 +786,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               if (selectedContacts.length === 1) {
                   afterMessage = `Contact ${selectedContacts[0].id} has been successfully deleted`;
               } else {
-                afterMessage = 'Contacts have been successfully deleted.';
+                afterMessage = 'Contacts have been successfully deleted.'+ cntIds;
               }
               this._dialogService
                 .confirm(afterMessage,

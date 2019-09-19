@@ -188,7 +188,9 @@
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                                 ? 'input-field-error'
                                 : ''
-                            " id="typeahead-template-committee-id" [ngbTypeahead]="searchCommitteeId" [focusFirst]=false
+                            " id="typeahead-template-committee-id" 
+                          [ngbTypeahead]="isFieldName(col?.name, 'beneficiary_cand_id') ? searchCandidateId : searchCommitteeId" 
+                          [focusFirst]=false
                           [resultTemplate]="rtCommitteeId" [inputFormatter]="formatterCommitteeId"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
