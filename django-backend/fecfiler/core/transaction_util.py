@@ -189,6 +189,7 @@ def get_sched_b_transactions(
                                         other_street_2, other_city, other_state, other_zip, 
                                         nc_soft_account, transaction_type_identifier, 
                                         beneficiary_cmte_name,
+                                        beneficiary_cand_entity_id,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id = %s 
@@ -208,6 +209,7 @@ def get_sched_b_transactions(
                         beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
+                        beneficiary_cand_entity_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -228,6 +230,7 @@ def get_sched_b_transactions(
                         beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
+                        beneficiary_cand_entity_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -252,6 +255,11 @@ def candify_it(cand_json):
     for _f in cand_json:
         if _f == "entity_id":
             candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+        elif _f == "ref_cand_cmte_id":
+            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
+            candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
+        elif _f in ["occupation", "employer"]:
+            continue
         elif not _f.startswith("cand"):
             candify_item["cand_" + _f] = cand_json.get(_f)
         else:
