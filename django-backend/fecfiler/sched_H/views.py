@@ -19,8 +19,12 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+)
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
+
 
 
 # Create your views here.
@@ -66,7 +70,11 @@ def schedH1_sql_dict(data):
             'public_communications',
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_h1_fields}
+        # return {k: v for k, v in data.items() if k in valid_h1_fields}
+        datum = {k: v for k, v in data.items() if k in valid_h1_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
     except:
         raise Exception('invalid h1 request data.')
 
@@ -108,7 +116,7 @@ def put_sql_schedH1(data):
               AND delete_ind is distinct from 'Y';
         """
     _v = (  
-            data.get('line_number')
+            data.get('line_number'),
             data.get('transaction_type_identifier'),
             data.get('transaction_type'),
             data.get('presidential_only'),
@@ -161,7 +169,7 @@ def post_sql_schedH1(data):
         INSERT INTO public.sched_h1 (
             cmte_id,
             report_id,
-            kine_number,
+            line_number,
             transaction_type_identifier,
             transaction_type,
             transaction_id,
@@ -479,7 +487,11 @@ def schedH2_sql_dict(data):
         "non_federal_percent",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_h2_fields}
+        # return {k: v for k, v in data.items() if k in valid_h2_fields}
+        datum = {k: v for k, v in data.items() if k in valid_h2_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
     except:
         raise Exception('invalid h1 request data.')
 
@@ -518,7 +530,7 @@ def put_sql_schedH2(data):
             AND delete_ind is distinct from 'Y';
         """
     _v = (  
-            data.get('line_number')
+            data.get('line_number'),
             data.get('transaction_type_identifier'),
             data.get('transaction_type'),
             data.get('activity_event_name'),
@@ -847,21 +859,9 @@ def schedH2(request):
         raise NotImplementedError
 
 
-
-
-
 """
 SCHED_H3
 """
-
-def check_mandatory_fields_SH3(data):
-    """
-
-
-"""
-SCHED_H3
-"""
-
 def check_mandatory_fields_SH3(data):
     """
     validate mandatory fields for sched_H3 item
