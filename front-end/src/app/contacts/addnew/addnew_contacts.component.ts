@@ -106,11 +106,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
       this.populateFormForEditOrView(message);
       console.log(' Here Got form fieds...');
-      this.getFormFields();
+      //this.getFormFields();
     });
 
     this._loadFormFieldsSubscription = this._contactsMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      this.getFormFields();
+      //this.getFormFields();
     });
   }
 
@@ -449,7 +449,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   
-  public handleTypeChange(entityOption: any, col: any) {
+  /*public handleTypeChange(entityOption: any, col: any) {
     console.log("handleTypeChange entityOption", entityOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
@@ -471,9 +471,20 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       }
      
     }
-  }
+  }*/
 
-  
+  public handleTypeChange(entityOption: any, col: any) {
+    console.log('handleTypeChange entityOption', entityOption);
+    this._entityType = entityOption.code;
+    if (this._selectedEntity) {
+      // this.showWarn(col.text);
+      this.frmContact.patchValue({ entityType: this._selectedEntity.entityType }, { onlySelf: true });
+    } else {
+      this._entityType = entityOption.code;
+      this.loadDynamiceFormFields();
+      this.frmContact.patchValue({ entityType: entityOption.code }, { onlySelf: true });
+    }
+  }
 
 
   /**

@@ -267,10 +267,13 @@
                 </ng-container>
                 
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'entityType'">
-                  <ng-select
+                  <ng-select #entityTypeSelect
+                    [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
                     class="state-select"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -278,11 +281,8 @@
                         : ''
                     "
                   >
-                    <ng-option *ngFor="let item3 of entityTypes" [ngValue]="item3">
-                      {{ item3.code }} - {{ item3.name }}
-                    </ng-option>
                   </ng-select>
-                </ng-container>                
+                </ng-container>     
               </div>
             </div>
             <!-- ./col -->
