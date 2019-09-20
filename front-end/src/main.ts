@@ -14,6 +14,7 @@ platformBrowserDynamic().bootstrapModule(AppModule)
 
 
 
+
 document.write(' \
 <script type="text/javascript"> \
   (function() { \
@@ -24,4 +25,4 @@ document.write(' \
     var x = document.getElementsByTagName(\'script\')[0]; \
     x.parentNode.insertBefore(s, x); \
   })(); \
-</script>')
+</script>');
