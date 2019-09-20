@@ -1558,7 +1558,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.loan_intrest_rate, ''0.0'') AS "loanInterestRate",
                     COALESCE(t1.is_loan_secured, '''') AS "isLoanSecured",
                     COALESCE(t1.lender_cmte_id, '''') AS "lenderCommitteeId",
-                    COALESCE(t1.lender_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.lender_cand_id, '''') AS "lenderCandidateId",
                     COALESCE(t1.lender_cand_last_name, '''') AS "lenderCandidateLastName",
                     COALESCE(t1.lender_cand_first_name, '''') AS "lenderCandidateFirstName",
                     COALESCE(t1.lender_cand_middle_name, '''') AS "lenderCandidateMiddleName",
@@ -1574,10 +1574,14 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
+                    # LOANS_OWED_BY_CMTE_STRING += """
+                    # INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    # VALUES ('F3X', 'SC', '{0}', '{1}');\n
+                    # """.format(tran, query)
                     LOANS_OWED_BY_CMTE_STRING += """
-                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SC', '{0}', '{1}');\n
-                    """.format(tran, query)
+                    UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                    AND form_type = '{2}' AND sched_type = '{3}';\n
+                    """.format(query, tran, 'F3X', 'SC')
 
                 List_SC_similar_LOANS_OWED_TO_CMTE = ['LOANS_OWED_TO_CMTE']
                 LOANS_OWED_TO_CMTE_STRING = ""
@@ -1596,7 +1600,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.loan_intrest_rate, ''0.0'') AS "loanInterestRate",
                     COALESCE(t1.is_loan_secured, '''') AS "isLoanSecured",
                     COALESCE(t1.lender_cmte_id, '''') AS "lenderCommitteeId",
-                    COALESCE(t1.lender_cand_id, '''') AS "candidateId",
+                    COALESCE(t1.lender_cand_id, '''') AS "lenderCandidateId",
                     COALESCE(t1.lender_cand_last_name, '''') AS "lenderCandidateLastName",
                     COALESCE(t1.lender_cand_first_name, '''') AS "lenderCandidateFirstName",
                     COALESCE(t1.lender_cand_middle_name, '''') AS "lenderCandidateMiddleName",
@@ -1611,10 +1615,14 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
 
+                    # LOANS_OWED_TO_CMTE_STRING += """
+                    # INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    # VALUES ('F3X', 'SC', '{0}', '{1}');\n
+                    # """.format(tran, query)
                     LOANS_OWED_TO_CMTE_STRING += """
-                    INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
-                    VALUES ('F3X', 'SC', '{0}', '{1}');\n
-                    """.format(tran, query)
+                    UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                    AND form_type = '{2}' AND sched_type = '{3}';\n
+                    """.format(query, tran, 'F3X', 'SC')
 
                 List_SA_SC_similar_LOAN_FROM_IND = ['LOAN_FROM_IND']
                 SA_LOAN_FROM_IND_STRING = ""
