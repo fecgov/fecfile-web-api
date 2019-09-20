@@ -187,18 +187,10 @@ def get_sched_b_transactions(
                                         semi_annual_refund_bundled_amount, expenditure_purpose, 
                                         category_code, memo_code, memo_text, election_code, 
                                         election_other_description, beneficiary_cmte_id, 
-                                        beneficiary_cand_id, other_name, other_street_1, 
+                                        other_name, other_street_1, 
                                         other_street_2, other_city, other_state, other_zip, 
                                         nc_soft_account, transaction_type_identifier, 
-                                        beneficiary_cand_office,
-                                        beneficiary_cand_state,
-                                        beneficiary_cand_district,
                                         beneficiary_cmte_name,
-                                        beneficiary_cand_last_name,
-                                        beneficiary_cand_first_name,
-                                        beneficiary_cand_middle_name,
-                                        beneficiary_cand_prefix,
-                                        beneficiary_cand_suffix,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id = %s 
@@ -215,17 +207,9 @@ def get_sched_b_transactions(
                 SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                         back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
                         expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
-                        beneficiary_cand_office,
-                        beneficiary_cand_state,
-                        beneficiary_cand_district,
                         beneficiary_cmte_name,
-                        beneficiary_cand_last_name,
-                        beneficiary_cand_first_name,
-                        beneficiary_cand_middle_name,
-                        beneficiary_cand_prefix,
-                        beneficiary_cand_suffix,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -243,17 +227,9 @@ def get_sched_b_transactions(
                 SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                         back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
                         expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
-                        beneficiary_cand_office,
-                        beneficiary_cand_state,
-                        beneficiary_cand_district,
                         beneficiary_cmte_name,
-                        beneficiary_cand_last_name,
-                        beneficiary_cand_first_name,
-                        beneficiary_cand_middle_name,
-                        beneficiary_cand_prefix,
-                        beneficiary_cand_suffix,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -268,6 +244,21 @@ def get_sched_b_transactions(
             return post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id)
     except Exception:
         raise
+
+
+def candify_it(cand_json):
+    """
+    a helper function to add 'cand_' to cand_entity fields
+    """
+    candify_item = {}
+    for _f in cand_json:
+        if _f == "entity_id":
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+        elif not _f.startswith("cand"):
+            candify_item["cand_" + _f] = cand_json.get(_f)
+        else:
+            candify_item[_f] = cand_json.get(_f)
+    return candify_item
 
 
 def post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id):
@@ -291,6 +282,15 @@ def post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id):
         data = {"entity_id": entity_id, "cmte_id": cmte_id}
         entity_list = get_entities(data)
         dictEntity = entity_list[0]
-        merged_dict = {**item, **dictEntity}
+        cand_entity = {}
+        if item.get("beneficiary_cand_entity_id"):
+            cand_data = {
+                "entity_id": item.get("beneficiary_cand_entity_id"),
+                "cmte_id": cmte_id,
+            }
+            cand_entity = get_entities(cand_data)[0]
+            cand_entity = candify_it(cand_entity)
+
+        merged_dict = {**item, **dictEntity, **cand_entity}
         merged_list.append(merged_dict)
     return merged_list
