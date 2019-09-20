@@ -3721,7 +3721,7 @@ def contact_sql_dict(data):
           'cand_office_state'  : is_null(data.get('officeState')), 
           'cand_office_district'  : is_null(data.get('district')), 
           'ref_cand_cmte_id'  : is_null(data.get('ref_cand_cmte_id')), 
-          'phone_number'  : is_null(data.get('phone_number')), 
+          'phone_number'  : is_null(data.get('phone_number'),'phone_number'), 
         }
 
         return datum
@@ -3854,8 +3854,11 @@ def get_list_contact(cmte_id, entity_id = None):
     except Exception:
         raise
 
-def is_null(check_value):
-    if check_value == None or check_value in ["null", " ", "", "none","Null"]:
+def is_null(check_value, check_field =""):
+    # if phone_nmumber is numeric field so pass 0 as default 
+    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null"]):
+        return None
+    elif check_value == None or check_value in ["null", " ", "", "none","Null"]:
         return ""
     else:
         return check_value
