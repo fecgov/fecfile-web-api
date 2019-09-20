@@ -750,9 +750,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
               }
             }
 
-            if (res.data.hasOwnProperty('entityTypes')) {
-              if (Array.isArray(res.data.entityTypes)) {
-                this.entityTypes = res.data.entityTypes;
+            if (res.data.hasOwnProperty('addEntityTypes')) {
+              if (Array.isArray(res.data.addEntityTypes)) {
+                this.entityTypes = res.data.addEntityTypes;
               }
             }
 

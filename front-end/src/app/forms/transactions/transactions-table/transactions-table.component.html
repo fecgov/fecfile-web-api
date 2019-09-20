@@ -154,7 +154,7 @@
           <td style="padding-left: 1.5rem;">
             <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>

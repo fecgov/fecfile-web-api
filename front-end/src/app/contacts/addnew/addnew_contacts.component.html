@@ -270,7 +270,9 @@
                   <ng-select #entityTypeSelect
                     [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
-                    class="state-select"
+                    
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
                     bindValue="code"
                     bindLabel="name" 
