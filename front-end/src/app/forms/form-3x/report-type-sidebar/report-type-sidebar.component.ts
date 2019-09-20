@@ -61,7 +61,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.selectedReport.hasOwnProperty('report_type')) {
+    if (this.selectedReport && this.selectedReport.hasOwnProperty('report_type')) {
       if (typeof this.selectedReport.report_type === 'string') {
         if (this._previousReportSelected === null) {
           this._previousReportSelected = this.selectedReport.report_type;

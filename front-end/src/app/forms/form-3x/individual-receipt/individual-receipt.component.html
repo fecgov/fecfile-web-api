@@ -195,7 +195,7 @@
                           [ngbTypeahead]="isFieldName(col?.name, 'beneficiary_cand_id') ? searchCandidateId : searchCommitteeId" 
                           [focusFirst]=false
                           [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
-                          [inputFormatter]="formatterCommitteeId"
+                          [inputFormatter]="isFieldName(col?.name, 'beneficiary_cand_id') ? formatterCandidateId: formatterCommitteeId"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"

@@ -219,10 +219,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.frmIndividualReceipt = this._fb.group({});
-    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-      Validators.required
-    ]);
+    // added check to avoid script error
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+    }
   }
 
   /**
@@ -254,10 +257,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   public ngOnChanges() {
     this._prepareForm();
-    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-      Validators.required
-    ]);
+    // added check to avoid script error
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+    }
   }
 
   private _prepareForm() {
@@ -1583,6 +1589,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCandidateId(result: any) {
+    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
     const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
     const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
     let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
@@ -1598,7 +1605,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
     const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
 
-    return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
+    return `${candidateId}, ${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
   }
 
   /**
@@ -1620,12 +1627,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCandidate(result: any) {
-    const street1 = result.street_1 ? result.street_1.trim() : '';
-    const street2 = result.street_2 ? result.street_2.trim() : '';
     const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
     const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
 
-    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
+    return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
   }
 
   /**
@@ -1664,8 +1681,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
     fieldNames.push('beneficiary_cand_id');
-
     this._patchFormFields(fieldNames, entity, namePrefix);
+    // setting Beneficiary Candidate Entity Id to hidden variable
+    const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
+    if (beneficiaryCandEntityIdHiddenField) {
+      beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
+    }
     // for (const field of fieldNames) {
     //   const patch = {};
     //   patch[namePrefix + field] = entity[field];
@@ -1773,7 +1794,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
     this._patchFormFields(fieldNames, entity, namePrefix);
-
+    // setting Beneficiary Candidate Entity Id to hidden variable
+    const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
+    if (beneficiaryCandEntityIdHiddenField) {
+      beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
+    }
     // These fields names do not map to the same name in the form
     const fieldName = col.name;
     if (isChildForm) {
@@ -2051,6 +2076,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       return x;
     }
   };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the Candidate ID field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandidateId = (x: { beneficiary_cand_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.beneficiary_cand_id;
+    } else {
+      return x;
+    }
+  }
 
   /**
    * format the value to display in the input field once selected from the typeahead.
