@@ -121,7 +121,7 @@ export class AppLayoutComponent implements OnInit {
     localStorage.removeItem('Reports.view');
 
     this._step = this._activatedRoute.snapshot.queryParams.step;
-
+    let formInfo: any ='';
     if (route === '/dashboard') {
       /**
        * Fix this issue with the sidenar on the dashboard.
@@ -132,9 +132,12 @@ export class AppLayoutComponent implements OnInit {
       this.showFormDueDate = false;
     } else if (route.indexOf('/forms/form/3X') === 0 || route.indexOf('/forms/transactions/3X') === 0 || route.indexOf('/signandSubmit') === 0 ) {
       if (localStorage.getItem('form_3X_report_type') !== null) {
-        const formInfo: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+         formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
+      } else if (localStorage.getItem('form_3X_report_type_backup') !== null) {
+          formInfo = JSON.parse(localStorage.getItem('form_3X_report_type_backup'));
+      }
 
-        if (typeof formInfo === 'object') {
+      if (typeof formInfo === 'object') {
           if (formInfo.hasOwnProperty('formType')) {
             this.formType = formInfo.formType;
           } else if (formInfo.hasOwnProperty('formtype')) {
@@ -150,6 +153,7 @@ export class AppLayoutComponent implements OnInit {
           if (formInfo.hasOwnProperty('cvgStartDate')) {
             this.formStartDate = formInfo.cvgStartDate;
           } else if (formInfo.hasOwnProperty('cvgstartdate')) {
+
             this.formStartDate = formInfo.cvgstartdate;
           }
 
@@ -180,12 +184,11 @@ export class AppLayoutComponent implements OnInit {
           } else {
             this.showFormDueDate = false;
           }
-        }
-      }
-    } else {
+      }else {
       this.showFormDueDate = false;
-    }
+      }
   }
+}
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.
    */

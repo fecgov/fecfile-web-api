@@ -4,6 +4,38 @@ from django.db import connection
 from fecfiler.core.views import get_entities, NoOPError
 
 
+def update_parent_purpose(data):
+    """
+    for earmark transaction only:
+    when a earmark child transactions is added or updated,
+    the child entity_name should be update in parents 
+    'purpose_description' field
+    """
+    parent_tran_id = data.get("back_ref_transaction_id")
+    cmte_id = data.get("cmte_id")
+    report_id = data.get("report_id")
+    entity_name = data.get("entity_name")
+    purpose = "Earmark for " + entity_name
+    _sql = """
+    UPDATE public.sched_a 
+    SET purpose_description = %s 
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedA table
+            cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "update parent purpose failed for transaction {}".format(
+                        parent_tran_id
+                    )
+                )
+    except Exception:
+        raise
+
+
 def transaction_exists(tran_id, sched_type):
     """
     check if a transaction of specific type exists

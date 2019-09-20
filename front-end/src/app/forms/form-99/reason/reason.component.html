@@ -259,15 +259,9 @@
                   </span>
                 </button>
               </div>
-              <div
-                class="editor"
-                contenteditable="true"
-                placeholder="Enter text here..."
-                role="textarea"
-                (input)="editorChange($event)"
-                (paste)="removeHTML($event)"
-                #htmlEditor
-              ></div>
+              <div class="editor" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
+                  role="textarea" [textContent]="textAreaTextContent" (input)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor> 
+              </div>
             </div>
           </div>
         </div>

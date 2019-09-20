@@ -1,11 +1,15 @@
 import { Component, EventEmitter, ElementRef, HostListener, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { ValidateComponent } from '../../../shared/partials/validate/validate.component';
-
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 @Component({
   selector: 'f99-type',
   templateUrl: './type.component.html',
@@ -18,6 +22,7 @@ export class TypeComponent implements OnInit {
   @ViewChild('mswCollapse') mswCollapse;
 
   public frmType: FormGroup;
+  public editMode: boolean;
   public typeSelected: string = '';
   public isValidType: boolean = false;
   public typeFailed: boolean = false;
@@ -32,7 +37,9 @@ export class TypeComponent implements OnInit {
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _activatedRoute: ActivatedRoute,
+    private _dialogService: DialogService
   ) {
     this._messageService.clearMessage();
   }
@@ -41,6 +48,7 @@ export class TypeComponent implements OnInit {
     this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
     console.log(" type this._form99Details =", this._form99Details)
     this.screenWidth = window.innerWidth;
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
 
     if(this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
@@ -121,13 +129,26 @@ export class TypeComponent implements OnInit {
    * @param      {<type>}  val     The value
    */
   public updateTypeSelected(e): void {
-    //if(e.target.checked) {
+    if (this.editMode) {
+      //if(e.target.checked) {
       this.typeSelected = e.target.value;
       this.typeFailed = false;
-    /*} else {
-      this.typeSelected = '';
-      this.typeFailed = true;
-    }*/
+      /*} else {
+        this.typeSelected = '';
+        this.typeFailed = true;
+      }*/
+    } else {
+      this._dialogService
+        .confirm('This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent, 'Warning')
+        .then(res => {
+          if (res === 'okay') {
+            this._setForm();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
+    }
   }
 
   /**

@@ -997,6 +997,7 @@ def get_list_entity(entity_id, cmte_id):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
+        logger.debug('entity data loaded:{}'.format(forms_obj))
         if forms_obj is None:
             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(entity_id))   
         return forms_obj
@@ -1517,6 +1518,8 @@ def autolookup_search_contacts(request):
     cand_last_name --> last_name
     cand_first_name --> first_name
     """
+    logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
+
     allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id'] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
@@ -1571,45 +1574,104 @@ def autolookup_search_contacts(request):
                 #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                 #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
                 #     pass
-                # else:
-                query_string = """
-                    SELECT json_agg(t) FROM 
-                    (SELECT 
-                    e.ref_cand_cmte_id as cmte_id,
-                    e.preffix as cand_prefix,
-                    e.last_name as cand_last_name,
-                    e.first_name as cand_first_name,
-                    e.middle_name as cand_middle_name,
-                    e.suffix as cand_suffix,
-                    e.entity_id,
-                    e.entity_type,
-                    e.entity_name as cmte_name,
-                    e.entity_name,
-                    e.first_name,
-                    e.last_name,
-                    e.middle_name,
-                    e.preffix,
-                    e.suffix,
-                    e.street_1,
-                    e.street_2,
-                    e.city,
-                    e.state,
-                    e.zip_code,
-                    e.occupation,
-                    e.employer,
-                    e.ref_cand_cmte_id,
-                    e.delete_ind,
-                    e.create_date,
-                    e.last_update_date,
-                    e.cand_office,
-                    e.cand_office_state,
-                    e.cand_office_district,
-                    e.cand_election_year
-                    FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
-                    AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                    """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                # else
+                # 
+                # :
+                # print('haha')
+                # print('cmte-id' in list(request.query_params.items()))
+                if 'cmte_id' in request.query_params:
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as cmte_id,
+                        e.entity_id,
+                        e.entity_type,
+                        e.entity_name as cmte_name,
+                        e.entity_name,
+                        e.first_name,
+                        e.last_name,
+                        e.middle_name,
+                        e.preffix,
+                        e.suffix,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.occupation,
+                        e.employer,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        AND substr(e.ref_cand_cmte_id,1,1)='C'
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                elif (
+                    'cand_id' in request.query_params
+                    or 'cand_first_name' in request.query_params
+                    or 'cand_last_name' in request.query_params
+                    ):
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as beneficiary_cand_id,
+                        e.preffix as cand_prefix,
+                        e.last_name as cand_last_name,
+                        e.first_name as cand_first_name,
+                        e.middle_name as cand_middle_name,
+                        e.suffix as cand_suffix,
+                        e.entity_id,
+                        e.entity_type,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date,
+                        e.cand_office,
+                        e.cand_office_state,
+                        e.cand_office_district,
+                        e.cand_election_year
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
+                else:
+                    query_string = """
+                        SELECT json_agg(t) FROM 
+                        (SELECT 
+                        e.ref_cand_cmte_id as cmte_id,
+                        e.entity_id,
+                        e.entity_type,
+                        e.entity_name as cmte_name,
+                        e.entity_name,
+                        e.first_name,
+                        e.last_name,
+                        e.middle_name,
+                        e.preffix,
+                        e.suffix,
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        e.occupation,
+                        e.employer,
+                        e.ref_cand_cmte_id,
+                        e.delete_ind,
+                        e.create_date,
+                        e.last_update_date
+                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
                 parameters.append(value + '%')
+                # parameters.append('C%')
             # elif key in ['cmte_id', 'cmte_name']:
             #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
             #     query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
@@ -1629,8 +1691,10 @@ def autolookup_search_contacts(request):
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
+            # print('fail..')
             for row in cursor.fetchall():
                 data_row = list(row)
+                # logger.debug('current data row:{}'.format())
                 forms_obj=data_row[0]
         status_value = status.HTTP_200_OK
         if forms_obj is None:
@@ -1861,6 +1925,62 @@ def filter_get_all_trans(request, param_string):
 #         return False
 #         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
+def load_child_transactions(cmte_id, report_id):
+    """
+    a helper function to query and load all child transactions
+    """
+    child_query_string = """
+    SELECT json_agg(t) FROM
+        (SELECT transaction_type, 
+                transaction_type_desc, 
+                transaction_id, 
+                api_call, 
+                name, 
+                street_1, 
+                street_2, 
+                city, 
+                state, 
+                zip_code, 
+                transaction_date, 
+                transaction_amount, 
+                aggregate_amt, 
+                purpose_description, 
+                occupation, 
+                employer, 
+                memo_code, 
+                memo_text, 
+                itemized, 
+                transaction_type_identifier, 
+                entity_id,
+                back_ref_transaction_id 
+        FROM all_transactions_view
+        WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+        AND delete_ind is distinct from 'Y') t;
+        """
+    child_dic = {}
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(child_query_string, (report_id, cmte_id))
+            child_list = cursor.fetchone()[0]
+            # TODO : update null value, NOT SURE it is necessary
+            # just go with parent function
+            if child_list:
+                for child in child_list:
+                    for i in child:
+                        if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
+                            child[i] = ''
+                        elif not child[i]:
+                            child[i] = 0
+                    if child['back_ref_transaction_id'] not in child_dic:
+                        child_dic[child['back_ref_transaction_id']] = [child]
+                    else:
+                        child_dic[child['back_ref_transaction_id']].append(child)
+    except Exception as e:
+        logger.debug("loading child errors:" + str(e))
+        raise
+    logger.debug('child dictionary loaded with {} items'.format(child_dic))
+    return child_dic
+
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
@@ -1945,9 +2065,14 @@ def get_all_transactions(request):
         memo_code_d = filters_post.get('filterMemoCode', False)
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
-        
+
+        child_tran_dic = load_child_transactions(cmte_id, report_id)
+        # update in FNE-1524: only load non-child transaction, child transaction will add as
+        # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'
+                                    AND back_ref_transaction_id is null
+                                    """
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
         # import ipdb;ipdb.set_trace()
@@ -1959,13 +2084,18 @@ def get_all_transactions(request):
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             for row in cursor.fetchall():
                 data_row = list(row)
-                forms_obj=data_row[0]
+                # forms_obj=data_row[0]
                 forms_obj = data_row[0]
                 if forms_obj is None:
                     forms_obj =[]
                     status_value = status.HTTP_200_OK
                 else:
+                    logger.debug('total transactions loaded:{}'.format(len(forms_obj)))
                     for d in forms_obj:
+                        if d['transaction_id'] in child_tran_dic:
+                            logger.debug('child found for transaction:{}'.format(d['transaction_id']))
+                            d['child'] = child_tran_dic.get(d['transaction_id'])
+                            # print('***'+str(d))
                         for i in d:
                             if not d[i] and i not in ['transaction_amount', 'aggregate_amt']:
                                 d[i] = ''
@@ -2025,7 +2155,7 @@ END - STATE API - CORE APP
 """
 ******************************************************************************************************************************
 GET ALL TRASHED TRANSACTIONS API - CORE APP - SPRINT 9 - FNE 744 - BY PRAVEEN JINKA
-REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 744 - BY PRAVEEN JINKA
+REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 74/4 - BY PRAVEEN JINKA
 ******************************************************************************************************************************
 """
 @api_view(['POST'])
@@ -3007,7 +3137,6 @@ Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 
 @api_view(['GET', 'POST'])
 def contactsTable(request):
-
     try:
         
         if request.method == 'POST':
@@ -3027,8 +3156,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3056,9 +3185,9 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
-            print("contacts trans_query_string: ",trans_query_string)
+            #print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
             if sortcolumn and sortcolumn != 'default':
                 trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
@@ -3554,9 +3683,9 @@ def post_sql_contact(data):
         data['entity_id'] = entity_id
         with connection.cursor() as cursor:
             # Insert data into entity table
-            cursor.execute("""INSERT INTO public.entity (cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
-                                [ data['cmte_id'], data['entity_id'], data['entity_type'], data['entity_name'], data['first_name'], data['last_name'], data['middle_name'], data['preffix'], data['suffix'], data['street_1'], data['street_2'], data['city'], data['state'], data['zip_code'], data['occupation'], data['employer'], data['cand_office'], data['cand_office_state'], data['cand_office_district'], data['ref_cand_cmte_id'] ])
+            cursor.execute("""INSERT INTO public.entity (cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id, phone_number)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
+                                [ data['cmte_id'], data['entity_id'], data['entity_type'], data['entity_name'], data['first_name'], data['last_name'], data['middle_name'], data['preffix'], data['suffix'], data['street_1'], data['street_2'], data['city'], data['state'], data['zip_code'], data['occupation'], data['employer'], data['cand_office'], data['cand_office_state'], data['cand_office_district'], data['ref_cand_cmte_id'], data['phone_number'] ])
 
     except Exception:
         raise
@@ -3591,6 +3720,7 @@ def contact_sql_dict(data):
           'cand_office_state'  : is_null(data.get('officeState')), 
           'cand_office_district'  : is_null(data.get('district')), 
           'ref_cand_cmte_id'  : is_null(data.get('ref_cand_cmte_id')), 
+          'phone_number'  : is_null(data.get('phone_number')), 
         }
 
         return datum
@@ -3762,25 +3892,40 @@ def get_reporttype(cmte_id, report_id):
 @api_view(['POST'])
 def delete_trashed_reports(request):
     try:
-        #import ipdb;ipdb.set_trace()
-        #message_dict = {}
+        """api for trash and restore report. """
         cmte_id = request.user.username
+        print("trash_restore_report cmte_id = ", cmte_id)
+        print("delete_trashed_reports  request.data =", request.data.get('actions', []))
+        list_report_ids=''
+        for _action in request.data.get('actions', []):
+            report_id = _action.get('id', '')
+            list_report_ids = list_report_ids + str(report_id) + ", " 
+        print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)    
+        report_ids = list_report_ids.strip().rstrip(',')
+        print("delete_trashed_reports list_report_ids", report_ids)    
         with connection.cursor() as cursor:
-             cursor.execute("""DELETE FROM public.reports WHERE cmte_id = %s AND report_id = %s;""",[cmte_id, report_id])
-        with connection.cursor() as cursor:
-             cursor.execute("""DELETE FROM public.form3x WHERE cmte_id = %s AND report_id = %s;""",[cmte_id, report_id])
-        
-        
-        message = 'Transaction deleted successfully'
-    except Exception as e:
-        print(e)
-        message = 'Error in deleting the transaction'
-        message_dict[trans_id] = message
-
+            cursor.execute("""DELETE FROM public.forms_committeeinfo WHERE id in (""" + report_ids + """) AND committeeid = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.reports WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.form_3x  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_a  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_b  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_c  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_c1  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_c2  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_d  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_e  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_f  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h1  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h2  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h3  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h4  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h5  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
+            cursor.execute("""DELETE FROM public.sched_h6  WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")      
+        message="success"
         json_result = {'message':message}
         return Response(json_result, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response('The delete_trashed_transactions API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response('The delete_trashed_reports API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_all_trashed_reports(request):
@@ -3800,29 +3945,33 @@ def get_all_trashed_reports(request):
             with connection.cursor() as cursor:
                 if reportid in ["None", "null", " ", "","0"]:    
                     query_string =  """SELECT json_agg(t) FROM 
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype ,
+                                            deleteddate   
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
-                                        END AS viewtype
+                                        END AS viewtype,
+                                            deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND delete_ind = 'Y' AND last_update_date is not null 
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
                     query_string =  """SELECT json_agg(t) FROM 
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype ,
+                                            deleteddate   
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
-                                        END AS viewtype
+                                        END AS viewtype,
+                                            deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND delete_ind = 'Y' AND last_update_date is not null 
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
     
-                print("query_string =", query_string)
+                #print("query_string =", query_string)
 
                 # print("query_string = ", query_string)
                 # Pull reports from reports_view
@@ -3843,28 +3992,32 @@ def get_all_trashed_reports(request):
 
                 if reportid in ["None", "null", " ", "","0"]:    
                     query_count_string =  """SELECT count('a') as totalreportsCount FROM 
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype ,
+                                            deleteddate   
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
-                                        END AS viewtype
+                                        END AS viewtype,
+                                            deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND delete_ind = 'Y' AND last_update_date is not null 
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
                     query_count_string =  """SELECT count('a') as totalreportsCount FROM 
-                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype    
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                                            deleteddate    
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
                                             WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
-                                        END AS viewtype
+                                        END AS viewtype,
+                                            deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND  delete_ind = 'Y' AND last_update_date is not null 
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-                print("query_count_string =", query_count_string)
+                #print("query_count_string =", query_count_string)
 
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_count_string, [cmte_id, viewtype])
@@ -3894,96 +4047,96 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
             #form 99 report
             report_type = get_reporttype(cmte_id, report_id)
             print("report_type3", report_type)
+            print("trash_restore_sql_report cmte_id = ", cmte_id)
+            print("trash_restore_sql_report report_id = ", report_id)
             if report_type == 'F99':
                 if (_delete == 'Y'):
-                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True  WHERE committeeid = '{}' AND id = '{}'  """.format(cmte_id, report_id))
+                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 else:
-                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False  WHERE committeeid = '{}' AND id = '{}'  """.format(cmte_id, report_id))
+                    cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 print("report_type4", report_type)
             else:
                 #form 3X report
-                cursor.execute("""UPDATE public.reports SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
+                cursor.execute("""UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
                 if not cursor.rowcount:
                     raise Exception(
                         """The report ID: {} is either already deleted
                         or does not exist in reports table""".format(report_id))
                 else:
-                    cursor.execute("""UPDATE public.form_3x SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_a SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_b SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c1 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_c2 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_d SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_e SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_f SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h1 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h2 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h3 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h4 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h5 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
-                    cursor.execute("""UPDATE public.sched_h6 SET delete_ind = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, cmte_id, report_id))
+                    cursor.execute("""UPDATE public.form_3x SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_a SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_b SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c1 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_c2 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_d SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_e SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_f SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h1 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h2 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h3 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h4 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h5 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}' """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+                    cursor.execute("""UPDATE public.sched_h6 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
+    
     except Exception:
         raise
 
 @api_view(['PUT'])
 def trash_restore_report(request):
-    """api for trash and resore report. 
-       we are doing soft-delete only, mark delete_ind to 'Y'
-       
-       request payload in this format:
-        {
-            "actions": [
-                {
-                    "action": "restore",
-                    "report_id": "123",
-                },
-                {
-                    "action": "trash",
-                    "report_id": "456",
-                }
-            ]
-        }
- 
-    """
+    """api for trash and restore report. """
+    cmte_id = request.user.username
     print("trash_restore_report  request.data =", request.data.get('actions', []))
     for _action in request.data.get('actions', []):
-        report_id = _action.get('report_id', '')
-        # print(transaction_id[0:2])
-        cmte_id = request.user.username
+        report_id = _action.get('id', '')
+        print("trash_restore_report cmte_id = ", cmte_id)
+        print("trash_restore_report report_id = ", report_id)
 
+        result='failed'
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
-
         try:
-            trash_restore_sql_report(cmte_id,
-                report_id,
-                _delete)
+            if _delete == 'Y':
+                if check_report_to_delete(cmte_id, report_id) == 'N':
+                    result = 'failed'
+                else:
+                    trash_restore_sql_report(cmte_id, report_id, _delete)
+                    result = 'success'
+            else:
+                trash_restore_sql_report(cmte_id, report_id, _delete)
+                result = 'success'
+        
         except Exception as e:
             return Response("The trash_restore_report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"result":"success"}, status=status.HTTP_200_OK)    
+    if result=='success':
+        return Response({"result":"success"}, status=status.HTTP_200_OK)
+    else:   
+        return Response({"result":"failed"}, status=status.HTTP_200_OK)
+    
 
 @api_view(['POST'])
 def delete_trashed_contacts(request):
     try:
-        #import ipdb;ipdb.set_trace()
-        #message_dict = {}
+        """api for trash and restore contact. """
         cmte_id = request.user.username
-        #entity_id = _action.get('id', '')
-        entity_id = request.get('id')
+        print("trash_restore_contact cmte_id = ", cmte_id)
+        print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
+        list_entity_ids="'"
+        for _action in request.data.get('actions', []):
+            entity_id = _action.get('id', '')
+            list_entity_ids = list_entity_ids + str(entity_id) + "','" 
+        print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
+        entity_ids = list_entity_ids[0:len(list_entity_ids)-2]
+        print("delete_trashed_contacts list_entity_ids", entity_ids)    
         with connection.cursor() as cursor:
-             cursor.execute("""DELETE FROM public.entity WHERE cmte_id = %s AND entity_id = %s;""",[cmte_id, entity_id])
+             cursor.execute("""DELETE FROM public.entity WHERE entity_id in (""" + entity_ids + """) AND cmte_id = '""" + cmte_id + """'""")
       
         
-        message = 'contact deleted successfully'
-    except Exception as e:
-        print(e)
-        message = 'Error in deleting the transaction'
-        message_dict[trans_id] = message
-
+        message="success"
         json_result = {'message':message}
         return Response(json_result, status=status.HTTP_201_CREATED)
+
     except Exception as e:
         return Response('The delete_trashed_contacts API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -4010,8 +4163,8 @@ def get_all_trashed_contacts(request):
                 else:
                     descending = 'ASC'
 
-                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
-                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number']
+                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
                 if search_string:
                     for key in search_keys:
                         if not param_string:
@@ -4041,13 +4194,13 @@ def get_all_trashed_contacts(request):
                 
                 #trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer from all_contacts_view where cmte_id='""" + cmte_id + """' """ + param_string 
 
-                trans_query_string= """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id =  AND delete_ind = 'Y' """
+                #trans_query_string= """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id =  AND delete_ind = 'Y' """
                 #cursor.execute("""SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, , candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number FROM public.entity WHERE cmte_id = %s AND delete_ind = 'Y' """.format(cmte_id))
 
                 # print("trans_query_string: ",trans_query_string)
                 # import ipdb;ipdb.set_trace()
 
-                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number from all_contacts_view
+                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
                 
                 if sortcolumn and sortcolumn != 'default':
@@ -4055,7 +4208,7 @@ def get_all_trashed_contacts(request):
                 elif sortcolumn == 'default':
                     trans_query_string = trans_query_string + """ ORDER BY name ASC"""
                 
-                print("contacts recycle trans_query_string: ",trans_query_string)
+                #print("contacts recycle trans_query_string: ",trans_query_string)
 
                 with connection.cursor() as cursor:
                     cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
@@ -4089,10 +4242,12 @@ def get_all_trashed_contacts(request):
 
 def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
     """trash or restore contacts table by updating delete_ind"""
+    print("check_report_to_delete cmte_id = ", cmte_id)
+    print("check_report_to_delete entity_id = ", entity_id)
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
-            cursor.execute("""UPDATE public.entity SET delete_ind = '{}' WHERE cmte_id = '{}' AND entity_id = '{}'  """.format(_delete, cmte_id, entity_id))
+            cursor.execute("""UPDATE public.entity SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND entity_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, entity_id))
     except Exception:
         raise
 
@@ -4101,14 +4256,17 @@ def trash_restore_contact(request):
     """api for trash and restore contact. """
     cmte_id = request.user.username
     print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    result=''
     for _action in request.data.get('actions', []):
         entity_id = _action.get('id', '')
-
+        print("trash_restore_contact entity_id = ", entity_id)
+        print("trash_restore_contact cmte_id = ", cmte_id)
         result='failed'
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
         try:
             if _delete == 'Y':
+                print("trying to trash_restore_contact...")
                 if check_contact_to_delete(cmte_id, entity_id) == 'N':
                     result = 'failed'
                 else:
@@ -4118,15 +4276,18 @@ def trash_restore_contact(request):
                 trash_restore_sql_contact(cmte_id, entity_id, _delete)
                 result = 'success'
 
-            if result=='success':
-                return Response({"result":"success"}, status=status.HTTP_200_OK)
-            else:   
-                return Response({"result":"failed"}, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response("The trash_restore_contact API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+    if result=='success':
+        return Response({"result":"success"}, status=status.HTTP_200_OK)
+    else:   
+        return Response({"result":"failed"}, status=status.HTTP_200_OK)
 
 def check_contact_to_delete(cmte_id, entity_id):
     try:
+        print("check_contact_to_delete cmte_id = ", cmte_id)
+        print("check_contact_to_delete entity_id = ", entity_id)
         _delete = 'Y'
         entity_id_found=''
         with connection.cursor() as cursor:
@@ -4134,12 +4295,13 @@ def check_contact_to_delete(cmte_id, entity_id):
                             WHERE rp.cmte_id = %s 
                             AND rp.cmte_id = vw.cmte_id 
                             AND rp.report_id = vw.report_id  
-                            AND  rp.status= 'Filed'
+                            AND rp.status= 'Submitted'
                             AND vw.entity_id = %s """, [cmte_id, entity_id])           
 
             entity_ids = cursor.fetchone()
+            print("entity_ids_found =", entity_ids)
             entity_id_found = entity_ids[0]
-
+            print("entity_id_found =", entity_id_found)
             if entity_id_found == '':
                 _delete = 'Y'
             else:
@@ -4150,4 +4312,107 @@ def check_contact_to_delete(cmte_id, entity_id):
         return Response("The check_contact_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     
+def check_report_to_delete(cmte_id, report_id):
+    try:
+        _delete = 'Y'
+        entity_id_found=''
+        print("check_report_to_delete cmte_id = ", cmte_id)
+        print("check_report_to_delete report_id = ", report_id)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT report_id FROM public.all_transactions_view vw, public.reports rp 
+                            WHERE rp.cmte_id = %s 
+                            AND rp.cmte_id = vw.cmte_id 
+                            AND rp.report_id = vw.report_id  
+                            AND rp.status= 'Filed'
+                            AND vw.report_id = %s """, [cmte_id, report_id])           
 
+            report_ids = cursor.fetchone()
+            report_id_found = report_ids[0]
+            print("report_id_found =",report_id_found)
+            if entity_id_found == '':
+                _delete = 'Y'
+            else:
+                _delete = 'N'
+
+        return _delete    
+    except Exception as e:
+        return Response("The check_report_to_delete function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def get_next_transaction_id(trans_char):
+    """get next transaction_id with seeding letter, like 'SA' """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT public.get_next_transaction_id(%s)""", [trans_char])
+            transaction_id = cursor.fetchone()[0]
+            # transaction_id = transaction_ids[0]
+        return transaction_id
+    except Exception:
+        raise
+
+@api_view(['POST'])
+def clone_a_transaction(request):
+    """
+    api for clone a transaction. 
+    expect: a transaction_id for transaction to be cloned
+    return: new transaction_id with clone status
+    e.g.: {'transaction_id': 'SA100095', 'status': 'success'}
+    """
+    # TODO: need to update this list for ohter transactions
+    logger.debug('request for cloning a transaction:{}'.format(request.data))
+
+    transaction_tables = {
+        'SA': 'sched_a',
+        'SB': 'sched_b',
+        'SC': 'sched_c',
+        'SD': 'sched_d',
+    }
+    # cmte_id = request.user.username
+    transaction_id = request.data.get('transaction_id')
+
+    if transaction_id[0:2] in transaction_tables:
+        transaction_table = transaction_tables.get(transaction_id[0:2])
+        # raise Exception('Error: invalid transaction id found.')
+    else:
+        raise Exception('Error: invalid transaction id found.')
+
+    table_schema_sql = """
+    SELECT column_name FROM information_schema.columns
+    WHERE table_name = '{}'
+    """.format(transaction_table)
+    
+    with connection.cursor() as cursor:
+        logger.debug("fetching transaction table column names...")
+        # cursor.execute(table_schema_sql, (transaction_table))
+        cursor.execute(table_schema_sql)
+        rows = cursor.fetchall()  
+        columns = []
+        for row in rows:
+            columns.append(row[0])
+        logger.debug('table columns: {}'.format(list(columns)))
+
+        insert_str = ','.join(columns)
+        replace_list = ['transaction_id', 'create_date', 'last_update_date']
+        tmp_list = [col if col not in replace_list else '%s' for col in columns]
+        select_str = ','.join(tmp_list)
+        # select_str = insert_str.replace(',transaction_id,', ',%s,'
+        # ).replace('create_date', '%s'
+        # ).replace('last_update_date', '%s')
+        
+        clone_sql = """
+            INSERT INTO public.{table_name}({_insert})
+            SELECT {_select}
+            FROM public.{table_name}
+        """.format(table_name=transaction_table, _insert=insert_str, _select=select_str)
+        clone_sql = clone_sql + ' WHERE transaction_id = %s;'
+        logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+        new_tran_id = get_next_transaction_id(transaction_id[0:2])
+
+        cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
+        if not cursor.rowcount:
+            raise Exception('transaction clone error')
+        return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+
+
+ 

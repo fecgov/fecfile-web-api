@@ -25,7 +25,8 @@ import {
   form3xReportTypeDetails
 } from '../../shared/interfaces/FormsService/FormsService';
 import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
-
+import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { FormsService } from '../../shared/services/FormsService/forms.service';
 @Component({
   selector: 'app-reportdetails',
   templateUrl: './reportdetails.component.html',
@@ -136,7 +137,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _activatedRoute: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private _reportTypeService: ReportTypeService,
+    private _formsService: FormsService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -335,6 +338,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
       .subscribe((res: GetReportsResponse) => {
         this.reportsModel = [];
+        console.log(' getRecyclingPage res', res);
         this._reportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
         console.log(' getRecyclingPage reportsModelL', reportsModelL);
@@ -429,6 +433,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.filters.filterFiledDateFrom = null;
         this.filters.filterFiledDateTo = null;
         this.getReportsPage(1);
+      case 'filterDeletedDate':
+        this.filters.filterDeletedDateFrom = null;
+        this.filters.filterDeletedDateTo = null;
+        this.getReportsPage(1);  
         break;
       default:
         console.log('unexpected type received for remove tag');
@@ -686,12 +694,93 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     alert('Link multiple report requirements have not been finalized');
   }
   
-  public printReport(): void{
-    alert('Print report is not yet supported');
+  public printPreview(): void {
+    console.log('TransactionsTableComponent printPreview...!');
+    this._reportTypeService.printPreview('transaction_table_screen', '3X');
   }
 
-  public uploadReport(): void{
-    alert('Upload report is not yet supported');
+public printReport(report: reportModel): void{
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        let formSavedObj: any = {
+          saved: true
+        };
+        localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        this._formsService.PreviewForm_Preview_sign_Screen({}, this.formType).subscribe(
+          res => {
+            if (res) {
+              window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
+            }
+          },
+          error => {
+            console.log('error: ', error);
+          }
+        );
+        console.log(new Date().toISOString());
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          this._reportTypeService.printPreview('dashboard_report_screen', '3X');
+        console.log(new Date().toISOString());
+      }, 1500);
+    }
+  }
+
+  public uploadReport(report: reportModel): void{
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        console.log('getReportInfo res =', res);
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        let formSavedObj: any = {
+          saved: true
+        };
+        localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
+      });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        this._router.navigate(['/signandSubmit/99']);
+        console.log(new Date().toISOString());
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          console.log('getReportInfo res =', res);
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      console.log(new Date().toISOString());
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4' } });
+        console.log(new Date().toISOString());
+      }, 1500);
+    }
+    
   }
 
   public downloadReport(): void{
@@ -846,7 +935,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .confirm('You are about to restore report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+          this._reportsService.trashOrRestoreReports('restore', [rep]).subscribe((res: GetReportsResponse) => {
             this.getRecyclingPage(this.config.currentPage);
             this._dialogService.confirm(
               'Report ' + rep.report_id + ' has been restored!',
@@ -1183,7 +1272,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       'cvg_end_date',
       'report_type_desc',
       'filed_date',
-      'last_update_date'
+      'last_update_date',
+      'deleted_date',
     ];
 
     /*let otherSortColumns = ['street', 'city', 'state', 'zip', 'aggregate', 'purposeDescription',  
@@ -1224,7 +1314,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     if (status === 'Failed') return true;
     else return false;
   }
-  /*public trashAllSelected(): void {
+  public trashAllSelected(): void {
     let repIds = '';
     const selectedReports: Array<reportModel> = [];
     for (const rep of this.reportsModel) {
@@ -1264,7 +1354,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         } else if (res === 'cancel') {
         }
       });
-  }*/
+  }
 
   public trashReport(rep: reportModel): void {
     console.log('trashReport ', rep);
@@ -1272,16 +1362,30 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {
         if (res === 'okay') {
-          this._reportsService.trashOrRestoreReports('trash', rep).subscribe((res: GetReportsResponse) => {
-            this.getReportsPage(this.config.currentPage);
-            this._dialogService.confirm(
-              'report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
-              ConfirmModalComponent,
-              'Success!',
-              false,
-              ModalHeaderClassEnum.successHeader
-            );
+          this._reportsService.trashOrRestoreReports('trash', [rep]).subscribe((res: GetReportsResponse) => {
+            console.log("trashReport res =", res);
+            if (res['result'] === 'success') {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Report has been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            } else
+            {
+              this.getReportsPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Report has not been successfully deleted and sent to the recycle bin. ' + rep.report_id,
+                ConfirmModalComponent,
+                'Warning!',
+                false,
+                ModalHeaderClassEnum.errorHeader
+              );
+            }
           });
+          
         } else if (res === 'cancel') {
         }
       });
@@ -1294,10 +1398,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         if (res === 'okay') {
           // this._reportsService.restorereport(rep)
           //   .subscribe((res: GetReportsResponse) => {
-          this._reportsService.trashOrRestoreReports('restore', rep).subscribe((res: GetReportsResponse) => {
+          this._reportsService.trashOrRestoreReports('restore', [rep]).subscribe((res: GetReportsResponse) => {
             this.getRecyclingPage(this.config.currentPage);
             this._dialogService.confirm(
-              'report ' + rep.report_id + ' has been restored!',
+              'Report ' + rep.report_id + ' has been restored!',
               ConfirmModalComponent,
               'Success!',
               false,

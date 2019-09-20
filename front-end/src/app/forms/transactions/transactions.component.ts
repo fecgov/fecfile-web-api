@@ -672,6 +672,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.showCategories();
+
     // let accessedByRoute = false;
     // if (this.routeData) {
     //   if (this.routeData.accessedByRoute && this.routeData.reportId) {

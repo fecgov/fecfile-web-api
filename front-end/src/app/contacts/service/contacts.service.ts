@@ -246,7 +246,7 @@ export class ContactsService {
     const modelArray = [];
     for (const row of serverData) {
       const model = new ContactModel({});
-      model.type = row.type;
+      model.entityType = row.entityType;
       model.id = row.id;
       model.name = row.name;
       model.street1 = row.street1;
@@ -259,9 +259,11 @@ export class ContactsService {
       model.phoneNumber = row.phoneNumber;
       model.entity_name = row.entity_name;
       model.candOffice = row.candOffice;
-      model.candOfficeState = row.candOfficeState;
+      model.candOfficeState = row.candOfficeState
       model.candOfficeDistrict = row.candOfficeDistrict;
+
       model.candCmteId = row.candCmteId;
+      model.deletedDate = row.deleteddate;
       modelArray.push(model);
     }
     return modelArray;
@@ -334,7 +336,10 @@ export class ContactsService {
         break;       
       case 'candCmteId':
         name= 'candCmteId';
-        break;       
+        break;     
+      case 'deletedDate':
+        name= 'deletedDate';
+        break;   
       default:
     }
     return name ? name : '';
@@ -353,7 +358,7 @@ export class ContactsService {
     }
 
     serverObject.name =  model.name;
-    serverObject.type = model.type;
+    serverObject.entityType = model.entityType;
     serverObject.id = model.id;
     serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;
@@ -368,6 +373,8 @@ export class ContactsService {
     serverObject.candOfficeState = model.candOfficeState;
     serverObject.candOfficeDistrict = model.candOfficeDistrict;
     serverObject.candCmteId = model.candCmteId;
+    serverObject.deletedDate = model.deletedDate;
+    
     return serverObject;
   }
 
@@ -396,10 +403,7 @@ export class ContactsService {
       return;
     }
     for (const cnt of response.contacts) {
-      cnt.transaction_amount_ui = `$${cnt.transaction_amount}`;
-      cnt.transaction_date_ui = this._datePipe.transform(cnt.transaction_date, 'MM/dd/yyyy');
-      cnt.deleted_date_ui = this._datePipe.transform(cnt.deleted_date, 'MM/dd/yyyy');
-      cnt.zip_code_ui = this._zipCodePipe.transform(cnt.zip_code);
+      cnt.deleted_date_ui = this._datePipe.transform(cnt.deleteddate, 'MM/dd/yyyy');
     }
   }
 
@@ -470,9 +474,37 @@ export class ContactsService {
       }
     }
 
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      const deletedFromDate = new Date(filters.filterDeletedDateFrom);
+      const deletedToDate = new Date(filters.filterDeletedDateTo);
+      const filteredDeletedDateArray = [];
+      for (const ctn of response.contacts) {
+        if (ctn.deleteddate) {
+          let d = new Date(ctn.deleteddate);
+          d.setUTCHours(0, 0, 0, 0);
+          const ctnDate = this.getDateMMDDYYYYformat(d);
+          if (ctnDate >= deletedFromDate && ctnDate <= deletedToDate) {
+            isFilter = true;
+          } else {
+            isFilter = false;
+          }
+        }
+
+        if (isFilter) {
+          filteredDeletedDateArray.push(ctn);
+        }
+      }
+      response.contacts = filteredDeletedDateArray;
+    }
+
     console.log("response.contacts", response.contacts);
   }
 
+  private getDateMMDDYYYYformat(dateValue: Date): Date {
+    var utc = new Date(dateValue.getUTCFullYear(), dateValue.getUTCMonth() + 1, dateValue.getUTCDate());
+    utc.setUTCHours(0,0,0,0);
+    return utc
+  }
 
   /**
    *
@@ -715,113 +747,7 @@ export class ContactsService {
     });
   }
   
-  /**
-   * Saves a schedule a using POST.  The POST API supports saving an existing
-   * transaction.  Therefore, transaction_id is required in this API call.
-   *
-   * TODO consider modifying saveContactA() to support both POST and PUT.
-   *
-   * @param      {string}  formType  The form type
-   */
-  /*public putScheduleA(formType: string): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sa/schedA';
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-
-    if (reportType === null || typeof reportType === 'undefined') {
-      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-    }
-
-    const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-    const receipt: any = JSON.parse(localStorage.getItem(`form_${formType}_receipt`));
-
-    let httpOptions = new HttpHeaders();
-    const formData: FormData = new FormData();
-
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    // Needed for update but not for add
-    formData.append('transaction_id', receipt.transactionId);
-
-    formData.append('cmte_id', committeeDetails.committeeid);
-    // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
-      formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
-      formData.append('report_id', reportType.reportid);
-    }
-
-    // formData.append('report_id', reportType.reportId);
-    formData.append('transaction_type', '15');
-    formData.append('line_number', '11AI');
-    formData.append('first_name', receipt.ContributorFirstName);
-    formData.append('last_name', receipt.ContributorLastName);
-    formData.append('state', receipt.ContributorState);
-    formData.append('city', receipt.ContributorCity);
-    formData.append('zip_code', receipt.ContributorZip);
-    formData.append('occupation', receipt.ContributorOccupation);
-    formData.append('employer', receipt.ContributorEmployer);
-    formData.append('contribution_amount', receipt.ContributionAmount);
-    formData.append('contribution_date', receipt.ContributionDate);
-    // formData.append('contribution_aggregate', receipt.ContributionAggregate);
-    formData.append('entity_type', receipt.EntityType);
-    if (receipt.ContributorMiddleName !== null) {
-      if (typeof receipt.ContributorMiddleName === 'string') {
-        formData.append('middle_name', receipt.ContributorMiddleName);
-      }
-    }
-    if (receipt.ContributorPrefix !== null) {
-      if (typeof receipt.ContributorPrefix === 'string') {
-        formData.append('prefix', receipt.ContributorPrefix);
-      }
-    }
-    if (receipt.ContributorSuffix !== null) {
-      if (typeof receipt.ContributorSuffix === 'string') {
-        formData.append('suffix', receipt.ContributorSuffix);
-      }
-    }
-    formData.append('street_1', receipt.ContributorStreet1);
-    if (receipt.ContributorStreet2 !== null) {
-      if (typeof receipt.ContributorStreet2 === 'string') {
-        formData.append('street_2', receipt.ContributorStreet2);
-      }
-    }
-    if (receipt.MemoText !== null) {
-      if (typeof receipt.MemoText === 'string') {
-        formData.append('memo_text', receipt.MemoText);
-      }
-    }
-    if (receipt.MemoCode !== null) {
-      if (typeof receipt.MemoCode === 'string') {
-        formData.append('memo_code', receipt.MemoCode);
-      }
-    }
-    if (receipt.ContributionPurposeDescription !== null) {
-      if (typeof receipt.ContributionPurposeDescription === 'string') {
-        formData.append('purpose_description', receipt.ContributionPurposeDescription);
-      }
-    }
-    // if (receipt.ContributionAggregate !== null) {
-    //   if (typeof receipt.ContributionAggregate === 'string') {
-    //     formData.append('contribution_aggregate', receipt.ContributionAggregate);
-    //   }
-    // }
-
-    return this._http
-      .put(`${environment.apiUrl}${url}`, formData, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
-        })
-      );
-  }*/
-
+  
   public deleteRecycleBinContact(contacts: Array<ContactModel>): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();

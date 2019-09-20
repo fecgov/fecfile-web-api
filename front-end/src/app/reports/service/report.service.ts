@@ -134,8 +134,6 @@ export class ReportsService {
     params = params.append('view', view);
     params = params.append('reportId', reportId.toString());
 
-    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
-
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
       params
@@ -162,8 +160,6 @@ export class ReportsService {
 
     params = params.append('view', view);
     params = params.append('reportId', reportId.toString());
-
-    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
 
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
@@ -193,6 +189,8 @@ export class ReportsService {
       model.last_update_date = row.last_update_date;
       model.report_type_desc = row.report_type_desc;
       model.filed_date = row.filed_date;
+      model.deleteddate = row.deleteddate;
+      model.delete_ind = row.delete_ind;
       modelArray.push(model);
     }
 
@@ -362,6 +360,36 @@ export class ReportsService {
 
       response.reports = filteredFiledDateArray;
     }
+
+
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      const deletedFromDate = new Date(filters.filterDeletedDateFrom);
+      const deletedToDate = new Date(filters.filterDeletedDateTo);
+      const filteredDeletedDateArray = [];
+
+      
+      for (const rep of response.reports) {
+        if (rep.deleteddate) {
+          let d = new Date(rep.deleteddate);
+          d.setUTCHours(0, 0, 0, 0);
+          //const repDate = this.getDateMMDDYYYYformat(d);
+          const repDate = d;
+          
+          if (repDate >= deletedFromDate && repDate <= deletedToDate) {
+            isFilter = true;
+          } else {
+            isFilter = false;
+          }
+        }
+       
+
+        if (isFilter) {
+          filteredDeletedDateArray.push(rep);
+        }
+      }
+      response.reports = filteredDeletedDateArray;
+    }
+    
   }
   private getDateMMDDYYYYformat(dateValue: Date): Date {
     
@@ -376,8 +404,6 @@ export class ReportsService {
     let params = new HttpParams();
     let url: string = '';
 
-    console.log('form_type =', form_type);
-    console.log('report_id =', report_id);
 
     if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
@@ -390,8 +416,6 @@ export class ReportsService {
 
     //params = params.append('committeeid', committee_id);
     params = params.append('reportid', report_id);
-    console.log('params =', params);
-    console.log('${environment.apiUrl}${url} =', `${environment.apiUrl}${url}`);
 
     if (form_type === 'F99') {
       return this._http.get(`${environment.apiUrl}${url}`, {
@@ -425,7 +449,7 @@ export class ReportsService {
         });
     }
   }
-  public trashOrRestoreReports(action: string,  reports: reportModel) {
+  public trashOrRestoreReports(action: string,  reports: Array<reportModel>) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_report';
@@ -435,13 +459,14 @@ export class ReportsService {
 
     const request: any = {};
     const actions = [];
-    actions.push({
+    for (const rpt of reports) {
+      actions.push({
         action: action,
-        report_id: reports.report_id
+        id: rpt.report_id
       });
-
+    }
     request.actions = actions;
-    console.log ("trashOrRestoreReports request.actions =", request.actions );
+
     return this._http
       .put(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
@@ -466,7 +491,7 @@ export class ReportsService {
     const actions = [];
     for (const rep of reports) {
       actions.push({
-        transaction_id: rep.report_id
+        id: rep.report_id
       });
     }
     request.actions = actions;

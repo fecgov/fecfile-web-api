@@ -114,7 +114,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private readonly maxColumnOption = 5;
+  private maxColumnOption = 5;
   private allContactsSelected: boolean;
 
   constructor(
@@ -201,6 +201,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
+        this.maxColumnOption=6;
         break;
       default:
         break;
@@ -678,7 +679,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               if (res['result'] === 'success') {
                 this.getContactsPage(this.config.currentPage);
                 this._dialogService.confirm(
-                  'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Success!',
                   false,
@@ -687,7 +688,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               } else
               {
                 this._dialogService.confirm(
-                  'Contact has not been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has not been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Warning!',
                   false,
@@ -753,18 +754,22 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     //   beforeMessage = 'Are you sure you want to permanently delete these contacts?';
     // }
 
+    let cntIds = '';
     const selectedContacts: Array<ContactModel> = [];
     for (const ctn of this.contactsModel) {
       if (ctn.selected) {
         selectedContacts.push(ctn);
+        cntIds += ctn.id + ', ';
       }
     }
+
+    cntIds = cntIds.substr(0, cntIds.length - 2);
 
     if (selectedContacts.length === 1) {
       beforeMessage = 'Are you sure you want to permanently delete Contact ' +
         selectedContacts[0].id + '?';
     } else {
-      beforeMessage = 'Are you sure you want to permanently delete these contacts?';
+      beforeMessage = 'Are you sure you want to permanently delete these contacts?' + cntIds;
     }
 
     this._dialogService
@@ -781,7 +786,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               if (selectedContacts.length === 1) {
                   afterMessage = `Contact ${selectedContacts[0].id} has been successfully deleted`;
               } else {
-                afterMessage = 'Contacts have been successfully deleted.';
+                afterMessage = 'Contacts have been successfully deleted.'+ cntIds;
               }
               this._dialogService
                 .confirm(afterMessage,
@@ -1079,8 +1084,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     
-    const defaultSortColumns = ['name', 'type', 'employer', 'occupation'];
-    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId'];
+    const defaultSortColumns = ['name', 'entityType', 'employer', 'occupation'];
+    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
   
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
@@ -1090,6 +1095,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     for (const field of otherSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }
+
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
@@ -1142,5 +1148,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  
 
 }

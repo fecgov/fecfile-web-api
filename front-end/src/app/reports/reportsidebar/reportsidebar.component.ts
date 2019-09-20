@@ -87,12 +87,17 @@ export class ReportsidebarComponent implements OnInit {
   public isHideTypeFilter: boolean;
   public isHideCvgDateFilter: boolean;
   public isHideFiledDateFilter: boolean;
+  public isHideDeletedDateFilter: boolean;
   public filterCvgDateFrom: Date = null;
   public filterCvgDateTo: Date = null;
   public filterFiledDateFrom: Date = null;
   public filterFiledDateTo: Date = null;
   public dateFilterValidation: ValidationErrorModel;
   public filedDateFilterValidation: ValidationErrorModel;
+  public deletedDateFilterValidation: ValidationErrorModel;
+  public filterDeletedDateFrom: Date = null;
+  public filterDeletedDateTo: Date = null;
+
   public cvgDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
   public isHideFormFilter: boolean;
@@ -143,6 +148,9 @@ export class ReportsidebarComponent implements OnInit {
     this.filterReports = [];
     this.filterStatuss = [];
     this.filterAmendmentIndicators = [];
+    this.filterDeletedDateTo = null;
+    this.filterDeletedDateFrom = null;
+    this.isHideDeletedDateFilter = true;
 
     this.initValidationErrors();
 
@@ -173,8 +181,12 @@ export class ReportsidebarComponent implements OnInit {
   /**
    * Toggle visibility of the Deleted Date filter
    */
-  public toggleDeletedDateFilterItem() {
+  public toggleFiledDateFilterItem() {
     this.isHideFiledDateFilter = !this.isHideFiledDateFilter;
+  }
+
+  public toggleDeletedDateFilterItem() {
+    this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
   }
 
   public toggleFormFilterItem() {
@@ -349,6 +361,15 @@ export class ReportsidebarComponent implements OnInit {
       modified = true;
     }
 
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
     filters.show = modified;
     console.log("applyFilters filters = ", filters)
     this._reportsMessageService.sendApplyFiltersMessage(filters);
@@ -386,6 +407,8 @@ export class ReportsidebarComponent implements OnInit {
     this.filterReports = [];
     this.filterStatuss = [];
     this.filterAmendmentIndicators = [];
+    this.filterDeletedDateFrom = null;
+    this.filterDeletedDateTo = null;
     this.applyFilters();
   }
 
@@ -551,6 +574,10 @@ export class ReportsidebarComponent implements OnInit {
         this.filterFiledDateTo = this.cachedFilters.filterFiledDateTo;
         this.isHideFiledDateFilter = (this.filterFiledDateFrom && this.filterFiledDateTo) ? false : true;
 
+        this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
+        this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
+        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateTo) ? false : true;
+
         // Note state and type apply filters are handled after server call to get values.
         this.filterForms = this.cachedFilters.filterForms;
         this.filterReports =this.cachedFilters.filterReports;
@@ -577,6 +604,7 @@ export class ReportsidebarComponent implements OnInit {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
     this.filedDateFilterValidation = new ValidationErrorModel(null, false);
     this.cvgDateFilterValidation = new ValidationErrorModel(null, false);
+    this.deletedDateFilterValidation = new ValidationErrorModel(null, false);
     //this.amountFilterValidation = new ValidationErrorModel(null, false);
   }
 
@@ -602,6 +630,8 @@ export class ReportsidebarComponent implements OnInit {
     this.filterCvgDateFrom = this.handleDateAsSpaces(this.filterCvgDateFrom);
     this.filterFiledDateTo = this.handleDateAsSpaces(this.filterFiledDateTo);
     this.filterFiledDateFrom = this.handleDateAsSpaces(this.filterFiledDateFrom);
+    this.filterDeletedDateTo = this.handleDateAsSpaces(this.filterDeletedDateTo);
+    this.filterDeletedDateFrom = this.handleDateAsSpaces(this.filterDeletedDateFrom);
 
     this.initValidationErrors();
     if (this.filterCvgDateFrom !== null && (this.filterCvgDateTo === null)) {
@@ -625,13 +655,13 @@ export class ReportsidebarComponent implements OnInit {
 
     if (this.filterFiledDateFrom !== null && this.filterFiledDateTo === null) {
       this.filedDateFilterValidation.isError = true;
-      this.filedDateFilterValidation.message = 'To Deleted Date is required';
+      this.filedDateFilterValidation.message = 'To Field Date is required';
       this.isHideFiledDateFilter = false;
       return false;
     }
     if (this.filterFiledDateTo !== null && this.filterFiledDateFrom === null) {
       this.filedDateFilterValidation.isError = true;
-      this.filedDateFilterValidation.message = 'From Deleted Date is required';
+      this.filedDateFilterValidation.message = 'From Field Date is required';
       this.isHideFiledDateFilter = false;
       return false;
     }
@@ -642,6 +672,24 @@ export class ReportsidebarComponent implements OnInit {
       return false;
     }
 
+    if (this.filterDeletedDateFrom !== null && this.filterDeletedDateTo === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'To Deleted Date is required';
+      this.isHideFiledDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Deleted Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Deleted Date must preceed To Deleted Date';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
      return true;
   }
 

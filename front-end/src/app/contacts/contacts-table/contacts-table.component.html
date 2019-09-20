@@ -14,11 +14,11 @@
         </th>
          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Entity Type
+        <th [@fadeInOut] *ngIf="isColumnVisible('tentityTypeype')" [class]="getSortClass('entityType')" (click)="changeSortDirection('entityType')">Entity Type
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">Entity Number
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('canCmteId')" [class]="getSortClass('canCmteId')" (click)="changeSortDirection('canCmteId')">Candidate/Committee ID
+        <th [@fadeInOut] *ngIf="isColumnVisible('canCmteId')" [class]="getSortClass('canCmteId')" (click)="changeSortDirection('canCmteId')">Candidate/Committee <br /> ID
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">Address
         </th>
@@ -37,6 +37,8 @@
         <th [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')" [class]="getSortClass('candOfficeState')" (click)="changeSortDirection('candOfficeState')">Candidate Office <br /> State
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')" [class]="getSortClass('candOfficeDistrict')" (click)="changeSortDirection('candOfficeDistrict')">Candidate Office <br /> District
+        </th>
+        <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')" (click)="changeSortDirection('deletedDate')">Deleted Date <br />and time
         </th>
 
         <th class="bulk_action">
@@ -65,7 +67,7 @@
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
-              <i class="undo-icon"></i>
+              <i class="trash-icon"></i>
             </button>
           </div>          
         </th>
@@ -89,7 +91,10 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
-
+        <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+        </td>
+        <!--<td [@fadeInOut] *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
+        </td>-->
         <td>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
@@ -145,7 +150,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header" id="contacts__pin-modal-header">
-          <h4 class="modal-title pull-left">Column Options (Select up to 5)</h4>
+          <h4 class="modal-title pull-left">Column Options (Select up to {{maxColumnOption}})</h4>
           <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelColumnOptions()">
             <span aria-hidden="true">×</span>
           </button>
@@ -320,6 +325,23 @@
                     Candidate/Committee ID
                   </span>
                 </label>
+              </div>
+            </div>
+            <div class="col-md">
+              <div class="checkbox">
+                <label>
+                  <input [(ngModel)]="getSortableColumn('deletedDate').checked"
+                    (change)="toggleVisibility('deletedDate', $event)" type="checkbox"
+                    [disabled]="getSortableColumn('deletedDate').disabled">
+                  <span [ngClass]="{'disabled-column-option':getSortableColumn('deletedDate').disabled}">
+                    Deleted Date
+                  </span>
+                </label>
+              </div>
+            </div>
+            <div class="col-md">
+              <div  class="checkbox">
+               &nbsp;
               </div>
             </div>
           </div>  

@@ -9,6 +9,10 @@
   padding: 24px 0;
   text-align: center;
   width: 100%;
+  font-family: 'Roboto', 'sans-serif';
+    font-size: 1rem;
+    font-weight: 400;
+    color: #212121;
   @include media(tablet) {
     padding: 24px 0 10px;
     width: 80%;

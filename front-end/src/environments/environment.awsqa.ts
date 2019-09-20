@@ -3,5 +3,5 @@ export const environment = {
   name: 'awsuat',
   apiUrl: 'https://qa-fecfile-api.efdev.fec.gov/api/v1',
   validateSuccess: 'All required fields have passed validation',
-  appTitle: 'FECFile Online',
+  appTitle: 'FECfile',
 };

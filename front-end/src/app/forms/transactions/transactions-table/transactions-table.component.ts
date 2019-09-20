@@ -662,7 +662,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
   }
-
+  
   public printPreview(): void {
     console.log('TransactionsTableComponent printPreview...!');
 
@@ -763,6 +763,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public editTransaction(trx: TransactionModel): void {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
+
+  public printTransaction(trx: TransactionModel): void {
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);  
+  }
+  
 
   /**
    * Trash the transaction selected by the user.

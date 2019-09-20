@@ -22,14 +22,14 @@ export class reportModel {
     create_date: string;
     last_update_date: string;
     viewtype: string;
-    selected; string;
-  
+    selected: boolean;
+    deleteddate: string;
     constructor(report: any) {
       this.id = report.id ? report.id : '';
       this.report_id = report.report_id ? report.report_id: '';
       this.form_type = report.form_type ? report.form_type : '';
       this.amend_ind = report.amend_ind ? report.amend_ind : '';
-      this.amend_number = report.amend_number ? report.amend_amend_numberind : 0;
+      this.amend_number = report.amend_number ? report.amend_number : 0;
       this.cmte_id = report.cmte_id ? report.cmte_id : '';
       this.report_type = report.report_type ? report.report_type : '';
       this.report_type_desc = report.report_type_desc ? report.report_type_desc : '';
@@ -47,6 +47,7 @@ export class reportModel {
       this.create_date = report.create_date ? report.create_date : '';
       this.last_update_date = report.last_update_date ? report.last_update_date : '';
       this.viewtype = report.viewtype ? report.viewtype : '';
-      this.selected = report.selected;
+      this.deleteddate= report.deleteddate? report.deleteddate : '';
+      this.selected = report.selected;     
     }
    }

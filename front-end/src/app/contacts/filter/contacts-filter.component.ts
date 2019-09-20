@@ -86,12 +86,15 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
 
   public isHideStateFilter: boolean;
   public isHideTypeFilter: boolean;
+  public isHideDeletedDateFilter: boolean;
   public states: any = [];
   public types: any = [];
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
   public aggregateAmountFilterValidation: ValidationErrorModel;
+  public filterDeletedDateFrom: Date = null;
+  public filterDeletedDateTo: Date = null;
 
   /**
    * Subscription for removing selected filters.
@@ -154,7 +157,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     this.msEdge = this.isEdge();
     this.isHideTypeFilter = true;
     this.isHideStateFilter = true;
-   
+    this.isHideDeletedDateFilter = true;
     this.initValidationErrors();
 
     this.applyFiltersCache();
@@ -191,6 +194,10 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleStateFilterItem() {
     this.isHideStateFilter = !this.isHideStateFilter;
+  }
+
+  public toggleDeletedDateFilterItem() {
+    this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
   }
 
   /**
@@ -309,6 +316,18 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       }
     }
     filters.filterTypes = filterTypes;
+
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
+    filters.show = modified;
 
     console.log("filters = ", filters);
     filters.show = modified;
@@ -458,6 +477,10 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
         this.types = this.cachedFilters.filterTypes;
         this.states = this.cachedFilters.filterStates;
 
+        this.filterDeletedDateFrom = this.cachedFilters.filterDeletedDateFrom;
+        this.filterDeletedDateTo = this.cachedFilters.filterDeletedDateTo;
+        this.isHideDeletedDateFilter = (this.filterDeletedDateFrom && this.filterDeletedDateTo) ? false : true;
+
       }
     } else {
       // Just in case cache has an unexpected issue, use default.
@@ -523,5 +546,34 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       }
     }
   }
+  /*private validateFilters(): boolean {
 
+    this.filterDeletedDateTo = this.handleDateAsSpaces(this.filterDeletedDateTo);
+    this.filterDeletedDateFrom = this.handleDateAsSpaces(this.filterDeletedDateFrom);
+
+    this.initValidationErrors();
+    if (this.filterDeletedDateFrom !== null && this.filterDeletedDateTo === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'To Deleted Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateTo !== null && this.filterDeletedDateFrom === null) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Deleted Date is required';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+    if (this.filterDeletedDateFrom > this.filterDeletedDateTo) {
+      this.deletedDateFilterValidation.isError = true;
+      this.deletedDateFilterValidation.message = 'From Deleted Date must preceed To Deleted Date';
+      this.isHideDeletedDateFilter = false;
+      return false;
+    }
+     return true;
+  }*/
+
+  private handleDateAsSpaces(date: any) {
+    return date === '' ? null : date;
+  }
 }

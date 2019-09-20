@@ -20,7 +20,10 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
 
-from fecfiler.core.transaction_util import get_line_number_trans_type
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    update_parent_purpose,
+)
 
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
                                     delete_schedB, get_list_child_schedB,
@@ -114,21 +117,29 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
 itemization_transaction_type_identifier_list = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
 
 # DICTIONARY OF ALL TRANSACTIONS TYPE IDENTIFIERS THAT ARE IMPLEMENTED AS 2 TRANSACTIONS IN 1 SCREEN FOR SCHED_A TO SCHED_A TABLE
-# TODO: need to decide if we need add "EAR_REC:EAR_REC_MEMO, PAC_EAR_REC:PAC_EAR_MEMO" to this list
+# the earmark list is emptied becuase the parent and child are saved with different api calls
+# TODO: need to clean up the earmark-related code when the decision is final
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT = { 
-                                            "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
-                                            "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
-                                            "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
-                                            "EAR_REC": "EAR_MEMO",
-                                            "PAC_EAR_REC": "PAC_EAR_MEMO" 
+                                            # "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
+                                            # "EAR_REC_CONVEN_ACC": "EAR_REC_CONVEN_ACC_MEMO",
+                                            # "EAR_REC_HQ_ACC": "EAR_REC_HQ_ACC_MEMO",
+                                            # "EAR_REC": "EAR_MEMO",
+                                            # "PAC_EAR_REC": "PAC_EAR_MEMO" 
                                         }
+EARMARK_SA_CHILD_LIST = [
+    "EAR_REC_RECNT_ACC_MEMO",
+    "EAR_REC_CONVEN_ACC_MEMO",
+    "AR_REC_HQ_ACC_MEMO",
+    "EAR_MEMO",
+    "PAC_EAR_MEMO",
+]
+                                            # "EAR_REC_RECNT_ACC": "EAR_REC_RECNT_ACC_MEMO",
 
 TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = { 
-                                            "CON_EAR_DEP": "CON_EAR_OUT_DEP",
-                                            "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
-                                            "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
-                                            "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
-
+                                            # "CON_EAR_DEP": "CON_EAR_OUT_DEP",
+                                            # "CON_EAR_UNDEP" : "CON_EAR_UNDEP_MEMO",
+                                            # "PAC_CON_EAR_DEP" : "PAC_CON_EAR_DEP_OUT",
+                                            # "PAC_CON_EAR_UNDEP" : "PAC_CON_EAR_UNDEP_MEMO",
                                         }
 
 API_CALL_SA = {'api_call' : '/sa/schedA'}
@@ -469,13 +480,30 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT t1.contribution_amount, t1.transaction_id, t1.report_id, t1.line_number, t1.contribution_date, 
-(SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), t1.memo_code, t1.back_ref_transaction_id
-FROM public.sched_a t1 
-WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s AND contribution_date >= %s 
-AND contribution_date <= %s AND delete_ind is distinct FROM 'Y' 
-ORDER BY contribution_date ASC, create_date ASC""", [
-                           entity_id, transaction_type_identifier, cmte_id, aggregate_start_date, aggregate_end_date])
+            cursor.execute("""
+            SELECT t1.contribution_amount, 
+                t1.transaction_id, 
+                t1.report_id, 
+                t1.line_number, 
+                t1.contribution_date, 
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
+                t1.memo_code, 
+                t1.back_ref_transaction_id
+            FROM public.sched_a t1 
+            WHERE entity_id = %s 
+            AND transaction_type_identifier = %s 
+            AND cmte_id = %s 
+            AND contribution_date >= %s 
+            AND contribution_date <= %s 
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY contribution_date ASC, create_date ASC
+            """, [
+                    entity_id, 
+                    transaction_type_identifier, 
+                    cmte_id, 
+                    aggregate_start_date, 
+                    aggregate_end_date
+                ])
             transactions_list = cursor.fetchall()
         return transactions_list
     except Exception as e:
@@ -514,8 +542,8 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
     try:
         child_flag = False
         itemization_value = 200
-        itemized_transaction_list = []
-        unitemized_transaction_list = []
+        # itemized_transaction_list = []
+        # unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
         if isinstance(contribution_date, str):
             contribution_date = date_format(contribution_date)
@@ -524,7 +552,6 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
             child_flag = True
             child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
-
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
@@ -547,7 +574,6 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
                     for child_SB_transaction in child_SB_transaction_list:
                         put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
-
 
     except Exception as e:
         raise Exception(
@@ -606,7 +632,6 @@ def post_schedA(datum):
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
-
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
@@ -799,7 +824,10 @@ def put_schedA(datum):
                 'The put_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+        update_date = datetime.datetime.strptime(prev_transaction_data.get('contribution_date'), '%Y-%m-%d').date()
+        if update_date > datum.get('contribution_date'):
+            update_date = datum.get('contribution_date')
+        update_linenumber_aggamt_transactions_SA(update_date, datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
     except:
@@ -1078,6 +1106,9 @@ def schedA(request):
             datum['cmte_id'] = cmte_id
             data = post_schedA(datum)
             output = get_schedA(data)
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SA_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -1140,6 +1171,10 @@ def schedA(request):
             form_type = find_form_type(report_id, datum.get('cmte_id'))
             data = put_schedA(datum)
             output = get_schedA(data)
+
+            # for earmark child transaction: update parent transction  purpose_description
+            if datum.get('transaction_type_identifier') in EARMARK_SA_CHILD_LIST:
+                update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedA API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

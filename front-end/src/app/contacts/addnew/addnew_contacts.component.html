@@ -15,7 +15,7 @@
         </div>
        </div>
 
-      <div class="grid-row">
+      <!--<div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
                 <div class="float-left">
                     <label for="type">
@@ -28,7 +28,7 @@
                       </button>
                     </label>
          &nbsp;&nbsp;&nbsp;
-                    <select id="type" name="type" class="form-control" (change)="selectTypeChange($event)">
+                   <select id="type" name="type" class="form-control" (change)="selectTypeChange($event)">
                       <option
                         *ngFor="let entityType of entityTypes"
                         [selected]="selectedentityType === entityType.code"
@@ -39,7 +39,7 @@
                     </select>
                  </div>
           </div>
-      </div>  
+      </div>  -->
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
@@ -60,6 +60,11 @@
               <div class="form-group">
                 <label [for]="col?.name">
                   {{ col?.text }}
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                </button>
                   <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
                     (Optional)
                   </ng-container>
@@ -227,7 +232,7 @@
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
                   <ng-select
-                    (change)="handleStateChange($event, col)"
+                    (change)="handleCandOfficeChange($event, col)"
                     class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="
@@ -237,15 +242,15 @@
                         : ''
                     "
                   >
-                    <ng-option *ngFor="let item of officeSought" [ngValue]="item">
-                      {{ item.code }} - {{ item.name }}
+                    <ng-option *ngFor="let item1 of officeSought" [ngValue]="item1">
+                      {{ item1.code }} - {{ item1.name }}
                     </ng-option>
                   </ng-select>
                 </ng-container>
 
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'Office_State'">
                   <ng-select
-                    (change)="handleStateChange($event, col)"
+                    (change)="handleOfficeStateChange($event, col)"
                     class="state-select"
                     [formControlName]="col?.name"
                     [ngClass]="
@@ -255,11 +260,29 @@
                         : ''
                     "
                   >
-                    <ng-option *ngFor="let item of states" [ngValue]="item">
-                      {{ item.code }} - {{ item.name }}
+                    <ng-option *ngFor="let item2 of states" [ngValue]="item2">
+                      {{ item2.code }} - {{ item2.name }}
                     </ng-option>
                   </ng-select>
                 </ng-container>
+                
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entityType'">
+                  <ng-select
+                    (change)="handleTypeChange($event, col)"
+                    class="state-select"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'state-select-error'
+                        : ''
+                    "
+                  >
+                    <ng-option *ngFor="let item3 of entityTypes" [ngValue]="item3">
+                      {{ item3.code }} - {{ item3.name }}
+                    </ng-option>
+                  </ng-select>
+                </ng-container>                
               </div>
             </div>
             <!-- ./col -->

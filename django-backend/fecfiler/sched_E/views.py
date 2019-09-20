@@ -27,14 +27,28 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-from fecfiler.sched_A.views import get_next_transaction_id
+from fecfiler.sched_A.views import (
+    get_next_transaction_id,
+    find_form_type,
+    find_aggregate_date,
+)
+from fecfiler.core.transaction_util import transaction_exists
 from fecfiler.sched_D.views import do_transaction
 
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+# TODO: may need to add the code for checking mandatory fields for aggregation
 MANDATORY_FIELDS_SCHED_E = ["cmte_id", "report_id", "transaction_id"]
+NEGATIVE_TRANSACTIONS = ["IE_VOID"]
+
+# a list of child_parent IE transaction types
+CHILD_PARENT_TRANSACTIONS = {
+    "IE_CC_PAY_MEMO": "IE_CC_PAY",
+    "IE_STAF_REIM_MEMO": "IE_STAF_REIM",
+    "IE_PMT_TO_PROL_MEMO": "IE_PMT_TO_PROL_MEMO",
+}
 
 
 def check_transaction_id(transaction_id):
@@ -44,6 +58,28 @@ def check_transaction_id(transaction_id):
             + "Transaction IDs start with SE characters".format(transaction_id)
         )
     return transaction_id
+
+
+def parent_transaction_exists(tran_id, sched_tp):
+    """
+    check if parent transaction exists
+    """
+    return transaction_exists(tran_id, sched_tp)
+
+
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    if data.get("transaction_type_identifier") in CHILD_PARENT_TRANSACTIONS:
+        if not data.get("back_ref_transaction_id"):
+            raise Exception("Error: parent transaction id missing.")
+        elif not parent_transaction_exists(
+            data.get("back_ref_transaction_id"), "sched_e"
+        ):
+            raise Exception("Error: parent transaction not found.")
+        else:
+            pass
 
 
 def check_mandatory_fields_se(data):
@@ -232,6 +268,197 @@ def validate_se_data(data):
     check_mandatory_fields_se(data)
 
 
+def update_aggregate_on_transaction(
+    cmte_id, report_id, transaction_id, aggregate_amount
+):
+    """
+    update transaction with updated aggregate amount
+    """
+    print(transaction_id)
+    print(aggregate_amount)
+    try:
+        _sql = """
+        UPDATE public.sched_e
+        SET calendar_ytd_amount= %s
+        WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+        AND delete_ind is distinct from 'Y'
+        """
+        do_transaction(_sql, (aggregate_amount, transaction_id, report_id, cmte_id))
+    except Exception as e:
+        raise Exception(
+            """error on update aggregate amount
+                        for transaction:{}""".format(
+                transaction_id
+            )
+        )
+
+
+def get_transactions_election_and_office(start_date, end_date, data):
+    """
+    load all transactions by electtion code and office within the date range.
+    - for president election: election_code + office
+    - for senate electtion: election_code + office + state
+    - for house: election_code + office + state + district
+
+    when both dissemination_date and disbursement_date are available, 
+    we take priority on dissemination_date 
+    """
+    if data.get("so_cand_office") == "P":
+        _sql = """
+        SELECT  
+                transaction_id, 
+				expenditure_amount as transaction_amt,
+				COALESCE(dissemination_date, disbursement_date) as transaction_dt
+        FROM public.sched_e
+        WHERE  
+            cmte_id = %s
+            AND COALESCE(dissemination_date, disbursement_date) >= %s
+            AND COALESCE(dissemination_date, disbursement_date) <= %s
+            AND election_code = %s
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY transaction_dt ASC, create_date ASC;
+        """
+        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
+    elif data.get("so_cand_office") == "S":
+        _sql = """
+        SELECT  
+                transaction_id, 
+				expenditure_amount as transaction_amt,
+				COALESCE(dissemination_date, disbursement_date) as transaction_dt
+        FROM public.sched_e
+        WHERE  
+            cmte_id = %s
+            AND COALESCE(dissemination_date, disbursement_date) >= %s
+            AND COALESCE(dissemination_date, disbursement_date) <= %s
+            AND election_code = %s
+            AND so_cand_state = %s
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY transaction_dt ASC, create_date ASC; 
+        """
+        _params = (
+            data.get("cmte_id"),
+            start_date,
+            end_date,
+            data.get("election_code"),
+            data.get("so_cand_state"),
+        )
+    elif data.get("so_cand_office") == "H":
+        _sql = """
+        SELECT  
+                transaction_id, 
+				expenditure_amount as transaction_amt,
+				COALESCE(dissemination_date, disbursement_date) as transaction_dt
+        FROM public.sched_e
+        WHERE  
+            cmte_id = %s
+            AND COALESCE(dissemination_date, disbursement_date) >= %s
+            AND COALESCE(dissemination_date, disbursement_date) <= %s
+            AND election_code = %s
+            AND so_cand_state = %s
+            AND so_cand_dsitrict = %s
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY transaction_dt ASC, create_date ASC;  
+        """
+        _params = (
+            data.get("cmte_id"),
+            start_date,
+            end_date,
+            data.get("election_code"),
+            data.get("so_cand_state"),
+            data.get("so_cand_district"),
+        )
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _params)
+            transactions_list = cursor.fetchall()
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            "Getting transactions for election and office is throwing an error: "
+            + str(e)
+        )
+
+
+def update_aggregate_amt_se(data):
+    """
+    update related se aggrgate amount
+    
+    """
+    try:
+        # itemization_value = 200
+        cmte_id = data.get("cmte_id")
+        report_id = data.get("report_id")
+        form_type = find_form_type(report_id, cmte_id)
+        # dissemination_date take priority
+        if data.get("dissemination_date"):
+            trans_dt = date_format(data.get("dissemination_date"))
+        else:
+            trans_dt = date_format(data.get("disbursement_date"))
+
+        # if isinstance(contribution_date, str):
+        # contribution_date = date_format(contribution_date)
+        aggregate_start_date, aggregate_end_date = find_aggregate_date(
+            form_type, trans_dt
+        )
+        # checking for child tranaction identifer for updating auto generated SB transactions
+        # if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
+        #     child_flag = True
+        #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
+        # make sure transaction list comes back sorted by contribution_date ASC
+        # transactions_list = list_all_transactions_entity(
+        #     aggregate_start_date,
+        #     aggregate_end_date,
+        #     transaction_type_identifier,
+        #     entity_id,
+        #     cmte_id,
+        # )
+        transaction_list = get_transactions_election_and_office(
+            aggregate_start_date, aggregate_end_date, data
+        )
+        aggregate_amount = 0
+        for transaction in transaction_list:
+            aggregate_amount += transaction[1]
+            logger.debug(
+                "update aggregate amount for transaction:{}".format(transaction[0])
+            )
+            logger.debug("current aggregate amount:{}".format(aggregate_amount))
+            update_aggregate_on_transaction(
+                cmte_id, report_id, transaction[0], aggregate_amount
+            )
+            # # checking in reports table if the delete_ind flag is false for the corresponding report
+            # if transaction[5] != 'Y':
+            #     # checking if the back_ref_transaction_id is null or not.
+            #     # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+            #     if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+            #         aggregate_amount += transaction[0]
+            #     # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
+            #     # if str(report_id) == str(transaction[2]):
+            #     if contribution_date <= transaction[4]:
+            #         line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
+            #         put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
+
+            #     #Updating aggregate amount to child auto generate sched B transactions
+            #     if child_flag:
+            #         child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
+            #         for child_SB_transaction in child_SB_transaction_list:
+            #             put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
+
+    except Exception as e:
+        raise Exception(
+            "The update aggregate amount for sched_e is throwing an error: " + str(e)
+        )
+
+
+def validate_negative_transaction(data):
+    """
+    validate transaction amount if negative transaction encounterred.
+    """
+    if data.get("transaction_type_identifier") in NEGATIVE_TRANSACTIONS:
+        if not float(data.get("expenditure_amount")) < 0:
+            raise Exception("current transaction amount need to be negative!")
+
+
 def post_schedE(data):
     """
     function for handling POST request for se, need to:
@@ -241,15 +468,51 @@ def post_schedE(data):
     """
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        logger.debug("saving sched_e with data:{}".format(data))
+        if "payee_entity_id" in data:
+            logger.debug("update payee entity with data:{}".format(data))
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("payee_entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            rollback_flag = True
+        else:
+            logger.debug("saving new entity:{}".format(data))
+            new_entity = post_entities(data)
+            logger.debug("new entity created:{}".format(new_entity))
+            rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get("entity_id")
+        # print('post_scheda {}'.format(entity_id))
+        data["payee_entity_id"] = entity_id
         data["transaction_id"] = get_next_transaction_id("SE")
-        print(data)
+        # print(data)
         validate_se_data(data)
+        validate_negative_transaction(data)
+        validate_parent_transaction_exist(data)
+        # TODO: add code for saving payee entity
+
         try:
+            logger.debug("saving new sched_e item with data:{}".format(data))
             post_sql_schedE(data)
         except Exception as e:
+            # remove entiteis if saving sched_a fails
+            if rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
+        update_aggregate_amt_se(data)
         return data
     except:
         raise
@@ -295,8 +558,10 @@ def post_sql_schedE(data):
             line_number,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
-        """
+        VALUES ({})
+        """.format(
+            ",".join(["%s"] * 32)
+        )
         _v = (
             data.get("cmte_id"),
             data.get("report_id"),
@@ -311,7 +576,7 @@ def post_sql_schedE(data):
             data.get("expenditure_amount"),
             data.get("disbursement_date"),
             data.get("calendar_ytd_amount"),
-            data.get("purpose,"),
+            data.get("purpose"),
             data.get("category_code"),
             data.get("payee_cmte_id"),
             data.get("support_oppose_code"),
@@ -331,9 +596,14 @@ def post_sql_schedE(data):
             data.get("line_number"),
             datetime.datetime.now(),
         )
+        logger.debug("sql:{}".format(_sql))
+        logger.debug("parameters:{}".format(_v))
         with connection.cursor() as cursor:
+            logger.info("sched_e db transaction: POST")
             # Insert data into schedD table
             cursor.execute(_sql, _v)
+            logger.info("transaction done.")
+
     except Exception:
         raise
 
