@@ -55,6 +55,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.2.1",
+    "classlist.js": "~1.1.20150312",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~1.7.1",
@@ -66,6 +67,7 @@
     "protractor": "^5.4.1",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
-    "typescript": "~2.7.2"
+    "typescript": "~2.7.2",
+    "web-animations-js": "~2.3.2"
   }
 }
