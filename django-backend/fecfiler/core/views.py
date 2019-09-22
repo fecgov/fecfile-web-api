@@ -1308,9 +1308,20 @@ def put_entities(data):
             data['entity_id'] = new_entity_id
             cloned_data = get_entities(data)[0]
             # remove None value field from data
+            # TODO: need to evaluate if this 100Per safe
             data = { k:v for k,v in data.items() if v }
             cloned_data.update(data)
             data = cloned_data
+        else:
+            logger.debug('combine existing data with new data:')
+            existing_data = get_entities(data)[0]
+            logger.debug('existing data:{}'.format(existing_data))
+            # remove None value field from data
+            data = { k:v for k,v in data.items() if v }
+            existing_data.update(data)
+            data = existing_data
+            logger.debug('data after update existing data with new data:{}'.format(data))
+
             # logger.debug('cloned cand entity data:{}'.format(cloned_data))
             # return cloned_data
         # filter out cand_fields for non-can entity
