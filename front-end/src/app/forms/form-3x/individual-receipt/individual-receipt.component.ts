@@ -1460,7 +1460,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   private _setReceiptObjectEntityId(userSelectedEntity: any, receiptObj: any, isChild: boolean) {
-    if (userSelectedEntity) {
+    if (userSelectedEntity && !receiptObj.entity_id) {
       if (userSelectedEntity.setEntityIdTo) {
         receiptObj[userSelectedEntity.setEntityIdTo] = userSelectedEntity.entity_id;
       } else {
