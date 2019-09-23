@@ -30,6 +30,7 @@
     "angular-archwizard": "^3.0.0",
     "angular-file-uploader": "^4.1.3",
     "bootstrap": "^4.1.3",
+    "classlist.js": "~1.1.20150312",
     "core-js": "^2.5.4",
     "json-server": "^0.14.0",
     "jsonwebtoken": "^8.3.0",
@@ -42,7 +43,7 @@
     "quill": "^1.3.6",
     "rxjs": "6.3.3",
     "rxjs-compat": "^6.3.2",
-    "web-animations-js": "^2.3.1",
+    "web-animations-js": "~2.3.2",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
@@ -55,7 +56,6 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.2.1",
-    "classlist.js": "~1.1.20150312",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~1.7.1",
@@ -67,7 +67,6 @@
     "protractor": "^5.4.1",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
-    "typescript": "~2.7.2",
-    "web-animations-js": "~2.3.2"
+    "typescript": "~2.7.2"
   }
 }
