@@ -55,7 +55,7 @@
             (click)="viewMode = 'tab3'"
             [ngClass]="viewMode === 'tab3' ? 'btn btn-block btn-primary' : 'btn btn-block btn-secondary-gray'"
           >
-        <h2>Cash Summary
+        <h2> Summary
 
         </h2>
           </button>
@@ -220,10 +220,50 @@
           </table>
         </div>
         <div id="tab3" *ngSwitchCase="'tab3'">
-          <table class="cash-on-hand-table">
-            <tbody *ngIf="tab3Data">
-                <div>&nbsp;&nbsp;&nbsp;&nbsp;This functionality is not yet implemented</div>
-            </tbody>
+          <table class="summary_table_text">            
+              <tbody *ngIf="tab3Data" class="summary_text">
+                  <tr>
+                      <td>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue">Cash on Hand as of January 1</div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue">Beginning Cash on Hand</div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue">Ending Cash on Hand</div>
+                          <div class="summary_text_level_1 summary_bg_color_white"></div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue">Debts/Loans Owed to Committee</div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue">Debts/Loans Owed by Committee</div>
+                      </td>
+  
+                      <td>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
+                          <div class="summary_text_level_1 summary_bg_color_white text-right"><h3>Total This Period</h3></div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED TO COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>
+                          <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED BY COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>
+                      </td>
+
+  
+                      <td>
+                        <div id="level_1" class="summary_text_amt_level_3" >
+                            {{ tab3Data['COH AS OF JANUARY 1'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_2" class="summary_text_amt_level_3" >
+                            {{ tab3Data['BEGINNING CASH ON HAND'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_3" class="summary_text_amt_level_3" >
+                            {{ tab3Data['ENDING CASH ON HAND'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_4" class="summary_text_level_3 summary_bg_color_white text-right" >
+                          <h3>Calendar Year-to-Date</h3>
+                        </div>
+                        <div id="level_5" class="summary_text_amt_level_3" >
+                            {{ tab3Data['DEBTS/LOANS OWED TO COMMITTEE YTD'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_6" class="summary_text_amt_level_3" >
+                            {{ tab3Data['DEBTS/LOANS OWED BY COMMITTEE YTD'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>                      
+                      </td>                    
+                  </tr>                  
+              </tbody>
           </table>
         </div>
       </div>
