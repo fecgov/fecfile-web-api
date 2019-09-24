@@ -91,7 +91,10 @@ export class ReasonComponent implements OnInit {
           reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
         });
-        this.frmReason.controls['reasonText'].setValue(this._form99Details.text);
+        const unescapedText = this._form99Details.text;
+        this.frmReason.controls['reasonText'].setValue(unescapedText);
+        this._reasonTextContent = unescapedText;
+        this._reasonInnerHTML = unescape(unescapedText);
        } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
@@ -140,10 +143,10 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    this._reasonTextContent = e.target.textContent;
-    this.textAreaTextContent = e.target.textContent;
+    this._reasonTextContent = e.target.value;
+    this.textAreaTextContent = e.target.value;
     if (this._reasonTextContent.length >= 1) {
-      this._reasonInnerText = e.target.innerText;
+      this._reasonInnerText = unescape(e.target.value);
 
       if (this._checkUnsupportedHTML(this._reasonInnerText)) {
         this.reasonHasInvalidHTML = true;
@@ -155,7 +158,7 @@ export class ReasonComponent implements OnInit {
         this.reasonHasInvalidHTML = false;
 
         if (!this._validateForSpaces(this._reasonInnerText)) {
-          this._reasonInnerHTML = e.target.innerHTML;
+          this._reasonInnerHTML = unescape(unescape(e.target.value));
 
           this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
 
