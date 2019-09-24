@@ -1460,6 +1460,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   private _setReceiptObjectEntityId(userSelectedEntity: any, receiptObj: any, isChild: boolean) {
+    // added condition to check if entity_id already exist in receiptObj to avoid overriding entity ID's
     if (userSelectedEntity && !receiptObj.entity_id) {
       if (userSelectedEntity.setEntityIdTo) {
         receiptObj[userSelectedEntity.setEntityIdTo] = userSelectedEntity.entity_id;
@@ -2946,8 +2947,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         }
         prePopulateFieldArray = [];
+        prePopulateFieldArray.push({name: 'purpose_description',
+        value: earmarkMemoPurpose});
         prePopulateFieldArray.push({name: 'expenditure_purpose',
-          value: earmarkMemoPurpose});
+        value: earmarkMemoPurpose});
       }
     }
     return prePopulateFieldArray;
