@@ -2738,7 +2738,9 @@ def get_summary_table(request):
                         'BEGINNING CASH ON HAND': coh_bop,
                         'ENDING CASH ON HAND': coh_cop,
                         'DEBTS/LOANS OWED TO COMMITTEE': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE': 0}
+                        'DEBTS/LOANS OWED BY COMMITTEE': 0,
+                        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
+                        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0}
 
         forms_obj = {'Total Raised': {'period_receipts': period_receipt},
                     'Total Spent': {'period_disbursements': period_disbursement},
