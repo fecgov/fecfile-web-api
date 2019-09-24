@@ -1078,7 +1078,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
-        } else if (this.isFieldName(field, 'purpose_description')) {
+        } else if (this.isFieldName(field, 'purpose_description') || this.isFieldName(field, 'expenditure_purpose')) {
           const preTextHiddenField = this._findHiddenField('name', 'pretext');
           let preText = '';
           if (preTextHiddenField) {
