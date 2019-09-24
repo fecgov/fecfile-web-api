@@ -154,6 +154,18 @@ API_CALL_SB = {'api_call' : '/sb/schedB'}
 REQ_ELECTION_YR = ''
 ELECTION_YR = {'election_year': REQ_ELECTION_YR}
 
+# a list of treansaction types for sched_l(levin funds report) contribuitions
+SCHED_L_A_TRAN_TYPES = [
+    "LEVIN_PAC_REC",
+    "LEVIN_TRIB_REC",
+    "LEVIN_PARTN_MEMO",
+    "LEVIN_PARTN_REC",
+    "LEVIN_ORG_REC",
+    "LEVIN_INDV_REC",
+    "LEVIN_NON_FED_REC",
+    "LEVIN_NON_FED_REC",
+]
+
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
     try:
@@ -170,7 +182,7 @@ def get_next_transaction_id(trans_char):
 def check_transaction_id(transaction_id):
     """validate transaction id against trsaction types, e.g. SA20190627000000094"""
     try:
-        transaction_type_list = ["SA", ]
+        transaction_type_list = ["SA", "LA"]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
             raise Exception(
@@ -655,7 +667,11 @@ def post_schedA(datum):
         # continue to save transaction
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
-        trans_char = "SA"
+        # for sched_l contributions, the transaction is starts with 'SLA'
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            trans_char = "LA"
+        else:
+            trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
         try:
