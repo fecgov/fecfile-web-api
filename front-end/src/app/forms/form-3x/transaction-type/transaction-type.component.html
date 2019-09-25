@@ -80,6 +80,8 @@
                           placeholder="{{childOption.text}}"
                           type="radio"
                           [name]="secondaryOption"
+                          formControlName="secondaryOption"
+                          [(ngModel)]="transactionType"
                           [value]="childOption.value"
                           (click)="updateTypeSelected($event)"
                         />
