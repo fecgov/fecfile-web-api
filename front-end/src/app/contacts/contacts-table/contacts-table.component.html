@@ -12,6 +12,7 @@
         <input [@fadeInOut]  [(ngModel)]="allContactsSelected" type="checkbox"
             (change)="changeAllContactsSelected()">
         </th>
+
          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('tentityTypeype')" [class]="getSortClass('entityType')" (click)="changeSortDirection('entityType')">Entity Type
@@ -58,10 +59,10 @@
               <button class="dropdown-item" (click)="exportAllSelected()">
                 <i class="file-export-icon"></i> Export
               </button>
-              <button class="dropdown-item" (click)="trashAllSelected()">
+            <!-- <button class="dropdown-item" (click)="trashAllSelected()">
                 <i class="trash-icon"></i> Trash
-              </button>
-            </div>
+              </button> -->
+            </div> 
           </div>
           <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
@@ -113,7 +114,7 @@
               <button class="dropdown-item" (click)="viewActivity(cnt)">
                 <i class="view-icon"></i> View Activity
               </button>
-              <button class="dropdown-item" (click)="trashContact(cnt)">
+              <button *ngIf="cnt.activeTransactionsCnt == 0" class="dropdown-item" (click)="trashContact(cnt)">
                 <i class="trash-icon"></i> Trash
               </button>
             </div>

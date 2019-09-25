@@ -261,7 +261,7 @@ export class ContactsService {
       model.candOffice = row.candOffice;
       model.candOfficeState = row.candOfficeState
       model.candOfficeDistrict = row.candOfficeDistrict;
-
+      model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
       modelArray.push(model);

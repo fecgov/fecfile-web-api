@@ -23,7 +23,7 @@ export class ContactModel {
     candCmteId: string;
     deletedDate: string;
     selected: boolean;
- 
+    activeTransactionsCnt: number;
     constructor(contact: any) {
         this.entityType = contact.entityType ? contact.entityType : '';
         this.id = contact.id ? contact.id : '';
@@ -50,6 +50,7 @@ export class ContactModel {
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
         this.selected = contact.selected;
+        this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
        
 
     }

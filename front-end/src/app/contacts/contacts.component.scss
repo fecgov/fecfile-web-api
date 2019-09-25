@@ -40,7 +40,7 @@
     header {
       .header-content {
         display: block;
-        margin: 0 auto;
+        margin: 5 auto;
         width: 96%;
         padding: .75em 0 .25em 0;
         @include clearfix();
@@ -59,7 +59,7 @@
 
     .contacts__btn-container {
       height: 100%;
-      padding: 1em 1em 0 1em;
+      //padding: 1em 1em 0 1em;
     }
 
     // .contacts__btn-search-wrapper {

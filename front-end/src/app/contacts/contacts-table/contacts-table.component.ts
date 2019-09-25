@@ -574,7 +574,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     let conIds = '';
     const selectedContacts: Array<ContactModel> = [];
     for (const con of this.contactsModel) {
-      if (con.selected) {
+      if (con.selected && con.activeTransactionsCnt === 0) {
         selectedContacts.push(con);
         conIds += con.id + ', ';
       }
