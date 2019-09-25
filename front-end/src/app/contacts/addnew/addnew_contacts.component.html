@@ -1,6 +1,21 @@
 <ng-template #rt let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeName let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidate let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
+</ng-template>
 
 <div class="add_new_contact-container">
   <form [formGroup]="frmContact">
@@ -81,7 +96,8 @@
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
                       *ngIf="col?.name !== 'first_name' 
-                          && col?.name !== 'last_name'"
+                          && col?.name !== 'last_name'
+                          && col?.name !== 'entity_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -144,6 +160,30 @@
                       [inputFormatter]="formatterFirstName"
                       (selectItem)="handleSelectedItem($event)"
                     />
+
+                    <input
+                    *ngIf="col?.name === 'entity_name'"
+                    class="form-control"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [attr.type]="col?.type"
+                    [attr.name]="col?.name"
+                    [attr.value]="col?.value"
+                    [maxlength]="col?.validation?.max"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    "
+                    id="typeahead-template-entity-name"
+                    [ngbTypeahead]="searchOrg"
+                    [resultTemplate]="rtOrg"
+                    [inputFormatter]="formatterOrgName"
+                    (selectItem)="handleSelectedOrgItem($event)"
+                  />
+
                   </div>
                   <div
                     class="error-text"
@@ -217,6 +257,8 @@
                   <ng-select
                     (change)="handleStateChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
@@ -230,11 +272,32 @@
                     </ng-option>
                   </ng-select>
                 </ng-container>
+                
+               <!-- <ng-container *ngIf="col?.type === 'select' && 
+                    (isFieldName(col?.name, 'state') ||
+                    isFieldName(col?.name, 'cand_office_state'))">
+                  <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
+                    class="form-control" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
+                        frmIndividualReceipt.get(col?.name)?.invalid &&
+                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                          ? 'forms__select-error'
+                          : ''
+                      ">
+                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                      <span>{{ item.code + ' - ' + item.name }}</span>
+                    </ng-template>
+                  </ng-select>
+                </ng-container> -->
+
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
                   <ng-select
                     (change)="handleCandOfficeChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -252,7 +315,11 @@
                   <ng-select
                     (change)="handleOfficeStateChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)

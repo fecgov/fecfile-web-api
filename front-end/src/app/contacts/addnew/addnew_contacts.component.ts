@@ -382,7 +382,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @param stateOption the state selected in the dropdown.
    */
-  public handleStateChange(stateOption: any, col: any) {
+  
+   public handleStateChange(stateOption: any, col: any) {
     console.log("handleStateChange stateOption", stateOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
@@ -403,6 +404,18 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       this.frmContact.patchValue({ state: stateCode }, { onlySelf: true });
     }
   }
+
+
+  /*public handleStateChange(stateOption: any, col: any) {
+    console.log("handleStateChange stateOption", stateOption);
+   
+    if (this._selectedEntity) {
+      // this.showWarn(col.text);
+      this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+    } else {
+      this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
+    }
+  }*/
 
   public handleCandOfficeChange(candOfficeOption: any, col: any) {
     console.log("handleCandOfficeChange candOfficeOption", candOfficeOption);
@@ -448,7 +461,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  
   /*public handleTypeChange(entityOption: any, col: any) {
     console.log("handleTypeChange entityOption", entityOption);
     if (this._selectedEntity) {
@@ -533,13 +545,106 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
   }
 
-  /**
+/**
    * Format an entity to display in the type ahead.
    *
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadItem(result: any) {
-    return `${result.last_name}, ${result.first_name}, ${result.street_1}, ${result.street_2}`;
+    const lastName = result.last_name ? result.last_name.trim() : '';
+    const firstName = result.first_name ? result.first_name.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+
+    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Format an entity to display in the Org type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadOrgItem(result: any) {
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.entity_name ? result.entity_name.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Format an entity to display in the Committee ID type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCommitteeId(result: any) {
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.cmte_id ? result.cmte_id.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Format an entity to display in the Candidate ID type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCandidateId(result: any) {
+    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
+
+    return `${candidateId}, ${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
+  }
+
+  /**
+   * Format an entity to display in the Committee Name type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCommitteeName(result: any) {
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+    const name = result.cmte_id ? result.cmte_name.trim() : '';
+
+    return `${name}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Format an entity to display in the Candidate type ahead field.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCandidate(result: any) {
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
+
+    return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
   }
 
   /**
@@ -547,6 +652,20 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
+  public handleSelectedOrgItem($event: NgbTypeaheadSelectItemEvent) {
+    const contact = $event.item;
+    this._selectedEntity = this._utilService.deepClone(contact);
+    //this.frmContact.patchValue({ type: contact.type }, { onlySelf: true });
+    this.frmContact.patchValue({ last_name: contact.entity_name }, { onlySelf: true });
+    this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
+    this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
+    this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    //this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
+    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+  }
+
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
@@ -561,14 +680,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
+    //this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
-    this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
-    this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
+    //this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    //this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
+    //this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
+    //this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
 
 
     let transactionTypeIdentifier = '';
@@ -585,6 +704,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     //const reportId = this.getReportIdFromStorage();
   }
+
 
   /**
    * Search for entities/contacts when last name input value changes.
@@ -619,6 +739,115 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     );
 
   /**
+   * Search for Candidates when last name input value changes.
+   */
+  searchCandLastName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cand_last_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for Candidate when first name input value changes.
+   */
+  searchCandFirstName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cand_first_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for entities when organization/entity_name input value changes.
+   */
+  searchOrg = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'entity_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for entities when organization/entity_name input value changes.
+   */
+  searchCommitteeName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cmte_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for entities when organization/entity_name input value changes.
+   */
+  searchCommitteeId = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        const searchTextUpper = searchText.toUpperCase();
+
+        if (
+          searchTextUpper === 'C' ||
+          searchTextUpper === 'C0' ||
+          searchTextUpper === 'C00' ||
+          searchTextUpper === 'C000'
+        ) {
+          return Observable.of([]);
+        }
+
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'cmte_id');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for entities when Candidate ID input value changes.
+   */
+  searchCandidateId = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText.length < 3) {
+          return Observable.of([]);
+        } else {
+          const searchTextUpper = searchText.toUpperCase();
+          return this._typeaheadService.getContacts(searchTextUpper, 'cand_id');
+        }
+      })
+    )
+
+
+  /**
    * format the value to display in the input field once selected from the typeahead.
    *
    * For some reason this gets called for all typeahead fields despite the binding in the
@@ -649,41 +878,94 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   };
 
   /**
-   * Obtain the Report ID from local storage.
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the last name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
    */
-  /*private getReportIdFromStorage() {
-    let reportId = '0';
-    let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
-      form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+  formatterCandLastName = (x: { cand_last_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cand_last_name;
+    } else {
+      return x;
     }
+  };
 
-    console.log('viewTransactions form3XReportType', form3XReportType);
-
-    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-      if (form3XReportType.hasOwnProperty('reportId')) {
-        reportId = form3XReportType.reportId;
-      } else if (form3XReportType.hasOwnProperty('reportid')) {
-        reportId = form3XReportType.reportid;
-      }
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the first name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandFirstName = (x: { cand_first_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cand_first_name;
+    } else {
+      return x;
     }
-    return reportId;
-  }*/
+  };
 
-  // Use this if the fields populated by the type-ahead should be disabled.
-  // public isReadOnly(name: string, type: string) {
-  //   if (name === 'contribution_aggregate' && type === 'text') {
-  //     return true;
-  //   }
-  //   if (name === 'first_name' || name === 'last_name' || name === 'prefix') {
-  //     if (this._selectedEntityId) {
-  //       console.log('this._selectedEntityId = ' + this._selectedEntityId);
-  //       return true;
-  //     }
-  //   }
-  //   return null;
-  // }
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the entity name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterOrgName = (x: { entity_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.entity_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the committee ID field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCommitteeId = (x: { cmte_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.cmte_id;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the Candidate ID field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandidateId = (x: { beneficiary_cand_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.beneficiary_cand_id;
+    } else {
+      return x;
+    }
+  }
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the committee name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCommitteeName = (x: { cmte_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cmte_name;
+    } else {
+      return x;
+    }
+  };
 
   private getFormFields(): void {
     console.log('get contact form fields ' + this.transactionType);
