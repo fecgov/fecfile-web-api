@@ -279,7 +279,11 @@ export class TransactionSidebarComponent implements OnInit {
                 this._router.navigate([`/forms/form/${this._formType}`], {
                   queryParams: { 
                     step: 'step_2',
-                    transactionCategory: this.transactionCategories[transactionCategorieIndex].value
+                    transactionCategory: this.transactionCategories[transactionCategorieIndex].value,
+                    transactionSubCategoryType: this.transactionCategories[transactionCategorieIndex]
+                    .options[transactionCategoryOptionIndex].value,
+                    transactionSubCategory: this.transactionCategories[transactionCategorieIndex]
+                    .options[transactionCategoryOptionIndex].options[transactionCategoryOptionOptionsIndex].value
                   }
                 });
               }
