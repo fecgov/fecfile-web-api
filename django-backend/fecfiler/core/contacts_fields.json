@@ -224,7 +224,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -544,7 +544,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -841,7 +841,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -915,7 +915,7 @@
                         "width": "197px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 200,
                             "alphaNumeric": true
                         }
                     }
@@ -1017,7 +1017,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
