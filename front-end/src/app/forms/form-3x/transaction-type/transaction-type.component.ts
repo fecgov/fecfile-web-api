@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPanelChangeEvent, NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
@@ -20,6 +20,7 @@ import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
   encapsulation: ViewEncapsulation.None
 })
 export class TransactionTypeComponent implements OnInit {
+  @ViewChild('acc') accordion: NgbAccordion;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
   @Input() transactionCategory: string = null;
@@ -64,6 +65,19 @@ export class TransactionTypeComponent implements OnInit {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const setTargetVal = {target: {value: null, placeholder: null}};
+    this.frmOption = this._fb.group({
+      secondaryOption: ['', Validators.required]
+    });
+    if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
+      setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+      setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+      this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
+      this.updateTypeSelected(setTargetVal);
+    }
+  }
+
   ngDoCheck(): void {
     if (this.transactionCategory) {
       this.transactionCategorySelected = false;
@@ -85,6 +99,10 @@ export class TransactionTypeComponent implements OnInit {
         this._setSecondaryTransactionCategories();
       }
     }
+  }
+
+  private _toggle(sec_option) {
+    setTimeout(() => this.accordion.toggle(sec_option), 0);
   }
 
   /**
