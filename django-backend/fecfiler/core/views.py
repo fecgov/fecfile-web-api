@@ -2400,6 +2400,9 @@ def loans_sql(sql, value_list, error_message):
         raise Exception(error_message + str(e))
 
 def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id ):
+    """
+    return line number, contribution_amount of each transaction and calendar_year sum of all contribution_amount
+    """
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
