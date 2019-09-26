@@ -236,8 +236,9 @@ export class TransactionTypeComponent implements OnInit {
   public childOptionsListClick(id): void {
     console.log('transaction type selected: ', id);
     if (document.getElementById(id) != null) {
-      var obj = <HTMLInputElement>document.getElementById('option_' + id);
+      const obj = <HTMLInputElement>document.getElementById('option_' + id);
       obj.click();
+      obj.checked = true;
     }
   }
 }
