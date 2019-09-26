@@ -1941,38 +1941,72 @@ def load_child_transactions(cmte_id, report_id):
     """
     a helper function to query and load all child transactions
     """
-    child_query_string = """
-    SELECT json_agg(t) FROM
-        (SELECT transaction_type, 
-                transaction_type_desc, 
-                transaction_id, 
-                api_call, 
-                name, 
-                street_1, 
-                street_2, 
-                city, 
-                state, 
-                zip_code, 
-                transaction_date, 
-                transaction_amount, 
-                aggregate_amt, 
-                purpose_description, 
-                occupation, 
-                employer, 
-                memo_code, 
-                memo_text, 
-                itemized, 
-                transaction_type_identifier, 
-                entity_id,
-                back_ref_transaction_id 
-        FROM all_transactions_view
-        WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
-        AND delete_ind is distinct from 'Y') t;
-        """
+    if report_id is None:
+        child_query_string = """
+        SELECT json_agg(t) FROM
+            (SELECT transaction_type, 
+                    transaction_type_desc, 
+                    transaction_id, 
+                    api_call, 
+                    name, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    transaction_date, 
+                    transaction_amount, 
+                    aggregate_amt, 
+                    purpose_description, 
+                    occupation, 
+                    employer, 
+                    memo_code, 
+                    memo_text, 
+                    itemized, 
+                    transaction_type_identifier, 
+                    entity_id,
+                    back_ref_transaction_id 
+            FROM all_transactions_view
+            WHERE cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+            AND delete_ind is distinct from 'Y') t;
+            """
+    else:
+        child_query_string = """
+        SELECT json_agg(t) FROM
+            (SELECT transaction_type, 
+                    transaction_type_desc, 
+                    transaction_id, 
+                    api_call, 
+                    name, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    transaction_date, 
+                    transaction_amount, 
+                    aggregate_amt, 
+                    purpose_description, 
+                    occupation, 
+                    employer, 
+                    memo_code, 
+                    memo_text, 
+                    itemized, 
+                    transaction_type_identifier, 
+                    entity_id,
+                    back_ref_transaction_id 
+            FROM all_transactions_view
+            WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+            AND delete_ind is distinct from 'Y') t;
+            """
     child_dic = {}
     try:
         with connection.cursor() as cursor:
-            cursor.execute(child_query_string, (report_id, cmte_id))
+            if report_id is None:
+                cursor.execute(child_query_string, [cmte_id])
+            else:
+                cursor.execute(child_query_string, (report_id, cmte_id))
+            # print(cursor.query)
             child_list = cursor.fetchone()[0]
             # TODO : update null value, NOT SURE it is necessary
             # just go with parent function
@@ -1988,17 +2022,17 @@ def load_child_transactions(cmte_id, report_id):
                     else:
                         child_dic[child['back_ref_transaction_id']].append(child)
     except Exception as e:
-        logger.debug("loading child errors:" + str(e))
+        # logger.debug("loading child errors:" + str(e))
         raise
-    logger.debug('child dictionary loaded with {} items'.format(child_dic))
+    # logger.debug('child dictionary loaded with {} items'.format(child_dic))
     return child_dic
-
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         # print("request.data: ", request.data)
         cmte_id = request.user.username
+        report_id = None
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
@@ -2011,7 +2045,7 @@ def get_all_transactions(request):
         # import ipdb;ipdb.set_trace()
         params = request.data.get('filters', {})
         keywords = params.get('keywords')
-        report_id = request.data.get('reportid')
+        # report_id = request.data.get('reportid')
         if str(descending).lower() == 'true':
             descending = 'DESC'
         else:
@@ -2064,12 +2098,21 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
         #         else:
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        # ADDED the below code to access transactions across reports and based on categoryType
+        if 'reportid' in request.data and str(request.data.get('reportid')).lower() not in ['',"", "null", "none"]:
+            report_id = request.data.get('reportid')
+            param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
+        if 'categoryType' in request.data and str(request.data.get('categoryType')).lower() not in ['',"", "null", "none"]:
+            param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
-                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                            # + """ ORDER BY """ + order_string
         # print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
+            # print(cursor.query)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
@@ -2082,7 +2125,7 @@ def get_all_transactions(request):
         # update in FNE-1524: only load non-child transaction, child transaction will add as
         # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'
+                                    where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
                                     AND back_ref_transaction_id is null
                                     """
                                     # + """ ORDER BY """ + order_string
@@ -2094,6 +2137,7 @@ def get_all_transactions(request):
             trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 # forms_obj=data_row[0]

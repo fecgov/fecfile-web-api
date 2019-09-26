@@ -485,7 +485,7 @@ ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_t
         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
 
-def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id):
+def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, entity_id, cmte_id):
     """
     load all transactions for an entity within a time window
     return value: a list of transction_records [
@@ -504,10 +504,10 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
                 t1.contribution_date, 
                 (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
                 t1.memo_code, 
-                t1.back_ref_transaction_id
+                t1.back_ref_transaction_id,
+                t1.transaction_type_identifier
             FROM public.sched_a t1 
             WHERE entity_id = %s 
-            AND transaction_type_identifier = %s 
             AND cmte_id = %s 
             AND contribution_date >= %s 
             AND contribution_date <= %s 
@@ -515,7 +515,6 @@ def list_all_transactions_entity(aggregate_start_date, aggregate_end_date, trans
             ORDER BY contribution_date ASC, create_date ASC
             """, [
                     entity_id, 
-                    transaction_type_identifier, 
                     cmte_id, 
                     aggregate_start_date, 
                     aggregate_end_date
@@ -594,7 +593,7 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
             child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
         # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity(
-            aggregate_start_date, aggregate_end_date, transaction_type_identifier, entity_id, cmte_id)
+            aggregate_start_date, aggregate_end_date, entity_id, cmte_id)
         aggregate_amount = 0
         for transaction in transactions_list:
             # checking in reports table if the delete_ind flag is false for the corresponding report
@@ -606,13 +605,12 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
-                    line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
+                    line_number = get_linenumber_itemization(transaction[8], aggregate_amount, itemization_value, transaction[3])
                     put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
                     
                 #Updating aggregate amount to child auto generate sched A transactions
                 if child_flag_SA:
                     child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
-                    get_list_child_transactionId_schedB(cmte_id, transaction[1])
                     for child_SA_transaction in child_SA_transaction_list:
                         put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
                 #Updating aggregate amount to child auto generate sched B transactions
