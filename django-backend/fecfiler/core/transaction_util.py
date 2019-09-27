@@ -1,6 +1,10 @@
+import logging
 from functools import lru_cache
 from django.db import connection
 from fecfiler.core.views import get_entities, NoOPError
+
+
+logger = logging.getLogger(__name__)
 
 
 def update_parent_purpose(data):
@@ -33,6 +37,11 @@ def update_parent_purpose(data):
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
+            logger.debug("update parent purpose with sql:{}".format(_sql))
+            logger.debug(
+                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+            )
+            # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
             if cursor.rowcount == 0:
                 raise Exception(
