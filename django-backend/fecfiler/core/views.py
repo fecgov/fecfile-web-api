@@ -3217,8 +3217,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            search_keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3246,7 +3246,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+            trans_query_string = """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
             #print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
@@ -4227,8 +4227,8 @@ def get_all_trashed_contacts(request):
                 else:
                     descending = 'ASC'
 
-                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
-                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                search_keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
                 if search_string:
                     for key in search_keys:
                         if not param_string:
@@ -4264,7 +4264,7 @@ def get_all_trashed_contacts(request):
                 # print("trans_query_string: ",trans_query_string)
                 # import ipdb;ipdb.set_trace()
 
-                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                trans_query_string = """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
                 
                 if sortcolumn and sortcolumn != 'default':
