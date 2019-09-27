@@ -10,11 +10,20 @@ def update_parent_purpose(data):
     the child entity_name should be update in parents 
     'purpose_description' field
     """
+    desc_start = {
+        "EAR_REC_CONVEN_ACC_MEMO": "Earmarked for Convention Account ",
+        "EAR_REC_HQ_ACC_MEMO": "Earmarked for Headquarters Account ",
+        "EAR_REC_RECNT_ACC_MEMO": "Earmarked for Recount Account ",
+    }
     parent_tran_id = data.get("back_ref_transaction_id")
     cmte_id = data.get("cmte_id")
     report_id = data.get("report_id")
     entity_name = data.get("entity_name")
-    purpose = "Earmark for " + entity_name
+    tran_type = data.get("transaction_type_identifier")
+    if tran_type in desc_start:
+        purpose = desc_start.get(tran_type) + entity_name
+    else:
+        purpose = "Earmarked for " + entity_name
     _sql = """
     UPDATE public.sched_a 
     SET purpose_description = %s 
