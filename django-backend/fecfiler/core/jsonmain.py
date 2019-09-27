@@ -49,7 +49,7 @@ SCHED_SCHED_CODES_DICT = {
         'sched_h4': 'SH',
         'sched_h5': 'SH',
         'sched_h6': 'SH',
-        # 'sched_l': 'SL',
+        'sched_l': 'SL',
 
 }
 # Dictionary that maps form type to the schedules that it should include
@@ -70,7 +70,12 @@ SCHED_SCHED_CODES_DICT = {
 EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
 
 # List of all sched D transction type identifiers. This has no back_ref_transaction_id column so modifying SQL based on this list
-list_of_SC_SD_transaction_types = ['DEBT_TO_VENDOR', 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE', 'ALLOC_H1', 'ALLOC_H2_RATIO', 'TRAN_FROM_NON_FED_ACC', 'TRAN_FROM_LEVIN_ACC']
+list_of_transaction_types_with_no_back_ref = ['DEBT_TO_VENDOR', 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE', 'ALLOC_H1', 'ALLOC_H2_RATIO', 'TRAN_FROM_NON_FED_ACC', 'TRAN_FROM_LEVIN_ACC', 'SCHED_L_SUM']
+
+list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC']
+
+list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
+
 def get_header_details():
     return {
         "version": "8.3",
@@ -218,7 +223,7 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
                 query = query + " AND transaction_id in ('{}')".format(
                         "', '".join(transaction_id_list))
         # Addressing no back_ref_transaction_id column in sched_D
-        if identifier in list_of_SC_SD_transaction_types:
+        if identifier in list_of_transaction_types_with_no_back_ref:
             query_values_list = [report_id, cmte_id]
         else:
             query_values_list = [report_id, cmte_id,
@@ -319,7 +324,8 @@ def create_json_builders(request):
         schedule_name_list = [
             {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'}, {'sched_type': 'sched_e'}, 
             {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'}, {'sched_type': 'sched_c1'}, 
-            {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'}, {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'}]
+            {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'}, {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
+            {'sched_type': 'sched_l'}]
         # Adding Summary data to output based on form type
         if form_type == 'F3X' and (not transaction_flag):
             # Iterating through schedules list and populating data into output
@@ -360,8 +366,16 @@ def create_json_builders(request):
                                                         else:
                                                             transaction['child'] = child_transactions
                                     if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
-                                            output['data']['schedules'][schedule].append(
-                                                transaction)
+                                        if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
+                                            if 'SL-A' not in output['data']['schedules']:
+                                                output['data']['schedules']['SL-A'] = []
+                                            output['data']['schedules']['SL-A'].append(transaction)
+                                        elif transaction.get('transactionTypeIdentifier') in list_of_SL_SB_transaction_types:
+                                            if 'SL-B' not in output['data']['schedules']:
+                                                output['data']['schedules']['SL-B'] = []
+                                            output['data']['schedules']['SL-B'].append(transaction)
+                                        else:
+                                            output['data']['schedules'][schedule].append(transaction)
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         tmp_filename = cmte_id + '_' + str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path = '/tmp/'+tmp_filename

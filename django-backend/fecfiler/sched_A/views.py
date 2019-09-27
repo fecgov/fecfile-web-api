@@ -678,7 +678,7 @@ def post_schedA(datum):
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
-                    child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
+                    child_datum['expenditure_purpose'] = "In-Kind #" + entity_data.get('entity_name')
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
                         child_datum['other_name'] = None
