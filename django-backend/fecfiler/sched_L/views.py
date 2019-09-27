@@ -27,6 +27,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     check_calendar_year,
+    get_cvg_dates,
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
@@ -739,6 +740,9 @@ def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt):
                 + float(result["GOTV_disbursement_ytd"])
                 + float(result["generic__ytd"])
             )
+            result["total_disbursemenmt_amount_ytd"] = float(
+                result["other_disbursement_ytd"]
+            ) + float(result["line4_subtotal_ytd"])
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte dsibursements:" + str(e)
@@ -836,6 +840,9 @@ def load_report_disbursements_sumamry(cmte_id, report_id):
                 + float(result["GOTV disbursement"])
                 + float(result["generic campaign disbursement"])
             )
+            result["total_disbursement_amount"] = float(
+                result["other_disbursement"]
+            ) + float(result["line4_subtotal"])
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte dsibursements:" + str(e)
@@ -884,20 +891,46 @@ def load_report_receipts_sumamry(cmte_id, report_id):
                     result["non-itemized_receipt_amount"] = row[1]
                 else:
                     pass
-            result["itemized_non-itemized_combined"] = int(
+            result["itemized_non-itemized_combined"] = float(
                 result["itemized_receipt_amount"]
-            ) + int(result["non-itemized_receipt_amount"])
+            ) + float(result["non-itemized_receipt_amount"])
             cursor.execute(_sql2, (cmte_id, report_id))
             result["other_sl_receipt_amount"] = cursor.fetchone()[0]
-            result["total_receipt_amount"] = int(
+            result["total_receipt_amount"] = float(
                 result["itemized_non-itemized_combined"]
-            ) + int(result["other_sl_receipt_amount"])
+            ) + float(result["other_sl_receipt_amount"])
 
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte receipts amount:" + str(e)
         )
     return result
+
+
+def get_cash_on_hand_cop(report_id, cmte_id, prev_yr):
+    try:
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        if prev_yr:
+            prev_cvg_year = cvg_start_date.year - 1
+            prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
+        else:
+            prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT COALESCE(coh_cop, 0) from public.sched_l where cmte_id = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'",
+                [cmte_id, prev_cvg_end_dt],
+            )
+            if cursor.rowcount == 0:
+                coh_cop = 0
+            else:
+                result = cursor.fetchone()
+                coh_cop = result[0]
+
+        return coh_cop
+    except Exception as e:
+        raise Exception(
+            "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
+        )
 
 
 @api_view(["GET"])
@@ -964,6 +997,27 @@ def get_sl_summary_table(request):
         # query and calculate YTD disbursement amount
         response.update(load_ytd_disbursements_summary(cmte_id, cal_start, cal_end))
 
+        # calculate cash summary
+        coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
+        coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
+        coh_cop_report = (
+            coh_bop_report
+            + response.get("total_receipt_amount")
+            - response.get("total_dsibursement_amount")
+        )
+        coh_cop_ytd = (
+            coh_bop_ytd
+            + response.get("total_receipt_amount_ytd")
+            + response.get("total_disbursement_amount_ytd")
+        )
+        cach_summary = {
+            "coh_bop_report": coh_bop_report,
+            "coh_bop_ytd": coh_bop_ytd,
+            "coh_cop_report": coh_cop_report,
+            "coh_cop_ytd": coh_cop_ytd,
+        }
+        response.update(cash_summary)
+
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
         calendar_receipt = summary_receipts(calendar_args)
@@ -986,8 +1040,8 @@ def get_sl_summary_table(request):
         #     "Total Spent": {"period_disbursements": period_disbursement},
         #     "Cash summary": cash_summary,
         # }
-        forms_obj = {"dev_status": "partial"}
-        return Response(forms_obj, status=status.HTTP_200_OK)
+        # forms_obj = {"dev_status": "partial"}
+        return Response(response, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The get_sl_summary_table API is throwing an error: " + str(e),
