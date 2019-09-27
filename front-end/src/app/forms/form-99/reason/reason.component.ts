@@ -94,6 +94,7 @@ export class ReasonComponent implements OnInit {
         const unescapedText = this._form99Details.text;
         this.frmReason.controls['reasonText'].setValue(unescapedText);
         this._reasonTextContent = unescapedText;
+        this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
        } else {
         this.frmReason = this._fb.group({
