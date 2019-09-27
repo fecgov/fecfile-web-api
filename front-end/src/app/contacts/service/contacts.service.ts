@@ -246,7 +246,7 @@ export class ContactsService {
     const modelArray = [];
     for (const row of serverData) {
       const model = new ContactModel({});
-      model.entityType = row.entityType;
+      model.entity_type = row.entity_type;
       model.id = row.id;
       model.name = row.name;
       model.street1 = row.street1;
@@ -292,8 +292,11 @@ export class ContactsService {
       case 'name':
         name = 'name';
         break;
-      case 'type':
-        name = 'type';
+      case 'entity_name':
+        name = 'entity_name';
+        break;  
+      case 'entityType':
+        name = 'entityType';
         break;
       case 'id':
         name = 'id';
@@ -325,6 +328,9 @@ export class ContactsService {
       case 'entityName':
         name= 'entityName';
         break;
+      case 'officeSought':
+        name= 'officeSought';
+        break;  
       case 'candOffice':
         name= 'candOffice';
         break;
@@ -340,10 +346,12 @@ export class ContactsService {
       case 'deletedDate':
         name= 'deletedDate';
         break;   
+      case 'activeTransactionsCnt':
+        name= 'activeTransactionsCnt';
+        break;           
       default:
     }
     return name ? name : '';
-
   }
   /**
    * Map front-end model fields to server fields.
@@ -358,7 +366,7 @@ export class ContactsService {
     }
 
     serverObject.name =  model.name;
-    serverObject.entityType = model.entityType;
+    serverObject.entity_type = model.entity_type;
     serverObject.id = model.id;
     serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;
@@ -373,6 +381,7 @@ export class ContactsService {
     serverObject.candOfficeState = model.candOfficeState;
     serverObject.candOfficeDistrict = model.candOfficeDistrict;
     serverObject.candCmteId = model.candCmteId;
+    serverObject.activeTransactionsCnt = model.activeTransactionsCnt;
     serverObject.deletedDate = model.deletedDate;
     
     return serverObject;

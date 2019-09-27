@@ -98,7 +98,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     private _decimalPipe: DecimalPipe,
     private _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
-    private _contactsMessageService: ContactsMessageService
+    private _contactsMessageService: ContactsMessageService,
+    private _formsService: FormsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -533,7 +534,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
+    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
@@ -662,7 +663,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    //this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
+    //this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
   }
 
@@ -680,7 +681,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    //this.frmContact.patchValue({ entityType: contact.entityType }, { onlySelf: true });
+    //this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
 
@@ -1090,7 +1091,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
 
-        this.frmContact.patchValue({ entityType: formData.entityType }, { onlySelf: true });
+        this.frmContact.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
         this.frmContact.patchValue({ street_1: formData.street1 }, { onlySelf: true });
         this.frmContact.patchValue({ street_2: formData.street2 }, { onlySelf: true });
         this.frmContact.patchValue({ city: formData.city }, { onlySelf: true });
@@ -1132,9 +1133,18 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.reset();
     this._router.navigate([`/contacts`]);
   }
-  public saveAndExit(): void {
-    this.doValidateContact('saveAndExit');
+  
+  public viewContacts(): void {
+    console.log ("this.frmContact.dirty", this.frmContact.dirty);
+    console.log ("this.frmContact.touched", this.frmContact.touched);
+    
+    if (this.frmContact.dirty || this.frmContact.touched){
+      console.log ("contactsaved", JSON.stringify({ saved: false }));
+      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+    }
+    this._router.navigate([`/contacts`]);
   }
+
   public saveAndAddMore(): void {
     this.doValidateContact('saveAndAddMore');
     //this._router.navigate([`/contacts`]);
@@ -1214,28 +1224,52 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         if (res) {
           console.log('_contactsService.saveContact res', res);
           this._contactToEdit = null;
-          //this._formSubmitted = true;
           this.frmContact.reset();
-
-          //this.frmContact.controls['memo_code'].setValue(null);
           this._selectedEntity = null;
-          //this._selectedChangeWarn = null;
-          //this._selectedEntityChild = null;
-          //._selectedChangeWarnChild = null;
-
           localStorage.removeItem(contactObj);
-          if (callFrom === 'saveAndExit') {
+          if (callFrom === 'viewContacts') {
             this._router.navigate([`/contacts`]);
           }
-          //localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
+          localStorage.setItem('contact_saved', JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
         }
       });
     } else {
       this.frmContact.markAsDirty();
       this.frmContact.markAsTouched();
-      //localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: false }));
+      localStorage.setItem('contact_saved', JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
     }
   }
+
+  /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    console.log("contact canDeactivate called ...");
+    if (this._formsService.HasUnsavedData('contact')) {
+      let result: boolean = null;
+      console.log(" contact not saved...");
+      result = await this._dialogService
+        .confirm('', ConfirmModalComponent)
+        .then(res => {
+          let val: boolean = null;
+
+          if(res === 'okay') {
+            val = true;
+          } else if(res === 'cancel') {
+            val = false;
+          }
+
+          return val;
+        });
+
+      return result;
+    } else {
+      console.log(" contact saved...");
+      return true;
+  }
+ }
 }

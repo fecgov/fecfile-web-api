@@ -1,5 +1,5 @@
 export class ContactModel {
-    entityType: string;
+    entity_type: string;
     id: string;
     name: string;
     entity_name: string;
@@ -25,7 +25,7 @@ export class ContactModel {
     selected: boolean;
     activeTransactionsCnt: number;
     constructor(contact: any) {
-        this.entityType = contact.entityType ? contact.entityType : '';
+        this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
         this.name = contact.name ? contact.name : '';
         this.entity_name = contact.entity_name ? contact.entity_name : '';

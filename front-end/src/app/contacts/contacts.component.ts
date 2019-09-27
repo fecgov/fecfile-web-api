@@ -383,6 +383,15 @@ export class ContactsComponent implements OnInit, OnDestroy {
     this.removeFilter(FilterTypes.state, state);
   }
 
+  /**
+   * Remove the Deleted Date filter tag and inform the filter component to clear it.
+   */
+  public removeDateDeletedFilter(index: number, deletedDate: string) {
+    //this.filters..splice(index, 1);
+    this.removeFilter(FilterTypes.deletedDate, deletedDate);
+  }
+
+
   public removeTypeFilter(index: number, type: string) {
     this.filters.filterTypes.splice(index, 1);
     this.removeFilter(FilterTypes.type, type);
@@ -471,7 +480,10 @@ export class ContactsComponent implements OnInit, OnDestroy {
         this.removeSearchTagArrayItem(tagText);
         this.keywordGroup.pop(tagText);
         break;
-  
+      case FilterTypes.deletedDate:
+        this.removeStateFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
+        break;
       default:
         console.log('unexpected type received for remove tag');
     }

@@ -333,7 +333,7 @@
                   </ng-select>
                 </ng-container>
                 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entityType'">
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
                   <ng-select #entityTypeSelect
                     [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
@@ -369,7 +369,7 @@
 
     <footer>
       <footer>
-        <div class="grid-row">
+        <!--<div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
               <button class="btn btn-primary btn-left" type="button" (click)="saveAndAddMore()">
@@ -377,7 +377,7 @@
               </button>
             </div>
           </div>
-        </div>
+        </div>-->
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
@@ -391,8 +391,11 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" type="button"  (click)="saveAndExit()">
-                Save &amp; Exit
+              <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
+                Save &amp; Add More
+              </button>
+              <button class="btn btn-previous btn-right" type="button"  (click)="viewContacts()">
+                View Contacts
               </button>
             </div>
           </div>          

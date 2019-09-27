@@ -164,9 +164,9 @@ export class AppLayoutComponent implements OnInit {
           }
 
           if (formInfo.hasOwnProperty('daysUntilDue')) {
-            this.formDaysUntilDue = formInfo.daysUntilDue;
+            this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
           } else if (formInfo.hasOwnProperty('daysuntildue')) {
-            this.formDaysUntilDue = formInfo.daysuntildue;
+            this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
           }
 
           if (formInfo.hasOwnProperty('dueDate')) {
