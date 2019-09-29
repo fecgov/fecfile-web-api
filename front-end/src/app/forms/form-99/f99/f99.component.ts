@@ -159,21 +159,21 @@ export class F99Component implements OnInit {
    *
    */
   public canContinue(): void {
-    if(this.frm && this.direction) {
-      if(this.direction === 'next') {
-        if(this.frm.valid) {
+    if (this.frm && this.direction) {
+      if (this.direction === 'next') {
+        if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step } });
-        } else if(this.frm === 'preview') {
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
+        } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step } });
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
         }
-      } else if(this.direction === 'previous') {
+      } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step } });
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
       }
     }
   }
