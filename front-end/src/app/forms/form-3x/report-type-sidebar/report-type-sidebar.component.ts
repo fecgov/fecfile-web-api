@@ -1,6 +1,6 @@
 import { Component, EventEmitter, ElementRef, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
@@ -10,6 +10,9 @@ import {
   selectedReportType
 } from '../../../shared/interfaces/FormsService/FormsService';
 import { Subscription } from 'rxjs/Subscription';
+
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
   selector: 'report-type-sidebar',
@@ -24,6 +27,7 @@ export class ReportTypeSidebarComponent implements OnInit {
   @Input() selectedReport: any = null;
   @Input() selectedreporttype: selectedReportType;
 
+  public editMode: boolean;
   public dueDate: string = null;
   public electionStates: any = null;
   public electionDates: any = null;
@@ -46,9 +50,11 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   constructor(
     private _fb: FormBuilder,
+    private _router: Router,
     private _config: NgbTooltipConfig,
     private _formService: FormsService,
     private _messageService: MessageService,
+    private _dialogService: DialogService,
     private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
@@ -57,6 +63,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.frmReportSidebar = this._fb.group({});
   }
 
@@ -226,57 +233,73 @@ export class ReportTypeSidebarComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public selectStateChange(e): void {
-    let selectedVal: string = e.target.value;
-    let selectedState: any = null;
+    if (this.editMode) {
+      let selectedVal: string = e.target.value;
+      let selectedState: any = null;
 
-    if (this._newReportSelected) {
-      this._newReportSelected = false;
-    }
+      if (this._newReportSelected) {
+        this._newReportSelected = false;
+      }
 
-    this._selectedState = selectedVal;
-    this.selectedElectionState = this._selectedState;
+      this._selectedState = selectedVal;
+      this.selectedElectionState = this._selectedState;
 
-    if (selectedVal !== '0') {
-      if (this.selectedReport.hasOwnProperty('election_state')) {
-        if (Array.isArray(this.selectedReport.election_state)) {
-          if (this.selectedReport.election_state.length === 1) {
-            selectedState = this.selectedReport.election_state[0];
+      if (selectedVal !== '0') {
+        if (this.selectedReport.hasOwnProperty('election_state')) {
+          if (Array.isArray(this.selectedReport.election_state)) {
+            if (this.selectedReport.election_state.length === 1) {
+              selectedState = this.selectedReport.election_state[0];
 
-            if (this._previousStateSelected === null) {
-              this._previousStateSelected = selectedState.state;
-            }
+              if (this._previousStateSelected === null) {
+                this._previousStateSelected = selectedState.state;
+              }
 
-            if (selectedState.state === selectedVal) {
-              if (selectedState.hasOwnProperty('dates')) {
-                if (Array.isArray(selectedState.dates)) {
-                  this.electionDates = [];
-                  this.electionDates[0] = selectedState.dates[0];
+              if (selectedState.state === selectedVal) {
+                if (selectedState.hasOwnProperty('dates')) {
+                  if (Array.isArray(selectedState.dates)) {
+                    this.electionDates = [];
+                    this.electionDates[0] = selectedState.dates[0];
+                  }
                 }
               }
-            }
-          } else if (this.selectedReport.election_state.length > 1) {
-            selectedState = this.selectedReport.election_state.find(el => {
-              return el.state === selectedVal;
-            });
+            } else if (this.selectedReport.election_state.length > 1) {
+              selectedState = this.selectedReport.election_state.find(el => {
+                return el.state === selectedVal;
+              });
 
-            if (this._previousStateSelected === null) {
-              this._previousStateSelected = selectedState.state;
-            }
-
-            if (this._previousStateSelected !== null && this._previousStateSelected !== selectedState.state) {
-              this.fromDate = '';
-              this.toDate = '';
-            }
-
-            if (selectedState.hasOwnProperty('dates')) {
-              if (Array.isArray(selectedState.dates)) {
-                this.electionDates = selectedState.dates;
+              if (this._previousStateSelected === null) {
+                this._previousStateSelected = selectedState.state;
               }
-            }
-          } // this.selectedReport.election_state.length
-        } // Array.isArray(this.selectedReport.election_state)
-      } // this.selectedReport.hasOwnProperty('election_state')
-    } // selectedVal !== '0'
+
+              if (this._previousStateSelected !== null && this._previousStateSelected !== selectedState.state) {
+                this.fromDate = '';
+                this.toDate = '';
+              }
+
+              if (selectedState.hasOwnProperty('dates')) {
+                if (Array.isArray(selectedState.dates)) {
+                  this.electionDates = selectedState.dates;
+                }
+              }
+            } // this.selectedReport.election_state.length
+          } // Array.isArray(this.selectedReport.election_state)
+        } // this.selectedReport.hasOwnProperty('election_state')
+      } // selectedVal !== '0'
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
+    }
   }
 
   /**
