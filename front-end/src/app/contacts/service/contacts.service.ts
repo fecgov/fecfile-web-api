@@ -125,9 +125,6 @@ export class ContactsService {
       request.filters = emptyFilters;
     }
 
-    console.log(' Contact Table request = ', request);
-    console.log(' Contact Table httpOptions = ', httpOptions);
-
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -211,9 +208,6 @@ export class ContactsService {
     //   'total pages': 0
     // };
     // return Observable.of(mockResponse);
-
-    console.log(' Contact Recycle Bin Table request = ', request);
-    console.log(' Contact Recycle Bin Table httpOptions = ', httpOptions);
 
     return this._http
       .post(
@@ -422,8 +416,6 @@ export class ContactsService {
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: ContactFilterModel) {
-    console.log("mockApplyFilters response =", response);
-    console.log("mockApplyFilters filters =", filters);
 
     if (!response.contacts) {
       return;
@@ -456,7 +448,6 @@ export class ContactsService {
     }   */
 
     if (filters.filterStates) {
-      console.log("filters.filterStates", filters.filterStates);
       if (filters.filterStates.length > 0) {
         isFilter = true;
         const fields = ['state'];
@@ -470,7 +461,6 @@ export class ContactsService {
     }
 
     if (filters.filterTypes) {
-      console.log("filters.filterTypes", filters.filterTypes);
       if (filters.filterTypes.length > 0) {
         isFilter = true;
         const fields = ['type'];
@@ -505,8 +495,6 @@ export class ContactsService {
       }
       response.contacts = filteredDeletedDateArray;
     }
-
-    console.log("response.contacts", response.contacts);
   }
 
   private getDateMMDDYYYYformat(dateValue: Date): Date {
@@ -634,8 +622,6 @@ export class ContactsService {
     }
     request.actions = actions;
 
-    console.log(" trashOrRestoreContacts request", request)
-
     return this._http
     .put(
       `${environment.apiUrl}${url}`,
@@ -695,16 +681,14 @@ export class ContactsService {
     //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const contact: any = JSON.parse(localStorage.getItem(`contactObj`));
     const formData: FormData = new FormData();
-    console.log(" saveContact called ...!");
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log(" saveContact contact object ...!", contact);
     for (const [key, value] of Object.entries(contact)) {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
-          console.log(" saveContact contact formdata object ...!", key, " ", value );
+
         }
       }
     }
@@ -737,7 +721,6 @@ export class ContactsService {
           })
         );
     } else {
-      console.log('unexpected ContactActions received - ' + scheduleAction);
     }
   }
 
