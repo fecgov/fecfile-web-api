@@ -77,6 +77,7 @@ import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.compon
 import { SubTransactionsTableComponent } from './forms/transactions/sub-transactions-table/sub-transactions-table.component';
 import { DecimalPipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
+import { UserIdleModule } from 'angular-user-idle';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -160,7 +161,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     NgbModule.forRoot(),
     ModalModule.forRoot(),
     NgxPaginationModule,
-    NgPipesModule
+    NgPipesModule,
+    UserIdleModule.forRoot({idle: 1200, timeout: 1320, ping: 1200})
   ],
   providers: [
     CookieService,
