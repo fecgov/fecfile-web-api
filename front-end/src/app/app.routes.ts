@@ -116,7 +116,12 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard]
       },
-      { path: 'addContact', component: AddNewContactComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      { path: 'addContact', 
+        component: AddNewContactComponent, 
+        pathMatch: 'full', 
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
+       },
     ]
   },
   { path: '**', redirectTo: '' }
