@@ -162,7 +162,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ModalModule.forRoot(),
     NgxPaginationModule,
     NgPipesModule,
-    UserIdleModule.forRoot({idle: 1200, timeout: 1320, ping: 1200})
+    UserIdleModule.forRoot({idle: 1200, timeout: 1320, ping: 1320})
   ],
   providers: [
     CookieService,

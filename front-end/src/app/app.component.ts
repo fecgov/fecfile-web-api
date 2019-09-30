@@ -12,7 +12,7 @@ import { UserIdleService } from 'angular-user-idle';
 })
 export class AppComponent {
   timeStart = false;
-  seconds = 15;
+  seconds = 1320;
 
   clientX = 0;
   clientY = 0;
