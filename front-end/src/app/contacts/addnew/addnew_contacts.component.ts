@@ -384,7 +384,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * @param stateOption the state selected in the dropdown.
    */
   
-   public handleStateChange(stateOption: any, col: any) {
+   /*public handleStateChange(stateOption: any, col: any) {
     console.log("handleStateChange stateOption", stateOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
@@ -404,10 +404,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       
       this.frmContact.patchValue({ state: stateCode }, { onlySelf: true });
     }
-  }
+  }*/
 
 
-  /*public handleStateChange(stateOption: any, col: any) {
+  public handleStateChange(stateOption: any, col: any) {
     console.log("handleStateChange stateOption", stateOption);
    
     if (this._selectedEntity) {
@@ -416,7 +416,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
     }
-  }*/
+  }
 
   public handleCandOfficeChange(candOfficeOption: any, col: any) {
     console.log("handleCandOfficeChange candOfficeOption", candOfficeOption);

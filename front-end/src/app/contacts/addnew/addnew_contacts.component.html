@@ -253,7 +253,7 @@
                   ></textarea>
                 </ng-container>
 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
+              <!--  <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
                     (change)="handleStateChange($event, col)"
                     class="state-select"
@@ -271,15 +271,15 @@
                       {{ item.code }} - {{ item.name }}
                     </ng-option>
                   </ng-select>
-                </ng-container>
+                </ng-container> -->
                 
-               <!-- <ng-container *ngIf="col?.type === 'select' && 
+                <ng-container *ngIf="col?.type === 'select' && 
                     (isFieldName(col?.name, 'state') ||
                     isFieldName(col?.name, 'cand_office_state'))">
                   <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
-                    class="form-control" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
-                        frmIndividualReceipt.get(col?.name)?.invalid &&
-                        (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                    class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
+                    frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
                           ? 'forms__select-error'
                           : ''
                       ">
@@ -287,7 +287,7 @@
                       <span>{{ item.code + ' - ' + item.name }}</span>
                     </ng-template>
                   </ng-select>
-                </ng-container> -->
+                </ng-container> 
 
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
                   <ng-select
