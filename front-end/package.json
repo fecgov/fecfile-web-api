@@ -29,6 +29,7 @@
     "@ng-select/ng-select": "^2.15.2",
     "angular-archwizard": "^3.0.0",
     "angular-file-uploader": "^4.1.3",
+    "angular-user-idle": "^2.2.1",
     "bootstrap": "^4.1.3",
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.5.4",
