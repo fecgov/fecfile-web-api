@@ -238,7 +238,7 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
         try:
                 if transaction_id_list:
                     # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5"]:
+                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
                             DB_table, "', '".join(transaction_id_list))
                     else:
@@ -246,7 +246,7 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
                             DB_table, "', '".join(transaction_id_list))
                 else:
                     # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5"]:
+                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(DB_table)
                     else:
                         query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(DB_table)
