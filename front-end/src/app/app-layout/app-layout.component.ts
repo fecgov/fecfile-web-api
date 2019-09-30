@@ -76,7 +76,6 @@ export class AppLayoutComponent implements OnInit {
           this.toggleMenu = false;
         }
         if (val.url.indexOf('/signandSubmit') === 0) {
-          console.log("Sign and submit call...");
           if (this.toggleMenu) {
             this.showSideBar = true;
             this.sideBarClass = 'app-container dashboard active';
@@ -84,7 +83,6 @@ export class AppLayoutComponent implements OnInit {
             this.showSideBar = false;
             this.sideBarClass = 'app-container active';
           }
-          //this._utilService.removeLocalItems('form_', 5);
         } else if (val.url.indexOf('/dashboard') === 0) {
           if (this.toggleMenu) {
             this.showSideBar = true;
