@@ -1418,21 +1418,21 @@ def put_sql_schedH4(data):
         """
     _v = (  
            
-            data.get('transaction_type_identifier', ''),
-            data.get('back_ref_transaction_id ', ''),
-            data.get('back_ref_sched_name ', ''),
-            data.get('payee_entity_id ', ''),
-            data.get('activity_event_identifier ', ''),
-            data.get('expenditure_date ', None),
-            data.get('fed_share_amount ', None),
-            data.get('non_fed_share_amount ', None),
-            data.get('total_amount ', None),
-            data.get('activity_event_amount_ytd ', None),
-            data.get('purpose ', ''),
-            data.get('category_code ', ''),
-            data.get('activity_event_type ', ''),
-            data.get('memo_code ', ''),
-            data.get('memo_text ', ''),
+            data.get('transaction_type_identifier'),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('payee_entity_id'),
+            data.get('activity_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('fed_share_amount'),
+            data.get('non_fed_share_amount'),
+            data.get('total_amount'),
+            data.get('activity_event_amount_ytd'),
+            data.get('purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1455,11 +1455,17 @@ def validate_parent_transaction_exist(data):
     else:
         pass
 
+def validate_fed_nonfed_share(data):
+    if (float(data.get('fed_share_amount')) + 
+        float(data.get('non_fed_share_amount')) != float(data.get('total_amount'))):
+        raise Exception('Error: fed_amount and non_fed_amount should sum to total amount.')
+
 def validate_sh4_data(data):
     """
     validate sH4 json data
     """
     check_mandatory_fields_SH4(data)
+    validate_fed_nonfed_share(data)
     if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
         validate_parent_transaction_exist(data)
 
@@ -1473,7 +1479,7 @@ def post_schedH4(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_H4)
         data['transaction_id'] = get_next_transaction_id('SH4')
-        print(data)
+        logger.debug('saving a new h4 transaction with data:{}'.format(data))
         validate_sh4_data(data)
         try:
             post_sql_schedH4(data)
@@ -1515,22 +1521,22 @@ def post_sql_schedH4(data):
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('transaction_type_identifier', ''),
+            data.get('transaction_type_identifier'),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id ', ''),
-            data.get('back_ref_sched_name ', ''),
-            data.get('payee_entity_id ', ''),
-            data.get('activity_event_identifier ', ''),
-            data.get('expenditure_date ', None),
-            data.get('fed_share_amount ', None),
-            data.get('non_fed_share_amount ', None),
-            data.get('total_amount ', None),
-            data.get('activity_event_amount_ytd ', None),
-            data.get('purpose ', ''),
-            data.get('category_code ', ''),
-            data.get('activity_event_type ', ''),
-            data.get('memo_code ', ''),
-            data.get('memo_text ', ''),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('payee_entity_id'),
+            data.get('activity_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('fed_share_amount'),
+            data.get('non_fed_share_amount'),
+            data.get('total_amount'),
+            data.get('activity_event_amount_ytd'),
+            data.get('purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             datetime.datetime.now(),  
          )
