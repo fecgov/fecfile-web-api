@@ -30,8 +30,20 @@ from fecfiler.sched_D.views import do_transaction
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_H1 = ['cmte_id', 'report_id', 'transaction_id']
-MANDATORY_FIELDS_SCHED_H2 = ['cmte_id', 'report_id', 'transaction_id']
+MANDATORY_FIELDS_SCHED_H1 = [
+    'cmte_id', 
+    'report_id', 
+    'transaction_id', 
+    'federal_percent', 
+    'non_federal_percent',
+    ]
+MANDATORY_FIELDS_SCHED_H2 = [
+    'cmte_id', 
+    'report_id', 
+    'transaction_id',
+    'federal_percent', 
+    'non_federal_percent',
+    ]
 MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_H5 = ['cmte_id', 'report_id', 'transaction_id']
@@ -47,7 +59,14 @@ def check_transaction_id(transaction_id):
     return transaction_id
 
 """
-SCHED_H1
+SCHED_H1:
+
+Method of Allocation for:
+- Allocated Administrative and Generic Voter Drive Costs
+- Allocated Exempt Party Activity Costs (Party Committees Only)
+- Allocated Public Communications that Refer to any Political Party (but not
+a candidate) (Separate Segregated Funds and Nonconnected Committees
+Only) 
 """
 
 def schedH1_sql_dict(data):
@@ -154,11 +173,25 @@ def put_schedH1(data):
     except:
         raise
     
+def validate_federal_nonfed_ratio(data):
+    """
+    validate fed and non_fed ratio add up:
+    fed + non_fed == 100%
+    e.g.
+    0.45 + 0.55 == 1.00
+    """
+    if not (
+        (float(data.get('federal_percent')) +
+        float(data.get('non_federal_percent')) == float(1))
+    ):
+        raise Exception('Error: combined federal and non-federal value should be 100%.')
+
 def validate_sh1_data(data):
     """
     validate sh1 request data for db transaction
     """
     check_mandatory_fields_SH1(data)
+    validate_federal_nonfed_ratio(data)
 
 def post_sql_schedH1(data):
     """
@@ -468,7 +501,8 @@ def schedH1(request):
 
 
 """
-SCHED_H2
+SCHED_H2:
+Ratios for Allocable Fundraising Events and Direct Candidate Support 
 """
 
 def schedH2_sql_dict(data):
@@ -476,9 +510,9 @@ def schedH2_sql_dict(data):
     filter out valid fileds for sched_H1
     """
     valid_h2_fields = [
-        "line_number",
+        # "line_number",
         "transaction_type_identifier",
-        "transaction_type",
+        # "transaction_type",
         "activity_event_name",
         "fundraising",
         "direct_cand_support",
@@ -493,7 +527,7 @@ def schedH2_sql_dict(data):
             data.get('transaction_type_identifier'))
         return datum
     except:
-        raise Exception('invalid h1 request data.')
+        raise Exception('invalid h2 request data.')
 
 def check_mandatory_fields_SH2(data):
     """
@@ -555,7 +589,8 @@ def put_schedH2(data):
     referencing something already in our DB
     """
     try:
-        check_mandatory_fields_SH2(data)
+        # check_mandatory_fields_SH2(data)
+        validate_sh2_data(data)
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH2(data)
@@ -571,6 +606,7 @@ def validate_sh2_data(data):
     validate sh1 request data for db transaction
     """
     check_mandatory_fields_SH2(data)
+    validate_federal_nonfed_ratio(data)
 
 def post_sql_schedH2(data):
     """
