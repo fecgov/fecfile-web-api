@@ -97,7 +97,6 @@ export class AppComponent {
   // }
 
   @HostListener('keypress') onKeyPress() {
-    window.alert('key is pressed');
     this.stop();
   }
 }
