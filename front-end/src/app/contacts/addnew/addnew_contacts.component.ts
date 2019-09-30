@@ -106,7 +106,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
       this.populateFormForEditOrView(message);
-      console.log(' Here Got form fieds...');
       //this.getFormFields();
     });
 
@@ -146,7 +145,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngDoCheck(): void {}
+  ngDoCheck(): void {
+
+  }
 
   ngOnDestroy(): void {
     this._messageService.clearMessage();
@@ -165,7 +166,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    */
   private _setForm(fields: any): void {
     const formGroup: any = [];
-    console.log("_setForm fields ", fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -408,7 +408,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
 
   public handleStateChange(stateOption: any, col: any) {
-    console.log("handleStateChange stateOption", stateOption);
    
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -419,7 +418,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   public handleCandOfficeChange(candOfficeOption: any, col: any) {
-    console.log("handleCandOfficeChange candOfficeOption", candOfficeOption);
+
     if (this._selectedEntity) {
       //this.showWarn(col.text);
       this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
@@ -431,7 +430,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           officeCode = officeCode.trim();
           if (officeCode.length > 1) {
             officeCode = officeCode.substring(0, 1);
-            console.log(" handleCandOfficeChange officeStofficeCodeateCode", officeCode);
           }
         }
       }
@@ -441,7 +439,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
   
   public handleOfficeStateChange(officeStateOption: any, col: any) {
-    console.log("handleOfficeStateChange officeStateOption", officeStateOption);
+
     if (this._selectedEntity) {
       //this.showWarn(col.text);
       this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
@@ -453,7 +451,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           officeStateCode = officeStateCode.trim();
           if (officeStateCode.length > 1) {
             officeStateCode = officeStateCode.substring(0, 2);
-            console.log(" handleOfficeStateChange officeStateCode", officeStateCode);
           }
         }
       }
@@ -487,7 +484,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }*/
 
   public handleTypeChange(entityOption: any, col: any) {
-    console.log('handleTypeChange entityOption', entityOption);
     this._entityType = entityOption.code;
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -515,7 +511,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * @deprecated
    */
   public receiveTypeaheadData(contact: any, fieldName: string): void {
-    console.log('entity selected by typeahead is ' + contact);
 
     if (fieldName === 'first_name') {
       this.frmContact.patchValue({ last_name: contact.last_name }, { onlySelf: true });
@@ -969,7 +964,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   };
 
   private getFormFields(): void {
-    console.log('get contact form fields ' + this.transactionType);
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
         console.log('getFormFields res =', res);
@@ -985,7 +979,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('individualFormFields')) {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
-                console.log("getFormFields this.individualFormFields = ", this.individualFormFields);
                 this.formFields = res.data.individualFormFields;
                 this._setForm(res.data.individualFormFields);
               }
@@ -1058,7 +1051,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
             }
 
             this._loading = false;
-            console.log(new Date().toISOString());
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
@@ -1135,11 +1127,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
   
   public viewContacts(): void {
-    console.log ("this.frmContact.dirty", this.frmContact.dirty);
-    console.log ("this.frmContact.touched", this.frmContact.touched);
     
     if (this.frmContact.dirty || this.frmContact.touched){
-      console.log ("contactsaved", JSON.stringify({ saved: false }));
       localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
     }
     this._router.navigate([`/contacts`]);
@@ -1219,7 +1208,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       contactObj.entity_type = this._entityType;
 
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
-      console.log('callFrom before saving=', callFrom);
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
           console.log('_contactsService.saveContact res', res);
@@ -1230,14 +1218,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           if (callFrom === 'viewContacts') {
             this._router.navigate([`/contacts`]);
           }
-          localStorage.setItem('contact_saved', JSON.stringify({ saved: true }));
+          localStorage.setItem('contactsaved', JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
         }
       });
     } else {
       this.frmContact.markAsDirty();
       this.frmContact.markAsTouched();
-      localStorage.setItem('contact_saved', JSON.stringify({ saved: false }));
+      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
     }
   }
@@ -1248,10 +1236,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-    console.log("contact canDeactivate called ...");
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
-      console.log(" contact not saved...");
       result = await this._dialogService
         .confirm('', ConfirmModalComponent)
         .then(res => {
@@ -1268,7 +1254,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
       return result;
     } else {
-      console.log(" contact saved...");
       return true;
   }
  }
