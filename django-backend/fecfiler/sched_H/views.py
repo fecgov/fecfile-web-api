@@ -21,6 +21,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  undo_delete_entities)
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
+    transaction_exists,
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
@@ -34,6 +35,7 @@ MANDATORY_FIELDS_SCHED_H1 = [
     'cmte_id', 
     'report_id', 
     'transaction_id', 
+    'transaction_type_identifier',
     'federal_percent', 
     'non_federal_percent',
     ]
@@ -41,11 +43,12 @@ MANDATORY_FIELDS_SCHED_H2 = [
     'cmte_id', 
     'report_id', 
     'transaction_id',
+    'transaction_type_identifier',
     'federal_percent', 
     'non_federal_percent',
     ]
-MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id']
-MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id']
+MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id', 'transaction_type_identifier']
+MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id', 'transaction_type_identifier']
 MANDATORY_FIELDS_SCHED_H5 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_H6 = ['cmte_id', 'report_id', 'transaction_id']
 
@@ -1311,8 +1314,18 @@ def schedH3(request):
 """
 ************************************************* CRUD API FOR SCHEDULE_H4 ********************************************************************************
 
-"""
+Disbursements for Allocated Federal/Nonfederal Activity
+some check points:
+1. when h4 activity is submitted, make sure an h1 or h2 is there to calcualte 
+   the fed and non-fed amount
+2. when a memo transaction is submitted, need to verify the parent transaction exist
 
+"""
+SCHED_H4_CHILD_TRANSACTIONS = [
+    'ALLOC_EXP_CC_PAY_MEMO',
+    'ALLOC_EXP_STAF_REIM_MEMO',
+    'ALLOC_EXP_PMT_TO_PROL_MEMO'
+]
 
 def check_mandatory_fields_SH4(data):
     """
@@ -1428,12 +1441,27 @@ def put_sql_schedH4(data):
     do_transaction(_sql, _v)
 
 
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    # if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
+    if not data.get("back_ref_transaction_id"):
+        raise Exception("Error: parent transaction id missing.")
+    elif not transaction_exists(
+        data.get("back_ref_transaction_id"), "sched_h4"
+    ):
+        raise Exception("Error: parent transaction not found.")
+    else:
+        pass
+
 def validate_sh4_data(data):
     """
     validate sH4 json data
     """
     check_mandatory_fields_SH4(data)
-
+    if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
+        validate_parent_transaction_exist(data)
 
 def post_schedH4(data):
     """
