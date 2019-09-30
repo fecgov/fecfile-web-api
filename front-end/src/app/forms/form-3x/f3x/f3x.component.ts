@@ -359,16 +359,16 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
+          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
+        this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
       }
     }
   }

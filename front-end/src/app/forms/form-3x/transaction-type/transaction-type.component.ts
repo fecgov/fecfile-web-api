@@ -11,6 +11,8 @@ import { TransactionTypeService } from './transaction-type.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -27,6 +29,7 @@ export class TransactionTypeComponent implements OnInit {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionCategories: any = [];
 
+  public editMode: boolean;
   public frmOption: FormGroup;
   public frmSubmitted: boolean = false;
   public showForm: boolean = false;
@@ -45,10 +48,12 @@ export class TransactionTypeComponent implements OnInit {
 
   constructor(
     private _fb: FormBuilder,
+    private _router: Router,
     private _config: NgbTooltipConfig,
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
     private _messageService: MessageService,
+    private _dialogService: DialogService,
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
     private _f3xMessageService: F3xMessageService
@@ -59,6 +64,7 @@ export class TransactionTypeComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
 
     this.frmOption = this._fb.group({
       secondaryOption: ['', Validators.required]
@@ -66,7 +72,7 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const setTargetVal = {target: {value: null, placeholder: null}};
+    const setTargetVal = { target: { value: null, placeholder: null } };
     this.frmOption = this._fb.group({
       secondaryOption: ['', Validators.required]
     });
@@ -234,11 +240,27 @@ export class TransactionTypeComponent implements OnInit {
     This function is called while selecting a list from transaction screen
   */
   public childOptionsListClick(id): void {
-    console.log('transaction type selected: ', id);
-    if (document.getElementById(id) != null) {
-      const obj = <HTMLInputElement>document.getElementById('option_' + id);
-      obj.click();
-      obj.checked = true;
+    if (this.editMode) {
+      console.log('transaction type selected: ', id);
+      if (document.getElementById(id) != null) {
+        const obj = <HTMLInputElement>document.getElementById('option_' + id);
+        obj.click();
+        obj.checked = true;
+      }
+    } else {
+      this._dialogService
+          .confirm(
+            'This report has been filed with the FEC. If you want to change, you must Amend the report',
+            ConfirmModalComponent,
+            'Warning'
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'cancel') {
+              this._router.navigate(['/reports']);
+            }
+          });
     }
   }
 }

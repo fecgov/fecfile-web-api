@@ -41,7 +41,8 @@ export class ReportTypeComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() committeeReportTypes: any = [];
   @Input() selectedReportInfo: any = null;
-  
+
+  public editMode: boolean;
   public frmReportType: FormGroup;
   public fromDateSelected: boolean = false;
   public reportTypeSelected: string = null;
@@ -84,6 +85,7 @@ export class ReportTypeComponent implements OnInit {
     this._messageService.clearMessage();
 
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
 
     this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
@@ -212,70 +214,86 @@ export class ReportTypeComponent implements OnInit {
    * @param      {Object}  e   The event object.
    */
   public updateTypeSelected(e): void {
-    if (e.target.checked) {
-      // for some reason selected radio button value is coming as 'on'
-      // temporarily using id to set correct report type
-      this.reportTypeSelected = e.target.getAttribute('id');
-      this.optionFailed = false;
-      this.reportType = this.reportTypeSelected;
-      const dataReportType: string = e.target.getAttribute('data-report-type');
+    if (this.editMode) {
+      if (e.target.checked) {
+        // for some reason selected radio button value is coming as 'on'
+        // temporarily using id to set correct report type
+        this.reportTypeSelected = e.target.getAttribute('id');
+        this.optionFailed = false;
+        this.reportType = this.reportTypeSelected;
+        const dataReportType: string = e.target.getAttribute('data-report-type');
 
-      const currentReport: any = this.committeeReportTypes.filter(el => {
-        return el.report_type === this.reportType;
-      });
-      if (dataReportType !== 'S') {
-        this.toDateSelected = true;
-        this.fromDateSelected = true;
+        const currentReport: any = this.committeeReportTypes.filter(el => {
+          return el.report_type === this.reportType;
+        });
+        if (dataReportType !== 'S') {
+          this.toDateSelected = true;
+          this.fromDateSelected = true;
 
-        if (Array.isArray(currentReport)) {
-          if (currentReport[0].hasOwnProperty('election_state')) {
-            const electionState: any = currentReport[0].election_state;
+          if (Array.isArray(currentReport)) {
+            if (currentReport[0].hasOwnProperty('election_state')) {
+              const electionState: any = currentReport[0].election_state;
 
-            if (Array.isArray(electionState)) {
-              if (electionState[0].hasOwnProperty('dates')) {
-                const dates: any = electionState[0].dates;
+              if (Array.isArray(electionState)) {
+                if (electionState[0].hasOwnProperty('dates')) {
+                  const dates: any = electionState[0].dates;
 
-                if (Array.isArray(dates)) {
-                  if (dates[0].hasOwnProperty('cvg_start_date')) {
-                    this._fromDateSelected = dates[0].cvg_start_date;
-                  }
+                  if (Array.isArray(dates)) {
+                    if (dates[0].hasOwnProperty('cvg_start_date')) {
+                      this._fromDateSelected = dates[0].cvg_start_date;
+                    }
 
-                  if (dates[0].hasOwnProperty('cvg_end_date')) {
-                    this._toDateSelected = dates[0].cvg_end_date;
-                  }
+                    if (dates[0].hasOwnProperty('cvg_end_date')) {
+                      this._toDateSelected = dates[0].cvg_end_date;
+                    }
 
-                  if (dates[0].hasOwnProperty('election_date')) {
-                    this._selectedElectionDate = dates[0].election_date;
-                  }
+                    if (dates[0].hasOwnProperty('election_date')) {
+                      this._selectedElectionDate = dates[0].election_date;
+                    }
 
-                  if (dates[0].hasOwnProperty('due_date')) {
-                    this._dueDate = dates[0].due_date;
+                    if (dates[0].hasOwnProperty('due_date')) {
+                      this._dueDate = dates[0].due_date;
+                    }
                   }
                 }
               }
             }
+            this._reportTypeDescripton = currentReport[0].report_type_desciption;
           }
-          this._reportTypeDescripton = currentReport[0].report_type_desciption;
+        } else {
+          this.toDateSelected = false;
+          this.fromDateSelected = false;
         }
+
+        if (Array.isArray(currentReport)) {
+          this._form3xReportTypeDetails = currentReport[0];
+
+          if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
+            window.localStorage.removeItem(`form_${this._formType}_report_type`);
+          }
+        }
+        this.status.emit({
+          form: this._formType,
+          reportTypeRadio: this.reportTypeSelected
+        });
       } else {
-        this.toDateSelected = false;
-        this.fromDateSelected = false;
+        this.reportTypeSelected = '';
+        this.optionFailed = true;
       }
-
-      if (Array.isArray(currentReport)) {
-        this._form3xReportTypeDetails = currentReport[0];
-
-        if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
-          window.localStorage.removeItem(`form_${this._formType}_report_type`);
-        }
-      }
-      this.status.emit({
-        form: this._formType,
-        reportTypeRadio: this.reportTypeSelected
-      });
     } else {
-      this.reportTypeSelected = '';
-      this.optionFailed = true;
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 
