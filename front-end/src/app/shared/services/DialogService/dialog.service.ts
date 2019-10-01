@@ -116,4 +116,10 @@ return 'cancel';
       });
     }
 
+  public checkIfModalOpen() {
+    if (this._modalService.hasOpenModals()) {
+      this._modalService.dismissAll();
+    }
+  }
+
 }
