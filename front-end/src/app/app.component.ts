@@ -13,7 +13,7 @@ import { UserIdleService } from 'angular-user-idle';
 })
 export class AppComponent {
   timeStart = false;
-  seconds = 1320;
+  seconds = 1200;
 
   clientX = 0;
   clientY = 0;
@@ -46,7 +46,7 @@ export class AppComponent {
             )
             .then(response => {
               if (response === 'okay') {
-                this.restart();
+                this.stop();
               } else if (response === 'cancel') {
                 this._router.navigate(['']);
               }
@@ -63,6 +63,7 @@ export class AppComponent {
               response === 'cancel' ||
               response === ModalDismissReasons.BACKDROP_CLICK ||
               response === ModalDismissReasons.ESC) {
+                this.restart();
                 this._router.navigate(['']);
               }
             });
@@ -73,13 +74,14 @@ export class AppComponent {
 
   ngDoCheck(): void {
     if (this._router.url === '/') {
+      this._dialogService.checkIfModalOpen();
       this.stopWatching();
     }
   }
 
   stop() {
     this.userIdle.stopTimer();
-    this.seconds = 1320;
+    this.seconds = 1200;
     this.timeStart = false;
   }
 
@@ -99,14 +101,14 @@ export class AppComponent {
     this.clientX = event.clientX;
     this.clientY = event.clientY;
 
-    this.restart();
+    this.stop();
   }
 
-  // @HostListener('mousemove') onMove() {
-  //   window.alert("mouse is moved");
-  // }
+  @HostListener('mousemove') onMove() {
+    this.stop();
+  }
 
   @HostListener('keypress') onKeyPress() {
-    this.restart();
+    this.stop();
   }
 }
