@@ -19,7 +19,8 @@ public confirm(message?: string,
     modalTitle?: string,
     isShowCancel?: boolean,
     headerClass?: ModalHeaderClassEnum,
-    dataMap?: Map<string, any>): Promise<any> {
+    dataMap?: Map<string, any>,
+    cancelTitle?: string): Promise<any> {
 const modalOptions: any = {
 'backdrop': true,
 'keyboard': false,
@@ -46,6 +47,9 @@ const propName = key;
 const propValue = value;
 modalRef.componentInstance[propName] = propValue;
 });
+}
+if (cancelTitle) {
+  modalRef.componentInstance.cancelTitle = cancelTitle;
 }
 return modalRef
 .result

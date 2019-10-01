@@ -19,7 +19,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { htmlLength } from '../../../shared/utils/forms/validation/html-length.validator';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'f99-reason',
@@ -209,11 +209,15 @@ export class ReasonComponent implements OnInit {
       }
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             if (this._form99Details.text) {

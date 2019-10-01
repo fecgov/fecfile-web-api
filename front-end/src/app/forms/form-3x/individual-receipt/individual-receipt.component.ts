@@ -30,7 +30,7 @@ import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from './schedule-actions.enum';
@@ -267,11 +267,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       }
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();

@@ -7,7 +7,7 @@ import { form99 } from '../../interfaces/FormsService/FormsService';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
-import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { loadElementInternal } from '@angular/core/src/render3/util';
 
@@ -417,11 +417,15 @@ export class SignComponent implements OnInit {
       console.log(' saveForm this.frmSaved =', this.frmSaved);
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
@@ -525,7 +529,7 @@ export class SignComponent implements OnInit {
 
                 localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved));
 
-                this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6' } });
+                this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode } });
 
                 this._messageService.sendMessage({
                   form_submitted: true
@@ -694,11 +698,15 @@ export class SignComponent implements OnInit {
       }
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
@@ -721,11 +729,15 @@ export class SignComponent implements OnInit {
       }
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             e.target.checked = false;
@@ -767,7 +779,7 @@ export class SignComponent implements OnInit {
         }
       });
     } else if (this.formType === '3X') {
-      this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2' } });
+      this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
     }
   }
 
