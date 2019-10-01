@@ -72,7 +72,18 @@
 			  </div>
 			</div>
 			<div class="grid-row">
-			  <div class="grid-col">
+				<div class="button-group">
+					<p></p>
+					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+				</div>
+			</div>
+			<div class="grid-row">
+				<div class="grid-row__col grid-row__col--12">
+					  <hr />
+				</div>
+			  </div>
+			<div class="grid-row">
+			  <div class="grid-col" *ngIf="accounts?.treasurerfirstname != ''">
 				<p>
 				  <b>Treasurer First Name</b>
 				</p>
@@ -80,7 +91,7 @@
 				  {{ accounts?.treasurerfirstname }}
 				</p>
 			  </div>
-			  <div class="grid-col">
+			  <div class="grid-col" *ngIf="accounts?.treasurermiddlename != ''">
 				<p>
 				  <b>Treasurer Middle Name</b>
 				</p>
@@ -88,7 +99,7 @@
 				 {{ accounts?.treasurermiddlename }}
 				</p>
 			  </div>
-			  <div class="grid-col">
+			  <div class="grid-col" *ngIf="accounts?.treasurerlastname != ''">
 				<p>
 				  <b>Treasurer Last Name</b>
 				</p>
@@ -98,7 +109,7 @@
 			  </div>
 			</div>
 			<div class="grid-row">
-			  <div class="grid-col">
+			  <div class="grid-col" *ngIf="accounts?.treasurerprefix != ''">
 				<p>
 				  <b>Treasurer Prefix</b>
 				</p>
@@ -106,7 +117,7 @@
 				 {{ accounts?.treasurerprefix }}
 				</p>
 			  </div>
-			  <div class="grid-col">
+			  <div class="grid-col" *ngIf="accounts?.treasurersuffix != ''">
 				<p>
 				  <b>Treasurer Sufix</b>
 				</p>
@@ -116,13 +127,13 @@
 			  </div>
 			</div>
 			<div class="grid-row">
-					<div class="grid-col">
+					<div class="grid-col" *ngIf="accounts?.treasurerstreet1 != ''">
 						<p><b>Address Line 1</b></p>
 						<p>
 						  {{ accounts?.treasurerstreet1 }}
 						</p>
 					</div>
-					<div class="grid-col">
+					<div class="grid-col" *ngIf="accounts?.treasurerstreet2 != ''">
 						<p><b>Address Line 2</b></p>
 						<p>
 						  {{ accounts?.treasurerstreet2 }}
@@ -130,7 +141,7 @@
 					</div>
 			</div>
 			<div class="grid-row">
-				  <div class="grid-col">
+				  <div class="grid-col" *ngIf="accounts?.treasurercity != ''">
 					<p>
 					  <b>City</b>
 					</p>
@@ -138,7 +149,7 @@
 					  {{ accounts?.treasurercity }}
 					</p>
 				  </div>
-				  <div class="grid-col">
+				  <div class="grid-col" *ngIf="accounts?.treasurerstate != ''">
 					<p>
 					  <b>State</b>
 					</p>
@@ -146,7 +157,7 @@
 					  {{ accounts?.treasurerstate }}
 					</p>
 				  </div>
-				  <div class="grid-col">
+				  <div class="grid-col" *ngIf="accounts?.treasurerzipcode != ''">
 					<p>
 					  <b>Zip Code</b>
 					</p>
@@ -155,7 +166,7 @@
 					</p>
 				  </div>
 			</div>
-			<div class="grid-row">
+			<div class="grid-row" *ngIf="accounts?.email_on_file != ''">
 				  <div class="grid-col">
 					<p>
 					  <b>Email</b>
@@ -165,6 +176,161 @@
 					</p>
 				  </div>
 			</div>
+			<div class="grid-row">
+				<div class="grid-col-button">
+					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+				</div>
+			</div>
+			<div class="grid-row">
+				<div class="grid-row__col grid-row__col--12">
+					  <hr />
+				</div>
+			  </div>
+
+			  <div class="grid-row">
+					<div class="grid-col" *ngIf="accounts?.bankName != ''">
+					  <p>
+						<b>Bank Name</b>
+					  </p>
+					  <p>
+						{{ accounts?.bankName}}
+					  </p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.bankAddress1 != ''">
+							<p>
+							  <b>Address Line 1</b>
+							</p>
+							<p>
+							  {{ accounts?.bankAddress1}}
+							</p>
+						  </div>
+						  <div class="grid-col" *ngIf="accounts?.bankAddress2 != ''">
+								<p>
+								  <b>Address Line 2</b>
+								</p>
+								<p>
+								  {{ accounts?.bankAddress2}}
+								</p>
+							  </div>
+							  <div class="grid-col" *ngIf="accounts?.bankCity != ''">
+									<p>
+									  <b>City</b>
+									</p>
+									<p>
+									  {{ accounts?.bankCity}}
+									</p>
+								  </div>
+								  <div class="grid-col" *ngIf="accounts?.bankState != ''">
+										<p>
+										  <b>State</b>
+										</p>
+										<p>
+										  {{ accounts?.bankState}}
+										</p>
+									  </div>
+									  <div class="grid-col" *ngIf="accounts?.bankZip != ''">
+											<p>
+											  <b>Zip Code</b>
+											</p>
+											<p>
+											  {{ accounts?.bankZip}}
+											</p>
+										  </div>
+			  </div>
+										  <div class="grid-row">
+												<div class="grid-col-button">
+													<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+												</div>
+											</div>
+											<div class="grid-row">
+												<div class="grid-row__col grid-row__col--12">
+													  <hr />
+												</div>
+											  </div>
+
+			
+											  
+
+											  <div *ngIf="accounts?.candidatePrefix != ''">
+													<div class="grid-row">
+														  <div class="grid-col" *ngIf="accounts?.candidatePrefix != ''">
+															<p>
+															  <b>Candidate Prefix</b>
+															</p>
+															<p>
+															  {{ accounts?.candidatePrefix}}
+															</p>
+														  </div>
+														  <div class="grid-col" *ngIf="accounts?.candidateFirstName != ''">
+																  <p>
+																	<b>Candidate First Name</b>
+																  </p>
+																  <p>
+																	{{ accounts?.candidateFirstName}}
+																  </p>
+																</div>
+																<div class="grid-col" *ngIf="accounts?.candidateLastName != ''">
+																	  <p>
+																		<b>Candidate Last Name</b>
+																	  </p>
+																	  <p>
+																		{{ accounts?.candidateLastName}}
+																	  </p>
+																	</div>
+																	<div class="grid-col" *ngIf="accounts?.candidateSuffix != ''">
+																		  <p>
+																			<b>Candidate Suffix</b>
+																		  </p>
+																		  <p>
+																			{{ accounts?.candidateSuffix}}
+																		  </p>
+																		</div>
+																		<div class="grid-col" *ngIf="accounts?.partyAffiliation != ''">
+																			  <p>
+																				<b>Party Affiliation</b>
+																			  </p>
+																			  <p>
+																				{{ accounts?.partyAffiliation}}
+																			  </p>
+																			</div>
+																			<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+																				  <p>
+																					<b>Office Sought</b>
+																				  </p>
+																				  <p>
+																					{{ accounts?.officeSought}}
+																				  </p>
+																				</div>
+																				<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+																					  <p>
+																						<b>State</b>
+																					  </p>
+																					  <p>
+																						{{ accounts?.candidateState}}
+																					  </p>
+																					</div>
+																					<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+																						  <p>
+																							<b>District</b>
+																						  </p>
+																						  <p>
+																							{{ accounts?.candidateDistrict}}
+																						  </p>
+																						</div>
+																					</div>
+																				<div class="grid-row">
+																					  <div class="grid-col-button" style="height: 50px;">
+																						  <button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+																					  </div>
+																				  </div>
+																				  <div class="grid-row">
+																					  <div class="grid-row__col grid-row__col--12">
+																							<hr />
+																					  </div>
+																					</div>
+																					</div>
+
+
 			</div> <!-- ./content -->
 		</section>
 </div>

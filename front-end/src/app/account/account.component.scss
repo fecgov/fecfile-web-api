@@ -1,6 +1,8 @@
 @import '../shared/scss/global';
 
 .account-container {
+	margin-left: 10px;
+		margin-right: 10px;
 	.grid-row {
 		margin-left: 0;
 		margin-right: 0;
@@ -59,7 +61,7 @@
 				    padding-left: 0;
 					position: relative;
 					width: 100%;				    				
-				} 				
+				} 								
 			}	
 			.validate__form {
 			&.show-alerts {
@@ -96,6 +98,12 @@
 		}
 	}
 
+	.md-button-right .button-group {
+		position: absolute;
+		right: 0px;
+		margin: 0;
+	  }
+
 	footer {
 		.footer {
 			bottom: 0;
@@ -110,6 +118,8 @@
 		}
 	}
 }
+
+
 @include form-btns();
 
   
