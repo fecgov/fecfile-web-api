@@ -595,6 +595,28 @@ def put_sql_linenumber_schedA(cmte_id, line_number, transaction_id, entity_id, a
     except Exception:
         raise
 
+def none_to_empty(val):
+    if val is None:
+        return ''
+    return str(val)
+
+def get_in_kind_entity_name(entity_data):
+    """
+    return entity_name if available,
+    else make up one with first_name, last_name, middle_name, prefix and suffix
+    """
+    logger.debug('get in kind entity name with {}'.format(entity_data))
+    if entity_data.get('entity_name'):
+        return entity_data.get('entity_name')
+    return ','.join([
+        none_to_empty(entity_data.get('first_name')),
+        none_to_empty(entity_data.get('last_name')),
+        none_to_empty(entity_data.get('middle_name')),
+        none_to_empty(entity_data.get('prefix')),
+        none_to_empty(entity_data.get('suffix')),
+    ])    
+
+
 """
 **************************************************** API FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
@@ -628,12 +650,17 @@ def post_schedA(datum):
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
         try:
+            logger.debug('saving sched_a transaction with data:{}'.format(datum))
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), check_decimal(datum.get(
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
+                    logger.debug('auto generating sched_b child transaction:')
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
-                    child_datum['expenditure_purpose'] = "In-Kind #" + transaction_id
+                    logger.debug('child data:{}'.format(child_datum))
+                    in_kind_entity_name = get_in_kind_entity_name(entity_data)
+                    logger.debug('child in kind name:{}'.format(in_kind_entity_name))
+                    child_datum['expenditure_purpose'] = "In-Kind " + in_kind_entity_name
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
                         child_datum['other_name'] = None
