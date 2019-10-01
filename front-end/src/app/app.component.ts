@@ -3,6 +3,7 @@ import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { MessageService } from './shared/services/MessageService/message.service';
 import { DialogService } from './shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { UserIdleService } from 'angular-user-idle';
 
 @Component({
@@ -36,6 +37,7 @@ export class AppComponent {
           this.timeStart = true; /* console.log(count) */
         });
         this.userIdle.ping$.subscribe(res => {
+          this._dialogService.checkIfModalOpen();
           this._dialogService
             .confirm(
               'This session will expire unless a response is received within 2 minutes. Click OK to prevent expiration.',
@@ -53,10 +55,14 @@ export class AppComponent {
 
         // Start watch when time is up.
         this.userIdle.onTimeout().subscribe(res => {
+          this._dialogService.checkIfModalOpen();
           this._dialogService
-            .confirm('The session has expired.', ConfirmModalComponent, 'Session Expired')
+            .confirm('The session has expired.', ConfirmModalComponent, 'Session Expired', false)
             .then(response => {
-              if (response === 'okay' || response === 'cancel') {
+              if (response === 'okay' ||
+              response === 'cancel' ||
+              response === ModalDismissReasons.BACKDROP_CLICK ||
+              response === ModalDismissReasons.ESC) {
                 this._router.navigate(['']);
               }
             });
@@ -65,7 +71,11 @@ export class AppComponent {
     });
   }
 
-  ngDoCheck(): void {}
+  ngDoCheck(): void {
+    if (this._router.url === '/') {
+      this.stopWatching();
+    }
+  }
 
   stop() {
     this.userIdle.stopTimer();
@@ -89,7 +99,7 @@ export class AppComponent {
     this.clientX = event.clientX;
     this.clientY = event.clientY;
 
-    console.log(this.clientX, this.clientY);
+    this.restart();
   }
 
   // @HostListener('mousemove') onMove() {
@@ -97,6 +107,6 @@ export class AppComponent {
   // }
 
   @HostListener('keypress') onKeyPress() {
-    this.stop();
+    this.restart();
   }
 }
