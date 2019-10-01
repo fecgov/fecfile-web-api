@@ -55,6 +55,7 @@ export class ReasonComponent implements OnInit {
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
   public textAreaTextContent: string = '';
+  public editingTextArea: boolean = false;
 
   private _printPriviewPdfFileLink: string = '';
   private _form99Details: any = {};
@@ -87,6 +88,7 @@ export class ReasonComponent implements OnInit {
       if (this._form99Details.text) {
         if (this._form99Details.reason) {
           this.typeSelected = this._form99Details.reason;
+          this.editingTextArea = true;
         }
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
@@ -97,6 +99,7 @@ export class ReasonComponent implements OnInit {
         this._reasonTextContent = unescapedText;
         this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
+        this.textAreaTextContent = unescape(unescapedText);
       } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
@@ -144,100 +147,67 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    if (this.editMode) {
-      this._reasonTextContent = e.target.value;
-      this.textAreaTextContent = e.target.value;
-      if (this._reasonTextContent.length >= 1) {
-        this._reasonInnerText = unescape(e.target.value);
+    this._reasonTextContent = e.target.textContent;
 
-        if (this._checkUnsupportedHTML(this._reasonInnerText)) {
-          this.reasonHasInvalidHTML = true;
+    if (this._reasonTextContent.length >= 1) {
+      this._reasonInnerText = e.target.innerText;
 
-          this.frmReason.controls['reasonText'].setValue('');
-          this.frmReason.controls['reasonText'].markAsTouched();
-          this.frmReason.controls['reasonText'].markAsDirty();
-        } else {
-          this.reasonHasInvalidHTML = false;
+      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
+        this.reasonHasInvalidHTML = true;
 
-          if (!this._validateForSpaces(this._reasonInnerText)) {
-            this._reasonInnerHTML = unescape(unescape(e.target.value));
-
-            this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
-
-            this.frmReason.controls['reasonText'].markAsTouched();
-            this.frmReason.controls['reasonText'].markAsDirty();
-
-            this.showValidateBar = false;
-            this.reasonFailed = false;
-
-            this.hideText = true;
-            this.formSaved = false;
-
-            this._messageService.sendMessage({
-              validateMessage: {
-                validate: {},
-                showValidateBar: false
-              }
-            });
-          } else {
-            this.frmReason.controls['reasonText'].setValue('');
-            this.frmReason.controls['reasonText'].markAsPristine();
-            this.frmReason.controls['reasonText'].markAsUntouched();
-
-            this._reasonInnerHTML = '';
-            this._reasonInnerText = '';
-            this._reasonTextContent = '';
-
-            this.reasonFailed = true;
-          }
-        }
-      } else {
         this.frmReason.controls['reasonText'].setValue('');
-        this.frmReason.controls['reasonText'].markAsPristine();
-        this.frmReason.controls['reasonText'].markAsUntouched();
-
+        this.frmReason.controls['reasonText'].markAsTouched();
+        this.frmReason.controls['reasonText'].markAsDirty();
+      } else {
         this.reasonHasInvalidHTML = false;
 
-        this.reasonFailed = true;
+        if (!this._validateForSpaces(this._reasonInnerText)) {
+          this._reasonInnerHTML = e.target.innerHTML;
 
-        this._messageService.sendMessage({
-          validateMessage: {
-            validate: {},
-            showValidateBar: false
-          }
-        });
+          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+          this.frmReason.controls['reasonText'].markAsTouched();
+          this.frmReason.controls['reasonText'].markAsDirty();
+
+          this.showValidateBar = false;
+          this.reasonFailed = false;
+
+          this.hideText = true;
+          this.formSaved = false;
+
+          this._messageService.sendMessage({
+            validateMessage: {
+              validate: {},
+              showValidateBar: false
+            }
+          });
+        } else {
+          this.frmReason.controls['reasonText'].setValue('');
+          this.frmReason.controls['reasonText'].markAsPristine();
+          this.frmReason.controls['reasonText'].markAsUntouched();
+
+          this._reasonInnerHTML = '';
+          this._reasonInnerText = '';
+          this._reasonTextContent = '';
+
+          this.reasonFailed = true;
+        }
       }
     } else {
-      this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
-        .then(res => {
-          if (res === 'okay') {
-            if (this._form99Details.text) {
-              if (this._form99Details.reason) {
-                this.typeSelected = this._form99Details.reason;
-              }
-              this.frmReason = this._fb.group({
-                reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
-                file: ['']
-              });
-              const unescapedText = this._form99Details.text;
-              this.frmReason.controls['reasonText'].setValue(unescapedText);
-              this._reasonTextContent = unescapedText;
-              this._reasonInnerText = unescapedText;
-              this._reasonInnerHTML = unescape(unescapedText);
-            }
-          } else if (res === 'cancel') {
-            this._router.navigate(['/reports']);
-          }
-        });
+      this.frmReason.controls['reasonText'].setValue('');
+      this.frmReason.controls['reasonText'].markAsPristine();
+      this.frmReason.controls['reasonText'].markAsUntouched();
+
+      this.reasonHasInvalidHTML = false;
+
+      this.reasonFailed = true;
+
+      this._messageService.sendMessage({
+        validateMessage: {
+          validate: {},
+          showValidateBar: false
+        }
+      });
     }
   }
 
