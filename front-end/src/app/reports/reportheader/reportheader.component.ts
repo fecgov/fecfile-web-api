@@ -86,7 +86,6 @@ private readonly filtersLSK = 'reports.filters';
        });
     this.existingReportId = localStorage.getItem('Existing_Report_id');
     if (this.existingReportId !== "") {
-          console.log(" ReportheaderComponent this.existingReportId =", this.existingReportId);  
           localStorage.removeItem('Existing_Report_id');
           localStorage.setItem(`form_3X_saved`, JSON.stringify(false));
         }

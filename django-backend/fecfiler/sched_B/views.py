@@ -85,10 +85,19 @@ CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT = {
     "IK_TRAN_FEA_OUT": "IK_TRAN_FEA"
 }
 EARMARK_SB_CHILD_LIST = [
-    "CON_EAR_OUT_DEP",
+    "CON_EAR_DEP_MEMO",
     "CON_EAR_UNDEP_MEMO",
-    "PAC_CON_EAR_DEP_OUT",
+    "PAC_CON_EAR_DEP_MEMO",
     "PAC_CON_EAR_UNDEP_MEMO",
+]
+
+# a list of treansaction types for sched_l(levin funds report) disbursments
+SCHED_L_B_TRAN_TYPES = [
+    "LEVIN_VOTER_ID",
+    "LEVIN_GOTV",
+    "LEVIN_GEN",
+    "LEVIN_OTH_DISB",
+    "LEVIN_VOTER_REG",
 ]
 
 # adding election_year field needed by front end
@@ -132,7 +141,7 @@ def check_transaction_id(transaction_id):
     make sure transaction_id start with 'SB'
     """
     try:
-        transaction_type_list = ["SB"]
+        transaction_type_list = ["SB", "LB"]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
             raise Exception(
@@ -644,7 +653,10 @@ def post_schedB(datum):
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
-        trans_char = "SB"
+        if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+            trans_char = "LB" # for sched_l transactions
+        else:
+            trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
         try:

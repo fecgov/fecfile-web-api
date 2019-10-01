@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation, SimpleChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -22,6 +22,7 @@ export class SignComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public committee_details: any = {};
+  public editMode: boolean;
   public formType: string = '';
   public typeSelected: string = '';
   public signFailed: boolean = false;
@@ -62,7 +63,7 @@ export class SignComponent implements OnInit {
 
   ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
     if (this.formType === '3X') {
@@ -86,6 +87,10 @@ export class SignComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
   }
 
   ngDoCheck(): void {
@@ -320,95 +325,111 @@ export class SignComponent implements OnInit {
    *
    */
   public saveForm(): void {
-    let formStatus: boolean = true;
+    if (this.editMode) {
+      let formStatus: boolean = true;
 
-    if (this.formType === '3X') {
-      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+      if (this.formType === '3X') {
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
 
-      if (this._form_details === null || typeof this._form_details === 'undefined') {
-        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        if (this._form_details === null || typeof this._form_details === 'undefined') {
+          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        }
+
+        const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
+      }
+      if (this.formType === '99') {
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+        const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
       }
 
-      const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
-    }
-    if (this.formType === '99') {
-      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-      const formSaved: boolean = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
-    }
+      this.additionalEmail1Invalid = false;
+      this.additionalEmail2Invalid = false;
 
-    this.additionalEmail1Invalid = false;
-    this.additionalEmail2Invalid = false;
+      if (
+        this.frmSignee.controls.signee.valid &&
+        this.frmSignee.controls.additional_email_1.valid &&
+        this.frmSignee.controls.additional_email_2.valid
+      ) {
+        this.validateAdditionalEmails();
 
-    if (
-      this.frmSignee.controls.signee.valid &&
-      this.frmSignee.controls.additional_email_1.valid &&
-      this.frmSignee.controls.additional_email_2.valid
-    ) {
-      this.validateAdditionalEmails();
-
-      if (!this.additionalEmail1Invalid && !this.additionalEmail2Invalid) {
-        this.frmSaved = true;
-        if (this.formType === '99') {
-          this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
-          this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
-        } else if (this.formType === '3X') {
-          if (this._form_details.hasOwnProperty('additionalEmail1')) {
-            this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
-          } else if (this._form_details.hasOwnProperty('additionalemail1')) {
-            this._form_details.additionalemail1 = this.frmSignee.get('additional_email_1').value;
-          }
-          if (this._form_details.hasOwnProperty('additionalEmail2')) {
-            this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
-          } else if (this._form_details.hasOwnProperty('additionalemail2')) {
-            this._form_details.additionalemail2 = this.frmSignee.get('additional_email_2').value;
-          }
-        }
-
-        if (this.formType === '99') {
-          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-        } else if (this.formType === '3X') {
-          localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
-        }
-
-        if (this.formType === '3X') {
-          this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved').subscribe(
-            res => {
-              if (res) {
-                this.frmSaved = true;
-
-                let formSavedObj: any = {
-                  saved: this.frmSaved
-                };
-
-                localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify(formSavedObj));
-              }
-            },
-            error => {
-              console.log('error: ', error);
+        if (!this.additionalEmail1Invalid && !this.additionalEmail2Invalid) {
+          this.frmSaved = true;
+          if (this.formType === '99') {
+            this._form_details.additional_email_1 = this.frmSignee.get('additional_email_1').value;
+            this._form_details.additional_email_2 = this.frmSignee.get('additional_email_2').value;
+          } else if (this.formType === '3X') {
+            if (this._form_details.hasOwnProperty('additionalEmail1')) {
+              this._form_details.additionalEmail1 = this.frmSignee.get('additional_email_1').value;
+            } else if (this._form_details.hasOwnProperty('additionalemail1')) {
+              this._form_details.additionalemail1 = this.frmSignee.get('additional_email_1').value;
             }
-          );
-        }
-        if (this.formType === '99') {
-          this._formsService.Signee_SaveForm({}, this.formType).subscribe(
-            res => {
-              if (res) {
-                this.frmSaved = true;
-
-                let formSavedObj: any = {
-                  saved: this.frmSaved
-                };
-
-                localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
-              }
-            },
-            error => {
-              console.log('error: ', error);
+            if (this._form_details.hasOwnProperty('additionalEmail2')) {
+              this._form_details.additionalEmail2 = this.frmSignee.get('additional_email_2').value;
+            } else if (this._form_details.hasOwnProperty('additionalemail2')) {
+              this._form_details.additionalemail2 = this.frmSignee.get('additional_email_2').value;
             }
-          );
+          }
+
+          if (this.formType === '99') {
+            localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+          } else if (this.formType === '3X') {
+            localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+          }
+
+          if (this.formType === '3X') {
+            this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved').subscribe(
+              res => {
+                if (res) {
+                  this.frmSaved = true;
+
+                  let formSavedObj: any = {
+                    saved: this.frmSaved
+                  };
+
+                  localStorage.setItem(`form_${this.formType}_saved_backup`, JSON.stringify(formSavedObj));
+                }
+              },
+              error => {
+                console.log('error: ', error);
+              }
+            );
+          }
+          if (this.formType === '99') {
+            this._formsService.Signee_SaveForm({}, this.formType).subscribe(
+              res => {
+                if (res) {
+                  this.frmSaved = true;
+
+                  let formSavedObj: any = {
+                    saved: this.frmSaved
+                  };
+
+                  localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(formSavedObj));
+                }
+              },
+              error => {
+                console.log('error: ', error);
+              }
+            );
+          }
         }
       }
+      console.log(' saveForm this.frmSaved =', this.frmSaved);
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
-    console.log(' saveForm this.frmSaved =', this.frmSaved);
   }
 
   /**
@@ -574,115 +595,145 @@ export class SignComponent implements OnInit {
   public updateAdditionalEmail(e): void {
     this.frmSaved = false;
     this.clearWarnMsg();
+    if (this.editMode) {
+      if (e.target.value.length) {
+        if (e.target.name === 'additional_email_1') {
+          if (this.formType === '99') {
+            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+            this._form_details.additional_email_1 = e.target.value;
+          } else if (this.formType === '3X') {
+            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
 
-    if (e.target.value.length) {
-      if (e.target.name === 'additional_email_1') {
-        if (this.formType === '99') {
-          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-          this._form_details.additional_email_1 = e.target.value;
-        } else if (this.formType === '3X') {
-          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+            if (this._form_details === null || typeof this._form_details === 'undefined') {
+              this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+            }
 
-          if (this._form_details === null || typeof this._form_details === 'undefined') {
-            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+            if (this._form_details.hasOwnProperty('additionalEmail1')) {
+              this._form_details.additionalEmail1 = e.target.value;
+            } else if (this._form_details.hasOwnProperty('additionalemail1')) {
+              this._form_details.additionalemail1 = e.target.value;
+            }
           }
 
-          if (this._form_details.hasOwnProperty('additionalEmail1')) {
-            this._form_details.additionalEmail1 = e.target.value;
-          } else if (this._form_details.hasOwnProperty('additionalemail1')) {
-            this._form_details.additionalemail1 = e.target.value;
+          if (this.formType === '99') {
+            localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+          } else if (this.formType === '3X') {
+            localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+          }
+
+          if (this.formType === '99') {
+            localStorage.setItem(
+              `form_${this.formType}_saved`,
+              JSON.stringify({
+                saved: false
+              })
+            );
+          } else if (this.formType === '3X') {
+            localStorage.setItem(
+              `form_${this.formType}_saved_backup`,
+              JSON.stringify({
+                saved: false
+              })
+            );
+          }
+        } else if (e.target.name === 'additional_email_2') {
+          if (this.formType === '99') {
+            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+            this._form_details.additional_email_2 = e.target.value;
+          } else if (this.formType === '3X') {
+            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+            if (this._form_details === null || typeof this._form_details === 'undefined') {
+              this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+            }
+
+            if (this._form_details.hasOwnProperty('additionalEmail2')) {
+              this._form_details.additionalEmail2 = e.target.value;
+            } else if (this._form_details.hasOwnProperty('additionalemail2')) {
+              this._form_details.additionalemail2 = e.target.value;
+            }
+          }
+
+          if (this.formType === '99') {
+            localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+          } else if (this.formType === '3X') {
+            localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+          }
+
+          if (this.formType === '99') {
+            localStorage.setItem(
+              `form_${this.formType}_saved`,
+              JSON.stringify({
+                saved: false
+              })
+            );
+          } else if (this.formType === '3X') {
+            localStorage.setItem(
+              `form_${this.formType}_saved_backup`,
+              JSON.stringify({
+                saved: false
+              })
+            );
           }
         }
-
-        if (this.formType === '99') {
-          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-        } else if (this.formType === '3X') {
-          localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
-        }
-
+      } else {
         if (this.formType === '99') {
           localStorage.setItem(
             `form_${this.formType}_saved`,
             JSON.stringify({
-              saved: false
+              saved: true
             })
           );
         } else if (this.formType === '3X') {
           localStorage.setItem(
             `form_${this.formType}_saved_backup`,
             JSON.stringify({
-              saved: false
-            })
-          );
-        }
-      } else if (e.target.name === 'additional_email_2') {
-        if (this.formType === '99') {
-          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-          this._form_details.additional_email_2 = e.target.value;
-        } else if (this.formType === '3X') {
-          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
-          if (this._form_details === null || typeof this._form_details === 'undefined') {
-            this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
-          }
-
-          if (this._form_details.hasOwnProperty('additionalEmail2')) {
-            this._form_details.additionalEmail2 = e.target.value;
-          } else if (this._form_details.hasOwnProperty('additionalemail2')) {
-            this._form_details.additionalemail2 = e.target.value;
-          }
-        }
-
-        if (this.formType === '99') {
-          localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-        } else if (this.formType === '3X') {
-          localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
-        }
-
-        if (this.formType === '99') {
-          localStorage.setItem(
-            `form_${this.formType}_saved`,
-            JSON.stringify({
-              saved: false
-            })
-          );
-        } else if (this.formType === '3X') {
-          localStorage.setItem(
-            `form_${this.formType}_saved_backup`,
-            JSON.stringify({
-              saved: false
+              saved: true
             })
           );
         }
       }
     } else {
-      if (this.formType === '99') {
-        localStorage.setItem(
-          `form_${this.formType}_saved`,
-          JSON.stringify({
-            saved: true
-          })
-        );
-      } else if (this.formType === '3X') {
-        localStorage.setItem(
-          `form_${this.formType}_saved_backup`,
-          JSON.stringify({
-            saved: true
-          })
-        );
-      }
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 
   public updateValidation(e): void {
-    this.frmSaved = false;
-    this.clearWarnMsg();
+    if (this.editMode) {
+      this.frmSaved = false;
+      this.clearWarnMsg();
 
-    if (e.target.checked) {
-      this.signFailed = false;
-    } else if (!e.target.checked) {
-      this.signFailed = true;
+      if (e.target.checked) {
+        this.signFailed = false;
+      } else if (!e.target.checked) {
+        this.signFailed = true;
+      }
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            e.target.checked = false;
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
-
     console.log('this.signFailed: ', this.signFailed);
   }
 

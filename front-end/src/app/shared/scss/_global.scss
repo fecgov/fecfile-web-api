@@ -13,7 +13,8 @@
 @import '../../../../node_modules/bootstrap/scss/forms';
 @import '../../../../node_modules/bootstrap/scss/input-group';
 
-@import url('https://fonts.googleapis.com/css?family=Roboto:100, 200, 300,400,700');
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700,900&display=swap&subset=latin-ext');
+
 
 
 @import '../../../../node_modules/@ng-select/ng-select/scss/default.theme.scss';
@@ -39,51 +40,51 @@ p {
 
 
  .h1 {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
 font-size: 2rem;
   color: #212121;
   font-weight: 700;
 }
 .h2 {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 2.8rem;
   color: #212121;
   font-weight: 700;
 }
 
 .h3 {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 2.5rem;
   font-weight: 700;
 }
 .h4 {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 2.3rem;
   font-weight: 700;
 }
 .h5 {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 1rem;
   font-weight: 700;
   color: #212121
 }
 
 .label {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 1rem;
   font-weight: 400;
   color: #212121;
 }
 
 .subtitle {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 1.1rem;
   font-weight: 400;
   color: #212121;
 }
 
 .subtitle-indv {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 1.1rem;
   font-weight: 400;
   color: #212121;
@@ -91,20 +92,20 @@ font-size: 2rem;
 }
 
 .paragraph {
-  font-family: 'Roboto', 'sans-serif';
+  font-family: 'Lato', 'sans-serif';
   font-size: 1rem;
   font-weight: 400;
   color: #212121;
 }
 
 .h2a {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 2.8rem;
   font-weight:200;
   color: #212121;
 }
 .h2b {
-  font-family: 'Roboto','sans-serif';
+  font-family: 'Lato','sans-serif';
   font-size: 2.8rem;
   font-weight:300;
   color: #212121;

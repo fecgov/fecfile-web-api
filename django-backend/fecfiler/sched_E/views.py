@@ -274,8 +274,8 @@ def update_aggregate_on_transaction(
     """
     update transaction with updated aggregate amount
     """
-    print(transaction_id)
-    print(aggregate_amount)
+    # print(transaction_id)
+    # print(aggregate_amount)
     try:
         _sql = """
         UPDATE public.sched_e

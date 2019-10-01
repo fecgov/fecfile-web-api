@@ -11,7 +11,7 @@
                         "text": "Type",
                         "infoIcon": true,
                         "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
-                        "name": "entityType",
+                        "name": "entity_type",
                         "type": "select",
                         "value": "IND",
                         "scroll": false,
@@ -224,7 +224,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -308,7 +308,7 @@
                         "text": "Type",
                         "infoIcon": true,
                         "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
-                         "name": "entityType",
+                         "name": "entity_type",
                         "type": "select",
                         "value": "IND",
                         "scroll": false,
@@ -544,7 +544,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -689,7 +689,7 @@
                         "text": "Type",
                         "infoIcon": true,
                         "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
-                         "name": "entityType",
+                         "name": "entity_type",
                         "type": "select",
                         "value": "IND",
                         "scroll": false,
@@ -841,7 +841,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -883,7 +883,7 @@
                         "text": "Type",
                         "infoIcon": true,
                         "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
-                         "name": "entityType",
+                         "name": "entity_type",
                         "type": "select",
                         "value": "IND",
                         "scroll": false,
@@ -915,7 +915,7 @@
                         "width": "197px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 200,
                             "alphaNumeric": true
                         }
                     }
@@ -1017,7 +1017,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }

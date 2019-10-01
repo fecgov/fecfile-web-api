@@ -259,8 +259,9 @@
                   </span>
                 </button>
               </div>
-              <div class="editor" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
-                  role="textarea" [textContent]="textAreaTextContent" (input)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor> 
+              <div>
+                <textarea class="editor full-width-textarea" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
+                  role="textarea" (change)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor></textarea>
               </div>
             </div>
           </div>

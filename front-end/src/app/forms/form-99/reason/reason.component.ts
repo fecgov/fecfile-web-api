@@ -32,6 +32,7 @@ export class ReasonComponent implements OnInit {
   @ViewChild('htmlEditor') htmlEditor: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
 
+  public editMode: boolean;
   public frmReason: FormGroup;
   public reasonType: string = null;
   public reasonFailed: boolean = false;
@@ -79,9 +80,9 @@ export class ReasonComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
-    
+
     if (this._form99Details) {
       if (this._form99Details.text) {
         if (this._form99Details.reason) {
@@ -91,8 +92,12 @@ export class ReasonComponent implements OnInit {
           reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
         });
-        this.frmReason.controls['reasonText'].setValue(this._form99Details.text);
-       } else {
+        const unescapedText = this._form99Details.text;
+        this.frmReason.controls['reasonText'].setValue(unescapedText);
+        this._reasonTextContent = unescapedText;
+        this._reasonInnerText = unescapedText;
+        this._reasonInnerHTML = unescape(unescapedText);
+      } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
@@ -108,19 +113,18 @@ export class ReasonComponent implements OnInit {
 
   ngDoCheck(): void {
     let form_99_details: any = {};
-    
+
     if (localStorage.getItem('form_99_details') !== null) {
       form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
     }
 
     if (form_99_details) {
       this.typeSelected = form_99_details.reason;
-      
     }
 
     if (this.frmReason.get('reasonText').value.length >= 1) {
       let text: string = this.frmReason.get('reasonText').value;
-       this.characterCount = this._countCharacters(text);
+      this.characterCount = this._countCharacters(text);
     } else if (this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
       this.characterCount = this._countCharacters(text);
@@ -140,67 +144,96 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    this._reasonTextContent = e.target.textContent;
-    this.textAreaTextContent = e.target.textContent;
-    if (this._reasonTextContent.length >= 1) {
-      this._reasonInnerText = e.target.innerText;
+    if (this.editMode) {
+      this._reasonTextContent = e.target.value;
+      this.textAreaTextContent = e.target.value;
+      if (this._reasonTextContent.length >= 1) {
+        this._reasonInnerText = unescape(e.target.value);
 
-      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
-        this.reasonHasInvalidHTML = true;
+        if (this._checkUnsupportedHTML(this._reasonInnerText)) {
+          this.reasonHasInvalidHTML = true;
 
-        this.frmReason.controls['reasonText'].setValue('');
-        this.frmReason.controls['reasonText'].markAsTouched();
-        this.frmReason.controls['reasonText'].markAsDirty();
-      } else {
-        this.reasonHasInvalidHTML = false;
-
-        if (!this._validateForSpaces(this._reasonInnerText)) {
-          this._reasonInnerHTML = e.target.innerHTML;
-
-          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
-
+          this.frmReason.controls['reasonText'].setValue('');
           this.frmReason.controls['reasonText'].markAsTouched();
           this.frmReason.controls['reasonText'].markAsDirty();
-
-          this.showValidateBar = false;
-          this.reasonFailed = false;
-
-          this.hideText = true;
-          this.formSaved = false;
-
-          this._messageService.sendMessage({
-            validateMessage: {
-              validate: {},
-              showValidateBar: false
-            }
-          });
         } else {
-          this.frmReason.controls['reasonText'].setValue('');
-          this.frmReason.controls['reasonText'].markAsPristine();
-          this.frmReason.controls['reasonText'].markAsUntouched();
+          this.reasonHasInvalidHTML = false;
 
-          this._reasonInnerHTML = '';
-          this._reasonInnerText = '';
-          this._reasonTextContent = '';
+          if (!this._validateForSpaces(this._reasonInnerText)) {
+            this._reasonInnerHTML = unescape(unescape(e.target.value));
 
-          this.reasonFailed = true;
+            this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+            this.frmReason.controls['reasonText'].markAsTouched();
+            this.frmReason.controls['reasonText'].markAsDirty();
+
+            this.showValidateBar = false;
+            this.reasonFailed = false;
+
+            this.hideText = true;
+            this.formSaved = false;
+
+            this._messageService.sendMessage({
+              validateMessage: {
+                validate: {},
+                showValidateBar: false
+              }
+            });
+          } else {
+            this.frmReason.controls['reasonText'].setValue('');
+            this.frmReason.controls['reasonText'].markAsPristine();
+            this.frmReason.controls['reasonText'].markAsUntouched();
+
+            this._reasonInnerHTML = '';
+            this._reasonInnerText = '';
+            this._reasonTextContent = '';
+
+            this.reasonFailed = true;
+          }
         }
+      } else {
+        this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsPristine();
+        this.frmReason.controls['reasonText'].markAsUntouched();
+
+        this.reasonHasInvalidHTML = false;
+
+        this.reasonFailed = true;
+
+        this._messageService.sendMessage({
+          validateMessage: {
+            validate: {},
+            showValidateBar: false
+          }
+        });
       }
     } else {
-      this.frmReason.controls['reasonText'].setValue('');
-      this.frmReason.controls['reasonText'].markAsPristine();
-      this.frmReason.controls['reasonText'].markAsUntouched();
-
-      this.reasonHasInvalidHTML = false;
-
-      this.reasonFailed = true;
-
-      this._messageService.sendMessage({
-        validateMessage: {
-          validate: {},
-          showValidateBar: false
-        }
-      });
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            if (this._form99Details.text) {
+              if (this._form99Details.reason) {
+                this.typeSelected = this._form99Details.reason;
+              }
+              this.frmReason = this._fb.group({
+                reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
+                file: ['']
+              });
+              const unescapedText = this._form99Details.text;
+              this.frmReason.controls['reasonText'].setValue(unescapedText);
+              this._reasonTextContent = unescapedText;
+              this._reasonInnerText = unescapedText;
+              this._reasonInnerHTML = unescape(unescapedText);
+            }
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 
@@ -335,7 +368,7 @@ export class ReasonComponent implements OnInit {
   }
 
   public setFile(e): void {
-    if (e.target.files.length === 1) {
+    if (e.target.files.length === 1 && this.editMode) {
       this.file = e.target.files[0];
       if (this.file.name.includes('.pdf')) {
         let fileNameObj: any = {
@@ -583,9 +616,7 @@ export class ReasonComponent implements OnInit {
   }
 
   public printPreview() {
-
     if (this.frmReason.valid) {
-
       if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
@@ -606,11 +637,9 @@ export class ReasonComponent implements OnInit {
         this.showValidateBar = false;
 
         if (this.file !== null) {
-
           this._formsService.PreviewForm_ReasonScreen({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
-
                 this._form99Details.id = res.id;
                 localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
                 // success
@@ -627,7 +656,6 @@ export class ReasonComponent implements OnInit {
             }
           );
         } else {
-
           this._formsService.PreviewForm_ReasonScreen({}, {}, this._formType).subscribe(
             res => {
               if (res) {

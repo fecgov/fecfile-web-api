@@ -28,6 +28,7 @@ export class TransactionSidebarComponent implements OnInit {
   @Input() transactionCategories: any = [];
   @Input() step: string = '';
 
+  public editMode: boolean;
   public itemSelected: string = '';
   public typeaheadValue: string = '';
   public receiptsTotal: number = 0.0;
@@ -70,29 +71,38 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
       }
-      for (let transactionCategorieIndex = 0; transactionCategorieIndex < this.transactionCategories.length; transactionCategorieIndex++) {
-        for (let transactionCategoryOptionIndex = 0;
-          transactionCategoryOptionIndex <
-          this.transactionCategories[transactionCategorieIndex].options.length; transactionCategoryOptionIndex++) {
-            for (let transactionCategoryOptionOptionsIndex = 0;
-              transactionCategoryOptionOptionsIndex <
-              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options.length;
-              transactionCategoryOptionOptionsIndex++) {
-              transactionCategoryOptions.push(
-                this.transactionCategories[transactionCategorieIndex]
-                  .options[transactionCategoryOptionIndex].options[transactionCategoryOptionOptionsIndex]
-              );
-            }
+      for (
+        let transactionCategorieIndex = 0;
+        transactionCategorieIndex < this.transactionCategories.length;
+        transactionCategorieIndex++
+      ) {
+        for (
+          let transactionCategoryOptionIndex = 0;
+          transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+          transactionCategoryOptionIndex++
+        ) {
+          for (
+            let transactionCategoryOptionOptionsIndex = 0;
+            transactionCategoryOptionOptionsIndex <
+            this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+              .length;
+            transactionCategoryOptionOptionsIndex++
+          ) {
+            transactionCategoryOptions.push(
+              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
+                transactionCategoryOptionOptionsIndex
+              ]
+            );
+          }
         }
       }
     });
-
-  
   }
 
   ngDoCheck(): void {
@@ -109,7 +119,7 @@ export class TransactionSidebarComponent implements OnInit {
                       this.cashOnHandTotal = res.totals.COH;
                       const totals: any = {
                         receipts: this.receiptsTotal,
-                        cashOnHand : this.cashOnHandTotal
+                        cashOnHand: this.cashOnHandTotal
                       };
                       localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
                     }
@@ -130,7 +140,7 @@ export class TransactionSidebarComponent implements OnInit {
                       this.disbursementsTotal = res.totals.Disbursements;
                       const totals: any = {
                         receipts: this.receiptsTotal,
-                        cashOnHand : this.cashOnHandTotal,
+                        cashOnHand: this.cashOnHandTotal,
                         disbursements: this.disbursementsTotal
                       };
                       localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
@@ -168,8 +178,7 @@ export class TransactionSidebarComponent implements OnInit {
       }
     }
 
-    if (this.itemSelected === '')
-    {
+    if (this.itemSelected === '') {
       this.itemSelected = 'receipts';
     }
   }
@@ -178,7 +187,7 @@ export class TransactionSidebarComponent implements OnInit {
     this._messageService.clearMessage();
   }
 
-    /**
+  /**
    * Sets the secondary transaction categories.
    */
   private _setSecondaryTransactionCategories(): void {
@@ -212,9 +221,13 @@ export class TransactionSidebarComponent implements OnInit {
       distinctUntilChanged(),
       merge(this.focus$),
       merge(this.click$.pipe(filter(() => !this.instance.isPopupOpen()))),
-      map(term => (term === '' ? transactionCategoryOptions
-        : transactionCategoryOptions.filter(v => v.text.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10))
-    )
+      map(term =>
+        (term === ''
+          ? transactionCategoryOptions
+          : transactionCategoryOptions.filter(v => v.text.toLowerCase().indexOf(term.toLowerCase()) > -1)
+        ).slice(0, 10)
+      )
+    );
 
   formatter = (x: { text: string }) => x.text;
 
@@ -224,43 +237,70 @@ export class TransactionSidebarComponent implements OnInit {
    * @param      {Object}  e  The event object.
    */
   public selectItem(e): void {
-    this.itemSelected = e.target.value;
+    if (this.editMode) {
+      this.itemSelected = e.target.value;
 
-    this.status.emit({
-      form: this._formType,
-      transactionCategory: e.target.value
-    });
-
-    this._messageService.sendMessage({
-      form: this._formType,
-      transactionCategory: e.target.value
-    });
-
-    if (
-      localStorage.getItem('Transaction_Table_Screen') === 'Yes' ||
-      localStorage.getItem('Summary_Screen') === 'Yes' ||
-      localStorage.getItem('Receipts_Entry_Screen') === 'Yes'
-    ) {
-      this._router.navigate([`/forms/form/${this._formType}`], {
-        queryParams: { step: 'step_2', transactionCategory: e.target.value }
+      this.status.emit({
+        form: this._formType,
+        transactionCategory: e.target.value
       });
+
+      this._messageService.sendMessage({
+        form: this._formType,
+        transactionCategory: e.target.value
+      });
+
+      if (
+        localStorage.getItem('Transaction_Table_Screen') === 'Yes' ||
+        localStorage.getItem('Summary_Screen') === 'Yes' ||
+        localStorage.getItem('Receipts_Entry_Screen') === 'Yes'
+      ) {
+        this._router.navigate([`/forms/form/${this._formType}`], {
+          queryParams: { step: 'step_2', transactionCategory: e.target.value }
+        });
+      }
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 
   public selectedTypeAheadValue(e): void {
-
-    if (e) {
-      for (let transactionCategorieIndex = 0;
-        transactionCategorieIndex < this.transactionCategories.length; transactionCategorieIndex++) {
-        for (let transactionCategoryOptionIndex = 0;
-          transactionCategoryOptionIndex <
-          this.transactionCategories[transactionCategorieIndex].options.length; transactionCategoryOptionIndex++) {
-          for (let transactionCategoryOptionOptionsIndex = 0;
+    if (this.editMode && e) {
+      for (
+        let transactionCategorieIndex = 0;
+        transactionCategorieIndex < this.transactionCategories.length;
+        transactionCategorieIndex++
+      ) {
+        for (
+          let transactionCategoryOptionIndex = 0;
+          transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+          transactionCategoryOptionIndex++
+        ) {
+          for (
+            let transactionCategoryOptionOptionsIndex = 0;
             transactionCategoryOptionOptionsIndex <
-            this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options.length;
-            transactionCategoryOptionOptionsIndex++) {
-            if (e.text === this.transactionCategories[transactionCategorieIndex]
-              .options[transactionCategoryOptionIndex].options[transactionCategoryOptionOptionsIndex].text) {
+            this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+              .length;
+            transactionCategoryOptionOptionsIndex++
+          ) {
+            if (
+              e.text ===
+              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
+                transactionCategoryOptionOptionsIndex
+              ].text
+            ) {
               this.itemSelected = this.transactionCategories[transactionCategorieIndex].value;
               this.status.emit({
                 form: this._formType,
@@ -277,9 +317,16 @@ export class TransactionSidebarComponent implements OnInit {
                 localStorage.getItem('Receipts_Entry_Screen') === 'Yes'
               ) {
                 this._router.navigate([`/forms/form/${this._formType}`], {
-                  queryParams: { 
+                  queryParams: {
                     step: 'step_2',
-                    transactionCategory: this.transactionCategories[transactionCategorieIndex].value
+                    edit: this.editMode,
+                    transactionCategory: this.transactionCategories[transactionCategorieIndex].value,
+                    transactionSubCategoryType: this.transactionCategories[transactionCategorieIndex].options[
+                      transactionCategoryOptionIndex
+                    ].value,
+                    transactionSubCategory: this.transactionCategories[transactionCategorieIndex].options[
+                      transactionCategoryOptionIndex
+                    ].options[transactionCategoryOptionOptionsIndex].value
                   }
                 });
               }
@@ -288,29 +335,60 @@ export class TransactionSidebarComponent implements OnInit {
           }
         }
       }
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 
   public viewSummary(): void {
-
     localStorage.setItem('Summary_Screen', 'Yes');
     localStorage.setItem(`form_${this._formType}_summary_screen`, 'Yes');
-    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'financial_summary' } });
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'financial_summary', edit: this.editMode }
+    });
   }
 
   public signandSubmit(): void {
-    this._router.navigate([`/signandSubmit/${this._formType}`]);
+    this._router.navigate([`/signandSubmit/${this._formType}`], { queryParams: { edit: this.editMode } });
   }
 
   public updateTypeSelected(e): void {
-    const val: string = e.target.value;
+    if (this.editMode) {
+      const val: string = e.target.value;
 
-    this.transactionType = val;
-    this.transactionTypeText = e.target.value.text;
+      this.transactionType = val;
+      this.transactionTypeText = e.target.value.text;
 
-    this.frmOption.controls['secondaryOption'].setValue(val);
+      this.frmOption.controls['secondaryOption'].setValue(val);
 
-    this.transactionTypeFailed = false;
+      this.transactionTypeFailed = false;
+    } else {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
+    }
   }
 
   /**
@@ -343,8 +421,8 @@ export class TransactionSidebarComponent implements OnInit {
     This function is called while selecting a list from report screen
   */
   public optionsListClick(type): void {
-    if(document.getElementById(type) != null) {
-        document.getElementById(type).click();
+    if (document.getElementById(type) != null) {
+      document.getElementById(type).click();
     }
   }
 }
