@@ -1,6 +1,10 @@
+import logging
 from functools import lru_cache
 from django.db import connection
 from fecfiler.core.views import get_entities, NoOPError
+
+
+logger = logging.getLogger(__name__)
 
 
 def update_parent_purpose(data):
@@ -10,11 +14,20 @@ def update_parent_purpose(data):
     the child entity_name should be update in parents 
     'purpose_description' field
     """
+    desc_start = {
+        "EAR_REC_CONVEN_ACC_MEMO": "Earmarked for Convention Account ",
+        "EAR_REC_HQ_ACC_MEMO": "Earmarked for Headquarters Account ",
+        "EAR_REC_RECNT_ACC_MEMO": "Earmarked for Recount Account ",
+    }
     parent_tran_id = data.get("back_ref_transaction_id")
     cmte_id = data.get("cmte_id")
     report_id = data.get("report_id")
     entity_name = data.get("entity_name")
-    purpose = "Earmark for " + entity_name
+    tran_type = data.get("transaction_type_identifier")
+    if tran_type in desc_start:
+        purpose = desc_start.get(tran_type) + entity_name
+    else:
+        purpose = "Earmarked for " + entity_name
     _sql = """
     UPDATE public.sched_a 
     SET purpose_description = %s 
@@ -24,6 +37,11 @@ def update_parent_purpose(data):
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
+            logger.debug("update parent purpose with sql:{}".format(_sql))
+            logger.debug(
+                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+            )
+            # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
             if cursor.rowcount == 0:
                 raise Exception(
@@ -96,6 +114,8 @@ def get_line_number_trans_type(transaction_type_identifier):
             list_value = trans_dic.get(transaction_type_identifier)
             line_number = list_value[0]
             transaction_type = list_value[1]
+            if transaction_type is None:
+                transaction_type = 0
             return line_number, transaction_type
         else:
             raise Exception(

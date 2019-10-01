@@ -134,7 +134,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription = this._contactsMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
         (filters: ContactFilterModel) => {
-          console.log(" keywordFilterSearchSubscription Get cachefilter...!");
           if (filters) {
             this.filters = filters;
             /*if (filters.formType) {
@@ -151,7 +150,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
-    console.log("Contacts table ngOnInit ...");
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
       itemsPerPage: this.maxItemsPerPage,
@@ -193,7 +191,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    console.log (" ContactsTableComponent getPage this.tableType", this.tableType);
 
     switch (this.tableType) {
       case this.contactsView:
@@ -215,8 +212,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the contacts to get
 	 */
   public getContactsPage(page: number): void {
-    console.log(" getContactsPage calling ...");
-    console.log(" getContactsPage this.filters =", this.filters);
     
     this.config.currentPage = page;
 
@@ -297,7 +292,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName,
       sortedCol.descending, this.filters)
       .subscribe((res: GetContactsResponse) => {
-
+        console.log(" getRecyclingPage res =", res)
         this.contactsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
@@ -524,9 +519,6 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 	 * Determine if pagination should be shown.
 	 */
   public showPagination(): boolean {
-    console.log("this.config.totalItems =", this.config.totalItems);
-    console.log("this.config.itemsPerPage =", this.config.itemsPerPage);
-    
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
@@ -574,7 +566,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     let conIds = '';
     const selectedContacts: Array<ContactModel> = [];
     for (const con of this.contactsModel) {
-      if (con.selected) {
+      if (con.selected && con.activeTransactionsCnt === 0) {
         selectedContacts.push(con);
         conIds += con.id + ', ';
       }
@@ -675,11 +667,10 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
           this._contactsService
             .trashOrRestoreContacts('trash', [ctn])
             .subscribe((res: GetContactsResponse) => {
-              console.log("trashContact res =", res);
               if (res['result'] === 'success') {
                 this.getContactsPage(this.config.currentPage);
                 this._dialogService.confirm(
-                  'Contact has been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Success!',
                   false,
@@ -688,7 +679,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               } else
               {
                 this._dialogService.confirm(
-                  'Contact has not been successfully deleted and sent to the recycle bin. ' + ctn.id,
+                  'Contact has not been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
                   'Warning!',
                   false,
@@ -1084,7 +1075,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     
-    const defaultSortColumns = ['name', 'entityType', 'employer', 'occupation'];
+    const defaultSortColumns = ['name', 'entity_type', 'employer', 'occupation'];
     const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
   
     this.sortableColumns = [];

@@ -1,18 +1,33 @@
 <ng-template #rt let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeName let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidate let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
+</ng-template>
 
 <div class="add_new_contact-container">
   <form [formGroup]="frmContact">
     <header>
       <div class="header-content">
-        <div class="float-left">
+        <!--<div class="float-left">-->
           <h1>
             Add New Contact
           </h1>
           <br />
           <br />
-        </div>
+        <!--</div>-->
        </div>
 
       <!--<div class="grid-row">
@@ -81,7 +96,8 @@
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
                       *ngIf="col?.name !== 'first_name' 
-                          && col?.name !== 'last_name'"
+                          && col?.name !== 'last_name'
+                          && col?.name !== 'entity_name'"
                       class="form-control"
                       [style.width]="col?.width"
                       [style.height]="col?.height"
@@ -144,6 +160,30 @@
                       [inputFormatter]="formatterFirstName"
                       (selectItem)="handleSelectedItem($event)"
                     />
+
+                    <input
+                    *ngIf="col?.name === 'entity_name'"
+                    class="form-control"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [attr.type]="col?.type"
+                    [attr.name]="col?.name"
+                    [attr.value]="col?.value"
+                    [maxlength]="col?.validation?.max"
+                    [formControlName]="col?.name"
+                    [ngClass]="
+                      frmContact.get(col?.name)?.invalid &&
+                      (frmContact.touched || frmContact.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    "
+                    id="typeahead-template-entity-name"
+                    [ngbTypeahead]="searchOrg"
+                    [resultTemplate]="rtOrg"
+                    [inputFormatter]="formatterOrgName"
+                    (selectItem)="handleSelectedOrgItem($event)"
+                  />
+
                   </div>
                   <div
                     class="error-text"
@@ -213,10 +253,12 @@
                   ></textarea>
                 </ng-container>
 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
+              <!--  <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
                   <ng-select
                     (change)="handleStateChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
@@ -229,12 +271,33 @@
                       {{ item.code }} - {{ item.name }}
                     </ng-option>
                   </ng-select>
-                </ng-container>
+                </ng-container> -->
+                
+                <ng-container *ngIf="col?.type === 'select' && 
+                    (isFieldName(col?.name, 'state') ||
+                    isFieldName(col?.name, 'cand_office_state'))">
+                  <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
+                    class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
+                    frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
+                          ? 'forms__select-error'
+                          : ''
+                      ">
+                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                      <span>{{ item.code + ' - ' + item.name }}</span>
+                    </ng-template>
+                  </ng-select>
+                </ng-container> 
+
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
                   <ng-select
                     (change)="handleCandOfficeChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -252,7 +315,11 @@
                   <ng-select
                     (change)="handleOfficeStateChange($event, col)"
                     class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -266,11 +333,15 @@
                   </ng-select>
                 </ng-container>
                 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entityType'">
-                  <ng-select
+                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
+                  <ng-select #entityTypeSelect
+                    [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
-                    class="state-select"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
                     [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -278,11 +349,8 @@
                         : ''
                     "
                   >
-                    <ng-option *ngFor="let item3 of entityTypes" [ngValue]="item3">
-                      {{ item3.code }} - {{ item3.name }}
-                    </ng-option>
                   </ng-select>
-                </ng-container>                
+                </ng-container>     
               </div>
             </div>
             <!-- ./col -->
@@ -301,15 +369,15 @@
 
     <footer>
       <footer>
-        <div class="grid-row">
+        <!--<div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="saveAndAddMore()">
+              <button class="btn btn-primary btn-left" type="button" (click)="saveAndAddMore()">
                 Save &amp; Add More
               </button>
             </div>
           </div>
-        </div>
+        </div>-->
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
@@ -323,8 +391,11 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" type="button"  (click)="saveAndExit()">
-                Save &amp; Exit
+              <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
+                Save &amp; Add More
+              </button>
+              <button class="btn btn-previous btn-right" type="button"  (click)="viewContacts()">
+                View Contacts
               </button>
             </div>
           </div>          

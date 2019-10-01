@@ -2,7 +2,7 @@
     "data": {
         "individualFormFields": [
             {
-                "colClassName": "col col-md-4",
+                "colClassName": "col col-md-2",
                 "seperator": false,
                 "cols": [
                     {
@@ -10,16 +10,16 @@
                         "inputIcon": "",
                         "text": "Type",
                         "infoIcon": true,
-                        "infoText": "Language will be provided by RAD",
-                        "name": "entityType",
+                        "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
+                        "name": "entity_type",
                         "type": "select",
-                        "value": null,
+                        "value": "IND",
                         "scroll": false,
                         "height": "30px",
-                        "width": "98px",
+                        "width": "450px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 3,
                             "alphaNumeric": true
                         }
                      }
@@ -224,7 +224,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -299,7 +299,7 @@
         ],
       "candidateFormFields": [
             {
-                "colClassName": "col col-md-4",
+                "colClassName": "col col-md-2",
                 "seperator": false,
                 "cols": [
                     {
@@ -307,16 +307,16 @@
                         "inputIcon": "",
                         "text": "Type",
                         "infoIcon": true,
-                        "infoText": "Language will be provided by RAD",
-                         "name": "entityType",
+                        "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
+                         "name": "entity_type",
                         "type": "select",
-                        "value": null,
+                        "value": "IND",
                         "scroll": false,
                         "height": "30px",
-                        "width": "98px",
+                        "width": "450px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 3,
                             "alphaNumeric": true
                         }
                     }
@@ -544,7 +544,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -680,7 +680,7 @@
 
      "committeeFormFields": [
             {
-                "colClassName": "col col-md-4",
+                "colClassName": "col col-md-2",
                 "seperator": false,
                 "cols": [
                     {
@@ -688,16 +688,16 @@
                         "inputIcon": "",
                         "text": "Type",
                         "infoIcon": true,
-                        "infoText": "Language will be provided by RAD",
-                         "name": "entityType",
+                        "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
+                         "name": "entity_type",
                         "type": "select",
-                        "value": null,
+                        "value": "IND",
                         "scroll": false,
                         "height": "30px",
-                        "width": "98px",
+                        "width": "450px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 3,
                             "alphaNumeric": true
                         }
                     }
@@ -841,7 +841,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -874,7 +874,7 @@
          ],
      "organizationFormFields": [
             {
-                "colClassName": "col col-md-4",
+                "colClassName": "col col-md-2",
                 "seperator": false,
                 "cols": [
                     {
@@ -882,16 +882,16 @@
                         "inputIcon": "",
                         "text": "Type",
                         "infoIcon": true,
-                        "infoText": "Language will be provided by RAD",
-                         "name": "entityType",
+                        "infoText": "CAN Candidate \\n\nCCM Candidate Committee  \\n\nCOM Committee \\n\nIND Individual (a person) \\n\nORG Organization (not a committee and not a person) \\n\nPAC Political Action Committee\\n\nPTY Party Organization",
+                         "name": "entity_type",
                         "type": "select",
-                        "value": null,
+                        "value": "IND",
                         "scroll": false,
                         "height": "30px",
-                        "width": "98px",
+                        "width": "450px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 3,
                             "alphaNumeric": true
                         }
                     }
@@ -915,7 +915,7 @@
                         "width": "197px",
                         "validation": {
                             "required": true,
-                            "max": 30,
+                            "max": 200,
                             "alphaNumeric": true
                         }
                     }
@@ -1017,7 +1017,7 @@
                         "width": "98px",
                         "validation": {
                             "required": true,
-                            "max": 9,
+                            "max": 10,
                             "alphaNumeric": true
                         }
                     }
@@ -1313,24 +1313,34 @@
                 "code": "Jr."
             }
         ],
-     "entityTypes": [
+    "addEntityTypes": [
             {
-                "name": "Individual",
+                "name": "Individual (a person)",
                 "code": "IND"
             },
             {
-                "name": "Candidate",
+                "name": "Organization (Not a commitee and not a person)",
+                "code": "ORG"
+            }
+        ],
+    "editEntityTypes": [
+            {
+                "name": "Individual (a person)",
+                "code": "IND"
+            },
+            {
+                "name": "CAN - Candidate",
                 "code": "CAN"
             },
             {
-                "name": "Organization",
+                "name": "Organization (Not a commitee and not a person)",
                 "code": "ORG"
             },
             {
-                "name": "Committee",
+                "name": "COM - Committee",
                 "code": "COM"
             }
-        ],
+        ],    
      "officeSought": [
             {
                 "name": "House",

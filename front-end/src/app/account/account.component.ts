@@ -6,6 +6,7 @@ import { MessageService } from '../shared/services/MessageService/message.servic
 import { HeaderComponent } from '../shared/partials/header/header.component';
 import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
 import { FormsComponent } from '../forms/forms.component';
+import { DOCUMENT } from '@angular/common';
 
 import { IAccount } from './account';
 import { AccountService } from './account.service';
@@ -26,7 +27,8 @@ export class AccountComponent implements OnInit {
     private _accountService:AccountService,
     private _sessionService: SessionService,
     private _apiService: ApiService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    //private document: Document
     ){}
 
     public toggleSideNav(): void {
@@ -46,5 +48,10 @@ export class AccountComponent implements OnInit {
     this._accountService.getAccounts()
       .subscribe(res => this.accounts = <IAccount> res);
     // console.log(this.accounts)
+  }
+
+  goToForms1() {
+    //this.document.location.href ='https://webforms.fec.gov/webforms/form1/index.htm';
+    window.location.href = 'https://webforms.fec.gov/webforms/form1/index.htm';
   }
 }

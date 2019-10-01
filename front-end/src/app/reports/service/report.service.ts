@@ -134,8 +134,6 @@ export class ReportsService {
     params = params.append('view', view);
     params = params.append('reportId', reportId.toString());
 
-    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
-
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
       params
@@ -162,8 +160,6 @@ export class ReportsService {
 
     params = params.append('view', view);
     params = params.append('reportId', reportId.toString());
-
-    console.log('${environment.apiUrl}${url}', `${environment.apiUrl}${url}`);
 
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
@@ -327,16 +323,15 @@ export class ReportsService {
     }
 
     if (filters.filterFiledDateFrom && filters.filterFiledDateTo) {
-      const filedFromDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateFrom));
-      const filedToDate = this.getDateMMDDYYYYformat(new Date(filters.filterFiledDateTo));
+      const filedFromDate = this._datePipe.transform((filters.filterFiledDateFrom), 'Mddyyyy');
+      const filedToDate = this._datePipe.transform((filters.filterFiledDateTo), 'Mddyyyy');
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
         if (rep.status === 'Filed') {
           if (rep.filed_date) {
-            let d = new Date(rep.filed_date);
-            d.setUTCHours(0, 0, 0, 0);
-            const repDate = this.getDateMMDDYYYYformat(d);
-
+            //this fix is done till services send data in EST format
+            let d = this.convertUtcToLocalDate(rep.filed_date);
+            let repDate =this._datePipe.transform(d, 'Mddyyyy');
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             } else {
@@ -346,9 +341,9 @@ export class ReportsService {
         } else if (rep.status === 'Saved') {
           if (rep.last_update_date) {
             //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
-            let d = new Date(rep.last_update_date);
-            d.setUTCHours(0, 0, 0, 0);
-            const repDate = this.getDateMMDDYYYYformat(d);
+            //this fix is done till services send data in EST format
+            let d = this.convertUtcToLocalDate(rep.last_update_date);
+            let repDate =this._datePipe.transform(d, 'Mddyyyy');
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             } else {
@@ -365,22 +360,27 @@ export class ReportsService {
       response.reports = filteredFiledDateArray;
     }
 
-
+    
     if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
       const deletedFromDate = new Date(filters.filterDeletedDateFrom);
       const deletedToDate = new Date(filters.filterDeletedDateTo);
       const filteredDeletedDateArray = [];
+
+      
       for (const rep of response.reports) {
         if (rep.deleteddate) {
           let d = new Date(rep.deleteddate);
           d.setUTCHours(0, 0, 0, 0);
-          const repDate = this.getDateMMDDYYYYformat(d);
+          //const repDate = this.getDateMMDDYYYYformat(d);
+          const repDate = d;
+          
           if (repDate >= deletedFromDate && repDate <= deletedToDate) {
             isFilter = true;
           } else {
             isFilter = false;
           }
         }
+       
 
         if (isFilter) {
           filteredDeletedDateArray.push(rep);
@@ -390,12 +390,26 @@ export class ReportsService {
     }
     
   }
-  private getDateMMDDYYYYformat(dateValue: Date): Date {
+  convertUtcToLocalDate(val : Date) : Date { 
+         
+    var d = new Date(val); // val is in UTC
+    var usaTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    var dateNy = new Date(usaTime);
     
-    var utc = new Date(dateValue.getUTCFullYear(), dateValue.getUTCMonth() + 1, dateValue.getUTCDate());
-    utc.setUTCHours(0,0,0,0);
-    return utc
-  }
+    var newOffset = dateNy.getTimezoneOffset();
+    var localOffset = (d.getTimezoneOffset() - newOffset) * 60000 ;
+    var localTime = d.getTime() - localOffset;
+
+    d.setTime(localTime);
+    return d;
+}
+ 
+private getDateMMDDYYYYformat(dateValue: Date): string {
+  var year = dateValue.getUTCFullYear() + '';
+  var month = dateValue.getUTCMonth() + 1 + '';
+  var day = dateValue.getUTCDate() + '';
+  return month + day + year;
+}
 
   public getReportInfo(form_type: string, report_id: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
@@ -403,8 +417,6 @@ export class ReportsService {
     let params = new HttpParams();
     let url: string = '';
 
-    console.log('form_type =', form_type);
-    console.log('report_id =', report_id);
 
     if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
@@ -417,8 +429,6 @@ export class ReportsService {
 
     //params = params.append('committeeid', committee_id);
     params = params.append('reportid', report_id);
-    console.log('params =', params);
-    console.log('${environment.apiUrl}${url} =', `${environment.apiUrl}${url}`);
 
     if (form_type === 'F99') {
       return this._http.get(`${environment.apiUrl}${url}`, {
@@ -470,7 +480,6 @@ export class ReportsService {
     }
     request.actions = actions;
 
-    console.log ("trashOrRestoreReports request.actions =", request.actions );
     return this._http
       .put(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions

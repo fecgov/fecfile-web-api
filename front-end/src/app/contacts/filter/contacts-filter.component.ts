@@ -142,7 +142,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
               break;
             default:
               this.view = ActiveView.contacts;
-              console.log('unexpected ActiveView received: ' + message);
           }
         }
       );
@@ -163,8 +162,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     this.applyFiltersCache();
     this.getStates();
     this.getTypes();
-    console.log(" this.states", this.states);
-    console.log(" this.types", this.types);
 
   }
 
@@ -292,8 +289,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log("applyFilters");
-
     const filters = new ContactFilterModel();
     let modified = false;
     //filters.formType = this.formType;
@@ -316,6 +311,18 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       }
     }
     filters.filterTypes = filterTypes;
+
+
+    filters.filterDeletedDateFrom = this.filterDeletedDateFrom;
+    filters.filterDeletedDateTo = this.filterDeletedDateTo;
+    if (this.filterDeletedDateFrom !== null) {
+      modified = true;
+    }
+    if (this.filterDeletedDateTo !== null) {
+      modified = true;
+    }
+
+    filters.show = modified;
 
     console.log("filters = ", filters);
     filters.show = modified;
@@ -507,7 +514,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
    */
   private removeFilter(message: any) {
     if (message) {
-      console.log(" contat removeFilter message", message);
       if (message.key) {
         switch (message.key) {
           case FilterTypes.state:
@@ -525,7 +531,6 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
             }
             break;  
           default:
-            console.log('unexpected key for remove filter = ' + message.key);
         }
       }
     }

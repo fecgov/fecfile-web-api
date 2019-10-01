@@ -8,6 +8,9 @@
 <ng-template #rtCommitteeId let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <ng-template #rtCommitteeName let-r="result" let-t="term">
     <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
 </ng-template>
@@ -105,7 +108,7 @@
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
-                          [attr.readonly]="isFieldName(col?.name, 'contribution_aggregate') && col.type === 'text' ? true : null"
+                          [attr.readonly]="(col.type === 'text' && col?.isReadonly) ? true : null"
                           [attr.value]="col?.value"
                           [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
                                         || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
@@ -191,7 +194,8 @@
                             " id="typeahead-template-committee-id" 
                           [ngbTypeahead]="isFieldName(col?.name, 'beneficiary_cand_id') ? searchCandidateId : searchCommitteeId" 
                           [focusFirst]=false
-                          [resultTemplate]="rtCommitteeId" [inputFormatter]="formatterCommitteeId"
+                          [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
+                          [inputFormatter]="isFieldName(col?.name, 'beneficiary_cand_id') ? formatterCandidateId: formatterCommitteeId"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
@@ -363,7 +367,11 @@
               placement="bottom-left" (openChange)="multipleMemoDropdownChanged($event)">
               <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
-                Add JF Transfer Memo
+                <ng-container *ngIf="transactionType === 'DEBT_TO_VENDOR'; else jfTransferMemo">
+                  Make a Payment to Debt
+                </ng-container>
+                <ng-template #jfTransferMemo>Add JF Transfer Memo</ng-template>
+                
                 <i class="dropdown-icon" aria-hidden="true"></i>
               </button>
               <div ngbDropdownMenu aria-labelledby="jfMemoDropdown" id="jfMemoDropdown-menu">

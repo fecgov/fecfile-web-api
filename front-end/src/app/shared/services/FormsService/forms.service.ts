@@ -543,6 +543,20 @@ export class FormsService {
     return false;
   }
 
+  public HasUnsavedData(screenType: string): boolean {
+    let screenSaved: any = JSON.parse(localStorage.getItem(`${screenType}saved`));
+    if (screenSaved.hasOwnProperty('saved')) {
+      if (screenSaved !== null) {
+        let screenStatus: boolean = screenSaved.saved;
+
+        if (!screenStatus) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public saveReport(form_type: string, access_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();

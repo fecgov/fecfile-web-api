@@ -1,5 +1,5 @@
 export class ContactModel {
-    entityType: string;
+    entity_type: string;
     id: string;
     name: string;
     entity_name: string;
@@ -23,9 +23,9 @@ export class ContactModel {
     candCmteId: string;
     deletedDate: string;
     selected: boolean;
- 
+    activeTransactionsCnt: number;
     constructor(contact: any) {
-        this.entityType = contact.entityType ? contact.entityType : '';
+        this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
         this.name = contact.name ? contact.name : '';
         this.entity_name = contact.entity_name ? contact.entity_name : '';
@@ -50,6 +50,7 @@ export class ContactModel {
         this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
         this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
         this.selected = contact.selected;
+        this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
        
 
     }

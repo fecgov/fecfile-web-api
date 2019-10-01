@@ -125,9 +125,6 @@ export class ContactsService {
       request.filters = emptyFilters;
     }
 
-    console.log(' Contact Table request = ', request);
-    console.log(' Contact Table httpOptions = ', httpOptions);
-
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -212,9 +209,6 @@ export class ContactsService {
     // };
     // return Observable.of(mockResponse);
 
-    console.log(' Contact Recycle Bin Table request = ', request);
-    console.log(' Contact Recycle Bin Table httpOptions = ', httpOptions);
-
     return this._http
       .post(
         `${environment.apiUrl}${url}`,
@@ -246,7 +240,7 @@ export class ContactsService {
     const modelArray = [];
     for (const row of serverData) {
       const model = new ContactModel({});
-      model.entityType = row.entityType;
+      model.entity_type = row.entity_type;
       model.id = row.id;
       model.name = row.name;
       model.street1 = row.street1;
@@ -261,7 +255,7 @@ export class ContactsService {
       model.candOffice = row.candOffice;
       model.candOfficeState = row.candOfficeState
       model.candOfficeDistrict = row.candOfficeDistrict;
-
+      model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
       modelArray.push(model);
@@ -292,8 +286,11 @@ export class ContactsService {
       case 'name':
         name = 'name';
         break;
-      case 'type':
-        name = 'type';
+      case 'entity_name':
+        name = 'entity_name';
+        break;  
+      case 'entityType':
+        name = 'entityType';
         break;
       case 'id':
         name = 'id';
@@ -325,6 +322,9 @@ export class ContactsService {
       case 'entityName':
         name= 'entityName';
         break;
+      case 'officeSought':
+        name= 'officeSought';
+        break;  
       case 'candOffice':
         name= 'candOffice';
         break;
@@ -340,10 +340,12 @@ export class ContactsService {
       case 'deletedDate':
         name= 'deletedDate';
         break;   
+      case 'activeTransactionsCnt':
+        name= 'activeTransactionsCnt';
+        break;           
       default:
     }
     return name ? name : '';
-
   }
   /**
    * Map front-end model fields to server fields.
@@ -358,7 +360,7 @@ export class ContactsService {
     }
 
     serverObject.name =  model.name;
-    serverObject.entityType = model.entityType;
+    serverObject.entity_type = model.entity_type;
     serverObject.id = model.id;
     serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;
@@ -373,6 +375,7 @@ export class ContactsService {
     serverObject.candOfficeState = model.candOfficeState;
     serverObject.candOfficeDistrict = model.candOfficeDistrict;
     serverObject.candCmteId = model.candCmteId;
+    serverObject.activeTransactionsCnt = model.activeTransactionsCnt;
     serverObject.deletedDate = model.deletedDate;
     
     return serverObject;
@@ -413,8 +416,6 @@ export class ContactsService {
    * by a backend API.
    */
   public mockApplyFilters(response: any, filters: ContactFilterModel) {
-    console.log("mockApplyFilters response =", response);
-    console.log("mockApplyFilters filters =", filters);
 
     if (!response.contacts) {
       return;
@@ -447,7 +448,6 @@ export class ContactsService {
     }   */
 
     if (filters.filterStates) {
-      console.log("filters.filterStates", filters.filterStates);
       if (filters.filterStates.length > 0) {
         isFilter = true;
         const fields = ['state'];
@@ -461,7 +461,6 @@ export class ContactsService {
     }
 
     if (filters.filterTypes) {
-      console.log("filters.filterTypes", filters.filterTypes);
       if (filters.filterTypes.length > 0) {
         isFilter = true;
         const fields = ['type'];
@@ -478,12 +477,12 @@ export class ContactsService {
       const deletedFromDate = new Date(filters.filterDeletedDateFrom);
       const deletedToDate = new Date(filters.filterDeletedDateTo);
       const filteredDeletedDateArray = [];
-      for (const rep of response.reports) {
-        if (rep.deleted_date) {
-          let d = new Date(rep.deleted_date);
+      for (const ctn of response.contacts) {
+        if (ctn.deleteddate) {
+          let d = new Date(ctn.deleteddate);
           d.setUTCHours(0, 0, 0, 0);
-          const repDate = this.getDateMMDDYYYYformat(d);
-          if (repDate >= deletedFromDate && repDate <= deletedToDate) {
+          const ctnDate = this.getDateMMDDYYYYformat(d);
+          if (ctnDate >= deletedFromDate && ctnDate <= deletedToDate) {
             isFilter = true;
           } else {
             isFilter = false;
@@ -491,13 +490,11 @@ export class ContactsService {
         }
 
         if (isFilter) {
-          filteredDeletedDateArray.push(rep);
+          filteredDeletedDateArray.push(ctn);
         }
       }
-      response.reports = filteredDeletedDateArray;
+      response.contacts = filteredDeletedDateArray;
     }
-
-    console.log("response.contacts", response.contacts);
   }
 
   private getDateMMDDYYYYformat(dateValue: Date): Date {
@@ -625,8 +622,6 @@ export class ContactsService {
     }
     request.actions = actions;
 
-    console.log(" trashOrRestoreContacts request", request)
-
     return this._http
     .put(
       `${environment.apiUrl}${url}`,
@@ -686,16 +681,14 @@ export class ContactsService {
     //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
     const contact: any = JSON.parse(localStorage.getItem(`contactObj`));
     const formData: FormData = new FormData();
-    console.log(" saveContact called ...!");
     let httpOptions = new HttpHeaders();
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    console.log(" saveContact contact object ...!", contact);
     for (const [key, value] of Object.entries(contact)) {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
-          console.log(" saveContact contact formdata object ...!", key, " ", value );
+
         }
       }
     }
@@ -728,7 +721,6 @@ export class ContactsService {
           })
         );
     } else {
-      console.log('unexpected ContactActions received - ' + scheduleAction);
     }
   }
 
