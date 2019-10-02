@@ -1260,7 +1260,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
-  public async canDeactivate(): Promise<boolean> {
+  /*public async canDeactivate(): Promise<boolean> {
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
       result = await this._dialogService
@@ -1281,5 +1281,5 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       return true;
   }
- }
+ }*/
 }
