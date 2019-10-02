@@ -127,7 +127,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
-  private _parentTransactionId: string;
   private _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private prePopulateFieldArray: Array<any>;
@@ -1210,8 +1209,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       // we might need to revisit to fix the two transactions one screen
 
       // set the back ref id for save on a sub tran.
-      if (this._parentTransactionId && this.scheduleAction === ScheduleActions.addSubTransaction) {
-        receiptObj.back_ref_transaction_id = this._parentTransactionId;
+      if (this._parentTransactionModel && this._parentTransactionModel.transactionId
+        && this.scheduleAction === ScheduleActions.addSubTransaction) {
+        receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
       }
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
@@ -1292,7 +1292,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           // before presenting a new sub tran to add.  Save parent id and emit to show new child form.
           if (saveAction === SaveActions.saveForAddSub) {
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
-              this._parentTransactionId = transactionId;
               this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([res])[0];
             }
             const addSubTransEmitObj: any = {
@@ -1319,8 +1318,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
-            // reset the parent ID if action is NOT for add sub transaction.
-            // if (this.scheduleAction !== ScheduleActions.addSubTransaction) {
             let resetParentId = true;
             if (this.subTransactionInfo) {
               if (this.subTransactionInfo.isParent === false) {
@@ -1328,7 +1325,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               }
             }
             if (resetParentId) {
-              this._parentTransactionId = null;
               this._parentTransactionModel = null;
               this.subTransactions = [];
             }
@@ -1472,7 +1468,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     if (!transactionModel) {
       transactionModel = new TransactionModel({});
     }
-    transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
     transactionModel.apiCall = this.subTransactionInfo.api_call;
@@ -2410,7 +2405,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               if (trx.hasOwnProperty('child')) {
                 if (Array.isArray(trx.child)) {
                   if (trx.child.length > 0) {
-                    this._parentTransactionId = transactionId;
                     this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
                     this.subTransactions = trx.child;
                     for (const subTrx of this.subTransactions) {
