@@ -11,7 +11,7 @@ import { TransactionTypeService } from './transaction-type.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
@@ -249,11 +249,15 @@ export class TransactionTypeComponent implements OnInit {
       }
     } else {
       this._dialogService
-          .confirm(
-            'This report has been filed with the FEC. If you want to change, you must Amend the report',
-            ConfirmModalComponent,
-            'Warning'
-          )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
           .then(res => {
             if (res === 'okay') {
               this.ngOnInit();

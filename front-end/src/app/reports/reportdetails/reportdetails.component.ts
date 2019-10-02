@@ -858,8 +858,8 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-        this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'reports', reportId: report.report_id, edit: false }
+        this._router.navigate([`/signandSubmit/${formType}`], {
+          queryParams: { reportId: report.report_id, edit: false }
         });
       }, 1500);
     }

@@ -899,7 +899,10 @@ def schedH2(request):
 
 
 """
+************************************************************************
 SCHED_H3
+Transfers from Nonfederal Accounts for Allocated Federal/Nonfederal Activity
+***********************************************************************
 """
 def check_mandatory_fields_SH3(data):
     """
@@ -1199,6 +1202,41 @@ def delete_schedH3(data):
     except Exception as e:
         raise
 
+@api_view(['GET'])
+def get_sched_h3_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+    SELECT activity_event_type, sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y'
+    GROUP BY activity_event_type
+    union 
+	SELECT 'total', sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y') t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
+        
+
+        
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
@@ -1469,6 +1507,89 @@ def validate_sh4_data(data):
     if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
         validate_parent_transaction_exist(data)
 
+
+def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte_id):
+    """
+    load all transactions with the specified activity event type
+    need to check
+    """
+    logger.debug('load ttransactionsransactions with activity_event_type:{}'.format(activity_event_type))
+    # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
+    # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
+    _sql = """
+            SELECT t1.total_amount, 
+                t1.transaction_id
+            FROM public.sched_h4 t1 
+            WHERE activity_event_type = %s 
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s 
+            AND back_ref_transaction_id is null
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+    """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_event_type, cmte_id, start_dt, end_dt))
+            # , [
+            #         activity_event_type, 
+            #         cmte_id, 
+            #         start_dt, 
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug('transaction fetched:{}'.format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            'The list_all_transactions_event_type function is throwing an error: ' + str(e))
+
+
+def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
+
+    """
+    update h4 ytd amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """ UPDATE public.sched_h4
+                    SET activity_event_amount_ytd = %s 
+                    WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+                    """,
+                    [aggregate_amount, transaction_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'Error: The Transaction ID: {} does not exist in schedH4 table'.format(transaction_id))
+    except Exception:
+        raise    
+
+def update_activity_event_amount_ytd(data):
+    """
+    aggregate and update 'activity_event_amount_ytd' for all h4 transactions
+    """
+    try:
+
+        logger.debug('updating ytd amount:')
+        # make sure transaction list comes back sorted by contribution_date ASC
+        expenditure_dt = date_format(data.get('expenditure_date'))
+        aggregate_start_date = datetime.date(expenditure_dt.year, 1, 1)
+        aggregate_end_date = datetime.date(expenditure_dt.year, 12, 31)
+        transactions_list = list_all_transactions_event_type(
+            aggregate_start_date, aggregate_end_date, data.get('activity_event_type'), data.get('cmte_id'))
+        aggregate_amount = 0
+        for transaction in transactions_list:
+            aggregate_amount += transaction[0]
+            transaction_id = transaction[1]
+            update_transaction_ytd_amount(data.get('cmte_id'), transaction_id, aggregate_amount)
+
+    except Exception as e:
+        raise Exception(
+            'The update_activity_event_amount_ytd function is throwing an error: ' + str(e))
+
+
 def post_schedH4(data):
     """
     function for handling POST request for sH4, need to:
@@ -1483,6 +1604,7 @@ def post_schedH4(data):
         validate_sh4_data(data)
         try:
             post_sql_schedH4(data)
+            update_activity_event_amount_ytd(data)
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH4 function is throwing an error: ' + str(e))
@@ -2084,6 +2206,38 @@ def delete_schedH5(data):
         raise
 
 
+@api_view(['GET'])
+def get_sched_h5_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+        select sum(total_amount_transferred) as total,
+        sum(voter_id_amount) as viter_id,
+        sum(voter_registration_amount) as voter_registration,
+        sum(gotv_amount) as gotv,
+        sum(generic_campaign_amount) as generic_campaign
+        from public.sched_h5
+        where report_id = %s
+        and cmte_id = %s
+        and delete_ind is distinct from 'Y'
+    ) t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
+
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH5(request):
     
@@ -2260,6 +2414,7 @@ def put_schedH6(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH6(data)
+            update_activity_event_amount_ytd_h6(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH6 function is throwing an error: ' + str(e))
@@ -2298,22 +2453,22 @@ def put_sql_schedH6(data):
         """
     _v = (  
             data.get('line_number'),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_type', ''),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('entity_id', ''),
-            data.get('account_event_identifier', ''),
-            data.get('expenditure_date', None),
-            data.get('total_fed_levin_amount', None),
-            data.get('federal_share', None),
-            data.get('levin_share', None),
-            data.get('activity_event_total_ytd', None),
-            data.get('expenditure_purpose', ''),
-            data.get('category_code', ''),
-            data.get('activity_event_type', ''),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('entity_id'),
+            data.get('account_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('total_fed_levin_amount'),
+            data.get('federal_share'),
+            data.get('levin_share'),
+            data.get('activity_event_total_ytd'),
+            data.get('expenditure_purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -2361,24 +2516,24 @@ def post_sql_schedH6(data):
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('line_number',''),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_type', ''),
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('entity_id', ''),
-            data.get('account_event_identifier', ''),
-            data.get('expenditure_date', None),
-            data.get('total_fed_levin_amount', None),
-            data.get('federal_share', None),
-            data.get('levin_share', None),
-            data.get('activity_event_total_ytd', None),
-            data.get('expenditure_purpose', ''),
-            data.get('category_code', ''),
-            data.get('activity_event_type', ''),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('entity_id'),
+            data.get('account_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('total_fed_levin_amount'),
+            data.get('federal_share'),
+            data.get('levin_share'),
+            data.get('activity_event_total_ytd'),
+            data.get('expenditure_purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             datetime.datetime.now()
          )
@@ -2388,6 +2543,85 @@ def post_sql_schedH6(data):
     except Exception:
         raise
 
+def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, cmte_id):
+    """
+    load all transactions with the specified activity event type
+    need to check
+    """
+    logger.debug('load transactions with activity_event_type:{}'.format(activity_event_type))
+    # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
+    # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
+    _sql = """
+            SELECT t1.total_fed_levin_amount, 
+                t1.transaction_id
+            FROM public.sched_h6 t1 
+            WHERE activity_event_type = %s 
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s 
+            AND back_ref_transaction_id is null
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+    """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    # logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_event_type, cmte_id, start_dt, end_dt))
+            # , [
+            #         activity_event_type, 
+            #         cmte_id, 
+            #         start_dt, 
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug('transaction fetched:{}'.format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            'The list_all_transactions_event_type function is throwing an error: ' + str(e))
+
+
+def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
+
+    """
+    update h4 ytd amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """ UPDATE public.sched_h6
+                    SET activity_event_total_ytd = %s 
+                    WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+                    """,
+                    [aggregate_amount, transaction_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'Error: The Transaction ID: {} does not exist in sched_h6 table'.format(transaction_id))
+    except Exception:
+        raise    
+
+def update_activity_event_amount_ytd_h6(data):
+    """
+    aggregate and update 'activity_event_amount_ytd' for all h6 transactions
+    """
+    try:
+
+        logger.debug('updating ytd amount h6:')
+        # make sure transaction list comes back sorted by contribution_date ASC
+        expenditure_dt = date_format(data.get('expenditure_date'))
+        aggregate_start_date = datetime.date(expenditure_dt.year, 1, 1)
+        aggregate_end_date = datetime.date(expenditure_dt.year, 12, 31)
+        transactions_list = list_all_transactions_event_type_h6(
+            aggregate_start_date, aggregate_end_date, data.get('activity_event_type'), data.get('cmte_id'))
+        aggregate_amount = 0
+        for transaction in transactions_list:
+            aggregate_amount += transaction[0]
+            transaction_id = transaction[1]
+            update_transaction_ytd_amount_h6(data.get('cmte_id'), transaction_id, aggregate_amount)
+    except Exception as e:
+        raise Exception(
+            'The update_activity_event_amount_ytd function is throwing an error: ' + str(e))
 
 def post_schedH6(data):
     """
@@ -2403,6 +2637,7 @@ def post_schedH6(data):
         validate_sh6_data(data)
         try:
             post_sql_schedH6(data)
+            update_activity_event_amount_ytd_h6(data)
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH6 function is throwing an error: ' + str(e))

@@ -27,7 +27,7 @@ import {
 } from '../../../shared/interfaces/FormsService/FormsService';
 import { Subscription } from 'rxjs/Subscription';
 
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
@@ -282,11 +282,15 @@ export class ReportTypeComponent implements OnInit {
       }
     } else {
       this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning'
-        )
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();

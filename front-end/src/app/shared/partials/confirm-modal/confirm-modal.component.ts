@@ -36,6 +36,9 @@ export class ConfirmModalComponent implements OnInit {
   @Input()
   public headerClass: string;
 
+  @Input()
+  public cancelTitle: string;
+
   private defaultTitle = 'Warning';
   private defaultMessage = 'You have unsaved changes! If you leave, your changes will be lost.';
   private defaultHeaderClass = ModalHeaderClassEnum.warningHeader;
@@ -61,6 +64,9 @@ export class ConfirmModalComponent implements OnInit {
     }
     if (!this.headerClass) {
       this.headerClass = this.defaultHeaderClass;
+    }
+    if (!this.cancelTitle) {
+      this.cancelTitle = 'Cancel';
     }
 
   }
