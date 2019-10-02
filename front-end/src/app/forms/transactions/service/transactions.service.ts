@@ -255,6 +255,9 @@ export class TransactionsService {
     return modelArray;
   }
 
+  /**
+   * Map Sched server fields to a TransactionModel.
+   */
   public mapFromServerSchedFields(serverData: any) {
     if (!serverData || !Array.isArray(serverData)) {
       return;
