@@ -899,7 +899,10 @@ def schedH2(request):
 
 
 """
+************************************************************************
 SCHED_H3
+Transfers from Nonfederal Accounts for Allocated Federal/Nonfederal Activity
+***********************************************************************
 """
 def check_mandatory_fields_SH3(data):
     """
@@ -1199,6 +1202,41 @@ def delete_schedH3(data):
     except Exception as e:
         raise
 
+@api_view(['GET'])
+def get_sched_h3_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+    SELECT activity_event_type, sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y'
+    GROUP BY activity_event_type
+    union 
+	SELECT 'total', sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y') t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
+        
+
+        
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
@@ -2166,6 +2204,38 @@ def delete_schedH5(data):
             'report_id'), data.get('transaction_id'))
     except Exception as e:
         raise
+
+
+@api_view(['GET'])
+def get_sched_h5_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+        select sum(total_amount_transferred) as total,
+        sum(voter_id_amount) as viter_id,
+        sum(voter_registration_amount) as voter_registration,
+        sum(gotv_amount) as gotv,
+        sum(generic_campaign_amount) as generic_campaign
+        from public.sched_h5
+        where report_id = %s
+        and cmte_id = %s
+        and delete_ind is distinct from 'Y'
+    ) t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
 
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
