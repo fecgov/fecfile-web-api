@@ -80,11 +80,13 @@
                           placeholder="{{childOption.text}}"
                           type="radio"
                           [name]="secondaryOption"
-                          formControlName="secondaryOption"
-                          [(ngModel)]="transactionType"
+
                           [value]="childOption.value"
                           (click)="updateTypeSelected($event)"
                         />
+
+                        <!-- formControlName="secondaryOption"
+                        [(ngModel)]="transactionType" -->
                           {{ childOption.text }}
                         </label>
                         <ng-container *ngIf="childOption?.infoIcon">
