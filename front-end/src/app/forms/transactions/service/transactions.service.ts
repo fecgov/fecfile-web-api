@@ -44,8 +44,12 @@ export class TransactionsService {
   private _datePipe: DatePipe;
   private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
-  constructor(private _http: HttpClient, private _cookieService: CookieService, 
-              private _receiptService: IndividualReceiptService, private _messageService: MessageService,) {
+  constructor(
+    private _http: HttpClient,
+    private _cookieService: CookieService,
+    private _receiptService: IndividualReceiptService,
+    private _messageService: MessageService
+  ) {
     // mock out the recycle trx
     for (let i = 0; i < 13; i++) {
       const t1: any = this.createMockTrx();
@@ -249,6 +253,38 @@ export class TransactionsService {
       modelArray.push(model);
     }
     return modelArray;
+  }
+
+  public mapFromServerSchedFields(serverData: any) {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
+    }
+    const modelArray = [];
+    for (const row of serverData) {
+      const model = new TransactionModel({});
+      this.mapSchedDatabaseRowToModel(model, row);
+      if (row.child) {
+        const modelChildArray = [];
+        for (const childRow of row.child) {
+          const childModel = new TransactionModel({});
+          this.mapSchedDatabaseRowToModel(childModel, childRow);
+          modelChildArray.push(childModel);
+        }
+        model.child = modelChildArray;
+      }
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+
+  public mapSchedDatabaseRowToModel(model: TransactionModel, row: any) {
+    // TODO add full field mapping if needed in the future.
+    model.transactionId = row.transaction_id;
+    model.date = row.contribution_date;
+    model.memoCode = row.memo_code;
+    model.amount = row.contribution_amount;
+    model.aggregate = row.contribution_aggregate;
+    model.entityId = row.entity_id;
   }
 
   /**
@@ -684,8 +720,12 @@ export class TransactionsService {
    * @param reportId the unique identifier for the Report
    * @param transactions the transactions to trash or restore
    */
-  public trashOrRestoreTransactions(formType: string, action: string, reportId: string, 
-                                    transactions: Array<TransactionModel>) {
+  public trashOrRestoreTransactions(
+    formType: string,
+    action: string,
+    reportId: string,
+    transactions: Array<TransactionModel>
+  ) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_transactions';
@@ -712,8 +752,8 @@ export class TransactionsService {
         map(res => {
           if (res) {
             console.log('Trash Restore response: ', res);
-            // refresh the left summary menu 
-            this._receiptService.getSchedule(formType, {report_id: reportId}).subscribe(resp => {
+            // refresh the left summary menu
+            this._receiptService.getSchedule(formType, { report_id: reportId }).subscribe(resp => {
               const message: any = {
                 formType: formType,
                 totals: resp
@@ -752,4 +792,3 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.itemized = row.itemized;
   model.reportStatus = row.reportStatus;
 }
-
