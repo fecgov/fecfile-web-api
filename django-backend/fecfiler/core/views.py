@@ -4478,5 +4478,95 @@ def clone_a_transaction(request):
             raise Exception('transaction clone error')
         return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
+********************************************************************************************************************************
+"""
 
- 
+
+def get_reports_data(report_id,pre_report_id=None):
+    try:
+        if report_id:
+            query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+            forms_obj = None
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", report_id)
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj=data_row[0]
+
+        if pre_report_id:
+            query_string = """SELECT count('previous_report_id') as amendement_count FROM public.reports WHERE previous_report_id = %s AND amend_ind ='A' """
+            forms_obj = None
+            with connection.cursor() as cursor:
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", pre_report_id)
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj=data_row[0]
+
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+
+@api_view(['POST','GET','DELETE','PUT'])
+def create_amended_reports_(request):
+
+    try:
+        if request.method == 'POST':
+            reportid =request.POST.get(report_id)
+            data = get_reports_data(reportid)
+            if data:
+                previous_reportid_count = get_reports_data(None,reportid)
+                amendement_count = previous_reportid_count.get('amendement_count')+1 if previous_reportid_count else 1
+
+                report_id = get_next_report_id()
+                data['report_id'] = str(report_id)
+
+                #post_sql_report(reports_obj(''))
+                data['amend_ind'] = 'A'
+                data['amend_number'] = amendement_count
+                data['previous_report_id'] = reportid
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+
+            else:
+                return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
+
+
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_contacts_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
