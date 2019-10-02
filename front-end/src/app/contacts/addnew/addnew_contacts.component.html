@@ -26,35 +26,9 @@
             Add New Contact
           </h1>
           <br />
-          <br />
         <!--</div>-->
        </div>
 
-      <!--<div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-                <div class="float-left">
-                    <label for="type">
-                      &nbsp;&nbsp;Type*
-                      <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">
-                          Click for more information
-                        </span>
-                      </button>
-                    </label>
-         &nbsp;&nbsp;&nbsp;
-                   <select id="type" name="type" class="form-control" (change)="selectTypeChange($event)">
-                      <option
-                        *ngFor="let entityType of entityTypes"
-                        [selected]="selectedentityType === entityType.code"
-                        [value]="entityType.code"
-                      >
-                        {{ entityType.name }}
-                      </option>
-                    </select>
-                 </div>
-          </div>
-      </div>  -->
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
@@ -80,7 +54,7 @@
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                 </button>
-                  <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                  <ng-container *ngIf="!col?.validation?.required">
                     (Optional)
                   </ng-container>
                 </label>
@@ -280,7 +254,7 @@
                     class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
                     frmContact.get(col?.name)?.invalid &&
                         (frmContact.touched || frmContact.dirty)
-                          ? 'forms__select-error'
+                          ? 'state-select-error'
                           : ''
                       ">
                     <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
@@ -351,22 +325,6 @@
                   >
                   </ng-select>
                 </ng-container>
-            
-
-              <!-- <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
-                  <ng-select #entityTypeSelect [items]="entityTypes" (change)="handleTypeChange($event, col)"
-                    class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="name" [ngClass]="
-                    frmContact.get(col?.name)?.invalid &&
-                        (frmContact.touched || frmContact.dirty)
-                          ? 'forms__select-error'
-                          : ''
-                      ">
-                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
-                      <span>{{ item.name }}</span>
-                    </ng-template>
-                  </ng-select>
-                </ng-container> --> 
-
 
               </div>
             </div>
@@ -386,15 +344,7 @@
 
     <footer>
       <footer>
-        <!--<div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-primary btn-left" type="button" (click)="saveAndAddMore()">
-                Save &amp; Add More
-              </button>
-            </div>
-          </div>
-        </div>-->
+
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
