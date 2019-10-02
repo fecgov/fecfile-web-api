@@ -333,7 +333,7 @@
                   </ng-select>
                 </ng-container>
                 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
                   <ng-select #entityTypeSelect
                     [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
@@ -350,7 +350,24 @@
                     "
                   >
                   </ng-select>
-                </ng-container>     
+                </ng-container>
+            
+
+              <!-- <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
+                  <ng-select #entityTypeSelect [items]="entityTypes" (change)="handleTypeChange($event, col)"
+                    class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="name" [ngClass]="
+                    frmContact.get(col?.name)?.invalid &&
+                        (frmContact.touched || frmContact.dirty)
+                          ? 'forms__select-error'
+                          : ''
+                      ">
+                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                      <span>{{ item.name }}</span>
+                    </ng-template>
+                  </ng-select>
+                </ng-container> --> 
+
+
               </div>
             </div>
             <!-- ./col -->
