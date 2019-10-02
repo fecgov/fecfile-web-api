@@ -660,6 +660,7 @@ export class ReasonComponent implements OnInit {
       this.notValidPdf = false;
 
       this._form99Details.filename = '';
+      this.fileNameToDisplay = null;
       localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
     //this._modalService.close(modalId);
@@ -715,6 +716,7 @@ export class ReasonComponent implements OnInit {
           this.notValidPdf = false;
           this.PdfUploaded = false;
           this._form99Details.filename = '';
+          this.fileNameToDisplay = null;
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
       });
