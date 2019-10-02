@@ -5,6 +5,7 @@ import { DialogService } from './shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { UserIdleService } from 'angular-user-idle';
+import { SessionService } from './shared/services/SessionService/session.service';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ export class AppComponent {
     private userIdle: UserIdleService,
     private _router: Router,
     private _messageService: MessageService,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _sessionService: SessionService
   ) {}
 
   ngOnInit() {
@@ -48,6 +50,7 @@ export class AppComponent {
               if (response === 'okay') {
                 this.stop();
               } else if (response === 'cancel') {
+                this._sessionService.destroy();
                 this._router.navigate(['']);
               }
             });
@@ -64,6 +67,7 @@ export class AppComponent {
               response === ModalDismissReasons.BACKDROP_CLICK ||
               response === ModalDismissReasons.ESC) {
                 this.restart();
+                this._sessionService.destroy();
                 this._router.navigate(['']);
               }
             });
