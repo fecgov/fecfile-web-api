@@ -43,6 +43,7 @@ import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
+import { TransactionsService } from '../../transactions/service/transactions.service';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -127,6 +128,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
   private _parentTransactionId: string;
+  private _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private prePopulateFieldArray: Array<any>;
 
@@ -148,7 +150,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
-    private _contributionDateValidator: ContributionDateValidator
+    private _contributionDateValidator: ContributionDateValidator,
+    private _transactionsService: TransactionsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -1286,6 +1289,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           if (saveAction === SaveActions.saveForAddSub) {
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
               this._parentTransactionId = transactionId;
+              this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([res])[0];
             }
             const addSubTransEmitObj: any = {
               form: {},
@@ -1321,6 +1325,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             }
             if (resetParentId) {
               this._parentTransactionId = null;
+              this._parentTransactionModel = null;
               this.subTransactions = [];
             }
           }
@@ -1459,7 +1464,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Return to the parent transaction from sub tran.
    */
   public returnToParent(scheduleAction: ScheduleActions): void {
-    const transactionModel = new TransactionModel({});
+    let transactionModel = this._parentTransactionModel;
+    if (!transactionModel) {
+      transactionModel = new TransactionModel({});
+    }
     transactionModel.transactionId = this._parentTransactionId;
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
@@ -2399,6 +2407,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                 if (Array.isArray(trx.child)) {
                   if (trx.child.length > 0) {
                     this._parentTransactionId = transactionId;
+                    this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
                     this.subTransactions = trx.child;
                     for (const subTrx of this.subTransactions) {
                       console.log('sub tran id ' + subTrx.transaction_id);
