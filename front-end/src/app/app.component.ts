@@ -42,13 +42,15 @@ export class AppComponent {
             .confirm(
               'This session will expire unless a response is received within 2 minutes. Click OK to prevent expiration.',
               ConfirmModalComponent,
-              'Session Warning'
+              'Session Warning',
+              false
             )
             .then(response => {
               if (response === 'okay') {
                 this.stop();
-              } else if (response === 'cancel') {
-                this._router.navigate(['']);
+              } else if (response === 'cancel' ||
+              response !== ModalDismissReasons.BACKDROP_CLICK ||
+              response !== ModalDismissReasons.ESC) {
               }
             });
         });
@@ -74,9 +76,18 @@ export class AppComponent {
 
   ngDoCheck(): void {
     if (this._router.url === '/') {
-      this._dialogService.checkIfModalOpen();
       this.stopWatching();
+      this._dialogService.checkIfModalOpen();
     }
+    this._router.events.subscribe(val => {
+      let oldUrl = '';
+      if (val instanceof NavigationEnd) {
+        oldUrl = val.url;
+      }
+      if (val instanceof NavigationStart && val.url !== oldUrl) {
+        this.stop();
+      }
+    });
   }
 
   stop() {
@@ -97,16 +108,10 @@ export class AppComponent {
     this.userIdle.resetTimer();
   }
 
-  coordinates(event: MouseEvent): void {
-    this.clientX = event.clientX;
-    this.clientY = event.clientY;
-
-    this.stop();
-  }
-
-  @HostListener('mousemove') onMove() {
-    this.stop();
-  }
+  // @HostListener('document:click', ['$event'])
+  // clickout(event) {
+  //   this.stop();
+  // }
 
   @HostListener('keypress') onKeyPress() {
     this.stop();
