@@ -120,7 +120,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     /*this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');*/
-
+    
+    localStorage.removeItem('contactsaved');
+    
     this._messageService.clearMessage();
 
     /*this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
@@ -145,14 +147,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngDoCheck(): void {
+  public ngDoCheck(): void {}
 
-  }
-
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this._messageService.clearMessage();
     this._populateFormSubscription.unsubscribe();
-    localStorage.removeItem('contact_saved');
+    //localStorage.removeItem('contactsaved');
   }
 
   public debug(obj: any): void {
@@ -164,7 +164,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @param      {Array}  fields  The fields
    */
-  private _setForm(fields: any): void {
+  /*private _setForm(fields: any): void {
     const formGroup: any = [];
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
@@ -175,6 +175,32 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     });
 
     this.frmContact = new FormGroup(formGroup);
+
+    // get form data API is passing X for memo code value.
+    // Set it to null here until it is checked by user where it will be set to X.
+    //this.frmContact.controls['memo_code'].setValue(null);
+  }*/
+
+  private _setForm(fields: any): void {
+    const formGroup: any = [];
+    console.log('_setForm fields ', fields);
+    fields.forEach(el => {
+      if (el.hasOwnProperty('cols')) {
+        el.cols.forEach(e => {
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
+        });
+      }
+    });
+
+    this.frmContact = new FormGroup(formGroup);
+
+    // SET THE DEFAULT HERE
+    if (this.frmContact.get('entity_type')) {
+      const entityTypeVal = this.frmContact.get('entity_type').value;
+      if (!entityTypeVal) {
+        this.frmContact.patchValue({ entity_type: this._entityType }, { onlySelf: true });
+      }
+    }
 
     // get form data API is passing X for memo code value.
     // Set it to null here until it is checked by user where it will be set to X.
@@ -484,17 +510,16 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }*/
 
   public handleTypeChange(entityOption: any, col: any) {
+    console.log(" handleTypeChange entityOption", entityOption);
     this._entityType = entityOption.code;
     if (this._selectedEntity) {
       // this.showWarn(col.text);
-      this.frmContact.patchValue({ entityType: this._selectedEntity.entityType }, { onlySelf: true });
+      this.frmContact.patchValue({ entity_type: this._selectedEntity.entity_type }, { onlySelf: true });
     } else {
-      this._entityType = entityOption.code;
       this.loadDynamiceFormFields();
-      this.frmContact.patchValue({ entityType: entityOption.code }, { onlySelf: true });
+      this.frmContact.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
     }
   }
-
 
   /**
    * Goes to the previous step.
@@ -658,7 +683,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    //this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
+    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
   }
 
@@ -676,7 +701,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
     this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
     this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    //this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
+    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
 
@@ -1235,7 +1260,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
-  public async canDeactivate(): Promise<boolean> {
+  /*public async canDeactivate(): Promise<boolean> {
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
       result = await this._dialogService
@@ -1256,5 +1281,5 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       return true;
   }
- }
+ }*/
 }
