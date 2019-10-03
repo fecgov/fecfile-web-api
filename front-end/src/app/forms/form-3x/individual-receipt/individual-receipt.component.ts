@@ -2412,6 +2412,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                     }
                   }
                 }
+              } else {
+                if (trx.hasOwnProperty('back_ref_transaction_id')) {
+                  if (trx.back_ref_transaction_id) {
+                    this._getParentFromChild(reportId, trx.back_ref_transaction_id, apiCall);
+                  }
+                }
               }
               for (const prop in trx) {
                 if (trx.hasOwnProperty(prop)) {
@@ -2491,6 +2497,33 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                 }
               }
               this._validateTransactionDate();
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * When a child transaction is selected for editing from the main table as opposed to editing
+   * from the parent sub-transaction table, the parent information needs to be obtained from the
+   * API.  It is need for returning to the parent from the child.
+   * @param reportId
+   * @param backRefTransactionId
+   * @param apiCall
+   */
+  private _getParentFromChild(reportId: string, backRefTransactionId: string, apiCall: string) {
+    this._receiptService.getDataSchedule(reportId, backRefTransactionId, apiCall).subscribe(res => {
+      if (Array.isArray(res)) {
+        for (const trx of res) {
+          if (trx.hasOwnProperty('transaction_id')) {
+            if (trx.transaction_id === backRefTransactionId) {
+              const modelArray = this._transactionsService.mapFromServerSchedFields([trx]);
+              if (modelArray) {
+                if (modelArray.length > 0) {
+                  this._parentTransactionModel = modelArray[0];
+                }
+              }
             }
           }
         }

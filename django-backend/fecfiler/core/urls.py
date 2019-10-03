@@ -144,4 +144,6 @@ urlpatterns = [
         views.address_validation,
         name="address_validation",
     ),
+
+    url(r"^core/create_amended_reports$", views.create_amended_reports, name="create_amended_reports"),
 ]

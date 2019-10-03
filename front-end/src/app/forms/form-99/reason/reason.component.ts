@@ -56,6 +56,7 @@ export class ReasonComponent implements OnInit {
   public editorMax: number = 20000;
   public textAreaTextContent: string = '';
   public editingTextArea: boolean = false;
+  public fileNameToDisplay: string = null;
 
   private _printPriviewPdfFileLink: string = '';
   private _form99Details: any = {};
@@ -100,6 +101,7 @@ export class ReasonComponent implements OnInit {
         this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
         this.textAreaTextContent = unescape(unescapedText);
+        this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
       } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
@@ -658,6 +660,7 @@ export class ReasonComponent implements OnInit {
       this.notValidPdf = false;
 
       this._form99Details.filename = '';
+      this.fileNameToDisplay = null;
       localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
     //this._modalService.close(modalId);
@@ -713,6 +716,7 @@ export class ReasonComponent implements OnInit {
           this.notValidPdf = false;
           this.PdfUploaded = false;
           this._form99Details.filename = '';
+          this.fileNameToDisplay = null;
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
       });

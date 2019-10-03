@@ -4486,6 +4486,72 @@ def clone_a_transaction(request):
             raise Exception('transaction clone error')
         return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
+********************************************************************************************************************************
+"""
+
+
+def get_reports_data(report_id):
+    try:
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+        forms_obj = None
+        print('here',forms_obj)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+def insert_sql_report(dict_data):
+    try:
+        sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
+        with connection.cursor() as cursor:
+            # INSERT row into Reports table
+            cursor.execute(sql,dict_data)                                          
+    except Exception:
+        raise
+
+
+@api_view(['POST'])
+def create_amended_reports(request):
+
+    try:
+        if request.method == 'POST':
+            reportid = request.POST.get('report_id')
+            print('create_amended_reports',reportid)
+            data_dict = get_reports_data(reportid)
+            if data_dict:
+                #data = data[0]
+                report_id = get_next_report_id()
+
+                for data in data_dict:
+                    print(data)
+                    data['report_id'] = str(report_id)
+
+                    #post_sql_report(reports_obj(''))
+                    data['amend_ind'] = 'A'
+                    data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
+                    data['previous_report_id'] = reportid
+                    data['report_seq'] = str(get_next_report_id())
+                    print(data,'here')
+                    insert_sql_report(data)
+                    #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+            else:
+                return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
+
+        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def address_validation(request):
