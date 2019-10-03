@@ -34,63 +34,83 @@
           </div>
         </ng-container>
         <ng-container *ngIf="transactionCategorySelected">
-          <ng-container *ngIf="transactionTypeFailed">
+          <!--Commented this warning as it is showing up even when we expand / collapse transaction header-->
+          <!--<ng-container *ngIf="transactionTypeFailed">
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12 text-center text-error">
                 Please select a transaction type.
               </div>
             </div>
-          </ng-container>
+          </ng-container>-->
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <ngb-accordion #acc="ngbAccordion" [closeOthers]="true" class="secondary-options" (pannelChange)="beforeChange($event)">
-                <ngb-panel id="{{option.value}}" class="secondary-options__item" *ngFor="let option of secondaryOptions; index as i" >
+              <ngb-accordion
+                #acc="ngbAccordion"
+                [closeOthers]="true"
+                class="secondary-options"
+                (pannelChange)="beforeChange($event)"
+              >
+                <ngb-panel
+                  id="{{ option.value }}"
+                  class="secondary-options__item"
+                  *ngFor="let option of secondaryOptions; index as i"
+                >
                   <ng-template ngbPanelHeader let-opened="opened">
                     <button class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
-                    <div class="option-header">
-                      <div class="option-header-text">
-                        <button id="option_{{i}}" class="btn btn-link">
-                          {{ option?.text }}
-                        </button>
-                        <ng-container *ngIf="option?.infoIcon">
-                          <button type="button" class="btn-info" ngbTooltip=" {{ option?.info }}">
-                            <i class="info-icon" aria-hidden="true"></i>
-                            <span class="sr-only">
-                              Click for more information
-                            </span>
+                      <div class="option-header">
+                        <div class="option-header-text">
+                          <button id="option_{{ i }}" class="btn btn-link">
+                            {{ option?.text }}
                           </button>
-                        </ng-container>
+                          <ng-container *ngIf="option?.infoIcon">
+                            <button
+                              type="button"
+                              class="btn-info"
+                              ngbTooltip=" {{ option?.info }}"
+                              (click)="$event.stopPropagation()"
+                            >
+                              <i class="info-icon" aria-hidden="true"></i>
+                              <span class="sr-only">
+                                Click for more information
+                              </span>
+                            </button>
+                          </ng-container>
+                        </div>
+                        <div class="option-header-icon">
+                          <button type="button" class="btn btn-link">
+                            <i [ngClass]="{ 'down-arrow-icon': !opened, 'up-arrow-icon': opened }" aria-hidden="true">
+                            </i
+                            >&nbsp;
+                          </button>
+                        </div>
                       </div>
-                      <div class="option-header-icon">
-                        <button type="button" class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
-                          <i [ngClass]="{ 'down-arrow-icon': opened, 'up-arrow-icon': !opened }" aria-hidden="true">
-                          </i>
-                        </button>
-                      </div>
-                    </div>
                     </button>
                   </ng-template>
                   <ng-template ngbPanelContent>
                     <ul class="child-options">
-                      <li class="child-options__item" *ngFor="let childOption of option.options"
-                      (click)="childOptionsListClick(childOption.value)">
-                        <label for="option_{{childOption.value}}" class="child-options-label">
-                        <input
-                          id="option_{{childOption.value}}"
-                          placeholder="{{childOption.text}}"
-                          type="radio"
-                          [name]="secondaryOption"
-
-                          [value]="childOption.value"
-                          (click)="updateTypeSelected($event)"
-                        />
-
-                        <!-- formControlName="secondaryOption"
-                        [(ngModel)]="transactionType" -->
+                      <li
+                        class="child-options__item"
+                        *ngFor="let childOption of option.options"
+                        (click)="childOptionsListClick(childOption.value); doValidateOption()"
+                      >
+                        <label for="option_{{ childOption.value }}" class="child-options-label">
+                          <input
+                            id="option_{{ childOption.value }}"
+                            placeholder="{{ childOption.text }}"
+                            type="radio"
+                            [name]="secondaryOption"
+                            [value]="childOption.value"
+                            (click)="updateTypeSelected($event)"
+                          />
                           {{ childOption.text }}
                         </label>
                         <ng-container *ngIf="childOption?.infoIcon">
-                          <button type="button" class="btn-info" ngbTooltip=" {{ childOption?.info }}">
+                          <button
+                            type="button"
+                            class="btn-info"
+                            ngbTooltip=" {{ childOption?.info }}"
+                            (click)="$event.stopPropagation()"
+                          >
                             <i class="info-icon" aria-hidden="true"></i>
                             <span class="sr-only">
                               Click for more information
@@ -109,7 +129,8 @@
       <!-- ./content -->
     </section>
     <footer>
-      <div class="grid-row">
+      <!--we don't need previous / next as we validate / submit on selection of transaction radio button -->
+      <!--<div class="grid-row">
         <div class="grid-row__col grid-row__col--11 forms__btn-container">
           <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
             Previous
@@ -118,7 +139,7 @@
             Next
           </button>
         </div>
-      </div>
+      </div>-->
     </footer>
   </form>
 </div>
