@@ -44,73 +44,50 @@
           </ng-container>-->
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
-              <ngb-accordion
-                #acc="ngbAccordion"
-                [closeOthers]="true"
-                class="secondary-options"
-                (pannelChange)="beforeChange($event)"
-              >
-                <ngb-panel
-                  id="{{ option.value }}"
-                  class="secondary-options__item"
-                  *ngFor="let option of secondaryOptions; index as i"
-                >
+              <ngb-accordion #acc="ngbAccordion" [closeOthers]="true" class="secondary-options" (pannelChange)="beforeChange($event)">
+                <ngb-panel id="{{option.value}}" class="secondary-options__item" *ngFor="let option of secondaryOptions; index as i" >
                   <ng-template ngbPanelHeader let-opened="opened">
                     <button class="btn btn-link" (click)="pannelChange(opened)" ngbPanelToggle>
-                      <div class="option-header">
-                        <div class="option-header-text">
-                          <button id="option_{{ i }}" class="btn btn-link">
-                            {{ option?.text }}
+                    <div class="option-header">
+                      <div class="option-header-text">
+                        <button id="option_{{i}}" class="btn btn-link">
+                          {{ option?.text }}
+                        </button>
+                        <ng-container *ngIf="option?.infoIcon">
+                          <button type="button" class="btn-info" ngbTooltip=" {{ option?.info }}" (click)="$event.stopPropagation()">
+                            <i class="info-icon" aria-hidden="true"></i>
+                            <span class="sr-only">
+                              Click for more information
+                            </span>
                           </button>
-                          <ng-container *ngIf="option?.infoIcon">
-                            <button
-                              type="button"
-                              class="btn-info"
-                              ngbTooltip=" {{ option?.info }}"
-                              (click)="$event.stopPropagation()"
-                            >
-                              <i class="info-icon" aria-hidden="true"></i>
-                              <span class="sr-only">
-                                Click for more information
-                              </span>
-                            </button>
-                          </ng-container>
-                        </div>
-                        <div class="option-header-icon">
-                          <button type="button" class="btn btn-link">
-                            <i [ngClass]="{ 'down-arrow-icon': !opened, 'up-arrow-icon': opened }" aria-hidden="true">
-                            </i
-                            >&nbsp;
-                          </button>
-                        </div>
+                        </ng-container>
                       </div>
+                      <div class="option-header-icon">
+                        <button type="button" class="btn btn-link">
+                          <i [ngClass]="{ 'down-arrow-icon': !opened, 'up-arrow-icon': opened }" aria-hidden="true">
+                          </i>&nbsp;
+                        </button>
+                      </div>
+                    </div>
                     </button>
                   </ng-template>
                   <ng-template ngbPanelContent>
                     <ul class="child-options">
-                      <li
-                        class="child-options__item"
-                        *ngFor="let childOption of option.options"
-                        (click)="childOptionsListClick(childOption.value); doValidateOption()"
-                      >
-                        <label for="option_{{ childOption.value }}" class="child-options-label">
-                          <input
-                            id="option_{{ childOption.value }}"
-                            placeholder="{{ childOption.text }}"
-                            type="radio"
-                            [name]="secondaryOption"
-                            [value]="childOption.value"
-                            (click)="updateTypeSelected($event)"
-                          />
+                      <li class="child-options__item" *ngFor="let childOption of option.options"
+                      (click)="childOptionsListClick(childOption.value); doValidateOption()">
+                        <label for="option_{{childOption.value}}" class="child-options-label">
+                        <input
+                          id="option_{{childOption.value}}"
+                          placeholder="{{childOption.text}}"
+                          type="radio"
+                          [name]="secondaryOption"
+                          [value]="childOption.value"
+                          (click)="updateTypeSelected($event)"
+                        />
                           {{ childOption.text }}
                         </label>
                         <ng-container *ngIf="childOption?.infoIcon">
-                          <button
-                            type="button"
-                            class="btn-info"
-                            ngbTooltip=" {{ childOption?.info }}"
-                            (click)="$event.stopPropagation()"
-                          >
+                          <button type="button" class="btn-info" ngbTooltip=" {{ childOption?.info }}" (click)="$event.stopPropagation()">
                             <i class="info-icon" aria-hidden="true"></i>
                             <span class="sr-only">
                               Click for more information
