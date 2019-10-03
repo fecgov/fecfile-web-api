@@ -4485,25 +4485,16 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 """
 
 
-def get_reports_data(report_id,pre_report_id=None):
+def get_reports_data(report_id):
     try:
-        if report_id:
-            query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
-            forms_obj = None
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", report_id)
-                for row in cursor.fetchall():
-                    data_row = list(row)
-                    forms_obj=data_row[0]
-
-        if pre_report_id:
-            query_string = """SELECT count('previous_report_id') as amendement_count FROM public.reports WHERE previous_report_id = %s AND amend_ind ='A' """
-            forms_obj = None
-            with connection.cursor() as cursor:
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", pre_report_id)
-                for row in cursor.fetchall():
-                    data_row = list(row)
-                    forms_obj=data_row[0]
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+        forms_obj = None
+        print('here',forms_obj)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
 
         if forms_obj is None:
             pass
@@ -4513,34 +4504,46 @@ def get_reports_data(report_id,pre_report_id=None):
         raise
 
 
+def insert_sql_report(dict_data):
+    try:
+        sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
+        with connection.cursor() as cursor:
+            # INSERT row into Reports table
+            cursor.execute(sql,dict_data)                                          
+    except Exception:
+        raise
 
-@api_view(['POST','GET','DELETE','PUT'])
-def create_amended_reports_(request):
+
+@api_view(['POST'])
+def create_amended_reports(request):
 
     try:
         if request.method == 'POST':
-            reportid =request.POST.get(report_id)
-            data = get_reports_data(reportid)
-            if data:
-                previous_reportid_count = get_reports_data(None,reportid)
-                amendement_count = previous_reportid_count.get('amendement_count')+1 if previous_reportid_count else 1
-
+            reportid = request.POST.get('report_id')
+            print('create_amended_reports',reportid)
+            data_dict = get_reports_data(reportid)
+            if data_dict:
+                #data = data[0]
                 report_id = get_next_report_id()
-                data['report_id'] = str(report_id)
 
-                #post_sql_report(reports_obj(''))
-                data['amend_ind'] = 'A'
-                data['amend_number'] = amendement_count
-                data['previous_report_id'] = reportid
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                for data in data_dict:
+                    print(data)
+                    data['report_id'] = str(report_id)
 
+                    #post_sql_report(reports_obj(''))
+                    data['amend_ind'] = 'A'
+                    data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
+                    data['previous_report_id'] = reportid
+                    data['report_seq'] = str(get_next_report_id())
+                    print(data,'here')
+                    insert_sql_report(data)
+                    #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
             else:
                 return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
 
-
-        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        return Response("The get_contacts_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 
