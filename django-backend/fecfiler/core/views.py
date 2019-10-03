@@ -26,6 +26,7 @@ from django.core.paginator import Paginator
 from datetime import date, timedelta, time
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
+from xml.etree import ElementTree
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -4552,31 +4553,55 @@ def create_amended_reports(request):
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def address_validation(request):
+    try:
+        output = {}
+        street_1 = request.data.get('street1')
+        street_2 = request.data.get('street2')
+        city = request.data.get('city')
+        state = request.data.get('state')
+        zip_code = request.data.get('zipCode')
 
+        XML_input = """<AddressValidateRequest USERID="{0}">
+<Revision>1</Revision>
+<Address ID="0">
+<Address1>{2}</Address1>
+<Address2>{1}</Address2>
+<City>{3}</City>
+<State>{4}</State>
+<Zip5>{5}</Zip5>
+<Zip4/>
+</Address>
+</AddressValidateRequest> """.format(settings.USPS_USERNAME, street_1, street_2, city, state, zip_code)
+        parameters = {'API': 'verify',
+                        'XML': XML_input}
+        response = requests.get(settings.USPS_HTTP_API_URL, params=parameters)
+        if not response:
+            raise Exception(response.json())
+        else:
+            output['data'] = {}
+            root = ElementTree.fromstring(response.text)
+            Address = root.find('Address')
+            if Address.find('Error') != None:
+                output['statusCode'] = "FAIL"
+            else:
+                output['statusCode'] = "SUCCESS"
+                output['data']['street1'] = Address.find('Address2').text
+                output['data']['street2'] = Address.find('Address1').text
+                output['data']['city'] = Address.find('City').text
+                output['data']['state'] = Address.find('State').text
+                output['data']['zipCode'] = Address.find('Zip5').text
+                output['data']['zipCode4'] = Address.find('Zip4').text
+                if Address.find('ReturnText') != None:
+                    output['statusCode'] = "WARNING"
+                    output['warningMessage'] = Address.find('ReturnText').text
+            # for child in root.iter('*'):
+            #     # print(child.tag, child.attrib)
+            #     print(child)
+            return Response(output, status.HTTP_200_OK)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    except requests.exceptions.HTTPError as http_err:
+        return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
