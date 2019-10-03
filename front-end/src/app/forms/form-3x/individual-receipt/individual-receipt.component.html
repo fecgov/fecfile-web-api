@@ -287,9 +287,15 @@
                     <ng-container *ngIf="col?.type === 'select' && 
                           (isFieldName(col?.name, 'state') ||
                           isFieldName(col?.name, 'cand_office_state'))">
-                      <!-- [searchFn]="customStateSearchFn" -->
-                      <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
-                        class="forms__select" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
+                      <ng-select #stateSelect 
+                        [items]="states" 
+                        (change)="handleStateChange($event, col)"
+                        class="forms__select" 
+                        [formControlName]="col?.name" 
+                        bindValue="code" 
+                        bindLabel="code" 
+                        [selectOnTab]="true"
+                        [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                               ? 'forms__select-error'
