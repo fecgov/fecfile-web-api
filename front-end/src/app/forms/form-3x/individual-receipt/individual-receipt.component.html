@@ -274,9 +274,15 @@
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
-                      <ng-select #candOfficeTypeSelect [items]="candidateOfficeTypes"
-                        (change)="handleCandOfficeChange($event, col)" class="forms__select" [formControlName]="col?.name"
-                        bindValue="code" bindLabel="name" [ngClass]="
+                      <ng-select #candOfficeTypeSelect 
+                        [items]="candidateOfficeTypes"
+                        (change)="handleCandOfficeChange($event, col)" 
+                        class="forms__select" 
+                        [formControlName]="col?.name"
+                        bindValue="code" 
+                        bindLabel="name"
+                        [selectOnTab]="true"
+                        [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                               ? 'forms__select-error'
@@ -307,9 +313,14 @@
                       </ng-select>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'election_code')">
-                      <ng-select #electionCodeSelect [items]="electionTypes"
-                        (change)="handleElectionCodeChange($event, col)" class="forms__select election-code-select"
-                        [formControlName]="col?.name" bindValue="electionType" bindLabel="electionTypeDescription"
+                      <ng-select #electionCodeSelect 
+                        [items]="electionTypes"
+                        (change)="handleElectionCodeChange($event, col)" 
+                        class="forms__select election-code-select"
+                        [formControlName]="col?.name" 
+                        bindValue="electionType" 
+                        bindLabel="electionTypeDescription"
+                        [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -326,6 +337,7 @@
                         [formControlName]="col?.name" 
                         bindValue="entityType"
                         bindLabel="entityTypeDescription" 
+                        [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
