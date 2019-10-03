@@ -277,9 +277,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.sortableColumns
     );
 
-    console.log('view', this.view);
-    console.log('existingReportId', this.existingReportId);
-
     this._reportsService
       .getReports(
         this.view,
@@ -295,7 +292,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.reportsModel = [];
         this._reportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
-        console.log(' getReportsPage reportsModelL', reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
         this.reportsModel = this._reportsService.sortReports(
@@ -309,7 +305,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
 
-        console.log('this.numberOfPages = ', this.numberOfPages);
         this.allReportsSelected = false;
       });
   }
@@ -321,9 +316,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName,
       this.sortableColumns
     );
-
-    console.log('view', this.view);
-    console.log('existingReportId', this.existingReportId);
 
     this._reportsService
       .getTrashedReports(
@@ -338,7 +330,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 
       .subscribe((res: GetReportsResponse) => {
         this.reportsModel = [];
-        console.log(' getRecyclingPage res', res);
         this._reportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
         console.log(' getRecyclingPage reportsModelL', reportsModelL);
@@ -350,12 +341,10 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
           sortedCol.descending
         );
 
-        console.log(' getRecyclingPage this.reportsModel= ', this.reportsModel);
         this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
 
-        console.log('getRecyclingPage this.numberOfPages = ', this.numberOfPages);
         this.allReportsSelected = false;
       });
   }
@@ -439,7 +428,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.getReportsPage(1);  
         break;
       default:
-        console.log('unexpected type received for remove tag');
+
     }
   }
 
@@ -695,7 +684,6 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   }
   
   public printPreview(): void {
-    console.log('TransactionsTableComponent printPreview...!');
     this._reportTypeService.printPreview('transaction_table_screen', '3X');
   }
 
@@ -709,7 +697,6 @@ public printReport(report: reportModel): void{
         };
         localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
       });
-      console.log(new Date().toISOString());
       setTimeout(() => {
         this._formsService.PreviewForm_Preview_sign_Screen({}, this.formType).subscribe(
           res => {
@@ -721,7 +708,6 @@ public printReport(report: reportModel): void{
             console.log('error: ', error);
           }
         );
-        console.log(new Date().toISOString());
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -733,14 +719,12 @@ public printReport(report: reportModel): void{
 
           //return false;
         });
-      console.log(new Date().toISOString());
       setTimeout(() => {
         // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
           this._reportTypeService.printPreview('dashboard_report_screen', '3X');
-        console.log(new Date().toISOString());
       }, 1500);
     }
   }
@@ -755,10 +739,8 @@ public printReport(report: reportModel): void{
         };
         localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
       });
-      console.log(new Date().toISOString());
       setTimeout(() => {
         this._router.navigate(['/signandSubmit/99']);
-        console.log(new Date().toISOString());
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -770,14 +752,14 @@ public printReport(report: reportModel): void{
 
           //return false;
         });
-      console.log(new Date().toISOString());
+
       setTimeout(() => {
         // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
           this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4' } });
-        console.log(new Date().toISOString());
+
       }, 1500);
     }
     
@@ -853,8 +835,34 @@ public printReport(report: reportModel): void{
    *
    * @param report the Report to view
    */
-  public viewReport(): void {
-    alert('View report is not yet supported');
+  public viewReport(report: reportModel): void {
+    if (report.form_type === 'F99') {
+      this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
+        localStorage.setItem('form_99_details', JSON.stringify(res));
+        //return false;
+      });
+      setTimeout(() => {
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: false } });
+      }, 1500);
+    } else if (report.form_type === 'F3X') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+          //return false;
+        });
+      setTimeout(() => {
+        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+        this._router.navigate([`/signandSubmit/${formType}`], {
+          queryParams: { reportId: report.report_id, edit: false }
+        });
+      }, 1500);
+    }
   }
 
   /**
@@ -869,10 +877,9 @@ public printReport(report: reportModel): void{
         localStorage.setItem('form_99_details', JSON.stringify(res));
         //return false;
       });
-      console.log(new Date().toISOString());
+
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
-        console.log(new Date().toISOString());
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -884,7 +891,6 @@ public printReport(report: reportModel): void{
 
           //return false;
         });
-      console.log(new Date().toISOString());
       setTimeout(() => {
         // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
 
@@ -893,7 +899,6 @@ public printReport(report: reportModel): void{
         this._router.navigate([`/forms/form/${formType}`], {
           queryParams: { step: 'reports', reportId: report.report_id }
         });
-        console.log(new Date().toISOString());
       }, 1500);
     }
   }
@@ -1357,7 +1362,6 @@ public printReport(report: reportModel): void{
   }
 
   public trashReport(rep: reportModel): void {
-    console.log('trashReport ', rep);
     this._dialogService
       .confirm('You are about to delete this report ' + rep.report_id + '.', ConfirmModalComponent, 'Warning!')
       .then(res => {

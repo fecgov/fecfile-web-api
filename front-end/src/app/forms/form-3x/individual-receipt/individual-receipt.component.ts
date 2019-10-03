@@ -30,7 +30,7 @@ import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from './schedule-actions.enum';
@@ -43,6 +43,7 @@ import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
+import { TransactionsService } from '../../transactions/service/transactions.service';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -57,7 +58,7 @@ export enum SaveActions {
   selector: 'f3x-individual-receipt',
   templateUrl: './individual-receipt.component.html',
   styleUrls: ['./individual-receipt.component.scss'],
-  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
   // encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
@@ -75,6 +76,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _clearFormSubscription: Subscription;
   private _loadFormFieldsSubscription: Subscription;
 
+  public editMode: boolean = true;
   public checkBoxVal = false;
   public cvgStartDate: string = null;
   public cvgEndDate: string = null;
@@ -125,7 +127,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
-  private _parentTransactionId: string;
+  private _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private prePopulateFieldArray: Array<any>;
 
@@ -147,7 +149,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
-    private _contributionDateValidator: ContributionDateValidator
+    private _contributionDateValidator: ContributionDateValidator,
+    private _transactionsService: TransactionsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -172,7 +175,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             console.log('message key not supported: ' + message.key);
         }
       }
-
     });
 
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
@@ -207,6 +209,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._getCandidateOfficeTypes();
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit
+      ? this._activatedRoute.snapshot.queryParams.edit
+      : true;
     localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
 
@@ -219,18 +224,20 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
 
     this.frmIndividualReceipt = this._fb.group({});
-    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-      Validators.required
-    ]);
+    // added check to avoid script error
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+      this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+        this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+        Validators.required
+      ]);
+    }
   }
 
   /**
    * Apply the validation rules when aggregate changes.
    */
-  private  _listenForAggregateChanges(): void {
+  private _listenForAggregateChanges(): void {
     this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
-
       // All validators are replaced here.  Currently the only validator functions
       // for employer and occupation is the validateAggregate().  The max length is enforced
       // in the template as an element attribute max.
@@ -241,23 +248,44 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       // dynamic form fields again in this.formFields[].
 
       const employerControl = this.frmIndividualReceipt.get('employer');
-      employerControl.setValidators([validateAggregate(
-        val, true, 'employer')]);
-        employerControl.updateValueAndValidity();
+      employerControl.setValidators([validateAggregate(val, true, 'employer')]);
+      employerControl.updateValueAndValidity();
 
       const occupationControl = this.frmIndividualReceipt.get('occupation');
-      occupationControl.setValidators([validateAggregate(
-        val, true, 'occupation')]);
-        occupationControl.updateValueAndValidity();
+      occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
+      occupationControl.updateValueAndValidity();
     });
   }
 
   public ngOnChanges() {
-    this._prepareForm();
-    this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-      this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-      Validators.required
-    ]);
+    if (this.editMode) {
+      this._prepareForm();
+      // added check to avoid script error
+      if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+          this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+          Validators.required
+        ]);
+      }
+    } else {
+      this._dialogService
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
+    }
   }
 
   private _prepareForm() {
@@ -340,10 +368,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null,
-            this._mapValidators(e.validation, e.name, e.value));
-          if (this.isFieldName(e.name, 'contribution_amount') ||
-              this.isFieldName(e.name, 'expenditure_amount')) {
+          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name, e.value));
+          if (this.isFieldName(e.name, 'contribution_amount') || this.isFieldName(e.name, 'expenditure_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
@@ -443,7 +469,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
         formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
       }
-    } 
+    }
     // else if (this.isFieldName(fieldName, 'purpose_description')) {
     //   // Purpose description is required when prefix with In-kind #
     //   if (fieldValue) {
@@ -470,14 +496,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            if ((fieldName !== 'contribution_amount') && (fieldName !== 'expenditure_amount')
-                && (fieldName !== 'contribution_aggregate')) {
+            if (
+              fieldName !== 'contribution_amount' &&
+              fieldName !== 'expenditure_amount' &&
+              fieldName !== 'contribution_aggregate'
+            ) {
               formValidators.push(Validators.maxLength(validators[validation]));
             } else {
               formValidators.push(validateAmount());
             }
           }
-        } else if ((validation === 'dollarAmount') || (validation === 'dollarAmountNegative')) {
+        } else if (validation === 'dollarAmount' || validation === 'dollarAmountNegative') {
           if (validators[validation] !== null) {
             formValidators.push(floatingPoint());
           }
@@ -495,8 +524,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     let amountField: string;
     // checking for expenditure_date in form parameter
     // If expenditure_date is not found setting contribution_date and contribution_amount
-    if(this.frmIndividualReceipt) {
-      if(this.frmIndividualReceipt.controls['expenditure_date']) {
+    if (this.frmIndividualReceipt) {
+      if (this.frmIndividualReceipt.controls['expenditure_date']) {
         dateField = 'expenditure_date';
         amountField = 'expenditure_amount';
       } else {
@@ -528,15 +557,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       if (this.memoCodeChild) {
         this.frmIndividualReceipt.controls['child*' + dateField].setValidators([Validators.required]);
 
-        this.frmIndividualReceipt.controls['child*'  + dateField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
       } else {
         if (this.frmIndividualReceipt.controls['child*' + dateField]) {
-          this.frmIndividualReceipt.controls['child*'+dateField].setValidators([
+          this.frmIndividualReceipt.controls['child*' + dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
           ]);
 
-          this.frmIndividualReceipt.controls['child*'+dateField].updateValueAndValidity();
+          this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
         }
       }
     }
@@ -555,13 +584,13 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       }
 
       // Do same as above for child amount
-      if (this.frmIndividualReceipt.controls['child*'+amountField]) {
-        this.frmIndividualReceipt.controls['child*'+amountField].setValidators([
+      if (this.frmIndividualReceipt.controls['child*' + amountField]) {
+        this.frmIndividualReceipt.controls['child*' + amountField].setValidators([
           floatingPoint(),
           Validators.required
         ]);
 
-        this.frmIndividualReceipt.controls['child*'+amountField].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['child*' + amountField].updateValueAndValidity();
       }
 
       if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
@@ -572,7 +601,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-    /**
+  /**
    * Updates vaprivate _memoCode variable.
    *
    * @param      {Object}  e      The event object.
@@ -584,9 +613,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     let amountField: string;
     // checking for expenditure_date in form parameter
     // If expenditure_date is not found setting contribution_date and contribution_amount
-    if(this.frmIndividualReceipt.controls['expenditure_date']) {
+    if (this.frmIndividualReceipt.controls['expenditure_date']) {
       dateField = 'expenditure_date';
-      amountField = 'expenditure_amount'
+      amountField = 'expenditure_amount';
     } else {
       dateField = 'contribution_date';
       amountField = 'contribution_amount';
@@ -635,9 +664,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       transactionDate = this.frmIndividualReceipt.get(dateField).value;
     }
     const aggregateValue: string = this._receiptService.determineAggregate(
-      this._contributionAggregateValue, contributionAmountNum,
-      this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType, this._isSubOfParent(), transactionDate
+      this._contributionAggregateValue,
+      contributionAmountNum,
+      this.scheduleAction,
+      this.memoCode,
+      this._selectedEntity,
+      this._transactionToEdit,
+      this.transactionType,
+      this._isSubOfParent(),
+      transactionDate
     );
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
   }
@@ -697,9 +732,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
     }
     const aggregateValue: string = this._receiptService.determineAggregate(
-      this._contributionAggregateValue, contributionAmountNum,
-      this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-       this.transactionType, this._isSubOfParent(), transactionDate
+      this._contributionAggregateValue,
+      contributionAmountNum,
+      this.scheduleAction,
+      this.memoCode,
+      this._selectedEntity,
+      this._transactionToEdit,
+      this.transactionType,
+      this._isSubOfParent(),
+      transactionDate
     );
 
     if (isChildForm) {
@@ -708,7 +749,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
     }
   }
-
 
   /**
    * Prevent user from keying in more than the max allowed by the API.
@@ -1034,8 +1074,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     // Description is required when Other is selected
     if (item.electionType === 'O') {
       if (this.frmIndividualReceipt.contains(description)) {
-        this.frmIndividualReceipt.controls[description]
-          .setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[description].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
       }
     } else {
@@ -1050,7 +1089,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Vaidates the form on submit.
    */
   private _doValidateReceipt(saveAction: SaveActions): Observable<any> {
-
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
@@ -1072,7 +1110,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
-        } else if (this.isFieldName(field, 'purpose_description')) {
+        } else if (this.isFieldName(field, 'purpose_description') || this.isFieldName(field, 'expenditure_purpose')) {
           const preTextHiddenField = this._findHiddenField('name', 'pretext');
           let preText = '';
           if (preTextHiddenField) {
@@ -1113,9 +1151,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
             receiptObj[field] = typeAheadField;
           }
           // }
-        } else if ((field === 'donor_cmte_id') || (field === 'beneficiary_cmte_id')) {
+        } else if (field === 'donor_cmte_id' || field === 'beneficiary_cmte_id') {
           // added this condition as some times we are getting entire json object
-          // when we perform auto lookup. 
+          // when we perform auto lookup.
           // TODO we might need to revisit to see if we need this condition
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
@@ -1171,8 +1209,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       // we might need to revisit to fix the two transactions one screen
 
       // set the back ref id for save on a sub tran.
-      if (this._parentTransactionId && this.scheduleAction === ScheduleActions.addSubTransaction) {
-        receiptObj.back_ref_transaction_id = this._parentTransactionId;
+      if (this._parentTransactionModel && this._parentTransactionModel.transactionId
+        && this.scheduleAction === ScheduleActions.addSubTransaction) {
+        receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
       }
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
@@ -1183,18 +1222,18 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           // commented below condition to update summary (Third navigation)
           // irrespective of memo code condition
           //if (res.hasOwnProperty('memo_code')) {
-            //if (typeof res.memo_code === 'object') {
-              //if (res.memo_code === null) {
-                this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
-                  const message: any = {
-                    formType: this.formType,
-                    totals: resp
-                  };
+          //if (typeof res.memo_code === 'object') {
+          //if (res.memo_code === null) {
+          this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
+            const message: any = {
+              formType: this.formType,
+              totals: resp
+            };
 
-                  this._messageService.sendMessage(message);
-                });
-              //}
-            //}
+            this._messageService.sendMessage(message);
+          });
+          //}
+          //}
           //}
 
           this._contributionAmount = '';
@@ -1253,7 +1292,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           // before presenting a new sub tran to add.  Save parent id and emit to show new child form.
           if (saveAction === SaveActions.saveForAddSub) {
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
-              this._parentTransactionId = transactionId;
+              this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([res])[0];
             }
             const addSubTransEmitObj: any = {
               form: {},
@@ -1270,7 +1309,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
             }
             this.status.emit(addSubTransEmitObj);
-
           } else if (saveAction === SaveActions.saveForEditSub) {
             this._progressToChild(ScheduleActions.edit, res);
           } else if (saveAction === SaveActions.saveForReturnToParent) {
@@ -1280,8 +1318,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
-            // reset the parent ID if action is NOT for add sub transaction.
-            // if (this.scheduleAction !== ScheduleActions.addSubTransaction) {
             let resetParentId = true;
             if (this.subTransactionInfo) {
               if (this.subTransactionInfo.isParent === false) {
@@ -1289,7 +1325,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               }
             }
             if (resetParentId) {
-              this._parentTransactionId = null;
+              this._parentTransactionModel = null;
               this.subTransactions = [];
             }
           }
@@ -1324,7 +1360,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   /**
    * Used by Earmarks or any other transaction where the
-   * "2 transactions / 1 screen" requirement is needed. 
+   * "2 transactions / 1 screen" requirement is needed.
    */
   public saveAndReturnToNewParent(): void {
     this._doValidateReceipt(SaveActions.saveForReturnToNewParent);
@@ -1347,14 +1383,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    */
   public multipleMemoDropdownChanged(open: boolean) {
     if (open) {
-
       // TEMP hack for testing
       // this.multipleSubTransactionInfo.push(this.multipleSubTransactionInfo[0]);
 
       // 23 px for each item and add 40px for default.
-      let size = this.multipleSubTransactionInfo ?
-        this.multipleSubTransactionInfo.length : 0;
-      size = (size > 0) ? ((size * 23) + 40) : 0;
+      let size = this.multipleSubTransactionInfo ? this.multipleSubTransactionInfo.length : 0;
+      size = size > 0 ? size * 23 + 40 : 0;
       this.memoDropdownSize = size + 'px';
     } else {
       this.memoDropdownSize = null;
@@ -1387,7 +1421,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   private _progressToChild(scheduleAction: ScheduleActions, res: any): void {
-
     let childTransactionId = null;
     let apiCall = null;
     if (res.hasOwnProperty('child')) {
@@ -1418,10 +1451,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
         previousStep: 'step_2',
         transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
         transactionType: this.subTransactionInfo.subTransactionType,
-        action: scheduleAction,
+        action: scheduleAction
       };
       if (scheduleAction === ScheduleActions.edit) {
-        emitObj.transactionDetail = {transactionModel: transactionModel};
+        emitObj.transactionDetail = { transactionModel: transactionModel };
       }
       this.status.emit(emitObj);
     }
@@ -1431,8 +1464,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Return to the parent transaction from sub tran.
    */
   public returnToParent(scheduleAction: ScheduleActions): void {
-    const transactionModel = new TransactionModel({});
-    transactionModel.transactionId = this._parentTransactionId;
+    let transactionModel = this._parentTransactionModel;
+    if (!transactionModel) {
+      transactionModel = new TransactionModel({});
+    }
     transactionModel.type = this.subTransactionInfo.transactionTypeDescription;
     transactionModel.transactionTypeIdentifier = this.subTransactionInfo.transactionType;
     transactionModel.apiCall = this.subTransactionInfo.api_call;
@@ -1445,16 +1480,17 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
       previousStep: 'step_2',
       transactionTypeText: this.subTransactionInfo.transactionTypeDescription,
       transactionType: this.subTransactionInfo.transactionType,
-      action: scheduleAction,
+      action: scheduleAction
     };
     if (scheduleAction === ScheduleActions.edit) {
-      emitObj.transactionDetail = {transactionModel: transactionModel};
+      emitObj.transactionDetail = { transactionModel: transactionModel };
     }
     this.status.emit(emitObj);
   }
 
   private _setReceiptObjectEntityId(userSelectedEntity: any, receiptObj: any, isChild: boolean) {
-    if (userSelectedEntity) {
+    // added condition to check if entity_id already exist in receiptObj to avoid overriding entity ID's
+    if (userSelectedEntity && !receiptObj.entity_id) {
       if (userSelectedEntity.setEntityIdTo) {
         receiptObj[userSelectedEntity.setEntityIdTo] = userSelectedEntity.entity_id;
       } else {
@@ -1497,7 +1533,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
     this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: { step: 'transactions', reportId: reportId}
+      queryParams: { step: 'transactions', reportId: reportId }
     });
   }
 
@@ -1507,7 +1543,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   public ImportTransactions(): void {
     alert('Import transaction is not yet supported');
   }
-  
 
   /**
    * @deprecated
@@ -1578,6 +1613,31 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   /**
+   * Format an entity to display in the Candidate ID type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadCandidateId(result: any) {
+    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
+
+    return `${candidateId}, ${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
+  }
+
+  /**
    * Format an entity to display in the Committee Name type ahead.
    *
    * @param result formatted item in the typeahead list
@@ -1596,12 +1656,22 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param result formatted item in the typeahead list
    */
   public formatTypeaheadCandidate(result: any) {
-    const street1 = result.street_1 ? result.street_1.trim() : '';
-    const street2 = result.street_2 ? result.street_2.trim() : '';
     const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
     const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
 
-    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
+    return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
   }
 
   /**
@@ -1640,8 +1710,12 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
     fieldNames.push('beneficiary_cand_id');
-
     this._patchFormFields(fieldNames, entity, namePrefix);
+    // setting Beneficiary Candidate Entity Id to hidden variable
+    const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
+    if (beneficiaryCandEntityIdHiddenField) {
+      beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
+    }
     // for (const field of fieldNames) {
     //   const patch = {};
     //   patch[namePrefix + field] = entity[field];
@@ -1655,7 +1729,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * @param $event The mouse event having selected the contact from the typeahead options.
    */
   public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent, col: any) {
-
     const entity = $event.item;
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
@@ -1749,7 +1822,11 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
     this._patchFormFields(fieldNames, entity, namePrefix);
-
+    // setting Beneficiary Candidate Entity Id to hidden variable
+    const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
+    if (beneficiaryCandEntityIdHiddenField) {
+      beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
+    }
     // These fields names do not map to the same name in the form
     const fieldName = col.name;
     if (isChildForm) {
@@ -1935,8 +2012,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           return this._typeaheadService.getContacts(searchTextUpper, 'cand_id');
         }
       })
-    )
-
+    );
 
   /**
    * format the value to display in the input field once selected from the typeahead.
@@ -2032,6 +2108,21 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * format the value to display in the input field once selected from the typeahead.
    *
    * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the Candidate ID field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterCandidateId = (x: { beneficiary_cand_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.beneficiary_cand_id;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
    * template to the committee name field.  In these cases return x to retain the value in the
    * input for the other typeahead fields.
    */
@@ -2070,7 +2161,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           Memo transactions should not validate for transaction date
         */
         if (this.memoCode) {
-          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].setValidators([Validators.required]);
+          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].setValidators([
+            Validators.required
+          ]);
           this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].updateValueAndValidity();
         }
         if (this._selectedEntityChild) {
@@ -2227,7 +2320,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   /**
    * Pre-populate form fields with values from the pre-populate array.
-   * 
+   *
    * @param fieldArray an array of field names and values
    */
   private _prePopulateFormField(fieldArray: Array<any>) {
@@ -2249,7 +2342,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   private _prePopulateFormForEditOrView(transactionDetail: any) {
-
     if (transactionDetail) {
       // The action on the message is the same as the this.scheduleAction from parent.
       // using the field from the message in case there is a race condition with Input().
@@ -2313,7 +2405,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               if (trx.hasOwnProperty('child')) {
                 if (Array.isArray(trx.child)) {
                   if (trx.child.length > 0) {
-                    this._parentTransactionId = transactionId;
+                    this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
                     this.subTransactions = trx.child;
                     for (const subTrx of this.subTransactions) {
                       console.log('sub tran id ' + subTrx.transaction_id);
@@ -2331,7 +2423,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
                   }
                   if (this.frmIndividualReceipt.get(prop)) {
                     if (this.isFieldName(prop, 'contribution_aggregate')) {
-                        this._contributionAggregateValue = trx[prop];
+                      this._contributionAggregateValue = trx[prop];
                     }
                     if (this.isFieldName(prop, 'memo_code')) {
                       const memoCodeValue = trx[prop];
@@ -2392,10 +2484,9 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
               // and apply contributionAMountChange() formatting, setting, etc.
               for (const prop in trx) {
                 if (trx.hasOwnProperty(prop)) {
-                  if (this.isFieldName(prop, 'contribution_amount') ||
-                      this.isFieldName(prop, 'expenditure_amount')) {
-                        const amount = trx[prop] ? trx[prop] : 0;
-                        this.contributionAmountChange({target: {value: amount.toString()}}, prop, false);
+                  if (this.isFieldName(prop, 'contribution_amount') || this.isFieldName(prop, 'expenditure_amount')) {
+                    const amount = trx[prop] ? trx[prop] : 0;
+                    this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
                   }
                 }
               }
@@ -2482,9 +2573,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  public showHideEntityType(entityTypeGroup: string) {
-    
-  }
+  public showHideEntityType(entityTypeGroup: string) {}
 
   // public isMemoCodeReadOnly(fieldName: string) {
   //   if (this.isFieldName(fieldName, 'memo_code')) {
@@ -2527,28 +2616,28 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   private toggleValidationIndOrg(entityType: string) {
     if (entityType === 'ORG' || entityType === 'org-group') {
-      if(this.frmIndividualReceipt.controls['last_name']) {
+      if (this.frmIndividualReceipt.controls['last_name']) {
         this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
       }
-      if(this.frmIndividualReceipt.controls['first_name']) {
+      if (this.frmIndividualReceipt.controls['first_name']) {
         this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
       }
-      if(this.frmIndividualReceipt.controls['entity_name']) {
+      if (this.frmIndividualReceipt.controls['entity_name']) {
         this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
       }
     } else {
-      if(this.frmIndividualReceipt.controls['last_name']) {
+      if (this.frmIndividualReceipt.controls['last_name']) {
         this.frmIndividualReceipt.controls['last_name'].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls['last_name'].updateValueAndValidity();
       }
-      if(this.frmIndividualReceipt.controls['first_name']) {
+      if (this.frmIndividualReceipt.controls['first_name']) {
         this.frmIndividualReceipt.controls['first_name'].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls['first_name'].updateValueAndValidity();
       }
-      if(this.frmIndividualReceipt.controls['entity_name']) {
+      if (this.frmIndividualReceipt.controls['entity_name']) {
         this.frmIndividualReceipt.controls['entity_name'].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls['entity_name'].updateValueAndValidity();
       }
@@ -2725,8 +2814,8 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
 
   private _convertFormattedAmountToDecimal(formatedAmount: string): number {
     if (!formatedAmount) {
-      if(this.frmIndividualReceipt.get('expenditure_amount')) {
-        formatedAmount = this.frmIndividualReceipt.get('expenditure_amount').value;  
+      if (this.frmIndividualReceipt.get('expenditure_amount')) {
+        formatedAmount = this.frmIndividualReceipt.get('expenditure_amount').value;
       } else {
         formatedAmount = this.frmIndividualReceipt.get('contribution_amount').value;
       }
@@ -2745,7 +2834,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._receiptService
       .getContributionAggregate(reportId, entityId, cmteId, this.transactionType, contribDate)
       .subscribe(res => {
-
         const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
 
         let contributionAggregate: string = String(res.contribution_aggregate);
@@ -2757,9 +2845,15 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
         }
         const aggregateValue: string = this._receiptService.determineAggregate(
-          this._contributionAggregateValue, contributionAmountNum,
-          this.scheduleAction, this.memoCode, this._selectedEntity, this._transactionToEdit,
-           this.transactionType, this._isSubOfParent(), transactionDate
+          this._contributionAggregateValue,
+          contributionAmountNum,
+          this.scheduleAction,
+          this.memoCode,
+          this._selectedEntity,
+          this._transactionToEdit,
+          this.transactionType,
+          this._isSubOfParent(),
+          transactionDate
         );
 
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
@@ -2808,7 +2902,6 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
    * Office types may be hard coded as they are never expected to Change for now.
    */
   private _getCandidateOfficeTypes() {
-
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
         console.log('getFormFields res =', res);
@@ -2882,11 +2975,10 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
           }
         }
         prePopulateFieldArray = [];
-        prePopulateFieldArray.push({name: 'expenditure_purpose',
-          value: earmarkMemoPurpose});
+        prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
+        prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });
       }
     }
     return prePopulateFieldArray;
   }
-
 }

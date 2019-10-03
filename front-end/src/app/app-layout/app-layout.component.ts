@@ -76,7 +76,6 @@ export class AppLayoutComponent implements OnInit {
           this.toggleMenu = false;
         }
         if (val.url.indexOf('/signandSubmit') === 0) {
-          console.log("Sign and submit call...");
           if (this.toggleMenu) {
             this.showSideBar = true;
             this.sideBarClass = 'app-container dashboard active';
@@ -84,7 +83,6 @@ export class AppLayoutComponent implements OnInit {
             this.showSideBar = false;
             this.sideBarClass = 'app-container active';
           }
-          //this._utilService.removeLocalItems('form_', 5);
         } else if (val.url.indexOf('/dashboard') === 0) {
           if (this.toggleMenu) {
             this.showSideBar = true;
@@ -137,6 +135,8 @@ export class AppLayoutComponent implements OnInit {
           formInfo = JSON.parse(localStorage.getItem('form_3X_report_type_backup'));
       }
 
+      console.log(" formInfo = ", formInfo);
+      
       if (typeof formInfo === 'object') {
           if (formInfo.hasOwnProperty('formType')) {
             this.formType = formInfo.formType;
@@ -153,7 +153,6 @@ export class AppLayoutComponent implements OnInit {
           if (formInfo.hasOwnProperty('cvgStartDate')) {
             this.formStartDate = formInfo.cvgStartDate;
           } else if (formInfo.hasOwnProperty('cvgstartdate')) {
-
             this.formStartDate = formInfo.cvgstartdate;
           }
 
@@ -164,9 +163,9 @@ export class AppLayoutComponent implements OnInit {
           }
 
           if (formInfo.hasOwnProperty('daysUntilDue')) {
-            this.formDaysUntilDue = formInfo.daysUntilDue;
+            this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
           } else if (formInfo.hasOwnProperty('daysuntildue')) {
-            this.formDaysUntilDue = formInfo.daysuntildue;
+            this.formDaysUntilDue = Math.abs(formInfo.daysuntildue).toString();
           }
 
           if (formInfo.hasOwnProperty('dueDate')) {
@@ -177,6 +176,12 @@ export class AppLayoutComponent implements OnInit {
 
           if (formInfo.hasOwnProperty('overDue')) {
             this.reportOverDue = formInfo.overDue;
+          } else if (formInfo.hasOwnProperty('overdue')) {
+              /*if (formInfo.overdue > 0) {
+                this.reportOverDue = true;
+              }*/
+              console.log("formInfo.overdue =", formInfo.overdue);
+              this.reportOverDue = formInfo.overdue;
           }
 
           if (this._step !== 'step_1') {

@@ -74,15 +74,50 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
     "CONT_REDESIG_MEMO": ("CONT_REDESIG", "sched_b"),
 }
 
+CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT = {
+    "IK_OUT": "IK_REC" ,
+    "IK_BC_OUT": "IK_BC_REC",
+    "PARTY_IK_OUT": "PARTY_IK_REC",
+    "PARTY_IK_BC_OUT": "PARTY_IK_BC_REC",
+    "PAC_IK_OUT": "PAC_IK_REC",
+    "PAC_IK_BC_OUT": "PAC_IK_BC_REC",
+    "IK_TRAN_OUT": "IK_TRAN",
+    "IK_TRAN_FEA_OUT": "IK_TRAN_FEA"
+}
 EARMARK_SB_CHILD_LIST = [
-    "CON_EAR_OUT_DEP",
+    "CON_EAR_DEP_MEMO",
     "CON_EAR_UNDEP_MEMO",
-    "PAC_CON_EAR_DEP_OUT",
+    "PAC_CON_EAR_DEP_MEMO",
     "PAC_CON_EAR_UNDEP_MEMO",
+]
+
+# a list of treansaction types for sched_l(levin funds report) disbursments
+SCHED_L_B_TRAN_TYPES = [
+    "LEVIN_VOTER_ID",
+    "LEVIN_GOTV",
+    "LEVIN_GEN",
+    "LEVIN_OTH_DISB",
+    "LEVIN_VOTER_REG",
 ]
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
+
+# To avoid circular reference adding sched_a function
+def put_sql_schedA_from_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
+    """
+    uopdate a schedule_a item
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedA table
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier, transaction_id, report_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
+    except Exception:
+        raise
 
 
 
@@ -107,7 +142,7 @@ def check_transaction_id(transaction_id):
     make sure transaction_id start with 'SB'
     """
     try:
-        transaction_type_list = ["SB"]
+        transaction_type_list = ["SB", "LB"]
         transaction_type = transaction_id[0:2]
         if not (transaction_type in transaction_type_list):
             raise Exception(
@@ -624,7 +659,10 @@ def post_schedB(datum):
         entity_id = entity_data.get("entity_id")
         datum["entity_id"] = entity_id
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
-        trans_char = "SB"
+        if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+            trans_char = "LB" # for sched_l transactions
+        else:
+            trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
         try:
@@ -804,6 +842,17 @@ def put_schedB(datum):
                 datum.get("aggregate_amt"),
                 datum.get("beneficiary_cand_entity_id"),
             )
+            if datum.get('transaction_type_identifier') in CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT.keys():
+                transaction_data = get_list_schedA_from_schedB(datum.get("report_id"), datum.get("cmte_id"), datum.get("back_ref_transaction_id"))[0]
+                transaction_data['entity_id'] = entity_id 
+                transaction_data['contribution_date'] = datum.get('expenditure_date') 
+                transaction_data['contribution_amount'] = datum.get('expenditure_amount')
+                transaction_data['election_code'] = datum.get('election_code')
+                transaction_data['election_other_description'] = datum.get('election_other_description')
+                transaction_data['donor_cmte_id'] = datum.get('beneficiary_cmte_id')
+                transaction_data['donor_cmte_name'] = datum.get('beneficiary_cmte_name')
+                put_sql_schedA_from_schedB(transaction_data.get('cmte_id'), transaction_data.get('report_id'), transaction_data.get('line_number'), transaction_data.get('transaction_type'), transaction_data.get('transaction_id'), transaction_data.get('back_ref_transaction_id'), transaction_data.get('back_ref_sched_name'), entity_id, transaction_data.get('contribution_date'), transaction_data.get(
+                'contribution_amount'), transaction_data.get('purpose_description'), transaction_data.get('memo_code'), transaction_data.get('memo_text'), transaction_data.get('election_code'), transaction_data.get('election_other_description'), transaction_data.get('donor_cmte_id'), transaction_data.get('donor_cmte_name'), transaction_data.get('transaction_type_identifier'))
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -1166,3 +1215,48 @@ def schedB(request):
                 "The schedB API - DELETE is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+def get_list_schedA_from_schedB(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
+
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            if transaction_id:
+                if not include_deleted_trans_flag:
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                else:
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
+
+                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                            """) t""", [report_id, cmte_id, transaction_id])
+            else:
+                if not include_deleted_trans_flag:
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                else:
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
+
+                cursor.execute("""SELECT json_agg(t) FROM (""" +
+                           query_string + """) t""", [report_id, cmte_id])           
+            print(cursor.query)
+            schedA_list = cursor.fetchone()[0]
+            if not schedA_list:
+                raise NoOPError(
+                    'No transaction found for cmte_id {} and report_id {}'.format(cmte_id, report_id))
+            merged_list = []
+            for dictA in schedA_list:
+                entity_id = dictA.get('entity_id')
+                data = {
+                    'entity_id': entity_id,
+                    'cmte_id': cmte_id
+                }
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                merged_dict = {**dictA, **dictEntity}
+                merged_list.append(merged_dict)
+        return merged_list
+    except Exception:
+        raise

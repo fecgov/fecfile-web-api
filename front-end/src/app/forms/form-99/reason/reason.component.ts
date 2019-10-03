@@ -19,7 +19,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { htmlLength } from '../../../shared/utils/forms/validation/html-length.validator';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'f99-reason',
@@ -32,6 +32,7 @@ export class ReasonComponent implements OnInit {
   @ViewChild('htmlEditor') htmlEditor: ElementRef;
   @ViewChild('fileInput') fileInput: ElementRef;
 
+  public editMode: boolean;
   public frmReason: FormGroup;
   public reasonType: string = null;
   public reasonFailed: boolean = false;
@@ -54,6 +55,8 @@ export class ReasonComponent implements OnInit {
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
   public textAreaTextContent: string = '';
+  public editingTextArea: boolean = false;
+  public fileNameToDisplay: string = null;
 
   private _printPriviewPdfFileLink: string = '';
   private _form99Details: any = {};
@@ -79,20 +82,27 @@ export class ReasonComponent implements OnInit {
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
-    
+
     if (this._form99Details) {
       if (this._form99Details.text) {
         if (this._form99Details.reason) {
           this.typeSelected = this._form99Details.reason;
+          this.editingTextArea = true;
         }
         this.frmReason = this._fb.group({
           reasonText: [this._form99Details.text, [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
         });
-        this.frmReason.controls['reasonText'].setValue(this._form99Details.text);
-       } else {
+        const unescapedText = this._form99Details.text;
+        this.frmReason.controls['reasonText'].setValue(unescapedText);
+        this._reasonTextContent = unescapedText;
+        this._reasonInnerText = unescapedText;
+        this._reasonInnerHTML = unescape(unescapedText);
+        this.textAreaTextContent = unescape(unescapedText);
+        this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
+      } else {
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
@@ -108,19 +118,18 @@ export class ReasonComponent implements OnInit {
 
   ngDoCheck(): void {
     let form_99_details: any = {};
-    
+
     if (localStorage.getItem('form_99_details') !== null) {
       form_99_details = JSON.parse(localStorage.getItem('form_99_details'));
     }
 
     if (form_99_details) {
       this.typeSelected = form_99_details.reason;
-      
     }
 
     if (this.frmReason.get('reasonText').value.length >= 1) {
       let text: string = this.frmReason.get('reasonText').value;
-       this.characterCount = this._countCharacters(text);
+      this.characterCount = this._countCharacters(text);
     } else if (this.frmReason.get('reasonText').value.length === 0) {
       let text: string = this.frmReason.get('reasonText').value;
       this.characterCount = this._countCharacters(text);
@@ -141,7 +150,7 @@ export class ReasonComponent implements OnInit {
    */
   public editorChange(e): void {
     this._reasonTextContent = e.target.textContent;
-    this.textAreaTextContent = e.target.textContent;
+
     if (this._reasonTextContent.length >= 1) {
       this._reasonInnerText = e.target.innerText;
 
@@ -335,7 +344,7 @@ export class ReasonComponent implements OnInit {
   }
 
   public setFile(e): void {
-    if (e.target.files.length === 1) {
+    if (e.target.files.length === 1 && this.editMode) {
       this.file = e.target.files[0];
       if (this.file.name.includes('.pdf')) {
         let fileNameObj: any = {
@@ -583,9 +592,7 @@ export class ReasonComponent implements OnInit {
   }
 
   public printPreview() {
-
     if (this.frmReason.valid) {
-
       if (this.frmReason.get('reasonText').value.length >= 1) {
         let formSaved: boolean = JSON.parse(localStorage.getItem('form_99_saved'));
         this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
@@ -606,11 +613,9 @@ export class ReasonComponent implements OnInit {
         this.showValidateBar = false;
 
         if (this.file !== null) {
-
           this._formsService.PreviewForm_ReasonScreen({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
-
                 this._form99Details.id = res.id;
                 localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
                 // success
@@ -627,7 +632,6 @@ export class ReasonComponent implements OnInit {
             }
           );
         } else {
-
           this._formsService.PreviewForm_ReasonScreen({}, {}, this._formType).subscribe(
             res => {
               if (res) {
@@ -656,6 +660,7 @@ export class ReasonComponent implements OnInit {
       this.notValidPdf = false;
 
       this._form99Details.filename = '';
+      this.fileNameToDisplay = null;
       localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
     //this._modalService.close(modalId);
@@ -711,6 +716,7 @@ export class ReasonComponent implements OnInit {
           this.notValidPdf = false;
           this.PdfUploaded = false;
           this._form99Details.filename = '';
+          this.fileNameToDisplay = null;
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
       });

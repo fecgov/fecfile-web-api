@@ -19,15 +19,36 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    transaction_exists,
+)
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
+
 
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id']
-MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id']
+MANDATORY_FIELDS_SCHED_H1 = [
+    'cmte_id', 
+    'report_id', 
+    'transaction_id', 
+    'transaction_type_identifier',
+    'federal_percent', 
+    'non_federal_percent',
+    ]
+MANDATORY_FIELDS_SCHED_H2 = [
+    'cmte_id', 
+    'report_id', 
+    'transaction_id',
+    'transaction_type_identifier',
+    'federal_percent', 
+    'non_federal_percent',
+    ]
+MANDATORY_FIELDS_SCHED_H3 = ['cmte_id', 'report_id', 'transaction_id', 'transaction_type_identifier']
+MANDATORY_FIELDS_SCHED_H4 = ['cmte_id', 'report_id', 'transaction_id', 'transaction_type_identifier']
 MANDATORY_FIELDS_SCHED_H5 = ['cmte_id', 'report_id', 'transaction_id']
 MANDATORY_FIELDS_SCHED_H6 = ['cmte_id', 'report_id', 'transaction_id']
 
@@ -37,10 +58,852 @@ def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SH"):
         raise Exception(
             'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SH6 characters'.format(transaction_id))
+            'Transaction IDs start with SH characters'.format(transaction_id))
     return transaction_id
 
+"""
+SCHED_H1:
 
+Method of Allocation for:
+- Allocated Administrative and Generic Voter Drive Costs
+- Allocated Exempt Party Activity Costs (Party Committees Only)
+- Allocated Public Communications that Refer to any Political Party (but not
+a candidate) (Separate Segregated Funds and Nonconnected Committees
+Only) 
+"""
+
+def schedH1_sql_dict(data):
+    """
+    filter out valid fileds for sched_H1
+
+    """
+    valid_h1_fields = [
+            'line_number', 
+            'transaction_type_identifier', 
+            'transaction_type', 
+            'presidential_only', 
+            'presidential_and_senate', 
+            'senate_only', 
+            'non_pres_and_non_senate', 
+            'federal_percent', 
+            'non_federal_percent', 
+            'adminstrative'
+            'generic_voter_drive', 
+            'public_communications',
+    ]
+    try:
+        # return {k: v for k, v in data.items() if k in valid_h1_fields}
+        datum = {k: v for k, v in data.items() if k in valid_h1_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
+    except:
+        raise Exception('invalid h1 request data.')
+
+def check_mandatory_fields_SH1(data):
+    """
+    check madatroy frields for sh1
+    """
+    try:
+        errors = []
+        for field in MANDATORY_FIELDS_SCHED_H1:
+            if not(field in data and check_null_value(data.get(field))):
+                errors.append(field)
+        if errors:
+            raise Exception(
+                'The following mandatory fields are required in order to save data to schedH1 table: {}'.format(','.join(errors)))
+    except:
+        raise
+
+def put_sql_schedH1(data):
+    """
+    sql and db_transaction for update sched_h1 item
+    """
+    _sql = """UPDATE public.sched_h1
+                SET 
+                line_number = %s, 
+                transaction_type_identifier = %s, 
+                transaction_type = %s, 
+                presidential_only = %s, 
+                presidential_and_senate = %s, 
+                senate_only = %s, 
+                non_pres_and_non_senate = %s, 
+                federal_percent = %s, 
+                non_federal_percent = %s, 
+                adminstrative = %s,
+                generic_voter_drive = %s, 
+                public_communications = %s,
+                last_update_date = %s
+              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              AND delete_ind is distinct from 'Y';
+        """
+    _v = (  
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('presidential_only'),
+            data.get('presidential_and_senate'),
+            data.get('senate_only'),
+            data.get('non_pres_and_non_senate'),
+            data.get('federal_percent'),
+            data.get('non_federal_percent'),
+            data.get('adminstrative'),
+            data.get('generic_voter_drive'),
+            data.get('public_communications'),
+            datetime.datetime.now(),
+            data.get('transaction_id'),
+            data.get('report_id'),
+            data.get('cmte_id'),
+         )
+    do_transaction(_sql, _v)
+
+
+def put_schedH1(data):
+    """
+    save/update a sched_h1 item
+
+    here we are assuming entity_id are always referencing something already in our DB
+    """
+    try:
+        check_mandatory_fields_SH1(data)
+        #check_transaction_id(data.get('transaction_id'))
+        try:
+            put_sql_schedH1(data)
+        except Exception as e:
+            raise Exception(
+                'The put_sql_schedH3 function is throwing an error: ' + str(e))
+        return data
+    except:
+        raise
+    
+def validate_federal_nonfed_ratio(data):
+    """
+    validate fed and non_fed ratio add up:
+    fed + non_fed == 100%
+    e.g.
+    0.45 + 0.55 == 1.00
+    """
+    if not (
+        (float(data.get('federal_percent')) +
+        float(data.get('non_federal_percent')) == float(1))
+    ):
+        raise Exception('Error: combined federal and non-federal value should be 100%.')
+
+def validate_sh1_data(data):
+    """
+    validate sh1 request data for db transaction
+    """
+    check_mandatory_fields_SH1(data)
+    validate_federal_nonfed_ratio(data)
+
+def post_sql_schedH1(data):
+    """
+    save a new sched_h1 item
+    """
+    try:
+        _sql = """
+        INSERT INTO public.sched_h1 (
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            presidential_only, 
+            presidential_and_senate, 
+            senate_only, 
+            non_pres_and_non_senate, 
+            federal_percent, 
+            non_federal_percent, 
+            adminstrative,
+            generic_voter_drive, 
+            public_communications,
+            create_date
+            )
+        VALUES ({}); 
+        """.format(','.join(['%s']*16))
+        _v = (
+            data.get('cmte_id'),
+            data.get('report_id'),
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('transaction_id'),
+            data.get('presidential_only'),
+            data.get('presidential_and_senate'),
+            data.get('senate_only'),
+            data.get('non_pres_and_non_senate'),
+            data.get('federal_percent'),
+            data.get('non_federal_percent'),
+            data.get('adminstrative'),
+            data.get('generic_voter_drive'),
+            data.get('public_communications'),
+            datetime.datetime.now(),   
+         )
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute(_sql, _v)
+    except Exception:
+        raise
+
+def post_schedH1(data):
+    """
+    save a new sched_h1 item
+    """ 
+    try:
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        data['transaction_id'] = get_next_transaction_id('SH')
+        validate_sh1_data(data)
+        try:
+            post_sql_schedH1(data)
+        except Exception as e:
+            raise Exception(
+                'The post_sql_schedH1 function is throwing an error: ' + str(e))
+        return data
+    except:
+        raise
+
+def get_schedH1(data):
+    """
+    load sched_h1 items
+    """
+ 
+    try:
+        cmte_id = data.get('cmte_id')
+        report_id = data.get('report_id')
+        if 'transaction_id' in data:
+            transaction_id = check_transaction_id(data.get('transaction_id'))
+            forms_obj = get_list_schedH1(report_id, cmte_id, transaction_id)
+        else:
+            forms_obj = get_list_all_schedH1(report_id, cmte_id)
+        return forms_obj
+    except:
+        raise
+
+
+def get_list_all_schedH1(report_id, cmte_id):
+    """
+    load all transactions for a report
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            presidential_only, 
+            presidential_and_senate, 
+            senate_only, 
+            non_pres_and_non_senate, 
+            federal_percent, 
+            non_federal_percent, 
+            adminstrative,
+            generic_voter_drive, 
+            public_communications,
+            create_date ,
+            last_update_date
+            FROM public.sched_h1
+            WHERE report_id = %s AND cmte_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            schedH1_list = cursor.fetchone()[0]
+            if schedH1_list is None:
+                raise NoOPError('No sched_H1 transaction found for report_id {} and cmte_id: {}'.format(
+                    report_id, cmte_id))
+            merged_list = []
+            for dictH1 in schedH1_list:
+                merged_list.append(dictH1)
+        return merged_list
+    except Exception:
+        raise
+
+
+def get_list_schedH1(report_id, cmte_id, transaction_id):
+    """
+    load one transaction
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedH3 table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            presidential_only, 
+            presidential_and_senate, 
+            senate_only, 
+            non_pres_and_non_senate, 
+            federal_percent, 
+            non_federal_percent, 
+            adminstrative,
+            generic_voter_drive, 
+            public_communications,
+            create_date ,
+            last_update_date
+            FROM public.sched_h1
+            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedH1_list = cursor.fetchone()[0]
+            if schedH1_list is None:
+                raise NoOPError('No sched_H1 transaction found for transaction_id {}'.format(
+                    transaction_id))
+            merged_list = []
+            for dictH1 in schedH1_list:
+                merged_list.append(dictH1)
+        return merged_list
+    except Exception:
+        raise
+
+
+
+def delete_sql_schedH1(cmte_id, report_id, transaction_id):
+    """
+    do delete sql transaction
+    """
+    _sql = """
+    UPDATE public.sched_h1
+    SET delete_ind = 'Y' 
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+    """
+    _v = (transaction_id, report_id, cmte_id)
+    do_transaction(_sql, _v)
+
+
+def delete_schedH1(data):
+    """
+    function for handling delete request for sh1
+    """
+    try:
+        delete_sql_schedH1(data.get('cmte_id'), data.get(
+            'report_id'), data.get('transaction_id'))
+    except Exception as e:
+        raise
+
+@api_view(['POST', 'GET', 'DELETE', 'PUT'])
+def schedH1(request):
+    
+    if request.method == 'POST':
+        try:
+            cmte_id = request.user.username
+            if not('report_id' in request.data):
+                raise Exception('Missing Input: Report_id is mandatory')
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get('report_id'))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get('report_id'))
+            # end of handling
+            datum = schedH1_sql_dict(request.data)
+            datum['report_id'] = report_id
+            datum['cmte_id'] = cmte_id
+
+            if 'transaction_id' in request.data and check_null_value(
+                    request.data.get('transaction_id')):
+                datum['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+                data = put_schedH1(datum)
+            else:
+                print(datum)
+                data = post_schedH1(datum)
+            # Associating child transactions to parent and storing them to DB
+
+            output = get_schedH1(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The schedH1 API - POST is throwing an exception: "
+                            + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'GET':
+        try:
+            data = {
+                'cmte_id': request.user.username
+            }
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+                data['report_id'] = check_report_id(
+                    request.data.get('report_id'))
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                data['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+            datum = get_schedH1(data)
+            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The schedH1 API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        try:
+            data = {
+                'cmte_id': request.user.username
+            }
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+                data['report_id'] = check_report_id(
+                    request.data.get('report_id'))
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                data['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
+            delete_schedH1(data)
+            return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')), status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The schedH1 API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        try:
+            datum = schedH1_sql_dict(request.data)
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                datum['transaction_id'] = request.data.get('transaction_id')
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
+
+            if not('report_id' in request.data):
+                raise Exception('Missing Input: Report_id is mandatory')
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get('report_id'))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get('report_id'))
+            # end of handling
+            datum['report_id'] = report_id
+            datum['cmte_id'] = request.user.username
+
+            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+            #     datum['entity_id'] = request.data.get('entity_id')
+            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+            #     data = put_schedB(datum)
+            #     output = get_schedB(data)
+            # else:
+            data = put_schedH1(datum)
+            # output = get_schedA(data)
+            return JsonResponse(data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The schedH1 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        raise NotImplementedError
+
+
+
+"""
+SCHED_H2:
+Ratios for Allocable Fundraising Events and Direct Candidate Support 
+"""
+
+def schedH2_sql_dict(data):
+    """
+    filter out valid fileds for sched_H1
+    """
+    valid_h2_fields = [
+        # "line_number",
+        "transaction_type_identifier",
+        # "transaction_type",
+        "activity_event_name",
+        "fundraising",
+        "direct_cand_support",
+        "ratio_code",
+        "federal_percent",
+        "non_federal_percent",
+    ]
+    try:
+        # return {k: v for k, v in data.items() if k in valid_h2_fields}
+        datum = {k: v for k, v in data.items() if k in valid_h2_fields}
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
+    except:
+        raise Exception('invalid h2 request data.')
+
+def check_mandatory_fields_SH2(data):
+    """
+    check madatroy frields for sh1
+    """
+    try:
+        errors = []
+        for field in MANDATORY_FIELDS_SCHED_H2:
+            if not(field in data and check_null_value(data.get(field))):
+                errors.append(field)
+        if errors:
+            raise Exception(
+                'The following mandatory fields are required in order to save data to schedH2 table: {}'.format(','.join(errors)))
+    except:
+        raise
+
+def put_sql_schedH2(data):
+    """
+    sql and db_transaction for update sched_h1 item
+    """
+    _sql = """UPDATE public.sched_h2
+            SET 
+                line_number = %s, 
+                transaction_type_identifier = %s, 
+                transaction_type = %s,
+                activity_event_name = %s,
+                fundraising = %s,
+                direct_cand_support = %s,
+                ratio_code = %s,
+                federal_percent = %s,
+                non_federal_percent = %s,
+                last_update_date = %s
+            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+            AND delete_ind is distinct from 'Y';
+        """
+    _v = (  
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('activity_event_name'),
+            data.get('fundraising'),
+            data.get('direct_cand_support'),
+            data.get('ratio_code'),
+            data.get('federal_percent'),
+            data.get('non_federal_percent'),
+            datetime.datetime.now(),
+            data.get('transaction_id'),
+            data.get('report_id'),
+            data.get('cmte_id'),
+         )
+    do_transaction(_sql, _v)
+
+
+def put_schedH2(data):
+    """
+    save/update a sched_h2 item
+
+    here we are assuming entity_id are always 
+    referencing something already in our DB
+    """
+    try:
+        # check_mandatory_fields_SH2(data)
+        validate_sh2_data(data)
+        #check_transaction_id(data.get('transaction_id'))
+        try:
+            put_sql_schedH2(data)
+        except Exception as e:
+            raise Exception(
+                'The put_sql_schedH2 function is throwing an error: ' + str(e))
+        return data
+    except:
+        raise
+    
+def validate_sh2_data(data):
+    """
+    validate sh1 request data for db transaction
+    """
+    check_mandatory_fields_SH2(data)
+    validate_federal_nonfed_ratio(data)
+
+def post_sql_schedH2(data):
+    """
+    save a new sched_h1 item
+    """
+    try:
+        _sql = """
+        INSERT INTO public.sched_h2 (
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            activity_event_name,
+            fundraising,
+            direct_cand_support,
+            ratio_code,
+            federal_percent,
+            non_federal_percent,
+            create_date
+            )
+        VALUES ({}); 
+        """.format(','.join(['%s']*13))
+        _v = (
+            data.get('cmte_id'),
+            data.get('report_id'),
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('transaction_id'),
+            data.get('activity_event_name'),
+            data.get('fundraising'),
+            data.get('direct_cand_support'),
+            data.get('ratio_code'),
+            data.get('federal_percent'),
+            data.get('non_federal_percent'),
+            datetime.datetime.now() 
+         )
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute(_sql, _v)
+    except Exception:
+        raise
+
+def post_schedH2(data):
+    """
+    save a new sched_h1 item
+    """ 
+    try:
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        data['transaction_id'] = get_next_transaction_id('SH')
+        validate_sh2_data(data)
+        try:
+            post_sql_schedH2(data)
+        except Exception as e:
+            raise Exception(
+                'The post_sql_schedH2 function is throwing an error: ' + str(e))
+        return data
+    except:
+        raise
+
+def get_schedH2(data):
+    """
+    load sched_h1 items
+    """
+ 
+    try:
+        cmte_id = data.get('cmte_id')
+        report_id = data.get('report_id')
+        if 'transaction_id' in data:
+            transaction_id = check_transaction_id(data.get('transaction_id'))
+            forms_obj = get_list_schedH2(report_id, cmte_id, transaction_id)
+        else:
+            forms_obj = get_list_all_schedH2(report_id, cmte_id)
+        return forms_obj
+    except:
+        raise
+
+
+def get_list_all_schedH2(report_id, cmte_id):
+    """
+    load all transactions for a report
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            activity_event_name,
+            fundraising,
+            direct_cand_support,
+            ratio_code,
+            federal_percent,
+            non_federal_percent,
+            create_date ,
+            last_update_date
+            FROM public.sched_h2
+            WHERE report_id = %s AND cmte_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            schedH_list = cursor.fetchone()[0]
+            if schedH_list is None:
+                raise NoOPError('No sched_H2 transaction found for report_id {} and cmte_id: {}'.format(
+                    report_id, cmte_id))
+            merged_list = []
+            for dictH in schedH_list:
+                merged_list.append(dictH)
+        return merged_list
+    except Exception:
+        raise
+
+
+def get_list_schedH2(report_id, cmte_id, transaction_id):
+    """
+    load one transaction
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedH3 table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            activity_event_name,
+            fundraising,
+            direct_cand_support,
+            ratio_code,
+            federal_percent,
+            non_federal_percent,
+            create_date ,
+            last_update_date
+            FROM public.sched_h2
+            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedH_list = cursor.fetchone()[0]
+            if schedH_list is None:
+                raise NoOPError('No sched_H2 transaction found for transaction_id {}'.format(
+                    transaction_id))
+            merged_list = []
+            for dictH in schedH_list:
+                merged_list.append(dictH)
+        return merged_list
+    except Exception:
+        raise
+
+
+
+def delete_sql_schedH2(cmte_id, report_id, transaction_id):
+    """
+    do delete sql transaction
+    """
+    _sql = """
+    UPDATE public.sched_h2
+    SET delete_ind = 'Y' 
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+    """
+    _v = (transaction_id, report_id, cmte_id)
+    do_transaction(_sql, _v)
+
+
+def delete_schedH2(data):
+    """
+    function for handling delete request for sh1
+    """
+    try:
+        delete_sql_schedH2(data.get('cmte_id'), data.get(
+            'report_id'), data.get('transaction_id'))
+    except Exception as e:
+        raise
+
+@api_view(['POST', 'GET', 'DELETE', 'PUT'])
+def schedH2(request):
+    
+    if request.method == 'POST':
+        try:
+            cmte_id = request.user.username
+            if not('report_id' in request.data):
+                raise Exception('Missing Input: Report_id is mandatory')
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get('report_id'))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get('report_id'))
+            # end of handling
+            datum = schedH2_sql_dict(request.data)
+            datum['report_id'] = report_id
+            datum['cmte_id'] = cmte_id
+
+            if 'transaction_id' in request.data and check_null_value(
+                    request.data.get('transaction_id')):
+                datum['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+                data = put_schedH2(datum)
+            else:
+                print(datum)
+                data = post_schedH2(datum)
+            # Associating child transactions to parent and storing them to DB
+
+            output = get_schedH2(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The schedH2 API - POST is throwing an exception: "
+                            + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'GET':
+        try:
+            data = {
+                'cmte_id': request.user.username
+            }
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+                data['report_id'] = check_report_id(
+                    request.data.get('report_id'))
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                data['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+            datum = get_schedH2(data)
+            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The schedH2 API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        try:
+            data = {
+                'cmte_id': request.user.username
+            }
+            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+                data['report_id'] = check_report_id(
+                    request.data.get('report_id'))
+            else:
+                raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                data['transaction_id'] = check_transaction_id(
+                    request.data.get('transaction_id'))
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
+            delete_schedH2(data)
+            return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')), status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response("The schedH2 API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PUT':
+        try:
+            datum = schedH2_sql_dict(request.data)
+            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+                datum['transaction_id'] = request.data.get('transaction_id')
+            else:
+                raise Exception('Missing Input: transaction_id is mandatory')
+
+            if not('report_id' in request.data):
+                raise Exception('Missing Input: Report_id is mandatory')
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get('report_id'))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get('report_id'))
+            # end of handling
+            datum['report_id'] = report_id
+            datum['cmte_id'] = request.user.username
+
+            data = put_schedH2(datum)
+            return JsonResponse(data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The schedH2 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        raise NotImplementedError
+
+
+"""
+************************************************************************
+SCHED_H3
+Transfers from Nonfederal Accounts for Allocated Federal/Nonfederal Activity
+***********************************************************************
+"""
 def check_mandatory_fields_SH3(data):
     """
     validate mandatory fields for sched_H3 item
@@ -339,6 +1202,41 @@ def delete_schedH3(data):
     except Exception as e:
         raise
 
+@api_view(['GET'])
+def get_sched_h3_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+    SELECT activity_event_type, sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y'
+    GROUP BY activity_event_type
+    union 
+	SELECT 'total', sum(total_amount_transferred) 
+    FROM public.sched_h3 
+    WHERE report_id = %s 
+    AND cmte_id = %s
+    AND delete_ind is distinct from 'Y') t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
+        
+
+        
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
@@ -454,8 +1352,18 @@ def schedH3(request):
 """
 ************************************************* CRUD API FOR SCHEDULE_H4 ********************************************************************************
 
-"""
+Disbursements for Allocated Federal/Nonfederal Activity
+some check points:
+1. when h4 activity is submitted, make sure an h1 or h2 is there to calcualte 
+   the fed and non-fed amount
+2. when a memo transaction is submitted, need to verify the parent transaction exist
 
+"""
+SCHED_H4_CHILD_TRANSACTIONS = [
+    'ALLOC_EXP_CC_PAY_MEMO',
+    'ALLOC_EXP_STAF_REIM_MEMO',
+    'ALLOC_EXP_PMT_TO_PROL_MEMO'
+]
 
 def check_mandatory_fields_SH4(data):
     """
@@ -548,21 +1456,21 @@ def put_sql_schedH4(data):
         """
     _v = (  
            
-            data.get('transaction_type_identifier', ''),
-            data.get('back_ref_transaction_id ', ''),
-            data.get('back_ref_sched_name ', ''),
-            data.get('payee_entity_id ', ''),
-            data.get('activity_event_identifier ', ''),
-            data.get('expenditure_date ', None),
-            data.get('fed_share_amount ', None),
-            data.get('non_fed_share_amount ', None),
-            data.get('total_amount ', None),
-            data.get('activity_event_amount_ytd ', None),
-            data.get('purpose ', ''),
-            data.get('category_code ', ''),
-            data.get('activity_event_type ', ''),
-            data.get('memo_code ', ''),
-            data.get('memo_text ', ''),
+            data.get('transaction_type_identifier'),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('payee_entity_id'),
+            data.get('activity_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('fed_share_amount'),
+            data.get('non_fed_share_amount'),
+            data.get('total_amount'),
+            data.get('activity_event_amount_ytd'),
+            data.get('purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -571,11 +1479,115 @@ def put_sql_schedH4(data):
     do_transaction(_sql, _v)
 
 
+def validate_parent_transaction_exist(data):
+    """
+    validate parent transaction exsit if saving a child transaction
+    """
+    # if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
+    if not data.get("back_ref_transaction_id"):
+        raise Exception("Error: parent transaction id missing.")
+    elif not transaction_exists(
+        data.get("back_ref_transaction_id"), "sched_h4"
+    ):
+        raise Exception("Error: parent transaction not found.")
+    else:
+        pass
+
+def validate_fed_nonfed_share(data):
+    if (float(data.get('fed_share_amount')) + 
+        float(data.get('non_fed_share_amount')) != float(data.get('total_amount'))):
+        raise Exception('Error: fed_amount and non_fed_amount should sum to total amount.')
+
 def validate_sh4_data(data):
     """
     validate sH4 json data
     """
     check_mandatory_fields_SH4(data)
+    validate_fed_nonfed_share(data)
+    if data.get("transaction_type_identifier") in SCHED_H4_CHILD_TRANSACTIONS:
+        validate_parent_transaction_exist(data)
+
+
+def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte_id):
+    """
+    load all transactions with the specified activity event type
+    need to check
+    """
+    logger.debug('load ttransactionsransactions with activity_event_type:{}'.format(activity_event_type))
+    # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
+    # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
+    _sql = """
+            SELECT t1.total_amount, 
+                t1.transaction_id
+            FROM public.sched_h4 t1 
+            WHERE activity_event_type = %s 
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s 
+            AND back_ref_transaction_id is null
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+    """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_event_type, cmte_id, start_dt, end_dt))
+            # , [
+            #         activity_event_type, 
+            #         cmte_id, 
+            #         start_dt, 
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug('transaction fetched:{}'.format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            'The list_all_transactions_event_type function is throwing an error: ' + str(e))
+
+
+def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
+
+    """
+    update h4 ytd amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """ UPDATE public.sched_h4
+                    SET activity_event_amount_ytd = %s 
+                    WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+                    """,
+                    [aggregate_amount, transaction_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'Error: The Transaction ID: {} does not exist in schedH4 table'.format(transaction_id))
+    except Exception:
+        raise    
+
+def update_activity_event_amount_ytd(data):
+    """
+    aggregate and update 'activity_event_amount_ytd' for all h4 transactions
+    """
+    try:
+
+        logger.debug('updating ytd amount:')
+        # make sure transaction list comes back sorted by contribution_date ASC
+        expenditure_dt = date_format(data.get('expenditure_date'))
+        aggregate_start_date = datetime.date(expenditure_dt.year, 1, 1)
+        aggregate_end_date = datetime.date(expenditure_dt.year, 12, 31)
+        transactions_list = list_all_transactions_event_type(
+            aggregate_start_date, aggregate_end_date, data.get('activity_event_type'), data.get('cmte_id'))
+        aggregate_amount = 0
+        for transaction in transactions_list:
+            aggregate_amount += transaction[0]
+            transaction_id = transaction[1]
+            update_transaction_ytd_amount(data.get('cmte_id'), transaction_id, aggregate_amount)
+
+    except Exception as e:
+        raise Exception(
+            'The update_activity_event_amount_ytd function is throwing an error: ' + str(e))
 
 
 def post_schedH4(data):
@@ -588,10 +1600,11 @@ def post_schedH4(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_H4)
         data['transaction_id'] = get_next_transaction_id('SH4')
-        print(data)
+        logger.debug('saving a new h4 transaction with data:{}'.format(data))
         validate_sh4_data(data)
         try:
             post_sql_schedH4(data)
+            update_activity_event_amount_ytd(data)
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH4 function is throwing an error: ' + str(e))
@@ -630,22 +1643,22 @@ def post_sql_schedH4(data):
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('transaction_type_identifier', ''),
+            data.get('transaction_type_identifier'),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id ', ''),
-            data.get('back_ref_sched_name ', ''),
-            data.get('payee_entity_id ', ''),
-            data.get('activity_event_identifier ', ''),
-            data.get('expenditure_date ', None),
-            data.get('fed_share_amount ', None),
-            data.get('non_fed_share_amount ', None),
-            data.get('total_amount ', None),
-            data.get('activity_event_amount_ytd ', None),
-            data.get('purpose ', ''),
-            data.get('category_code ', ''),
-            data.get('activity_event_type ', ''),
-            data.get('memo_code ', ''),
-            data.get('memo_text ', ''),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('payee_entity_id'),
+            data.get('activity_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('fed_share_amount'),
+            data.get('non_fed_share_amount'),
+            data.get('total_amount'),
+            data.get('activity_event_amount_ytd'),
+            data.get('purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             datetime.datetime.now(),  
          )
@@ -1193,6 +2206,38 @@ def delete_schedH5(data):
         raise
 
 
+@api_view(['GET'])
+def get_sched_h5_breakdown(request):
+    _sql = """
+    SELECT json_agg(t) FROM(
+        select sum(total_amount_transferred) as total,
+        sum(voter_id_amount) as viter_id,
+        sum(voter_registration_amount) as voter_registration,
+        sum(gotv_amount) as gotv,
+        sum(generic_campaign_amount) as generic_campaign
+        from public.sched_h5
+        where report_id = %s
+        and cmte_id = %s
+        and delete_ind is distinct from 'Y'
+    ) t
+    """
+    try:
+        cmte_id = request.user.username
+        if not('report_id' in request.data):
+            raise Exception('Missing Input: Report_id is mandatory')
+        # handling null,none value of report_id
+        if not (check_null_value(request.data.get('report_id'))):
+            report_id = "0"
+        else:
+            report_id = check_report_id(request.data.get('report_id'))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [report_id, cmte_id])
+            result = cursor.fetchone()[0]
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('Error on fetching h3 break down')
+
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH5(request):
     
@@ -1369,6 +2414,7 @@ def put_schedH6(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH6(data)
+            update_activity_event_amount_ytd_h6(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH6 function is throwing an error: ' + str(e))
@@ -1407,22 +2453,22 @@ def put_sql_schedH6(data):
         """
     _v = (  
             data.get('line_number'),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_type', ''),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('entity_id', ''),
-            data.get('account_event_identifier', ''),
-            data.get('expenditure_date', None),
-            data.get('total_fed_levin_amount', None),
-            data.get('federal_share', None),
-            data.get('levin_share', None),
-            data.get('activity_event_total_ytd', None),
-            data.get('expenditure_purpose', ''),
-            data.get('category_code', ''),
-            data.get('activity_event_type', ''),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('entity_id'),
+            data.get('account_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('total_fed_levin_amount'),
+            data.get('federal_share'),
+            data.get('levin_share'),
+            data.get('activity_event_total_ytd'),
+            data.get('expenditure_purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1470,24 +2516,24 @@ def post_sql_schedH6(data):
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('line_number',''),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_type', ''),
+            data.get('line_number'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_type'),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('entity_id', ''),
-            data.get('account_event_identifier', ''),
-            data.get('expenditure_date', None),
-            data.get('total_fed_levin_amount', None),
-            data.get('federal_share', None),
-            data.get('levin_share', None),
-            data.get('activity_event_total_ytd', None),
-            data.get('expenditure_purpose', ''),
-            data.get('category_code', ''),
-            data.get('activity_event_type', ''),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('entity_id'),
+            data.get('account_event_identifier'),
+            data.get('expenditure_date'),
+            data.get('total_fed_levin_amount'),
+            data.get('federal_share'),
+            data.get('levin_share'),
+            data.get('activity_event_total_ytd'),
+            data.get('expenditure_purpose'),
+            data.get('category_code'),
+            data.get('activity_event_type'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             datetime.datetime.now()
          )
@@ -1497,6 +2543,85 @@ def post_sql_schedH6(data):
     except Exception:
         raise
 
+def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, cmte_id):
+    """
+    load all transactions with the specified activity event type
+    need to check
+    """
+    logger.debug('load transactions with activity_event_type:{}'.format(activity_event_type))
+    # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
+    # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
+    _sql = """
+            SELECT t1.total_fed_levin_amount, 
+                t1.transaction_id
+            FROM public.sched_h6 t1 
+            WHERE activity_event_type = %s 
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s 
+            AND back_ref_transaction_id is null
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+    """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    # logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_event_type, cmte_id, start_dt, end_dt))
+            # , [
+            #         activity_event_type, 
+            #         cmte_id, 
+            #         start_dt, 
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug('transaction fetched:{}'.format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            'The list_all_transactions_event_type function is throwing an error: ' + str(e))
+
+
+def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
+
+    """
+    update h4 ytd amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """ UPDATE public.sched_h6
+                    SET activity_event_total_ytd = %s 
+                    WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+                    """,
+                    [aggregate_amount, transaction_id, cmte_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'Error: The Transaction ID: {} does not exist in sched_h6 table'.format(transaction_id))
+    except Exception:
+        raise    
+
+def update_activity_event_amount_ytd_h6(data):
+    """
+    aggregate and update 'activity_event_amount_ytd' for all h6 transactions
+    """
+    try:
+
+        logger.debug('updating ytd amount h6:')
+        # make sure transaction list comes back sorted by contribution_date ASC
+        expenditure_dt = date_format(data.get('expenditure_date'))
+        aggregate_start_date = datetime.date(expenditure_dt.year, 1, 1)
+        aggregate_end_date = datetime.date(expenditure_dt.year, 12, 31)
+        transactions_list = list_all_transactions_event_type_h6(
+            aggregate_start_date, aggregate_end_date, data.get('activity_event_type'), data.get('cmte_id'))
+        aggregate_amount = 0
+        for transaction in transactions_list:
+            aggregate_amount += transaction[0]
+            transaction_id = transaction[1]
+            update_transaction_ytd_amount_h6(data.get('cmte_id'), transaction_id, aggregate_amount)
+    except Exception as e:
+        raise Exception(
+            'The update_activity_event_amount_ytd function is throwing an error: ' + str(e))
 
 def post_schedH6(data):
     """
@@ -1512,6 +2637,7 @@ def post_schedH6(data):
         validate_sh6_data(data)
         try:
             post_sql_schedH6(data)
+            update_activity_event_amount_ytd_h6(data)
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH6 function is throwing an error: ' + str(e))

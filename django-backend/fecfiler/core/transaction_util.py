@@ -1,7 +1,11 @@
+import logging
 from functools import lru_cache
 from django.db import connection
 
 from fecfiler.core.views import get_entities, NoOPError
+
+
+logger = logging.getLogger(__name__)
 
 
 def update_parent_purpose(data):
@@ -11,11 +15,20 @@ def update_parent_purpose(data):
     the child entity_name should be update in parents 
     'purpose_description' field
     """
+    desc_start = {
+        "EAR_REC_CONVEN_ACC_MEMO": "Earmarked for Convention Account ",
+        "EAR_REC_HQ_ACC_MEMO": "Earmarked for Headquarters Account ",
+        "EAR_REC_RECNT_ACC_MEMO": "Earmarked for Recount Account ",
+    }
     parent_tran_id = data.get("back_ref_transaction_id")
     cmte_id = data.get("cmte_id")
     report_id = data.get("report_id")
     entity_name = data.get("entity_name")
-    purpose = "Earmark for " + entity_name
+    tran_type = data.get("transaction_type_identifier")
+    if tran_type in desc_start:
+        purpose = desc_start.get(tran_type) + entity_name
+    else:
+        purpose = "Earmarked for " + entity_name
     _sql = """
     UPDATE public.sched_a 
     SET purpose_description = %s 
@@ -25,6 +38,11 @@ def update_parent_purpose(data):
     try:
         with connection.cursor() as cursor:
             # Insert data into schedA table
+            logger.debug("update parent purpose with sql:{}".format(_sql))
+            logger.debug(
+                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+            )
+            # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
             if cursor.rowcount == 0:
                 raise Exception(
@@ -100,6 +118,8 @@ def get_line_number_trans_type(transaction_type_identifier):
             list_value = trans_dic.get(transaction_type_identifier)
             line_number = list_value[0]
             transaction_type = list_value[1]
+            if transaction_type is None:
+                transaction_type = 0
             return line_number, transaction_type
         else:
             raise Exception(
@@ -201,18 +221,11 @@ def get_sched_b_transactions(
                                         semi_annual_refund_bundled_amount, expenditure_purpose, 
                                         category_code, memo_code, memo_text, election_code, 
                                         election_other_description, beneficiary_cmte_id, 
-                                        beneficiary_cand_id, other_name, other_street_1, 
+                                        other_name, other_street_1, 
                                         other_street_2, other_city, other_state, other_zip, 
                                         nc_soft_account, transaction_type_identifier, 
-                                        beneficiary_cand_office,
-                                        beneficiary_cand_state,
-                                        beneficiary_cand_district,
                                         beneficiary_cmte_name,
-                                        beneficiary_cand_last_name,
-                                        beneficiary_cand_first_name,
-                                        beneficiary_cand_middle_name,
-                                        beneficiary_cand_prefix,
-                                        beneficiary_cand_suffix,
+                                        beneficiary_cand_entity_id,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id = %s 
@@ -229,17 +242,10 @@ def get_sched_b_transactions(
                 SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                         back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
                         expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
-                        beneficiary_cand_office,
-                        beneficiary_cand_state,
-                        beneficiary_cand_district,
                         beneficiary_cmte_name,
-                        beneficiary_cand_last_name,
-                        beneficiary_cand_first_name,
-                        beneficiary_cand_middle_name,
-                        beneficiary_cand_prefix,
-                        beneficiary_cand_suffix,
+                        beneficiary_cand_entity_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -257,17 +263,10 @@ def get_sched_b_transactions(
                 SELECT  cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                         back_ref_sched_name, entity_id, expenditure_date, expenditure_amount, semi_annual_refund_bundled_amount, 
                         expenditure_purpose, category_code, memo_code, memo_text, election_code, election_other_description, 
-                        beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, other_street_2, other_city, 
+                        beneficiary_cmte_id, other_name, other_street_1, other_street_2, other_city, 
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
-                        beneficiary_cand_office,
-                        beneficiary_cand_state,
-                        beneficiary_cand_district,
                         beneficiary_cmte_name,
-                        beneficiary_cand_last_name,
-                        beneficiary_cand_first_name,
-                        beneficiary_cand_middle_name,
-                        beneficiary_cand_prefix,
-                        beneficiary_cand_suffix,
+                        beneficiary_cand_entity_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -282,6 +281,26 @@ def get_sched_b_transactions(
             return post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id)
     except Exception:
         raise
+
+
+def candify_it(cand_json):
+    """
+    a helper function to add 'cand_' to cand_entity fields
+    """
+    candify_item = {}
+    for _f in cand_json:
+        if _f == "entity_id":
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+        elif _f == "ref_cand_cmte_id":
+            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
+            candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
+        elif _f in ["occupation", "employer"]:
+            continue
+        elif not _f.startswith("cand"):
+            candify_item["cand_" + _f] = cand_json.get(_f)
+        else:
+            candify_item[_f] = cand_json.get(_f)
+    return candify_item
 
 
 def post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id):
@@ -309,6 +328,15 @@ def post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id):
 
         entity_list = get_entities(data)
         dictEntity = entity_list[0]
-        merged_dict = {**item, **dictEntity}
+        cand_entity = {}
+        if item.get("beneficiary_cand_entity_id"):
+            cand_data = {
+                "entity_id": item.get("beneficiary_cand_entity_id"),
+                "cmte_id": cmte_id,
+            }
+            cand_entity = get_entities(cand_data)[0]
+            cand_entity = candify_it(cand_entity)
+
+        merged_dict = {**item, **dictEntity, **cand_entity}
         merged_list.append(merged_dict)
     return merged_list

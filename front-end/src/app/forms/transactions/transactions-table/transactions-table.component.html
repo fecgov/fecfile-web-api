@@ -100,7 +100,7 @@
           <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.TransactionId}}</td>
           <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" 
               (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''" *ngIf="isColumnVisible('name')">{{trx.name}}
-              <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-bottom' : 'arrow-top'"></div>
+              <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
           </td>
           <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
@@ -154,7 +154,7 @@
           <td style="padding-left: 1.5rem;">
             <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>

@@ -139,8 +139,15 @@ export class TypeComponent implements OnInit {
       }*/
     } else {
       this._dialogService
-        .confirm('This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent, 'Warning')
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
         .then(res => {
           if (res === 'okay') {
             this._setForm();

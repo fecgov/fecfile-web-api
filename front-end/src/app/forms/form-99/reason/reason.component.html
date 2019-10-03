@@ -259,8 +259,8 @@
                   </span>
                 </button>
               </div>
-              <div class="editor" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
-                  role="textarea" [textContent]="textAreaTextContent" (input)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor> 
+              <div class="editor full-width-textarea" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
+                  role="textarea" (input)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor> {{editingTextArea ? textAreaTextContent : null}}
               </div>
             </div>
           </div>
@@ -312,14 +312,14 @@
                 <span class="sr-only">Click here for more information</span>
               </button>
             </label>
-            <div class="file-upload-container border-bottom" *ngIf="file === null">
+            <div class="file-upload-container border-bottom" *ngIf="file === null && fileNameToDisplay === null">
               <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
             </div>
-            <div class="file-attached-container" *ngIf="file !== null">
+            <div class="file-attached-container" *ngIf="file !== null || fileNameToDisplay !== null">
               <div class="grid-row">
                 <div class="grid-row__col grid-row__col--12">
                   <h5>
-                    {{ file.name }}
+                    {{ file ? file.name : fileNameToDisplay }}
                     <!--<button type="button" class="btn btn-link" (click)="open(deletePDF)">-->
                     <button type="button" class="btn btn-link" (click)="deletePDFFile()">
                     <span vertical-align="top" class="close-icon"></span>

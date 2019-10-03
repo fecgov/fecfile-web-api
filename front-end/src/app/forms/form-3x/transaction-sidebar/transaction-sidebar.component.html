@@ -92,7 +92,7 @@
           class="btn btn-secondary-gray"
           (click)="viewSummary()"
           [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'financial_summary' }"
+          [queryParams]="{ step: 'financial_summary', edit: editMode }"
         >
           Summary
         </button> 
@@ -101,7 +101,7 @@
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row signAndSubmit">
-          <button id ="sidebar_signBtn" type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']">
+          <button id ="sidebar_signBtn" type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']" [queryParams]="{edit: editMode}">
             Sign &amp; Submit
           </button>
         </div>

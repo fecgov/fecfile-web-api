@@ -15,10 +15,13 @@
     margin-bottom: 15px;
     header {
       .header-content {
-        margin-left: 2;
+        /*margin-left: 0;
         display: block;
         margin: 0 auto;
-        width: 96%;
+        width: 98%;*/
+        margin-left: 10px;
+        display: block;
+        width: 20%;
         h1 {
           font-family: sans-serif;
         }
@@ -127,22 +130,22 @@
   }
   footer {
     .forms__btn-container {
-      margin: 0 auto;
+      margin: 5px auto;
       padding: 0;
       width: 80%;
       @include media(tablet) {
         margin: 0;
         padding: 0;
-        width: 95%;
+        width: 98%;
       }
       @include media(mediumDesktop) {
-        width: 95%;
+        width: 98%;
         .btn-right {
           margin-right: 20px;
         }
       }
       @include media(largeDesktop) {
-        width: 95%;
+        width: 98%;
         .btn-right {
           margin-right: 20px;
         }

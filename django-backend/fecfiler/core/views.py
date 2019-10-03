@@ -1308,9 +1308,20 @@ def put_entities(data):
             data['entity_id'] = new_entity_id
             cloned_data = get_entities(data)[0]
             # remove None value field from data
+            # TODO: need to evaluate if this 100Per safe
             data = { k:v for k,v in data.items() if v }
             cloned_data.update(data)
             data = cloned_data
+        else:
+            logger.debug('combine existing data with new data:')
+            existing_data = get_entities(data)[0]
+            logger.debug('existing data:{}'.format(existing_data))
+            # remove None value field from data
+            data = { k:v for k,v in data.items() if v }
+            existing_data.update(data)
+            data = existing_data
+            logger.debug('data after update existing data with new data:{}'.format(data))
+
             # logger.debug('cloned cand entity data:{}'.format(cloned_data))
             # return cloned_data
         # filter out cand_fields for non-can entity
@@ -1617,6 +1628,7 @@ def autolookup_search_contacts(request):
                         SELECT json_agg(t) FROM 
                         (SELECT 
                         e.ref_cand_cmte_id as beneficiary_cand_id,
+                        e.entity_id as beneficiary_cand_entity_id,
                         e.preffix as cand_prefix,
                         e.last_name as cand_last_name,
                         e.first_name as cand_first_name,
@@ -1929,38 +1941,72 @@ def load_child_transactions(cmte_id, report_id):
     """
     a helper function to query and load all child transactions
     """
-    child_query_string = """
-    SELECT json_agg(t) FROM
-        (SELECT transaction_type, 
-                transaction_type_desc, 
-                transaction_id, 
-                api_call, 
-                name, 
-                street_1, 
-                street_2, 
-                city, 
-                state, 
-                zip_code, 
-                transaction_date, 
-                transaction_amount, 
-                aggregate_amt, 
-                purpose_description, 
-                occupation, 
-                employer, 
-                memo_code, 
-                memo_text, 
-                itemized, 
-                transaction_type_identifier, 
-                entity_id,
-                back_ref_transaction_id 
-        FROM all_transactions_view
-        WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
-        AND delete_ind is distinct from 'Y') t;
-        """
+    if report_id is None:
+        child_query_string = """
+        SELECT json_agg(t) FROM
+            (SELECT transaction_type, 
+                    transaction_type_desc, 
+                    transaction_id, 
+                    api_call, 
+                    name, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    transaction_date, 
+                    transaction_amount, 
+                    aggregate_amt, 
+                    purpose_description, 
+                    occupation, 
+                    employer, 
+                    memo_code, 
+                    memo_text, 
+                    itemized, 
+                    transaction_type_identifier, 
+                    entity_id,
+                    back_ref_transaction_id 
+            FROM all_transactions_view
+            WHERE cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+            AND delete_ind is distinct from 'Y') t;
+            """
+    else:
+        child_query_string = """
+        SELECT json_agg(t) FROM
+            (SELECT transaction_type, 
+                    transaction_type_desc, 
+                    transaction_id, 
+                    api_call, 
+                    name, 
+                    street_1, 
+                    street_2, 
+                    city, 
+                    state, 
+                    zip_code, 
+                    transaction_date, 
+                    transaction_amount, 
+                    aggregate_amt, 
+                    purpose_description, 
+                    occupation, 
+                    employer, 
+                    memo_code, 
+                    memo_text, 
+                    itemized, 
+                    transaction_type_identifier, 
+                    entity_id,
+                    back_ref_transaction_id 
+            FROM all_transactions_view
+            WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+            AND delete_ind is distinct from 'Y') t;
+            """
     child_dic = {}
     try:
         with connection.cursor() as cursor:
-            cursor.execute(child_query_string, (report_id, cmte_id))
+            if report_id is None:
+                cursor.execute(child_query_string, [cmte_id])
+            else:
+                cursor.execute(child_query_string, (report_id, cmte_id))
+            # print(cursor.query)
             child_list = cursor.fetchone()[0]
             # TODO : update null value, NOT SURE it is necessary
             # just go with parent function
@@ -1976,17 +2022,17 @@ def load_child_transactions(cmte_id, report_id):
                     else:
                         child_dic[child['back_ref_transaction_id']].append(child)
     except Exception as e:
-        logger.debug("loading child errors:" + str(e))
+        # logger.debug("loading child errors:" + str(e))
         raise
-    logger.debug('child dictionary loaded with {} items'.format(child_dic))
+    # logger.debug('child dictionary loaded with {} items'.format(child_dic))
     return child_dic
-
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         # print("request.data: ", request.data)
         cmte_id = request.user.username
+        report_id = None
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
@@ -1999,7 +2045,7 @@ def get_all_transactions(request):
         # import ipdb;ipdb.set_trace()
         params = request.data.get('filters', {})
         keywords = params.get('keywords')
-        report_id = request.data.get('reportid')
+        # report_id = request.data.get('reportid')
         if str(descending).lower() == 'true':
             descending = 'DESC'
         else:
@@ -2052,12 +2098,21 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND " + key + "='" + str(transaction_date) + "'"
         #         else:
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
+
+        # ADDED the below code to access transactions across reports and based on categoryType
+        if 'reportid' in request.data and str(request.data.get('reportid')).lower() not in ['',"", "null", "none"]:
+            report_id = request.data.get('reportid')
+            param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
+        if 'categoryType' in request.data and str(request.data.get('categoryType')).lower() not in ['',"", "null", "none"]:
+            param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
-                           where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                           where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
                            # + """ ORDER BY """ + order_string
         # print(query_string)
         with connection.cursor() as cursor:
             cursor.execute(query_string)
+            # print(cursor.query)
             result = cursor.fetchone()
             count = result[0]
             sum_trans = result[1]
@@ -2070,7 +2125,7 @@ def get_all_transactions(request):
         # update in FNE-1524: only load non-child transaction, child transaction will add as
         # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' AND report_id=""" + str(report_id)+""" """ + param_string + """ AND delete_ind is distinct from 'Y'
+                                    where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
                                     AND back_ref_transaction_id is null
                                     """
                                     # + """ ORDER BY """ + order_string
@@ -2082,6 +2137,7 @@ def get_all_transactions(request):
             trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 # forms_obj=data_row[0]
@@ -2111,7 +2167,7 @@ def get_all_transactions(request):
         if paginator.num_pages < page_num:
             page_num = paginator.num_pages
         forms_obj = paginator.page(page_num)
-        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': count,
+        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': total_count,
                     'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
@@ -2388,6 +2444,9 @@ def loans_sql(sql, value_list, error_message):
         raise Exception(error_message + str(e))
 
 def period_receipts_for_summary_table_sql(calendar_start_dt, calendar_end_dt, cmte_id, report_id ):
+    """
+    return line number, contribution_amount of each transaction and calendar_year sum of all contribution_amount
+    """
     try:
         with connection.cursor() as cursor:
             #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
@@ -2726,7 +2785,9 @@ def get_summary_table(request):
                         'BEGINNING CASH ON HAND': coh_bop,
                         'ENDING CASH ON HAND': coh_cop,
                         'DEBTS/LOANS OWED TO COMMITTEE': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE': 0}
+                        'DEBTS/LOANS OWED BY COMMITTEE': 0,
+                        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
+                        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0}
 
         forms_obj = {'Total Raised': {'period_receipts': period_receipt},
                     'Total Spent': {'period_disbursements': period_disbursement},
@@ -3069,9 +3130,16 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
                     
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
+                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, 
+                                        report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                                        rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
+                                        '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, 
+                                        due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop,
+                                         (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
+                                         email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
+                                         additional_email_2 as additionalEmail2, 
+                                         (SELECT CASE WHEN due_date IS NOT NULL AND due_date < now() THEN True ELSE False END ) AS overdue
                                       FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s""" 
-
                     # print("query_string", query_string)
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id, report_id])
@@ -3156,8 +3224,8 @@ def contactsTable(request):
             else:
                 descending = 'ASC'
 
-            keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
-            search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
+            search_keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number','deleteddate']
             if search_string:
                 for key in search_keys:
                     if not param_string:
@@ -3185,7 +3253,7 @@ def contactsTable(request):
             param_string = param_string + keywords_string
             
             
-            trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
+            trans_query_string = """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='""" + cmte_id + """' """ + param_string 
             #print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
@@ -3720,7 +3788,7 @@ def contact_sql_dict(data):
           'cand_office_state'  : is_null(data.get('officeState')), 
           'cand_office_district'  : is_null(data.get('district')), 
           'ref_cand_cmte_id'  : is_null(data.get('ref_cand_cmte_id')), 
-          'phone_number'  : is_null(data.get('phone_number')), 
+          'phone_number'  : is_null(data.get('phone_number'),'phone_number'), 
         }
 
         return datum
@@ -3853,8 +3921,11 @@ def get_list_contact(cmte_id, entity_id = None):
     except Exception:
         raise
 
-def is_null(check_value):
-    if check_value == None or check_value in ["null", " ", "", "none","Null"]:
+def is_null(check_value, check_field =""):
+    # if phone_nmumber is numeric field so pass 0 as default 
+    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null"]):
+        return None
+    elif check_value == None or check_value in ["null", " ", "", "none","Null"]:
         return ""
     else:
         return check_value
@@ -4163,8 +4234,8 @@ def get_all_trashed_contacts(request):
                 else:
                     descending = 'ASC'
 
-                keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
-                search_keys = ['id', 'type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
+                search_keys = ['id', 'entity_type', 'name', 'street1', 'street2', 'city', 'state', 'zip', 'occupation', 'employer', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'phone_number', 'deletedDate']
                 if search_string:
                     for key in search_keys:
                         if not param_string:
@@ -4200,7 +4271,7 @@ def get_all_trashed_contacts(request):
                 # print("trans_query_string: ",trans_query_string)
                 # import ipdb;ipdb.set_trace()
 
-                trans_query_string = """SELECT id, type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate from all_contacts_view
+                trans_query_string = """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='""" + cmte_id + """' """ + param_string 
                 
                 if sortcolumn and sortcolumn != 'default':
