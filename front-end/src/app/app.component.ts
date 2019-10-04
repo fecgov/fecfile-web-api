@@ -135,6 +135,12 @@ export class AppComponent {
   //   this.stop();
   // }
 
+  @HostListener('window:beforeunload', ['$event'])
+  beforeunloadHandler(event) {
+      localStorage.clear();
+      this._sessionService.destroy();
+  }
+
   @HostListener('keypress') onKeyPress() {
     this.stop();
     this._dialogService.checkIfModalOpen();
