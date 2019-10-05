@@ -2758,8 +2758,88 @@ def summary_receipts_for_sumamry_table(args):
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
+def load_loan_debt_summary(period_args):
+    """
+    query laon and debt sum for current report and ytd
+    TODO: still need to verify the business logic is correct
+    1. need to check against get_loan_debt_summary api
+    2. need to verify the transaction types in the database
+    """
+    start_dt = period_args[0]
+    end_dt = period_args[1]
+    cmte_id = period_args[2]
+    report_id = period_args[3]
+    loan_debt_dic =  {  
+        'DEBTS/LOANS OWED TO COMMITTEE': 0,
+        'DEBTS/LOANS OWED BY COMMITTEE': 0,
+        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
+        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0
+    }
+
+    _sql_rep = """
+        SELECT transaction_type_identifier, 
+        SUM(loan_balance) 
+        FROM   sched_c 
+        WHERE  cmte_id = %s 
+            AND report_id = %s 
+            AND transaction_type_identifier IN ( 
+                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+        UNION 
+        SELECT transaction_type_identifier, 
+            SUM(balance_at_close) 
+        FROM   sched_d 
+        WHERE  cmte_id = %s 
+            AND report_id = %s 
+            AND transaction_type_identifier IN ( 
+                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+    """
+    _sql_ytd = """
+        SELECT transaction_type_identifier AS ytd, 
+            Sum(loan_balance) 
+        FROM   sched_c 
+        WHERE  cmte_id = %s 
+            AND loan_incurred_date BETWEEN %s AND %s 
+            AND transaction_type_identifier IN ( 
+                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+        UNION 
+        SELECT transaction_type_identifier AS ytd, 
+            Sum(balance_at_close) 
+        FROM   sched_d 
+        WHERE  cmte_id = %s
+            AND create_date BETWEEN %s AND %s
+            AND transaction_type_identifier IN ( 
+                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+    """
+    try:
+        with connection.cursor() as cursor:
+            #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute(_sql_rep, [cmte_id, report_id]*2)
+            for row in cursor.fetchall():
+                if row[0].endswith('TO_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED TO COMMITTEE'] += float(row[1])
+                elif row[0].endswith('BY_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED BY COMMITTEE'] += float(row[1])
+                else:
+                    pass
+            cursor.execute(_sql_ytd, [cmte_id, start_dt, end_dt]*2)
+            for row in cursor.fetchall():
+                if row[0].endswith('TO_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED TO COMMITTEE YTD'] += float(row[1])
+                elif row[0].endswith('BY_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED BY COMMITTEE YTD'] += float(row[1])
+                else:
+                    pass
+            return loan_debt_dic
+    except Exception as e:
+        raise Exception('The get_loan_debt_summary function is throwing an error: ' + str(e))
+
 @api_view(['GET'])
 def get_summary_table(request):
+    logger.debug('get_summary_table with request:{}'.format(request.query_params))
     try:
         cmte_id = request.user.username
 
@@ -2771,8 +2851,12 @@ def get_summary_table(request):
 
         report_id = check_report_id(request.query_params.get('report_id'))
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        logger.debug('query_params: report_id {}, calendar_year {}'.format(report_id, calendar_year))
 
         period_args = [datetime.date(int(calendar_year), 1, 1), datetime.date(int(calendar_year), 12, 31),  cmte_id, report_id]
+        logger.debug('period_args:{}'.format(period_args))
+
+        logger.debug('load receipts and dsibursements...')
         period_receipt = summary_receipts_for_sumamry_table(period_args)
         period_disbursement = summary_disbursements_for_sumamry_table(period_args)
         
@@ -2781,21 +2865,25 @@ def get_summary_table(request):
         calendar_receipt = summary_receipts(calendar_args)
         calendar_disbursement = summary_disbursements(calendar_args)
         '''
+        logger.debug('load cash on hand...')
         coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
         coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
 
         cash_summary = {'COH AS OF JANUARY 1': coh_bop_ytd,
                         'BEGINNING CASH ON HAND': coh_bop,
-                        'ENDING CASH ON HAND': coh_cop,
-                        'DEBTS/LOANS OWED TO COMMITTEE': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE': 0,
-                        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0}
+                        'ENDING CASH ON HAND': coh_cop}
+        logger.debug('cash summary:{}'.format(cash_summary))
+
+        loan_and_debts = load_loan_debt_summary(period_args)
+        logger.debug('adding loan and debts:{}'.format(loan_and_debts))
+        cash_summary.update(loan_and_debts)
+        logger.debug('adding loan and debts:{}'.format(cash_summary))
 
         forms_obj = {'Total Raised': {'period_receipts': period_receipt},
                     'Total Spent': {'period_disbursements': period_disbursement},
                     'Cash summary': cash_summary}
+        logger.debug('summary result:{}'.format(forms_obj))
                         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4717,3 +4805,47 @@ def check_duplicate_address(request):
         return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
         return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
+
+def get_levin_accounts(cmte_id):
+    _sql = """
+    select json_agg(t) from 
+    (select levin_account_id, levin_account_name from levin_account where cmte_id = %s) t
+    """
+    try:
+        with connection.cursor() as cursor:
+                # INSERT row into Reports table
+            cursor.execute(_sql,[cmte_id])
+            return cursor.fetchone()[0]  
+    except Exception as e:
+        logger.debug('Error on loading levin account names:'+str(e))
+        raise
+
+
+
+@api_view(['POST','GET','DELETE','PUT'])
+def levin_accounts(request):
+
+
+       
+    if request.method == 'GET':
+        try:
+            # data = {
+            #     'cmte_id': request.user.username,
+            #     }
+            cmte_id = request.user.username
+            # if 'report_id' in request.query_params:
+                # data['report_id'] = request.query_params.get('report_id')
+            forms_obj = get_levin_accounts(cmte_id)   
+            return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response(
+                "The levin_account API - GET is throwing an error: " + str(e), 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        pass

@@ -6,6 +6,7 @@ import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/con
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { UserIdleService } from 'angular-user-idle';
 import { SessionService } from './shared/services/SessionService/session.service';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ export class AppComponent {
 
   clientX = 0;
   clientY = 0;
+  private timeIsUp:boolean = false;
 
   constructor(
     private userIdle: UserIdleService,
@@ -28,6 +30,7 @@ export class AppComponent {
   ) {}
 
   ngOnInit() {
+    this.restart();
     this._router.events.subscribe(val => {
       if (val instanceof NavigationEnd && val.url !== '/') {
         // Start watching for user inactivity.
@@ -37,38 +40,48 @@ export class AppComponent {
         this.userIdle.onTimerStart().subscribe(count => {
           this.seconds = this.seconds - 1;
           this.timeStart = true; /* console.log(count) */
+          if (this.timeStart && !this.timeIsUp) {
+            // Enhancement: To display countdown timer
+            const minutes: number = Math.floor(count / 60);
+
+            this._dialogService.checkIfModalOpen();
+            this._dialogService
+              .confirm(
+                'This session will expire unless a response is received within 2 minutes. Click OK to prevent expiration.',
+                ConfirmModalComponent,
+                'Session Warning',
+                false
+              )
+              .then(response => {
+                if (response === 'okay') {
+                  this.stop();
+                  this._dialogService.checkIfModalOpen();
+                } else if (
+                  response === 'cancel' ||
+                  response !== ModalDismissReasons.BACKDROP_CLICK ||
+                  response !== ModalDismissReasons.ESC
+                ) {
+                }
+              });
+          }
         });
         this.userIdle.ping$.subscribe(res => {
-          this._dialogService.checkIfModalOpen();
-          this._dialogService
-            .confirm(
-              'This session will expire unless a response is received within 2 minutes. Click OK to prevent expiration.',
-              ConfirmModalComponent,
-              'Session Warning',
-              false
-            )
-            .then(response => {
-              if (response === 'okay') {
-                this.stop();
-              } else if (response === 'cancel' ||
-              response !== ModalDismissReasons.BACKDROP_CLICK ||
-              response !== ModalDismissReasons.ESC) {
-              }
-            });
         });
 
         // Start watch when time is up.
         this.userIdle.onTimeout().subscribe(res => {
+          this.timeIsUp = true;
           this._dialogService.checkIfModalOpen();
+          this._sessionService.destroy();
           this._dialogService
             .confirm('The session has expired.', ConfirmModalComponent, 'Session Expired', false)
             .then(response => {
-              if (response === 'okay' ||
-              response === 'cancel' ||
-              response === ModalDismissReasons.BACKDROP_CLICK ||
-              response === ModalDismissReasons.ESC) {
-                this.restart();
-                this._sessionService.destroy();
+              if (
+                response === 'okay' ||
+                response === 'cancel' ||
+                response === ModalDismissReasons.BACKDROP_CLICK ||
+                response === ModalDismissReasons.ESC
+              ) {
                 this._router.navigate(['']);
               }
             });
@@ -87,9 +100,13 @@ export class AppComponent {
       if (val instanceof NavigationEnd) {
         oldUrl = val.url;
       }
-      if (val instanceof NavigationStart && val.url !== oldUrl) {
+      if (val instanceof NavigationStart) {
         this.stop();
+        this._dialogService.checkIfModalOpen();
       }
+
+      // if (this.timeStart && !this.timeIsUp) {
+      // }
     });
   }
 
@@ -101,6 +118,7 @@ export class AppComponent {
 
   stopWatching() {
     this.userIdle.stopWatching();
+    this.timeIsUp = false;
   }
 
   startWatching() {
@@ -109,6 +127,7 @@ export class AppComponent {
 
   restart() {
     this.userIdle.resetTimer();
+    this.timeIsUp = false;
   }
 
   // @HostListener('document:click', ['$event'])
@@ -116,7 +135,14 @@ export class AppComponent {
   //   this.stop();
   // }
 
+  @HostListener('window:beforeunload', ['$event'])
+  beforeunloadHandler(event) {
+      localStorage.clear();
+      this._sessionService.destroy();
+  }
+
   @HostListener('keypress') onKeyPress() {
     this.stop();
+    this._dialogService.checkIfModalOpen();
   }
 }
