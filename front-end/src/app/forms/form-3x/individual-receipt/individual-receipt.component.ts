@@ -1533,7 +1533,7 @@ export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges 
     this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
     this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: { step: 'transactions', reportId: reportId }
+      queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode }
     });
   }
 
