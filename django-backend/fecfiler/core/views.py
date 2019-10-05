@@ -4693,3 +4693,48 @@ def address_validation(request):
         return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
         return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_levin_accounts(cmte_id):
+    _sql = """
+    select json_agg(t) from 
+    (select levin_account_id, levin_account_name from levin_account where cmte_id = %s) t
+    """
+    try:
+        with connection.cursor() as cursor:
+                # INSERT row into Reports table
+            cursor.execute(_sql,[cmte_id])
+            return cursor.fetchone()[0]  
+    except Exception as e:
+        logger.debug('Error on loading levin account names:'+str(e))
+        raise
+
+
+
+@api_view(['POST','GET','DELETE','PUT'])
+def levin_accounts(request):
+
+
+       
+    if request.method == 'GET':
+        try:
+            # data = {
+            #     'cmte_id': request.user.username,
+            #     }
+            cmte_id = request.user.username
+            # if 'report_id' in request.query_params:
+                # data['report_id'] = request.query_params.get('report_id')
+            forms_obj = get_levin_accounts(cmte_id)   
+            return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response(
+                "The levin_account API - GET is throwing an error: " + str(e), 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        pass
