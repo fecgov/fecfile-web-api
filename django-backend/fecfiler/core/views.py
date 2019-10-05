@@ -27,6 +27,9 @@ from datetime import date, timedelta, time
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 from xml.etree import ElementTree
+from fuzzywuzzy import fuzz
+import pandas
+import numpy
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -962,7 +965,7 @@ def post_sql_entity(
         raise
 
 def get_list_entity(entity_id, cmte_id):
-    logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
+    # logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
     try:
         query_string = """
         SELECT 
@@ -998,7 +1001,7 @@ def get_list_entity(entity_id, cmte_id):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        logger.debug('entity data loaded:{}'.format(forms_obj))
+        # logger.debug('entity data loaded:{}'.format(forms_obj))
         if forms_obj is None:
             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(entity_id))   
         return forms_obj
@@ -1234,7 +1237,7 @@ def get_entities(data):
         cmte_id = data.get('cmte_id')
         entity_flag = False
         if 'entity_id' in data:
-            logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
+            # logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get('entity_id'))
                 entity_flag = True
@@ -2101,11 +2104,14 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
         # ADDED the below code to access transactions across reports and based on categoryType
-        if 'reportid' in request.data and str(request.data.get('reportid')).lower() not in ['',"", "null", "none"]:
+        if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
             report_id = request.data.get('reportid')
             param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
-        if 'categoryType' in request.data and str(request.data.get('categoryType')).lower() not in ['',"", "null", "none"]:
-            param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+        if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
+            if request.data.get('categoryType') == "SL-A":
+                param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
+            else:
+                param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
 
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
@@ -3972,26 +3978,43 @@ def get_contact(data):
     except:
         raise
 
-def get_list_contact(cmte_id, entity_id = None):
+def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity_name_flag = False):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from entity table
-            if entity_id:
-                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
+            #This Flag seperates whether I need only entity name or first_name, last_name
+            if not name_select_flag:
+                if isinstance(entity_id, list):
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format("', '".join(entity_id))
 
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                            """) t""", [cmte_id, entity_id])
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                                """) t""", [cmte_id])
+                # GET single row from entity table
+                elif entity_id:
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                                """) t""", [cmte_id, entity_id])
+                else:
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" +
+                               query_string + """) t""", [cmte_id])
             else:
-                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
-
+                if entity_name_flag:
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
+                else:
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [cmte_id])           
+                               query_string + """) t""", [cmte_id])
  
             contact_list = cursor.fetchone()[0]
-            print("contact_list", contact_list)
+            # print("contact_list", contact_list)
             if not contact_list:
                 raise NoOPError(
                     'No entity found for cmte_id {} '.format(cmte_id))
@@ -4641,15 +4664,23 @@ def create_amended_reports(request):
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def address_validation(request):
+def none_text_to_none(text):
+    try:
+        if text in ['None', 'none', 'NONE']:
+            return None
+        else:
+            return text
+    except:
+        raise
+
+def USPS_address_validation(data):
     try:
         output = {}
-        street_1 = request.data.get('street1')
-        street_2 = request.data.get('street2')
-        city = request.data.get('city')
-        state = request.data.get('state')
-        zip_code = request.data.get('zipCode')
+        street_1 = data.get('street_1')
+        street_2 = data.get('street_2')
+        city = data.get('city')
+        state = data.get('state')
+        zip_code = data.get('zip_code')
 
         XML_input = """<AddressValidateRequest USERID="{0}">
 <Revision>1</Revision>
@@ -4672,28 +4703,111 @@ def address_validation(request):
             root = ElementTree.fromstring(response.text)
             Address = root.find('Address')
             if Address.find('Error') != None:
-                output['statusCode'] = "FAIL"
+                output['status_code'] = "FAIL"
             else:
-                output['statusCode'] = "SUCCESS"
-                output['data']['street1'] = Address.find('Address2').text
-                output['data']['street2'] = Address.find('Address1').text
-                output['data']['city'] = Address.find('City').text
+                output['status_code'] = "SUCCESS"
+                output['data']['street_1'] = Address.find('Address2').text
+                output['data']['street_2'] = none_text_to_none(Address.find('Address1').text)
+                output['data']['city'] = none_text_to_none(Address.find('City').text)
                 output['data']['state'] = Address.find('State').text
-                output['data']['zipCode'] = Address.find('Zip5').text
-                output['data']['zipCode4'] = Address.find('Zip4').text
+                output['data']['zip_code'] = Address.find('Zip5').text
+                output['data']['zip_code4'] = none_text_to_none(Address.find('Zip4').text)
                 if Address.find('ReturnText') != None:
-                    output['statusCode'] = "WARNING"
-                    output['warningMessage'] = Address.find('ReturnText').text
-            # for child in root.iter('*'):
-            #     # print(child.tag, child.attrib)
-            #     print(child)
-            return Response(output, status.HTTP_200_OK)
+                    output['status_code'] = "WARNING"
+                    output['warning_message'] = Address.find('ReturnText').text
+            return output
+    except Exception as err:
+        raise Exception(f'USPS_address_validation API is throwing an error: {err}')
+
+@api_view(['POST'])
+def address_validation(request):
+    try:
+        output = USPS_address_validation(request.data)
+        return Response(output, status.HTTP_200_OK)
 
     except requests.exceptions.HTTPError as http_err:
         return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
         return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
 
+def partial_match(x,y):
+    return(max(fuzz.ratio(x,y),fuzz.partial_ratio(x,y),fuzz.token_sort_ratio(x,y),fuzz.token_set_ratio(x,y),fuzz.WRatio(x,y)))
+
+def duplicate_address(cmte_id, data):
+    try:
+        moderation_score = 92
+        if 'entity_name' in data and data.get('entity_name') not in ['null', 'None', '', "", None]:
+            org_name_flag = True
+            input_name = data.get('entity_name')
+        else:
+            org_name_flag = False
+            input_list = [data.get('preffix'), data.get('first_name'), data.get('middle_name'), data.get('last_name'), data.get('suffix')]
+            input_name = " ".join(filter(None, input_list))
+
+        USPS_input = USPS_address_validation(data)
+        if USPS_input.get('status_code') != "FAIL":
+            input_address = " ".join(filter(None, [USPS_input.get('data').get('street_1'), USPS_input.get('data').get('street_2'), USPS_input.get('data').get('city'), USPS_input.get('data').get('state'), USPS_input.get('data').get('zip_code')]))
+        else:
+            input_address = " ".join(filter(None, [data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state')]))
+            if 'zip_code' in data and data.get('zip_code') not in ['null', 'None', '', "", None]:
+                input_address += " " + data.get('zip_code')[0:5]
+        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation'), data.get('employer')])]
+
+        contact_list = get_list_contact(cmte_id, None, True, org_name_flag)
+        compare_entity_id_list = []
+        compare_total_address_list = []
+        if org_name_flag:
+            for contact in contact_list:
+                compare_entity_id_list.append(contact.get('entity_id'))
+                if 'zip_code' in contact and contact.get('zip_code') not in ['null', 'None', '', "", None]:
+                    compare_total_address = " ".join(filter(None, [contact.get('entity_name'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('zip_code')[0:5], contact.get('occupation'), contact.get('employer')]))
+                else:
+                    compare_total_address = " ".join(filter(None, [contact.get('entity_name'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('occupation'), contact.get('employer')]))
+                compare_total_address_list.append(compare_total_address)
+        else:
+            for contact in contact_list:
+                compare_entity_id_list.append(contact.get('entity_id'))
+                if 'zip_code' in contact and contact.get('zip_code') not in ['null', 'None', '', "", None]:
+                    compare_total_address_list.append(" ".join(filter(None, [contact.get('preffix'), contact.get('first_name'), contact.get('middle_name'), contact.get('last_name'), contact.get('suffix'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('zip_code')[0:5], contact.get('occupation'), contact.get('employer')])))
+                else:
+                    compare_total_address_list.append(" ".join(filter(None, [contact.get('preffix'), contact.get('first_name'), contact.get('middle_name'), contact.get('last_name'), contact.get('suffix'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('occupation'), contact.get('employer')])))
+        inputcolumn = pandas.DataFrame(input_total_address_list)
+        inputcolumn.columns = ['Match']
+        compare_dict = {'EntityId':compare_entity_id_list, 'Compare':compare_total_address_list}
+        comparecolumn = pandas.DataFrame(compare_dict)
+
+        inputcolumn['Key'] = 1
+        comparecolumn['Key'] = 1
+        combined_dataframe = comparecolumn.merge(inputcolumn,on="Key",how="left")
+
+        partial_match_vector = numpy.vectorize(partial_match)
+        combined_dataframe['Score']=partial_match_vector(combined_dataframe['Match'],combined_dataframe['Compare'])
+        combined_dataframe = combined_dataframe[combined_dataframe.Score>=moderation_score]
+        if combined_dataframe.empty:
+            return []
+        else:
+            return get_list_contact(cmte_id, combined_dataframe['EntityId'].values.tolist())
+
+    except Exception as e:
+        raise Exception(f'duplicate_Address function is throwing an error: {e}')
+
+@api_view(['POST'])
+def check_duplicate_address(request):
+    try:
+        cmte_id = request.user.username
+        address = duplicate_address(cmte_id, request.data)
+        if address:
+            status_code = "FAIL"
+        else:
+            status_code = "SUCCESS"
+        output = {}
+        output['status_code'] = status_code
+        output['data'] = address
+        return Response(output, status=status.HTTP_200_OK)
+    except requests.exceptions.HTTPError as http_err:
+        return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
 
 def get_levin_accounts(cmte_id):
     _sql = """
