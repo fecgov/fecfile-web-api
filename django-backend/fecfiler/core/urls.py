@@ -26,6 +26,7 @@ urlpatterns = [
     ),
     url(r"^core/create_json_file$", views.create_json_file, name="create_json_file"),
     url(r"^core/entities$", views.entities, name="entities"),
+    url(r"^core/levin_accounts$", views.levin_accounts, name="levin_accounts"),
     url(
         r"^core/autolookup_search_contacts$",
         views.autolookup_search_contacts,
@@ -144,6 +145,9 @@ urlpatterns = [
         views.address_validation,
         name="address_validation",
     ),
-
-    url(r"^core/create_amended_reports$", views.create_amended_reports, name="create_amended_reports"),
+    url(
+        r"^core/create_amended_reports$",
+        views.create_amended_reports,
+        name="create_amended_reports",
+    ),
 ]
