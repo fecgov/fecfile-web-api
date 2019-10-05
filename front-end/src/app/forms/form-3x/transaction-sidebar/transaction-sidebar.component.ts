@@ -225,9 +225,9 @@ export class TransactionSidebarComponent implements OnInit {
         (term === ''
           ? transactionCategoryOptions
           : transactionCategoryOptions.filter(v => v.text.toLowerCase().indexOf(term.toLowerCase()) > -1)
-        ).slice(0, 10)
+        )
       )
-    );
+    )
 
   formatter = (x: { text: string }) => x.text;
 
