@@ -144,6 +144,10 @@ urlpatterns = [
         views.address_validation,
         name="address_validation",
     ),
-
+    url(
+        r"^core/check_duplicate_address$",
+        views.check_duplicate_address,
+        name="check_duplicate_address",
+    ),
     url(r"^core/create_amended_reports$", views.create_amended_reports, name="create_amended_reports"),
 ]
