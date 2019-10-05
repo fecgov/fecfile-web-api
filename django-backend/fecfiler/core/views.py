@@ -4695,10 +4695,28 @@ def address_validation(request):
         return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
 
 
+def get_next_levin_acct_id():
+    """
+    get a new levin account id
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT nextval('levin_account_id_seq')""")
+            return cursor.fetchone()[0]
+    except Exception:
+        logger.debug('failed to get a new levin account id.')
+        raise 
+
+
 def get_levin_accounts(cmte_id):
+    """
+    load levin_account names and account ids for a committee
+    """
     _sql = """
     select json_agg(t) from 
-    (select levin_account_id, levin_account_name from levin_account where cmte_id = %s) t
+    (select levin_account_id, levin_account_name 
+    from levin_account where cmte_id = %s 
+    and delete_ind is distinct from 'Y') t
     """
     try:
         with connection.cursor() as cursor:
@@ -4709,32 +4727,154 @@ def get_levin_accounts(cmte_id):
         logger.debug('Error on loading levin account names:'+str(e))
         raise
 
+def get_levin_account(cmte_id, levin_account_id):
+    """
+    load levin_account names and account ids for a committee
+    """
+    _sql = """
+    select json_agg(t) from 
+    (select levin_account_id, levin_account_name, create_date, last_update_date
+    from levin_account where cmte_id = %s
+    and levin_account_id = %s
+    and delete_ind is distinct from 'Y') t
+    """
+    try:
+        with connection.cursor() as cursor:
+                # INSERT row into Reports table
+            cursor.execute(_sql,[cmte_id, levin_account_id])
+            return cursor.fetchone()[0]  
+    except Exception as e:
+        logger.debug('Error on loading levin account names:'+str(e))
+        raise
 
+def post_levin_account(cmte_id, levin_account_id, levin_account_name):
+    """
+    db transaction for saving a new levin account
+    """
+    _sql = """
+    INSERT INTO public.levin_account(levin_account_id, cmte_id, levin_account_name) 
+    VALUES(%s, %s, %s)
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (levin_account_id, cmte_id, levin_account_name))
+    except Exception as e:
+        raise Exception('Error creating levin account.')
+    
+
+def put_levin_account(cmte_id, levin_account_id, levin_account_name):
+    """
+    db transaction for updating a levin acccount name
+    """
+    _sql = """
+    UPDATE public.levin_account
+    SET levin_account_name = %s
+    WHERE cmte_id = %s
+    AND levin_account_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (levin_account_name, cmte_id, levin_account_id))
+    except Exception as e:
+        raise Exception('Error updating levin account.')
+
+def delete_levin_account(cmte_id, levin_account_id):
+    """
+    delete a levin account
+    """    
+    _sql = """
+        UPDATE public.levin_account
+        SET delete_ind = 'Y'
+        WHERE cmte_id = %s
+        AND levin_account_id = %s 
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (cmte_id, levin_account_id))
+    except Exception as e:
+        raise Exception('Error deleting levin account.')
 
 @api_view(['POST','GET','DELETE','PUT'])
 def levin_accounts(request):
-
-
-       
+    """
+    the api for adding/retrieving levin accounts
+    """
     if request.method == 'GET':
         try:
-            # data = {
-            #     'cmte_id': request.user.username,
-            #     }
             cmte_id = request.user.username
-            # if 'report_id' in request.query_params:
-                # data['report_id'] = request.query_params.get('report_id')
-            forms_obj = get_levin_accounts(cmte_id)   
-            return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            levin_account_id = request.query_params.get('levin_account_id')
+            if not levin_account_id:
+                forms_obj = get_levin_accounts(cmte_id)
+            else:
+                forms_obj = get_levin_account(cmte_id, levin_account_id)
+                
+            if forms_obj:   
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            else:
+                return JsonResponse([], status=status.HTTP_204_NO_CONTENT, safe=False)
+
         except NoOPError as e:
             logger.debug(e)
             forms_obj = []
-            return JsonResponse(forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False)
+            return JsonResponse(forms_obj, status.HTTP_204_NO_CONTENT, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response(
                 "The levin_account API - GET is throwing an error: " + str(e), 
-                status=status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST
             )
-    else:
-        pass
+    elif request.method == 'POST':
+        try:
+            cmte_id = request.user.username
+
+            if not 'levin_account_name' in request.data:
+                raise Exception('levin account name is required.')
+            if not request.data.get('levin_account_name'):
+                raise Exception('a valid levin account name is required.')
+            levin_account_name = request.data.get('levin_account_name')
+
+            levin_account_id = get_next_levin_acct_id()
+            post_levin_account(cmte_id, levin_account_id, levin_account_name)
+            levin_obj = get_levin_account(cmte_id, levin_account_id)
+            return Response(
+                levin_obj, status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.debug('Error on creating a new levin account:'+str(e))
+            return Response(
+                "Error on creating a new levin account:" + str(e),
+                status.HTTP_400_BAD_REQUEST
+            )
+
+    elif request.method == 'PUT':
+        try:
+            cmte_id = request.user.username
+            levin_account_name = request.data.get('levin_account_name')
+            levin_account_id = request.data.get('levin_account_id')
+            put_levin_account(cmte_id, levin_account_id, levin_account_name)
+            levin_obj = get_levin_account(cmte_id, levin_account_id)
+            return Response(
+                levin_obj,
+                status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.debug('Error on saving a new levin account name:' + str(e))
+            return Response(
+                'Error on saving levin account name:' + str(e),
+                status.HTTP_400_BAD_REQUEST
+            )
+    elif request.method == 'DELETE':
+        try:
+            cmte_id = request.user.username
+            levin_account_id = request.query_params.get('levin_account_id')
+            if not levin_account_id:
+                raise Exception('a valid levin account id is required.')
+            delete_levin_account(cmte_id, levin_account_id)
+            return Response("The account: {} has been successfully deleted".format(levin_account_id),status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.debug('Error on deleting account:' + str(e))
+            return Response("The levin account API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)        
+
+
+        
+        
