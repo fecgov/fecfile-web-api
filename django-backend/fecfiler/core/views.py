@@ -2104,11 +2104,14 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
         # ADDED the below code to access transactions across reports and based on categoryType
-        if 'reportid' in request.data and str(request.data.get('reportid')).lower() not in ['',"", "null", "none"]:
+        if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
             report_id = request.data.get('reportid')
             param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
-        if 'categoryType' in request.data and str(request.data.get('categoryType')).lower() not in ['',"", "null", "none"]:
-            param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+        if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
+            if request.data.get('categoryType') == "SL-A":
+                param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
+            else:
+                param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
 
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
