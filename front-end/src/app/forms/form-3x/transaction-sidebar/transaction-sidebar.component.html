@@ -12,7 +12,7 @@
       <div id="scrollable-dropdown-menu">
         <input type="search" #instance="ngbTypeahead" placeholder="Search by type" aria-label="Search by type"
           [(ngModel)]="itemSelected" [ngbTypeahead]="searchByType" [resultTemplate]="rt" [inputFormatter]="formatter"
-          (focus)="focus$.next($event.target.value)" placement="bottom">
+          (focus)="focus$.next($event.target.value)" placement="right">
       </div>
     </div>
     <!-- </ng-container> -->

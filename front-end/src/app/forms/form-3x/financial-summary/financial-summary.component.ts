@@ -24,6 +24,7 @@ export class FinancialSummaryComponent implements OnInit {
   public viewMode: string = '';
   public reportId: string = '';
   public step: string = '';
+  public editMode: boolean;
 
   private _form3XReportType: any = {};
 
@@ -45,6 +46,7 @@ export class FinancialSummaryComponent implements OnInit {
     this.viewMode = 'tab1';
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.step = this._activatedRoute.snapshot.queryParams.step;
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     console.log('this.step = ', this.step);
 
@@ -96,12 +98,12 @@ export class FinancialSummaryComponent implements OnInit {
     console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
     this._transactionsMessageService.sendLoadTransactionsMessage(this.reportId);
     this._router.navigate([`/forms/form/${this._formType}`], {
-      queryParams: { step: 'transactions', reportId: this.reportId }
+      queryParams: { step: 'transactions', reportId: this.reportId, edit: this.editMode }
     });
   }
 
   public all_Transactions(): void {
-    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'step_2' } });
+    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
   }
 
   public expanded_Summary(): void {
