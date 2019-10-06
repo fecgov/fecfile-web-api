@@ -2393,7 +2393,7 @@ def delete_trashed_transactions(request):
             message='Transaction deleted successfully'
             #message_dict[trans_id] = message
             sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
-            print(sched_a_obj)
+            #print(sched_a_obj) Mahendra 10052019
             if sched_a_obj:
                
                 report_info = get_list_report_data(sched_a_obj['report_id'], committeeid)[0]
@@ -3267,15 +3267,17 @@ def print_preview_pdf(request):
         }
 
         json_builder_resp = requests.post(settings.JSON_BUILDER_URL, data=data_obj)
-        print("json_builder_resp = ", json_builder_resp)
+        #print("json_builder_resp = ", json_builder_resp)
+        #commented by Mahendra 10052019
 
         bucket_name = 'dev-efile-repo'
         client = boto3.client('s3')
         transfer = S3Transfer(client)
         #s3.download_file(bucket_name , s3_file_path, save_as)
         transfer.download_file(bucket_name , json_builder_resp, json_builder_resp)
-        with open(save_as) as f:
-            print(json_builder_resp.read())
+        #commented by Mahendra 10052019
+        #with open(save_as) as f:
+            #print(json_builder_resp.read())
 
         printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
@@ -3505,7 +3507,8 @@ def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, rep
 @api_view(['POST'])
 def prepare_json_builders_data(request):
     try:
-        print("request.data: ", request.data)
+        #print("request.data: ", request.data)
+        #commented by Mahendra 10052019
         cmte_id = request.user.username
         param_string = ""
         report_id = request.data.get('report_id')
@@ -3525,20 +3528,24 @@ def prepare_json_builders_data(request):
             cursor.execute("""
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             sched_a_line_sum_result = cursor.fetchall()
             sched_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(expenditure_amount) from public.sched_b 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             sched_b_line_sum_result = cursor.fetchall()
             sched_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result}
         
         #sched_a_line_sum.update(sched_b_line_sum)
-        print(sched_a_line_sum, "sched_a_line_sum")
-        print(sched_b_line_sum, "sched_b_line_sum")
+        #print(sched_a_line_sum, "sched_a_line_sum")
+        #commented by Mahendra 10052019
+        #print(sched_b_line_sum, "sched_b_line_sum")
+        #commented by Mahendra 10052019
         
         ##schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         ##schedule_a_b_line_sum_dict.update(sched_b_line_sum)
@@ -3554,14 +3561,16 @@ def prepare_json_builders_data(request):
             cursor.execute(""" 
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
-            print(cursor.query)     
+            #print(cursor.query)     
+            #commented by Mahendra 10052019
             col_a_line_sum_result = cursor.fetchall()
             col_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_a_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(expenditure_amount) from public.sched_b 
                 where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             col_b_line_sum_result = cursor.fetchall()
             col_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_b_line_sum_result}
 
@@ -3570,8 +3579,10 @@ def prepare_json_builders_data(request):
         col_line_sum_dict.update(col_a_line_sum)
         col_line_sum_dict.update(col_b_line_sum)
 
-        print(col_a_line_sum, "col_a_line_sum")
-        print(col_b_line_sum, "col_b_line_sum")
+        #print(col_a_line_sum, "col_a_line_sum")
+        #commented by Mahendra 10052019
+        #print(col_b_line_sum, "col_b_line_sum")
+        #commented by Mahendra 10052019
         
 
 
@@ -3599,7 +3610,8 @@ def prepare_json_builders_data(request):
                                                                schedule_a_b_line_sum_dict, cmte_id, report_id)
             schedule_a_b_line_sum_dict[line_number] = final_col_a_dict[line_number]
 
-        print(final_col_a_dict, "col_a_dict")
+        #print(final_col_a_dict, "col_a_dict")
+        #commented by Mahendra 10052019
 
         col_b = [
             ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''),
@@ -3626,7 +3638,8 @@ def prepare_json_builders_data(request):
                                                                col_line_sum_dict,
                                                                cmte_id, report_id)
             col_line_sum_dict[line_number] = final_col_b_dict[line_number]
-        print(final_col_b_dict, "col_b_dict")
+        #print(final_col_b_dict, "col_b_dict")
+        #commented by Mahendra 10052019
 
         for i in final_col_a_dict:
             a_val = final_col_a_dict[i]
@@ -3649,10 +3662,11 @@ def prepare_json_builders_data(request):
             final_col_b_dict[i] = b_val
             final_col_a_dict[i] = a_val
 
-        print("---------------------------------")
-        print("Final AAAA", final_col_a_dict)
-        print("---------------------------------")
-        print("Final B", final_col_b_dict)
+        #commented by Mahendra 10052019
+        #print("---------------------------------")
+        #print("Final AAAA", final_col_a_dict)
+        #print("---------------------------------")
+        #print("Final B", final_col_b_dict)
 
 
         update_col_a_dict = {'6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per',
@@ -3727,8 +3741,8 @@ def prepare_json_builders_data(request):
 
         update_str = update_str[:-1]
         # print("-------------------------")
-        print(update_str, "update_str")
-
+        #print(update_str, "update_str")
+        #commented by Mahendra 10052019
         #return Response({'Response':'Success'}, status=status_value)
         
         with connection.cursor() as cursor:
@@ -3903,7 +3917,8 @@ def contacts(request):
             datum['cmte_id'] = request.user.username
             #datum['cmte_id'] = cmte_id
             post_contact(datum)
-            print ("datum", datum)
+            #commented by Mahendra 10052019
+            #print ("datum", datum)
             output = get_contact(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -4052,7 +4067,8 @@ def get_reporttype(cmte_id, report_id):
                 for row in cursor.fetchall():
                     data_row = list(row)
                 report_type=data_row[0]
-            print("report_type1", report_type)
+            #commented by Mahendra 10052019
+            #print("report_type1", report_type)
             if report_type == "":
                 cursor.execute("""SELECT id FROM public.forms_committeeinfo WHERE committeeid = %s AND id = %s """, [cmte_id, report_id])
                 data_row=[]
@@ -4061,7 +4077,8 @@ def get_reporttype(cmte_id, report_id):
                     for row in cursor.fetchall():
                         data_row = list(row)
                     report_type=data_row[0]
-                print("report_type2", report_type)
+                #commented by Mahendra 10052019
+                #print("report_type2", report_type)
                 if not report_type:
                     report_type=""
                 else:
@@ -4077,15 +4094,18 @@ def delete_trashed_reports(request):
     try:
         """api for trash and restore report. """
         cmte_id = request.user.username
-        print("trash_restore_report cmte_id = ", cmte_id)
-        print("delete_trashed_reports  request.data =", request.data.get('actions', []))
+        #commented by Mahendra 10052019
+        #print("trash_restore_report cmte_id = ", cmte_id)
+        #print("delete_trashed_reports  request.data =", request.data.get('actions', []))
         list_report_ids=''
         for _action in request.data.get('actions', []):
             report_id = _action.get('id', '')
             list_report_ids = list_report_ids + str(report_id) + ", " 
-        print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)    
+        #commented by Mahendra 10052019
+        #print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)    
         report_ids = list_report_ids.strip().rstrip(',')
-        print("delete_trashed_reports list_report_ids", report_ids)    
+        #commented by Mahendra 10052019
+        #print("delete_trashed_reports list_report_ids", report_ids)    
         with connection.cursor() as cursor:
             cursor.execute("""DELETE FROM public.forms_committeeinfo WHERE id in (""" + report_ids + """) AND committeeid = '""" + cmte_id + """'""")
             cursor.execute("""DELETE FROM public.reports WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
@@ -4120,9 +4140,10 @@ def get_all_trashed_reports(request):
             cmte_id = request.user.username
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
-            print ("[cmte_id]", cmte_id)
-            print ("[viewtype]", viewtype)
-            print ("[reportid]", reportid)
+            #commented by Mahendra 10052019
+            #print ("[cmte_id]", cmte_id)
+            #print ("[viewtype]", viewtype)
+            #print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -4153,12 +4174,6 @@ def get_all_trashed_reports(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-    
-                #print("query_string =", query_string)
-
-                # print("query_string = ", query_string)
-                # Pull reports from reports_view
-                #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_string, [cmte_id, viewtype])
                 else:
@@ -4200,8 +4215,6 @@ def get_all_trashed_reports(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-                #print("query_count_string =", query_count_string)
-
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_count_string, [cmte_id, viewtype])
                 else:
@@ -4229,15 +4242,18 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
             # UPDATE delete_ind flag to Y in DB
             #form 99 report
             report_type = get_reporttype(cmte_id, report_id)
-            print("report_type3", report_type)
-            print("trash_restore_sql_report cmte_id = ", cmte_id)
-            print("trash_restore_sql_report report_id = ", report_id)
+            #commented by Mahendra 10052019
+            #print("report_type3", report_type)
+            #print("trash_restore_sql_report cmte_id = ", cmte_id)
+            #print("trash_restore_sql_report report_id = ", report_id)
+            
             if report_type == 'F99':
                 if (_delete == 'Y'):
                     cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 else:
                     cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
-                print("report_type4", report_type)
+                #commented by Mahendra 10052019
+                #print("report_type4", report_type)
             else:
                 #form 3X report
                 cursor.execute("""UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
@@ -4269,11 +4285,13 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
 def trash_restore_report(request):
     """api for trash and restore report. """
     cmte_id = request.user.username
-    print("trash_restore_report  request.data =", request.data.get('actions', []))
+    #commented by Mahendra 10052019
+    #print("trash_restore_report  request.data =", request.data.get('actions', []))
     for _action in request.data.get('actions', []):
         report_id = _action.get('id', '')
-        print("trash_restore_report cmte_id = ", cmte_id)
-        print("trash_restore_report report_id = ", report_id)
+        #commented by Mahendra 10052019
+        #print("trash_restore_report cmte_id = ", cmte_id)
+        #print("trash_restore_report report_id = ", report_id)
 
         result='failed'
         action = _action.get('action', '')
@@ -4303,15 +4321,16 @@ def delete_trashed_contacts(request):
     try:
         """api for trash and restore contact. """
         cmte_id = request.user.username
-        print("trash_restore_contact cmte_id = ", cmte_id)
-        print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
+        #commented by Mahendra 10052019
+        #print("trash_restore_contact cmte_id = ", cmte_id)
+        #print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
         list_entity_ids="'"
         for _action in request.data.get('actions', []):
             entity_id = _action.get('id', '')
             list_entity_ids = list_entity_ids + str(entity_id) + "','" 
-        print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
+        #print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
         entity_ids = list_entity_ids[0:len(list_entity_ids)-2]
-        print("delete_trashed_contacts list_entity_ids", entity_ids)    
+        #print("delete_trashed_contacts list_entity_ids", entity_ids)    
         with connection.cursor() as cursor:
              cursor.execute("""DELETE FROM public.entity WHERE entity_id in (""" + entity_ids + """) AND cmte_id = '""" + cmte_id + """'""")
       
@@ -4425,8 +4444,9 @@ def get_all_trashed_contacts(request):
 
 def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
     """trash or restore contacts table by updating delete_ind"""
-    print("check_report_to_delete cmte_id = ", cmte_id)
-    print("check_report_to_delete entity_id = ", entity_id)
+    #commented by Mahendra 10052019
+    #print("check_report_to_delete cmte_id = ", cmte_id)
+    #print("check_report_to_delete entity_id = ", entity_id)
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
@@ -4438,18 +4458,19 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
 def trash_restore_contact(request):
     """api for trash and restore contact. """
     cmte_id = request.user.username
-    print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    #commented by Mahendra 10052019
+    #print("trash_restore_contact  request.data =", request.data.get('actions', []))
     result=''
     for _action in request.data.get('actions', []):
         entity_id = _action.get('id', '')
-        print("trash_restore_contact entity_id = ", entity_id)
-        print("trash_restore_contact cmte_id = ", cmte_id)
+        #print("trash_restore_contact entity_id = ", entity_id)
+        #print("trash_restore_contact cmte_id = ", cmte_id)
         result='failed'
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
         try:
             if _delete == 'Y':
-                print("trying to trash_restore_contact...")
+                #print("trying to trash_restore_contact...")
                 if check_contact_to_delete(cmte_id, entity_id) == 'N':
                     result = 'failed'
                 else:
@@ -4469,8 +4490,9 @@ def trash_restore_contact(request):
 
 def check_contact_to_delete(cmte_id, entity_id):
     try:
-        print("check_contact_to_delete cmte_id = ", cmte_id)
-        print("check_contact_to_delete entity_id = ", entity_id)
+        #commented by Mahendra 10052019
+        #print("check_contact_to_delete cmte_id = ", cmte_id)
+        #print("check_contact_to_delete entity_id = ", entity_id)
         _delete = 'Y'
         entity_id_found=''
         with connection.cursor() as cursor:
@@ -4482,9 +4504,9 @@ def check_contact_to_delete(cmte_id, entity_id):
                             AND vw.entity_id = %s """, [cmte_id, entity_id])           
 
             entity_ids = cursor.fetchone()
-            print("entity_ids_found =", entity_ids)
+            #print("entity_ids_found =", entity_ids)
             entity_id_found = entity_ids[0]
-            print("entity_id_found =", entity_id_found)
+            #print("entity_id_found =", entity_id_found)
             if entity_id_found == '':
                 _delete = 'Y'
             else:
@@ -4499,8 +4521,9 @@ def check_report_to_delete(cmte_id, report_id):
     try:
         _delete = 'Y'
         entity_id_found=''
-        print("check_report_to_delete cmte_id = ", cmte_id)
-        print("check_report_to_delete report_id = ", report_id)
+        #commented by Mahendra 10052019
+        #print("check_report_to_delete cmte_id = ", cmte_id)
+        #print("check_report_to_delete report_id = ", report_id)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT report_id FROM public.all_transactions_view vw, public.reports rp 
                             WHERE rp.cmte_id = %s 
@@ -4511,7 +4534,7 @@ def check_report_to_delete(cmte_id, report_id):
 
             report_ids = cursor.fetchone()
             report_id_found = report_ids[0]
-            print("report_id_found =",report_id_found)
+            #print("report_id_found =",report_id_found)
             if entity_id_found == '':
                 _delete = 'Y'
             else:
@@ -4608,7 +4631,8 @@ def get_reports_data(report_id):
     try:
         query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
         forms_obj = None
-        print('here',forms_obj)
+        #commented by Mahendra 10052019
+        #print('here',forms_obj)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
             for row in cursor.fetchall():
