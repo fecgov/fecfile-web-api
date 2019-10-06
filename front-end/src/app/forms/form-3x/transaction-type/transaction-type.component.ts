@@ -80,8 +80,9 @@ export class TransactionTypeComponent implements OnInit {
       setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
       setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
       this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
-      // this.updateTypeSelected(setTargetVal);
-      // this.childOptionsListClick(setTargetVal.target.value);
+      this.updateTypeSelected(setTargetVal);
+      this.childOptionsListClick(setTargetVal.target.value);
+      this.doValidateOption();
     }
   }
 
@@ -109,7 +110,11 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   private _toggle(sec_option) {
-    setTimeout(() => this.accordion.toggle(sec_option), 0);
+    setTimeout(() => {
+      if (this.accordion) {
+        this.accordion.toggle(sec_option), 0;
+      }
+    });
   }
 
   /**
@@ -245,8 +250,10 @@ export class TransactionTypeComponent implements OnInit {
       console.log('transaction type selected: ', id);
       if (document.getElementById(id) != null) {
         const obj = <HTMLInputElement>document.getElementById('option_' + id);
-        obj.click();
-        obj.checked = true;
+        if (obj) {
+          obj.click();
+          obj.checked = true;
+        }
       }
     } else {
       this._dialogService
