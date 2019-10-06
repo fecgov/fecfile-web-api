@@ -1637,21 +1637,19 @@ def check_F99_Reason_Text(strReasonText):
 
 
 def validate_HTMLtag(strWord):
-    #commented by Mahendra 10052019
-    #print("validate_HTMLtag...")
-    #print(" strWord = ", strWord)
+    print("validate_HTMLtag...")
+    print(" strWord = ", strWord)
     try:
         valideTags=['div','br','span','blockquote','ul','ol','li','b','u','i']
         if ('</' in strWord and '>' in strWord) and ('<div' not in strWord or '<span' not in strWord ): 
-            #commented by Mahendra 10052019
-            #print(" word check strWord = ", strWord)
+            print(" word check strWord = ", strWord)
             intstartpos=strWord.find('</'); 
             substr=strWord[intstartpos+2]
             intendpos=substr.find('>'); 
             strsearch=strWord[intstartpos+2:intendpos]
-            #print(strsearch)
+            print(strsearch)
             if strsearch not in valideTags:
-                #print(" Wrong tag =", strsearch) 
+                print(" Wrong tag =", strsearch) 
         return ""  
     except Exception as e:
         return Response("The validate_HTMLtag function is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
