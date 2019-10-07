@@ -4657,6 +4657,43 @@ def insert_sql_report(dict_data):
         raise
 
 
+@api_view(['PUT'])
+def new_report_update_date(request):
+    logger.debug('request for update report last_update_date:')
+    try:
+        if request.method == 'PUT':
+            cmte_id = request.user.username
+            logger.debug('cmte id:{}'.format(cmte_id))
+            if not request.data.get('report_id'):
+                raise Exception("Error: report_id is required for this api.")
+            report_id = check_report_id(request.data.get('report_id'))
+            logger.debug('report_id:{}'.format(report_id))
+            _sql = """
+            UPDATE public.reports
+            SET last_update_date = %s
+            WHERE cmte_id = %s
+            AND report_id = %s 
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [
+                    datetime.datetime.now(),
+                    cmte_id,
+                    report_id
+                ])
+                if cursor.rowcount == 0:
+                    raise Exception('Error: updating report update date failed.')
+            
+        else:
+            raise Exception('Error: request type not implemented.')
+    except Exception as e:
+        return Response(
+            "new report update date API is throwing an error: " + str(e), 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+    return Response({"result" : "success"}, status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 def create_amended_reports(request):
 

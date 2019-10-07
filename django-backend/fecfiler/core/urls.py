@@ -154,5 +154,10 @@ urlpatterns = [
         r"^core/create_amended_reports$",
         views.create_amended_reports,
         name="create_amended_reports",
-    )
+    ),
+    url(
+        r"^core/new_report_update_date$",
+        views.new_report_update_date,
+        name="new_report_update_date",
+    ),
 ]
