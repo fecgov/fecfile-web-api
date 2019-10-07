@@ -4719,7 +4719,7 @@ def USPS_address_validation(data):
 </AddressValidateRequest> """.format(settings.USPS_USERNAME, street_1, street_2, city, state, zip_code)
         parameters = {'API': 'verify',
                         'XML': XML_input}
-        response = requests.get(settings.USPS_HTTP_API_URL, params=parameters)
+        response = requests.get("http:" + settings.USPS_API_URL, params=parameters)
         if not response:
             raise Exception(response.json())
         else:

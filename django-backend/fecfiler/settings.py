@@ -342,7 +342,7 @@ AWS_REGION = 'us-east-1'
 AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, turn off automatic throttling, set this to None)
 
 USPS_USERNAME = os.environ.get('USPS_USERNAME', None)
-USPS_HTTP_API_URL = os.environ.get('USPS_HTTP_API_URL', None)
+USPS_API_URL = os.environ.get('USPS_API_URL', None)
 
 
 # add the credentials from IAM and bucket name
