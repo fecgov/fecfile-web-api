@@ -4487,7 +4487,7 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 
 def get_reports_data(report_id):
     try:
-        query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' """
         forms_obj = None
         print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -4514,34 +4514,77 @@ def insert_sql_report(dict_data):
         raise
 
 
+def create_amended(reportid):
+    try:
+        data_dict = get_reports_data(reportid)
+        if data_dict:
+            #data = data[0]
+            report_id = get_next_report_id()
+
+            for data in data_dict:
+                print(data)
+                data['report_id'] = str(report_id)
+
+                #post_sql_report(reports_obj(''))
+                data['amend_ind'] = 'A'
+                data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
+                data['previous_report_id'] = reportid
+                data['report_seq'] = get_next_report_id()
+                #print(data,'here')
+                insert_sql_report(data)
+                print(data,'here')
+
+                return True
+
+        else:
+            return False
+
+    except Exception as e:
+        print(e)
+        return False
+
+
+def get_report_ids(from_date):
+    data_ids =[]
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s """, [from_date])
+            if cursor.rowcount > 0:
+                for row in cursor.fetchall():
+                    data_ids.append(row[0])
+            
+        return data_ids
+    except Exception as e:
+        print(e,'get_reportid dddddddddddddddddddddddddddddddddd')
+        return data_ids
+
+
 @api_view(['POST'])
 def create_amended_reports(request):
 
     try:
         if request.method == 'POST':
             reportid = request.POST.get('report_id')
-            print('create_amended_reports',reportid)
-            data_dict = get_reports_data(reportid)
-            if data_dict:
-                #data = data[0]
-                report_id = get_next_report_id()
+            cmte_id = request.user.username
 
-                for data in data_dict:
-                    print(data)
-                    data['report_id'] = str(report_id)
+            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
-                    #post_sql_report(reports_obj(''))
-                    data['amend_ind'] = 'A'
-                    data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
-                    data['previous_report_id'] = reportid
-                    data['report_seq'] = str(get_next_report_id())
-                    print(data,'here')
-                    insert_sql_report(data)
+            #cdate = date.today()
+            from_date = cvg_start_date
+
+            report_id_list = get_report_ids(from_date)
+
+            print(report_id_list, from_date ,'herreeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+
+            if report_id_list:
+                for i in report_id_list:
+                    amended_status = create_amended(i)
+            
                     #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
             else:
                 return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse("Succesfully Create amended report", status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
