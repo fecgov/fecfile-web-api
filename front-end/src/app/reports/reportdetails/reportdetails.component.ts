@@ -765,9 +765,15 @@ public printReport(report: reportModel): void{
     
   }
 
-  public downloadReport(): void{
-    alert('Download report is not yet supported');
+  public downloadReport(report: reportModel): void{
+    
+    const imageNumber="201804139108073637"; // Todo in the production get the imagenumber from reports table
+    const url=`https://www.fec.gov/data/filings/?data_type=processed&committee_id=${report.cmte_id}&beginning_image_number=${imageNumber}`;
+    console.log("downloadReport url = ", url);
+    window.open(url, '_blank');
+
   }
+
 
   
 
