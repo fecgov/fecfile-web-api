@@ -260,7 +260,7 @@
                 </button>
               </div>
               <div class="editor full-width-textarea" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
-                  role="textarea" (input)="editorChange($event)" (paste)="removeHTML($event)" #htmlEditor> {{editingTextArea ? textAreaTextContent : null}}
+                  role="textarea" (input)="editorChange($event)" (paste)="removeHTML($event)" [innerHTML]="editingTextArea ? textAreaTextContent : null" #htmlEditor>
               </div>
             </div>
           </div>

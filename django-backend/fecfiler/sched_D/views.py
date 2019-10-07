@@ -112,8 +112,18 @@ def schedD(request):
             data = {"cmte_id": request.user.username}
             if "report_id" in request.data:
                 data["report_id"] = check_report_id(request.data.get("report_id"))
+            elif "report_id" in request.query_params:
+                data["report_id"] = check_report_id(
+                    request.query_params.get("report_id")
+                )
             else:
                 raise Exception("Missing Input: report_id is mandatory")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
+            ):
+                data["transaction_id"] = check_transaction_id(
+                    request.query_params.get("transaction_id")
+                )
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -138,15 +148,17 @@ def schedD(request):
     elif request.method == "DELETE":
         try:
             data = {"cmte_id": request.user.username}
-            if "report_id" in request.data:
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+            if "report_id" in request.query_params:
+                data["report_id"] = check_report_id(
+                    request.query_params.get("report_id")
+                )
             else:
                 raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
             ):
                 data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 )
             else:
                 raise Exception("Missing Input: transaction_id is mandatory")
@@ -308,7 +320,7 @@ def check_mandatory_fields_SD(data):
             #     string = string + x + ", "
             # string = string[0:-2]
             raise Exception(
-                "The following mandatory fields are required in order to save data to schedA table: {}".format(
+                "The following mandatory fields are required in order to save data to schedD table: {}".format(
                     ",".join(errors)
                 )
             )
@@ -494,7 +506,7 @@ def get_list_all_schedD(report_id, cmte_id):
             FROM public.sched_d 
             WHERE report_id = %s 
             AND cmte_id = %s 
-            AND delete_ind is distinct from 'Y';
+            AND delete_ind is distinct from 'Y'
             """
 
             cursor.execute(

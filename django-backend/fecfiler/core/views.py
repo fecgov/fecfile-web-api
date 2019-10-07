@@ -26,6 +26,10 @@ from django.core.paginator import Paginator
 from datetime import date, timedelta, time
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
+from xml.etree import ElementTree
+from fuzzywuzzy import fuzz
+import pandas
+import numpy
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -961,7 +965,7 @@ def post_sql_entity(
         raise
 
 def get_list_entity(entity_id, cmte_id):
-    logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
+    # logger.debug("get_list_entity with entity_id {} and cmte_id {}".format(entity_id, cmte_id))
     try:
         query_string = """
         SELECT 
@@ -997,7 +1001,7 @@ def get_list_entity(entity_id, cmte_id):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        logger.debug('entity data loaded:{}'.format(forms_obj))
+        # logger.debug('entity data loaded:{}'.format(forms_obj))
         if forms_obj is None:
             raise NoOPError('The Entity ID: {} does not exist or is deleted'.format(entity_id))   
         return forms_obj
@@ -1233,7 +1237,7 @@ def get_entities(data):
         cmte_id = data.get('cmte_id')
         entity_flag = False
         if 'entity_id' in data:
-            logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
+            # logger.debug('load entity with entity id: {}'.format(data.get('entity_id')))
             try:
                 check_entity_id(data.get('entity_id'))
                 entity_flag = True
@@ -2100,11 +2104,14 @@ def get_all_transactions(request):
         #             param_string = param_string + " AND LOWER(" + key + ") LIKE LOWER('" + value +"%')"
 
         # ADDED the below code to access transactions across reports and based on categoryType
-        if 'reportid' in request.data and str(request.data.get('reportid')).lower() not in ['',"", "null", "none"]:
+        if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
             report_id = request.data.get('reportid')
             param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
-        if 'categoryType' in request.data and str(request.data.get('categoryType')).lower() not in ['',"", "null", "none"]:
-            param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+        if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
+            if request.data.get('categoryType') == "SL-A":
+                param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
+            else:
+                param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
 
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
@@ -2386,7 +2393,7 @@ def delete_trashed_transactions(request):
             message='Transaction deleted successfully'
             #message_dict[trans_id] = message
             sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
-            print(sched_a_obj)
+            #print(sched_a_obj) Mahendra 10052019
             if sched_a_obj:
                
                 report_info = get_list_report_data(sched_a_obj['report_id'], committeeid)[0]
@@ -2754,8 +2761,88 @@ def summary_receipts_for_sumamry_table(args):
     except Exception as e:
         raise Exception('The summary_receipts API is throwing the error: ' + str(e))
 
+def load_loan_debt_summary(period_args):
+    """
+    query laon and debt sum for current report and ytd
+    TODO: still need to verify the business logic is correct
+    1. need to check against get_loan_debt_summary api
+    2. need to verify the transaction types in the database
+    """
+    start_dt = period_args[0]
+    end_dt = period_args[1]
+    cmte_id = period_args[2]
+    report_id = period_args[3]
+    loan_debt_dic =  {  
+        'DEBTS/LOANS OWED TO COMMITTEE': 0,
+        'DEBTS/LOANS OWED BY COMMITTEE': 0,
+        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
+        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0
+    }
+
+    _sql_rep = """
+        SELECT transaction_type_identifier, 
+        SUM(loan_balance) 
+        FROM   sched_c 
+        WHERE  cmte_id = %s 
+            AND report_id = %s 
+            AND transaction_type_identifier IN ( 
+                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+        UNION 
+        SELECT transaction_type_identifier, 
+            SUM(balance_at_close) 
+        FROM   sched_d 
+        WHERE  cmte_id = %s 
+            AND report_id = %s 
+            AND transaction_type_identifier IN ( 
+                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+    """
+    _sql_ytd = """
+        SELECT transaction_type_identifier AS ytd, 
+            Sum(loan_balance) 
+        FROM   sched_c 
+        WHERE  cmte_id = %s 
+            AND loan_incurred_date BETWEEN %s AND %s 
+            AND transaction_type_identifier IN ( 
+                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+        UNION 
+        SELECT transaction_type_identifier AS ytd, 
+            Sum(balance_at_close) 
+        FROM   sched_d 
+        WHERE  cmte_id = %s
+            AND create_date BETWEEN %s AND %s
+            AND transaction_type_identifier IN ( 
+                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+        GROUP  BY transaction_type_identifier 
+    """
+    try:
+        with connection.cursor() as cursor:
+            #cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            cursor.execute(_sql_rep, [cmte_id, report_id]*2)
+            for row in cursor.fetchall():
+                if row[0].endswith('TO_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED TO COMMITTEE'] += float(row[1])
+                elif row[0].endswith('BY_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED BY COMMITTEE'] += float(row[1])
+                else:
+                    pass
+            cursor.execute(_sql_ytd, [cmte_id, start_dt, end_dt]*2)
+            for row in cursor.fetchall():
+                if row[0].endswith('TO_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED TO COMMITTEE YTD'] += float(row[1])
+                elif row[0].endswith('BY_CMTE'):
+                    loan_debt_dic['DEBTS/LOANS OWED BY COMMITTEE YTD'] += float(row[1])
+                else:
+                    pass
+            return loan_debt_dic
+    except Exception as e:
+        raise Exception('The get_loan_debt_summary function is throwing an error: ' + str(e))
+
 @api_view(['GET'])
 def get_summary_table(request):
+    logger.debug('get_summary_table with request:{}'.format(request.query_params))
     try:
         cmte_id = request.user.username
 
@@ -2767,8 +2854,12 @@ def get_summary_table(request):
 
         report_id = check_report_id(request.query_params.get('report_id'))
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        logger.debug('query_params: report_id {}, calendar_year {}'.format(report_id, calendar_year))
 
         period_args = [datetime.date(int(calendar_year), 1, 1), datetime.date(int(calendar_year), 12, 31),  cmte_id, report_id]
+        logger.debug('period_args:{}'.format(period_args))
+
+        logger.debug('load receipts and dsibursements...')
         period_receipt = summary_receipts_for_sumamry_table(period_args)
         period_disbursement = summary_disbursements_for_sumamry_table(period_args)
         
@@ -2777,21 +2868,25 @@ def get_summary_table(request):
         calendar_receipt = summary_receipts(calendar_args)
         calendar_disbursement = summary_disbursements(calendar_args)
         '''
+        logger.debug('load cash on hand...')
         coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
         coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
 
         cash_summary = {'COH AS OF JANUARY 1': coh_bop_ytd,
                         'BEGINNING CASH ON HAND': coh_bop,
-                        'ENDING CASH ON HAND': coh_cop,
-                        'DEBTS/LOANS OWED TO COMMITTEE': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE': 0,
-                        'DEBTS/LOANS OWED TO COMMITTEE YTD': 0,
-                        'DEBTS/LOANS OWED BY COMMITTEE YTD': 0}
+                        'ENDING CASH ON HAND': coh_cop}
+        logger.debug('cash summary:{}'.format(cash_summary))
+
+        loan_and_debts = load_loan_debt_summary(period_args)
+        logger.debug('adding loan and debts:{}'.format(loan_and_debts))
+        cash_summary.update(loan_and_debts)
+        logger.debug('adding loan and debts:{}'.format(cash_summary))
 
         forms_obj = {'Total Raised': {'period_receipts': period_receipt},
                     'Total Spent': {'period_disbursements': period_disbursement},
                     'Cash summary': cash_summary}
+        logger.debug('summary result:{}'.format(forms_obj))
                         
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
@@ -2840,7 +2935,7 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COALESCE(coh_cop, 0) from public.form_3x where cmte_id = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
+            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.form_3x t1 where t1.cmte_id = %s AND t1.cvg_end_dt = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
             if (cursor.rowcount == 0):
                 coh_cop = 0
             else:
@@ -3172,15 +3267,17 @@ def print_preview_pdf(request):
         }
 
         json_builder_resp = requests.post(settings.JSON_BUILDER_URL, data=data_obj)
-        print("json_builder_resp = ", json_builder_resp)
+        #print("json_builder_resp = ", json_builder_resp)
+        #commented by Mahendra 10052019
 
         bucket_name = 'dev-efile-repo'
         client = boto3.client('s3')
         transfer = S3Transfer(client)
         #s3.download_file(bucket_name , s3_file_path, save_as)
         transfer.download_file(bucket_name , json_builder_resp, json_builder_resp)
-        with open(save_as) as f:
-            print(json_builder_resp.read())
+        #commented by Mahendra 10052019
+        #with open(save_as) as f:
+            #print(json_builder_resp.read())
 
         printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
@@ -3410,7 +3507,8 @@ def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, rep
 @api_view(['POST'])
 def prepare_json_builders_data(request):
     try:
-        print("request.data: ", request.data)
+        #print("request.data: ", request.data)
+        #commented by Mahendra 10052019
         cmte_id = request.user.username
         param_string = ""
         report_id = request.data.get('report_id')
@@ -3430,20 +3528,24 @@ def prepare_json_builders_data(request):
             cursor.execute("""
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             sched_a_line_sum_result = cursor.fetchall()
             sched_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(expenditure_amount) from public.sched_b 
                 where cmte_id = '%s' AND report_id = '%s' group by line_number;""" %(cmte_id, report_id))
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             sched_b_line_sum_result = cursor.fetchall()
             sched_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result}
         
         #sched_a_line_sum.update(sched_b_line_sum)
-        print(sched_a_line_sum, "sched_a_line_sum")
-        print(sched_b_line_sum, "sched_b_line_sum")
+        #print(sched_a_line_sum, "sched_a_line_sum")
+        #commented by Mahendra 10052019
+        #print(sched_b_line_sum, "sched_b_line_sum")
+        #commented by Mahendra 10052019
         
         ##schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         ##schedule_a_b_line_sum_dict.update(sched_b_line_sum)
@@ -3459,14 +3561,16 @@ def prepare_json_builders_data(request):
             cursor.execute(""" 
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
-            print(cursor.query)     
+            #print(cursor.query)     
+            #commented by Mahendra 10052019
             col_a_line_sum_result = cursor.fetchall()
             col_a_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_a_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT line_number, sum(expenditure_amount) from public.sched_b 
                 where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
-            print(cursor.query)
+            #print(cursor.query)
+            #commented by Mahendra 10052019
             col_b_line_sum_result = cursor.fetchall()
             col_b_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_b_line_sum_result}
 
@@ -3475,8 +3579,10 @@ def prepare_json_builders_data(request):
         col_line_sum_dict.update(col_a_line_sum)
         col_line_sum_dict.update(col_b_line_sum)
 
-        print(col_a_line_sum, "col_a_line_sum")
-        print(col_b_line_sum, "col_b_line_sum")
+        #print(col_a_line_sum, "col_a_line_sum")
+        #commented by Mahendra 10052019
+        #print(col_b_line_sum, "col_b_line_sum")
+        #commented by Mahendra 10052019
         
 
 
@@ -3504,7 +3610,8 @@ def prepare_json_builders_data(request):
                                                                schedule_a_b_line_sum_dict, cmte_id, report_id)
             schedule_a_b_line_sum_dict[line_number] = final_col_a_dict[line_number]
 
-        print(final_col_a_dict, "col_a_dict")
+        #print(final_col_a_dict, "col_a_dict")
+        #commented by Mahendra 10052019
 
         col_b = [
             ('11ai', ''), ('11aii', ''), ('11aiii', '11ai + 11aii'), ('11b', ''), ('11c', ''),
@@ -3531,7 +3638,8 @@ def prepare_json_builders_data(request):
                                                                col_line_sum_dict,
                                                                cmte_id, report_id)
             col_line_sum_dict[line_number] = final_col_b_dict[line_number]
-        print(final_col_b_dict, "col_b_dict")
+        #print(final_col_b_dict, "col_b_dict")
+        #commented by Mahendra 10052019
 
         for i in final_col_a_dict:
             a_val = final_col_a_dict[i]
@@ -3554,10 +3662,11 @@ def prepare_json_builders_data(request):
             final_col_b_dict[i] = b_val
             final_col_a_dict[i] = a_val
 
-        print("---------------------------------")
-        print("Final AAAA", final_col_a_dict)
-        print("---------------------------------")
-        print("Final B", final_col_b_dict)
+        #commented by Mahendra 10052019
+        #print("---------------------------------")
+        #print("Final AAAA", final_col_a_dict)
+        #print("---------------------------------")
+        #print("Final B", final_col_b_dict)
 
 
         update_col_a_dict = {'6b': 'coh_bop', '6c': 'ttl_receipts_sum_page_per', '6d': 'subttl_sum_page_per',
@@ -3632,8 +3741,8 @@ def prepare_json_builders_data(request):
 
         update_str = update_str[:-1]
         # print("-------------------------")
-        print(update_str, "update_str")
-
+        #print(update_str, "update_str")
+        #commented by Mahendra 10052019
         #return Response({'Response':'Success'}, status=status_value)
         
         with connection.cursor() as cursor:
@@ -3808,7 +3917,8 @@ def contacts(request):
             datum['cmte_id'] = request.user.username
             #datum['cmte_id'] = cmte_id
             post_contact(datum)
-            print ("datum", datum)
+            #commented by Mahendra 10052019
+            #print ("datum", datum)
             output = get_contact(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -3883,26 +3993,43 @@ def get_contact(data):
     except:
         raise
 
-def get_list_contact(cmte_id, entity_id = None):
+def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity_name_flag = False):
 
     try:
         with connection.cursor() as cursor:
-            # GET single row from entity table
-            if entity_id:
-                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
+            #This Flag seperates whether I need only entity name or first_name, last_name
+            if not name_select_flag:
+                if isinstance(entity_id, list):
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format("', '".join(entity_id))
 
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                            """) t""", [cmte_id, entity_id])
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                                """) t""", [cmte_id])
+                # GET single row from entity table
+                elif entity_id:
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
+                                """) t""", [cmte_id, entity_id])
+                else:
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
+
+                    cursor.execute("""SELECT json_agg(t) FROM (""" +
+                               query_string + """) t""", [cmte_id])
             else:
-                query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
-                                FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
-
+                if entity_name_flag:
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
+                else:
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                                    FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [cmte_id])           
+                               query_string + """) t""", [cmte_id])
  
             contact_list = cursor.fetchone()[0]
-            print("contact_list", contact_list)
+            # print("contact_list", contact_list)
             if not contact_list:
                 raise NoOPError(
                     'No entity found for cmte_id {} '.format(cmte_id))
@@ -3940,7 +4067,8 @@ def get_reporttype(cmte_id, report_id):
                 for row in cursor.fetchall():
                     data_row = list(row)
                 report_type=data_row[0]
-            print("report_type1", report_type)
+            #commented by Mahendra 10052019
+            #print("report_type1", report_type)
             if report_type == "":
                 cursor.execute("""SELECT id FROM public.forms_committeeinfo WHERE committeeid = %s AND id = %s """, [cmte_id, report_id])
                 data_row=[]
@@ -3949,7 +4077,8 @@ def get_reporttype(cmte_id, report_id):
                     for row in cursor.fetchall():
                         data_row = list(row)
                     report_type=data_row[0]
-                print("report_type2", report_type)
+                #commented by Mahendra 10052019
+                #print("report_type2", report_type)
                 if not report_type:
                     report_type=""
                 else:
@@ -3965,15 +4094,18 @@ def delete_trashed_reports(request):
     try:
         """api for trash and restore report. """
         cmte_id = request.user.username
-        print("trash_restore_report cmte_id = ", cmte_id)
-        print("delete_trashed_reports  request.data =", request.data.get('actions', []))
+        #commented by Mahendra 10052019
+        #print("trash_restore_report cmte_id = ", cmte_id)
+        #print("delete_trashed_reports  request.data =", request.data.get('actions', []))
         list_report_ids=''
         for _action in request.data.get('actions', []):
             report_id = _action.get('id', '')
             list_report_ids = list_report_ids + str(report_id) + ", " 
-        print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)    
+        #commented by Mahendra 10052019
+        #print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)    
         report_ids = list_report_ids.strip().rstrip(',')
-        print("delete_trashed_reports list_report_ids", report_ids)    
+        #commented by Mahendra 10052019
+        #print("delete_trashed_reports list_report_ids", report_ids)    
         with connection.cursor() as cursor:
             cursor.execute("""DELETE FROM public.forms_committeeinfo WHERE id in (""" + report_ids + """) AND committeeid = '""" + cmte_id + """'""")
             cursor.execute("""DELETE FROM public.reports WHERE report_id in (""" + report_ids + """) AND cmte_id = '""" + cmte_id + """'""")
@@ -4008,9 +4140,10 @@ def get_all_trashed_reports(request):
             cmte_id = request.user.username
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
-            print ("[cmte_id]", cmte_id)
-            print ("[viewtype]", viewtype)
-            print ("[reportid]", reportid)
+            #commented by Mahendra 10052019
+            #print ("[cmte_id]", cmte_id)
+            #print ("[viewtype]", viewtype)
+            #print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -4041,12 +4174,6 @@ def get_all_trashed_reports(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-    
-                #print("query_string =", query_string)
-
-                # print("query_string = ", query_string)
-                # Pull reports from reports_view
-                #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_string, [cmte_id, viewtype])
                 else:
@@ -4088,8 +4215,6 @@ def get_all_trashed_reports(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-                #print("query_count_string =", query_count_string)
-
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_count_string, [cmte_id, viewtype])
                 else:
@@ -4117,15 +4242,18 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
             # UPDATE delete_ind flag to Y in DB
             #form 99 report
             report_type = get_reporttype(cmte_id, report_id)
-            print("report_type3", report_type)
-            print("trash_restore_sql_report cmte_id = ", cmte_id)
-            print("trash_restore_sql_report report_id = ", report_id)
+            #commented by Mahendra 10052019
+            #print("report_type3", report_type)
+            #print("trash_restore_sql_report cmte_id = ", cmte_id)
+            #print("trash_restore_sql_report report_id = ", report_id)
+            
             if report_type == 'F99':
                 if (_delete == 'Y'):
                     cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = True, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
                 else:
                     cursor.execute("""UPDATE public.forms_committeeinfo SET isdeleted = False, deleted_at = '{}'  WHERE committeeid = '{}' AND id = '{}'  """.format(datetime.datetime.now(), cmte_id, report_id))
-                print("report_type4", report_type)
+                #commented by Mahendra 10052019
+                #print("report_type4", report_type)
             else:
                 #form 3X report
                 cursor.execute("""UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(_delete, datetime.datetime.now(), cmte_id, report_id))
@@ -4157,11 +4285,13 @@ def trash_restore_sql_report(cmte_id, report_id, _delete='Y'):
 def trash_restore_report(request):
     """api for trash and restore report. """
     cmte_id = request.user.username
-    print("trash_restore_report  request.data =", request.data.get('actions', []))
+    #commented by Mahendra 10052019
+    #print("trash_restore_report  request.data =", request.data.get('actions', []))
     for _action in request.data.get('actions', []):
         report_id = _action.get('id', '')
-        print("trash_restore_report cmte_id = ", cmte_id)
-        print("trash_restore_report report_id = ", report_id)
+        #commented by Mahendra 10052019
+        #print("trash_restore_report cmte_id = ", cmte_id)
+        #print("trash_restore_report report_id = ", report_id)
 
         result='failed'
         action = _action.get('action', '')
@@ -4191,15 +4321,16 @@ def delete_trashed_contacts(request):
     try:
         """api for trash and restore contact. """
         cmte_id = request.user.username
-        print("trash_restore_contact cmte_id = ", cmte_id)
-        print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
+        #commented by Mahendra 10052019
+        #print("trash_restore_contact cmte_id = ", cmte_id)
+        #print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
         list_entity_ids="'"
         for _action in request.data.get('actions', []):
             entity_id = _action.get('id', '')
             list_entity_ids = list_entity_ids + str(entity_id) + "','" 
-        print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
+        #print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
         entity_ids = list_entity_ids[0:len(list_entity_ids)-2]
-        print("delete_trashed_contacts list_entity_ids", entity_ids)    
+        #print("delete_trashed_contacts list_entity_ids", entity_ids)    
         with connection.cursor() as cursor:
              cursor.execute("""DELETE FROM public.entity WHERE entity_id in (""" + entity_ids + """) AND cmte_id = '""" + cmte_id + """'""")
       
@@ -4313,8 +4444,9 @@ def get_all_trashed_contacts(request):
 
 def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
     """trash or restore contacts table by updating delete_ind"""
-    print("check_report_to_delete cmte_id = ", cmte_id)
-    print("check_report_to_delete entity_id = ", entity_id)
+    #commented by Mahendra 10052019
+    #print("check_report_to_delete cmte_id = ", cmte_id)
+    #print("check_report_to_delete entity_id = ", entity_id)
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
@@ -4326,18 +4458,19 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete='Y'):
 def trash_restore_contact(request):
     """api for trash and restore contact. """
     cmte_id = request.user.username
-    print("trash_restore_contact  request.data =", request.data.get('actions', []))
+    #commented by Mahendra 10052019
+    #print("trash_restore_contact  request.data =", request.data.get('actions', []))
     result=''
     for _action in request.data.get('actions', []):
         entity_id = _action.get('id', '')
-        print("trash_restore_contact entity_id = ", entity_id)
-        print("trash_restore_contact cmte_id = ", cmte_id)
+        #print("trash_restore_contact entity_id = ", entity_id)
+        #print("trash_restore_contact cmte_id = ", cmte_id)
         result='failed'
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
         try:
             if _delete == 'Y':
-                print("trying to trash_restore_contact...")
+                #print("trying to trash_restore_contact...")
                 if check_contact_to_delete(cmte_id, entity_id) == 'N':
                     result = 'failed'
                 else:
@@ -4357,8 +4490,9 @@ def trash_restore_contact(request):
 
 def check_contact_to_delete(cmte_id, entity_id):
     try:
-        print("check_contact_to_delete cmte_id = ", cmte_id)
-        print("check_contact_to_delete entity_id = ", entity_id)
+        #commented by Mahendra 10052019
+        #print("check_contact_to_delete cmte_id = ", cmte_id)
+        #print("check_contact_to_delete entity_id = ", entity_id)
         _delete = 'Y'
         entity_id_found=''
         with connection.cursor() as cursor:
@@ -4370,9 +4504,9 @@ def check_contact_to_delete(cmte_id, entity_id):
                             AND vw.entity_id = %s """, [cmte_id, entity_id])           
 
             entity_ids = cursor.fetchone()
-            print("entity_ids_found =", entity_ids)
+            #print("entity_ids_found =", entity_ids)
             entity_id_found = entity_ids[0]
-            print("entity_id_found =", entity_id_found)
+            #print("entity_id_found =", entity_id_found)
             if entity_id_found == '':
                 _delete = 'Y'
             else:
@@ -4387,8 +4521,9 @@ def check_report_to_delete(cmte_id, report_id):
     try:
         _delete = 'Y'
         entity_id_found=''
-        print("check_report_to_delete cmte_id = ", cmte_id)
-        print("check_report_to_delete report_id = ", report_id)
+        #commented by Mahendra 10052019
+        #print("check_report_to_delete cmte_id = ", cmte_id)
+        #print("check_report_to_delete report_id = ", report_id)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT report_id FROM public.all_transactions_view vw, public.reports rp 
                             WHERE rp.cmte_id = %s 
@@ -4399,7 +4534,7 @@ def check_report_to_delete(cmte_id, report_id):
 
             report_ids = cursor.fetchone()
             report_id_found = report_ids[0]
-            print("report_id_found =",report_id_found)
+            #print("report_id_found =",report_id_found)
             if entity_id_found == '':
                 _delete = 'Y'
             else:
@@ -4485,5 +4620,441 @@ def clone_a_transaction(request):
             raise Exception('transaction clone error')
         return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
+********************************************************************************************************************************
+"""
 
- 
+
+def get_reports_data(report_id):
+    try:
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+        forms_obj = None
+        #commented by Mahendra 10052019
+        #print('here',forms_obj)
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
+            for row in cursor.fetchall():
+                data_row = list(row)
+                forms_obj=data_row[0]
+
+        if forms_obj is None:
+            pass
+            #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
+        return forms_obj
+    except Exception:
+        raise
+
+
+def insert_sql_report(dict_data):
+    try:
+        sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
+        with connection.cursor() as cursor:
+            # INSERT row into Reports table
+            cursor.execute(sql,dict_data)                                          
+    except Exception:
+        raise
+
+
+@api_view(['PUT'])
+def new_report_update_date(request):
+    logger.debug('request for update report last_update_date:')
+    try:
+        if request.method == 'PUT':
+            cmte_id = request.user.username
+            logger.debug('cmte id:{}'.format(cmte_id))
+            if not request.data.get('report_id'):
+                raise Exception("Error: report_id is required for this api.")
+            report_id = check_report_id(request.data.get('report_id'))
+            logger.debug('report_id:{}'.format(report_id))
+            _sql = """
+            UPDATE public.reports
+            SET last_update_date = %s
+            WHERE cmte_id = %s
+            AND report_id = %s 
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [
+                    datetime.datetime.now(),
+                    cmte_id,
+                    report_id
+                ])
+                if cursor.rowcount == 0:
+                    raise Exception('Error: updating report update date failed.')
+            
+        else:
+            raise Exception('Error: request type not implemented.')
+    except Exception as e:
+        return Response(
+            "new report update date API is throwing an error: " + str(e), 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+    return Response({"result" : "success"}, status=status.HTTP_200_OK)
+
+
+
+@api_view(['POST'])
+def create_amended_reports(request):
+
+    try:
+        if request.method == 'POST':
+            reportid = request.POST.get('report_id')
+            print('create_amended_reports',reportid)
+            data_dict = get_reports_data(reportid)
+            if data_dict:
+                #data = data[0]
+                report_id = get_next_report_id()
+
+                for data in data_dict:
+                    print(data)
+                    data['report_id'] = str(report_id)
+
+                    #post_sql_report(reports_obj(''))
+                    data['amend_ind'] = 'A'
+                    data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
+                    data['previous_report_id'] = reportid
+                    data['report_seq'] = str(get_next_report_id())
+                    print(data,'here')
+                    insert_sql_report(data)
+                    #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+            else:
+                return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
+
+        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+def none_text_to_none(text):
+    try:
+        if text in ['None', 'none', 'NONE']:
+            return None
+        else:
+            return text
+    except:
+        raise
+
+def USPS_address_validation(data):
+    try:
+        output = {}
+        street_1 = data.get('street_1')
+        street_2 = data.get('street_2')
+        city = data.get('city')
+        state = data.get('state')
+        zip_code = data.get('zip_code')
+
+        XML_input = """<AddressValidateRequest USERID="{0}">
+<Revision>1</Revision>
+<Address ID="0">
+<Address1>{2}</Address1>
+<Address2>{1}</Address2>
+<City>{3}</City>
+<State>{4}</State>
+<Zip5>{5}</Zip5>
+<Zip4/>
+</Address>
+</AddressValidateRequest> """.format(settings.USPS_USERNAME, street_1, street_2, city, state, zip_code)
+        parameters = {'API': 'verify',
+                        'XML': XML_input}
+        response = requests.get("http:" + settings.USPS_API_URL, params=parameters)
+        if not response:
+            raise Exception(response.json())
+        else:
+            output['data'] = {}
+            root = ElementTree.fromstring(response.text)
+            Address = root.find('Address')
+            if Address.find('Error') != None:
+                output['status_code'] = "FAIL"
+            else:
+                output['status_code'] = "SUCCESS"
+                output['data']['street_1'] = Address.find('Address2').text
+                output['data']['street_2'] = none_text_to_none(Address.find('Address1').text)
+                output['data']['city'] = none_text_to_none(Address.find('City').text)
+                output['data']['state'] = Address.find('State').text
+                output['data']['zip_code'] = Address.find('Zip5').text
+                output['data']['zip_code4'] = none_text_to_none(Address.find('Zip4').text)
+                if Address.find('ReturnText') != None:
+                    output['status_code'] = "WARNING"
+                    output['warning_message'] = Address.find('ReturnText').text
+            return output
+    except Exception as err:
+        raise Exception(f'USPS_address_validation API is throwing an error: {err}')
+
+@api_view(['POST'])
+def address_validation(request):
+    try:
+        output = USPS_address_validation(request.data)
+        return Response(output, status.HTTP_200_OK)
+
+    except requests.exceptions.HTTPError as http_err:
+        return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
+
+def partial_match(x,y):
+    return(max(fuzz.ratio(x,y),fuzz.partial_ratio(x,y),fuzz.token_sort_ratio(x,y),fuzz.token_set_ratio(x,y),fuzz.WRatio(x,y)))
+
+def duplicate_address(cmte_id, data):
+    try:
+        moderation_score = 92
+        if 'entity_name' in data and data.get('entity_name') not in ['null', 'None', '', "", None]:
+            org_name_flag = True
+            input_name = data.get('entity_name')
+        else:
+            org_name_flag = False
+            input_list = [data.get('preffix'), data.get('first_name'), data.get('middle_name'), data.get('last_name'), data.get('suffix')]
+            input_name = " ".join(filter(None, input_list))
+
+        USPS_input = USPS_address_validation(data)
+        if USPS_input.get('status_code') != "FAIL":
+            input_address = " ".join(filter(None, [USPS_input.get('data').get('street_1'), USPS_input.get('data').get('street_2'), USPS_input.get('data').get('city'), USPS_input.get('data').get('state'), USPS_input.get('data').get('zip_code')]))
+        else:
+            input_address = " ".join(filter(None, [data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state')]))
+            if 'zip_code' in data and data.get('zip_code') not in ['null', 'None', '', "", None]:
+                input_address += " " + data.get('zip_code')[0:5]
+        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation'), data.get('employer')])]
+
+        contact_list = get_list_contact(cmte_id, None, True, org_name_flag)
+        compare_entity_id_list = []
+        compare_total_address_list = []
+        if org_name_flag:
+            for contact in contact_list:
+                compare_entity_id_list.append(contact.get('entity_id'))
+                if 'zip_code' in contact and contact.get('zip_code') not in ['null', 'None', '', "", None]:
+                    compare_total_address = " ".join(filter(None, [contact.get('entity_name'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('zip_code')[0:5], contact.get('occupation'), contact.get('employer')]))
+                else:
+                    compare_total_address = " ".join(filter(None, [contact.get('entity_name'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('occupation'), contact.get('employer')]))
+                compare_total_address_list.append(compare_total_address)
+        else:
+            for contact in contact_list:
+                compare_entity_id_list.append(contact.get('entity_id'))
+                if 'zip_code' in contact and contact.get('zip_code') not in ['null', 'None', '', "", None]:
+                    compare_total_address_list.append(" ".join(filter(None, [contact.get('preffix'), contact.get('first_name'), contact.get('middle_name'), contact.get('last_name'), contact.get('suffix'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('zip_code')[0:5], contact.get('occupation'), contact.get('employer')])))
+                else:
+                    compare_total_address_list.append(" ".join(filter(None, [contact.get('preffix'), contact.get('first_name'), contact.get('middle_name'), contact.get('last_name'), contact.get('suffix'), contact.get('street_1'), contact.get('street_2'), contact.get('city'), contact.get('state'), contact.get('occupation'), contact.get('employer')])))
+        inputcolumn = pandas.DataFrame(input_total_address_list)
+        inputcolumn.columns = ['Match']
+        compare_dict = {'EntityId':compare_entity_id_list, 'Compare':compare_total_address_list}
+        comparecolumn = pandas.DataFrame(compare_dict)
+
+        inputcolumn['Key'] = 1
+        comparecolumn['Key'] = 1
+        combined_dataframe = comparecolumn.merge(inputcolumn,on="Key",how="left")
+
+        partial_match_vector = numpy.vectorize(partial_match)
+        combined_dataframe['Score']=partial_match_vector(combined_dataframe['Match'],combined_dataframe['Compare'])
+        combined_dataframe = combined_dataframe[combined_dataframe.Score>=moderation_score]
+        if combined_dataframe.empty:
+            return []
+        else:
+            return get_list_contact(cmte_id, combined_dataframe['EntityId'].values.tolist())
+
+    except Exception as e:
+        raise Exception(f'duplicate_Address function is throwing an error: {e}')
+
+@api_view(['POST'])
+def check_duplicate_address(request):
+    try:
+        cmte_id = request.user.username
+        address = duplicate_address(cmte_id, request.data)
+        if address:
+            status_code = "FAIL"
+        else:
+            status_code = "SUCCESS"
+        output = {}
+        output['status_code'] = status_code
+        output['data'] = address
+        return Response(output, status=status.HTTP_200_OK)
+    except requests.exceptions.HTTPError as http_err:
+        return Response(f'address_validation API is throwing an HTTP error: {http_err}', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        return Response(f'address_validation API is throwing an error: {err}', status=status.HTTP_400_BAD_REQUEST)
+
+def get_next_levin_acct_id():
+    """
+    get a new levin account id
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT nextval('levin_account_id_seq')""")
+            return cursor.fetchone()[0]
+    except Exception:
+        logger.debug('failed to get a new levin account id.')
+        raise 
+
+
+def get_levin_accounts(cmte_id):
+    """
+    load levin_account names and account ids for a committee
+    """
+    _sql = """
+    select json_agg(t) from 
+    (select levin_account_id, levin_account_name 
+    from levin_account where cmte_id = %s 
+    and delete_ind is distinct from 'Y') t
+    """
+    try:
+        with connection.cursor() as cursor:
+                # INSERT row into Reports table
+            cursor.execute(_sql,[cmte_id])
+            return cursor.fetchone()[0]  
+    except Exception as e:
+        logger.debug('Error on loading levin account names:'+str(e))
+        raise
+
+def get_levin_account(cmte_id, levin_account_id):
+    """
+    load levin_account names and account ids for a committee
+    """
+    _sql = """
+    select json_agg(t) from 
+    (select levin_account_id, levin_account_name, create_date, last_update_date
+    from levin_account where cmte_id = %s
+    and levin_account_id = %s
+    and delete_ind is distinct from 'Y') t
+    """
+    try:
+        with connection.cursor() as cursor:
+                # INSERT row into Reports table
+            cursor.execute(_sql,[cmte_id, levin_account_id])
+            return cursor.fetchone()[0]  
+    except Exception as e:
+        logger.debug('Error on loading levin account names:'+str(e))
+        raise
+
+def post_levin_account(cmte_id, levin_account_id, levin_account_name):
+    """
+    db transaction for saving a new levin account
+    """
+    _sql = """
+    INSERT INTO public.levin_account(levin_account_id, cmte_id, levin_account_name) 
+    VALUES(%s, %s, %s)
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (levin_account_id, cmte_id, levin_account_name))
+    except Exception as e:
+        raise Exception('Error creating levin account.')
+    
+
+def put_levin_account(cmte_id, levin_account_id, levin_account_name):
+    """
+    db transaction for updating a levin acccount name
+    """
+    _sql = """
+    UPDATE public.levin_account
+    SET levin_account_name = %s
+    WHERE cmte_id = %s
+    AND levin_account_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (levin_account_name, cmte_id, levin_account_id))
+    except Exception as e:
+        raise Exception('Error updating levin account.')
+
+def delete_levin_account(cmte_id, levin_account_id):
+    """
+    delete a levin account
+    """    
+    _sql = """
+        UPDATE public.levin_account
+        SET delete_ind = 'Y'
+        WHERE cmte_id = %s
+        AND levin_account_id = %s 
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (cmte_id, levin_account_id))
+    except Exception as e:
+        raise Exception('Error deleting levin account.')
+
+@api_view(['POST','GET','DELETE','PUT'])
+def levin_accounts(request):
+    """
+    the api for adding/retrieving levin accounts
+    """
+    if request.method == 'GET':
+        try:
+            cmte_id = request.user.username
+            levin_account_id = request.query_params.get('levin_account_id')
+            if not levin_account_id:
+                forms_obj = get_levin_accounts(cmte_id)
+            else:
+                forms_obj = get_levin_account(cmte_id, levin_account_id)
+                
+            if forms_obj:   
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            else:
+                return JsonResponse([], status=status.HTTP_204_NO_CONTENT, safe=False)
+
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(forms_obj, status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response(
+                "The levin_account API - GET is throwing an error: " + str(e), 
+                status.HTTP_400_BAD_REQUEST
+            )
+
+    elif request.method == 'POST':
+        try:
+            cmte_id = request.user.username
+
+            if not 'levin_account_name' in request.data:
+                raise Exception('levin account name is required.')
+            if not request.data.get('levin_account_name'):
+                raise Exception('a valid levin account name is required.')
+            levin_account_name = request.data.get('levin_account_name')
+
+            levin_account_id = get_next_levin_acct_id()
+            post_levin_account(cmte_id, levin_account_id, levin_account_name)
+            levin_obj = get_levin_account(cmte_id, levin_account_id)
+            return Response(
+                levin_obj, status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.debug('Error on creating a new levin account:'+str(e))
+            return Response(
+                "Error on creating a new levin account:" + str(e),
+                status.HTTP_400_BAD_REQUEST
+            )
+
+    elif request.method == 'PUT':
+        try:
+            cmte_id = request.user.username
+            levin_account_name = request.data.get('levin_account_name')
+            levin_account_id = request.data.get('levin_account_id')
+            put_levin_account(cmte_id, levin_account_id, levin_account_name)
+            levin_obj = get_levin_account(cmte_id, levin_account_id)
+            return Response(
+                levin_obj,
+                status.HTTP_200_OK
+            )
+        except Exception as e:
+            logger.debug('Error on saving a new levin account name:' + str(e))
+            return Response(
+                'Error on saving levin account name:' + str(e),
+                status.HTTP_400_BAD_REQUEST
+            )
+    elif request.method == 'DELETE':
+        try:
+            cmte_id = request.user.username
+            levin_account_id = request.query_params.get('levin_account_id')
+            if not levin_account_id:
+                raise Exception('a valid levin account id is required.')
+            delete_levin_account(cmte_id, levin_account_id)
+            return Response("The account: {} has been successfully deleted".format(levin_account_id),status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.debug('Error on deleting account:' + str(e))
+            return Response("The levin account API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)        
+
+
+        
+        
+
+    else:
+        pass
+

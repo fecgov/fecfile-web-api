@@ -90,6 +90,8 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         model.amount = trx.expenditure_amount ? trx.expenditure_amount : trx.contribution_amount;
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
+        model.memoCode = trx.memo_code;
+        model.memoText = trx.memo_text;
 
         model.transactionTypeIdentifier = trx.transaction_type_identifier;
         model.transactionId = trx.transaction_id;
