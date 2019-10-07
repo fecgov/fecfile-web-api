@@ -45,10 +45,15 @@ export class TypeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this._form99Details = null;
     this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
     console.log(" type this._form99Details =", this._form99Details)
     this.screenWidth = window.innerWidth;
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
+
+    console.log(" Type this.editMode = ", this.editMode);
+    console.log(" Type this._form99Details = ", this._form99Details);
+
 
     if(this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
@@ -139,23 +144,30 @@ export class TypeComponent implements OnInit {
       }*/
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true, false, true
+          )
         .then(res => {
           if (res === 'okay') {
             this._setForm();
-          } else if (res === 'cancel') {
-            this._router.navigate(['/reports']);
+          } else if (res === 'NewReport') {
+            //this._router.navigate(['/reports']);
+            //this._router.navigate(['/forms/form/99'], { queryParams: { step: 1, edit: this.editMode } });
+            this.editMode=true;
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            setTimeout(() => {
+              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: this.editMode } });
+            }, 500);
+            
           }
         });
     }
+    window.scrollTo(0, 0);
+
   }
 
   /**

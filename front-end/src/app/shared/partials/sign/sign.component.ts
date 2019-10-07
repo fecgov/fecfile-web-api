@@ -416,23 +416,36 @@ export class SignComponent implements OnInit {
       }
       console.log(' saveForm this.frmSaved =', this.frmSaved);
     } else {
-      this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+      if (this.formType === '99') {
+        this._dialogService
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true, false, true
+          )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
-          } else if (res === 'cancel') {
+          } else if (res === 'NewReport') {
             this._router.navigate(['/reports']);
           }
         });
+      } else if (this.formType === '3X') {
+        this._dialogService
+          .confirm(
+            'This report has been filed with the FEC. If you want to change, you must Amend the report.',
+            ConfirmModalComponent,
+            'Warning'
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'cancel') {
+              this._router.navigate(['/reports']);
+            }
+          });
+      }
     }
   }
 
@@ -728,23 +741,38 @@ export class SignComponent implements OnInit {
         this.signFailed = true;
       }
     } else {
-      this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+      if (this.formType === '99') {
+        this._dialogService
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true, false, true
+          )
         .then(res => {
           if (res === 'okay') {
-            e.target.checked = false;
-          } else if (res === 'cancel') {
-            this._router.navigate(['/reports']);
+            this.ngOnInit();
+          } else if (res === 'NewReport') {
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
           }
         });
+      } else if (this.formType === '3X') {
+        this._dialogService
+          .confirm(
+            'This report has been filed with the FEC. If you want to change, you must Amend the report.',
+            ConfirmModalComponent,
+            'Warning'
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'cancel') {
+              this._router.navigate(['/reports']);
+            }
+          });
+      }
     }
     console.log('this.signFailed: ', this.signFailed);
   }
