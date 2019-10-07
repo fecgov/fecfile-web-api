@@ -300,6 +300,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
           sortedCol.descending
         );
 
+        this.setAmendmentIndicator(this.reportsModel);
+        this.setAmendmentShow(this.reportsModel);
+
         console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
         this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
         this.numberOfPages =
@@ -379,6 +382,67 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+  
+  public setAmendmentIndicator(reports: any) {
+    if(reports) {
+      for(const report of reports) {        
+        if(report.form_type !== 'F99') {
+          if(report.amend_ind === 'N' && this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id})) {
+          //&& this.reportsModel.filter(rp => rp.previous_report_id == report.report_id)) {
+            report.amend_ind = 'Original';           
+          }else if(report.amend_ind === 'A') {        
+            report.amend_ind = report.amend_ind.concat(report.amend_number.toString());            
+          }
+        }        
+      }
+    }
+  }
+
+  public setAmendmentShow(reports: any) {
+
+    let reportId = 0;
+    let next: reportModel;
+    let max: reportModel;
+    
+    if(reports) {
+      for(const report of reports) {
+        
+        if(report.amend_ind === 'Original') {
+          report.amend_show = false;
+          
+          next = this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id});
+          //if(next) 
+          next.amend_show = false;
+
+          while(next) {
+            next.amend_show = false;
+            max = next;
+            next = this.reportsModel.find(function(obj) { return obj.previous_report_id === next.report_id});
+          }
+ 
+          //if(next) {
+            max.amend_show = true;
+            max.amend_max = 'up';
+          //}
+
+        }
+      }
+    }  }
+  
+  public amendArrow(report: reportModel) {
+    
+    report.amend_max === 'up' ? this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'down'
+      : this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'up';
+
+    let pre = report;
+    pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+
+    while(pre) {
+      pre.amend_show = !pre.amend_show;
+      pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+    }
+    
   }
 
   public displayReportTypes(reportType: any) {
@@ -1457,5 +1521,36 @@ public printReport(report: reportModel): void{
       } else if (res === 'cancel') {
       }
     });
+  }
+
+  public amendReport(report: reportModel): void {
+
+    this._reportsService.amendReport(report).subscribe(res =>
+      {        
+        report = res;
+        console.log('new amend Res: ', report)
+      
+        if (report.form_type === 'F3X') {
+        this._reportsService
+          .getReportInfo(report.form_type, report.report_id)
+          .subscribe((res: form3xReportTypeDetails) => {
+            console.log('getReportInfo res =', res);
+            localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
+            localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+
+            //return false;
+          });
+        setTimeout(() => {
+          // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
+
+          const formType =
+            report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          this._router.navigate([`/forms/form/${formType}`], {
+            queryParams: { step: 'reports', reportId: report.report_id }
+            });
+          }, 1500);
+        }          
+      }
+    )    
   }
 }
