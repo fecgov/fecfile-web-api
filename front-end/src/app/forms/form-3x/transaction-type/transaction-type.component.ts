@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -11,7 +20,10 @@ import { TransactionTypeService } from './transaction-type.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 
 @Component({
@@ -40,6 +52,7 @@ export class TransactionTypeComponent implements OnInit {
   public transactionTypeFailed: boolean = false;
   public transactionCategorySelected: boolean = false;
   public tranasctionCategoryVal: string = '';
+  public scheduleType: string = null;
 
   private _formType: string = '';
   private _mainTransactionCategory: any = [];
@@ -69,9 +82,9 @@ export class TransactionTypeComponent implements OnInit {
         setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
         setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
         this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
-        this.updateTypeSelected(setTargetVal);
-        this.childOptionsListClick(setTargetVal.target.value);
-        this.doValidateOption();
+        // this.updateTypeSelected(setTargetVal);
+        // this.childOptionsListClick(setTargetVal.target.value);
+        // this.doValidateOption();
       }
     });
   }
@@ -134,6 +147,12 @@ export class TransactionTypeComponent implements OnInit {
       // Send message to form (indv-receipt) to clear form field vals if they are still populated.
       this._f3xMessageService.sendInitFormMessage('');
 
+      // TODO temp - get val from getCategoryTypes API called in f3x comp.
+      // let scheduleType = 'sched_a';
+      // if (this.transactionType === 'DEBT_TO_VENDOR') {
+      //   scheduleType = 'sched_h';
+      // }
+
       this.status.emit({
         form: this.frmOption,
         direction: 'next',
@@ -141,7 +160,8 @@ export class TransactionTypeComponent implements OnInit {
         previousStep: 'step_2',
         action: ScheduleActions.add,
         transactionTypeText: this.transactionTypeText,
-        transactionType: this.transactionType
+        transactionType: this.transactionType,
+        scheduleType: this.scheduleType
       });
       return 1;
     } else {
@@ -184,12 +204,24 @@ export class TransactionTypeComponent implements OnInit {
    *
    * @param      {Object}  e            The event object.
    */
-  public updateTypeSelected(e): void {
-    const val: string = e.target.value;
+  // public updateTypeSelected(e, selectedOption: any): void {
+  //   const val: string = e.target.value;
+  //   this.transactionType = val;
+  //   this.transactionTypeText = e.target.placeholder;
+  //   this.frmOption.controls['secondaryOption'].setValue(val);
+  //   this.transactionTypeFailed = false;
+  //   this.scheduleType = selectedOption ? selectedOption.scheduleType : null;
+  //   this.doValidateOption();
+  // }
+
+  public updateTypeSelected(selectedOption: any): void {
+    const val: string = selectedOption.value;
     this.transactionType = val;
-    this.transactionTypeText = e.target.placeholder;
+    this.transactionTypeText = selectedOption.text;
     this.frmOption.controls['secondaryOption'].setValue(val);
     this.transactionTypeFailed = false;
+    this.scheduleType = selectedOption ? selectedOption.scheduleType : null;
+    this.doValidateOption();
   }
 
   /**
@@ -256,22 +288,22 @@ export class TransactionTypeComponent implements OnInit {
       }
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
-          .then(res => {
-            if (res === 'okay') {
-              this.ngOnInit();
-            } else if (res === 'cancel') {
-              this._router.navigate(['/reports']);
-            }
-          });
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this.ngOnInit();
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
     }
   }
 }

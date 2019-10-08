@@ -3,6 +3,7 @@ export class TransactionModel {
   entityId: string;
   entityType: string;
   apiCall: string;
+  scheduleType: string;
   transactionId: string;
   backRefTransactionId: string;
   transactionTypeIdentifier: string;
@@ -32,6 +33,7 @@ export class TransactionModel {
     this.entityId = transaction.entityId ? transaction.entityId : '';
     this.entityType = transaction.entityType ? transaction.entityType : '';
     this.apiCall = transaction.apiCall ? transaction.apiCall : '';
+    this.scheduleType = transaction.scheduleType ? transaction.scheduleType : '';
     this.transactionId = transaction.transactionId ? transaction.transactionId : '';
     this.backRefTransactionId = transaction.backRefTransactionId ? transaction.backRefTransactionId : '';
     this.transactionTypeIdentifier = transaction.transactionTypeIdentifier ? transaction.transactionTypeIdentifier : '';
