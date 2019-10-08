@@ -193,6 +193,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
+    // localStorage.removeItem('Reports_Edit_Screen');
   }
 
   /**
@@ -871,6 +872,7 @@ public printReport(report: reportModel): void{
    * @param report the Report to edit
    */
   public editReport(report: reportModel): void {
+    localStorage.setItem('Reports_Edit_Screen', 'Yes');
     if (report.form_type === 'F99') {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
         console.log('getReportInfo res =', res);
