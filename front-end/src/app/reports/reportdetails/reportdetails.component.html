@@ -136,7 +136,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let report of reportsModel | paginate: config; let i = index">
+            <ng-container *ngFor="let report of reportsModel | paginate: config; let i = index">                
+                <tr *ngIf="report.amend_show">               
                 <!--<td >
                     <input [(ngModel)]="report.selected" type="checkbox" (click)="checkForMultiChecked($event)">
                 </td>-->
@@ -144,7 +145,15 @@
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
                 <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
-                <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())"></td>
+                <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())">
+                    <div class="row td-amend">
+                        {{(report.amend_ind === 'N' || report.amend_ind === 'T') ? '' : report.amend_ind}}
+                        <div >
+                            <i *ngIf="report.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(report)"></i>
+                            <i *ngIf="report.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(report)"></i>
+                        </div>
+                    </div>
+                </td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
                     {{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>
@@ -173,7 +182,7 @@
 
 
                         <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="editReport(report)">
+                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="dropdown-item" (click)="printReport(report)">
@@ -182,7 +191,7 @@
                             <button class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
-                            <button class="dropdown-item" (click)="trashReport(report)">
+                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
@@ -196,10 +205,10 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" *ngIf="report.status === 'Filed'" (click)="viewReport(report)">
+                            <button class="dropdown-item" *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
-                            <button class="dropdown-item" (click)="amendReport(report)">
+                            <button  *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="amendReport(report)">
                                 <i class="fas fa-edit"></i> Amend
                             </button>
                             <button class="dropdown-item" (click)="downloadReport(report)">
@@ -257,6 +266,7 @@
                 </td>
 
             </tr>
+            </ng-container>
         </tbody>
     </table>
     <div *ngIf="showPagination()" class="d-flex justify-content-center Report-table-pagination-container">
