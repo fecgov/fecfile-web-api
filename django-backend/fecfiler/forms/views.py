@@ -849,9 +849,11 @@ def get_form99list(request):
             cmte_id = request.user.username
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
-            print ("[cmte_id]", cmte_id)
-            print ("[viewtype]", viewtype)
-            print ("[reportid]", reportid)
+
+            #commented by Mahendra 10052019
+            #print ("[cmte_id]", cmte_id)
+            #print ("[viewtype]", viewtype)
+            #print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -882,8 +884,8 @@ def get_form99list(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-    
-                print("query_string =", query_string)
+                #commented by Mahendra 10052019
+                #print("query_string =", query_string)
 
                 # print("query_string = ", query_string)
                 # Pull reports from reports_view
@@ -932,7 +934,8 @@ def get_form99list(request):
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
-                print("query_count_string =", query_count_string)
+                #commented by Mahendra 10052019
+                #print("query_count_string =", query_count_string)
 
                 if reportid in ["None", "null", " ", "","0"]:  
                     cursor.execute(query_count_string, [cmte_id, viewtype])
@@ -1230,8 +1233,9 @@ def save_print_f99(request):
         tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
         #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
         vdata = {}
-        print ("url= ", url)
-        print ("tmp_filename= ", tmp_filename)
+        #commented by Mahendra 10052019
+        #print ("url= ", url)
+        #print ("tmp_filename= ", tmp_filename)
 
 
         vdata['wait'] = 'false'
@@ -1384,8 +1388,9 @@ def update_print_f99(request):
         tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
         #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
         vdata = {}
-        print ("url= ", url)
-        print ("tmp_filename= ", tmp_filename)
+        #commented by Mahendra 10052019
+        #print ("url= ", url)
+        #print ("tmp_filename= ", tmp_filename)
 
 
         vdata['wait'] = 'false'
@@ -1654,12 +1659,12 @@ def get_f99_report_info(request):
     """
     Get F99 report details
     """
-    print("request.query_params.get('reportid')=", request.query_params.get('reportid'))
+    #print("request.query_params.get('reportid')=", request.query_params.get('reportid'))
     try:
         if ('reportid' in request.query_params and (not request.query_params.get('reportid') =='')):
-            print("you are here1")
+            #print("you are here1")
             if int(request.query_params.get('reportid'))>=1:
-                print("you are here2")
+                #print("you are here2")
                 id_comm = CommitteeInfo()
                 id_comm.id = request.query_params.get('reportid')
                 #comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
