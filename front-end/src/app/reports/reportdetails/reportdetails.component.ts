@@ -932,6 +932,10 @@ public printReport(report: reportModel): void{
             this._router.navigate([`/forms/form/${formType}`], {
               queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false }
             });
+          } else if(formType === 'F99') {
+            this._router.navigate([`/forms/form/${formType}`], {
+              queryParams: { step: 'step_1', reportId: report.report_id, edit: false }
+            });
           }
       }, 1500);
     }

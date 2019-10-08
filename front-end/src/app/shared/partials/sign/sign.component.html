@@ -120,6 +120,7 @@
                   value=""
                   (change)="changeAdditionalEmail($event)"
                   (blur)="updateAdditionalEmail($event)"
+                  [attr.disabled]="!editMode ? '' : null"
                   formControlName="additional_email_1"
                   autocomplete="off"
                 />
@@ -143,6 +144,7 @@
                   value=""
                   (change)="changeAdditionalEmail($event)"
                   (blur)="updateAdditionalEmail($event)"
+                  [attr.disabled]="!editMode ? '' : null"
                   formControlName="confirm_email_1"
                   autocomplete="off"
                 />
@@ -185,6 +187,7 @@
                   value=""
                   (change)="changeAdditionalEmail($event)"
                   (blur)="updateAdditionalEmail($event)"
+                  [attr.disabled]="!editMode ? '' : null"
                   formControlName="additional_email_2"
                   autocomplete="off"
                 />
@@ -207,6 +210,7 @@
                   value=""
                   (change)="changeAdditionalEmail($event)"
                   (blur)="updateAdditionalEmail($event)"
+                  [attr.disabled]="!editMode ? '' : null"
                   formControlName="confirm_email_2"
                   autocomplete="off"
                 />

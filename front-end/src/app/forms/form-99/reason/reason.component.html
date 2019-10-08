@@ -108,6 +108,7 @@
                   title="Undo"
                   data-command="undo"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="undo-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -120,6 +121,7 @@
                   title="Redo"
                   data-command="redo"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="redo-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -132,6 +134,7 @@
                   title="Bold"
                   data-command="bold"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="bold-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -144,6 +147,7 @@
                   title="Underline"
                   data-command="underline"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="underline-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -156,6 +160,7 @@
                   title="Italic"
                   data-command="italic"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="italic-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -168,6 +173,7 @@
                   title="Align Left"
                   data-command="justifyLeft"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="align-left-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -180,6 +186,7 @@
                   title="Align Center"
                   data-command="justifyCenter"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="align-center-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -192,6 +199,7 @@
                   data-command="justifyRight"
                   title="Align Right"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="align-right-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -204,6 +212,7 @@
                   title="Justify"
                   data-command="justifyFull"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="justify-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -216,6 +225,7 @@
                   title="Unordered List"
                   data-command="insertUnorderedList"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="ul-list-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -228,6 +238,7 @@
                   title="Ordered List"
                   data-command="insertOrderedList"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="ol-list-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -240,6 +251,7 @@
                   title="Decrease Indent"
                   data-command="outdent"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="outdent-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -252,6 +264,7 @@
                   title="Increase Indent"
                   data-command="indent"
                   (click)="insertHTML($event)"
+                  [disabled]="!editMode"
                 >
                   <i class="indent-icon" aria-hidden="true"></i>
                   <span class="sr-only">
@@ -259,8 +272,8 @@
                   </span>
                 </button>
               </div>
-              <div class="editor full-width-textarea" formControlName="reasonText" contenteditable="true" placeholder="Enter text here..."
-                  role="textarea" (input)="editorChange($event)" (paste)="removeHTML($event)" [innerHTML]="editingTextArea ? textAreaTextContent : null" #htmlEditor>
+              <div class="editor full-width-textarea" formControlName="reasonText" [contentEditable]="this.editMode" placeholder="Enter text here..."
+                  role="textarea" (input)="editorChange($event)" (focus)="checkIfEditMode()" (paste)="removeHTML($event)" [innerHTML]="editingTextArea ? textAreaTextContent : null" #htmlEditor>
               </div>
             </div>
           </div>
@@ -313,7 +326,7 @@
               </button>
             </label>
             <div class="file-upload-container border-bottom" *ngIf="file === null && fileNameToDisplay === null">
-              <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
+              <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" [disabled]="!this.editMode" />
             </div>
             <div class="file-attached-container" *ngIf="file !== null || fileNameToDisplay !== null">
               <div class="grid-row">
@@ -321,7 +334,7 @@
                   <h5>
                     {{ file ? file.name : fileNameToDisplay }}
                     <!--<button type="button" class="btn btn-link" (click)="open(deletePDF)">-->
-                    <button type="button" class="btn btn-link" (click)="deletePDFFile()">
+                    <button type="button" class="btn btn-link" (click)="deletePDFFile()" [disabled]="!this.editMode">
                     <span vertical-align="top" class="close-icon"></span>
                     </button>
                   </h5>
