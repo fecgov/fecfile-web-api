@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -60,6 +60,20 @@ export class TransactionTypeComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+    _activatedRoute.queryParams.subscribe(p => {
+      const setTargetVal = { target: { value: null, placeholder: null } };
+      this.frmOption = this._fb.group({
+        secondaryOption: ['', Validators.required]
+      });
+      if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
+        setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+        setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+        this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
+        this.updateTypeSelected(setTargetVal);
+        this.childOptionsListClick(setTargetVal.target.value);
+        this.doValidateOption();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -69,19 +83,6 @@ export class TransactionTypeComponent implements OnInit {
     this.frmOption = this._fb.group({
       secondaryOption: ['', Validators.required]
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const setTargetVal = { target: { value: null, placeholder: null } };
-    this.frmOption = this._fb.group({
-      secondaryOption: ['', Validators.required]
-    });
-    if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
-      setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
-      setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
-      this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
-      this.updateTypeSelected(setTargetVal);
-    }
   }
 
   ngDoCheck(): void {
@@ -108,7 +109,11 @@ export class TransactionTypeComponent implements OnInit {
   }
 
   private _toggle(sec_option) {
-    setTimeout(() => this.accordion.toggle(sec_option), 0);
+    setTimeout(() => {
+      if (this.accordion) {
+        this.accordion.toggle(sec_option), 0;
+      }
+    });
   }
 
   /**
@@ -244,8 +249,10 @@ export class TransactionTypeComponent implements OnInit {
       console.log('transaction type selected: ', id);
       if (document.getElementById(id) != null) {
         const obj = <HTMLInputElement>document.getElementById('option_' + id);
-        obj.click();
-        obj.checked = true;
+        if (obj) {
+          obj.click();
+          obj.checked = true;
+        }
       }
     } else {
       this._dialogService

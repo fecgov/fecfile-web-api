@@ -26,6 +26,7 @@ urlpatterns = [
     ),
     url(r"^core/create_json_file$", views.create_json_file, name="create_json_file"),
     url(r"^core/entities$", views.entities, name="entities"),
+    url(r"^core/levin_accounts$", views.levin_accounts, name="levin_accounts"),
     url(
         r"^core/autolookup_search_contacts$",
         views.autolookup_search_contacts,
@@ -139,6 +140,24 @@ urlpatterns = [
         name="clone_a_transaction",
     ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
-
-    url(r"^core/create_amended_reports$", views.create_amended_reports, name="create_amended_reports"),
+    url(
+        r"^core/address_validation$",
+        views.address_validation,
+        name="address_validation",
+    ),
+    url(
+        r"^core/check_duplicate_address$",
+        views.check_duplicate_address,
+        name="check_duplicate_address",
+    ),
+    url(
+        r"^core/create_amended_reports$",
+        views.create_amended_reports,
+        name="create_amended_reports",
+    ),
+    url(
+        r"^core/new_report_update_date$",
+        views.new_report_update_date,
+        name="new_report_update_date",
+    ),
 ]

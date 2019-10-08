@@ -829,9 +829,15 @@ public printReport(report: reportModel): void{
     
   }
 
-  public downloadReport(): void{
-    alert('Download report is not yet supported');
+  public downloadReport(report: reportModel): void{
+    
+    const imageNumber="201804139108073637"; // Todo in the production get the imagenumber from reports table
+    const url=`https://www.fec.gov/data/filings/?data_type=processed&committee_id=${report.cmte_id}&beginning_image_number=${imageNumber}`;
+    console.log("downloadReport url = ", url);
+    window.open(url, '_blank');
+
   }
+
 
   
 
@@ -922,9 +928,11 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-        this._router.navigate([`/signandSubmit/${formType}`], {
-          queryParams: { reportId: report.report_id, edit: false }
-        });
+          if (formType === '3X') {
+            this._router.navigate([`/forms/form/${formType}`], {
+              queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false }
+            });
+          }
       }, 1500);
     }
   }

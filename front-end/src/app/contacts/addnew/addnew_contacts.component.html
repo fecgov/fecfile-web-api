@@ -227,27 +227,8 @@
                   ></textarea>
                 </ng-container>
 
-              <!--  <ng-container *ngIf="col?.type === 'select' && col?.name === 'state'">
-                  <ng-select
-                    (change)="handleStateChange($event, col)"
-                    class="state-select"
-                    [style.width]="col?.width"
-                    [style.height]="col?.height"
-                    [formControlName]="col?.name"
-                    [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    "
-                  >
-                    <ng-option *ngFor="let item of states" [ngValue]="item">
-                      {{ item.code }} - {{ item.name }}
-                    </ng-option>
-                  </ng-select>
-                </ng-container> -->
                 
-                <ng-container *ngIf="col?.type === 'select' && 
+                <!--<ng-container *ngIf="col?.type === 'select' && 
                     (isFieldName(col?.name, 'state') ||
                     isFieldName(col?.name, 'cand_office_state'))">
                   <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
@@ -261,7 +242,30 @@
                       <span>{{ item.code + ' - ' + item.name }}</span>
                     </ng-template>
                   </ng-select>
-                </ng-container> 
+                </ng-container> -->
+
+                <ng-container *ngIf="col?.type === 'select' && 
+                    (isFieldName(col?.name, 'state') ||
+                    isFieldName(col?.name, 'cand_office_state'))">
+                    <ng-select #stateSelect 
+                      [items]="states" 
+                      (change)="handleStateChange($event, col)"
+                      class="forms__select" 
+                      [formControlName]="col?.name" 
+                      bindValue="code" 
+                      bindLabel="code" 
+                      [selectOnTab]="true"
+                      [ngClass]="
+                          frmContact.get(col?.name)?.invalid &&
+                          (frmContact.touched || frmContact.dirty)
+                            ? 'forms__select-error'
+                            : ''
+                        ">
+                      <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                        <span>{{ item.code + ' - ' + item.name }}</span>
+                      </ng-template>
+                    </ng-select>
+               </ng-container>
 
                 <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
                   <ng-select
@@ -326,7 +330,7 @@
                   </ng-select>
                 </ng-container>
 
-              </div>
+             </div>
             </div>
             <!-- ./col -->
           </ng-container>

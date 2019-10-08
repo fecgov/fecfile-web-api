@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -54,7 +55,7 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
-  public textAreaTextContent: string = '';
+  public textAreaTextContent: any = '';
   public editingTextArea: boolean = false;
   public fileNameToDisplay: string = null;
 
@@ -75,7 +76,8 @@ export class ReasonComponent implements OnInit {
     private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _dormSanitizer: DomSanitizer
   ) {
     this._messageService.clearMessage();
   }
@@ -100,7 +102,7 @@ export class ReasonComponent implements OnInit {
         this._reasonTextContent = unescapedText;
         this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
-        this.textAreaTextContent = unescape(unescapedText);
+        this.textAreaTextContent = this._dormSanitizer.bypassSecurityTrustHtml(unescapedText);
         this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
       } else {
         this.frmReason = this._fb.group({
