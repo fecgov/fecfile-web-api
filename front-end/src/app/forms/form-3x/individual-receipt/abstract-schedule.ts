@@ -207,10 +207,10 @@ export abstract class AbstractSchedule {
 
   ngOnInit(): void {
 
-    this.transactionTypeText = '';
-    this.transactionType = '';
-    this.scheduleAction = null;
-    this.status = new EventEmitter<any>();
+    // this.transactionTypeText = '';
+    // this.transactionType = '';
+    // this.scheduleAction = null;
+    // this.status = new EventEmitter<any>();
 
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
