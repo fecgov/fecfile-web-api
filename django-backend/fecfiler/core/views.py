@@ -3788,6 +3788,99 @@ def contact_sql_dict(data):
     except:
         raise
 
+
+def contact_entity_dict(data):
+    """
+    filter data, validate fields and build entity item dic
+    """
+    try:
+        datum = {
+         # 'cmte_id' : data.get('cmte_id'),
+          'entity_id' : is_null(data.get('id')),   
+          'entity_type'  : is_null(data.get('entity_type')), 
+          'entity_name'  : is_null(data.get('entity_name')), 
+          'first_name'  : is_null(data.get('firstName')), 
+          'last_name'  : is_null(data.get('lastName')), 
+          'middle_name' : is_null(data.get('middleName')), 
+          'preffix'  : is_null(data.get('preffix')), 
+          'suffix' : is_null(data.get('suffix')), 
+          'street_1'  : is_null(data.get('street1')), 
+          'street_2'  : is_null(data.get('street2')), 
+          'city'  : is_null(data.get('city')),  
+          'state' : is_null(data.get('state')), 
+          'zip_code' : is_null(data.get('zip')), 
+          'occupation'  : is_null(data.get('occupation')), 
+          'employer' : is_null(data.get('employer')), 
+          'cand_office'  : is_null(data.get('candOffice')), 
+          'cand_office_state'  : is_null(data.get('candOfficeState')), 
+          'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
+          'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
+          'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
+          'last_update_date' : is_null(data.get('deletedDate')),
+        }
+
+        return datum
+    except:
+        raise
+
+def put_contact_data(data):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE public.entity SET 
+                    entity_type = %s, 
+                    entity_name = %s, 
+                    first_name = %s, 
+                    last_name = %s, 
+                    middle_name = %s, 
+                    preffix = %s, 
+                    suffix = %s, 
+                    street_1 = %s, 
+                    street_2 = %s, 
+                    city = %s, 
+                    state = %s, 
+                    zip_code = %s, 
+                    occupation = %s, 
+                    employer = %s, 
+                    ref_cand_cmte_id = %s,
+                    cand_office = %s,
+                    cand_office_state = %s,
+                    cand_office_district = %s,
+                    last_update_date = %s 
+                WHERE entity_id = %s AND cmte_id = %s 
+                AND delete_ind is distinct FROM 'Y'
+                """,
+                [
+                data.get('entity_type'), 
+                data.get('entity_name'), 
+                data.get('first_name'), 
+                data.get('last_name'), 
+                data.get('middle_name'), 
+                data.get('preffix'), 
+                data.get('suffix'), 
+                data.get('street_1'), 
+                data.get('street_2'), 
+                data.get('city'), 
+                data.get('state'), 
+                data.get('zip_code'), 
+                data.get('occupation'), 
+                data.get('employer'), 
+                data.get('ref_cand_cmte_id'), 
+                data.get('entity_id'), 
+                data.get('cand_office'),
+                data.get('cand_office_state'),
+                data.get('cand_office_district'),
+                data.get('last_update_date', None),
+                data.get('cmte_id')])                       
+                
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The Entity ID: {} does not exist in Entity table'.format(entity_id))
+    
+    except Exception:
+        raise
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def contacts(request):
     """
@@ -3812,15 +3905,36 @@ def contacts(request):
     """
     # Get records from entity table
     if request.method == 'GET':
-        datum=[]
-        return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+
+         try:
+            data = {
+                'cmte_id': request.user.username,
+                }
+            if 'report_id' in request.query_params:
+                data['report_id'] = request.query_params.get('report_id')
+            output = get_contact(data)   
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The reports API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     """
     ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-        output=[]
-        return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        try:
+            datum = contact_entity_dict(request.data)
+            datum['cmte_id'] = request.user.username
+            #datum['cmte_id'] = cmte_id
+            put_contact_data(datum)
+            print ("datum", datum)
+            output = get_entities(datum)
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            return Response("The contacts API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        
 
     """
     ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
@@ -4587,6 +4701,16 @@ def create_amended_reports(request):
         return JsonResponse("Succesfully Create amended report", status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+
+***************************************************************************************************************************************************
+
+"""
+
+
+
 
 
 
