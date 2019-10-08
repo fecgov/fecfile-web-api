@@ -1,4 +1,3 @@
-<!-- dummy change for what happened? 9/18 5:30 -->
 <ng-template #rt let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
@@ -50,15 +49,6 @@
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
-      <!--<ng-container *ngFor="let row of formFields; let i = index">
-        <ng-container *ngIf="titles[i]?.fieldset">
-          <div class="subtitle-indv">
-            <div [class]="titles[i]?.colClassName">
-              {{ titles[i]?.label }}
-            </div>
-          </div>
-
-        </ng-container>-->
         <ng-container *ngFor="let row of formFields; let i = index">
           <ng-container *ngIf="titles[i]?.fieldset">
             <div class="subtitle-indv">
@@ -74,11 +64,18 @@
                   <div class="form-group" [style.width]="setSelectTypeWidth(col)">
                     <label [for]="col?.name">
                       {{ col?.text }}
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                      <!-- replace button with div below to resolve tab issue into button -->
+                      <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
-                      </button>
+                      </button> -->
+                      <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </div>
+
                       <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
                         (Optional)
                       </ng-container>
