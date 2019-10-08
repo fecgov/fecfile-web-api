@@ -72,13 +72,19 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule {
 
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() selectedOptions: any = {};
-  @Input() formOptionsVisible = false;
-  @Input() transactionTypeText = '';
-  @Input() transactionType = '';
-  @Input() scheduleAction: ScheduleActions = null;
-  @Input() scheduleType = '';
+  // @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  // @Input() selectedOptions: any = {};
+  // @Input() formOptionsVisible = false;
+  // @Input() transactionTypeText = '';
+  // @Input() transactionType = '';
+  // @Input() scheduleAction: ScheduleActions = null;
+  // @Input() scheduleType = '';
+
+  transactionTypeText = '';
+  transactionType = '';
+  scheduleAction: ScheduleActions = null;
+  scheduleType = '';
+  status: EventEmitter<any> = new EventEmitter<any>();
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -93,7 +99,6 @@ export abstract class AbstractSchedule {
   public cvgEndDate: string = null;
   public frmIndividualReceipt: FormGroup;
   public formFields: any = [];
-  public formVisible = false;
   public hiddenFields: any = [];
   public memoCode = false;
   public memoCodeChild = false;
@@ -201,6 +206,12 @@ export abstract class AbstractSchedule {
   }
 
   ngOnInit(): void {
+
+    this.transactionTypeText = '';
+    this.transactionType = '';
+    this.scheduleAction = null;
+    this.status = new EventEmitter<any>();
+
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
@@ -304,11 +315,6 @@ export abstract class AbstractSchedule {
   }
 
   private _prepareForm() {
-    if (this.selectedOptions) {
-      if (this.selectedOptions.length >= 1) {
-        this.formVisible = true;
-      }
-    }
 
     this._getTransactionType();
 
