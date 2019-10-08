@@ -266,6 +266,7 @@
       float:left;
       width: $footerContactInfoWidth;
       .contact-info__item {
+        font-size: 1.21269rem;
         display: block;
         @include media(tablet) {
           display: block;

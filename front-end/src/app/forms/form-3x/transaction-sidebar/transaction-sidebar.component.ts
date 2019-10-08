@@ -228,9 +228,9 @@ export class TransactionSidebarComponent implements OnInit {
         (term === ''
           ? transactionCategoryOptions
           : transactionCategoryOptions.filter(v => v.text.toLowerCase().indexOf(term.toLowerCase()) > -1)
-        ).slice(0, 10)
+        )
       )
-    );
+    )
 
   formatter = (x: { text: string }) => x.text;
 
@@ -334,7 +334,10 @@ export class TransactionSidebarComponent implements OnInit {
                     ].value,
                     transactionSubCategory: this.transactionCategories[transactionCategorieIndex].options[
                       transactionCategoryOptionIndex
-                    ].options[transactionCategoryOptionOptionsIndex].value
+                    ].options[transactionCategoryOptionOptionsIndex].value,
+                    transactionSubCategoryText: this.transactionCategories[transactionCategorieIndex].options[
+                      transactionCategoryOptionIndex
+                    ].options[transactionCategoryOptionOptionsIndex].text
                   }
                 });
               }

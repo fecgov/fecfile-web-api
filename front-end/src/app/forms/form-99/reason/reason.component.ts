@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -54,7 +55,7 @@ export class ReasonComponent implements OnInit {
   public PdfUploaded: boolean = false;
   public PdfDeleted: boolean = false;
   public editorMax: number = 20000;
-  public textAreaTextContent: string = '';
+  public textAreaTextContent: any = '';
   public editingTextArea: boolean = false;
   public fileNameToDisplay: string = null;
 
@@ -75,7 +76,8 @@ export class ReasonComponent implements OnInit {
     private _renderer: Renderer2,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _dormSanitizer: DomSanitizer
   ) {
     this._messageService.clearMessage();
   }
@@ -100,7 +102,7 @@ export class ReasonComponent implements OnInit {
         this._reasonTextContent = unescapedText;
         this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
-        this.textAreaTextContent = unescape(unescapedText);
+        this.textAreaTextContent = this._dormSanitizer.bypassSecurityTrustHtml(unescapedText);
         this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
       } else {
         this.frmReason = this._fb.group({
@@ -149,67 +151,96 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    this._reasonTextContent = e.target.textContent;
+    if (this.editMode) {
+      this._reasonTextContent = e.target.textContent;
 
-    if (this._reasonTextContent.length >= 1) {
-      this._reasonInnerText = e.target.innerText;
+      if (this._reasonTextContent.length >= 1) {
+        this._reasonInnerText = e.target.innerText;
 
-      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
-        this.reasonHasInvalidHTML = true;
+        if (this._checkUnsupportedHTML(this._reasonInnerText)) {
+          this.reasonHasInvalidHTML = true;
 
-        this.frmReason.controls['reasonText'].setValue('');
-        this.frmReason.controls['reasonText'].markAsTouched();
-        this.frmReason.controls['reasonText'].markAsDirty();
-      } else {
-        this.reasonHasInvalidHTML = false;
-
-        if (!this._validateForSpaces(this._reasonInnerText)) {
-          this._reasonInnerHTML = e.target.innerHTML;
-
-          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
-
+          this.frmReason.controls['reasonText'].setValue('');
           this.frmReason.controls['reasonText'].markAsTouched();
           this.frmReason.controls['reasonText'].markAsDirty();
-
-          this.showValidateBar = false;
-          this.reasonFailed = false;
-
-          this.hideText = true;
-          this.formSaved = false;
-
-          this._messageService.sendMessage({
-            validateMessage: {
-              validate: {},
-              showValidateBar: false
-            }
-          });
         } else {
-          this.frmReason.controls['reasonText'].setValue('');
-          this.frmReason.controls['reasonText'].markAsPristine();
-          this.frmReason.controls['reasonText'].markAsUntouched();
+          this.reasonHasInvalidHTML = false;
 
-          this._reasonInnerHTML = '';
-          this._reasonInnerText = '';
-          this._reasonTextContent = '';
+          if (!this._validateForSpaces(this._reasonInnerText)) {
+            this._reasonInnerHTML = e.target.innerHTML;
 
-          this.reasonFailed = true;
+            this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+            this.frmReason.controls['reasonText'].markAsTouched();
+            this.frmReason.controls['reasonText'].markAsDirty();
+
+            this.showValidateBar = false;
+            this.reasonFailed = false;
+
+            this.hideText = true;
+            this.formSaved = false;
+
+            this._messageService.sendMessage({
+              validateMessage: {
+                validate: {},
+                showValidateBar: false
+              }
+            });
+          } else {
+            this.frmReason.controls['reasonText'].setValue('');
+            this.frmReason.controls['reasonText'].markAsPristine();
+            this.frmReason.controls['reasonText'].markAsUntouched();
+
+            this._reasonInnerHTML = '';
+            this._reasonInnerText = '';
+            this._reasonTextContent = '';
+
+            this.reasonFailed = true;
+          }
         }
+      } else {
+        this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsPristine();
+        this.frmReason.controls['reasonText'].markAsUntouched();
+
+        this.reasonHasInvalidHTML = false;
+
+        this.reasonFailed = true;
+
+        this._messageService.sendMessage({
+          validateMessage: {
+            validate: {},
+            showValidateBar: false
+          }
+        });
       }
-    } else {
-      this.frmReason.controls['reasonText'].setValue('');
-      this.frmReason.controls['reasonText'].markAsPristine();
-      this.frmReason.controls['reasonText'].markAsUntouched();
+    }
+  }
 
-      this.reasonHasInvalidHTML = false;
-
-      this.reasonFailed = true;
-
-      this._messageService.sendMessage({
-        validateMessage: {
-          validate: {},
-          showValidateBar: false
-        }
-      });
+  public checkIfEditMode() {
+    if (!this.editMode) {
+      this._dialogService
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true, false, true
+          )
+        .then(res => {
+          if (res === 'cancel' ||
+          res === ModalDismissReasons.BACKDROP_CLICK ||
+          res === ModalDismissReasons.ESC) {
+            this.ngOnInit();
+            this._dialogService.checkIfModalOpen();
+          } else if (res === 'NewReport') {
+            this.editMode = true;
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            setTimeout(() => {
+              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: this.editMode } });
+            }, 500);
+          }
+        });
     }
   }
 

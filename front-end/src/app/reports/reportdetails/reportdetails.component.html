@@ -78,17 +78,10 @@
     <table class="table table-striped table-hover table__sortable reports__table">
         <thead>
             <tr>
-                <!--<th class="forms__trx-table-checkbox">
-                    <input *ngIf="isReportViewActive()"
-                        [(ngModel)]="allreportsSelected"
-                        type="checkbox" (change)="changeAllreportsSelected()">
-                </th> -->
-                <th class="reports__table-checkbox">
-                    <!-- *ngIf="isContactViewActive()" -->
+                <!--<th class="reports__table-checkbox">
                     <input [@fadeInOut]  [(ngModel)]="allReportsSelected" type="checkbox"
                     (change)="changeAllReportsSelected()">
-                    
-                </th>
+                </th>-->
                 
                 <th [@fadeInOut] *ngIf="isColumnVisible('form_type')" [class]="getSortClass('form_type')"
                     (click)="changeSortDirection('form_type')">Form
@@ -114,7 +107,8 @@
                 <th [@fadeInOut] *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())" [class]="getSortClass('deleted_date')"
                     (click)="changeSortDirection('deleted_date')">Deleted Date <br />Time
                  </th>
-                <th class="bulk_action">
+
+            <!--    <th class="bulk_action">
                     <div [@fadeInOut] *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn" 
@@ -122,9 +116,6 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                            <!--<button class="dropdown-item" (click)="viewAllSelected()">
-                                <i class="fas fa-eye"></i>View
-                            </button>-->
                             <button class="dropdown-item" (click)="printAllSelected()">
                                 <i class="fas fa-print"></i>Print
                             </button>
@@ -133,27 +124,6 @@
                             </button>
                         </div>
                     </div> 
-                    <!--<div [@fadeInOut] *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
-                    aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
-                      ngbDropdownToggle [disabled]="bulkActionDisabled">
-                      <i class="ellipsis-icon"></i>
-                    </button>
-                    <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" (click)="printAllSelected()">
-                        <i class="print-icon"></i> Print
-                      </button>
-                      <button class="dropdown-item" (click)="viewActivityAllSelected()">
-                        <i class="table-icon"></i> View Activity
-                      </button>
-                      <button class="dropdown-item" (click)="exportAllSelected()">
-                        <i class="file-export-icon"></i> Export
-                      </button>
-                      <button class="dropdown-item" (click)="trashAllSelected()">
-                        <i class="trash-icon"></i> Trash
-                      </button>
-                    </div>
-                  </div>-->
                     <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn" 
                           (click)="deleteRecyleBin()"
@@ -161,23 +131,29 @@
                           <i class="trash-icon"></i>
                         </button>
                     </div>                            
-                </th> 
+                </th> -->
+
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let report of reportsModel | paginate: config; let i = index">
-                <!--<td>
-                    <input [(ngModel)]="report.selected"
-                            type="checkbox">
-                </td>-->
-                <td >
+            <ng-container *ngFor="let report of reportsModel | paginate: config; let i = index">                
+                <tr *ngIf="report.amend_show">               
+                <!--<td >
                     <input [(ngModel)]="report.selected" type="checkbox" (click)="checkForMultiChecked($event)">
-                </td>
+                </td>-->
                 <td *ngIf="isColumnVisible('form_type')">{{report.form_type}}</td>
                 <td *ngIf="isColumnVisible('status')">{{report.status}}</td>
                 <td *ngIf="isColumnVisible('fec_id')">{{report.status === 'Filed' ? report.fec_id : '' }}</td>
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
-                <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())"></td>
+                <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())">
+                    <div class="row td-amend">
+                        {{(report.amend_ind === 'N' || report.amend_ind === 'T') ? '' : report.amend_ind}}
+                        <div >
+                            <i *ngIf="report.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(report)"></i>
+                            <i *ngIf="report.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(report)"></i>
+                        </div>
+                    </div>
+                </td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
                     {{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>
@@ -188,6 +164,7 @@
                 <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
                     {{(report.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
                 </td>
+
                 <td class="bulk_action" >
                     <div *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-primary" (click)="restoreReport(report)">
@@ -205,7 +182,7 @@
 
 
                         <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="editReport(report)">
+                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="dropdown-item" (click)="printReport(report)">
@@ -214,7 +191,7 @@
                             <button class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
-                            <button class="dropdown-item" (click)="trashReport(report)">
+                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
@@ -228,10 +205,10 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" *ngIf="report.status === 'Filed'" (click)="viewReport(report)">
+                            <button class="dropdown-item" *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
-                            <button class="dropdown-item" (click)="amendReport(report)">
+                            <button  *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="amendReport(report)">
                                 <i class="fas fa-edit"></i> Amend
                             </button>
                             <button class="dropdown-item" (click)="downloadReport(report)">
@@ -287,7 +264,9 @@
 
                     </div>
                 </td>
+
             </tr>
+            </ng-container>
         </tbody>
     </table>
     <div *ngIf="showPagination()" class="d-flex justify-content-center Report-table-pagination-container">

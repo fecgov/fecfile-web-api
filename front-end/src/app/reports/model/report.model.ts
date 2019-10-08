@@ -24,6 +24,8 @@ export class reportModel {
     viewtype: string;
     selected: boolean;
     deleteddate: string;
+    amend_show: boolean;
+    amend_max: string;
     constructor(report: any) {
       this.id = report.id ? report.id : '';
       this.report_id = report.report_id ? report.report_id: '';
@@ -48,6 +50,8 @@ export class reportModel {
       this.last_update_date = report.last_update_date ? report.last_update_date : '';
       this.viewtype = report.viewtype ? report.viewtype : '';
       this.deleteddate= report.deleteddate? report.deleteddate : '';
-      this.selected = report.selected;     
+      this.selected = report.selected;
+      this.amend_show = report.amend_show;
+      this.amend_max = report.amend_max;     
     }
    }

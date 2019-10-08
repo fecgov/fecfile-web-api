@@ -76,7 +76,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public officeSought: any = [];
   public officeState: any = [];
-
+  
   private _formType: string = '';
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
@@ -86,6 +86,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private readonly _childFieldNamePrefix = 'child*';
   private _contactToEdit: ContactModel;
   private _loading: boolean = false;
+  private _selectedChangeWarn: any;
 
   constructor(
     private _http: HttpClient,
@@ -329,7 +330,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   public handleFormFieldKeyup($event: any, col: any) {
-    /*  if (!col) {
+    /*if (!col) {
       return;
     }
     if (!col.name) {
@@ -350,6 +351,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       if (this._selectedEntity) {
         this.frmContact.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
         //this.showWarn(col.text);
+        this.showWarn(col.text, col.name);
       }
     } else {
       return null;
@@ -361,13 +363,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @param fieldLabel Field Label to show in the message
    */
-  private showWarn(fieldLabel: string) {
+  /*private showWarn(fieldLabel: string) {
     const message =
       `Changes to ${fieldLabel} can't be edited when a Contributor is` +
       ` selected from the dropdwon.  Go to the Contacts page to edit a Contributor.`;
 
     this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {});
-  }
+  }*/
 
   /**
    * Updates vaprivate _memoCode variable.
@@ -433,7 +435,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }*/
 
 
-  public handleStateChange(stateOption: any, col: any) {
+  /*public handleStateChange(stateOption: any, col: any) {
    
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -441,6 +443,27 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
     }
+  } commented on 10052019*/
+
+
+  public handleStateChange(stateOption: any, col: any) {
+      if (this._selectedEntity) {
+        this.showWarn(col.text, 'state');
+        this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+      } else {
+        this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
+     }
+  }
+
+  private showWarn(fieldLabel: string, name: string) {
+    if (this._selectedChangeWarn[name] === name) {
+        return;
+    }
+
+    //const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
+    //this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+
+    this._selectedChangeWarn[name] = name;
   }
 
   public handleCandOfficeChange(candOfficeOption: any, col: any) {
@@ -520,6 +543,20 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       this.frmContact.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
     }
   }
+
+  public handleEntityTypeChange(item: any, col: any, entityType: any) {
+    // Set the selectedEntityType for the toggle method to check.
+    for (const entityTypeObj of this.entityTypes) {
+      if (entityTypeObj.entityType === item.entityType) {
+        entityTypeObj.selected = true;
+        //this.selectedEntityType = entityTypeObj;
+        this._entityType = entityTypeObj;
+      } else {
+        entityTypeObj.selected = false;
+      }
+    }
+  }
+
 
   /**
    * Goes to the previous step.
