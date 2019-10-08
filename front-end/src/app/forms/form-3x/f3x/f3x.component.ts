@@ -50,6 +50,7 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
+  public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
   public scheduleAction: ScheduleActions;
@@ -275,6 +276,7 @@ export class F3xComponent implements OnInit {
 
             this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             this.transactionType = e.transactionType ? e.transactionType : '';
+            this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
             if (e.action) {
               if (e.action in ScheduleActions) {
@@ -359,16 +361,22 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate([`/forms/form/${this.formType}`], {
+            queryParams: { step: this.step, edit: this.editMode }
+          });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate([`/forms/form/${this.formType}`], {
+            queryParams: { step: this.step, edit: this.editMode }
+          });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+        this._router.navigate([`/forms/form/${this.formType}`], {
+          queryParams: { step: this.step, edit: this.editMode }
+        });
       }
     }
   }
