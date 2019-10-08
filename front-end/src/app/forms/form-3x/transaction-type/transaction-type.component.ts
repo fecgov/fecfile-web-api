@@ -67,7 +67,7 @@ export class TransactionTypeComponent implements OnInit {
       });
       if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
         setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
-        setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+        setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
         this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
         this.updateTypeSelected(setTargetVal);
         this.childOptionsListClick(setTargetVal.target.value);
