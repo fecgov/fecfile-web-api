@@ -3907,7 +3907,7 @@ def contacts(request):
     if request.method == 'GET':
 
 
-         try:
+        try:
             data = {
                 'cmte_id': request.user.username,
                 }
