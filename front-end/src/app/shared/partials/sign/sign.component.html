@@ -261,6 +261,7 @@
               name="agreement"
               value="yes"
               (change)="updateValidation($event)"
+              [attr.disabled]="!editMode ? '' : null"
               formControlName="agreement"
             />
             <label class="agreement__text" for="agreement">
