@@ -67,11 +67,12 @@ export enum SaveActions {
   // encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
-
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Output() status: EventEmitter<any>;
+
+  public formType: string;
 
   constructor(
     _http: HttpClient,
@@ -118,22 +119,15 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
   }
 
   public ngOnInit() {
+    this.formType = '3X';
     super.ngOnInit();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    // if (this.isInit) {
+    // OnChanges() can be triggered before OnInit().  Ensure formType is set.
+    this.formType = '3X';
+
     super.ngOnChanges(changes);
-    // }
-    // if (changes.scheduleType) {
-    //   if (
-    //     changes.scheduleType.currentValue === 'sched_a' ||
-    //     changes.scheduleType.currentValue === 'sched_b' ||
-    //     changes.scheduleType.currentValue === 'sched_d'
-    //   ) {
-    //     super.ngOnChanges(changes);
-    //   }
-    // }
   }
 
   public ngOnDestroy(): void {

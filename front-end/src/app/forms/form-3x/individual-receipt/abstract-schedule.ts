@@ -70,7 +70,7 @@ export enum SaveActions {
 //   @Input() transactionType = '';
 //   @Input() scheduleAction: ScheduleActions = null;
 
-export abstract class AbstractSchedule {
+export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   // @Output() status: EventEmitter<any> = new EventEmitter<any>();
   // @Input() selectedOptions: any = {};
@@ -84,6 +84,7 @@ export abstract class AbstractSchedule {
   transactionType = '';
   scheduleAction: ScheduleActions = null;
   scheduleType = '';
+  forceChangeSwitch = 0;
   status: EventEmitter<any> = new EventEmitter<any>();
 
   /**
@@ -92,6 +93,7 @@ export abstract class AbstractSchedule {
   private _populateFormSubscription: Subscription;
   private _clearFormSubscription: Subscription;
   private _loadFormFieldsSubscription: Subscription;
+  private _storeParentModelSubscription: Subscription;
 
   public editMode: boolean = true;
   public checkBoxVal = false;
@@ -195,6 +197,10 @@ export abstract class AbstractSchedule {
       }
     });
 
+    this._storeParentModelSubscription = this._f3xMessageService.getParentModelMessage().subscribe(message => {
+      this._parentTransactionModel = message;
+    });
+
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
       this._clearFormValues();
     });
@@ -205,7 +211,7 @@ export abstract class AbstractSchedule {
     });
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
 
     // this.transactionTypeText = '';
     // this.transactionType = '';
@@ -259,30 +265,6 @@ export abstract class AbstractSchedule {
     this.isInit = true;
   }
 
-  /**
-   * Apply the validation rules when aggregate changes.
-   */
-  private _listenForAggregateChanges(): void {
-    this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
-      // All validators are replaced here.  Currently the only validator functions
-      // for employer and occupation is the validateAggregate().  The max length is enforced
-      // in the template as an element attribute max.
-      // If additoanl validators need to be added here, there is no replace function in ng,
-      // they must be cleared and all set in an array again. Onc solution is to
-      // store the validators in a class variable array, add this function to the array, and set the
-      // controls's setValidator() using the full array.  Or just get the validations from the
-      // dynamic form fields again in this.formFields[].
-
-      const employerControl = this.frmIndividualReceipt.get('employer');
-      employerControl.setValidators([validateAggregate(val, true, 'employer')]);
-      employerControl.updateValueAndValidity();
-
-      const occupationControl = this.frmIndividualReceipt.get('occupation');
-      occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
-      occupationControl.updateValueAndValidity();
-    });
-  }
-
   public ngOnChanges(changes: SimpleChanges) {
     if (this.editMode) {
       this._prepareForm();
@@ -312,6 +294,15 @@ export abstract class AbstractSchedule {
           }
         });
     }
+  }
+
+  public ngOnDestroy(): void {
+    this._messageService.clearMessage();
+    this._populateFormSubscription.unsubscribe();
+    this._clearFormSubscription.unsubscribe();
+    this._loadFormFieldsSubscription.unsubscribe();
+    this._storeParentModelSubscription.unsubscribe();
+    localStorage.removeItem('form_3X_saved');
   }
 
   private _prepareForm() {
@@ -360,18 +351,6 @@ export abstract class AbstractSchedule {
         }
       }
     }
-  }
-
-  ngOnDestroy(): void {
-    this._messageService.clearMessage();
-    this._populateFormSubscription.unsubscribe();
-    this._clearFormSubscription.unsubscribe();
-    this._loadFormFieldsSubscription.unsubscribe();
-    localStorage.removeItem('form_3X_saved');
-  }
-
-  public debug(obj: any): void {
-    console.log('obj: ', obj);
   }
 
   /**
@@ -620,6 +599,30 @@ export abstract class AbstractSchedule {
         this.frmIndividualReceipt.controls['child*contribution_aggregate'].updateValueAndValidity();
       }
     }
+  }
+
+  /**
+   * Apply the validation rules when aggregate changes.
+   */
+  private _listenForAggregateChanges(): void {
+    this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
+      // All validators are replaced here.  Currently the only validator functions
+      // for employer and occupation is the validateAggregate().  The max length is enforced
+      // in the template as an element attribute max.
+      // If additoanl validators need to be added here, there is no replace function in ng,
+      // they must be cleared and all set in an array again. Onc solution is to
+      // store the validators in a class variable array, add this function to the array, and set the
+      // controls's setValidator() using the full array.  Or just get the validations from the
+      // dynamic form fields again in this.formFields[].
+
+      const employerControl = this.frmIndividualReceipt.get('employer');
+      employerControl.setValidators([validateAggregate(val, true, 'employer')]);
+      employerControl.updateValueAndValidity();
+
+      const occupationControl = this.frmIndividualReceipt.get('occupation');
+      occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
+      occupationControl.updateValueAndValidity();
+    });
   }
 
   /**
@@ -1317,8 +1320,19 @@ export abstract class AbstractSchedule {
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
               this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([res])[0];
             }
+
+            // If the child is a sub-schedule, send a message containing the parent transaction model.
+            if (this.subTransactionInfo) {
+              if (this.subTransactionInfo.scheduleType && this.subTransactionInfo.subScheduleType) {
+                if (this.subTransactionInfo.scheduleType !== this.subTransactionInfo.subScheduleType) {
+                  this._f3xMessageService.sendParentModelMessage(this._parentTransactionModel);
+                }
+              }
+            }
+
+
             const addSubTransEmitObj: any = {
-              form: {},
+              form: this.frmIndividualReceipt,
               direction: 'next',
               step: 'step_3',
               previousStep: 'step_2',

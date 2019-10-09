@@ -27,6 +27,13 @@ import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedul
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
 })
 export class SchedHComponent extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+  @Input() transactionTypeText: string;
+  @Input() transactionType: string;
+  @Input() scheduleAction: ScheduleActions;
+  @Output() status: EventEmitter<any>;
+
+  public formType: string;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -72,18 +79,15 @@ export class SchedHComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnInit() {
+    this.formType = '3X';
     super.ngOnInit();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    if (this.isInit) {
-      super.ngOnChanges(changes);
-    }
-    // if (changes.scheduleType) {
-    //   if (changes.scheduleType.currentValue === 'sched_h4' || changes.scheduleType.currentValue === 'sched_h6') {
-    //     super.ngOnChanges(changes);
-    //   }
-    // }
+    // OnChanges() can be triggered before OnInit().  Ensure formType is set.
+    this.formType = '3X';
+
+    super.ngOnChanges(changes);
   }
 
   public ngOnDestroy(): void {
