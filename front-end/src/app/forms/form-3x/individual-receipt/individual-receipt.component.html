@@ -343,6 +343,26 @@
                           ">
                       </ng-select>
                     </ng-container>
+                    <ng-container *ngIf="col?.type === 'select' && 
+                          (isFieldName(col?.name, 'levin_account_id'))">
+                      <ng-select #levinAccountSelect 
+                        [items]="levinAccounts" 
+                        class="forms__select" 
+                        [formControlName]="col?.name" 
+                        bindValue="levin_account_id" 
+                        bindLabel="levin_account_name" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                        <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                          <span>{{ item.levin_account_id + ' - ' + item.levin_account_name }}</span>
+                        </ng-template>
+                      </ng-select>
+                    </ng-container>
                   </div>
                 </div>
               </ng-container>

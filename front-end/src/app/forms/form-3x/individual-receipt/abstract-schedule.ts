@@ -107,6 +107,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
+  public levinAccounts: any = [];
   public electionTypes: any = [];
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
@@ -2264,7 +2265,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
     this.memoDropdownSize = null;
-
+    const levinText = 'LEVIN';
+    if ((this.transactionType).startsWith(levinText)) {
+      this._receiptService.getLevinAccounts().subscribe(res => {
+        if (res) {
+          this.levinAccounts = res;
+        }
+      });
+    }
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
       if (res) {
         if (res.hasOwnProperty('data')) {
@@ -3061,6 +3069,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
         }
         prePopulateFieldArray = [];
+        if (res.hasOwnProperty('contribution_amount')) {
+          prePopulateFieldArray.push({ name: 'contribution_amount', value: res.contribution_amount });
+          prePopulateFieldArray.push({ name: 'expenditure_amount', value: res.contribution_amount });
+        } else if (res.hasOwnProperty('expenditure_amount')) {
+          prePopulateFieldArray.push({ name: 'contribution_amount', value: res.expenditure_amount });
+          prePopulateFieldArray.push({ name: 'expenditure_amount', value: res.expenditure_amount });
+        }
         prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
         prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });
       }
