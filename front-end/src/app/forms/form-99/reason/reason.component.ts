@@ -538,7 +538,7 @@ export class ReasonComponent implements OnInit {
 
         if (this.file !== null) {
           this._form99Details.file = this.file;
-          this._formsService.saveForm({}, this.file, this._formType).subscribe(
+          this._formsService.updateForm({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
                 this._form99Details.id = res.id;
