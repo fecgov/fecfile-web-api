@@ -110,6 +110,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public electionTypes: any = [];
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
+  public activityEventTypes: any = [];
   public subTransactionInfo: any;
   public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
@@ -2287,6 +2288,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('electionTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.electionTypes = res.data.electionTypes;
+              }
+            }
+            if (res.data.hasOwnProperty('activityEventTypes')) {
+              if (Array.isArray(res.data.electionTypes)) {
+                this.activityEventTypes = res.data.activityEventTypes;
               }
             }
             if (res.data.hasOwnProperty('titles')) {
