@@ -71,6 +71,7 @@ def schedD(request):
 
     # create new sched_d transaction
     if request.method == "POST":
+        logger.debug("POST request received:{}".format(request.data))
         try:
             cmte_id = request.user.username
             if not ("report_id" in request.data):
@@ -81,9 +82,13 @@ def schedD(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
+            # save entoty first
+            logger.debug("checking and filtering reqt data...")
             datum = schedD_sql_dict(request.data)
+            logger.debug("valid data set:{}".format(datum))
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+
             # if 'creditor_entity_id' in request.data and check_null_value(
             #         request.data.get('creditor_entity_id')):
             #     datum['creditor_entity_id'] = request.data.get(
@@ -94,8 +99,14 @@ def schedD(request):
                 datum["transaction_id"] = check_transaction_id(
                     request.data.get("transaction_id")
                 )
+                logger.debug(
+                    "update transaction {} with data:{}".format(
+                        datum.get("transaction_id", datum)
+                    )
+                )
                 data = put_schedD(datum)
             else:
+                logger.debug("saving new sd transaction:{}".format(datum))
                 data = post_schedD(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -203,8 +214,9 @@ def schedD(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedD(datum)
+            output = get_schedD(data)
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response(
@@ -252,12 +264,36 @@ def schedD_sql_dict(data):
         "payment_amount",
         "balance_at_close",
         "line_number",
+        # entity_data
+        "entity_id",
+        "entity_type",
+        "entity_name",
+        "first_name",
+        "last_name",
+        "middle_name",
+        "preffix",
+        "suffix",
+        "street_1",
+        "street_2",
+        "city",
+        "state",
+        "zip_code",
+        "occupation",
+        "employer",
+        "ref_cand_cmte_id",
+        "cand_office",
+        "cand_office_state",
+        "cand_office_district",
+        "cand_election_year",
+        "phone_number",
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        logger.debug("current valid data:{}".format(valid_data))
         line_num, tran_tp = get_line_number_trans_type(
             data["transaction_type_identifier"]
         )
+        logger.debug(line_num)
         valid_data["line_number"] = line_num
         return valid_data
     except:
@@ -269,6 +305,26 @@ def put_schedD(datum):
     here we are assuming creditor_entoty_id are always referencing something already in our DB
     """
     try:
+        # save entity data first
+        if "entity_id" in datum:
+            get_data = {
+                "cmte_id": datum.get("cmte_id"),
+                "entity_id": datum.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(datum)
+            entity_flag = True
+        else:
+            entity_data = post_entities(datum)
+            entity_flag = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        datum["entity_id"] = entity_id
         check_mandatory_fields_SD(datum)
         transaction_id = check_transaction_id(datum.get("transaction_id"))
 
@@ -288,14 +344,11 @@ def put_schedD(datum):
         try:
             put_sql_schedD(datum)
         except Exception as e:
-            # if flag:
-            #     entity_data = put_entities(prev_entity_list[0])
-            # else:
-            #     get_data = {
-            #         'cmte_id': datum.get('cmte_id'),
-            #         'entity_id': entity_id
-            #     }
-            #     remove_entities(get_data)
+            if entity_flag:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedD function is throwing an error: " + str(e)
             )
@@ -340,6 +393,25 @@ def post_schedD(datum):
     """save sched_d item and the associated entities."""
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        if "entity_id" in datum:
+            get_data = {
+                "cmte_id": datum.get("cmte_id"),
+                "entity_id": datum.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(datum)
+            entity_flag = True
+        else:
+            entity_data = post_entities(datum)
+            entity_flag = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        datum["entity_id"] = entity_id
         transaction_id = get_next_transaction_id("SD")
         datum["transaction_id"] = transaction_id
         validate_sd_data(datum)
@@ -365,20 +437,14 @@ def post_schedD(datum):
         try:
             post_sql_schedD(datum)
         except Exception as e:
-            # if 'creditor_entity_id' in datum:
-            #     entity_data = put_entities(prev_entity_list[0])
-            # else:
-            #     get_data = {
-            #         'cmte_id': datum.get('cmte_id'),
-            #         'entity_id': creditor_entity_id
-            #     }
-            #     remove_entities(get_data)
+            if entity_flag:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedD function is throwing an error: " + str(e)
             )
-        # update line number based on aggregate amount info
-        # update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
-        #     'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         return datum
     except:
         raise
@@ -524,15 +590,12 @@ def get_list_all_schedD(report_id, cmte_id):
                 )
             merged_list = []
             for dictD in schedD_list:
-                # entity_id = dictA.get('entity_id')
-                # data = {
-                #     'entity_id': entity_id,
-                #     'cmte_id': cmte_id
-                # }
-                # entity_list = get_entities(data)
-                # dictEntity = entity_list[0]
-                # merged_dict = {**dictA, **dictEntity}
-                merged_list.append(dictD)
+                entity_id = dictD.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(q_data)
+                dictEntity = entity_list[0]
+                # merged_dict = {**dictD, **dictEntity}
+                merged_list.append({**dictD, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -574,7 +637,12 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                 )
             merged_list = []
             for dictD in schedD_list:
-                merged_list.append(dictD)
+                entity_id = dictD.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(q_data)
+                dictEntity = entity_list[0]
+                # merged_dict = {**dictD, **dictEntity}
+                merged_list.append({**dictD, **dictEntity})
         return merged_list
     except Exception:
         raise
