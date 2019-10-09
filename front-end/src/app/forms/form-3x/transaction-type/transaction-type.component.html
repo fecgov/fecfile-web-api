@@ -67,7 +67,7 @@
                               type="button"
                               class="btn-info"
                               ngbTooltip=" {{ option?.info }}"
-                              (click)="$event.stopPropagation()"
+                              (click)="$event.stopPropagation();$event.preventDefault();"
                             >
                               <i class="info-icon" aria-hidden="true"></i>
                               <span class="sr-only">
