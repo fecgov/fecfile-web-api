@@ -19,6 +19,7 @@ import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
+import { ReportsService } from 'src/app/reports/service/report.service';
 
 @Component({
   selector: 'app-sched-h',
@@ -53,7 +54,8 @@ export class SchedHComponent extends AbstractSchedule implements OnInit, OnDestr
     _f3xMessageService: F3xMessageService,
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
-    _transactionsService: TransactionsService
+    _transactionsService: TransactionsService,
+    _reportsService: ReportsService
   ) {
     super(
       _http,
@@ -74,7 +76,8 @@ export class SchedHComponent extends AbstractSchedule implements OnInit, OnDestr
       _f3xMessageService,
       _transactionsMessageService,
       _contributionDateValidator,
-      _transactionsService
+      _transactionsService,
+      _reportsService
     );
   }
 
