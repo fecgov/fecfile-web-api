@@ -3816,7 +3816,7 @@ def contact_entity_dict(data):
           'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
           'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
           'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
-          'last_update_date' : is_null(data.get('deletedDate')),
+          'last_update_date' : is_null(data.get('lastupdatedate')),
         }
 
         return datum
@@ -3848,30 +3848,31 @@ def put_contact_data(data):
                     cand_office_state = %s,
                     cand_office_district = %s,
                     last_update_date = %s 
-                WHERE entity_id = %s AND cmte_id = %s 
+                WHERE entity_id = %s
+                AND cmte_id = %s 
                 AND delete_ind is distinct FROM 'Y'
                 """,
                 [
-                data.get('entity_type'), 
-                data.get('entity_name'), 
-                data.get('first_name'), 
-                data.get('last_name'), 
-                data.get('middle_name'), 
-                data.get('preffix'), 
-                data.get('suffix'), 
-                data.get('street_1'), 
-                data.get('street_2'), 
-                data.get('city'), 
-                data.get('state'), 
-                data.get('zip_code'), 
-                data.get('occupation'), 
-                data.get('employer'), 
+                data.get('entity_type', ""), 
+                data.get('entity_name', ""), 
+                data.get('first_name', ""), 
+                data.get('last_name', ""), 
+                data.get('middle_name', ""), 
+                data.get('preffix', ""), 
+                data.get('suffix', ""), 
+                data.get('street_1', ""), 
+                data.get('street_2', ""), 
+                data.get('city', ""), 
+                data.get('state', ""), 
+                data.get('zip_code', None), 
+                data.get('occupation', ""), 
+                data.get('employer', ""), 
                 data.get('ref_cand_cmte_id'), 
-                data.get('entity_id'), 
-                data.get('cand_office'),
-                data.get('cand_office_state'),
-                data.get('cand_office_district'),
-                data.get('last_update_date', None),
+                data.get('cand_office', ""),
+                data.get('cand_office_state', ""),
+                data.get('cand_office_district', ""),
+                datetime.datetime.now(),
+                data.get('entity_id'),
                 data.get('cmte_id')])                       
                 
             if (cursor.rowcount == 0):
@@ -3932,7 +3933,7 @@ def contacts(request):
             output = get_entities(datum)
             return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
         except Exception as e:
-            return Response("The contacts API - POST is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+            return Response("The contacts API - PUT is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
         
 
