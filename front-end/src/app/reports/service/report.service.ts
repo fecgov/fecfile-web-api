@@ -522,6 +522,7 @@ export class ReportsService {
     let httpOptions = new HttpHeaders();
     const url = '/core/create_amended_reports';
 
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const formData: FormData = new FormData();
