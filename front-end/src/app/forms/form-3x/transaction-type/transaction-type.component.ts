@@ -73,18 +73,34 @@ export class TransactionTypeComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+    // _activatedRoute.queryParams.subscribe(p => {
+    //   const setTargetVal = { target: { value: null, placeholder: null } };
+    //   this.frmOption = this._fb.group({
+    //     secondaryOption: ['', Validators.required]
+    //   });
+    //   if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
+    //     setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+    //     setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
+    //     this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
+    //     // this.updateTypeSelected(setTargetVal);
+    //     // this.childOptionsListClick(setTargetVal.target.value);
+    //     // this.doValidateOption();
+    //   }
+    // });
+
     _activatedRoute.queryParams.subscribe(p => {
-      const setTargetVal = { target: { value: null, placeholder: null } };
+      const setTargetVal = { value: null, placeholder: null, text: null };
       this.frmOption = this._fb.group({
         secondaryOption: ['', Validators.required]
       });
       if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
-        setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
-        setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
+        setTargetVal.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
+        setTargetVal.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
+        setTargetVal.text = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
         this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
-        // this.updateTypeSelected(setTargetVal);
-        // this.childOptionsListClick(setTargetVal.target.value);
-        // this.doValidateOption();
+        this.updateTypeSelected(setTargetVal);
+        this.childOptionsListClick(setTargetVal.value);
+        this.doValidateOption();
       }
     });
   }

@@ -328,15 +328,15 @@ export class ReportsService {
     }
 
     if (filters.filterFiledDateFrom && filters.filterFiledDateTo) {
-      const filedFromDate = this._datePipe.transform((filters.filterFiledDateFrom), 'Mddyyyy');
-      const filedToDate = this._datePipe.transform((filters.filterFiledDateTo), 'Mddyyyy');
+      const filedFromDate = this._datePipe.transform(filters.filterFiledDateFrom, 'Mddyyyy');
+      const filedToDate = this._datePipe.transform(filters.filterFiledDateTo, 'Mddyyyy');
       const filteredFiledDateArray = [];
       for (const rep of response.reports) {
         if (rep.status === 'Filed') {
           if (rep.filed_date) {
             //this fix is done till services send data in EST format
             let d = this.convertUtcToLocalDate(rep.filed_date);
-            let repDate =this._datePipe.transform(d, 'Mddyyyy');
+            let repDate = this._datePipe.transform(d, 'Mddyyyy');
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             } else {
@@ -348,7 +348,7 @@ export class ReportsService {
             //const repDate =  this.getDateMMDDYYYYformat(new Date(rep.last_update_date));
             //this fix is done till services send data in EST format
             let d = this.convertUtcToLocalDate(rep.last_update_date);
-            let repDate =this._datePipe.transform(d, 'Mddyyyy');
+            let repDate = this._datePipe.transform(d, 'Mddyyyy');
             if (repDate >= filedFromDate && repDate <= filedToDate) {
               isFilter = true;
             } else {
@@ -365,27 +365,24 @@ export class ReportsService {
       response.reports = filteredFiledDateArray;
     }
 
-    
     if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
       const deletedFromDate = new Date(filters.filterDeletedDateFrom);
       const deletedToDate = new Date(filters.filterDeletedDateTo);
       const filteredDeletedDateArray = [];
 
-      
       for (const rep of response.reports) {
         if (rep.deleteddate) {
           let d = new Date(rep.deleteddate);
           d.setUTCHours(0, 0, 0, 0);
           //const repDate = this.getDateMMDDYYYYformat(d);
           const repDate = d;
-          
+
           if (repDate >= deletedFromDate && repDate <= deletedToDate) {
             isFilter = true;
           } else {
             isFilter = false;
           }
         }
-       
 
         if (isFilter) {
           filteredDeletedDateArray.push(rep);
@@ -393,35 +390,32 @@ export class ReportsService {
       }
       response.reports = filteredDeletedDateArray;
     }
-    
   }
-  convertUtcToLocalDate(val : Date) : Date { 
-         
+  convertUtcToLocalDate(val: Date): Date {
     var d = new Date(val); // val is in UTC
-    var usaTime = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    var usaTime = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
     var dateNy = new Date(usaTime);
-    
+
     var newOffset = dateNy.getTimezoneOffset();
-    var localOffset = (d.getTimezoneOffset() - newOffset) * 60000 ;
+    var localOffset = (d.getTimezoneOffset() - newOffset) * 60000;
     var localTime = d.getTime() - localOffset;
 
     d.setTime(localTime);
     return d;
-}
- 
-private getDateMMDDYYYYformat(dateValue: Date): string {
-  var year = dateValue.getUTCFullYear() + '';
-  var month = dateValue.getUTCMonth() + 1 + '';
-  var day = dateValue.getUTCDate() + '';
-  return month + day + year;
-}
+  }
+
+  private getDateMMDDYYYYformat(dateValue: Date): string {
+    var year = dateValue.getUTCFullYear() + '';
+    var month = dateValue.getUTCMonth() + 1 + '';
+    var day = dateValue.getUTCDate() + '';
+    return month + day + year;
+  }
 
   public getReportInfo(form_type: string, report_id: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
-
 
     if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
@@ -467,7 +461,7 @@ private getDateMMDDYYYYformat(dateValue: Date): string {
         });
     }
   }
-  public trashOrRestoreReports(action: string,  reports: Array<reportModel>) {
+  public trashOrRestoreReports(action: string, reports: Array<reportModel>) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/trash_restore_report';
@@ -490,11 +484,11 @@ private getDateMMDDYYYYformat(dateValue: Date): string {
         headers: httpOptions
       })
       .map(res => {
-          if (res) {
-            console.log('Report Trash Restore response: ', res);
-            return res;
-          }
-          return false;
+        if (res) {
+          console.log('Report Trash Restore response: ', res);
+          return res;
+        }
+        return false;
       });
   }
   public deleteRecycleBinReport(reports: Array<reportModel>): Observable<any> {
@@ -518,31 +512,57 @@ private getDateMMDDYYYYformat(dateValue: Date): string {
       .post(`${environment.apiUrl}${url}`, request, {
         headers: httpOptions
       })
-     .map(res => {
-          return false;
-        });
+      .map(res => {
+        return false;
+      });
   }
 
   public amendReport(report: reportModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/core/create_amended_reports';
-    
+
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     const formData: FormData = new FormData();
-    formData.append("report_id", report.report_id);
-       
+    formData.append('report_id', report.report_id);
+
     return this._http
       .post(`${environment.apiUrl}${url}`, formData, {
-        headers: httpOptions        
+        headers: httpOptions
       })
-      .pipe(map(res => {
+      .pipe(
+        map(res => {
+          if (res) {
+            console.log('amend res: ', res);
+            return res;
+          }
+          return false;
+        })
+      );
+  }
+
+  public updateReportDate(report: reportModel) {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/new_report_update_date';
+
+    // httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const formData: FormData = new FormData();
+    formData.append('report_id', report.report_id);
+
+    return this._http
+      .put(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions
+      })
+      .map(res => {
         if (res) {
-          console.log('amend res: ', res);
+          // console.log('Ypdate Report Date response: ', res);
           return res;
         }
         return false;
-    }));
+      });
   }
 }

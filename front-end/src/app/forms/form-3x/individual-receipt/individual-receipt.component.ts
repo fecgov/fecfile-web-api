@@ -49,6 +49,7 @@ import { trigger, transition, style, animate, state } from '@angular/animations'
 import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { AbstractSchedule } from './abstract-schedule';
+import { ReportsService } from 'src/app/reports/service/report.service';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -93,7 +94,8 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
     _f3xMessageService: F3xMessageService,
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
-    _transactionsService: TransactionsService
+    _transactionsService: TransactionsService,
+    _reportsService: ReportsService
   ) {
     super(
       _http,
@@ -114,7 +116,8 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
       _f3xMessageService,
       _transactionsMessageService,
       _contributionDateValidator,
-      _transactionsService
+      _transactionsService,
+      _reportsService
     );
   }
 
