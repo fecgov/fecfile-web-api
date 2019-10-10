@@ -119,6 +119,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private maxColumnOption = 6;
   private readonly maxColumnOptionReadOnly = 6;
   private allTransactionsSelected: boolean;
+  private clonedTransaction: any;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -377,6 +378,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
         this.transactionsModel = transactionsModelL;
+
+        if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
+          for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
+            if (this.transactionsModel[transactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+              this.editTransaction(this.transactionsModel[transactionModelIndex]);
+            }
+          }
+        }
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
@@ -733,8 +742,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to clone
    */
-  public cloneTransaction(): void {
-    alert('Clone transaction is not yet supported');
+  public cloneTransaction(trx: TransactionModel): void {
+    this._transactionsService.cloneTransaction(trx.transactionId).subscribe((cloneTransactionResponse: TransactionModel) => {
+      if (cloneTransactionResponse && cloneTransactionResponse.hasOwnProperty('transaction_id')) {
+        this.getTransactionsPage(this.config.currentPage);
+        this.clonedTransaction = cloneTransactionResponse;
+      }
+    });
   }
 
   /**
@@ -765,9 +779,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public printTransaction(trx: TransactionModel): void {
-      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);  
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);
   }
-  
 
   /**
    * Trash the transaction selected by the user.
