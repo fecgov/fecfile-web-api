@@ -515,7 +515,7 @@
                     Previous
                   </button>
                   <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
-                    type="button" (click)="returnToParent()">
+                    type="button" (click)="returnToParent(editScheduleAction)">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="saveOnly()">
