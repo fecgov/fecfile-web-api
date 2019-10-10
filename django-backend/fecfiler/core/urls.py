@@ -140,5 +140,5 @@ urlpatterns = [
     ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
 
-    url(r"^core/create_amended_reports$", views.create_amended_reports, name="create_amended_reports"),
+    
 ]
