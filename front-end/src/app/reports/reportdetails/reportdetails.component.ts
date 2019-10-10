@@ -193,6 +193,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
+    // localStorage.removeItem('Reports_Edit_Screen');
   }
 
   /**
@@ -932,6 +933,10 @@ public printReport(report: reportModel): void{
             this._router.navigate([`/forms/form/${formType}`], {
               queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false }
             });
+          } else if(formType === 'F99') {
+            this._router.navigate([`/forms/form/${formType}`], {
+              queryParams: { step: 'step_1', reportId: report.report_id, edit: false }
+            });
           }
       }, 1500);
     }
@@ -943,6 +948,7 @@ public printReport(report: reportModel): void{
    * @param report the Report to edit
    */
   public editReport(report: reportModel): void {
+    localStorage.setItem('Reports_Edit_Screen', 'Yes');
     if (report.form_type === 'F99') {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
         console.log('getReportInfo res =', res);

@@ -6,12 +6,15 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from '../../../shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionTypeService } from '../../../forms/form-3x/transaction-type/transaction-type.service';
 import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
-import {Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, filter, map, merge} from 'rxjs/operators';
-import {NgbTypeahead} from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, merge } from 'rxjs/operators';
+import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 
 const transactionCategoryOptions = [];
@@ -253,7 +256,8 @@ export class TransactionSidebarComponent implements OnInit {
       if (
         localStorage.getItem('Transaction_Table_Screen') === 'Yes' ||
         localStorage.getItem('Summary_Screen') === 'Yes' ||
-        localStorage.getItem('Receipts_Entry_Screen') === 'Yes'
+        localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
+        localStorage.getItem('Reports_Edit_Screen') === 'Yes'
       ) {
         this._router.navigate([`/forms/form/${this._formType}`], {
           queryParams: { step: 'step_2', transactionCategory: e.target.value }
@@ -261,15 +265,15 @@ export class TransactionSidebarComponent implements OnInit {
       }
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
@@ -330,7 +334,10 @@ export class TransactionSidebarComponent implements OnInit {
                     ].value,
                     transactionSubCategory: this.transactionCategories[transactionCategorieIndex].options[
                       transactionCategoryOptionIndex
-                    ].options[transactionCategoryOptionOptionsIndex].value
+                    ].options[transactionCategoryOptionOptionsIndex].value,
+                    transactionSubCategoryText: this.transactionCategories[transactionCategorieIndex].options[
+                      transactionCategoryOptionIndex
+                    ].options[transactionCategoryOptionOptionsIndex].text
                   }
                 });
               }
@@ -341,15 +348,15 @@ export class TransactionSidebarComponent implements OnInit {
       }
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
@@ -384,15 +391,15 @@ export class TransactionSidebarComponent implements OnInit {
       this.transactionTypeFailed = false;
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();

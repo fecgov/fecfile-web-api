@@ -355,8 +355,28 @@ def get_list_all_report(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from Reports table
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
-                                                    FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
+            query_string = """
+            SELECT report_id, 
+            cmte_id, 
+            form_type, 
+            report_type, 
+            amend_ind, 
+            amend_number, 
+            cvg_start_date, 
+            cvg_end_date, 
+            due_date, 
+            superceded_report_id, 
+            previous_report_id, 
+            status, 
+            email_1, 
+            email_2, 
+            filed_date, 
+            fec_id, 
+            fec_accepted_date, 
+            fec_status, 
+            create_date, 
+            last_update_date
+            FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
            
             for row in cursor.fetchall():
@@ -904,7 +924,8 @@ def post_sql_entity(
     cand_office,
     cand_office_state,
     cand_office_district,
-    cand_election_year):
+    cand_election_year,
+    phone_number):
 
     try:
         with connection.cursor() as cursor:
@@ -933,8 +954,9 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     create_date)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     entity_id, 
@@ -958,6 +980,7 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     datetime.datetime.now(),
                 ]
                     )
@@ -989,7 +1012,9 @@ def get_list_entity(entity_id, cmte_id):
             cand_office,
             cand_office_state,
             cand_office_district,
-            cand_election_year
+            cand_election_year,
+            phone_number,
+            last_update_date
         FROM public.entity 
         WHERE entity_id = %s 
         AND cmte_id = %s 
@@ -1033,7 +1058,9 @@ def get_list_all_entity(cmte_id):
             cand_office,
             cand_office_state,
             cand_office_district,
-            cand_election_year
+            cand_election_year,
+            phone_number,
+            last_update_date
         FROM public.entity 
         WHERE cmte_id = %s 
         AND delete_ind is distinct from 'Y'
@@ -1071,6 +1098,7 @@ def put_sql_entity(
     cand_office_state,
     cand_office_district,
     cand_election_year,
+    phone_number,
     cmte_id):
 
     try:
@@ -1099,7 +1127,9 @@ def put_sql_entity(
                     cand_office = %s,
                     cand_office_state = %s,
                     cand_office_district = %s,
-                    cand_election_year = %s 
+                    cand_election_year = %s,
+                    phone_number=%s,
+                    last_update_date=%s
                 WHERE entity_id = %s AND cmte_id = %s 
                 AND delete_ind is distinct FROM 'Y'
                 """,
@@ -1123,6 +1153,9 @@ def put_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
+                    datetime.datetime.now(),
+                    # last_update_date,
                     entity_id, 
                     cmte_id,
                     ])                       
@@ -1224,7 +1257,9 @@ def post_entities(data):
             data.get('cand_office'),
             data.get('cand_office_state'),
             data.get('cand_office_district'),
-            data.get('cand_election_year')
+            data.get('cand_election_year'),
+            data.get('phone_number'),
+            # data.get('last_update_date')
             )
         output = get_entities(data)
         return output[0]
@@ -1265,13 +1300,13 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year)
+                cand_office_district, cand_election_year, phone_number)
             SELECT %s, entity_type, %s, entity_name, 
                 first_name, last_name, middle_name, preffix, 
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year
+                cand_office_district, cand_election_year, phone_number
             FROM public.entity e 
             WHERE e.entity_id = %s;
             """
@@ -1362,6 +1397,8 @@ def put_entities(data):
             data.get('cand_office_state'),
             data.get('cand_office_district'),
             data.get('cand_election_year', None),
+            data.get('phone_number'),
+            # data.get('last_update_date'),
             cmte_id)
         output = get_entities(data)
         return output[0]
@@ -1430,7 +1467,8 @@ def entities(request):
                     'cand_office': request.data.get('cand_office'),
                     'cand_office_state': request.data.get('cand_office_state'),
                     'cand_office_district': request.data.get('cand_office_district'),
-                    'cand_election_year': request.data.get('cand_election_year')
+                    'cand_election_year': request.data.get('cand_election_year'),
+                    'phone_number': request.data.get('phone_number'),
                 }     
             data = post_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -1486,7 +1524,9 @@ def entities(request):
                 'cand_office': request.data.get('cand_office'),
                 'cand_office_state': request.data.get('cand_office_state'),
                 'cand_office_district': request.data.get('cand_office_district'),
-                'cand_election_year': request.data.get('cand_election_year')
+                'cand_election_year': request.data.get('cand_election_year'),
+                'phone_number': request.data.get('phone_number'),
+                # 'last_update_date': request.data.get('last_update_date')
             }      
             data = put_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -3904,6 +3944,105 @@ def contact_sql_dict(data):
     except:
         raise
 
+
+def contact_entity_dict(data):
+    """
+    filter data, validate fields and build entity item dic
+    """
+    try:
+        datum = {
+         # 'cmte_id' : data.get('cmte_id'),
+          'entity_id' : is_null(data.get('id')),   
+          'entity_type'  : is_null(data.get('entity_type')), 
+          'entity_name'  : is_null(data.get('entity_name')), 
+          'first_name'  : is_null(data.get('firstName')), 
+          'last_name'  : is_null(data.get('lastName')), 
+          'middle_name' : is_null(data.get('middleName')), 
+          'preffix'  : is_null(data.get('preffix')), 
+          'suffix' : is_null(data.get('suffix')), 
+          'street_1'  : is_null(data.get('street1')), 
+          'street_2'  : is_null(data.get('street2')), 
+          'city'  : is_null(data.get('city')),  
+          'state' : is_null(data.get('state')), 
+          'zip_code' : is_null(data.get('zip')), 
+          'occupation'  : is_null(data.get('occupation')), 
+          'employer' : is_null(data.get('employer')), 
+          'cand_office'  : is_null(data.get('candOffice')), 
+          'cand_office_state'  : is_null(data.get('candOfficeState')), 
+          'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
+          'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
+          'phone_number'  : is_null(data.get('phoneNumber')),
+          'cand_election_year': is_null(data.get('candElectionYear')),
+          'last_update_date' : is_null(data.get('lastupdatedate')),
+        }
+
+        return datum
+    except:
+        raise
+
+def put_contact_data(data):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE public.entity SET 
+                    entity_type = %s, 
+                    entity_name = %s, 
+                    first_name = %s, 
+                    last_name = %s, 
+                    middle_name = %s, 
+                    preffix = %s, 
+                    suffix = %s, 
+                    street_1 = %s, 
+                    street_2 = %s, 
+                    city = %s, 
+                    state = %s, 
+                    zip_code = %s, 
+                    occupation = %s, 
+                    employer = %s, 
+                    ref_cand_cmte_id = %s,
+                    cand_office = %s,
+                    cand_office_state = %s,
+                    cand_office_district = %s,
+                    phone_number= %s,
+                    cand_election_year =%s,
+                    last_update_date = %s 
+                WHERE entity_id = %s
+                AND cmte_id = %s 
+                AND delete_ind is distinct FROM 'Y'
+                """,
+                [
+                data.get('entity_type', ""), 
+                data.get('entity_name', ""), 
+                data.get('first_name', ""), 
+                data.get('last_name', ""), 
+                data.get('middle_name', ""), 
+                data.get('preffix', ""), 
+                data.get('suffix', ""), 
+                data.get('street_1', ""), 
+                data.get('street_2', ""), 
+                data.get('city', ""), 
+                data.get('state', ""), 
+                data.get('zip_code', None), 
+                data.get('occupation', ""), 
+                data.get('employer', ""), 
+                data.get('ref_cand_cmte_id'), 
+                data.get('cand_office', ""),
+                data.get('cand_office_state', ""),
+                data.get('cand_office_district', ""),
+                data.get('phone_number'),
+                data.get('cand_election_year'),
+                datetime.datetime.now(),
+                data.get('entity_id'),
+                data.get('cmte_id')])                       
+                
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The Entity ID: {} does not exist in Entity table'.format(entity_id))
+    
+    except Exception:
+        raise
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def contacts(request):
     """
@@ -3929,15 +4068,36 @@ def contacts(request):
     """
     # Get records from entity table
     if request.method == 'GET':
-        datum=[]
-        return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+
+        try:
+            data = {
+                'cmte_id': request.user.username,
+                }
+            if 'report_id' in request.query_params:
+                data['report_id'] = request.query_params.get('report_id')
+            output = get_contact(data)   
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The reports API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     """
     ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-        output=[]
-        return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        try:
+            datum = contact_entity_dict(request.data)
+            datum['cmte_id'] = request.user.username
+            #datum['cmte_id'] = cmte_id
+            put_contact_data(datum)
+            print ("datum", datum)
+            output = get_entities(datum)
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            return Response("The contacts API - PUT is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        
 
     """
     ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
@@ -4614,6 +4774,7 @@ def clone_a_transaction(request):
         logger.debug('clone transaction with sql:{}'.format(clone_sql))
 
         new_tran_id = get_next_transaction_id(transaction_id[0:2])
+        logger.debug('new transaction id:{}'.format(new_tran_id))
 
         cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
         if not cursor.rowcount:
@@ -4625,6 +4786,29 @@ def clone_a_transaction(request):
 GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
 ********************************************************************************************************************************
 """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def get_reports_data(report_id):
     try:
@@ -4728,6 +4912,8 @@ def create_amended_reports(request):
         return JsonResponse("Succesfully Create amended report", status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
@@ -5100,3 +5286,4 @@ def new_report_update_date(request):
             status=status.HTTP_400_BAD_REQUEST
             )
     return Response({"result" : "success"}, status=status.HTTP_200_OK)
+

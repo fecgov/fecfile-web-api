@@ -62,20 +62,15 @@
               <ng-container *ngFor="let col of row.cols">
                 <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
                   <div class="form-group" [style.width]="setSelectTypeWidth(col)">
+                  <!-- <div class="col?.type === 'radio' ? 'form-check' : 'form-group'" 
+                      [style.width]="setSelectTypeWidth(col)"> -->
                     <label [for]="col?.name">
                       {{ col?.text }}
-                      <!-- replace button with div below to resolve tab issue into button -->
-                      <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button> -->
                       <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
                       </div>
-
                       <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
                         (Optional)
                       </ng-container>
@@ -258,13 +253,15 @@
                         [attr.value]="col?.value"
                         [checked]="isFieldName(col?.name, 'memo_code') ? checkForMemoCode(col?.name) : null"
                         [formControlName]="col?.name"
-                        (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : null" [ngClass]="
+                        (change)="isFieldName(col?.name, 'memo_code') ? memoCodeChange($event, col?.name) : 
+                          handleCheckboxChange($event, col)" 
+                        [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                               ? 'input-field-error'
                               : ''
                           " />
-                    </ng-container>
+                    </ng-container>                   
                     <ng-container *ngIf="col?.type === 'textarea'">
                       <textarea [style.height]="col?.height" [style.width]="col?.width"
                         [style.overflow]="col.scroll ? col.scroll : null" [attr.name]="col?.name"
@@ -343,11 +340,10 @@
                           ">
                       </ng-select>
                     </ng-container>
-                    <!-- (change)="handleActivityEventTypeChange($event, col)" -->
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
                       <ng-select #activityEventTypeSelect 
                         [items]="activityEventTypes" 
-                  
+                        (change)="handleActivityEventTypeChange($event, col)"
                         class="forms__select activity-event-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="activityEventType"
@@ -360,27 +356,7 @@
                               : ''
                           ">
                       </ng-select>
-                    </ng-container>                     
-                    <ng-container *ngIf="col?.type === 'select' && 
-                          (isFieldName(col?.name, 'levin_account_id'))">
-                      <ng-select #levinAccountSelect 
-                        [items]="levinAccounts" 
-                        class="forms__select" 
-                        [formControlName]="col?.name" 
-                        bindValue="levin_account_id" 
-                        bindLabel="levin_account_name" 
-                        [selectOnTab]="true"
-                        [ngClass]="
-                            frmIndividualReceipt.get(col?.name)?.invalid &&
-                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                              ? 'forms__select-error'
-                              : ''
-                          ">
-                        <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
-                          <span>{{ item.levin_account_id + ' - ' + item.levin_account_name }}</span>
-                        </ng-template>
-                      </ng-select>
-                    </ng-container>
+                    </ng-container>                    
                   </div>
                 </div>
               </ng-container>
@@ -408,6 +384,40 @@
             </div>
           </ng-container>
         </ng-container>
+
+        <!-- <div class="row">
+          <div class="col col-md-2">
+            <div class="form-group">
+                <label for="field1">
+                    Field 1
+                    <div type="button" class="btn btn-info" ngbTooltip="Test"
+                      tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </div>
+                  </label>
+              <input id="field1"
+                class="form-control forms__big_checkbox" 
+                type="checkbox" name="expenditure_purpose" style="width: 25px; height: 30px;">
+            </div>
+          </div>
+          <div class="col col-md-2">
+            <div class="form-group">
+                <label for="field2">
+                    Field 2
+                    <div type="button" class="btn btn-info" ngbTooltip="Test"
+                      tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </div>
+                  </label>
+              <input id="field2"
+                class="form-control forms__big_checkbox" 
+                type="checkbox" name="expenditure_purpose" style="width: 25px; height: 30px;">
+            </div>
+          </div>
+        </div> -->
+
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
           [formType]="formType">
@@ -515,7 +525,7 @@
                     Previous
                   </button>
                   <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
-                    type="button" (click)="returnToParent(editScheduleAction)">
+                    type="button" (click)="returnToParent()">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="saveOnly()">

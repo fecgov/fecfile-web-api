@@ -15,6 +15,7 @@ export class F3xMessageService {
   private populateFormSubject = new Subject<any>();
   private clearFormSubject = new Subject<any>();
   private loadFormFieldsSubject = new Subject<any>();
+  private storeParentModelSubject = new Subject<any>();
 
 
   /**
@@ -92,6 +93,32 @@ export class F3xMessageService {
    */
   public getLoadFormFieldsMessage(): Observable<any> {
     return this.loadFormFieldsSubject.asObservable();
+  }
+
+  /**
+   * Send a message with the parent transaction ID
+   * to the child sub-schedule of a different type.
+   *
+   * @param message
+   */
+  public sendParentModelMessage(message: any) {
+    this.storeParentModelSubject.next(message);
+  }
+
+
+  /**
+   * Clear the parent model message.
+   */
+  public clearParentModelMessage() {
+    this.storeParentModelSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the store parent model message.
+   */
+  public getParentModelMessage(): Observable<any> {
+    return this.storeParentModelSubject.asObservable();
   }
 
 }
