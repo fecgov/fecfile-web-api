@@ -340,6 +340,23 @@
                           ">
                       </ng-select>
                     </ng-container>
+                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
+                      <ng-select #activityEventTypeSelect 
+                        [items]="activityEventTypes" 
+                        (change)="handleActivityEventTypeChange($event, col)"
+                        class="forms__select activity-event-type-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="activityEventType"
+                        bindLabel="activityEventTypeDescription" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>
+                    </ng-container>                    
                   </div>
                 </div>
               </ng-container>

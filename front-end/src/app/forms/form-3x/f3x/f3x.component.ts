@@ -353,25 +353,24 @@ export class F3xComponent implements OnInit {
     }
   }
 
-  private _setTransactionTypeBySchedule(transactionTypeText: string, 
-    transactionType: string, scheduleType: string) {
-      if (!scheduleType) {
-        this.transactionType = transactionType;
-        this.transactionTypeText = transactionTypeText;
-        return;
-      }
-      if (scheduleType.length === 0) {
-        this.transactionType = transactionType;
-        this.transactionTypeText = transactionTypeText;
-        return;
-      }
-      if (scheduleType.startsWith('sched_h') ) {
-        this.transactionTypeSchedH = transactionType;
-        this.transactionTypeTextSchedH = transactionTypeText;
-      } else {
-        this.transactionType = transactionType;
-        this.transactionTypeText = transactionTypeText;
-      }
+  private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string, scheduleType: string) {
+    if (!scheduleType) {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+      return;
+    }
+    if (scheduleType.length === 0) {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+      return;
+    }
+    if (scheduleType.startsWith('sched_h????????')) {
+      this.transactionTypeSchedH = transactionType;
+      this.transactionTypeTextSchedH = transactionTypeText;
+    } else {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+    }
   }
 
   /**
