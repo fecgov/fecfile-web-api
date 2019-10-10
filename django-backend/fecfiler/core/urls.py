@@ -140,6 +140,7 @@ urlpatterns = [
         name="clone_a_transaction",
     ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
+
     url(
         r"^core/address_validation$",
         views.address_validation,
@@ -160,4 +161,5 @@ urlpatterns = [
         views.new_report_update_date,
         name="new_report_update_date",
     ),
+
 ]
