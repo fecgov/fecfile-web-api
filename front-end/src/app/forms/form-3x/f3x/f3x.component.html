@@ -111,7 +111,13 @@
         </app-sched-h> -->
 
         <f3x-individual-receipt
-          [hidden]="scheduleType !== 'sched_a' && scheduleType !== 'sched_b' && scheduleType !== 'sched_d'"
+          [hidden]="
+            scheduleType !== 'sched_a' &&
+            scheduleType !== 'sched_b' &&
+            scheduleType !== 'sched_d' &&
+            scheduleType !== 'sched_h4' &&
+            scheduleType !== 'sched_h6'
+          "
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
@@ -120,7 +126,7 @@
         >
         </f3x-individual-receipt>
         <app-sched-h
-          [hidden]="scheduleType !== 'sched_h4' && scheduleType !== 'sched_h6'"
+          [hidden]="scheduleType !== 'sched_h?' && scheduleType !== 'sched_h??????'"
           [transactionTypeText]="transactionTypeTextSchedH"
           [transactionType]="transactionTypeSchedH"
           [scheduleAction]="scheduleAction"
