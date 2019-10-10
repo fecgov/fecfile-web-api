@@ -50,9 +50,13 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
+  public transactionTypeTextSchedH = '';
+  public transactionTypeSchedH = '';
+  public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
   public scheduleAction: ScheduleActions;
+  public forceChangeSwitch = 0;
 
   private _step: string = '';
 
@@ -273,8 +277,9 @@ export class F3xComponent implements OnInit {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
 
-            this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
-            this.transactionType = e.transactionType ? e.transactionType : '';
+            // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
+            // this.transactionType = e.transactionType ? e.transactionType : '';
+            this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
             if (e.action) {
               if (e.action in ScheduleActions) {
@@ -288,6 +293,9 @@ export class F3xComponent implements OnInit {
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
 
+            let transactionTypeText = '';
+            let transactionType = '';
+
             if (this.scheduleAction === ScheduleActions.edit) {
               // message the child component rather than sending data as input because
               // ngOnChanges fires when the form fields are changed, thereby reseting the
@@ -298,11 +306,11 @@ export class F3xComponent implements OnInit {
                 transactionModel: e.transactionDetail
               });
               const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
-              this.transactionTypeText = transactionModel.type;
-              this.transactionType = transactionModel.transactionTypeIdentifier;
+              transactionTypeText = transactionModel.type;
+              transactionType = transactionModel.transactionTypeIdentifier;
             } else {
-              this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
-              this.transactionType = e.transactionType ? e.transactionType : '';
+              transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
+              transactionType = e.transactionType ? e.transactionType : '';
 
               if (this.scheduleAction === ScheduleActions.addSubTransaction) {
                 if (e.hasOwnProperty('prePopulateFieldArray') && Array.isArray(e.prePopulateFieldArray)) {
@@ -313,6 +321,7 @@ export class F3xComponent implements OnInit {
                 }
               }
             }
+            this._setTransactionTypeBySchedule(transactionTypeText, transactionType, this.scheduleType);
           }
           this.canContinue();
         } else if (typeof e.form === 'string') {
@@ -330,12 +339,6 @@ export class F3xComponent implements OnInit {
             }
           }
         }
-        // } else if (e.hasOwnProperty('showTransactionType')) {
-        //   this.direction = e.direction;
-        //   this.previousStep = e.previousStep;
-        //   this._step = e.step;
-        //   this.currentStep = e.step;
-        //   this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step } });
       } else if (e.hasOwnProperty('direction')) {
         if (typeof e.direction === 'string') {
           if (e.direction === 'previous') {
@@ -350,6 +353,26 @@ export class F3xComponent implements OnInit {
     }
   }
 
+  private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string, scheduleType: string) {
+    if (!scheduleType) {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+      return;
+    }
+    if (scheduleType.length === 0) {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+      return;
+    }
+    if (scheduleType.startsWith('sched_h????????')) {
+      this.transactionTypeSchedH = transactionType;
+      this.transactionTypeTextSchedH = transactionTypeText;
+    } else {
+      this.transactionType = transactionType;
+      this.transactionTypeText = transactionTypeText;
+    }
+  }
+
   /**
    * Determines ability to continue.
    */
@@ -359,16 +382,22 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate([`/forms/form/${this.formType}`], {
+            queryParams: { step: this.step, edit: this.editMode }
+          });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate([`/forms/form/${this.formType}`], {
+            queryParams: { step: this.step, edit: this.editMode }
+          });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: this.step, edit: this.editMode } });
+        this._router.navigate([`/forms/form/${this.formType}`], {
+          queryParams: { step: this.step, edit: this.editMode }
+        });
       }
     }
   }

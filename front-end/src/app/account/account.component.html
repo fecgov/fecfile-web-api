@@ -71,12 +71,13 @@
 				</p>
 			  </div>
 			</div>
-			<div class="grid-row">
-				<div class="button-group">
+			<div class="grid-row-btn">
+				<div class="grid-col-1"> 
 					<p></p>
 					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
 				</div>
 			</div>
+			<div class="grid-row" style="height: 35px;"></div>
 			<div class="grid-row">
 				<div class="grid-row__col grid-row__col--12">
 					  <hr />
@@ -174,16 +175,22 @@
 					<p>
 					  {{ accounts?.email_on_file }}
 					</p>
-				  </div>
+				  </div>	  
 			</div>
-			<div class="grid-row">
-				<div class="grid-col-button">
-					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
-				</div>
+
+
+			<div class="grid-row-btn">
+				<div class="grid-col-1">
+					<button type="button"  (click)="goToForms1()"><i class="fas fa-edit "></i>Edit</button>
+					</div>
 			</div>
+
+			<div class="grid-row" style="height: 20px;"></div>
+			
 			<div class="grid-row">
 				<div class="grid-row__col grid-row__col--12">
-					  <hr />
+					
+					  <hr />					  
 				</div>
 			  </div>
 
@@ -237,18 +244,19 @@
 											</p>
 										  </div>
 			  </div>
-										  <div class="grid-row">
-												<div class="grid-col-button">
+
+			                          <div class="grid-row-btn">
+					                       <div class="grid-col-1">
 													<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
 												</div>
 											</div>
+											<div class="grid-row" style="height: 20px;"></div>
+
 											<div class="grid-row">
 												<div class="grid-row__col grid-row__col--12">
 													  <hr />
 												</div>
-											  </div>
-
-			
+											  </div>			
 											  
 
 											  <div *ngIf="accounts?.candidatePrefix != ''">
@@ -318,11 +326,14 @@
 																						  </p>
 																						</div>
 																					</div>
-																				<div class="grid-row">
-																					  <div class="grid-col-button" style="height: 50px;">
+
+																				<div class="grid-row-btn">
+																					  <div class="grid-col-1">
 																						  <button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
 																					  </div>
 																				  </div>
+																				  <div class="grid-row" style="height: 20px;"></div>
+
 																				  <div class="grid-row">
 																					  <div class="grid-row__col grid-row__col--12">
 																							<hr />

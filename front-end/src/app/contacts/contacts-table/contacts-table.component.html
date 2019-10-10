@@ -19,7 +19,7 @@
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">Entity Number
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('canCmteId')" [class]="getSortClass('canCmteId')" (click)="changeSortDirection('canCmteId')">Candidate/Committee <br /> ID
+        <th [@fadeInOut] *ngIf="isColumnVisible('candCmteId')" [class]="getSortClass('candCmteId')" (click)="changeSortDirection('candCmteId')">Candidate/Committee <br /> ID
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">Address
         </th>
@@ -82,7 +82,7 @@
         <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('canCmteId')">{{cnt.canCmteId}}</td>        
+        <td [@fadeInOut] *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>        
         <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
         <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
@@ -319,17 +319,17 @@
             <div class="col-md">
               <div class="checkbox">
                 <label>
-                  <input [(ngModel)]="getSortableColumn('canCmteId').checked"
-                    (change)="toggleVisibility('canCmteId', $event)" type="checkbox"
-                    [disabled]="getSortableColumn('canCmteId').disabled">
-                  <span [ngClass]="{'disabled-column-option':getSortableColumn('canCmteId').disabled}">
+                  <input [(ngModel)]="getSortableColumn('candCmteId').checked"
+                    (change)="toggleVisibility('candCmteId', $event)" type="checkbox"
+                    [disabled]="getSortableColumn('candCmteId').disabled">
+                  <span [ngClass]="{'disabled-column-option':getSortableColumn('candCmteId').disabled}">
                     Candidate/Committee ID
                   </span>
                 </label>
               </div>
             </div>
             <div class="col-md">
-              <div class="checkbox">
+              <div class="checkbox" *ngIf="isRecycleBinViewActive()">
                 <label>
                   <input [(ngModel)]="getSortableColumn('deletedDate').checked"
                     (change)="toggleVisibility('deletedDate', $event)" type="checkbox"

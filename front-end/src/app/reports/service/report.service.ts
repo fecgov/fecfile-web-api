@@ -12,6 +12,7 @@ import { ReportFilterModel } from '../model/report-filter.model';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { ActiveView } from '../reportheader/reportheader.component';
+import { map } from 'rxjs/operators';
 
 export interface GetReportsResponse {
   reports: reportModel[];
@@ -191,6 +192,10 @@ export class ReportsService {
       model.filed_date = row.filed_date;
       model.deleteddate = row.deleteddate;
       model.delete_ind = row.delete_ind;
+      model.amend_number = row.amend_number;
+      model.previous_report_id = row.previous_report_id;
+      model.amend_show = true;
+      model.amend_max = row.amend_max;
       modelArray.push(model);
     }
 
@@ -516,5 +521,28 @@ private getDateMMDDYYYYformat(dateValue: Date): string {
      .map(res => {
           return false;
         });
+  }
+
+  public amendReport(report: reportModel): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/create_amended_reports';
+    
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const formData: FormData = new FormData();
+    formData.append("report_id", report.report_id);
+       
+    return this._http
+      .post(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions        
+      })
+      .pipe(map(res => {
+        if (res) {
+          console.log('amend res: ', res);
+          return res;
+        }
+        return false;
+    }));
   }
 }

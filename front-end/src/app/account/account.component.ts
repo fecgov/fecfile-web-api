@@ -51,7 +51,6 @@ export class AccountComponent implements OnInit {
   }
 
   goToForms1() {
-    //this.document.location.href ='https://webforms.fec.gov/webforms/form1/index.htm';
-    window.location.href = 'https://webforms.fec.gov/webforms/form1/index.htm';
+    window.open('https://webforms.fec.gov/webforms/form1/index.htm' , '_blank');
   }
 }
