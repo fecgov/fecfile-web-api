@@ -45,6 +45,8 @@ import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { reportModel } from 'src/app/reports/model/report.model';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -172,7 +174,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
     private _contributionDateValidator: ContributionDateValidator,
-    private _transactionsService: TransactionsService
+    private _transactionsService: TransactionsService,
+    private _reportsService: ReportsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -1264,11 +1267,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._receiptService.saveSchedule(this.formType, this.scheduleAction).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
-          // commented below condition to update summary (Third navigation)
-          // irrespective of memo code condition
-          //if (res.hasOwnProperty('memo_code')) {
-          //if (typeof res.memo_code === 'object') {
-          //if (res.memo_code === null) {
+
+          const reportId = this._receiptService.getReportIdFromStorage(this.formType);
+          this._reportsService.updateReportDate(new reportModel({report_id: reportId}))
+            .subscribe((resUpdateReportDate: any) => {
+              console.log(resUpdateReportDate);
+            });
           this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
             const message: any = {
               formType: this.formType,
@@ -1277,9 +1281,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
             this._messageService.sendMessage(message);
           });
-          //}
-          //}
-          //}
 
           this._contributionAmount = '';
           this._contributionAmountChlid = '';
