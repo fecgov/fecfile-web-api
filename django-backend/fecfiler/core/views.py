@@ -355,8 +355,28 @@ def get_list_all_report(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from Reports table
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
-                                                    FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
+            query_string = """
+            SELECT report_id, 
+            cmte_id, 
+            form_type, 
+            report_type, 
+            amend_ind, 
+            amend_number, 
+            cvg_start_date, 
+            cvg_end_date, 
+            due_date, 
+            superceded_report_id, 
+            previous_report_id, 
+            status, 
+            email_1, 
+            email_2, 
+            filed_date, 
+            fec_id, 
+            fec_accepted_date, 
+            fec_status, 
+            create_date, 
+            last_update_date
+            FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
            
             for row in cursor.fetchall():
@@ -1280,13 +1300,13 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year, phone_number, last_update_date)
+                cand_office_district, cand_election_year, phone_number)
             SELECT %s, entity_type, %s, entity_name, 
                 first_name, last_name, middle_name, preffix, 
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year, phone_number, last_update_date
+                cand_office_district, cand_election_year, phone_number
             FROM public.entity e 
             WHERE e.entity_id = %s;
             """
@@ -4754,6 +4774,7 @@ def clone_a_transaction(request):
         logger.debug('clone transaction with sql:{}'.format(clone_sql))
 
         new_tran_id = get_next_transaction_id(transaction_id[0:2])
+        logger.debug('new transaction id:{}'.format(new_tran_id))
 
         cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
         if not cursor.rowcount:
