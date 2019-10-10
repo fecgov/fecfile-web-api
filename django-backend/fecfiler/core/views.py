@@ -904,7 +904,8 @@ def post_sql_entity(
     cand_office,
     cand_office_state,
     cand_office_district,
-    cand_election_year):
+    cand_election_year,
+    phone_number):
 
     try:
         with connection.cursor() as cursor:
@@ -933,8 +934,9 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     create_date)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     entity_id, 
@@ -958,6 +960,7 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     datetime.datetime.now(),
                 ]
                     )
@@ -1076,7 +1079,6 @@ def put_sql_entity(
     cand_office_district,
     cand_election_year,
     phone_number,
-    last_update_date,
     cmte_id):
 
     try:
@@ -1132,7 +1134,8 @@ def put_sql_entity(
                     cand_office_district,
                     cand_election_year,
                     phone_number,
-                    last_update_date,
+                    datetime.datetime.now(),
+                    # last_update_date,
                     entity_id, 
                     cmte_id,
                     ])                       
@@ -1236,7 +1239,7 @@ def post_entities(data):
             data.get('cand_office_district'),
             data.get('cand_election_year'),
             data.get('phone_number'),
-            data.get('last_update_date')
+            # data.get('last_update_date')
             )
         output = get_entities(data)
         return output[0]
@@ -1375,7 +1378,7 @@ def put_entities(data):
             data.get('cand_office_district'),
             data.get('cand_election_year', None),
             data.get('phone_number'),
-            data.get('last_update_date'),
+            # data.get('last_update_date'),
             cmte_id)
         output = get_entities(data)
         return output[0]
@@ -1444,7 +1447,8 @@ def entities(request):
                     'cand_office': request.data.get('cand_office'),
                     'cand_office_state': request.data.get('cand_office_state'),
                     'cand_office_district': request.data.get('cand_office_district'),
-                    'cand_election_year': request.data.get('cand_election_year')
+                    'cand_election_year': request.data.get('cand_election_year'),
+                    'phone_number': request.data.get('phone_number'),
                 }     
             data = post_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -1502,7 +1506,7 @@ def entities(request):
                 'cand_office_district': request.data.get('cand_office_district'),
                 'cand_election_year': request.data.get('cand_election_year'),
                 'phone_number': request.data.get('phone_number'),
-                'last_update_date': request.data.get('last_update_date')
+                # 'last_update_date': request.data.get('last_update_date')
             }      
             data = put_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
