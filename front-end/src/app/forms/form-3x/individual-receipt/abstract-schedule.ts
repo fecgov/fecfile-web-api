@@ -1193,6 +1193,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
+        } else if (field === 'beginning_balance' ||
+                   field === 'incurred_amount' ||
+                   field === 'balance_at_close' ||
+                   field === 'payment_amount') {
+
+          // Amounts in numeric format shoud be supported by the API.
+          // The individual-receipt.service is currently only passing string values
+          // to in the request.  TODO Why is this?  Remove the check or allow numerics and
+          // then remove this block of code.
+          let amountVal = null;
+          if (this.frmIndividualReceipt.get(field).value) {
+            amountVal = this.frmIndividualReceipt.get(field).value;
+            if (amountVal) {
+              amountVal = amountVal.toString();
+            }
+          }
+          receiptObj[field] = amountVal;
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
