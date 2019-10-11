@@ -198,7 +198,7 @@
                     </div>
 
                     <div [@fadeInOut]
-                        *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Saved' && !(report.amend_ind === 'N' || report.amend_ind === 'T')"
+                        *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status !== 'Filed' && !(report.amend_ind === 'N' || report.amend_ind === 'T')"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
                         <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
@@ -238,9 +238,9 @@
                             <button class="dropdown-item" (click)="downloadReport(report)">
                                 <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="dropdown-item" (click)="printReport(report)">
+                            <!--<button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
-                            </button> 
+                            </button> -->
                         </div>
                     </div>
 
@@ -258,14 +258,14 @@
                             <button class="dropdown-item" (click)="downloadReport(report)">
                                 <i class="fas fa-download"></i> Download
                             </button>
-                            <button class="dropdown-item" (click)="printReport(report)">
+                          <!---  <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
-                            </button> 
+                            </button> -->
                         </div>
                     </div>
 
                     <div [@fadeInOut]
-                        *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Saved'"
+                        *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status !== 'Filed'"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
                         <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">

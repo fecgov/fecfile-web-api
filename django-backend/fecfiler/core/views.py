@@ -2173,7 +2173,7 @@ def get_all_transactions(request):
         # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
-                                    AND back_ref_transaction_id is null
+                                    AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                                     """
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
@@ -4759,6 +4759,8 @@ def clone_a_transaction(request):
             columns.append(row[0])
         logger.debug('table columns: {}'.format(list(columns)))
 
+
+
         insert_str = ','.join(columns)
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
@@ -4779,42 +4781,40 @@ def clone_a_transaction(request):
         logger.debug('new transaction id:{}'.format(new_tran_id))
 
         cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
+
         if not cursor.rowcount:
             raise Exception('transaction clone error')
-        return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+
+        exclude_list = []
+        if transaction_id.startswith('SA'):
+            exclude_list = ['contribution_date', 'contribution_amount']
+        if transaction_id.startswith('SB'):
+            exclude_list = ['expenditure_date', 'expenditure_amount'] 
+        columns = set(columns) - set(exclude_list)
+        select_str = ','.join(columns)
+        load_sql = """
+        SELECT {_select}
+        FROM public.{table_name}
+        """.format(table_name=transaction_table, _select=select_str)
+
+        load_sql = """SELECT json_agg(t) 
+        FROM (""" + load_sql + """WHERE transaction_id = '{}' ) t
+        """.format(new_tran_id)
+        logger.debug('load_sql:{}'.format(load_sql))
+        cursor.execute(load_sql)
+        rep_json = cursor.fetchone()[0]
+
+        # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+        return Response(rep_json, status=status.HTTP_200_OK)
 
 """
 ********************************************************************************************************************************
 GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
 ********************************************************************************************************************************
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def get_reports_data(report_id):
     try:
-        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' """
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
         forms_obj = None
         #print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -4849,19 +4849,24 @@ def create_amended(reportid):
             report_id = get_next_report_id()
 
             for data in data_dict:
-                print(data)
-                data['report_id'] = str(report_id)
+                #print(data)
+                data['report_id'] = report_id
 
                 #post_sql_report(reports_obj(''))
                 data['amend_ind'] = 'A'
                 data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
                 data['previous_report_id'] = reportid
-                data['report_seq'] = get_next_report_id()
+                #data['report_seq'] = get_next_report_id()
+                del data['report_seq']
+                data['status'] = 'Saved'
                 #print(data,'here')
                 insert_sql_report(data)
-                print(data)
+                #print(data)
 
-                return True
+                with connection.cursor() as cursor:
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id,reportid]) 
+
+                return data
 
         else:
             return False
@@ -4875,7 +4880,7 @@ def get_report_ids(from_date):
     data_ids =[]
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s """, [from_date])
+            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL""", [from_date])
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
@@ -4894,10 +4899,17 @@ def create_amended_reports(request):
             reportid = request.POST.get('report_id')
             cmte_id = request.user.username
 
+            val_data = get_reports_data(reportid)
+
+            if not val_data:
+                return Response("Given Report_id canot be amended", status=status.HTTP_400_BAD_REQUEST)
+
+
             cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
             #cdate = date.today()
             from_date = cvg_start_date
+            data_obj = None
 
             report_id_list = get_report_ids(from_date)
 
@@ -4905,13 +4917,17 @@ def create_amended_reports(request):
 
             if report_id_list:
                 for i in report_id_list:
-                    amended_status = create_amended(i)
+                    amended_obj = create_amended(i)
+                    if str(i) == str(reportid):
+                        data_obj = amended_obj
+
+
             
                     #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
             else:
                 return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse("Succesfully Create amended report", status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 

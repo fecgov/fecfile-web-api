@@ -19,4 +19,5 @@ urlpatterns = [
         views.get_sched_h5_breakdown,
         name="get_sched_h5_breakdown",
     ),
+    url(r"^sh1/get_h1_percentage$", views.get_h1_percentage, name="get_h1_percentage"),
 ]
