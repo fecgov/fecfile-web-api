@@ -436,7 +436,11 @@ export class SignComponent implements OnInit {
           .confirm(
             'This report has been filed with the FEC. If you want to change, you must Amend the report.',
             ConfirmModalComponent,
-            'Warning'
+            'Warning',
+            true,
+            ModalHeaderClassEnum.warningHeader,
+            null,
+            'Return to Reports'
           )
           .then(res => {
             if (res === 'okay') {
@@ -763,7 +767,11 @@ export class SignComponent implements OnInit {
           .confirm(
             'This report has been filed with the FEC. If you want to change, you must Amend the report.',
             ConfirmModalComponent,
-            'Warning'
+            'Warning',
+            true,
+            ModalHeaderClassEnum.warningHeader,
+            null,
+            'Return to Reports'
           )
           .then(res => {
             if (res === 'okay') {
