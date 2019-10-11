@@ -4812,7 +4812,7 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 
 def get_reports_data(report_id):
     try:
-        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' """
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' """
         forms_obj = None
         #print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -4847,19 +4847,20 @@ def create_amended(reportid):
             report_id = get_next_report_id()
 
             for data in data_dict:
-                print(data)
-                data['report_id'] = str(report_id)
+                #print(data)
+                data['report_id'] = report_id
 
                 #post_sql_report(reports_obj(''))
                 data['amend_ind'] = 'A'
                 data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
                 data['previous_report_id'] = reportid
                 data['report_seq'] = get_next_report_id()
+                data['status'] = 'Saved'
                 #print(data,'here')
                 insert_sql_report(data)
-                print(data)
+                #print(data)
 
-                return True
+                return data
 
         else:
             return False
@@ -4896,6 +4897,7 @@ def create_amended_reports(request):
 
             #cdate = date.today()
             from_date = cvg_start_date
+            data_obj = None
 
             report_id_list = get_report_ids(from_date)
 
@@ -4903,13 +4905,17 @@ def create_amended_reports(request):
 
             if report_id_list:
                 for i in report_id_list:
-                    amended_status = create_amended(i)
+                    amended_obj = create_amended(i)
+                    if str(i) == str(reportid):
+                        data_obj = amended_obj
+
+
             
                     #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
             else:
                 return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse("Succesfully Create amended report", status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
