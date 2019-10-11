@@ -4786,33 +4786,9 @@ def clone_a_transaction(request):
 GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
 ********************************************************************************************************************************
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def get_reports_data(report_id):
     try:
-        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' """
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
         forms_obj = None
         #print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -4854,11 +4830,15 @@ def create_amended(reportid):
                 data['amend_ind'] = 'A'
                 data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
                 data['previous_report_id'] = reportid
-                data['report_seq'] = get_next_report_id()
+                #data['report_seq'] = get_next_report_id()
+                del data['report_seq']
                 data['status'] = 'Saved'
                 #print(data,'here')
                 insert_sql_report(data)
                 #print(data)
+
+                with connection.cursor() as cursor:
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id,reportid]) 
 
                 return data
 
@@ -4874,7 +4854,7 @@ def get_report_ids(from_date):
     data_ids =[]
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s """, [from_date])
+            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL""", [from_date])
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
@@ -4892,6 +4872,12 @@ def create_amended_reports(request):
         if request.method == 'POST':
             reportid = request.POST.get('report_id')
             cmte_id = request.user.username
+
+            val_data = get_reports_data(reportid)
+
+            if not val_data:
+                return Response("Given Report_id canot be amended", status=status.HTTP_400_BAD_REQUEST)
+
 
             cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
