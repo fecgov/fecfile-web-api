@@ -31,9 +31,11 @@ export class TypeComponent implements OnInit {
   public tooltipPosition: string = 'right';
   public tooltipLeft: string = 'auto';
 
+  private committee_details: any = {};
   private _form99Details: form99;
   private _newForm: boolean = false;
   private _previousUrl: string = null;
+  private _setRefresh: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -43,11 +45,18 @@ export class TypeComponent implements OnInit {
     private _dialogService: DialogService
   ) {
     this._messageService.clearMessage();
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.refresh) {
+        this._setRefresh = true;
+        this.ngOnInit();
+      }
+    });
   }
 
   ngOnInit(): void {
     this._form99Details = null;
     this._form99Details = JSON.parse(localStorage.getItem('form_99_details'));
+    this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
     console.log(" type this._form99Details =", this._form99Details)
     this.screenWidth = window.innerWidth;
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
@@ -129,6 +138,29 @@ export class TypeComponent implements OnInit {
     }
   }
 
+  private _setF99Details(): void {
+    if(this.committee_details) {
+      if(this.committee_details.committeeid) {
+        this._form99Details = this.committee_details;
+
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
+
+        let formSavedObj: any = {
+          'saved': false
+        };
+        localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
+        localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
+      }
+    }
+  }
+
   /**
    * Updates the type selected.
    *
@@ -163,8 +195,9 @@ export class TypeComponent implements OnInit {
             this.editMode = true;
             localStorage.removeItem('form_99_details');
             localStorage.removeItem('form_99_saved');
+            this._setF99Details();
             setTimeout(() => {
-              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: this.editMode } });
+              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: this.editMode, refresh: true } });
             }, 500);
           }
         });
@@ -196,7 +229,8 @@ export class TypeComponent implements OnInit {
           form: this.frmType,
           direction: 'next',
           step: 'step_2',
-          previousStep: 'step_1'
+          previousStep: 'step_1',
+          refresh: this._setRefresh
         });
 
         return 1;

@@ -38,6 +38,9 @@ export class SignComponent implements OnInit {
   private _additional_email_2: string = '';
   private _confirm_email_1: string = '';
   private _confirm_email_2: string = '';
+  private _form99Details: any = {};
+  private _formType: string = '';
+  private _setRefresh:boolean = false;
 
   private _form_details: any = {};
   private _step: string = '';
@@ -59,7 +62,14 @@ export class SignComponent implements OnInit {
     private _dialogService: DialogService,
     private _router: Router,
     private _reportTypeService: ReportTypeService
-  ) {}
+  ) {
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.refresh) {
+        this._setRefresh = true;
+        this.ngOnInit();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -292,6 +302,29 @@ export class SignComponent implements OnInit {
     this._messageService.clearMessage();
   }
 
+  private _setF99Details(): void {
+    if(this.committee_details) {
+      if(this.committee_details.committeeid) {
+        this._form99Details = this.committee_details;
+
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
+
+        let formSavedObj: any = {
+          'saved': false
+        };
+        localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
+        localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
+      }
+    }
+  }
+
   /**
    * Validates the form.
    *
@@ -428,7 +461,10 @@ export class SignComponent implements OnInit {
           if (res === 'okay') {
             this.ngOnInit();
           } else if (res === 'NewReport') {
-            this._router.navigate(['/reports']);
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            this._setF99Details();
+            this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', refresh: true } });
           }
         });
       } else if (this.formType === '3X') {
@@ -759,7 +795,8 @@ export class SignComponent implements OnInit {
           } else if (res === 'NewReport') {
             localStorage.removeItem('form_99_details');
             localStorage.removeItem('form_99_saved');
-            this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
+            this._setF99Details();
+            this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', refresh: true } });
           }
         });
       } else if (this.formType === '3X') {
