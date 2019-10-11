@@ -2173,7 +2173,7 @@ def get_all_transactions(request):
         # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
-                                    AND back_ref_transaction_id is null
+                                    AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                                     """
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
