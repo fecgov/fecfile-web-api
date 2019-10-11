@@ -4759,6 +4759,8 @@ def clone_a_transaction(request):
             columns.append(row[0])
         logger.debug('table columns: {}'.format(list(columns)))
 
+
+
         insert_str = ','.join(columns)
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
@@ -4779,9 +4781,31 @@ def clone_a_transaction(request):
         logger.debug('new transaction id:{}'.format(new_tran_id))
 
         cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
+
         if not cursor.rowcount:
             raise Exception('transaction clone error')
-        return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+
+        exclude_list = []
+        if transaction_id.startswith('SA'):
+            exclude_list = ['contribution_date', 'contribution_amount']
+        if transaction_id.startswith('SB'):
+            exclude_list = ['expenditure_date', 'expenditure_amount'] 
+        columns = set(columns) - set(exclude_list)
+        select_str = ','.join(columns)
+        load_sql = """
+        SELECT {_select}
+        FROM public.{table_name}
+        """.format(table_name=transaction_table, _select=select_str)
+
+        load_sql = """SELECT json_agg(t) 
+        FROM (""" + load_sql + """WHERE transaction_id = '{}' ) t
+        """.format(new_tran_id)
+        logger.debug('load_sql:{}'.format(load_sql))
+        cursor.execute(load_sql)
+        rep_json = cursor.fetchone()[0]
+
+        # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+        return Response(rep_json, status=status.HTTP_200_OK)
 
 """
 ********************************************************************************************************************************
