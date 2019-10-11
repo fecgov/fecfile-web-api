@@ -18,7 +18,9 @@ from rest_framework.response import Response
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities)
+                                 undo_delete_entities,
+                                 check_calendar_year,
+                                 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     transaction_exists,
@@ -501,6 +503,37 @@ def schedH1(request):
     else:
         raise NotImplementedError
 
+@api_view(['GET'])
+def get_h1_percentage(request):
+    """
+    get calendar year fed_nonfed share percentage
+    """
+    logger.debug('get_h1_percentage with request:{}'.format(request.query_params))
+    try:
+        cmte_id = request.user.username
+
+        # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
+            # raise Exception ('Missing Input: report_id is mandatory')
+
+        if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
+            raise Exception ('Missing Input: calendar_year is mandatory')
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        start_dt = datetime.date(int(calendar_year), 1, 1)
+        end_dt = datetime.date(int(calendar_year), 12, 31)
+        _sql = """
+            select json_agg(t) from
+            (select federal_percent, non_federal_percent from public.sched_h1
+            where create_date between %s and %s
+            order by create_date desc, last_update_date desc) t
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (start_dt, end_dt))
+            if not cursor.rowcount:
+                raise Exception('Error: no h1 found.')
+            rep_json = cursor.fetchone()[0][0]
+    except:
+        raise
+    return JsonResponse(rep_json, status = status.HTTP_200_OK)
 
 
 """
@@ -1463,6 +1496,7 @@ def put_schedH4(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH4(data)
+            update_activity_event_amount_ytd(data)
         except Exception as e:
             if roll_back:
                 entity_data = put_entities(prev_entity_list[0])
