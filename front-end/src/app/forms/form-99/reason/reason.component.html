@@ -272,7 +272,7 @@
                   </span>
                 </button>
               </div>
-              <div class="editor full-width-textarea" formControlName="reasonText" [contentEditable]="this.editMode" placeholder="Enter text here..."
+              <div class="editor full-width-textarea" [contentEditable]="this.editMode" placeholder="Enter text here..."
                   role="textarea" (input)="editorChange($event)" (focus)="checkIfEditMode()" (paste)="removeHTML($event)" [innerHTML]="editingTextArea ? textAreaTextContent : null" #htmlEditor>
               </div>
             </div>
