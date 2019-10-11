@@ -35,13 +35,21 @@ export class PreviewComponent implements OnInit {
   private _step: string = '';
   private _printPriviewPdfFileLink: string = '';
   private _formDetails: any = {};
+  private _setRefresh:boolean = false;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
     private _formsService: FormsService,
     private _dialogService: DialogService
-  ) {}
+  ) {
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.refresh) {
+        this._setRefresh = true;
+        this.ngOnInit();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -191,7 +199,8 @@ export class PreviewComponent implements OnInit {
       form: 'preview',
       direction: 'next',
       step: 'step_4',
-      previousStep: this._step
+      previousStep: this._step,
+      refresh: this._setRefresh
     });
 
     this.showValidateBar = false;

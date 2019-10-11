@@ -326,7 +326,7 @@
               </button>
             </label>
             <div class="file-upload-container border-bottom" *ngIf="file === null && fileNameToDisplay === null">
-              <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" [disabled]="!this.editMode" />
+              <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" [attr.disabled]="!editMode ? '' : null" />
             </div>
             <div class="file-attached-container" *ngIf="file !== null || fileNameToDisplay !== null">
               <div class="grid-row">

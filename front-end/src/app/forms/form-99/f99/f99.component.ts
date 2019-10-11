@@ -164,16 +164,16 @@ export class F99Component implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode } });
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
       }
     }
   }
@@ -193,6 +193,10 @@ export class F99Component implements OnInit {
     this._step = e.step;
 
     this.currentStep = e.step;
+
+    if (e.refresh) {
+      this.editMode = e.refresh;
+    }
 
     this.canContinue();
   }
