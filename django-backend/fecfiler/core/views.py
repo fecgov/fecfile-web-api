@@ -4735,6 +4735,8 @@ def clone_a_transaction(request):
     }
     # cmte_id = request.user.username
     transaction_id = request.data.get('transaction_id')
+    if not transaction_id:
+        raise Exception('Error: transaction_id is required for this api.')
 
     if transaction_id[0:2] in transaction_tables:
         transaction_table = transaction_tables.get(transaction_id[0:2])
