@@ -1,7 +1,8 @@
 import psycopg2
 import requests
 
-conn = None
+#Global Variables
+_conn = None
 _NEXGEN_DJANGO_API_URL="127.0.0.1:8000/api/v1"
 #_NEXGEN_DJANGO_API_URL=settings.DATA_RECEIVE_API_URL  
 
@@ -11,7 +12,7 @@ _database="fecfrontend"
 _user="postgresqluser1"
 _password="postgresqluser1"
 
-def get_reports_to_upload():
+def get_fec_number():
     """ query data from the vendors table """
     try:
         print("get_reports_to_upload accessing ...")
@@ -34,7 +35,7 @@ def get_reports_to_upload():
                            WHERE cmte_id = %s 
                            AND report_id = %s 
                            AND status = 'Waiting' """, [data_row[0],  data_row[1]])
-            conn.commit()
+            _conn.commit()
 
             data_obj = {
                     'committeeId':data_row[0],
@@ -47,7 +48,7 @@ def get_reports_to_upload():
 
             if resp['Response']=='Success':
                     # update fec_id in report table 
-                    cur.execute("""UPDATE public.reports 
+                cur.execute("""UPDATE public.reports 
                                     SET fec_id = %s, 
                                         last_update_date = %s
                                         status = 'Submitted'
@@ -55,33 +56,33 @@ def get_reports_to_upload():
                                     AND report_id = %s 
                                     AND status = 'Getting_FEC_Number' """, [resp['fec_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
             elif resp['Response']=='Failed':
-                    cur.execute("""UPDATE public.reports 
+                cur.execute("""UPDATE public.reports 
                                     SET last_update_date = %s
                                         status = 'Failed'
                                     WHERE cmte_id = %s 
                                     AND report_id = %s 
                                     AND status = 'Getting_FEC_Number' """, [datetime.datetime.now(), data_row[0],  data_row[1]])
             elif resp['Response']=='Waiting':
-                    cur.execute("""UPDATE public.reports 
+                cur.execute("""UPDATE public.reports 
                                     SET last_update_date = %s
                                         status = 'Waiting'
                                     WHERE cmte_id = %s 
                                     AND report_id = %s 
                                     AND status = 'Getting_FEC_Number' """, [datetime.datetime.now(), data_row[0],  data_row[1]])
-            else :
-                    cur.execute("""UPDATE public.reports 
+            else:
+                cur.execute("""UPDATE public.reports 
                                     SET last_update_date = %s
                                         status = 'Waiting'
                                     WHERE cmte_id = %s 
                                     AND report_id = %s 
                                     AND status = 'Getting_FEC_Number' """, [datetime.datetime.now(), data_row[0],  data_row[1]])
  
-            conn.commit()       
+            _conn.commit()       
 
             if cursor.rowcount == 0:
                 raise Exception('Error: updating fec_id failed.')                                          
 
-        cur.close()
+        #cur.close()
 
         #Processing F99 reports 
         cur.execute("""SELECT committeeid, id, submission_id
@@ -98,7 +99,7 @@ def get_reports_to_upload():
                            WHERE committeeid = %s 
                            AND id = %s 
                            AND status = 'Waiting' """, [data_row[0],  data_row[1]])
-            conn.commit()
+            _conn.commit()
 
             data_obj = {
                     'committeeId':data_row[0],
@@ -132,14 +133,14 @@ def get_reports_to_upload():
                                 WHERE committeeId = %s 
                                 AND id = %s 
                                 AND status = 'Getting_FEC_Number' """, [datetime.datetime.now(), data_row[0],  data_row[1]])                    
-            else
+            else:
                 cur.execute("""UPDATE public.forms_committeeinfo 
                                 SET updated_at = %s,
                                     status = 'Waiting'
                                 WHERE committeeId = %s 
                                 AND id = %s 
                                 AND status = 'Getting_FEC_Number' """, [datetime.datetime.now(), data_row[0],  data_row[1]])                    
-            conn.commit()       
+            _conn.commit()       
 
             if cursor.rowcount == 0:
                 raise Exception('Error: updating submission_id failed.')                                          
@@ -148,8 +149,8 @@ def get_reports_to_upload():
         raise Exception('Error: get_fec_number is throwing an error.')    
 
     finally:
-            conn.close()
+            _conn.close()
             
-if __name__ == '__main__':
-    get_fec_number()
+    if __name__ == '__main__':
+        get_fec_number()
 
