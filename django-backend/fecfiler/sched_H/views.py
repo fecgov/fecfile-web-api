@@ -1402,7 +1402,29 @@ def schedH4_sql_dict(data):
             'category_code',
             'activity_event_type',
             'memo_code',
-            'memo_text',         
+            'memo_text',    
+                    # entity_data
+            "entity_id",
+            "entity_type",
+            "entity_name",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "preffix",
+            "suffix",
+            "street_1",
+            "street_2",
+            "city",
+            "state",
+            "zip_code",
+            "occupation",
+            "employer",
+            "ref_cand_cmte_id",
+            "cand_office",
+            "cand_office_state",
+            "cand_office_district",
+            "cand_election_year",
+            "phone_number",     
     ]
     try:
         return {k: v for k, v in data.items() if k in valid_fields}
@@ -1417,10 +1439,36 @@ def put_schedH4(data):
     """
     try:
         check_mandatory_fields_SH4(data)
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        data["entity_id"] = entity_id
+        data['payee_entity_id'] = entity_id
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH4(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 'The put_sql_schedH4 function is throwing an error: ' + str(e))
         return data
@@ -1431,7 +1479,6 @@ def put_schedH4(data):
 def put_sql_schedH4(data):
     """
     update a schedule_H4 item                    
-            
     """
     _sql = """UPDATE public.sched_h4
               SET transaction_type_identifier= %s, 
@@ -1449,10 +1496,9 @@ def put_sql_schedH4(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
-                  create_date= %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
-              AND delete_ind is distinct from 'Y';
+              AND delete_ind is distinct from 'Y'
         """
     _v = (  
            
@@ -1598,6 +1644,27 @@ def post_schedH4(data):
     3. save data to db
     """
     try:
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        data['entity_id'] = entity_id
+        data["payee_entity_id"] = entity_id
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_H4)
         data['transaction_id'] = get_next_transaction_id('SH4')
         logger.debug('saving a new h4 transaction with data:{}'.format(data))
@@ -1606,6 +1673,11 @@ def post_schedH4(data):
             post_sql_schedH4(data)
             update_activity_event_amount_ytd(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedH4 function is throwing an error: ' + str(e))
         return data
@@ -1635,10 +1707,9 @@ def post_sql_schedH4(data):
             activity_event_type,
             memo_code,
             memo_text,
-            create_date ,
-            last_update_date
+            create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
@@ -1660,7 +1731,6 @@ def post_sql_schedH4(data):
             data.get('memo_code'),
             data.get('memo_text'),
             datetime.datetime.now(),
-            datetime.datetime.now(),  
          )
         with connection.cursor() as cursor:
             # Insert data into schedH4 table
@@ -1718,13 +1788,17 @@ def get_list_all_schedH4(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedH4_list = cursor.fetchone()[0]
-            if schedH4_list is None:
+            tran_list = cursor.fetchone()[0]
+            if trtan_list is None:
                 raise NoOPError('No sched_H4 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictH4 in schedH4_list:
-                merged_list.append(dictH4)
+            for tran in tran_list:
+                entity_id = tran.get("payee_entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
+                # merged_list.append(dictH4)
         return merged_list
     except Exception:
         raise
@@ -1761,13 +1835,16 @@ def get_list_schedH4(report_id, cmte_id, transaction_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
-            schedH4_list = cursor.fetchone()[0]
-            if schedH4_list is None:
+            tran_list = cursor.fetchone()[0]
+            if not tran_list:
                 raise NoOPError('No sched_H4 transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictH4 in schedH4_list:
-                merged_list.append(dictH4)
+            for tran in tran_list:
+                entity_id = tran.get("payee_entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -1820,7 +1897,7 @@ def schedH4(request):
                     request.data.get('transaction_id'))
                 data = put_schedH4(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedH4(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -1899,8 +1976,9 @@ def schedH4(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH4(datum)
+            output = get_schedH4(data)[0]
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(output, status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH4 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

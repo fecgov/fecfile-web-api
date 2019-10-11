@@ -1193,6 +1193,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             receiptObj[field] = typeAheadField;
           }
         } else if (field === 'contribution_amount' || field === 'expenditure_amount') {
+          if (this._contributionAmount === '') {
+            let amountValue = this.frmIndividualReceipt.get(field).value;
+            amountValue = amountValue.replace(/,/g, ``);
+            this._contributionAmount = amountValue.toString();
+          }
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
@@ -1213,6 +1218,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
           receiptObj[field] = amountVal;
+        } else if (field === 'levin_account_id') {
+          receiptObj[field] = (this.frmIndividualReceipt.get(field).value).toString();
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
@@ -3088,11 +3095,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
         prePopulateFieldArray = [];
         if (res.hasOwnProperty('contribution_amount')) {
-          prePopulateFieldArray.push({ name: 'contribution_amount', value: res.contribution_amount });
-          prePopulateFieldArray.push({ name: 'expenditure_amount', value: res.contribution_amount });
+          const amountValue: string = this._decimalPipe.transform(parseFloat(res.contribution_amount), '.2-2');
+          prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
+          prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
         } else if (res.hasOwnProperty('expenditure_amount')) {
-          prePopulateFieldArray.push({ name: 'contribution_amount', value: res.expenditure_amount });
-          prePopulateFieldArray.push({ name: 'expenditure_amount', value: res.expenditure_amount });
+          const amountValue: string = this._decimalPipe.transform(parseFloat(res.expenditure_amount), '.2-2');
+          prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
+          prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
         }
         prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
         prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });
