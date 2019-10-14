@@ -1,12 +1,41 @@
-<div  class="transactions__table-container">
+<div class="transactions__table-container">
+  <div class="grid-row">
+    <nav class="navbar navbar-light width-100">
+      <button [ngClass]="{
+                                    'btn btn-primary': transactionCategory === 'receipts',
+                                    'btn btn-secondary-gray': transactionCategory !== 'receipts'
+                                  }" class="btn-lg width-25" type="button"
+        (click)="changeTransactionCategory('receipts')">
+        Receipts
+      </button>
+      <button [ngClass]="{
+                            'btn btn-primary': transactionCategory === 'disbursements',
+                            'btn btn-secondary-gray': transactionCategory !== 'disbursements'
+                          }" class="btn-lg width-25" type="button"
+        (click)="changeTransactionCategory('disbursements')">
+        Disbursements
+      </button>
+      <button [ngClass]="{
+                            'btn btn-primary': transactionCategory === 'loans-and-debts',
+                            'btn btn-secondary-gray': transactionCategory !== 'loans-and-debts'
+                          }" class="btn-lg width-25" type="button"
+        (click)="changeTransactionCategory('loans-and-debts')">
+        Loans and Debts
+      </button>
+      <button [ngClass]="{
+                      'btn btn-primary': transactionCategory === 'other',
+                      'btn btn-secondary-gray': transactionCategory !== 'other'
+                      }" class="btn-lg width-25" type="button" (click)="changeTransactionCategory('other')">
+        Other
+      </button>
+    </nav>
+  </div>
   <div class="grid-row float-right transactions__page-item-range">
     <div *ngIf="isTransactionViewActive() || isRecycleBinViewActive()"
       class="float-right transactions__item-range">
       {{determineItemRange()}} of {{config.totalItems}}
     </div>
   </div>
- 
-    
   <table class="table table-striped table-hover table__sortable transactions__table">
     <thead>
       <tr>

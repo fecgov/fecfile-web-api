@@ -23,7 +23,7 @@
           <div class="grid-row__col grid-row__col--12">
             <div class="float-left">
               <h1 *ngIf="!isEditViewActive(); else editHeading">
-                Transactions / Form {{ formType }}
+                Form {{ formType }} / Transactions / {{transactionCategory | titlecase}}
                 <span [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                   / Recycling Bin
                   <span class="trash-icon"></span>

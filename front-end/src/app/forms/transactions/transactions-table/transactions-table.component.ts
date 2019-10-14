@@ -20,6 +20,9 @@ import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { environment } from 'src/environments/environment';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
+import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
+
+const transactionCategoryOptions = [];
 
 @Component({
   selector: 'app-transactions-table',
@@ -63,6 +66,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
   public pageReceivedTransactions: boolean = false;
   public pageReceivedReports: boolean = false;
+  public transactionCategories: any = [];
+  public transactionCategory: string = '';
 
   // ngx-pagination config
   public maxItemsPerPage = 10;
@@ -128,8 +133,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _reportTypeService: ReportTypeService,
+    private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _receiptService: IndividualReceiptService
+    private _receiptService: IndividualReceiptService,
+    private _transactionTypeService: TransactionTypeService
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -153,6 +160,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.reportId = reportId;
         this.getPage(this.config.currentPage);
       });
+
+    _activatedRoute.queryParams.subscribe(p => {
+      this.transactionCategory = p.transactionCategory;
+      this.getTransactionsPage(1);
+    });
   }
 
   /**
@@ -201,6 +213,37 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       }
     }
+
+    this._transactionTypeService.getTransactionCategories('3X').subscribe(res => {
+      if (res) {
+        this.transactionCategories = res.data.transactionCategories;
+      }
+      for (
+        let transactionCategorieIndex = 0;
+        transactionCategorieIndex < this.transactionCategories.length;
+        transactionCategorieIndex++
+      ) {
+        for (
+          let transactionCategoryOptionIndex = 0;
+          transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+          transactionCategoryOptionIndex++
+        ) {
+          for (
+            let transactionCategoryOptionOptionsIndex = 0;
+            transactionCategoryOptionOptionsIndex <
+            this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+              .length;
+            transactionCategoryOptionOptionsIndex++
+          ) {
+            transactionCategoryOptions.push(
+              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
+                transactionCategoryOptionOptionsIndex
+              ]
+            );
+          }
+        }
+      }
+    });
   }
 
   // /**
@@ -377,21 +420,65 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this._transactionsService.addUIFileds(res);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
-        this.transactionsModel = transactionsModelL;
+        // this.transactionsModel = transactionsModelL;
 
-        // if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
-        //   for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
-        //     if (this.transactionsModel[transactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
-        //       this.editTransaction(this.clonedTransaction);
-        //     }
-        //   }
-        // }
+        for (
+          let transactionCategorieIndex = 0;
+          transactionCategorieIndex < this.transactionCategories.length;
+          transactionCategorieIndex++
+        ) {
+          for (
+            let transactionCategoryOptionIndex = 0;
+            transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+            transactionCategoryOptionIndex++
+          ) {
+            for (
+              let transactionCategoryOptionOptionsIndex = 0;
+              transactionCategoryOptionOptionsIndex <
+              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+                .length;
+              transactionCategoryOptionOptionsIndex++
+            ) {
+              for (
+                let transactionModelLindex = 0;
+                transactionModelLindex < transactionsModelL.length;
+                transactionModelLindex++
+              ) {
+                // console.log('1 ' +
+                // transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
+                // this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
+                //   .options[transactionCategoryOptionOptionsIndex].value);
+                // console.log(this.transactionCategory ===
+                //  this.transactionCategories[transactionCategorieIndex].value);
+                if (
+                  transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
+                    this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
+                      .options[transactionCategoryOptionOptionsIndex].value &&
+                  this.transactionCategory === this.transactionCategories[transactionCategorieIndex].value
+                ) {
+                  this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
+                }
+              }
+            }
+          }
+        }
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
         this.allTransactionsSelected = false;
       });
+  }
+
+  public changeTransactionCategory(transactionCategory) {
+    this._router.navigate([], {
+      queryParams: {
+        step: this._activatedRoute.snapshot.queryParams.step,
+        reportId: this._activatedRoute.snapshot.queryParams.reportId,
+        edit: this._activatedRoute.snapshot.queryParams.edit,
+        transactionCategory: transactionCategory
+      }
+    });
   }
 
   /**
@@ -671,7 +758,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
   }
-  
+
   public printPreview(): void {
     console.log('TransactionsTableComponent printPreview...!');
 
@@ -743,11 +830,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to clone
    */
   public cloneTransaction(trx: TransactionModel): void {
-    this._transactionsService.cloneTransaction(trx.transactionId).subscribe((cloneTransactionResponse: TransactionModel) => {
-      if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
-        this.editTransaction(cloneTransactionResponse[0]);
-      }
-    });
+    this._transactionsService
+      .cloneTransaction(trx.transactionId)
+      .subscribe((cloneTransactionResponse: TransactionModel) => {
+        if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
+          this.editTransaction(cloneTransactionResponse[0]);
+        }
+      });
   }
 
   /**
@@ -778,7 +867,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public printTransaction(trx: TransactionModel): void {
-      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);
   }
 
   /**
@@ -821,7 +910,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           // this._transactionsService.restoreTransaction(trx)
           //   .subscribe((res: GetTransactionsResponse) => {
           this._transactionsService
-            .trashOrRestoreTransactions(this.formType,'restore', this.reportId, [trx])
+            .trashOrRestoreTransactions(this.formType, 'restore', this.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               this.getRecyclingPage(this.config.currentPage);
               this._dialogService.confirm(
@@ -1175,7 +1264,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    const defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+    let defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+
+    if (this.transactionCategory === 'disbursements') {
+      defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
+    }
     const otherSortColumns = [
       'transactionId',
       'street',
@@ -1187,6 +1280,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       'contributorOccupation',
       'memoText'
     ];
+    // Desc., Donor Committee ID, Election Code, Election Year
 
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
