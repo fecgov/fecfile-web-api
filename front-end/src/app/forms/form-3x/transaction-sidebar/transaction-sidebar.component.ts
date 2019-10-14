@@ -66,6 +66,11 @@ export class TransactionSidebarComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.transactionCategory) {
+        this.itemSelected = p.transactionCategory;
+      }
+    });
   }
 
   @ViewChild('instance') instance: NgbTypeahead;

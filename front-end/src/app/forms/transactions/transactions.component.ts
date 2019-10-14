@@ -143,6 +143,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .subscribe(message => {
         this.showTransactions();
       });
+
+      _activatedRoute.queryParams.subscribe(p => {
+        this.transactionCategory = p.transactionCategory;
+      });
   }
 
   /**

@@ -21,7 +21,7 @@
     <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
     <ul class="form-sidebar__links">
       <li
-        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        [ngClass]="(itemSelected === categoryType?.value) ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
         (click)="optionsListClick(categoryType?.text)"
       >
