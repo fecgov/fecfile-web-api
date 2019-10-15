@@ -42,6 +42,7 @@ export class TransactionSidebarComponent implements OnInit {
   public disbursementsTotal: number = 0.0;
   public loansanddebtsTotal: number = 0.0;
   public othersTotal: number = 0.0;
+  public reportId: number;
 
   private _formType: string = '';
   public transactionCategory: string = '';
@@ -84,6 +85,7 @@ export class TransactionSidebarComponent implements OnInit {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
+        this.reportId = res.data.id ? res.data.id : 0;
       }
       for (
         let transactionCategorieIndex = 0;

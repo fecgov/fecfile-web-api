@@ -164,6 +164,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.getTransactionsPage(1);
+      this.setSortableColumns();
     });
   }
 
@@ -1265,11 +1266,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private setSortableColumns(): void {
     let defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
-
-    if (this.transactionCategory === 'disbursements') {
-      defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-    }
-    const otherSortColumns = [
+    let otherSortColumns = [
       'transactionId',
       'street',
       'city',
@@ -1280,7 +1277,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       'contributorOccupation',
       'memoText'
     ];
-    // Desc., Donor Committee ID, Election Code, Election Year
+    if (this.transactionCategory === 'disbursements') {
+      defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
+      // Desc., Donor Committee ID, Election Code, Election Year
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+    } else if (this.transactionCategory === 'loans-and-debts') {
+      // Balance at Close (D)
+      defaultSortColumns = ['type', 'name', '', 'amount'];
+      // Purpose of Debt (D), Beginning Balance (D), Incurred Amount (D), Payment Amount (D) 
+      // Loan Amount (C), Loan Payment to Date (C), Loan Balance (C), Loan Incurred Date (C), Loan Due Date (C)
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoCode', 'memoText', '', ''];
+    } else if (this.transactionCategory === 'other') {
+      // Schedule
+      defaultSortColumns = ['', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
+      // Activity or Event Identifier
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+    }
 
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
