@@ -50,8 +50,8 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
-  public transactionTypeTextSchedH = '';
-  public transactionTypeSchedH = '';
+  public transactionTypeTextSchedF = '';
+  public transactionTypeSchedF = '';
   public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
@@ -364,9 +364,9 @@ export class F3xComponent implements OnInit {
       this.transactionTypeText = transactionTypeText;
       return;
     }
-    if (scheduleType.startsWith('sched_h????????')) {
-      this.transactionTypeSchedH = transactionType;
-      this.transactionTypeTextSchedH = transactionTypeText;
+    if (scheduleType.startsWith('sched_f????????')) {
+      this.transactionTypeSchedF = transactionType;
+      this.transactionTypeTextSchedF = transactionTypeText;
     } else {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;

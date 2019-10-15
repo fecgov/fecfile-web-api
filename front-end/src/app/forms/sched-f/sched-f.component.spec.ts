@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SchedHComponent } from './sched-h.component';
+import { SchedFComponent } from './sched-f.component';
 
-describe('SchedHComponent', () => {
-  let component: SchedHComponent;
-  let fixture: ComponentFixture<SchedHComponent>;
+describe('SchedFComponent', () => {
+  let component: SchedFComponent;
+  let fixture: ComponentFixture<SchedFComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SchedHComponent ]
+      declarations: [ SchedFComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SchedHComponent);
+    fixture = TestBed.createComponent(SchedFComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
