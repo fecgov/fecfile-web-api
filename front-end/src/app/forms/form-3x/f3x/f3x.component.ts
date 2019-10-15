@@ -50,8 +50,8 @@ export class F3xComponent implements OnInit {
   public transactionCategory: string = '';
   public transactionTypeText = '';
   public transactionType = '';
-  public transactionTypeTextSchedH = '';
-  public transactionTypeSchedH = '';
+  public transactionTypeTextSchedF = '';
+  public transactionTypeSchedF = '';
   public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
