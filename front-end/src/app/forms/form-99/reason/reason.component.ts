@@ -572,7 +572,7 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
 
-        if (this.file !== null) {
+        if (this._form99Details.id && this._form99Details.id !== null && this._form99Details.id !== '') {
           this._form99Details.file = this.file;
           this._formsService.updateForm({}, this.file, this._formType).subscribe(
             res => {

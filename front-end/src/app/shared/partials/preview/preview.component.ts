@@ -90,7 +90,7 @@ export class PreviewComponent implements OnInit {
   
           }
   
-          if (typeof this.formDetails !== 'undefined') {
+          if (this.formDetails && typeof this.formDetails !== 'undefined' && this.formDetails.reason) {
             if (typeof this.formDetails.reason !== 'undefined') {
               this.typeSelected = this.formDetails.reason;
             }

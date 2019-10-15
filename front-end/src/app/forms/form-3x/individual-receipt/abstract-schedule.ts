@@ -133,6 +133,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
+  private _transactionCategory: string = '';
   private _formSubmitted = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -215,6 +216,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
       this._getFormFields();
       this._validateTransactionDate();
+    });
+
+    _activatedRoute.queryParams.subscribe(p => {
+      this._transactionCategory = p.transactionCategory;
     });
   }
 
@@ -1635,7 +1640,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
     this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode }
+      queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
     });
   }
 

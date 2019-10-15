@@ -177,6 +177,7 @@ export class TransactionTypeComponent implements OnInit {
         action: ScheduleActions.add,
         transactionTypeText: this.transactionTypeText,
         transactionType: this.transactionType,
+        transactionCategory: this.transactionCategory,
         scheduleType: this.scheduleType
       });
       return 1;
