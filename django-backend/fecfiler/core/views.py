@@ -4864,7 +4864,7 @@ def create_amended(reportid):
                 #print(data)
 
                 with connection.cursor() as cursor:
-                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id,reportid]) 
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id, reportid]) 
 
                 return data
 
@@ -4876,11 +4876,11 @@ def create_amended(reportid):
         return False
 
 
-def get_report_ids(from_date):
+def get_report_ids(cmte_id, from_date):
     data_ids =[]
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT report_id FROM public.reports WHERE cvg_start_date >= %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL""", [from_date])
+            cursor.execute("""SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date >= %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL""", [cmte_id, from_date])
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
@@ -4911,7 +4911,7 @@ def create_amended_reports(request):
             from_date = cvg_start_date
             data_obj = None
 
-            report_id_list = get_report_ids(from_date)
+            report_id_list = get_report_ids(cmte_id, from_date)
 
             print(report_id_list, from_date)
 
