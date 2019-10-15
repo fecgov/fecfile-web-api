@@ -83,6 +83,8 @@
             style = "align-self:stretch;"
             type="button"
             class="btn btn-secondary-dark-gray mr-2"
+            [routerLink]="['/forms/form/', '3X']"
+            [queryParams]="{step: 'transactions', reportId: reportId, edit: editMode, transactionCategory: 'receipts'}"
           >
             All Transactions
           </button>
