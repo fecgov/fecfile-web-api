@@ -81,35 +81,6 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_3'">
-        <!-- <f3x-individual-receipt
-          [formOptionsVisible]="formOptionsVisible"
-          [selectedOptions]="selectedOptions"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          (status)="onNotify($event)"
-        >
-        </f3x-individual-receipt> -->
-
-        <!-- <f3x-individual-receipt
-          *ngIf="scheduleType === 'sched_a' || scheduleType === 'sched_b' || scheduleType === 'sched_d'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
-        </f3x-individual-receipt>
-        <app-sched-h
-          *ngIf="scheduleType === 'sched_h4' || scheduleType === 'sched_h6'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
-        </app-sched-h> -->
-
         <f3x-individual-receipt
           [hidden]="
             scheduleType !== 'sched_a' &&
@@ -125,15 +96,15 @@
           (status)="onNotify($event)"
         >
         </f3x-individual-receipt>
-        <app-sched-h
-          [hidden]="scheduleType !== 'sched_h?' && scheduleType !== 'sched_h??????'"
+        <app-sched-f
+          [hidden]="scheduleType !== 'sched_f'"
           [transactionTypeText]="transactionTypeTextSchedH"
           [transactionType]="transactionTypeSchedH"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
-        </app-sched-h>
+        </app-sched-f>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">

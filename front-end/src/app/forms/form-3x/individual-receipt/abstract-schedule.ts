@@ -125,6 +125,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public memoDropdownSize = null;
 
   protected isInit = false;
+  protected formFieldsPrePopulated = false;
+  protected staticFormFields = null;
 
   private _reportType: any = null;
   private _types: any = [];
@@ -151,7 +153,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
-  private _parentTransactionModel: TransactionModel;
+  protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private prePopulateFieldArray: Array<any>;
 
@@ -207,7 +209,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
-      this._clearFormValues();
+      this.clearFormValues();
     });
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
@@ -706,6 +708,38 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
   }
 
+  public handleOnBlurEvent($event: any, col: any) {
+    if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount')) {
+      this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
+    } else if (this.isFieldName(col.name, 'incurred_amount')) {
+      this._formatAmount($event, true);
+    } else {
+      this.populatePurpose(col.name);
+    }
+  }
+
+  private _formatAmount(e: any, negativeAmount: boolean) {
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+    
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+  }
+
   /**
    * Updates the contribution aggregate field once contribution ammount is entered.
    *
@@ -1123,7 +1157,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
-    if (this.frmIndividualReceipt.valid) {
+    if (this. frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
@@ -1437,6 +1471,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public saveAndReturnToParent(): void {
     if (!this.frmIndividualReceipt.dirty) {
+      this.clearFormValues();
       this.returnToParent(ScheduleActions.edit);
     } else {
       this._doValidateReceipt(SaveActions.saveForReturnToParent);
@@ -1576,7 +1611,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Goes to the previous step.
    */
   public previousStep(): void {
-    this._clearFormValues();
+    this.clearFormValues();
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -1588,7 +1623,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    this._clearFormValues();
+    this.clearFormValues();
     let reportId = this._receiptService.getReportIdFromStorage(this.formType);
     console.log('reportId', reportId);
 
@@ -2304,6 +2339,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (typeof res.data === 'object') {
             if (res.data.hasOwnProperty('formFields')) {
               if (Array.isArray(res.data.formFields)) {
+
+                // If fields are pre-populated for "static" forms, append any additional fields
+                // from the API as with SF.
+                if (this.formFieldsPrePopulated) {
+                  if (this.staticFormFields) {
+                    if (this.staticFormFields.length > 0) {
+                      for (const field of this.staticFormFields) {
+                        res.data.formFields.push(field);
+                      }
+                    }
+                  }
+                }
                 this.formFields = res.data.formFields;
                 this._setForm(this.formFields);
               }
@@ -2706,7 +2753,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   //   return false;
   // }
 
-  private _clearFormValues(): void {
+  protected clearFormValues(): void {
     this._transactionToEdit = null;
 
     this._selectedEntity = null;
