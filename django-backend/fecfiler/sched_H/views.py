@@ -504,6 +504,78 @@ def schedH1(request):
         raise NotImplementedError
 
 @api_view(['GET'])
+def get_fed_nonfed_share(request):
+    """
+    get calendar year fed_nonfed share percentage
+    """
+    logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
+    try:
+        cmte_id = request.user.username
+        cmte_type_category = request.query_params.get('cmte_type_category')
+        total_amount = request.query_params.get('total_amount')
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        start_dt = datetime.date(int(calendar_year), 1, 1)
+        end_dt = datetime.date(int(calendar_year), 12, 31)
+        if cmte_type_category == 'PTY':
+            _sql = """
+            select federal_percent from public.sched_h1
+            where create_date between %s and %s
+            and cmte_id = %s
+            order by create_date desc, last_update_date desc
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                fed_percent = float(cursor.fetchone()[0])
+        elif cmte_type_category == 'PAC':
+            activity = request.query_params.get('activity')
+            if not activity:
+                return Response('Error: activity missing is required for this committee.')
+            _sql = """
+            select federal_percent from public.sched_h1
+            where create_date between %s and %s
+            and cmte_id = %s
+            """
+            activity_part = """and {} = true """.format(activity)
+            order_part = 'order by create_date desc, last_update_date desc'
+            _sql = _sql + activity_part + order_part
+            print(_sql)
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                fed_percent = float(cursor.fetchone()[0])
+        else:
+            raise Exception('invalid cmte_type entered.')
+        # fed_percent = float(cursor.fetchone()[0])
+        fed_share = float(total_amount) * fed_percent
+        nonfed_share = float(total_amount) - fed_share
+
+        # # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
+        #     # raise Exception ('Missing Input: report_id is mandatory')
+
+        # if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
+        #     raise Exception ('Missing Input: calendar_year is mandatory')
+        # _sql = """
+        #     select json_agg(t) from
+        #     (select federal_percent, non_federal_percent from public.sched_h1
+        #     where create_date between %s and %s
+        #     and cmte_id = %s
+        #     order by create_date desc, last_update_date desc) t
+        # """
+        # with connection.cursor() as cursor:
+        #     cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+        #     # print('rows:{}'.format(cursor.rowcount))
+        #     json_data = cursor.fetchone()[0]
+        #     print(json_data)
+        #     if not json_data:
+        #         # raise Exception('Error: no h1 found.')
+        #         return Response("The schedH1 API - PUT is throwing an error: no h1 data found.", 
+        #         status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'fed_share': fed_share, 'nonfed_share':nonfed_share}, 
+                status = status.HTTP_200_OK)
+    except:
+        raise
+
+
+@api_view(['GET'])
 def get_h1_percentage(request):
     """
     get calendar year fed_nonfed share percentage
