@@ -1275,8 +1275,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'beginning_balance' ||
                    field === 'incurred_amount' ||
                    field === 'balance_at_close' ||
-                   field === 'payment_amount') {
-
+                   field === 'payment_amount' ||
+                   field === 'fed_share_amount' ||
+                   field === 'non_fed_share_amount' ||
+                   field === 'activity_event_amount_ytd') {
+// fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
           // to in the request.  TODO Why is this?  Remove the check or allow numerics and
@@ -1286,6 +1289,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             amountVal = this.frmIndividualReceipt.get(field).value;
             if (amountVal) {
               amountVal = amountVal.toString();
+              amountVal = amountVal.replace(/,/g, ``);
             }
           }
           receiptObj[field] = amountVal;
@@ -2663,6 +2667,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this.isFieldName(prop, 'contribution_amount') || this.isFieldName(prop, 'expenditure_amount')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
+                  } else if (this.isFieldName(prop, 'total_amount') ||
+                             this.isFieldName(prop, 'beginning_balance') ||
+                             this.isFieldName(prop, 'payment_amount') ||
+                             this.isFieldName(prop, 'balance_at_close') ||
+                             this.isFieldName(prop, 'fed_share_amount') ||
+                             this.isFieldName(prop, 'non_fed_share_amount') ||
+                             this.isFieldName(prop, 'activity_event_amount_ytd')) {
+                    const amount = trx[prop] ? trx[prop] : 0;
+                    this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    // ?? TODO Can we assume negavtive is false?
+                    // col.validation.dollarAmountNegative);
                   }
                 }
               }
