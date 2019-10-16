@@ -524,16 +524,21 @@ def get_h1_percentage(request):
             select json_agg(t) from
             (select federal_percent, non_federal_percent from public.sched_h1
             where create_date between %s and %s
+            and cmte_id = %s
             order by create_date desc, last_update_date desc) t
         """
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (start_dt, end_dt))
-            if not cursor.rowcount:
-                raise Exception('Error: no h1 found.')
-            rep_json = cursor.fetchone()[0][0]
+            cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+            # print('rows:{}'.format(cursor.rowcount))
+            json_data = cursor.fetchone()[0]
+            print(json_data)
+            if not json_data:
+                # raise Exception('Error: no h1 found.')
+                return Response("The schedH1 API - PUT is throwing an error: no h1 data found.", 
+                status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(json_data[0], status = status.HTTP_200_OK)
     except:
         raise
-    return JsonResponse(rep_json, status = status.HTTP_200_OK)
 
 
 """
