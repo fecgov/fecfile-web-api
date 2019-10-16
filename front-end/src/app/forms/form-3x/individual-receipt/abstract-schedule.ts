@@ -381,7 +381,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name, e.value));
-          if (this.isFieldName(e.name, 'contribution_amount') || this.isFieldName(e.name, 'expenditure_amount')) {
+          if (this.isFieldName(e.name, 'contribution_amount') ||
+              this.isFieldName(e.name, 'expenditure_amount') ||
+              this.isFieldName(e.name, 'total_amount') ||
+              this.isFieldName(e.name, 'incurred_amount')) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
@@ -716,14 +719,38 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public handleOnBlurEvent($event: any, col: any) {
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount')) {
       this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
-    } else if (this.isFieldName(col.name, 'incurred_amount')) {
-      this._formatAmount($event, true);
+    } else if (this.isFieldName(col.name, 'total_amount') ||
+               this.isFieldName(col.name, 'incurred_amount')) {
+      this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
+      this._getFedNonFedPercentage(col);
+
     } else {
       this.populatePurpose(col.name);
     }
   }
 
-  private _formatAmount(e: any, negativeAmount: boolean) {
+  private _getFedNonFedPercentage(col: any) {
+
+    if (col.name !== 'total_amount') {
+      return;
+    }
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
+        this.transactionType !== 'ALLOC_EXP_DEBT') {
+      return;
+    }
+    if (!this.frmIndividualReceipt.contains('total_amount')) {
+      return;
+    }
+    let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
+    totalAmount = totalAmount.replace(/,/g, ``);
+    const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
+      console.log();
+    });
+  }
+
+  private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
     let contributionAmount: string = e.target.value;
 
     // default to 0 when no value
@@ -734,7 +761,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     // determine if negative, truncate if > max
     contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
-    
+
     let contributionAmountNum = parseFloat(contributionAmount);
     // Amount is converted to negative for Return / Void / Bounced
     if (negativeAmount) {
@@ -743,6 +770,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+    console.log();
+
+    const patch = {};
+    patch[fieldName] = amountValue;
+    this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
   }
 
   /**
@@ -1243,8 +1275,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'beginning_balance' ||
                    field === 'incurred_amount' ||
                    field === 'balance_at_close' ||
-                   field === 'payment_amount') {
-
+                   field === 'payment_amount' ||
+                   field === 'fed_share_amount' ||
+                   field === 'non_fed_share_amount' ||
+                   field === 'activity_event_amount_ytd') {
+// fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
           // to in the request.  TODO Why is this?  Remove the check or allow numerics and
@@ -1254,6 +1289,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             amountVal = this.frmIndividualReceipt.get(field).value;
             if (amountVal) {
               amountVal = amountVal.toString();
+              amountVal = amountVal.replace(/,/g, ``);
             }
           }
           receiptObj[field] = amountVal;
@@ -2631,6 +2667,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this.isFieldName(prop, 'contribution_amount') || this.isFieldName(prop, 'expenditure_amount')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
+                  } else if (this.isFieldName(prop, 'total_amount') ||
+                             this.isFieldName(prop, 'beginning_balance') ||
+                             this.isFieldName(prop, 'payment_amount') ||
+                             this.isFieldName(prop, 'balance_at_close') ||
+                             this.isFieldName(prop, 'fed_share_amount') ||
+                             this.isFieldName(prop, 'non_fed_share_amount') ||
+                             this.isFieldName(prop, 'activity_event_amount_ytd')) {
+                    const amount = trx[prop] ? trx[prop] : 0;
+                    this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    // ?? TODO Can we assume negavtive is false?
+                    // col.validation.dollarAmountNegative);
                   }
                 }
               }
@@ -3028,44 +3075,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         );
 
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
-      });
-  }
-
-  private _getContributionAggregateChild(contribDate: string, entityId: number, cmteId: string) {
-    const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-    this._receiptService
-      .getContributionAggregate(reportId, entityId, cmteId, this.transactionType, contribDate)
-      .subscribe(res => {
-        // Add the UI val for Contribution Amount to the Contribution Aggregate for the
-        // Entity selected from the typeahead list.
-
-        let contributionAmount = this.frmIndividualReceipt.get(this._childFieldNamePrefix + 'contribution_amount')
-          .value;
-        contributionAmount = contributionAmount ? contributionAmount : 0;
-        // remove commas
-        if (typeof contributionAmount === 'string') {
-          contributionAmount = contributionAmount.replace(/,/g, ``);
-        }
-
-        // TODO make this a class variable for contributionAmountChange() to add to.
-        const childAggregateName = this._childFieldNamePrefix + 'contribution_aggregate';
-        let contributionAggregate: string = String(res[childAggregateName]);
-        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
-
-        const total: number = parseFloat(contributionAmount) + parseFloat(contributionAggregate);
-        const value: string = this._decimalPipe.transform(total, '.2-2');
-
-        console.log(`contributionAMount: + ${contributionAmount} + contributionAggregate:
-          ${contributionAggregate} = ${total}`);
-        console.log(`value = ${value}`);
-
-        const aggregateVO = {};
-        aggregateVO[childAggregateName] = value;
-        this.frmIndividualReceipt.patchValue(aggregateVO, { onlySelf: true });
-
-        // Store the entity aggregate to be added to the contribution amount
-        // if it changes in the UI.  See contributionAmountChange();
-        this._contributionAggregateValue = parseFloat(contributionAggregate);
       });
   }
 

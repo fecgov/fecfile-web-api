@@ -75,8 +75,8 @@
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
                       </div>
-
-                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
+                      <ng-container *ngIf="!col?.validation?.required 
+                        && !col?.isReadonly">
                         (Optional)
                       </ng-container>
                     </label>
@@ -93,6 +93,8 @@
                         <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                         <!-- && col?.name !== 'child*entity_name'
                           && col?.name !== 'child*donor_cmte_id'" -->
+                          <!-- (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
+                                    ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)" -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
@@ -110,8 +112,7 @@
                           [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
                                         || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
                           [formControlName]="col?.name"
-                          (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
-                                    ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
+                          (blur)="handleOnBlurEvent($event, col)"    
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
