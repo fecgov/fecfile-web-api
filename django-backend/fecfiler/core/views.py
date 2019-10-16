@@ -4721,8 +4721,12 @@ def clone_a_transaction(request):
     """
     api for clone a transaction. 
     expect: a transaction_id for transaction to be cloned
-    return: new transaction_id with clone status
-    e.g.: {'transaction_id': 'SA100095', 'status': 'success'}
+    return: new transaction_id with clone data in json
+    note:
+    1. transaction date is set to current date 
+    2. transaction amount is set to 0
+    3. create date is also today's date 
+    4. last update date has null value
     """
     # TODO: need to update this list for ohter transactions
     logger.debug('request for cloning a transaction:{}'.format(request.data))
@@ -4765,9 +4769,21 @@ def clone_a_transaction(request):
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
         select_str = ','.join(tmp_list)
+
+        # set transaction date to today's date and transaction amount to 0
+        from datetime import date
+        _today = date.today().strftime('%m/%d/%Y')
+        if transaction_id.startswith('SA'):
+            select_str = select_str.replace('contribution_date', "'"+_today+"'")
+            select_str = select_str.replace('contribution_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SB'):
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+            # exclude_list = ['expenditure_date', 'expenditure_amount'] 
         # select_str = insert_str.replace(',transaction_id,', ',%s,'
         # ).replace('create_date', '%s'
         # ).replace('last_update_date', '%s')
+        
         
         clone_sql = """
             INSERT INTO public.{table_name}({_insert})
@@ -4785,12 +4801,12 @@ def clone_a_transaction(request):
         if not cursor.rowcount:
             raise Exception('transaction clone error')
 
-        exclude_list = []
-        if transaction_id.startswith('SA'):
-            exclude_list = ['contribution_date', 'contribution_amount']
-        if transaction_id.startswith('SB'):
-            exclude_list = ['expenditure_date', 'expenditure_amount'] 
-        columns = set(columns) - set(exclude_list)
+        # exclude_list = []
+        # if transaction_id.startswith('SA'):
+        #     exclude_list = ['contribution_date', 'contribution_amount']
+        # if transaction_id.startswith('SB'):
+            # exclude_list = ['expenditure_date', 'expenditure_amount'] 
+        # columns = set(columns) - set(exclude_list)
         select_str = ','.join(columns)
         load_sql = """
         SELECT {_select}
