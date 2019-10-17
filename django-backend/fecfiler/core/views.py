@@ -223,7 +223,7 @@ def check_list_cvg_dates(args):
     
         forms_obj = []
         with connection.cursor() as cursor: 
-            cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' ORDER BY report_id DESC", [cmte_id, form_type])
+            cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC", [cmte_id, form_type])
 
             if len(args) == 4:
                 for row in cursor.fetchall():
@@ -340,13 +340,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
     except Exception:
         raise
 
@@ -423,8 +423,13 @@ def put_sql_report(report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, e
                 cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                                 [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
             elif status=="Submitted":
+                # print(cvg_start_dt)
+                # print(cvg_end_dt)
+                # print(status)
+                # print(report_type)
                 cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s, filed_date = last_update_date WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                                 [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
+                # print(cursor.query)
 
             if (cursor.rowcount == 0):
                 raise Exception('The Report ID: {} does not exist in Reports table'.format(report_id))
@@ -508,7 +513,7 @@ def delete_sql_form3x(report_id, cmte_id):
 """
 ********************************************************** API FUNCTIONS - REPORTS *******************************************************************
 """
-def post_reports(data):
+def post_reports(data, reportid=None):
     try:
         check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')
@@ -523,13 +528,17 @@ def post_reports(data):
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
         forms_obj = []
+        if reportid:
+            args.append(reportid)
         if not (cvg_start_dt is None or cvg_end_dt is None):
             forms_obj = check_list_cvg_dates(args)
+        print(forms_obj)
+        print('just in post_reports')
         if len(forms_obj)== 0:
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('amend_number'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
 
             except Exception as e:
                 # Resetting Report ID
@@ -539,9 +548,14 @@ def post_reports(data):
             try:
                 #Insert data into Form 3X table
                 if data.get('form_type') == "F3X":
+                    print('here1')
                     check_mandatory_fields_form3x(data)
-                    post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))                                            
+                    print('here2')
+                    post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))
+                    print('here3')
+                print('here3.5')
                 output = get_reports(data)
+                print('here4')
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -590,12 +604,14 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
+            print(old_list_report)
+            # print(data.get('status'))
             put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
             old_dict_report = old_list_report[0]
-            prev_report_type = old_dict_report.get('report_type')
-            prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
-            prev_cvg_end_dt = old_dict_report.get('cvg_end_date')
-            prev_last_update_date = old_dict_report.get('last_update_date')
+            prev_report_type = old_dict_report.get('reporttype')
+            prev_cvg_start_dt = old_dict_report.get('cvgstartdate')
+            prev_cvg_end_dt = old_dict_report.get('cvgenddate')
+            prev_last_update_date = datetime.datetime.now()
                                            
             try:
                 if data.get('form_type') == "F3X":
@@ -4835,10 +4851,11 @@ def get_reports_data(report_id):
         #print('here',forms_obj)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
+            print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-
+        print(forms_obj)
         if forms_obj is None:
             pass
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
@@ -4847,14 +4864,14 @@ def get_reports_data(report_id):
         raise
 
 
-def insert_sql_report(dict_data):
-    try:
-        sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
-        with connection.cursor() as cursor:
-            # INSERT row into Reports table
-            cursor.execute(sql,dict_data)                                          
-    except Exception:
-        raise
+# def insert_sql_report(dict_data):
+#     try:
+#         sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
+#         with connection.cursor() as cursor:
+#             # INSERT row into Reports table
+#             cursor.execute(sql,dict_data)                                          
+#     except Exception:
+#         raise
 
 
 def create_amended(reportid):
@@ -4862,11 +4879,11 @@ def create_amended(reportid):
         data_dict = get_reports_data(reportid)
         if data_dict:
             #data = data[0]
-            report_id = get_next_report_id()
+            # report_id = get_next_report_id()
 
             for data in data_dict:
                 #print(data)
-                data['report_id'] = report_id
+                # data['report_id'] = report_id
 
                 #post_sql_report(reports_obj(''))
                 data['amend_ind'] = 'A'
@@ -4876,11 +4893,21 @@ def create_amended(reportid):
                 del data['report_seq']
                 data['status'] = 'Saved'
                 #print(data,'here')
-                insert_sql_report(data)
+                data['cvg_start_dt'] = datetime.datetime.strptime(data['cvg_start_date'], '%Y-%m-%d').date()
+                data['cvg_end_dt'] = datetime.datetime.strptime(data['cvg_end_date'], '%Y-%m-%d').date()
+                print('just before post_reports')
+                created_data = post_reports(data, reportid)
+                if type(created_data) is list:                    
+                    raise Exception ('coverage dates already cover a existing report id')
+                elif type(created_data) is dict:
+                    print(created_data)
+                print('just after post_reports')
                 #print(data)
 
                 with connection.cursor() as cursor:
-                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id, reportid]) 
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[created_data['reportid'], reportid])
+                    cursor.execute("""UPDATE public.reports SET previous_report_id = %s WHERE report_id = %s """,[ reportid, created_data['reportid']])
+
 
                 return data
 
