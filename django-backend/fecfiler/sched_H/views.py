@@ -523,8 +523,11 @@ def get_fed_nonfed_share(request):
             and cmte_id = %s
             order by create_date desc, last_update_date desc
             """
+            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
                 cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                if not cursor.rowcount:
+                    return Response('Error: no valid h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
         elif cmte_type_category == 'PAC':
             activity = request.query_params.get('activity')
@@ -538,9 +541,11 @@ def get_fed_nonfed_share(request):
             activity_part = """and {} = true """.format(activity)
             order_part = 'order by create_date desc, last_update_date desc'
             _sql = _sql + activity_part + order_part
-            print(_sql)
+            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
                 cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                if not cursor.rowcount:
+                    return Response('Error: no valid h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
         else:
             raise Exception('invalid cmte_type entered.')
@@ -1703,6 +1708,43 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
         raise Exception(
             'The list_all_transactions_event_type function is throwing an error: ' + str(e))
 
+def list_all_transactions_event_identifier(start_dt, end_dt, activity_event_identifier, cmte_id):
+    """
+    load all transactions with the specified activity event type
+    need to check
+    """
+    logger.debug('load ttransactionsransactions with activity_event_identifier:{}'.format(activity_event_identifier))
+    # logger.debug('load ttransactionsransactions with start:{}, end {}'.format(start_dt, end_dt))
+    # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
+    _sql = """
+            SELECT t1.total_amount, 
+                t1.transaction_id
+            FROM public.sched_h4 t1 
+            WHERE activity_event_identifier = %s 
+            AND cmte_id = %s
+            AND expenditure_date >= %s
+            AND expenditure_date <= %s 
+            AND back_ref_transaction_id is null
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+    """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_event_identifier, cmte_id, start_dt, end_dt))
+            # , [
+            #         activity_event_type, 
+            #         cmte_id, 
+            #         start_dt, 
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug('transaction fetched:{}'.format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            'The list_all_transactions_event_identifier function is throwing an error: ' + str(e))
 
 def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
 
@@ -1726,6 +1768,8 @@ def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
 def update_activity_event_amount_ytd(data):
     """
     aggregate and update 'activity_event_amount_ytd' for all h4 transactions
+    if event_identifier is provided, will do event-based aggregation;
+    else will do event_type-based aggregation
     """
     try:
 
@@ -1734,8 +1778,20 @@ def update_activity_event_amount_ytd(data):
         expenditure_dt = date_format(data.get('expenditure_date'))
         aggregate_start_date = datetime.date(expenditure_dt.year, 1, 1)
         aggregate_end_date = datetime.date(expenditure_dt.year, 12, 31)
-        transactions_list = list_all_transactions_event_type(
-            aggregate_start_date, aggregate_end_date, data.get('activity_event_type'), data.get('cmte_id'))
+        if data.get('activity_event_identifier'):
+            transactions_list = list_all_transactions_event_identifier(
+                aggregate_start_date, 
+                aggregate_end_date, 
+                data.get('activity_event_identifier'), 
+                data.get('cmte_id') 
+            )
+        else:
+            transactions_list = list_all_transactions_event_type(
+                aggregate_start_date, 
+                aggregate_end_date, 
+                data.get('activity_event_type'), 
+                data.get('cmte_id')
+                )
         aggregate_amount = 0
         for transaction in transactions_list:
             aggregate_amount += transaction[0]
