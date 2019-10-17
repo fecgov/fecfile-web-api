@@ -286,9 +286,11 @@ def create_f99_info(request):
                         return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     incoming_data['created_at'] = datetime.datetime.now()
+                    incoming_data['updated_at'] = incoming_data['created_at']
                     serializer = CommitteeInfoSerializer(data=incoming_data)
             else:
                 incoming_data['created_at'] = datetime.datetime.now()
+                incoming_data['updated_at'] = incoming_data['created_at']
                 serializer = CommitteeInfoSerializer(data=incoming_data)
         except CommitteeInfo.DoesNotExist:
             logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")

@@ -445,12 +445,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 transactionModelLindex < transactionsModelL.length;
                 transactionModelLindex++
               ) {
-                // console.log('1 ' +
-                // transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
-                // this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
-                //   .options[transactionCategoryOptionOptionsIndex].value);
-                // console.log(this.transactionCategory ===
-                //  this.transactionCategories[transactionCategorieIndex].value);
                 if (
                   transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
                     this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
@@ -460,6 +454,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                   this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
                 }
               }
+            }
+          }
+        }
+
+        if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
+          for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
+            if (this.transactionsModel[transactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+              this.editTransaction(this.transactionsModel[transactionModelIndex]);
             }
           }
         }
@@ -831,13 +833,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to clone
    */
   public cloneTransaction(trx: TransactionModel): void {
-    this._transactionsService
-      .cloneTransaction(trx.transactionId)
-      .subscribe((cloneTransactionResponse: TransactionModel) => {
-        if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
-          this.editTransaction(cloneTransactionResponse[0]);
-        }
-      });
+    this._transactionsService.cloneTransaction(trx.transactionId).subscribe((cloneTransactionResponse: TransactionModel) => {
+      if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
+        this.getTransactionsPage(this.config.currentPage);
+        this.clonedTransaction = cloneTransactionResponse[0];
+      }
+    });
   }
 
   /**
