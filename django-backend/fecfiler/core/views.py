@@ -3971,8 +3971,8 @@ def contact_entity_dict(data):
           'cand_office_state'  : is_null(data.get('candOfficeState')), 
           'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
           'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
-          'phone_number'  : is_null(data.get('phoneNumber')),
-          'cand_election_year': is_null(data.get('candElectionYear')),
+          'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
+          'cand_election_year': is_null(data.get('candElectionYear'),'cand_election_year'),
           'last_update_date' : is_null(data.get('lastupdatedate')),
         }
 
@@ -4031,7 +4031,7 @@ def put_contact_data(data):
                 data.get('cand_office_state', ""),
                 data.get('cand_office_district', ""),
                 data.get('phone_number'),
-                data.get('cand_election_year'),
+                data.get('cand_election_year', None),
                 datetime.datetime.now(),
                 data.get('entity_id'),
                 data.get('cmte_id')])                       
@@ -4210,7 +4210,9 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
 
 def is_null(check_value, check_field =""):
     # if phone_nmumber is numeric field so pass 0 as default 
-    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null"]):
+    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]):
+        return None
+    elif check_field == "cand_election_year" and (check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]):
         return None
     elif check_value == None or check_value in ["null", " ", "", "none","Null"]:
         return ""
