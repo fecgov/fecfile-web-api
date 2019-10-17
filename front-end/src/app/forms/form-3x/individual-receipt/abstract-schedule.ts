@@ -123,6 +123,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
   public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
   public memoDropdownSize = null;
+  public totalAmountReadOnly: boolean;
 
   protected isInit = false;
   protected formFieldsPrePopulated = false;
@@ -247,6 +248,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._contributionAmountChlid = '';
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
+    this.totalAmountReadOnly = true;
 
     this._getCandidateOfficeTypes();
 
@@ -743,7 +745,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     totalAmount = totalAmount.replace(/,/g, ``);
     const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
+    this._receiptService.getFedNonFedPercentage__(totalAmount, activityEvent).subscribe(res => {
       console.log();
     },
     errorRes => {
@@ -751,12 +753,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (errorRes.error) {
         if (typeof errorRes.error === 'string') {
           if (errorRes.error.toLowerCase().includes('no h1 data found')) {
-            const message = `Please add a H1 Schedule for Federal and Non-Federal amounts to be applied.`;
-            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
-            
-            this.frmIndividualReceipt.patchValue({'fed_share_amount': 0}, { onlySelf: true });
-            this.frmIndividualReceipt.patchValue({'non_fed_share_amount': 0}, { onlySelf: true });
-            this.frmIndividualReceipt.patchValue({'activity_event_amount_ytd': 0}, { onlySelf: true });
+            const message = `Please add Schedule H1 before proceeding with adding the ` +
+              `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
+            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+              if (res === 'okay') {
+
+                // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
+                // based on the event type selected.
+                this.clearFormValues();
+                this.scheduleType = 'sched_h6';
+                this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+                this.transactionTypeText = 'Allocated FEA Debt Payment (H6)';
+                window.scrollTo(0, 0);
+              }
+            });
+
+            // this.frmIndividualReceipt.patchValue({'fed_share_amount': 0}, { onlySelf: true });
+            // this.frmIndividualReceipt.patchValue({'non_fed_share_amount': 0}, { onlySelf: true });
+            // this.frmIndividualReceipt.patchValue({'activity_event_amount_ytd': 0}, { onlySelf: true });
           }
         }
       }
@@ -788,8 +802,51 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
   }
 
-  public handleActivityEventTypeChange() {
+  public handleActivityEventTypeChange($event: any, col: any) {
+
+    const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
+    if (!eventTypeVal) {
+
+    }
+    if (eventTypeVal === 'Select') {
+      this.totalAmountReadOnly = true;
+    } else {
+      this.totalAmountReadOnly = false;
+    }
+
     this._getFedNonFedPercentage();
+  }
+
+  /**
+   * Determine if fields is read only.  If it should
+   * be read only return true else null.  Null will
+   * remove HTML attribute readonly whereas setting it to
+   * false will not remove readonly from DOM and fields remains in readonly.
+   */
+  public isFieldReadOnly(col: any) {
+    if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    if (col.name === 'total_amount') {
+      return this._isTotalAmountReadOnly(col);
+    }
+    return null;
+  }
+
+
+  /**
+   * Return true id readonly else null to remove readonly attribute from DOM.
+   */
+  private _isTotalAmountReadOnly(col: any): boolean {
+    if (col.name !== 'total_amount') {
+      return null;
+    }
+    // Must be H4 or H6
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
+      this.transactionType !== 'ALLOC_EXP_DEBT') {
+        return null;
+    }
+    return this.totalAmountReadOnly ? true : null;
   }
 
   /**
@@ -2381,6 +2438,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
     this.memoDropdownSize = null;
+    this.totalAmountReadOnly = true;
     const levinText = 'LEVIN';
     if ((this.transactionType).startsWith(levinText)) {
       this._receiptService.getLevinAccounts().subscribe(res => {
@@ -2619,6 +2677,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this.frmIndividualReceipt.get(prop)) {
                     if (this.isFieldName(prop, 'contribution_aggregate')) {
                       this._contributionAggregateValue = trx[prop];
+                    }
+                    if (this.isFieldName(prop, 'activity_event_type')) {
+                      if (trx[prop] !== null || trx[prop] !== 'Select') {
+                        this.totalAmountReadOnly = false;
+                      }
                     }
                     if (this.isFieldName(prop, 'memo_code')) {
                       const memoCodeValue = trx[prop];
