@@ -722,18 +722,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else if (this.isFieldName(col.name, 'total_amount') ||
                this.isFieldName(col.name, 'incurred_amount')) {
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
-      this._getFedNonFedPercentage(col);
-
+      if (col.name === 'total_amount') {
+        this._getFedNonFedPercentage();
+      }
     } else {
       this.populatePurpose(col.name);
     }
   }
 
-  private _getFedNonFedPercentage(col: any) {
+  private _getFedNonFedPercentage() {
 
-    if (col.name !== 'total_amount') {
-      return;
-    }
     if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
         this.transactionType !== 'ALLOC_EXP_DEBT') {
       return;
@@ -747,6 +745,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
       console.log();
+    },
+    errorRes => {
+      console.log('error caught getting h1 percentage' + errorRes);
+      if (errorRes.error) {
+        if (typeof errorRes.error === 'string') {
+          if (errorRes.error.toLowerCase().includes('no h1 data found')) {
+            const message = `Please add a H1 Schedule for Federal and Non-Federal amounts to be applied.`;
+            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+            
+            this.frmIndividualReceipt.patchValue({'fed_share_amount': 0}, { onlySelf: true });
+            this.frmIndividualReceipt.patchValue({'non_fed_share_amount': 0}, { onlySelf: true });
+            this.frmIndividualReceipt.patchValue({'activity_event_amount_ytd': 0}, { onlySelf: true });
+          }
+        }
+      }
     });
   }
 
@@ -770,11 +783,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
-    console.log();
-
     const patch = {};
     patch[fieldName] = amountValue;
     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+  }
+
+  public handleActivityEventTypeChange() {
+    this._getFedNonFedPercentage();
   }
 
   /**

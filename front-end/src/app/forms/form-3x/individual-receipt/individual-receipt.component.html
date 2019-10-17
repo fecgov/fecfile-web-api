@@ -348,7 +348,7 @@
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
                       <ng-select #activityEventTypeSelect 
                         [items]="activityEventTypes" 
-                  
+                        (change)="handleActivityEventTypeChange($event, col)"
                         class="forms__select activity-event-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="activityEventType"
