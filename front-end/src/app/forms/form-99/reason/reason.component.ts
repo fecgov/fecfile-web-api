@@ -597,7 +597,7 @@ export class ReasonComponent implements OnInit {
           );
         } else {
           console.log('if file === null');
-          this._formsService.saveForm({}, {}, this._formType).subscribe(
+          this._formsService.saveForm({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
                 this._form99Details.id = res.id;
