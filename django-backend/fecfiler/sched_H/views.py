@@ -506,7 +506,18 @@ def schedH1(request):
 @api_view(['GET'])
 def get_fed_nonfed_share(request):
     """
-    get calendar year fed_nonfed share percentage
+    get calendar year fed_nonfed share percentage, also query aggregation
+    and update aggregation value.
+
+    if event_name is available:
+        go to h2 for ration
+        grab event-based aggregation value from h4
+    else:
+        go to h1 for ratio
+            if party, get election_year based fixed ratio
+            if PAC, get activity based ratio
+        grad event_type-based aggregation value from h4
+    calculate fed and non-fed share based on ratio and update aggregate value
     """
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
     try:
@@ -516,66 +527,109 @@ def get_fed_nonfed_share(request):
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         start_dt = datetime.date(int(calendar_year), 1, 1)
         end_dt = datetime.date(int(calendar_year), 12, 31)
-        if cmte_type_category == 'PTY':
+        event_name = request.query_params.get('activity_event_identifier') 
+
+        if event_name: # event-based, goes to h2
             _sql = """
-            select federal_percent from public.sched_h1
-            where create_date between %s and %s
-            and cmte_id = %s
-            order by create_date desc, last_update_date desc
+            select federal_percent 
+            from public.sched_h2 
+            where cmte_id = %s 
+            and activity_event_name = %s
+            and create_date between %s and %s
             """
-            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
-                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                logger.debug('query with _sql:{}'.format(_sql))
+                logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                 if not cursor.rowcount:
-                    return Response('Error: no valid h1 data found.')
+                    return Response('Error: no valid h1 data found for this event.')
                 fed_percent = float(cursor.fetchone()[0])
-        elif cmte_type_category == 'PAC':
-            activity = request.query_params.get('activity')
-            if not activity:
-                return Response('Error: activity missing is required for this committee.')
+
             _sql = """
-            select federal_percent from public.sched_h1
-            where create_date between %s and %s
-            and cmte_id = %s
+            select activity_event_amount_ytd 
+            from public.sched_h4 
+            where cmte_id = %s 
+            and activity_event_identifier = %s
+            and create_date between %s and %s
+            order by create_date desc, last_update_date desc;
             """
-            activity_part = """and {} = true """.format(activity)
-            order_part = 'order by create_date desc, last_update_date desc'
-            _sql = _sql + activity_part + order_part
-            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
-                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                 if not cursor.rowcount:
-                    return Response('Error: no valid h1 data found.')
-                fed_percent = float(cursor.fetchone()[0])
-        else:
-            raise Exception('invalid cmte_type entered.')
+                    aggregate_amount = 0 
+                else:
+                    aggregate_amount = float(cursor.fetchone()[0])
+
+        else: # need to go to h1 for ratios
+            activity_event_type = request.query_params.get('activity_event_type')
+
+            # TODO: need to db change to fix this typo
+            if activity_event_type == 'administrative':
+                activity_event_type = 'adminstrative'
+
+            if not activity_event_type:
+                return Response('Error: event type is required for this committee.')
+            
+            if cmte_type_category == 'PTY':
+                _sql = """
+                select federal_percent from public.sched_h1
+                where create_date between %s and %s
+                and cmte_id = %s
+                order by create_date desc, last_update_date desc
+                """
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    if not cursor.rowcount:
+                        return Response('Error: no valid h1 data found.')
+                    fed_percent = float(cursor.fetchone()[0])
+            elif cmte_type_category == 'PAC':
+                # activity_event_type = request.query_params.get('activity_event_type')
+                # if not activity_event_type:
+                    # return Response('Error: event type is required for this committee.')
+                _sql = """
+                select federal_percent from public.sched_h1
+                where create_date between %s and %s
+                and cmte_id = %s
+                """
+                activity_part = """and {} = true """.format(activity_event_type)
+                order_part = 'order by create_date desc, last_update_date desc'
+                _sql = _sql + activity_part + order_part
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    if not cursor.rowcount:
+                        return Response('Error: no valid h1 data found.')
+                    fed_percent = float(cursor.fetchone()[0])
+            else:
+                raise Exception('invalid cmte_type_category.')
+
+            _sql = """
+                select activity_event_amount_ytd 
+                from public.sched_h4 
+                where cmte_id = %s 
+                and activity_event_type = %s
+                and create_date between %s and %s
+                order by create_date desc, last_update_date desc
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
+                if not cursor.rowcount:
+                    aggregate_amount = 0
+                else:
+                    aggregate_amount = float(cursor.fetchone()[0])
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-
-        # # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
-        #     # raise Exception ('Missing Input: report_id is mandatory')
-
-        # if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
-        #     raise Exception ('Missing Input: calendar_year is mandatory')
-        # _sql = """
-        #     select json_agg(t) from
-        #     (select federal_percent, non_federal_percent from public.sched_h1
-        #     where create_date between %s and %s
-        #     and cmte_id = %s
-        #     order by create_date desc, last_update_date desc) t
-        # """
-        # with connection.cursor() as cursor:
-        #     cursor.execute(_sql, (start_dt, end_dt, cmte_id))
-        #     # print('rows:{}'.format(cursor.rowcount))
-        #     json_data = cursor.fetchone()[0]
-        #     print(json_data)
-        #     if not json_data:
-        #         # raise Exception('Error: no h1 found.')
-        #         return Response("The schedH1 API - PUT is throwing an error: no h1 data found.", 
-        #         status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({'fed_share': fed_share, 'nonfed_share':nonfed_share}, 
-                status = status.HTTP_200_OK)
+        new_aggregate_amount = aggregate_amount + float(total_amount)
+        return JsonResponse(
+            {
+                'fed_share': fed_share, 
+                'nonfed_share': nonfed_share,
+                'aggregate_amount': new_aggregate_amount,
+            }, 
+                status = status.HTTP_200_OK
+        )
     except:
         raise
 
@@ -905,6 +959,52 @@ def delete_schedH2(data):
         delete_sql_schedH2(data.get('cmte_id'), data.get(
             'report_id'), data.get('transaction_id'))
     except Exception as e:
+        raise
+
+@api_view(['GET'])
+def get_h2_summary_table(request):
+    """
+    h2 summary need to be h4 transaction-based:
+    all the calendar-year based h2 need to show up for current report as long as
+    a live h4 transaction refering this h2 exist:
+    h2 report goes with h4, not h2 report_id
+    """
+    logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
+    _sql = """
+    SELECT json_agg(t) from(
+    SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        DATE(create_date) AS date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
+    WHERE  cmte_id = %s
+        AND activity_event_name IN (
+            SELECT activity_event_identifier 
+            FROM   public.sched_h4 
+            WHERE  report_id = %s
+            AND cmte_id = %s)) t;
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        with connection.cursor() as cursor:
+            logger.debug('query with _sql:{}'.format(_sql))
+            logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id))
+            json_res = cursor.fetchone()[0]
+            print(json_res)
+            if not json_res:
+                return Response('Error: no valid h2 data found for this report.')
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res, status = status.HTTP_200_OK)
+    except:
         raise
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])

@@ -76,11 +76,13 @@ export class PreviewComponent implements OnInit {
             } else {
               this.fileName = "";
             }
-  
+            const fileFromLocalStorage = localStorage.getItem('orm_99_details.org_fileurl');
             if (this.formDetails.hasOwnProperty('org_fileurl')) {
               this.orgFileUrl = this.formDetails.org_fileurl;
-            } else if (this.formDetails.hasOwnProperty('file')) {
+            } else if (this.formDetails.hasOwnProperty('file') && Object.entries(this.formDetails.file).length !== 0) {
               this.orgFileUrl = this.formDetails.file;
+            } else if (fileFromLocalStorage) {
+              this.orgFileUrl = fileFromLocalStorage;
             } else {
               this.orgFileUrl = "";
             }

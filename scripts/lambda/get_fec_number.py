@@ -1,16 +1,19 @@
 import psycopg2
 import requests
+import os
 
-#Global Variables
+
+# Global Variables
 _conn = None
-_NEXGEN_DJANGO_API_URL="127.0.0.1:8000/api/v1"
-#_NEXGEN_DJANGO_API_URL=settings.DATA_RECEIVE_API_URL  
+_NEXGEN_DJANGO_API_URL = os.environ.get("NEXGEN_DJANGO_API_URL", "127.0.0.1:8000")
+_NEXGEN_DJANGO_API_URL = _NEXGEN_DJANGO_API_URL + "/api/v1"
+# _NEXGEN_DJANGO_API_URL=settings.DATA_RECEIVE_API_URL
 
-#replace off 4 DB parameters with environment variables
-_host="localhost"
-_database="fecfrontend"
-_user="postgresqluser1"
-_password="postgresqluser1"
+# replace off 4 DB parameters with environment variables
+_host = os.environ.get("DB_HOST", "localhost")
+_database = os.environ.get("DB_NAME", "postgres")
+_user = os.environ.get("DB_USER", "postgres")
+_password = os.environ.get("DB_PASSWD", "postgresqluser1")
 
 def get_fec_number():
     """ query data from the vendors table """
