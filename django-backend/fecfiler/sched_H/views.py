@@ -961,6 +961,52 @@ def delete_schedH2(data):
     except Exception as e:
         raise
 
+@api_view(['GET'])
+def get_h2_summary_table(request):
+    """
+    h2 summary need to be h4 transaction-based:
+    all the calendar-year based h2 need to show up for current report as long as
+    a live h4 transaction refering this h2 exist:
+    h2 report goes with h4, not h2 report_id
+    """
+    logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
+    _sql = """
+    SELECT json_agg(t) from(
+    SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        DATE(create_date) AS date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
+    WHERE  cmte_id = %s
+        AND activity_event_name IN (
+            SELECT activity_event_identifier 
+            FROM   public.sched_h4 
+            WHERE  report_id = %s
+            AND cmte_id = %s)) t;
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        with connection.cursor() as cursor:
+            logger.debug('query with _sql:{}'.format(_sql))
+            logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id))
+            json_res = cursor.fetchone()[0]
+            print(json_res)
+            if not json_res:
+                return Response('Error: no valid h2 data found for this report.')
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res, status = status.HTTP_200_OK)
+    except:
+        raise
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH2(request):
     
