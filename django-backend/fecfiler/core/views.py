@@ -4851,11 +4851,11 @@ def get_reports_data(report_id):
         #print('here',forms_obj)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
-            print(cursor.query)
+            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-        print(forms_obj)
+        # print(forms_obj)
         if forms_obj is None:
             pass
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
@@ -4900,9 +4900,9 @@ def create_amended(reportid):
                 if type(created_data) is list:                    
                     raise Exception ('coverage dates already cover a existing report id')
                 elif type(created_data) is dict:
-                    # print(created_data)
+                    print(created_data)
                 # print('just after post_reports')
-                #print(data)
+                # print(data)
 
                 with connection.cursor() as cursor:
                     cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[created_data['reportid'], reportid])
