@@ -532,8 +532,8 @@ def post_reports(data, reportid=None):
             args.append(reportid)
         if not (cvg_start_dt is None or cvg_end_dt is None):
             forms_obj = check_list_cvg_dates(args)
-        print(forms_obj)
-        print('just in post_reports')
+        # print(forms_obj)
+        # print('just in post_reports')
         if len(forms_obj)== 0:
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
@@ -548,14 +548,14 @@ def post_reports(data, reportid=None):
             try:
                 #Insert data into Form 3X table
                 if data.get('form_type') == "F3X":
-                    print('here1')
+                    # print('here1')
                     check_mandatory_fields_form3x(data)
-                    print('here2')
+                    # print('here2')
                     post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))
-                    print('here3')
-                print('here3.5')
+                    # print('here3')
+                # print('here3.5')
                 output = get_reports(data)
-                print('here4')
+                # print('here4')
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -604,7 +604,7 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
-            print(old_list_report)
+            # print(old_list_report)
             # print(data.get('status'))
             put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
             old_dict_report = old_list_report[0]
@@ -4895,13 +4895,13 @@ def create_amended(reportid):
                 #print(data,'here')
                 data['cvg_start_dt'] = datetime.datetime.strptime(data['cvg_start_date'], '%Y-%m-%d').date()
                 data['cvg_end_dt'] = datetime.datetime.strptime(data['cvg_end_date'], '%Y-%m-%d').date()
-                print('just before post_reports')
+                # print('just before post_reports')
                 created_data = post_reports(data, reportid)
                 if type(created_data) is list:                    
                     raise Exception ('coverage dates already cover a existing report id')
                 elif type(created_data) is dict:
-                    print(created_data)
-                print('just after post_reports')
+                    # print(created_data)
+                # print('just after post_reports')
                 #print(data)
 
                 with connection.cursor() as cursor:
