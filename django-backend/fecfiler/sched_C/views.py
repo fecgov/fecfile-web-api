@@ -807,6 +807,49 @@ def schedC(request):
     else:
         raise NotImplementedError
 
+
+@api_view(['GET'])
+def get_outstanding_loans(request):
+    """
+    Get all loans with an outstanding balance
+    this api is used to enable the sched_c summary page
+    need to return:
+    1. name/bank (this is the entity name)
+    2. original loan
+    3. cumulative payemnt to date
+    4. outstanding balance
+    5. due date
+    """
+    logger.debug('POST request received.')
+    try:
+        cmte_id = request.user.username
+        _sql = """
+        SELECT Json_agg(t) 
+            FROM   (SELECT e.entity_name, 
+                        c.loan_amount_original, 
+                        c.loan_payment_to_date, 
+                        c.loan_balance, 
+                        c.loan_due_date 
+                    FROM   public.sched_c c, 
+                        public.entity e 
+                    WHERE c.cmte_id = %s
+                    AND c.entity_id = e.entity_id 
+                    AND c.loan_balance > 0
+                    ) t
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id])
+            json_result = cursor.fetchone()[0] 
+            if not json_result:
+                return Response('No loans found')
+            else:
+                return Response(json_result, status=status.HTTP_200_OK)
+
+    except:
+        raise
+
+
+
 """
 start of sched_C1
 """
