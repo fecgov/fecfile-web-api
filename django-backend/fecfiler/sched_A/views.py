@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from decimal import Decimal
-
+from django.utils import timezone
 import requests
 import copy
 from functools import lru_cache
@@ -233,7 +233,11 @@ def check_decimal(value):
             """Invalid Input: Expecting a decimal value like 18.11, 24.07. 
             Input received: {}""".format(value))
 
-
+# @api_view(['GET'])
+# def date_print(request):
+#   print(datetime.datetime.now())
+#   print(timezone.now())
+#   return Response('SUCCESS', status=status.HTTP_200_OK)
 
 # TODO: update this function to take one argument of data_dic
 def post_sql_schedA(cmte_id, 

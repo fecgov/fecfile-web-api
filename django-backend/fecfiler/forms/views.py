@@ -349,9 +349,11 @@ def update_f99_info(request):
                         comm_info.treasurerprefix = request.data.get('treasurerprefix')
                         comm_info.treasurersuffix = request.data.get('treasurersuffix')
                         comm_info.is_submitted = request.data.get('is_submitted')
-
-                        comm_info.file = request.data.get('file')
-                        comm_info.filename = request.data.get('file').name
+                        try:
+                            comm_info.filename = request.data.get('file').name
+                            comm_info.file = request.data.get('file')
+                        except:
+                            pass
                         comm_info.form_type = request.data.get('form_type')
                         comm_info.coverage_start_date = request.data.get('coverage_start_date')
                         comm_info.coverage_end_date = request.data.get('coverage_end_date')                       
