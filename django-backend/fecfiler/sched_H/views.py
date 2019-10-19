@@ -1642,7 +1642,15 @@ def schedH4_sql_dict(data):
             "phone_number",     
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        # return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+
+        valid_data["line_number"] = line_num
+        valid_data['transaction_type'] = tran_tp
+        return valid_data
     except:
         raise Exception('invalid request data.')
 
@@ -1712,6 +1720,8 @@ def put_sql_schedH4(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
+                  line_number = %s, 
+                  transaction_type = %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y'
@@ -1733,6 +1743,8 @@ def put_sql_schedH4(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
+            data.get('line_number'),
+            data.get('transaction_type'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1974,9 +1986,11 @@ def post_sql_schedH4(data):
             activity_event_type,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
@@ -1997,6 +2011,8 @@ def post_sql_schedH4(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
+            data.get('line_number'),
+            data.get('transaction_type'),
             datetime.datetime.now(),
          )
         with connection.cursor() as cursor:
@@ -2047,7 +2063,8 @@ def get_list_all_schedH4(report_id, cmte_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
+            line_number,
+            transaction_type,
             create_date ,
             last_update_date
             FROM public.sched_h4
@@ -2094,8 +2111,9 @@ def get_list_schedH4(report_id, cmte_id, transaction_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
-            create_date ,
+            line_number,
+            transaction_type,
+            create_date,
             last_update_date
             FROM public.sched_h4
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
@@ -2739,28 +2757,74 @@ def schedH6_sql_dict(data):
             'activity_event_type',
             'memo_code',
             'memo_text',
-            'delete_ind',
-            'create_date',
-            'last_update_date',
+            # 'create_date',
+            # 'last_update_date',
+                    # entity_data
+            "entity_id",
+            "entity_type",
+            "entity_name",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "preffix",
+            "suffix",
+            "street_1",
+            "street_2",
+            "city",
+            "state",
+            "zip_code",
+            "occupation",
+            "employer",
+            "ref_cand_cmte_id",
+            "cand_office",
+            "cand_office_state",
+            "cand_office_district",
+            "cand_election_year",
+            "phone_number",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+        valid_data["line_number"] = line_num
+        valid_data['transaction_type'] = tran_tp
+        return valid_data
     except:
         raise Exception('invalid request data.')
-
 
 def put_schedH6(data):
     """
     update sched_H6 item
-    
     """
     try:
         check_mandatory_fields_SH6(data)
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data) 
             raise Exception(
                 'The put_sql_schedH6 function is throwing an error: ' + str(e))
         return data
@@ -2791,7 +2855,6 @@ def put_sql_schedH6(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
-                  create_date= %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -2853,10 +2916,9 @@ def post_sql_schedH6(data):
             activity_event_type,
             memo_code,
             memo_text,
-            create_date,
-            last_update_date
+            create_date
          )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
@@ -2879,7 +2941,6 @@ def post_sql_schedH6(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
-            datetime.datetime.now(),
             datetime.datetime.now()
          )
         with connection.cursor() as cursor:
@@ -2976,7 +3037,27 @@ def post_schedH6(data):
     3. save data to db
     """
     try:
-        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6)
+        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6o)
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        data['entity_id'] = entity_id
         data['transaction_id'] = get_next_transaction_id('SH6')
         
         validate_sh6_data(data)
@@ -2984,6 +3065,11 @@ def post_schedH6(data):
             post_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedH6 function is throwing an error: ' + str(e))
         return data
@@ -3035,7 +3121,6 @@ def get_list_all_schedH6(report_id, cmte_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -3048,8 +3133,11 @@ def get_list_all_schedH6(report_id, cmte_id):
                 raise NoOPError('No sched_H6 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictH6 in schedH6_list:
-                merged_list.append(dictH6)
+            for tran in schedH6_list:
+                entity_id = tran.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -3080,7 +3168,6 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -3093,8 +3180,11 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
                 raise NoOPError('No sched_H6 transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictH6 in schedH6_list:
-                merged_list.append(dictH6)
+            for tran in schedH6_list:
+                entity_id = tran.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -3227,8 +3317,8 @@ def schedH6(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH6(datum)
-            # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            output = get_schedH6(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH6 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
