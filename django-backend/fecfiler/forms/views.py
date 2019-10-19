@@ -1699,3 +1699,105 @@ def get_f99_report_info(request):
                     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
     except CommitteeInfo.DoesNotExist:
             return Response({"FEC Error 004":"There is no submitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def submit_formf99(request):
+    """"
+    Fetches the last unsubmitted comm_info object saved in db. This obviously is for the object persistence between logins.
+    """
+    try:
+        #comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
+        print("cmte_id", request.data.get('cmte_id'))
+        print("reportid", str(request.data.get('reportid')))
+
+
+        comm_info = CommitteeInfo.objects.filter(committeeid=request.data.get('cmte_id'), id=request.data.get('reportid')).last()
+        
+        if comm_info:
+            header = {
+                    "version":"8.3",
+                    "softwareName":"ABC Inc",
+                    "softwareVersion":"1.02 Beta",
+                    "additionalInfomation":"Any other useful information"
+            }
+
+            serializer = CommitteeInfoSerializer(comm_info)
+            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            k.content_type = "application/json"
+            data_obj = {}
+            data_obj['header'] = header
+            f99data = {}
+            f99data['committeeId'] = comm_info.committeeid
+            f99data['committeeName'] = comm_info.committeename
+            f99data['street1'] = comm_info.street1
+            f99data['street2'] = comm_info.street2
+            f99data['city'] = comm_info.city
+            f99data['state'] = comm_info.state
+            f99data['zipCode'] = str(comm_info.zipcode)
+            f99data['treasurerLastName'] = comm_info.treasurerlastname
+            f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+            f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+            f99data['treasurerPrefix'] = comm_info.treasurerprefix
+            f99data['treasurerSuffix'] = comm_info.treasurersuffix
+            f99data['reason'] = comm_info.reason
+            f99data['text'] = comm_info.text
+            f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+            f99data['email1'] = comm_info.email_on_file
+            f99data['email2'] = comm_info.email_on_file_1
+            f99data['formType'] = comm_info.form_type
+            f99data['attachement'] = 'X'
+            f99data['password'] = "test"
+
+            data_obj['data'] = f99data
+            k.set_contents_from_string(json.dumps(data_obj))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
+
+            tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+            #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+            vdata = {}
+            vdata['wait'] = 'false'
+            json.dump(data_obj, open(tmp_filename, 'w'))
+
+            # variables to be sent along the JSON file in form-data
+            filing_type='FEC'
+            vendor_software_name='FECFILE'
+            form_type = comm_info.form_type
+            data_obj = {
+                    'form_type':form_type,
+                    'filing_type':filing_type,
+                    'vendor_software_name':vendor_software_name,
+                }
+
+            if not (comm_info.file in [None, '', 'null', ' ',""]):
+                filename = comm_info.file.name 
+                myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
+                myfile = urllib.request.urlopen(myurl)
+
+                file_obj = {
+                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+                }
+
+            #printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+            resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL +
+                                 "/v1/upload_filing", data=data_obj, files=file_obj)
+            if not resp.ok:
+                return Response(resp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse(resp.json(), status=status.HTTP_201_CREATED)
+
+        else:
+            return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+    except comm_info.DoesNotExist:
+        return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response("The submit_f99 API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
