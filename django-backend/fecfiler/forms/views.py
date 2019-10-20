@@ -1707,9 +1707,6 @@ def submit_formf99(request):
     """
     try:
         #comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
-        print("cmte_id", request.data.get('cmte_id'))
-        print("reportid", str(request.data.get('reportid')))
-
 
         comm_info = CommitteeInfo.objects.filter(committeeid=request.data.get('cmte_id'), id=request.data.get('reportid')).last()
         
@@ -1776,12 +1773,12 @@ def submit_formf99(request):
                 myfile = urllib.request.urlopen(myurl)
 
                 file_obj = {
-                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
-                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                    'fecPDFAttachment': ('attachment.pdf', myfile, 'application/pdf')
                 }
             else:
                 file_obj = {
-                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+                    'fecDataFile': ('data.json', open(tmp_filename, 'rb'), 'application/json')
                 }
 
             #printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
